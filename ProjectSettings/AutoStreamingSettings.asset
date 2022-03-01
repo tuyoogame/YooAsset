@@ -4,10 +4,8 @@
 AutoStreamingSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  mSearchMode: 15
+  mSearchMode: 7
   mCustomSearchFile: 
-  mTextureSearchString: 
-  mMeshSearchString: 
   mTextures: []
   mAudios: []
   mMeshes: []
