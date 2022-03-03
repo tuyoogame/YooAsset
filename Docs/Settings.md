@@ -6,15 +6,15 @@
 
 **注意**：请将配置文件放在Resources文件夹下
 
-**Asset Bundle File Variant** : AssetBundle资源包后缀名
+配置说明：
 
-**Raw File Variant** : 原生资源包后缀名
+- **Asset Bundle File Variant** : AssetBundle资源包后缀名
+- **Raw File Variant** : 原生资源包后缀名
 
-**Patch Manifest File Name** : 补丁清单文件名
+- **Patch Manifest File Name** : 补丁清单文件名
 
-**Patch Manifest Hash File Name** : 补丁清单哈希文件名
+- **Patch Manifest Hash File Name** : 补丁清单哈希文件名
 
-**Unity Manifest File Name** : Unity构建的清单名称
-
-**Readme File Name** : 说明文件名称
+- **Unity Manifest File Name** : Unity构建的清单名称
+- **Readme File Name** : 说明文件名称
 

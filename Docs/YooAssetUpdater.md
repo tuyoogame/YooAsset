@@ -33,7 +33,7 @@ private IEnumerator UpdatePatchManifest()
 根据产品需求，可以选择更新全部资源，或者只更新部分资源。
 
 ````c#
-private PatchDownloader _downloader;
+private DownloaderOperation _downloader;
 
 /// <summary>
 /// 创建下载器
@@ -43,7 +43,7 @@ private void CreateDownloader()
     string[] tags = { "buildin", "config" };
     int downloadingMaxNum = 10;
     int failedTryAgain = 3;
-    _downloader = YooAssets.CreateDLCDownloader(tags, 10, 3);
+    _downloader = YooAssets.CreatePatchDownloader(tags, downloadingMaxNum, failedTryAgain);
     if (_downloader.TotalDownloadCount == 0)
     {
         //没有需要下载的资源
@@ -57,24 +57,15 @@ private void CreateDownloader()
 }
 
 /// <summary>
-/// 更新下载器
-/// </summary>
-private void UpdateDownloader()
-{
-    if (_downloader != null)
-        _downloader.Update();
-}
-
-/// <summary>
 /// 开启下载
 /// </summary>
 private IEnumerator Download()
 {
     //注册下载回调
-    _downloader.OnPatchFileDownloadFailedCallback = OnPatchFileDownloadFailed;
+    _downloader.OnDownloadFileFailedCallback = OneDownloadFileFailed;
     _downloader.OnDownloadProgressCallback = OnDownloadProgressUpdate;
     _downloader.OnDownloadOverCallback = OnDownloadOver;
-    _downloader.Download();
+    _downloader.BeginDownload();
     yield return _downloader;
 
     //检测下载结果
@@ -91,7 +82,7 @@ private IEnumerator Download()
 /// <summary>
 /// 文件下载失败
 /// </summary>
-private void OnPatchFileDownloadFailed(string fileName)
+private void OneDownloadFileFailed(string fileName)
 {
     Debug.LogError($"File download failed : {fileName}");
 }

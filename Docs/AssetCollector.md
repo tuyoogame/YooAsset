@@ -4,25 +4,26 @@
 
 ### 界面介绍
 
-**着色器收集**
+- **着色器收集**
 
-勾选收集所有着色器复选框后，打包系统会自动收集所有依赖的材质球使用的着色器，并将这些着色器打进一个AssetBundle文件内。
+  勾选收集所有着色器复选框后，打包系统会自动收集所有依赖的材质球使用的着色器，并将这些着色器打进一个AssetBundle文件内。
 
-**Directory**
+- **Directory**
 
-收集的资源目录，目录下的所有文件将会根据打包规则和过滤规则进行打包。
+  收集的资源目录，目录下的所有文件将会根据打包规则和过滤规则进行打包。
 
-**PackRule**
+- **PackRule**
 
-打包规则，规则可以自定义扩展。下面是内置的打包规则：
+  打包规则，规则可以自定义扩展。下面是内置的打包规则：
 
-1. PackExplicit 目录下的资源文件会各自打进自己的资源包里。
-2. PackDirectory 目录下的资源文件会被打进一个资源包里。
-3. PackRawFile 目录下的资源文件会被处理为原生资源包。
+  - PackExplicit 目录下的资源文件会各自打进自己的资源包里。
 
-自定义扩展范例
+  - PackDirectory 目录下的资源文件会被打进一个资源包里。
+
+  - PackRawFile 目录下的资源文件会被处理为原生资源包。
 
 ````c#
+//自定义扩展范例
 public class PackDirectory : IPackRule
 {
     string IPackRule.GetAssetBundleLabel(string assetPath)
@@ -32,18 +33,20 @@ public class PackDirectory : IPackRule
 }
 ````
 
-**FilterRule**
+- **FilterRule**
 
-过滤规则，规则可以自定义扩展。下面是内置的过滤规则：
+  过滤规则，规则可以自定义扩展。下面是内置的过滤规则：
 
-1. CollectAll 收集目录下的所有资源文件
-2. CollectScene 只收集目录下的场景文件
-3. CollectPrefab 只收集目录下的预制体文件
-4. CollectSprite 只收集目录下的精灵类型的文件
+  - CollectAll 收集目录下的所有资源文件
 
-自定义扩展范例
+  - CollectScene 只收集目录下的场景文件
+
+  - CollectPrefab 只收集目录下的预制体文件
+
+  - CollectSprite 只收集目录下的精灵类型的文件
 
 ````c#
+//自定义扩展范例
 public class CollectScene : IFilterRule
 {
     public bool IsCollectAsset(string assetPath)
@@ -53,13 +56,13 @@ public class CollectScene : IFilterRule
 }
 ````
 
-**DontWriteAssetPath**
+- **DontWriteAssetPath**
 
-资源目录下的资源对象不写入清单
+  资源目录下的资源对象不写入清单
 
-**AssetTags**
+- **AssetTags**
 
-资源标签列表（多个标签使用分号间隔）
+  资源标签列表（多个标签使用分号间隔）
 
 ### 配置表
 
