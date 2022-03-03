@@ -17,8 +17,8 @@ YooAssets.InitializeAsync(CreateParameters parameters);
 private IEnumerator InitializeYooAsset()
 {
     var createParameters = new YooAssets.EditorPlayModeParameters();
-	createParameters.LocationRoot = "Assets/GameRes";
-	yield return YooAssets.InitializeAsync(createParameters);
+    createParameters.LocationRoot = "Assets/GameRes";
+    yield return YooAssets.InitializeAsync(createParameters);
 }
 ````
 
@@ -32,8 +32,8 @@ private IEnumerator InitializeYooAsset()
 private IEnumerator InitializeYooAsset()
 {
     var createParameters = new YooAssets.OfflinePlayModeParameters();
-	createParameters.LocationRoot = "Assets/GameRes";
-	yield return YooAssets.InitializeAsync(createParameters);
+    createParameters.LocationRoot = "Assets/GameRes";
+    yield return YooAssets.InitializeAsync(createParameters);
 }
 ````
 

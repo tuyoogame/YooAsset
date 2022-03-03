@@ -26,38 +26,38 @@ YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
 // 委托加载方式
 void Start()
 {
-	AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
-	handle.Completed += Handle_Completed;
+    AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
+    handle.Completed += Handle_Completed;
 }
 void Handle_Completed(AssetOperationHandle handle)
 {
-	AudioClip audioClip = handle.AssetObject as AudioClip;
+    AudioClip audioClip = handle.AssetObject as AudioClip;
 }
 ````
 ````C#
 // 协程加载方式
 void Start()
 {
-	this.StartCoroutine(AsyncLoad());
+    this.StartCoroutine(AsyncLoad());
 }
 IEnumerator AsyncLoad()
 {
-	AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
-	yield return handle;   
-	AudioClip audioClip = handle.AssetObject as AudioClip;
+    AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
+    yield return handle;   
+    AudioClip audioClip = handle.AssetObject as AudioClip;
 }
 ````
 ````C#
 // Task加载方式
 async void Start()
 {
-	await AsyncLoad();
+    await AsyncLoad();
 }
 async Task AsyncLoad()
 {
-	AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
-	await handle.Task;
-	AudioClip audioClip = handle.AssetObject as AudioClip;	
+    AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
+    await handle.Task;
+    AudioClip audioClip = handle.AssetObject as AudioClip;	
 }
 ````
 
@@ -66,11 +66,11 @@ async Task AsyncLoad()
 ````C#
 void Start()
 {
-	AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
+    AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
 
-	...
+    ...
 
-	handle.Release();
+    handle.Release();
 }
 ````
 
@@ -94,7 +94,7 @@ GameObject go = UnityEngine.Object.Instantiate(handle.AssetObject as GameObject)
 var handle = YooAssets.LoadSubAssetsSync<Sprite>(location);
 foreach (var asset in handle.AllAssets)
 {
-	Debug.Log($"Sprite name is {asset.name}");
+    Debug.Log($"Sprite name is {asset.name}");
 }
 ````
 
@@ -103,18 +103,18 @@ foreach (var asset in handle.AllAssets)
 ````c#
 void Start()
 {
-	// 场景加载参数
-	SceneInstanceParam param = new SceneInstanceParam();
-	param.LoadMode = UnityEngine.SceneManagement.LoadSceneMode.Single;
-	param.ActivateOnLoad = true;
+    // 场景加载参数
+    SceneInstanceParam param = new SceneInstanceParam();
+    param.LoadMode = UnityEngine.SceneManagement.LoadSceneMode.Single;
+    param.ActivateOnLoad = true;
 
-	AssetOperationHandle handle = YooAssets.LoadSceneAsync("Scene/Login", param);
-	handle.Completed += Handle_Completed;
+    AssetOperationHandle handle = YooAssets.LoadSceneAsync("Scene/Login", param);
+    handle.Completed += Handle_Completed;
 }
 void Handle_Completed(AssetOperationHandle handle)
 {
-	SceneInstance instance = handle.AssetInstance as SceneInstance;
-	Debug.Log(instance.Scene.name);
+    SceneInstance instance = handle.AssetInstance as SceneInstance;
+    Debug.Log(instance.Scene.name);
 }
 ````
 

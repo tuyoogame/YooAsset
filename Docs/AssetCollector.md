@@ -25,10 +25,10 @@
 ````c#
 public class PackDirectory : IPackRule
 {
-	string IPackRule.GetAssetBundleLabel(string assetPath)
-	{
-		return Path.GetDirectoryName(assetPath); //"Assets/Config/test.txt" --> "Assets/Config"
-	}
+    string IPackRule.GetAssetBundleLabel(string assetPath)
+    {
+        return Path.GetDirectoryName(assetPath); //"Assets/Config/test.txt" --> "Assets/Config"
+    }
 }
 ````
 
@@ -46,10 +46,10 @@ public class PackDirectory : IPackRule
 ````c#
 public class CollectScene : IFilterRule
 {
-	public bool IsCollectAsset(string assetPath)
-	{
-		return Path.GetExtension(assetPath) == ".unity";
-	}
+    public bool IsCollectAsset(string assetPath)
+    {
+        return Path.GetExtension(assetPath) == ".unity";
+    }
 }
 ````
 
@@ -67,8 +67,8 @@ public class CollectScene : IFilterRule
 
 ````xml
 <root>
-	<Collector Directory="Assets/GameRes/UIAtlas/" PackRule="PackExplicit" FilterRule="CollectAll" DontWriteAssetPath="0" AssetTags=""/>
-	<Collector Directory="Assets/GameRes/UIPanel/" PackRule="PackExplicit" FilterRule="CollectAll" DontWriteAssetPath="0" AssetTags=""/>
+    <Collector Directory="Assets/GameRes/UIAtlas/" PackRule="PackExplicit" FilterRule="CollectAll" DontWriteAssetPath="0" AssetTags=""/>
+    <Collector Directory="Assets/GameRes/UIPanel/" PackRule="PackExplicit" FilterRule="CollectAll" DontWriteAssetPath="0" AssetTags=""/>
 </root>
 ````
 
