@@ -39,7 +39,7 @@ namespace YooAsset
 		/// <summary>
 		/// 轮询更新
 		/// </summary>
-		public static void UpdatePoll()
+		public static void Update()
 		{
 			// 更新加载器	
 			foreach (var loader in _loaders)
