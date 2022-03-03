@@ -31,13 +31,14 @@ YooAsset是一个基于Unity3D引擎的资源管理插件。
 支持线上版本快速回退，支持区分审核版本，测试版本，线上版本，支持灰度更新及测试。
 
 ## 入门教程
-**1. 快速开始**
-**2. 全局配置**
-**3. 资源收集**
-**4. 资源打包**
-**5. 资源部署**
+1. [快速开始](https://github.com/tuyoogame/YooAsset/blob/master/Docs/QuickStart.md)
+2. [全局配置](https://github.com/tuyoogame/YooAsset/blob/master/Docs/Settings.md)
+3. [资源收集](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetCollector.md)
+4. [资源打包](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBuilder.md)
+5. [资源部署](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetDeploy.md)
 
 ## 代码教程
-**1. 初始化**
-**2. 资源更新**
-**3. 资源加载**
+1. [初始化](https://github.com/tuyoogame/YooAsset/blob/master/Docs/YooAssetInit.md)
+2. [资源更新](https://github.com/tuyoogame/YooAsset/blob/master/Docs/YooAssetUpdater.md)
+3. [资源加载](https://github.com/tuyoogame/YooAsset/blob/master/Docs/YooAssetLoader.md)
+

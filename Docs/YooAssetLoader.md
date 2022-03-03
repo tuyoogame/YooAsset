@@ -57,7 +57,7 @@ async Task AsyncLoad()
 {
 	AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
 	await handle.Task;
-    AudioClip audioClip = handle.AssetObject as AudioClip;	
+	AudioClip audioClip = handle.AssetObject as AudioClip;	
 }
 ````
 

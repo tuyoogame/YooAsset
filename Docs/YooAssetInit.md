@@ -54,7 +54,7 @@ private IEnumerator InitializeYooAsset()
 private IEnumerator InitializeYooAsset()
 {
     var createParameters = new YooAssets.HostPlayModeParameters();
-	createParameters.LocationRoot = "Assets/GameRes";
+    createParameters.LocationRoot = "Assets/GameRes";
     createParameters.DecryptServices = null;
     createParameters.ClearCacheWhenDirty = false;
     createParameters.IgnoreResourceVersion = false;

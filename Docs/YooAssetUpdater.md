@@ -9,18 +9,18 @@
 ````c#
 private IEnumerator UpdatePatchManifest()
 {
-    int updateResourceVersion = 123;
-    int timeout = 30;
+	int updateResourceVersion = 123;
+	int timeout = 30;
 	UpdateManifestOperation operation = YooAssets.UpdateManifestAsync(updateResourceVersion, timeout);
-    yield return operation;
-    
-    if(operation.Status == EOperationStatus.Succeed)
+	yield return operation;
+
+	if (operation.Status == EOperationStatus.Succeed)
 	{
 		//更新成功
 	}
 	else
 	{
-        //更新失败
+		//更新失败
 		Debug.LogError(operation.Error);
 	}
 }
@@ -41,19 +41,19 @@ private PatchDownloader _downloader;
 private void CreateDownloader()
 {
 	string[] tags = { "buildin", "config" };
-    int downloadingMaxNum = 10;
-    int failedTryAgain = 3;
-	_downloader = YooAssets.CreateDLCDownloader(tags, 10, 3);    
- 	if (_downloader.TotalDownloadCount == 0)
-    {
-        //没有需要下载的资源
-    }
-    else
-    {
-        //需要下载的文件总数和总大小
-       	int totalDownloadCount = _downloader.TotalDownloadCount;
+	int downloadingMaxNum = 10;
+	int failedTryAgain = 3;
+	_downloader = YooAssets.CreateDLCDownloader(tags, 10, 3);
+	if (_downloader.TotalDownloadCount == 0)
+	{
+		//没有需要下载的资源
+	}
+	else
+	{
+		//需要下载的文件总数和总大小
+		int totalDownloadCount = _downloader.TotalDownloadCount;
 		long totalDownloadBytes = _downloader.TotalDownloadBytes;
-    }
+	}
 }
 
 /// <summary>
@@ -61,8 +61,8 @@ private void CreateDownloader()
 /// </summary>
 private void UpdateDownloader()
 {
-    if(_downloader != null)
-        _downloader.Update();
+	if (_downloader != null)
+		_downloader.Update();
 }
 
 /// <summary>
@@ -73,19 +73,19 @@ private IEnumerator Download()
 	//注册下载回调
 	_downloader.OnPatchFileDownloadFailedCallback = OnPatchFileDownloadFailed;
 	_downloader.OnDownloadProgressCallback = OnDownloadProgressUpdate;
-    _downloader.OnDownloadOverCallback = OnDownloadOver;
+	_downloader.OnDownloadOverCallback = OnDownloadOver;
 	_downloader.Download();
 	yield return _downloader;
 
 	//检测下载结果
 	if (_downloader.DownloadStates == EDownloaderStates.Succeed)
-    {
-        //下载成功
-    }
-    else      
-    {
-        //下载失败
-    }
+	{
+		//下载成功
+	}
+	else
+	{
+		//下载失败
+	}
 }
 
 /// <summary>
@@ -93,7 +93,7 @@ private IEnumerator Download()
 /// </summary>
 private void OnPatchFileDownloadFailed(string fileName)
 {
-    Debug.LogError($"File download failed : {fileName}");
+	Debug.LogError($"File download failed : {fileName}");
 }
 
 /// <summary>

@@ -98,7 +98,7 @@ private static void BuildInternal(BuildTarget buildTarget)
 	buildParameters.BuildTarget = buildTarget;
 	buildParameters.BuildVersion = buildVersion;
 	buildParameters.CompressOption = ECompressOption.LZ4;
-    buildParameters.AppendFileExtension = false;
+	buildParameters.AppendFileExtension = false;
 	buildParameters.IsForceRebuild = isForceBuild;
 	buildParameters.BuildinTags = "buildin";
 
