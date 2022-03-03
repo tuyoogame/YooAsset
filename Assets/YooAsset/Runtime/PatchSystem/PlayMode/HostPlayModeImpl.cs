@@ -63,15 +63,15 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 创建补丁下载器
+		/// 创建下载器
 		/// </summary>
-		public PatchDownloader CreateDLCDownloader(string[] dlcTags, int fileLoadingMaxNumber, int failedTryAgain)
+		public DownloaderOperation CreateDownloaderByTags(string[] tags, int fileLoadingMaxNumber, int failedTryAgain)
 		{
-			List<AssetBundleInfo> downloadList = GetDLCDownloadList(dlcTags);
-			PatchDownloader downlader = new PatchDownloader(this, downloadList, fileLoadingMaxNumber, failedTryAgain);
-			return downlader;
+			List<AssetBundleInfo> downloadList = GetDownloadListByTags(tags);
+			var operation = new DownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
+			return operation;
 		}
-		private List<AssetBundleInfo> GetDLCDownloadList(string[] dlcTags)
+		private List<AssetBundleInfo> GetDownloadListByTags(string[] tags)
 		{
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
 			foreach (var patchBundle in LocalPatchManifest.BundleList)
@@ -98,7 +98,7 @@ namespace YooAsset
 				else
 				{
 					// 查询DLC资源
-					if (patchBundle.HasTag(dlcTags))
+					if (patchBundle.HasTag(tags))
 					{
 						downloadList.Add(patchBundle);
 					}
@@ -109,15 +109,15 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 创建补丁下载器
+		/// 创建下载器
 		/// </summary>
-		public PatchDownloader CreateBundleDownloader(List<string> assetPaths, int fileLoadingMaxNumber, int failedTryAgain)
+		public DownloaderOperation CreateDownloaderByPaths(List<string> assetPaths, int fileLoadingMaxNumber, int failedTryAgain)
 		{
-			List<AssetBundleInfo> downloadList = GetBundleDownloadList(assetPaths);
-			PatchDownloader downlader = new PatchDownloader(this, downloadList, fileLoadingMaxNumber, failedTryAgain);
-			return downlader;
+			List<AssetBundleInfo> downloadList = GetDownloadListByPaths(assetPaths);
+			var operation = new DownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
+			return operation;
 		}
-		private List<AssetBundleInfo> GetBundleDownloadList(List<string> assetPaths)
+		private List<AssetBundleInfo> GetDownloadListByPaths(List<string> assetPaths)
 		{
 			// 获取资源对象的资源包和所有依赖资源包
 			List<PatchBundle> checkList = new List<PatchBundle>();

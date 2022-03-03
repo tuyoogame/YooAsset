@@ -48,7 +48,7 @@ namespace YooAsset
 	{
 		private enum ESteps
 		{
-			Idle,
+			None,
 			LoadWebManifestHash,
 			CheckWebManifestHash,
 			LoadWebManifest,
@@ -63,7 +63,7 @@ namespace YooAsset
 		private readonly HostPlayModeImpl _impl;
 		private readonly int _updateResourceVersion;
 		private readonly int _timeout;
-		private ESteps _steps = ESteps.Idle;
+		private ESteps _steps = ESteps.None;
 		private UnityWebRequester _downloaderHash;
 		private UnityWebRequester _downloaderManifest;
 		private float _verifyTime;
@@ -90,7 +90,7 @@ namespace YooAsset
 		}
 		internal override void Update()
 		{
-			if (_steps == ESteps.Idle)
+			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
 			if (_steps == ESteps.LoadWebManifestHash)
@@ -110,10 +110,10 @@ namespace YooAsset
 				// Check fatal
 				if (_downloaderHash.HasError())
 				{
-					Error = _downloaderHash.GetError();
-					Status = EOperationStatus.Failed;
+					Error = _downloaderHash.GetError();				
 					_downloaderHash.Dispose();
 					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
 					return;
 				}
 
@@ -152,10 +152,10 @@ namespace YooAsset
 				// Check fatal
 				if (_downloaderManifest.HasError())
 				{
-					Error = _downloaderManifest.GetError();
-					Status = EOperationStatus.Failed;
+					Error = _downloaderManifest.GetError();			
 					_downloaderManifest.Dispose();
 					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
 					return;
 				}
 

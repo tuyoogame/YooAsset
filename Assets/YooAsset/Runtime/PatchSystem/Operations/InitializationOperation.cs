@@ -33,14 +33,14 @@ namespace YooAsset
 	{
 		private enum ESteps
 		{
-			Idle,
+			None,
 			LoadAppManifest,
 			CheckAppManifest,
 			Done,
 		}
 
 		private OfflinePlayModeImpl _impl;
-		private ESteps _steps = ESteps.Idle;
+		private ESteps _steps = ESteps.None;
 		private UnityWebRequester _downloader;
 		private string _downloadURL;
 
@@ -54,7 +54,7 @@ namespace YooAsset
 		}
 		internal override void Update()
 		{
-			if (_steps == ESteps.Idle)
+			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
 			if (_steps == ESteps.LoadAppManifest)
@@ -74,9 +74,9 @@ namespace YooAsset
 				if (_downloader.HasError())
 				{
 					Error = _downloader.GetError();
-					Status = EOperationStatus.Failed;
 					_downloader.Dispose();
 					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
 					throw new System.Exception($"Fatal error : Failed load application patch manifest file : {_downloadURL}");
 				}
 
@@ -96,7 +96,7 @@ namespace YooAsset
 	{
 		private enum ESteps
 		{
-			Idle,
+			None,
 			InitCache,
 			LoadAppManifest,
 			CheckAppManifest,
@@ -105,7 +105,7 @@ namespace YooAsset
 		}
 
 		private HostPlayModeImpl _impl;
-		private ESteps _steps = ESteps.Idle;
+		private ESteps _steps = ESteps.None;
 		private UnityWebRequester _downloader;
 		private string _downloadURL;
 
@@ -119,7 +119,7 @@ namespace YooAsset
 		}
 		internal override void Update()
 		{
-			if (_steps == ESteps.Idle)
+			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
 			if (_steps == ESteps.InitCache)
@@ -133,7 +133,7 @@ namespace YooAsset
 					// 注意：在覆盖安装的时候，会保留APP沙盒目录，可以选择清空缓存目录
 					if (_impl.ClearCacheWhenDirty)
 					{
-						Logger.Warning("Clear cache files.");					
+						Logger.Warning("Clear cache files.");
 						PatchHelper.DeleteSandboxCacheFolder();
 					}
 
@@ -164,9 +164,9 @@ namespace YooAsset
 				if (_downloader.HasError())
 				{
 					Error = _downloader.GetError();
-					Status = EOperationStatus.Failed;
 					_downloader.Dispose();
 					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
 					throw new System.Exception($"Fatal error : Failed load application patch manifest file : {_downloadURL}");
 				}
 
