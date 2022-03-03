@@ -93,6 +93,7 @@ namespace YooAsset
 		}
 
 
+		private static bool _isInitialize = false;
 		private static string _locationRoot;
 		private static EPlayMode _playMode;
 		private static IBundleServices _bundleServices;
@@ -116,6 +117,19 @@ namespace YooAsset
 			if (parameters is EditorPlayModeParameters)
 				throw new Exception($"Editor play mode only support unity editor.");
 #endif
+
+			// 创建驱动器
+			if (_isInitialize == false)
+			{
+				_isInitialize = true;
+				UnityEngine.GameObject driver = new UnityEngine.GameObject("[YooAsset]");
+				var driverGo = driver.AddComponent<YooAssetDriver>().gameObject;
+				UnityEngine.Object.DontDestroyOnLoad(driverGo);
+			}
+			else
+			{
+				throw new Exception("YooAsset is initialized yet.");
+			}
 
 			// 检测创建参数
 			if (parameters.AssetLoadingMaxNumber < 3)
@@ -212,16 +226,16 @@ namespace YooAsset
 		/// <summary>
 		/// 更新资源系统
 		/// </summary>
-		public static void Update()
+		internal static void InternalUpdate()
 		{
 			// 更新异步请求操作
 			OperationUpdater.Update();
 
 			// 更新下载管理系统
 			DownloadSystem.Update();
-
+			
 			// 轮询更新资源系统
-			AssetSystem.UpdatePoll();
+			AssetSystem.Update();
 
 			// 自动释放零引用资源
 			if (_releaseCD > 0)
@@ -417,39 +431,39 @@ namespace YooAsset
 		/// <summary>
 		/// 创建补丁下载器
 		/// </summary>
-		/// <param name="dlcTag">DLC标记</param>
+		/// <param name="tag">资源标签</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public static PatchDownloader CreateDLCDownloader(string dlcTag, int downloadingMaxNumber, int failedTryAgain)
+		public static DownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain)
 		{
-			return CreateDLCDownloader(new string[] { dlcTag }, downloadingMaxNumber, failedTryAgain);
+			return CreatePatchDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain);
 		}
 
 		/// <summary>
 		/// 创建补丁下载器
 		/// </summary>
-		/// <param name="dlcTags">DLC标记列表</param>
+		/// <param name="tags">资源标签列表</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public static PatchDownloader CreateDLCDownloader(string[] dlcTags, int downloadingMaxNumber, int failedTryAgain)
+		public static DownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain)
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
 				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
-				PatchDownloader downlader = new PatchDownloader(null, downloadList, downloadingMaxNumber, failedTryAgain);
-				return downlader;
+				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
-				PatchDownloader downlader = new PatchDownloader(null, downloadList, downloadingMaxNumber, failedTryAgain);
-				return downlader;
+				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
 				if (_hostPlayModeImpl == null)
 					throw new Exception("YooAsset is not initialized.");
-				return _hostPlayModeImpl.CreateDLCDownloader(dlcTags, downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreateDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain);
 			}
 			else
 			{
@@ -458,24 +472,24 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 创建补丁下载器
+		/// 创建资源包下载器
 		/// </summary>
 		/// <param name="locations">资源列表</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public static PatchDownloader CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain)
+		public static DownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain)
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
 				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
-				PatchDownloader downlader = new PatchDownloader(null, downloadList, downloadingMaxNumber, failedTryAgain);
-				return downlader;
+				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
-				PatchDownloader downlader = new PatchDownloader(null, downloadList, downloadingMaxNumber, failedTryAgain);
-				return downlader;
+				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
@@ -488,7 +502,7 @@ namespace YooAsset
 					string assetPath = ConvertLocationToAssetPath(location);
 					assetPaths.Add(assetPath);
 				}
-				return _hostPlayModeImpl.CreateBundleDownloader(assetPaths, downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreateDownloaderByPaths(assetPaths, downloadingMaxNumber, failedTryAgain);
 			}
 			else
 			{
