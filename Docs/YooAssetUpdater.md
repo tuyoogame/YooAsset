@@ -61,10 +61,12 @@ private void CreateDownloader()
 /// </summary>
 private IEnumerator Download()
 {
-    //注册下载回调
+    //注册回调方法
     _downloader.OnDownloadFileFailedCallback = OneDownloadFileFailed;
     _downloader.OnDownloadProgressCallback = OnDownloadProgressUpdate;
     _downloader.OnDownloadOverCallback = OnDownloadOver;
+
+    //开启下载
     _downloader.BeginDownload();
     yield return _downloader;
 
@@ -77,28 +79,6 @@ private IEnumerator Download()
     {
         //下载失败
     }
-}
-
-/// <summary>
-/// 文件下载失败
-/// </summary>
-private void OneDownloadFileFailed(string fileName)
-{
-    Debug.LogError($"File download failed : {fileName}");
-}
-
-/// <summary>
-/// 下载进度的更新
-/// </summary>
-private void OnDownloadProgressUpdate(int totalDownloadCount, int currentDownloadCount, long totalDownloadSizeBytes, long currentDownloadSizeBytes)
-{
-}
-
-/// <summary>
-/// 下载结束，成功或失败
-/// </summary>
-private void OnDownloadOver(bool isSucceed)
-{
 }
 ````
 
