@@ -322,7 +322,7 @@ namespace YooAsset
 		/// </summary>
 		public static void UnloadUnusedAssets()
 		{
-			AssetSystem.UpdatePoll();
+			AssetSystem.Update();
 			AssetSystem.UnloadUnusedAssets();
 		}
 
