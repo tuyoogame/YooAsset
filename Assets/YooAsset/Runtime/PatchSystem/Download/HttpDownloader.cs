@@ -19,7 +19,7 @@ namespace YooAsset
 			Failed,
 		}
 
-		public AssetBundleInfo BundleInfo { private set; get; }
+		private readonly BundleInfo _bundleInfo;
 		private ESteps _steps = ESteps.None;
 
 		// 线程
@@ -61,6 +61,10 @@ namespace YooAsset
 		}
 
 
+		internal HttpDownloader(BundleInfo bundleInfo)
+		{
+			_bundleInfo = bundleInfo;
+		}
 		internal void SendRequest(int failedTryAgain, int timeout)
 		{
 			_failedTryAgain = failedTryAgain;
@@ -102,7 +106,7 @@ namespace YooAsset
 				_downloadError = _threadError;
 				if (_threadResult)
 				{
-					DownloadSystem.CacheVerifyFile(BundleInfo.Hash, BundleInfo.BundleName);
+					DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.BundleName);
 					_steps = ESteps.Succeed;
 				}
 				else
@@ -123,6 +127,14 @@ namespace YooAsset
 		internal void SetDone()
 		{
 			_steps = ESteps.Succeed;
+		}
+
+		/// <summary>
+		/// 获取资源包信息
+		/// </summary>
+		public BundleInfo GetBundleInfo()
+		{
+			return _bundleInfo;
 		}
 
 		/// <summary>
@@ -155,8 +167,8 @@ namespace YooAsset
 		private void ThreadRun()
 		{
 			string url = GetRequestURL();
-			string savePath = BundleInfo.LocalPath;
-			long fileTotalSize = BundleInfo.SizeBytes;
+			string savePath = _bundleInfo.LocalPath;
+			long fileTotalSize = _bundleInfo.SizeBytes;
 			
 			FileStream fileStream = null;
 			Stream webStream = null;
@@ -202,7 +214,7 @@ namespace YooAsset
 				}
 
 				// 验证下载文件完整性
-				bool verfiyResult = DownloadSystem.CheckContentIntegrity(savePath, BundleInfo.SizeBytes, BundleInfo.CRC);
+				bool verfiyResult = DownloadSystem.CheckContentIntegrity(savePath, _bundleInfo.SizeBytes, _bundleInfo.CRC);
 				if(verfiyResult)
 				{
 					_threadResult = true;
@@ -210,7 +222,7 @@ namespace YooAsset
 				else
 				{
 					_threadResult = false;
-					_threadError = $"Verify file content failed : {BundleInfo.Hash}";
+					_threadError = $"Verify file content failed : {_bundleInfo.Hash}";
 				}
 			}
 			catch (Exception e)
@@ -245,9 +257,9 @@ namespace YooAsset
 			// 轮流返回请求地址
 			_requestCount++;
 			if (_requestCount % 2 == 0)
-				return BundleInfo.RemoteFallbackURL;
+				return _bundleInfo.RemoteFallbackURL;
 			else
-				return BundleInfo.RemoteMainURL;
+				return _bundleInfo.RemoteMainURL;
 		}
 		#endregion
 	}

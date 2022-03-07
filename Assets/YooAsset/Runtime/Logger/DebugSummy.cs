@@ -9,7 +9,7 @@ namespace YooAsset
 		/// <summary>
 		/// 资源包调试信息
 		/// </summary>
-		public class BundleInfo
+		public class DebugBundleInfo
 		{
 			/// <summary>
 			/// 资源包名称
@@ -35,7 +35,7 @@ namespace YooAsset
 		/// <summary>
 		/// 资源加载对象调试信息
 		/// </summary>
-		public class ProviderInfo : IComparer<ProviderInfo>, IComparable<ProviderInfo>
+		public class DebugProviderInfo : IComparer<DebugProviderInfo>, IComparable<DebugProviderInfo>
 		{
 			/// <summary>
 			/// 资源对象路径
@@ -55,20 +55,20 @@ namespace YooAsset
 			/// <summary>
 			/// 依赖的资源包列表
 			/// </summary>
-			public readonly List<BundleInfo> BundleInfos = new List<BundleInfo>();
+			public readonly List<DebugBundleInfo> BundleInfos = new List<DebugBundleInfo>();
 
-			public int CompareTo(ProviderInfo other)
+			public int CompareTo(DebugProviderInfo other)
 			{
 				return Compare(this, other);
 			}
-			public int Compare(ProviderInfo a, ProviderInfo b)
+			public int Compare(DebugProviderInfo a, DebugProviderInfo b)
 			{
 				return string.CompareOrdinal(a.AssetPath, b.AssetPath);
 			}
 		}
 
 
-		public readonly List<ProviderInfo> ProviderInfos = new List<ProviderInfo>(1000);
+		public readonly List<DebugProviderInfo> ProviderInfos = new List<DebugProviderInfo>(1000);
 		public int BundleCount { set; get; }
 		public int AssetCount { set; get; }
 

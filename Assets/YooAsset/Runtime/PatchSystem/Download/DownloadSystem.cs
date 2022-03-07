@@ -44,7 +44,7 @@ namespace YooAsset
 		/// 开始下载资源文件
 		/// 注意：只有第一次请求的参数才是有效的
 		/// </summary>
-		public static FileDownloader BeginDownload(AssetBundleInfo bundleInfo, int failedTryAgain, int timeout = 60)
+		public static FileDownloader BeginDownload(BundleInfo bundleInfo, int failedTryAgain, int timeout = 60)
 		{
 			// 查询存在的下载器
 			if (_downloaderDic.TryGetValue(bundleInfo.Hash, out var downloader))
@@ -119,7 +119,7 @@ namespace YooAsset
 		}
 
 		// 验证文件完整性
-		public static bool CheckContentIntegrity(AssetBundleInfo bundleInfo)
+		public static bool CheckContentIntegrity(BundleInfo bundleInfo)
 		{
 			return CheckContentIntegrity(bundleInfo.LocalPath, bundleInfo.SizeBytes, bundleInfo.CRC);
 		}

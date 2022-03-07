@@ -19,7 +19,7 @@ namespace YooAsset
 			Failed,
 		}
 
-		public AssetBundleInfo BundleInfo { private set; get; }
+		private readonly BundleInfo _bundleInfo;
 		private UnityWebRequest _webRequest;
 		private UnityWebRequestAsyncOperation _operationHandle;
 
@@ -48,13 +48,13 @@ namespace YooAsset
 		public ulong DownloadedBytes { private set; get; }
 
 
-		internal FileDownloader(AssetBundleInfo bundleInfo)
+		internal FileDownloader(BundleInfo bundleInfo)
 		{
-			BundleInfo = bundleInfo;
+			_bundleInfo = bundleInfo;
 		}
 		internal void SendRequest(int failedTryAgain, int timeout)
 		{
-			if (string.IsNullOrEmpty(BundleInfo.LocalPath))
+			if (string.IsNullOrEmpty(_bundleInfo.LocalPath))
 				throw new ArgumentNullException();
 
 			if (_steps == ESteps.None)
@@ -85,7 +85,7 @@ namespace YooAsset
 				_requestCount++;
 				_requestURL = GetRequestURL();
 				_webRequest = new UnityWebRequest(_requestURL, UnityWebRequest.kHttpVerbGET);
-				DownloadHandlerFile handler = new DownloadHandlerFile(BundleInfo.LocalPath);
+				DownloadHandlerFile handler = new DownloadHandlerFile(_bundleInfo.LocalPath);
 				handler.removeFileOnAbort = true;
 				_webRequest.downloadHandler = handler;
 				_webRequest.disposeDownloadHandlerOnDispose = true;
@@ -124,12 +124,12 @@ namespace YooAsset
 				if (isError == false)
 				{
 					// 注意：如果文件验证失败需要删除文件
-					if (DownloadSystem.CheckContentIntegrity(BundleInfo) == false)
+					if (DownloadSystem.CheckContentIntegrity(_bundleInfo) == false)
 					{
 						isError = true;
 						_lastError = $"Verification failed";			
-						if (File.Exists(BundleInfo.LocalPath))
-							File.Delete(BundleInfo.LocalPath);
+						if (File.Exists(_bundleInfo.LocalPath))
+							File.Delete(_bundleInfo.LocalPath);
 					}
 				}
 
@@ -144,7 +144,7 @@ namespace YooAsset
 				else
 				{
 					_steps = ESteps.Succeed;
-					DownloadSystem.CacheVerifyFile(BundleInfo.Hash, BundleInfo.BundleName);
+					DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.BundleName);
 				}
 
 				// 释放下载器
@@ -172,9 +172,9 @@ namespace YooAsset
 		{
 			// 轮流返回请求地址
 			if (_requestCount % 2 == 0)
-				return BundleInfo.RemoteFallbackURL;
+				return _bundleInfo.RemoteFallbackURL;
 			else
-				return BundleInfo.RemoteMainURL;
+				return _bundleInfo.RemoteMainURL;
 		}
 		private void CheckTimeout()
 		{
@@ -204,6 +204,14 @@ namespace YooAsset
 				_webRequest = null;
 				_operationHandle = null;
 			}
+		}
+
+		/// <summary>
+		/// 获取资源包信息
+		/// </summary>
+		public BundleInfo GetBundleInfo()
+		{
+			return _bundleInfo;
 		}
 
 		/// <summary>

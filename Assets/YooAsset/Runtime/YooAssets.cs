@@ -254,11 +254,11 @@ namespace YooAsset
 		/// <summary>
 		/// 获取资源包信息
 		/// </summary>
-		public static AssetBundleInfo GetAssetBundleInfo(string location)
+		public static BundleInfo GetBundleInfo(string location)
 		{
 			string assetPath = ConvertLocationToAssetPath(location);
-			string bundleName = _bundleServices.GetAssetBundleName(assetPath);
-			return _bundleServices.GetAssetBundleInfo(bundleName);
+			string bundleName = _bundleServices.GetBundleName(assetPath);
+			return _bundleServices.GetBundleInfo(bundleName);
 		}
 
 		/// <summary>
@@ -393,13 +393,13 @@ namespace YooAsset
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
-				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
+				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
+				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
 				return operation;
 			}
@@ -425,13 +425,13 @@ namespace YooAsset
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
-				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
+				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
+				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
 				return operation;
 			}
@@ -477,13 +477,13 @@ namespace YooAsset
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
-				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
+				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new DownloaderOperation(downloadList, unpackingMaxNumber, failedTryAgain);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
+				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new DownloaderOperation(downloadList, unpackingMaxNumber, failedTryAgain);
 				return operation;
 			}

@@ -6,12 +6,12 @@ namespace YooAsset
 		/// <summary>
 		/// 获取AssetBundle的信息
 		/// </summary>
-		AssetBundleInfo GetAssetBundleInfo(string bundleName);
+		BundleInfo GetBundleInfo(string bundleName);
 
 		/// <summary>
 		/// 获取资源所属的资源包名称
 		/// </summary>
-		string GetAssetBundleName(string assetPath);
+		string GetBundleName(string assetPath);
 
 		/// <summary>
 		/// 获取资源依赖的所有AssetBundle列表

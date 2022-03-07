@@ -66,13 +66,13 @@ namespace YooAsset
 		/// <summary>
 		/// 获取资源包的调试信息列表
 		/// </summary>
-		internal void GetBundleDebugInfos(List<DebugSummy.BundleInfo> output)
+		internal void GetBundleDebugInfos(List<DebugSummy.DebugBundleInfo> output)
 		{
 			foreach (var loader in _dependBundles)
 			{
-				var debugInfo = new DebugSummy.BundleInfo();
-				debugInfo.BundleName = loader.BundleInfo.BundleName;
-				debugInfo.Version = loader.BundleInfo.Version;
+				var debugInfo = new DebugSummy.DebugBundleInfo();
+				debugInfo.BundleName = loader.BundleFileInfo.BundleName;
+				debugInfo.Version = loader.BundleFileInfo.Version;
 				debugInfo.RefCount = loader.RefCount;
 				debugInfo.States = loader.States;
 				output.Add(debugInfo);

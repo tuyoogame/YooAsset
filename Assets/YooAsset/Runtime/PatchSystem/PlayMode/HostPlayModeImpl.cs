@@ -57,11 +57,11 @@ namespace YooAsset
 		/// </summary>
 		public DownloaderOperation CreateDownloaderByTags(string[] tags, int fileLoadingMaxNumber, int failedTryAgain)
 		{
-			List<AssetBundleInfo> downloadList = GetDownloadListByTags(tags);
+			List<BundleInfo> downloadList = GetDownloadListByTags(tags);
 			var operation = new DownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
 			return operation;
 		}
-		private List<AssetBundleInfo> GetDownloadListByTags(string[] tags)
+		private List<BundleInfo> GetDownloadListByTags(string[] tags)
 		{
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
 			foreach (var patchBundle in LocalPatchManifest.BundleList)
@@ -103,17 +103,17 @@ namespace YooAsset
 		/// </summary>
 		public DownloaderOperation CreateDownloaderByPaths(List<string> assetPaths, int fileLoadingMaxNumber, int failedTryAgain)
 		{
-			List<AssetBundleInfo> downloadList = GetDownloadListByPaths(assetPaths);
+			List<BundleInfo> downloadList = GetDownloadListByPaths(assetPaths);
 			var operation = new DownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
 			return operation;
 		}
-		private List<AssetBundleInfo> GetDownloadListByPaths(List<string> assetPaths)
+		private List<BundleInfo> GetDownloadListByPaths(List<string> assetPaths)
 		{
 			// 获取资源对象的资源包和所有依赖资源包
 			List<PatchBundle> checkList = new List<PatchBundle>();
 			foreach (var assetPath in assetPaths)
 			{
-				string mainBundleName = LocalPatchManifest.GetAssetBundleName(assetPath);
+				string mainBundleName = LocalPatchManifest.GetBundleName(assetPath);
 				if (string.IsNullOrEmpty(mainBundleName) == false)
 				{
 					if (LocalPatchManifest.Bundles.TryGetValue(mainBundleName, out PatchBundle mainBundle))
@@ -160,11 +160,11 @@ namespace YooAsset
 		/// </summary>
 		public DownloaderOperation CreateUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
 		{
-			List<AssetBundleInfo> unpcakList = GetUnpackListByTags(tags);
+			List<BundleInfo> unpcakList = GetUnpackListByTags(tags);
 			var operation = new DownloaderOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
 			return operation;
 		}
-		private List<AssetBundleInfo> GetUnpackListByTags(string[] tags)
+		private List<BundleInfo> GetUnpackListByTags(string[] tags)
 		{
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
 			foreach (var patchBundle in AppPatchManifest.BundleList)
@@ -213,18 +213,18 @@ namespace YooAsset
 		}
 
 		// 下载相关
-		private AssetBundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
+		private BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
 		{
 			// 注意：资源版本号只用于确定下载路径
 			string sandboxPath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
 			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.Version, patchBundle.Hash);
 			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.Version, patchBundle.Hash);
-			AssetBundleInfo bundleInfo = new AssetBundleInfo(patchBundle, sandboxPath, remoteMainURL, remoteFallbackURL);
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, remoteMainURL, remoteFallbackURL);
 			return bundleInfo;
 		}
-		private List<AssetBundleInfo> ConvertToDownloadList(List<PatchBundle> downloadList)
+		private List<BundleInfo> ConvertToDownloadList(List<PatchBundle> downloadList)
 		{
-			List<AssetBundleInfo> result = new List<AssetBundleInfo>(downloadList.Count);
+			List<BundleInfo> result = new List<BundleInfo>(downloadList.Count);
 			foreach (var patchBundle in downloadList)
 			{
 				var bundleInfo = ConvertToDownloadInfo(patchBundle);
@@ -234,16 +234,16 @@ namespace YooAsset
 		}
 
 		// 解压相关
-		private AssetBundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
+		private BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
 		{
 			string sandboxPath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
 			string streamingLoadPath = AssetPathHelper.MakeStreamingLoadPath(patchBundle.Hash);
-			AssetBundleInfo bundleInfo = new AssetBundleInfo(patchBundle, sandboxPath, streamingLoadPath, streamingLoadPath);
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, streamingLoadPath, streamingLoadPath);
 			return bundleInfo;
 		}
-		private List<AssetBundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
+		private List<BundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
 		{
-			List<AssetBundleInfo> result = new List<AssetBundleInfo>(unpackList.Count);
+			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
 			foreach (var patchBundle in unpackList)
 			{
 				var bundleInfo = ConvertToUnpackInfo(patchBundle);
@@ -253,10 +253,10 @@ namespace YooAsset
 		}
 
 		#region IBundleServices接口
-		AssetBundleInfo IBundleServices.GetAssetBundleInfo(string bundleName)
+		BundleInfo IBundleServices.GetBundleInfo(string bundleName)
 		{
 			if (string.IsNullOrEmpty(bundleName))
-				return new AssetBundleInfo(string.Empty, string.Empty);
+				return new BundleInfo(string.Empty, string.Empty);
 
 			if (LocalPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
 			{
@@ -266,7 +266,7 @@ namespace YooAsset
 					if (appPatchBundle.IsBuildin && appPatchBundle.Hash == patchBundle.Hash)
 					{
 						string appLoadPath = AssetPathHelper.MakeStreamingLoadPath(appPatchBundle.Hash);
-						AssetBundleInfo bundleInfo = new AssetBundleInfo(appPatchBundle, appLoadPath);
+						BundleInfo bundleInfo = new BundleInfo(appPatchBundle, appLoadPath);
 						return bundleInfo;
 					}
 				}
@@ -275,7 +275,7 @@ namespace YooAsset
 				if (DownloadSystem.ContainsVerifyFile(patchBundle.Hash))
 				{
 					string sandboxLoadPath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
-					AssetBundleInfo bundleInfo = new AssetBundleInfo(patchBundle, sandboxLoadPath);
+					BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxLoadPath);
 					return bundleInfo;
 				}
 
@@ -285,13 +285,13 @@ namespace YooAsset
 			else
 			{
 				Logger.Warning($"Not found bundle in patch manifest : {bundleName}");
-				AssetBundleInfo bundleInfo = new AssetBundleInfo(bundleName, string.Empty);
+				BundleInfo bundleInfo = new BundleInfo(bundleName, string.Empty);
 				return bundleInfo;
 			}
 		}
-		string IBundleServices.GetAssetBundleName(string assetPath)
+		string IBundleServices.GetBundleName(string assetPath)
 		{
-			return LocalPatchManifest.GetAssetBundleName(assetPath);
+			return LocalPatchManifest.GetBundleName(assetPath);
 		}
 		string[] IBundleServices.GetAllDependencies(string assetPath)
 		{

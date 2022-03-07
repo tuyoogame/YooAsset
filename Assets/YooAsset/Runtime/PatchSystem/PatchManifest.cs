@@ -87,7 +87,7 @@ namespace YooAsset
 		/// <summary>
 		/// 获取资源包名称
 		/// </summary>
-		public string GetAssetBundleName(string assetPath)
+		public string GetBundleName(string assetPath)
 		{
 			if (Assets.TryGetValue(assetPath, out PatchAsset patchAsset))
 			{

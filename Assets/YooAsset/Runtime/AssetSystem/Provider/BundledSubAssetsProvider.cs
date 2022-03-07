@@ -97,7 +97,7 @@ namespace YooAsset
 
 				States = AllAssets == null ? EAssetStates.Fail : EAssetStates.Success;
 				if (States == EAssetStates.Fail)
-					Logger.Warning($"Failed to load sub assets : {AssetName} from bundle : {OwnerBundle.BundleInfo.BundleName}");
+					Logger.Warning($"Failed to load sub assets : {AssetName} from bundle : {OwnerBundle.BundleFileInfo.BundleName}");
 				InvokeCompletion();
 			}
 		}

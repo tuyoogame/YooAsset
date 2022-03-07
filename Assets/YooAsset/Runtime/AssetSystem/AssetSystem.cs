@@ -227,8 +227,8 @@ namespace YooAsset
 
 		internal static BundleFileLoader CreateOwnerBundleLoader(string assetPath)
 		{
-			string bundleName = BundleServices.GetAssetBundleName(assetPath);
-			AssetBundleInfo bundleInfo = BundleServices.GetAssetBundleInfo(bundleName);
+			string bundleName = BundleServices.GetBundleName(assetPath);
+			BundleInfo bundleInfo = BundleServices.GetBundleInfo(bundleName);
 			return CreateBundleFileLoaderInternal(bundleInfo);
 		}
 		internal static List<BundleFileLoader> CreateDependBundleLoaders(string assetPath)
@@ -239,7 +239,7 @@ namespace YooAsset
 			{
 				foreach (var dependBundleName in depends)
 				{
-					AssetBundleInfo dependBundleInfo = BundleServices.GetAssetBundleInfo(dependBundleName);
+					BundleInfo dependBundleInfo = BundleServices.GetBundleInfo(dependBundleName);
 					BundleFileLoader dependLoader = CreateBundleFileLoaderInternal(dependBundleInfo);
 					result.Add(dependLoader);
 				}
@@ -254,7 +254,7 @@ namespace YooAsset
 			}
 		}
 
-		private static BundleFileLoader CreateBundleFileLoaderInternal(AssetBundleInfo bundleInfo)
+		private static BundleFileLoader CreateBundleFileLoaderInternal(BundleInfo bundleInfo)
 		{
 			// 如果加载器已经存在
 			BundleFileLoader loader = TryGetBundleFileLoader(bundleInfo.BundleName);
@@ -272,7 +272,7 @@ namespace YooAsset
 			for (int i = 0; i < _loaders.Count; i++)
 			{
 				BundleFileLoader temp = _loaders[i];
-				if (temp.BundleInfo.BundleName.Equals(bundleName))
+				if (temp.BundleFileInfo.BundleName.Equals(bundleName))
 				{
 					loader = temp;
 					break;
@@ -304,7 +304,7 @@ namespace YooAsset
 
 			foreach (var provider in _providers)
 			{
-				DebugSummy.ProviderInfo providerInfo = new DebugSummy.ProviderInfo();
+				DebugSummy.DebugProviderInfo providerInfo = new DebugSummy.DebugProviderInfo();
 				providerInfo.AssetPath = provider.AssetPath;
 				providerInfo.RefCount = provider.RefCount;
 				providerInfo.States = provider.States;

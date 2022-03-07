@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-	public class AssetBundleInfo
+	public class BundleInfo
 	{
 		private readonly PatchBundle _patchBundle;
 		
@@ -110,10 +110,10 @@ namespace YooAsset
 		}
 
 
-		private AssetBundleInfo()
+		private BundleInfo()
 		{
 		}
-		internal AssetBundleInfo(PatchBundle patchBundle, string localPath, string mainURL, string fallbackURL)
+		internal BundleInfo(PatchBundle patchBundle, string localPath, string mainURL, string fallbackURL)
 		{
 			_patchBundle = patchBundle;
 			BundleName = patchBundle.BundleName;
@@ -121,7 +121,7 @@ namespace YooAsset
 			RemoteMainURL = mainURL;
 			RemoteFallbackURL = fallbackURL;
 		}
-		internal AssetBundleInfo(PatchBundle patchBundle, string localPath)
+		internal BundleInfo(PatchBundle patchBundle, string localPath)
 		{
 			_patchBundle = patchBundle;
 			BundleName = patchBundle.BundleName;
@@ -129,7 +129,7 @@ namespace YooAsset
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
 		}
-		internal AssetBundleInfo(string bundleName, string localPath)
+		internal BundleInfo(string bundleName, string localPath)
 		{
 			_patchBundle = null;
 			BundleName = bundleName;

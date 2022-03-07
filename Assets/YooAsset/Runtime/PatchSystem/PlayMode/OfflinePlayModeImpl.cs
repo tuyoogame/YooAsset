@@ -29,27 +29,27 @@ namespace YooAsset
 		}
 
 		#region IBundleServices接口
-		AssetBundleInfo IBundleServices.GetAssetBundleInfo(string bundleName)
+		BundleInfo IBundleServices.GetBundleInfo(string bundleName)
 		{
 			if (string.IsNullOrEmpty(bundleName))
-				return new AssetBundleInfo(string.Empty, string.Empty);
+				return new BundleInfo(string.Empty, string.Empty);
 
 			if (AppPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
 			{
 				string localPath = AssetPathHelper.MakeStreamingLoadPath(patchBundle.Hash);
-				AssetBundleInfo bundleInfo = new AssetBundleInfo(patchBundle, localPath);
+				BundleInfo bundleInfo = new BundleInfo(patchBundle, localPath);
 				return bundleInfo;
 			}
 			else
 			{
 				Logger.Warning($"Not found bundle in patch manifest : {bundleName}");
-				AssetBundleInfo bundleInfo = new AssetBundleInfo(bundleName, string.Empty);
+				BundleInfo bundleInfo = new BundleInfo(bundleName, string.Empty);
 				return bundleInfo;
 			}
 		}
-		string IBundleServices.GetAssetBundleName(string assetPath)
+		string IBundleServices.GetBundleName(string assetPath)
 		{
-			return AppPatchManifest.GetAssetBundleName(assetPath);
+			return AppPatchManifest.GetBundleName(assetPath);
 		}
 		string[] IBundleServices.GetAllDependencies(string assetPath)
 		{
