@@ -455,6 +455,51 @@ namespace YooAsset
 		}
 		#endregion
 
+		#region 资源解压接口
+		/// <summary>
+		/// 创建补丁解压器
+		/// </summary>
+		/// <param name="tag">资源标签</param>
+		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
+		/// <param name="failedTryAgain">解压失败的重试次数</param>
+		public static DownloaderOperation CreatePatchUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
+		{
+			return CreatePatchUnpacker(new string[] { tag }, unpackingMaxNumber, failedTryAgain);
+		}
+		
+		/// <summary>
+		/// 创建补丁解压器
+		/// </summary>
+		/// <param name="tags">资源标签列表</param>
+		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
+		/// <param name="failedTryAgain">解压失败的重试次数</param>
+		public static DownloaderOperation CreatePatchUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
+		{
+			if (_playMode == EPlayMode.EditorPlayMode)
+			{
+				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
+				var operation = new DownloaderOperation(downloadList, unpackingMaxNumber, failedTryAgain);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				List<AssetBundleInfo> downloadList = new List<AssetBundleInfo>();
+				var operation = new DownloaderOperation(downloadList, unpackingMaxNumber, failedTryAgain);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.HostPlayMode)
+			{
+				if (_hostPlayModeImpl == null)
+					throw new Exception("YooAsset is not initialized.");
+				return _hostPlayModeImpl.CreateUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain);
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
+		#endregion
+
 		#region 沙盒相关
 		/// <summary>
 		/// 清空沙盒目录

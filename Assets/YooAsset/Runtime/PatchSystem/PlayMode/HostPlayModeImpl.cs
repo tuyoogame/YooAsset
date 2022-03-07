@@ -155,6 +155,47 @@ namespace YooAsset
 			return ConvertToDownloadList(downloadList);
 		}
 
+		/// <summary>
+		/// 创建解压器
+		/// </summary>
+		public DownloaderOperation CreateUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
+		{
+			List<AssetBundleInfo> unpcakList = GetUnpackListByTags(tags);
+			var operation = new DownloaderOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
+			return operation;
+		}
+		private List<AssetBundleInfo> GetUnpackListByTags(string[] tags)
+		{
+			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
+			foreach (var patchBundle in AppPatchManifest.BundleList)
+			{
+				// 如果已经在沙盒内
+				string filePath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+				if (System.IO.File.Exists(filePath))
+					continue;
+
+				// 如果不是内置资源
+				if (patchBundle.IsBuildin == false)
+					continue;
+
+				// 如果是纯内置资源
+				if (patchBundle.IsPureBuildin())
+				{
+					downloadList.Add(patchBundle);
+				}
+				else
+				{
+					// 查询DLC资源
+					if (patchBundle.HasTag(tags))
+					{
+						downloadList.Add(patchBundle);
+					}
+				}
+			}
+
+			return ConvertToUnpackList(downloadList);
+		}
+
 		// WEB相关
 		internal string GetPatchDownloadMainURL(int resourceVersion, string fileName)
 		{
@@ -187,6 +228,25 @@ namespace YooAsset
 			foreach (var patchBundle in downloadList)
 			{
 				var bundleInfo = ConvertToDownloadInfo(patchBundle);
+				result.Add(bundleInfo);
+			}
+			return result;
+		}
+
+		// 解压相关
+		private AssetBundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
+		{
+			string sandboxPath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+			string streamingLoadPath = AssetPathHelper.MakeStreamingLoadPath(patchBundle.Hash);
+			AssetBundleInfo bundleInfo = new AssetBundleInfo(patchBundle, sandboxPath, streamingLoadPath, streamingLoadPath);
+			return bundleInfo;
+		}
+		private List<AssetBundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
+		{
+			List<AssetBundleInfo> result = new List<AssetBundleInfo>(unpackList.Count);
+			foreach (var patchBundle in unpackList)
+			{
+				var bundleInfo = ConvertToUnpackInfo(patchBundle);
 				result.Add(bundleInfo);
 			}
 			return result;

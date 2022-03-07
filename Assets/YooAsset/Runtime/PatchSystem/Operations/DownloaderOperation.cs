@@ -15,9 +15,9 @@ namespace YooAsset
 		private const int MAX_LOADER_COUNT = 64;
 
 		public delegate void OnDownloadOver(bool isSucceed);
-		public delegate void OnDownloadProgress(int totalDownloadCount, int currentDownloadCoun, long totalDownloadBytes, long currentDownloadBytes);
+		public delegate void OnDownloadProgress(int totalDownloadCount, int currentDownloadCount, long totalDownloadBytes, long currentDownloadBytes);
 		public delegate void OnDownloadFileFailed(string fileName);
-
+		
 		private readonly int _fileLoadingMaxNumber;
 		private readonly int _failedTryAgain;
 		private readonly List<AssetBundleInfo> _downloadList;
