@@ -122,8 +122,8 @@ namespace YooAsset
 			if (_isInitialize == false)
 			{
 				_isInitialize = true;
-				UnityEngine.GameObject driver = new UnityEngine.GameObject("[YooAsset]");
-				var driverGo = driver.AddComponent<YooAssetDriver>().gameObject;
+				UnityEngine.GameObject driverGo = new UnityEngine.GameObject("[YooAsset]");
+				driverGo.AddComponent<YooAssetDriver>();
 				UnityEngine.Object.DontDestroyOnLoad(driverGo);
 			}
 			else
@@ -222,33 +222,6 @@ namespace YooAsset
 		}
 
 
-
-		/// <summary>
-		/// 更新资源系统
-		/// </summary>
-		internal static void InternalUpdate()
-		{
-			// 更新异步请求操作
-			OperationUpdater.Update();
-
-			// 更新下载管理系统
-			DownloadSystem.Update();
-			
-			// 轮询更新资源系统
-			AssetSystem.Update();
-
-			// 自动释放零引用资源
-			if (_releaseCD > 0)
-			{
-				_releaseTimer += UnityEngine.Time.unscaledDeltaTime;
-				if (_releaseTimer >= _releaseCD)
-				{
-					_releaseTimer = 0f;
-					AssetSystem.UnloadUnusedAssets();
-				}
-			}
-		}
-
 		/// <summary>
 		/// 获取资源版本号
 		/// </summary>
@@ -271,35 +244,6 @@ namespace YooAsset
 				if (_hostPlayModeImpl == null)
 					throw new Exception("YooAsset is not initialized.");
 				return _hostPlayModeImpl.GetResourceVersion();
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
-		}
-
-		/// <summary>
-		/// 获取内置资源标记列表
-		/// </summary>
-		public static string[] GetManifestBuildinTags()
-		{
-			if (_playMode == EPlayMode.EditorPlayMode)
-			{
-				if (_editorPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
-				return _editorPlayModeImpl.GetManifestBuildinTags();
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				if (_offlinePlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
-				return _offlinePlayModeImpl.GetManifestBuildinTags();
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				if (_hostPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
-				return _hostPlayModeImpl.GetManifestBuildinTags();
 			}
 			else
 			{
@@ -532,6 +476,32 @@ namespace YooAsset
 		#endregion
 
 		#region 内部方法
+		/// <summary>
+		/// 更新资源系统
+		/// </summary>
+		internal static void InternalUpdate()
+		{
+			// 更新异步请求操作
+			OperationUpdater.Update();
+
+			// 更新下载管理系统
+			DownloadSystem.Update();
+
+			// 轮询更新资源系统
+			AssetSystem.Update();
+
+			// 自动释放零引用资源
+			if (_releaseCD > 0)
+			{
+				_releaseTimer += UnityEngine.Time.unscaledDeltaTime;
+				if (_releaseTimer >= _releaseCD)
+				{
+					_releaseTimer = 0f;
+					AssetSystem.UnloadUnusedAssets();
+				}
+			}
+		}
+
 		/// <summary>
 		/// 定位地址转换为资源路径
 		/// </summary>
