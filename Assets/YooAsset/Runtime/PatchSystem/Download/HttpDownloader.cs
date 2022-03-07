@@ -63,6 +63,8 @@ namespace YooAsset
 
 		internal void SendRequest(int failedTryAgain, int timeout)
 		{
+			_failedTryAgain = failedTryAgain;
+			_timeout = timeout;
 		}
 		internal void Update()
 		{

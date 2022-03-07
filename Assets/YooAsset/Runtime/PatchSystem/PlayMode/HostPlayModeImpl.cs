@@ -53,16 +53,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取内置资源标记列表
-		/// </summary>
-		public string[] GetManifestBuildinTags()
-		{
-			if (LocalPatchManifest == null)
-				return new string[0];
-			return LocalPatchManifest.GetBuildinTags();
-		}
-
-		/// <summary>
 		/// 创建下载器
 		/// </summary>
 		public DownloaderOperation CreateDownloaderByTags(string[] tags, int fileLoadingMaxNumber, int failedTryAgain)

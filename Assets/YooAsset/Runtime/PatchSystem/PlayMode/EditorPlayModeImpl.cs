@@ -24,14 +24,6 @@ namespace YooAsset
 			return 0;
 		}
 
-		/// <summary>
-		/// 获取内置资源标记列表
-		/// </summary>
-		public string[] GetManifestBuildinTags()
-		{
-			return new string[0];
-		}
-
 		#region IBundleServices接口
 		AssetBundleInfo IBundleServices.GetAssetBundleInfo(string bundleName)
 		{

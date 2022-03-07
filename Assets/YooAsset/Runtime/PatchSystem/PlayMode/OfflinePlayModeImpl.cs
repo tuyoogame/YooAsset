@@ -28,16 +28,6 @@ namespace YooAsset
 			return AppPatchManifest.ResourceVersion;
 		}
 
-		/// <summary>
-		/// 获取内置资源标记列表
-		/// </summary>
-		public string[] GetManifestBuildinTags()
-		{
-			if (AppPatchManifest == null)
-				return new string[0];
-			return AppPatchManifest.GetBuildinTags();
-		}
-
 		#region IBundleServices接口
 		AssetBundleInfo IBundleServices.GetAssetBundleInfo(string bundleName)
 		{
