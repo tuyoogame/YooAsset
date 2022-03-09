@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Animations;
-using YooAsset.Utility;
 
 namespace YooAsset.Editor
 {

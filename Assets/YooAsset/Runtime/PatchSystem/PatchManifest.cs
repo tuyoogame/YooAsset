@@ -3,7 +3,6 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YooAsset.Utility;
 
 namespace YooAsset
 {
@@ -11,7 +10,7 @@ namespace YooAsset
 	/// 补丁清单文件
 	/// </summary>
 	[Serializable]
-	public class PatchManifest
+	internal class PatchManifest
 	{
 		/// <summary>
 		/// 资源版本号
@@ -79,7 +78,7 @@ namespace YooAsset
 			}
 			else
 			{
-				Logger.Warning($"Not found asset path in patch manifest : {assetPath}");
+				YooLogger.Warning($"Not found asset path in patch manifest : {assetPath}");
 				return new string[] { };
 			}
 		}
@@ -104,7 +103,7 @@ namespace YooAsset
 			}
 			else
 			{
-				Logger.Warning($"Not found asset path in patch manifest : {assetPath}");
+				YooLogger.Warning($"Not found asset path in patch manifest : {assetPath}");
 				return string.Empty;
 			}
 		}
@@ -150,7 +149,7 @@ namespace YooAsset
 				{
 					string assetPathWithoutExtension = StringUtility.RemoveExtension(assetPath);
 					if (patchManifest.Assets.ContainsKey(assetPathWithoutExtension))
-						Logger.Warning($"Asset path have existed : {assetPathWithoutExtension}");
+						YooLogger.Warning($"Asset path have existed : {assetPathWithoutExtension}");
 					else
 						patchManifest.Assets.Add(assetPathWithoutExtension, patchAsset);
 				}

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
-using YooAsset.Utility;
 
 namespace YooAsset
 {
 	[Serializable]
-	public class PatchBundle
+	internal class PatchBundle
 	{
 		/// <summary>
 		/// 资源包名称

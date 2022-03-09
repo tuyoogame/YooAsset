@@ -2,8 +2,8 @@
 
 namespace YooAsset
 {
-	[CreateAssetMenu(fileName = "YooAssetSetting", menuName = "YooAsset/Create Setting")]
-	public class ResourceSetting : ScriptableObject
+	[CreateAssetMenu(fileName = "YooAssetSettings", menuName = "YooAsset/Create Settings")]
+	public class YooAssetSettings : ScriptableObject
 	{
 		/// <summary>
 		/// AssetBundle文件的后缀名

@@ -74,7 +74,7 @@ namespace YooAsset
 				debugInfo.BundleName = loader.BundleFileInfo.BundleName;
 				debugInfo.Version = loader.BundleFileInfo.Version;
 				debugInfo.RefCount = loader.RefCount;
-				debugInfo.States = loader.States;
+				debugInfo.States = (int)loader.States;
 				output.Add(debugInfo);
 			}
 		}

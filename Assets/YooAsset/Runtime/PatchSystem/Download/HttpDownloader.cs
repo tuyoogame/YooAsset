@@ -158,7 +158,7 @@ namespace YooAsset
 		/// </summary>
 		public void ReportError()
 		{
-			Logger.Error(_downloadError);
+			YooLogger.Error(_downloadError);
 		}
 
 

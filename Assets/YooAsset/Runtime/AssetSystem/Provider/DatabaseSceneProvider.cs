@@ -46,7 +46,7 @@ namespace YooAsset
 				}
 				else
 				{
-					Logger.Warning($"Failed to load scene : {AssetName}");
+					YooLogger.Warning($"Failed to load scene : {AssetName}");
 					States = EAssetStates.Fail;
 					InvokeCompletion();
 				}

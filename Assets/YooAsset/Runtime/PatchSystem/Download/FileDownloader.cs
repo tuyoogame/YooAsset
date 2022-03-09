@@ -159,7 +159,7 @@ namespace YooAsset
 				{
 					_failedTryAgain--;
 					_steps = ESteps.CreateDownload;
-					Logger.Warning($"Try again download : {_requestURL}");
+					YooLogger.Warning($"Try again download : {_requestURL}");
 				}
 			}
 		}
@@ -190,7 +190,7 @@ namespace YooAsset
 				float offset = Time.realtimeSinceStartup - _latestDownloadRealtime;
 				if (offset > _timeout)
 				{
-					Logger.Warning($"Web file request timeout : {_requestURL}");
+					YooLogger.Warning($"Web file request timeout : {_requestURL}");
 					_webRequest.Abort();
 					_isAbort = true;
 				}
@@ -236,7 +236,7 @@ namespace YooAsset
 		/// </summary>
 		public void ReportError()
 		{
-			Logger.Error($"Failed to download : {_requestURL} Error : {_lastError}");
+			YooLogger.Error($"Failed to download : {_requestURL} Error : {_lastError}");
 		}
 	}
 }

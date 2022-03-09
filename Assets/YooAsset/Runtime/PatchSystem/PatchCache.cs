@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YooAsset.Utility;
 
 namespace YooAsset
 {
@@ -22,14 +21,14 @@ namespace YooAsset
 		{
 			if (PatchHelper.CheckSandboxCacheFileExist())
 			{
-				Logger.Log("Load patch cache from disk.");
+				YooLogger.Log("Load patch cache from disk.");
 				string filePath = PatchHelper.GetSandboxCacheFilePath();
 				string jsonData = FileUtility.ReadFile(filePath);
 				return JsonUtility.FromJson<PatchCache>(jsonData);
 			}
 			else
 			{
-				Logger.Log($"Create patch cache to disk : {Application.version}");
+				YooLogger.Log($"Create patch cache to disk : {Application.version}");
 				PatchCache cache = new PatchCache();
 				cache.CacheAppVersion = Application.version;
 				string filePath = PatchHelper.GetSandboxCacheFilePath();
@@ -44,7 +43,7 @@ namespace YooAsset
 		/// </summary>
 		public static void UpdateCache()
 		{
-			Logger.Log($"Update patch cache to disk : {Application.version}");
+			YooLogger.Log($"Update patch cache to disk : {Application.version}");
 			PatchCache cache = new PatchCache();
 			cache.CacheAppVersion = Application.version;
 			string filePath = PatchHelper.GetSandboxCacheFilePath();

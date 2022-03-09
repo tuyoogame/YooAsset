@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace YooAsset.Utility
+namespace YooAsset
 {
 	internal class SafeProxy
 	{

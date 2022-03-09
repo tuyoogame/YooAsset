@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEditor.UIElements;
 
-public class AssetBundleBrowserWindow
+namespace YooAsset.Editor
 {
+	public class AssetBundleBrowserWindow
+	{
 
+	}
 }

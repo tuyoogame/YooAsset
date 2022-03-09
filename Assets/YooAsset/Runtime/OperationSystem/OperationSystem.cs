@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	internal class OperationUpdater
+	internal class OperationSystem
 	{
 		private static readonly List<AsyncOperationBase> _operations = new List<AsyncOperationBase>(100);
 

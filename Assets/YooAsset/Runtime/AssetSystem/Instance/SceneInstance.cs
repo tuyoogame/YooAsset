@@ -34,7 +34,7 @@ namespace YooAsset
 			}
 			else
 			{
-				Logger.Warning($"Scene is invalid or not loaded : {Scene.name}");
+				YooLogger.Warning($"Scene is invalid or not loaded : {Scene.name}");
 				return false;
 			}
 		}

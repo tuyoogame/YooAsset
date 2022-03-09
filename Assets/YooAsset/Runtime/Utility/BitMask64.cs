@@ -1,15 +1,15 @@
 ﻿using System;
 
-namespace YooAsset.Utility
+namespace YooAsset
 {
-    public struct BitMask32
+    internal struct BitMask64
     {
-        private int _mask;
+        private long _mask;
 
-        public static implicit operator int(BitMask32 mask) { return mask._mask; }
-        public static implicit operator BitMask32(int mask) { return new BitMask32(mask); }
-
-        public BitMask32(int mask)
+        public static implicit operator long(BitMask64 mask) { return mask._mask; }
+        public static implicit operator BitMask64(long mask) { return new BitMask64(mask); }
+        
+        public BitMask64(long mask)
         {
             _mask = mask;
         }
@@ -19,10 +19,10 @@ namespace YooAsset.Utility
         /// </summary>
         public void Open(int bit)
         {
-			if (bit < 0 || bit > 31)
+			if (bit < 0 || bit > 63)
 				throw new ArgumentOutOfRangeException();
             else
-                _mask |= 1 << bit;
+                _mask |= 1L << bit;
         }
 
         /// <summary>
@@ -30,10 +30,10 @@ namespace YooAsset.Utility
         /// </summary>
         public void Close(int bit)
         {
-            if (bit < 0 || bit > 31)
+            if (bit < 0 || bit > 63)
 				throw new ArgumentOutOfRangeException();
 			else
-                _mask &= ~(1 << bit);
+                _mask &= ~(1L << bit);
         }
 
         /// <summary>
@@ -41,10 +41,10 @@ namespace YooAsset.Utility
         /// </summary>
         public void Reverse(int bit)
         {
-            if (bit < 0 || bit > 31)
+            if (bit < 0 || bit > 63)
 				throw new ArgumentOutOfRangeException();
 			else
-                _mask ^= 1 << bit;
+                _mask ^= 1L << bit;
         }
 
 		/// <summary>
@@ -60,10 +60,10 @@ namespace YooAsset.Utility
 		/// </summary>
 		public bool Test(int bit)
         {
-            if (bit < 0 || bit > 31)
+            if (bit < 0 || bit > 63)
 				throw new ArgumentOutOfRangeException();
 			else
-				return (_mask & (1 << bit)) != 0;
+				return (_mask & (1L << bit)) != 0;
         }
     }
 }

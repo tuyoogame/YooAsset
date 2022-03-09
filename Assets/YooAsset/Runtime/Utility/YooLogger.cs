@@ -2,7 +2,7 @@
 
 namespace YooAsset
 {
-	internal static class Logger
+	internal static class YooLogger
 	{
 		/// <summary>
 		/// 日志

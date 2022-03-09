@@ -66,7 +66,7 @@ namespace YooAsset
 			{
 				States = AllAssets == null ? EAssetStates.Fail : EAssetStates.Success;
 				if (States == EAssetStates.Fail)
-					Logger.Warning($"Failed to load all asset object : {AssetPath}");
+					YooLogger.Warning($"Failed to load all asset object : {AssetPath}");
 				InvokeCompletion();
 			}
 #endif

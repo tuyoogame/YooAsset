@@ -84,7 +84,7 @@ namespace YooAsset
 					if (IsWaitForAsyncComplete)
 					{
 						// 强制挂起主线程（注意：该操作会很耗时）
-						Logger.Warning("Suspend the main thread to load unity asset.");
+						YooLogger.Warning("Suspend the main thread to load unity asset.");
 						AllAssets = _cacheRequest.allAssets;
 					}
 					else
@@ -97,7 +97,7 @@ namespace YooAsset
 
 				States = AllAssets == null ? EAssetStates.Fail : EAssetStates.Success;
 				if (States == EAssetStates.Fail)
-					Logger.Warning($"Failed to load sub assets : {AssetName} from bundle : {OwnerBundle.BundleFileInfo.BundleName}");
+					YooLogger.Warning($"Failed to load sub assets : {AssetName} from bundle : {OwnerBundle.BundleFileInfo.BundleName}");
 				InvokeCompletion();
 			}
 		}

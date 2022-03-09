@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
-using YooAsset.Utility;
 
 namespace YooAsset.Editor
 {
@@ -125,7 +124,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 从输出目录加载补丁清单文件
 		/// </summary>
-		public static PatchManifest LoadPatchManifestFile(string fileDirectory)
+		internal static PatchManifest LoadPatchManifestFile(string fileDirectory)
 		{
 			string filePath = $"{fileDirectory}/{ResourceSettingData.Setting.PatchManifestFileName}";
 			if (File.Exists(filePath) == false)

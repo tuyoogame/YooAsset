@@ -4,8 +4,8 @@ namespace YooAsset
 {
 	public static class ResourceSettingData
 	{
-		private static ResourceSetting _setting = null;
-		public static ResourceSetting Setting
+		private static YooAssetSettings _setting = null;
+		public static YooAssetSettings Setting
 		{
 			get
 			{
@@ -20,15 +20,15 @@ namespace YooAsset
 		/// </summary>
 		private static void LoadSettingData()
 		{
-			_setting = Resources.Load<ResourceSetting>("YooAssetSetting");
+			_setting = Resources.Load<YooAssetSettings>("YooAssetSettings");
 			if (_setting == null)
 			{
-				Debug.Log("Use YooAsset default resource setting.");
-				_setting = ScriptableObject.CreateInstance<ResourceSetting>();
+				YooLogger.Log("YooAsset use default settings.");
+				_setting = ScriptableObject.CreateInstance<YooAssetSettings>();
 			}
 			else
 			{
-				Debug.Log("Use YooAsset custom resource setting.");
+				YooLogger.Log("YooAsset use custom settings.");
 			}
 		}
 	}

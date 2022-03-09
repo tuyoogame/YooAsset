@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using YooAsset.Utility;
 
 namespace YooAsset
 {
@@ -113,7 +112,7 @@ namespace YooAsset
 			}
 
 			// 没有找到同名的资源文件
-			Logger.Warning($"Not found asset : {filePath}");
+			YooLogger.Warning($"Not found asset : {filePath}");
 			return filePath;
 #else
 			throw new System.NotImplementedException();

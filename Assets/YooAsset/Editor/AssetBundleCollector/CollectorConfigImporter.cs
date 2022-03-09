@@ -4,7 +4,6 @@ using System.Xml;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using YooAsset.Utility;
 
 namespace YooAsset.Editor
 {

@@ -1,8 +1,8 @@
 ﻿
 namespace YooAsset
 {
-	public interface IBundleServices
-	{	
+	internal interface IBundleServices
+	{
 		/// <summary>
 		/// 获取AssetBundle的信息
 		/// </summary>

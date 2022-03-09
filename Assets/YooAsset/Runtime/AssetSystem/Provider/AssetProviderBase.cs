@@ -61,7 +61,7 @@ namespace YooAsset
 		public void Release()
 		{
 			if (RefCount <= 0)
-				Logger.Warning("Asset provider reference count is already zero. There may be resource leaks !");
+				YooLogger.Warning("Asset provider reference count is already zero. There may be resource leaks !");
 
 			RefCount--;
 		}
@@ -97,7 +97,7 @@ namespace YooAsset
 			// 验证结果
 			if (IsDone == false)
 			{
-				Logger.Warning($"WaitForAsyncComplete failed to loading : {AssetPath}");
+				YooLogger.Warning($"WaitForAsyncComplete failed to loading : {AssetPath}");
 			}
 		}
 

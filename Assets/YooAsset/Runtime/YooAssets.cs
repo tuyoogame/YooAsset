@@ -135,7 +135,7 @@ namespace YooAsset
 			if (parameters.AssetLoadingMaxNumber < 3)
 			{
 				parameters.AssetLoadingMaxNumber = 3;
-				Logger.Warning($"{nameof(parameters.AssetLoadingMaxNumber)} minimum is 3");
+				YooLogger.Warning($"{nameof(parameters.AssetLoadingMaxNumber)} minimum is 3");
 			}
 
 			// 创建间隔计时器
@@ -200,13 +200,13 @@ namespace YooAsset
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
 				var operation = new EditorModeUpdateManifestOperation();
-				OperationUpdater.ProcessOperaiton(operation);
+				OperationSystem.ProcessOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				var operation = new OfflinePlayModeUpdateManifestOperation();
-				OperationUpdater.ProcessOperaiton(operation);
+				OperationSystem.ProcessOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
@@ -284,7 +284,7 @@ namespace YooAsset
 		public static void GetDebugSummy(DebugSummy summy)
 		{
 			if (summy == null)
-				Logger.Error($"{nameof(DebugSummy)} is null");
+				YooLogger.Error($"{nameof(DebugSummy)} is null");
 
 			AssetSystem.GetDebugSummy(summy);
 		}
@@ -507,7 +507,7 @@ namespace YooAsset
 		/// </summary>
 		public static void ClearSandbox()
 		{
-			Logger.Warning("Clear sandbox.");
+			YooLogger.Warning("Clear sandbox.");
 			PatchHelper.ClearSandbox();
 		}
 
@@ -527,7 +527,7 @@ namespace YooAsset
 		internal static void InternalUpdate()
 		{
 			// 更新异步请求操作
-			OperationUpdater.Update();
+			OperationSystem.Update();
 
 			// 更新下载管理系统
 			DownloadSystem.Update();

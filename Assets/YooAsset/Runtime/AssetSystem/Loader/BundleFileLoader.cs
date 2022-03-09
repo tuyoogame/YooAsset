@@ -136,7 +136,7 @@ namespace YooAsset
 				// 注意：Unity2017.4编辑器模式下，如果AssetBundle文件不存在会导致编辑器崩溃，这里做了预判。
 				if (System.IO.File.Exists(BundleFileInfo.LocalPath) == false)
 				{
-					Logger.Warning($"Not found assetBundle file : {BundleFileInfo.LocalPath}");
+					YooLogger.Warning($"Not found assetBundle file : {BundleFileInfo.LocalPath}");
 					States = ELoaderStates.Fail;
 					return;
 				}
@@ -188,7 +188,7 @@ namespace YooAsset
 					if (_isWaitForAsyncComplete)
 					{
 						// 强制挂起主线程（注意：该操作会很耗时）
-						Logger.Warning("Suspend the main thread to load unity bundle.");
+						YooLogger.Warning("Suspend the main thread to load unity bundle.");
 						CacheBundle = _cacheRequest.assetBundle;
 					}
 					else
@@ -202,7 +202,7 @@ namespace YooAsset
 				// Check error
 				if (CacheBundle == null)
 				{
-					Logger.Error($"Failed to load assetBundle file : {BundleFileInfo.BundleName}");
+					YooLogger.Error($"Failed to load assetBundle file : {BundleFileInfo.BundleName}");
 					States = ELoaderStates.Fail;
 				}
 				else
@@ -302,7 +302,7 @@ namespace YooAsset
 					if (_isShowWaitForAsyncError == false)
 					{
 						_isShowWaitForAsyncError = true;
-						Logger.Error($"WaitForAsyncComplete failed ! BundleName : {BundleFileInfo.BundleName} States : {States}");
+						YooLogger.Error($"WaitForAsyncComplete failed ! BundleName : {BundleFileInfo.BundleName} States : {States}");
 					}
 					break;
 				}

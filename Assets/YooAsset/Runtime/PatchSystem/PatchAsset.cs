@@ -3,7 +3,7 @@
 namespace YooAsset
 {
 	[Serializable]
-	public class PatchAsset
+	internal class PatchAsset
 	{
 		/// <summary>
 		/// 资源路径

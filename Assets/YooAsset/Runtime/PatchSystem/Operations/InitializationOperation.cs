@@ -128,12 +128,12 @@ namespace YooAsset
 				PatchCache cache = PatchCache.LoadCache();
 				if (cache.CacheAppVersion != Application.version)
 				{
-					Logger.Warning($"Cache is dirty ! Cache app version is {cache.CacheAppVersion}, Current app version is {Application.version}");
+					YooLogger.Warning($"Cache is dirty ! Cache app version is {cache.CacheAppVersion}, Current app version is {Application.version}");
 
 					// 注意：在覆盖安装的时候，会保留APP沙盒目录，可以选择清空缓存目录
 					if (_impl.ClearCacheWhenDirty)
 					{
-						Logger.Warning("Clear cache files.");
+						YooLogger.Warning("Clear cache files.");
 						PatchHelper.DeleteSandboxCacheFolder();
 					}
 
@@ -148,7 +148,7 @@ namespace YooAsset
 			if (_steps == ESteps.LoadAppManifest)
 			{
 				// 加载APP内的补丁清单
-				Logger.Log($"Load application patch manifest.");
+				YooLogger.Log($"Load application patch manifest.");
 				string filePath = AssetPathHelper.MakeStreamingLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
 				_downloadURL = AssetPathHelper.ConvertToWWWPath(filePath);
 				_downloader = new UnityWebRequester();
@@ -183,7 +183,7 @@ namespace YooAsset
 				// 加载沙盒内的补丁清单	
 				if (PatchHelper.CheckSandboxPatchManifestFileExist())
 				{
-					Logger.Log($"Load sandbox patch manifest.");
+					YooLogger.Log($"Load sandbox patch manifest.");
 					string filePath = AssetPathHelper.MakePersistentLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
 					string jsonData = File.ReadAllText(filePath);
 					_impl.LocalPatchManifest = PatchManifest.Deserialize(jsonData);

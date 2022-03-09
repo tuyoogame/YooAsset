@@ -28,7 +28,7 @@ namespace YooAsset
 			_fallbackHostServer = fallbackHostServer;
 
 			var operation = new HostPlayModeInitializationOperation(this);
-			OperationUpdater.ProcessOperaiton(operation);
+			OperationSystem.ProcessOperaiton(operation);
 			return operation;
 		}
 
@@ -38,7 +38,7 @@ namespace YooAsset
 		public UpdateManifestOperation UpdatePatchManifestAsync(int updateResourceVersion, int timeout)
 		{
 			var operation = new HostPlayModeUpdateManifestOperation(this, updateResourceVersion, timeout);
-			OperationUpdater.ProcessOperaiton(operation);
+			OperationSystem.ProcessOperaiton(operation);
 			return operation;
 		}
 
@@ -284,7 +284,7 @@ namespace YooAsset
 			}
 			else
 			{
-				Logger.Warning($"Not found bundle in patch manifest : {bundleName}");
+				YooLogger.Warning($"Not found bundle in patch manifest : {bundleName}");
 				BundleInfo bundleInfo = new BundleInfo(bundleName, string.Empty);
 				return bundleInfo;
 			}
