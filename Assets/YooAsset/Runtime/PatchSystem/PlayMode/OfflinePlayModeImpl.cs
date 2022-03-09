@@ -36,7 +36,7 @@ namespace YooAsset
 
 			if (AppPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
 			{
-				string localPath = AssetPathHelper.MakeStreamingLoadPath(patchBundle.Hash);
+				string localPath = PathHelper.MakeStreamingLoadPath(patchBundle.Hash);
 				BundleInfo bundleInfo = new BundleInfo(patchBundle, localPath);
 				return bundleInfo;
 			}

@@ -39,7 +39,7 @@ namespace YooAsset
 		/// <summary>
 		/// 当前的加载状态
 		/// </summary>
-		EAssetStates States { get; }
+		AssetProviderBase.EStatus Status { get; }
 
 		/// <summary>
 		/// 引用计数

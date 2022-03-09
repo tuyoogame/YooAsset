@@ -7,6 +7,17 @@ namespace YooAsset
 {
 	internal class BundleFileLoader
 	{
+		public enum EStatus
+		{
+			None = 0,
+			Download,
+			CheckDownload,
+			LoadFile,
+			CheckFile,
+			Success,
+			Fail,
+		}
+
 		/// <summary>
 		/// 资源包文件信息
 		/// </summary>
@@ -20,7 +31,7 @@ namespace YooAsset
 		/// <summary>
 		/// 加载状态
 		/// </summary>
-		public ELoaderStates States { private set; get; }
+		public EStatus Status { private set; get; }
 
 		/// <summary>
 		/// 是否已经销毁
@@ -33,13 +44,13 @@ namespace YooAsset
 		private FileDownloader _fileDownloader;
 		private AssetBundleCreateRequest _cacheRequest;
 		internal AssetBundle CacheBundle { private set; get; }
-		
+
 
 		public BundleFileLoader(BundleInfo bundleInfo)
 		{
 			BundleFileInfo = bundleInfo;
 			RefCount = 0;
-			States = ELoaderStates.None;
+			Status = EStatus.None;
 		}
 
 		/// <summary>
@@ -89,31 +100,31 @@ namespace YooAsset
 			if (IsDone())
 				return;
 
-			if (States == ELoaderStates.None)
+			if (Status == EStatus.None)
 			{
 				// 检测加载地址是否为空
 				if (string.IsNullOrEmpty(BundleFileInfo.LocalPath))
 				{
-					States = ELoaderStates.Fail;
+					Status = EStatus.Fail;
 					return;
 				}
 
 				if (string.IsNullOrEmpty(BundleFileInfo.RemoteMainURL))
-					States = ELoaderStates.LoadFile;
+					Status = EStatus.LoadFile;
 				else
-					States = ELoaderStates.Download;
+					Status = EStatus.Download;
 			}
 
 			// 1. 从服务器下载
-			if (States == ELoaderStates.Download)
+			if (Status == EStatus.Download)
 			{
 				int failedTryAgain = int.MaxValue;
 				_fileDownloader = DownloadSystem.BeginDownload(BundleFileInfo, failedTryAgain);
-				States = ELoaderStates.CheckDownload;
+				Status = EStatus.CheckDownload;
 			}
 
 			// 2. 检测服务器下载结果
-			if (States == ELoaderStates.CheckDownload)
+			if (Status == EStatus.CheckDownload)
 			{
 				if (_fileDownloader.IsDone() == false)
 					return;
@@ -121,23 +132,23 @@ namespace YooAsset
 				if (_fileDownloader.HasError())
 				{
 					_fileDownloader.ReportError();
-					States = ELoaderStates.Fail;
+					Status = EStatus.Fail;
 				}
 				else
 				{
-					States = ELoaderStates.LoadFile;
+					Status = EStatus.LoadFile;
 				}
 			}
 
 			// 3. 加载AssetBundle
-			if (States == ELoaderStates.LoadFile)
+			if (Status == EStatus.LoadFile)
 			{
 #if UNITY_EDITOR
 				// 注意：Unity2017.4编辑器模式下，如果AssetBundle文件不存在会导致编辑器崩溃，这里做了预判。
 				if (System.IO.File.Exists(BundleFileInfo.LocalPath) == false)
 				{
 					YooLogger.Warning($"Not found assetBundle file : {BundleFileInfo.LocalPath}");
-					States = ELoaderStates.Fail;
+					Status = EStatus.Fail;
 					return;
 				}
 #endif
@@ -145,30 +156,14 @@ namespace YooAsset
 				// Load assetBundle file
 				if (BundleFileInfo.IsEncrypted)
 				{
-					if (AssetSystem.DecryptServices == null)
+					if (AssetSystem.DecryptionServices == null)
 						throw new Exception($"{nameof(BundleFileLoader)} need IDecryptServices : {BundleFileInfo.BundleName}");
 
-					EDecryptMethod decryptType = AssetSystem.DecryptServices.DecryptType;
-					if (decryptType == EDecryptMethod.GetDecryptOffset)
-					{
-						ulong offset = AssetSystem.DecryptServices.GetDecryptOffset(BundleFileInfo);
-						if (_isWaitForAsyncComplete)
-							CacheBundle = AssetBundle.LoadFromFile(BundleFileInfo.LocalPath, 0, offset);
-						else
-							_cacheRequest = AssetBundle.LoadFromFileAsync(BundleFileInfo.LocalPath, 0, offset);
-					}
-					else if (decryptType == EDecryptMethod.GetDecryptBinary)
-					{
-						byte[] binary = AssetSystem.DecryptServices.GetDecryptBinary(BundleFileInfo);
-						if (_isWaitForAsyncComplete)
-							CacheBundle = AssetBundle.LoadFromMemory(binary);
-						else
-							_cacheRequest = AssetBundle.LoadFromMemoryAsync(binary);
-					}
+					ulong offset = AssetSystem.DecryptionServices.GetFileOffset(BundleFileInfo);
+					if (_isWaitForAsyncComplete)
+						CacheBundle = AssetBundle.LoadFromFile(BundleFileInfo.LocalPath, 0, offset);
 					else
-					{
-						throw new NotImplementedException($"{decryptType}");
-					}
+						_cacheRequest = AssetBundle.LoadFromFileAsync(BundleFileInfo.LocalPath, 0, offset);
 				}
 				else
 				{
@@ -177,11 +172,11 @@ namespace YooAsset
 					else
 						_cacheRequest = AssetBundle.LoadFromFileAsync(BundleFileInfo.LocalPath);
 				}
-				States = ELoaderStates.CheckFile;
+				Status = EStatus.CheckFile;
 			}
 
 			// 4. 检测AssetBundle加载结果
-			if (States == ELoaderStates.CheckFile)
+			if (Status == EStatus.CheckFile)
 			{
 				if (_cacheRequest != null)
 				{
@@ -203,11 +198,11 @@ namespace YooAsset
 				if (CacheBundle == null)
 				{
 					YooLogger.Error($"Failed to load assetBundle file : {BundleFileInfo.BundleName}");
-					States = ELoaderStates.Fail;
+					Status = EStatus.Fail;
 				}
 				else
 				{
-					States = ELoaderStates.Success;
+					Status = EStatus.Success;
 				}
 			}
 		}
@@ -240,7 +235,7 @@ namespace YooAsset
 		/// </summary>
 		public bool IsDone()
 		{
-			return States == ELoaderStates.Success || States == ELoaderStates.Fail;
+			return Status == EStatus.Success || Status == EStatus.Fail;
 		}
 
 		/// <summary>
@@ -302,7 +297,7 @@ namespace YooAsset
 					if (_isShowWaitForAsyncError == false)
 					{
 						_isShowWaitForAsyncError = true;
-						YooLogger.Error($"WaitForAsyncComplete failed ! BundleName : {BundleFileInfo.BundleName} States : {States}");
+						YooLogger.Error($"WaitForAsyncComplete failed ! BundleName : {BundleFileInfo.BundleName} States : {Status}");
 					}
 					break;
 				}

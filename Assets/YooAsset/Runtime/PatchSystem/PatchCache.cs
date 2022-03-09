@@ -19,10 +19,10 @@ namespace YooAsset
 		/// </summary>
 		public static PatchCache LoadCache()
 		{
-			if (PatchHelper.CheckSandboxCacheFileExist())
+			if (SandboxHelper.CheckSandboxCacheFileExist())
 			{
 				YooLogger.Log("Load patch cache from disk.");
-				string filePath = PatchHelper.GetSandboxCacheFilePath();
+				string filePath = SandboxHelper.GetSandboxCacheFilePath();
 				string jsonData = FileUtility.ReadFile(filePath);
 				return JsonUtility.FromJson<PatchCache>(jsonData);
 			}
@@ -31,7 +31,7 @@ namespace YooAsset
 				YooLogger.Log($"Create patch cache to disk : {Application.version}");
 				PatchCache cache = new PatchCache();
 				cache.CacheAppVersion = Application.version;
-				string filePath = PatchHelper.GetSandboxCacheFilePath();
+				string filePath = SandboxHelper.GetSandboxCacheFilePath();
 				string jsonData = JsonUtility.ToJson(cache);
 				FileUtility.CreateFile(filePath, jsonData);
 				return cache;
@@ -46,7 +46,7 @@ namespace YooAsset
 			YooLogger.Log($"Update patch cache to disk : {Application.version}");
 			PatchCache cache = new PatchCache();
 			cache.CacheAppVersion = Application.version;
-			string filePath = PatchHelper.GetSandboxCacheFilePath();
+			string filePath = SandboxHelper.GetSandboxCacheFilePath();
 			string jsonData = JsonUtility.ToJson(cache);
 			FileUtility.CreateFile(filePath, jsonData);
 		}

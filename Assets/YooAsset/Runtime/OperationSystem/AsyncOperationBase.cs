@@ -6,6 +6,9 @@ namespace YooAsset
 {
 	public abstract class AsyncOperationBase : IEnumerator
 	{
+		// 用户请求的回调
+		private Action<AsyncOperationBase> _callback;
+
 		/// <summary>
 		/// 状态
 		/// </summary>
@@ -26,11 +29,6 @@ namespace YooAsset
 				return Status == EOperationStatus.Failed || Status == EOperationStatus.Succeed;
 			}
 		}
-
-		/// <summary>
-		/// 用户请求的回调
-		/// </summary>
-		private Action<AsyncOperationBase> _callback;
 
 		/// <summary>
 		/// 完成事件

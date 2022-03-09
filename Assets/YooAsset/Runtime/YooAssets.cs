@@ -38,7 +38,7 @@ namespace YooAsset
 			/// <summary>
 			/// 文件解密接口
 			/// </summary>
-			public IDecryptServices DecryptServices = null;
+			public IDecryptionServices DecryptionServices = null;
 
 			/// <summary>
 			/// 资源系统自动释放零引用资源的间隔秒数
@@ -145,7 +145,7 @@ namespace YooAsset
 			}
 
 			if (string.IsNullOrEmpty(parameters.LocationRoot) == false)
-				_locationRoot = AssetPathHelper.GetRegularPath(parameters.LocationRoot);
+				_locationRoot = PathHelper.GetRegularPath(parameters.LocationRoot);
 
 			// 运行模式
 			if (parameters is EditorPlayModeParameters)
@@ -162,21 +162,21 @@ namespace YooAsset
 			{
 				_editorPlayModeImpl = new EditorPlayModeImpl();
 				_bundleServices = _editorPlayModeImpl;
-				AssetSystem.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptServices, _bundleServices);
+				AssetSystem.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
 				return _editorPlayModeImpl.InitializeAsync();
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				_offlinePlayModeImpl = new OfflinePlayModeImpl();
 				_bundleServices = _offlinePlayModeImpl;
-				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptServices, _bundleServices);
+				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
 				return _offlinePlayModeImpl.InitializeAsync();
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
 				_hostPlayModeImpl = new HostPlayModeImpl();
 				_bundleServices = _hostPlayModeImpl;
-				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptServices, _bundleServices);
+				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
 				return _hostPlayModeImpl.InitializeAsync(
 					hostPlayModeParameters.ClearCacheWhenDirty,
@@ -508,7 +508,7 @@ namespace YooAsset
 		public static void ClearSandbox()
 		{
 			YooLogger.Warning("Clear sandbox.");
-			PatchHelper.ClearSandbox();
+			SandboxHelper.ClearSandbox();
 		}
 
 		/// <summary>
@@ -516,7 +516,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetSandboxRoot()
 		{
-			return AssetPathHelper.MakePersistentRootPath();
+			return PathHelper.MakePersistentRootPath();
 		}
 		#endregion
 
@@ -554,12 +554,12 @@ namespace YooAsset
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
-				string filePath = AssetPathHelper.CombineAssetPath(_locationRoot, location);
-				return AssetPathHelper.FindDatabaseAssetPath(filePath);
+				string filePath = PathHelper.CombineAssetPath(_locationRoot, location);
+				return PathHelper.FindDatabaseAssetPath(filePath);
 			}
 			else
 			{
-				return AssetPathHelper.CombineAssetPath(_locationRoot, location);
+				return PathHelper.CombineAssetPath(_locationRoot, location);
 			}
 		}
 		#endregion

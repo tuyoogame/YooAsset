@@ -28,13 +28,13 @@ namespace YooAsset
 			if (IsDone)
 				return;
 
-			if (States == EAssetStates.None)
+			if (Status == EStatus.None)
 			{
-				States = EAssetStates.Loading;
+				Status = EStatus.Loading;
 			}
 
 			// 1. 加载资源对象
-			if (States == EAssetStates.Loading)
+			if (Status == EStatus.Loading)
 			{
 				LoadSceneParameters loadSceneParameters = new LoadSceneParameters();
 				loadSceneParameters.loadSceneMode = _param.LoadMode;			
@@ -42,18 +42,18 @@ namespace YooAsset
 				if (_asyncOp != null)
 				{
 					_asyncOp.allowSceneActivation = true;
-					States = EAssetStates.Checking;
+					Status = EStatus.Checking;
 				}
 				else
 				{
 					YooLogger.Warning($"Failed to load scene : {AssetName}");
-					States = EAssetStates.Fail;
+					Status = EStatus.Fail;
 					InvokeCompletion();
 				}
 			}
 
 			// 2. 检测加载结果
-			if (States == EAssetStates.Checking)
+			if (Status == EStatus.Checking)
 			{
 				if (_asyncOp.isDone)
 				{
@@ -63,7 +63,7 @@ namespace YooAsset
 					if(_param.ActivateOnLoad)
 						instance.Activate();
 
-					States = instance.Scene.IsValid() ? EAssetStates.Success : EAssetStates.Fail;
+					Status = instance.Scene.IsValid() ? EStatus.Success : EStatus.Fail;
 					InvokeCompletion();
 				}
 			}

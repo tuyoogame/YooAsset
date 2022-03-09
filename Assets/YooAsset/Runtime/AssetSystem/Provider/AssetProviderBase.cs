@@ -3,6 +3,16 @@ namespace YooAsset
 {
 	internal abstract class AssetProviderBase : IAssetProvider
 	{
+		public enum EStatus
+		{
+			None = 0,
+			CheckBundle,
+			Loading,
+			Checking,
+			Success,
+			Fail,
+		}
+
 		protected bool IsWaitForAsyncComplete { private set; get; } = false;
 		
 		public string AssetPath { private set; get; }
@@ -11,7 +21,7 @@ namespace YooAsset
 		public UnityEngine.Object AssetObject { protected set; get; }
 		public UnityEngine.Object[] AllAssets { protected set; get; }
 		public IAssetInstance AssetInstance { protected set; get; }
-		public EAssetStates States { protected set; get; }
+		public EStatus Status { protected set; get; }
 		public int RefCount { private set; get; }
 		public AssetOperationHandle Handle { private set; get; }
 		public System.Action<AssetOperationHandle> Callback { set; get; }
@@ -20,7 +30,7 @@ namespace YooAsset
 		{
 			get
 			{
-				return States == EAssetStates.Success || States == EAssetStates.Fail;
+				return Status == EStatus.Success || Status == EStatus.Fail;
 			}
 		}
 		public bool IsValid
@@ -44,7 +54,7 @@ namespace YooAsset
 			AssetPath = assetPath;
 			AssetName = System.IO.Path.GetFileName(assetPath);
 			AssetType = assetType;
-			States = EAssetStates.None;
+			Status = EStatus.None;
 			Handle = new AssetOperationHandle(this);
 		}
 

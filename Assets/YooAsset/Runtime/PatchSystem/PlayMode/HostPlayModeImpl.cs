@@ -170,7 +170,7 @@ namespace YooAsset
 			foreach (var patchBundle in AppPatchManifest.BundleList)
 			{
 				// 如果已经在沙盒内
-				string filePath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+				string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
 				if (System.IO.File.Exists(filePath))
 					continue;
 
@@ -216,7 +216,7 @@ namespace YooAsset
 		private BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
 		{
 			// 注意：资源版本号只用于确定下载路径
-			string sandboxPath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+			string sandboxPath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
 			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.Version, patchBundle.Hash);
 			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.Version, patchBundle.Hash);
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, remoteMainURL, remoteFallbackURL);
@@ -236,8 +236,8 @@ namespace YooAsset
 		// 解压相关
 		private BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
 		{
-			string sandboxPath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
-			string streamingLoadPath = AssetPathHelper.MakeStreamingLoadPath(patchBundle.Hash);
+			string sandboxPath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+			string streamingLoadPath = PathHelper.MakeStreamingLoadPath(patchBundle.Hash);
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, streamingLoadPath, streamingLoadPath);
 			return bundleInfo;
 		}
@@ -265,7 +265,7 @@ namespace YooAsset
 				{
 					if (appPatchBundle.IsBuildin && appPatchBundle.Hash == patchBundle.Hash)
 					{
-						string appLoadPath = AssetPathHelper.MakeStreamingLoadPath(appPatchBundle.Hash);
+						string appLoadPath = PathHelper.MakeStreamingLoadPath(appPatchBundle.Hash);
 						BundleInfo bundleInfo = new BundleInfo(appPatchBundle, appLoadPath);
 						return bundleInfo;
 					}
@@ -274,7 +274,7 @@ namespace YooAsset
 				// 查询沙盒资源				
 				if (DownloadSystem.ContainsVerifyFile(patchBundle.Hash))
 				{
-					string sandboxLoadPath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+					string sandboxLoadPath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
 					BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxLoadPath);
 					return bundleInfo;
 				}

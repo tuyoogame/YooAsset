@@ -59,8 +59,8 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadAppManifest)
 			{
-				string filePath = AssetPathHelper.MakeStreamingLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
-				_downloadURL = AssetPathHelper.ConvertToWWWPath(filePath);
+				string filePath = PathHelper.MakeStreamingLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+				_downloadURL = PathHelper.ConvertToWWWPath(filePath);
 				_downloader = new UnityWebRequester();
 				_downloader.SendRequest(_downloadURL);
 				_steps = ESteps.CheckAppManifest;
@@ -134,11 +134,11 @@ namespace YooAsset
 					if (_impl.ClearCacheWhenDirty)
 					{
 						YooLogger.Warning("Clear cache files.");
-						PatchHelper.DeleteSandboxCacheFolder();
+						SandboxHelper.DeleteSandboxCacheFolder();
 					}
 
 					// 删除清单文件
-					PatchHelper.DeleteSandboxPatchManifestFile();
+					SandboxHelper.DeleteSandboxPatchManifestFile();
 					// 更新缓存文件
 					PatchCache.UpdateCache();
 				}
@@ -149,8 +149,8 @@ namespace YooAsset
 			{
 				// 加载APP内的补丁清单
 				YooLogger.Log($"Load application patch manifest.");
-				string filePath = AssetPathHelper.MakeStreamingLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
-				_downloadURL = AssetPathHelper.ConvertToWWWPath(filePath);
+				string filePath = PathHelper.MakeStreamingLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+				_downloadURL = PathHelper.ConvertToWWWPath(filePath);
 				_downloader = new UnityWebRequester();
 				_downloader.SendRequest(_downloadURL);
 				_steps = ESteps.CheckAppManifest;
@@ -181,10 +181,10 @@ namespace YooAsset
 			if (_steps == ESteps.LoadSandboxManifest)
 			{
 				// 加载沙盒内的补丁清单	
-				if (PatchHelper.CheckSandboxPatchManifestFileExist())
+				if (SandboxHelper.CheckSandboxPatchManifestFileExist())
 				{
 					YooLogger.Log($"Load sandbox patch manifest.");
-					string filePath = AssetPathHelper.MakePersistentLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+					string filePath = PathHelper.MakePersistentLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
 					string jsonData = File.ReadAllText(filePath);
 					_impl.LocalPatchManifest = PatchManifest.Deserialize(jsonData);
 				}

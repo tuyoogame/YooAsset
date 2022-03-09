@@ -24,15 +24,20 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 当前的加载状态
+		/// 当前状态
 		/// </summary>
-		public EAssetStates States
+		public EOperationStatus Status
 		{
 			get
 			{
 				if (IsValid == false)
-					return EAssetStates.None;
-				return _provider.States;
+					return EOperationStatus.None;
+				if (_provider.Status == AssetProviderBase.EStatus.Fail)
+					return EOperationStatus.Failed;
+				else if (_provider.Status == AssetProviderBase.EStatus.Success)
+					return EOperationStatus.Succeed;
+				else
+					return EOperationStatus.None;
 			}
 		}
 

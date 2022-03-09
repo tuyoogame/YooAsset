@@ -20,7 +20,7 @@ namespace YooAsset
 		/// </summary>
 		public static int AssetLoadingMaxNumber { private set; get; }
 
-		public static IDecryptServices DecryptServices { private set; get; }
+		public static IDecryptionServices DecryptionServices { private set; get; }
 		public static IBundleServices BundleServices { private set; get; }
 
 
@@ -28,11 +28,11 @@ namespace YooAsset
 		/// 初始化资源系统
 		/// 注意：在使用AssetSystem之前需要初始化
 		/// </summary>
-		public static void Initialize(bool simulationOnEditor, int assetLoadingMaxNumber, IDecryptServices decryptServices, IBundleServices bundleServices)
+		public static void Initialize(bool simulationOnEditor, int assetLoadingMaxNumber, IDecryptionServices decryptionServices, IBundleServices bundleServices)
 		{
 			SimulationOnEditor = simulationOnEditor;
 			AssetLoadingMaxNumber = assetLoadingMaxNumber;
-			DecryptServices = decryptServices;
+			DecryptionServices = decryptionServices;
 			BundleServices = bundleServices;
 		}
 
@@ -307,7 +307,7 @@ namespace YooAsset
 				DebugSummy.DebugProviderInfo providerInfo = new DebugSummy.DebugProviderInfo();
 				providerInfo.AssetPath = provider.AssetPath;
 				providerInfo.RefCount = provider.RefCount;
-				providerInfo.States = (int)provider.States;
+				providerInfo.Status = (int)provider.Status;
 				providerInfo.BundleInfos.Clear();
 				summy.ProviderInfos.Add(providerInfo);
 

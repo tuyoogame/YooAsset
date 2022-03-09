@@ -122,7 +122,7 @@ namespace YooAsset
 				_downloaderHash.Dispose();
 
 				// 如果补丁清单文件的哈希值相同
-				string currentFileHash = PatchHelper.GetSandboxPatchManifestFileHash();
+				string currentFileHash = SandboxHelper.GetSandboxPatchManifestFileHash();
 				if (currentFileHash == webManifestHash)
 				{
 					YooLogger.Log($"Patch manifest file hash is not change : {webManifestHash}");
@@ -206,7 +206,7 @@ namespace YooAsset
 
 			// 注意：这里会覆盖掉沙盒内的补丁清单文件
 			YooLogger.Log("Save remote patch manifest file.");
-			string savePath = AssetPathHelper.MakePersistentLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+			string savePath = PathHelper.MakePersistentLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
 			PatchManifest.Serialize(savePath, _impl.LocalPatchManifest);
 		}
 
@@ -246,7 +246,7 @@ namespace YooAsset
 				}
 
 				// 查看文件是否存在
-				string filePath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+				string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
 				if (File.Exists(filePath) == false)
 					continue;
 
@@ -285,7 +285,7 @@ namespace YooAsset
 		}
 		private bool RunThread(PatchBundle patchBundle)
 		{
-			string filePath = PatchHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+			string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
 			ThreadInfo info = new ThreadInfo(filePath, patchBundle);
 			return ThreadPool.QueueUserWorkItem(new WaitCallback(VerifyFile), info);
 		}

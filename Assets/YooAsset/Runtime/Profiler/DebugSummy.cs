@@ -29,7 +29,7 @@ namespace YooAsset
 			/// <summary>
 			/// 加载状态
 			/// </summary>
-			public int States { set; get; }
+			public int Status { set; get; }
 		}
 
 		/// <summary>
@@ -50,7 +50,7 @@ namespace YooAsset
 			/// <summary>
 			/// 加载状态
 			/// </summary>
-			public int States { set; get; }
+			public int Status { set; get; }
 
 			/// <summary>
 			/// 依赖的资源包列表

@@ -27,19 +27,19 @@ namespace YooAsset
 			if (IsDone)
 				return;
 
-			if (States == EAssetStates.None)
+			if (Status == EStatus.None)
 			{
 				// 检测资源文件是否存在
 				string guid = UnityEditor.AssetDatabase.AssetPathToGUID(AssetPath);
 				if (string.IsNullOrEmpty(guid))
 				{
-					States = EAssetStates.Fail;
+					Status = EStatus.Fail;
 					InvokeCompletion();
 					return;
 				}
 				else
 				{
-					States = EAssetStates.Loading;
+					Status = EStatus.Loading;
 				}		
 
 				// 注意：模拟异步加载效果提前返回
@@ -48,7 +48,7 @@ namespace YooAsset
 			}
 
 			// 1. 加载资源对象
-			if (States == EAssetStates.Loading)
+			if (Status == EStatus.Loading)
 			{
 				var findAssets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(AssetPath);
 				List<UnityEngine.Object> result = new List<Object>(findAssets.Length);
@@ -58,14 +58,14 @@ namespace YooAsset
 						result.Add(findObj);
 				}
 				AllAssets = result.ToArray();
-				States = EAssetStates.Checking;
+				Status = EStatus.Checking;
 			}
 
 			// 2. 检测加载结果
-			if (States == EAssetStates.Checking)
+			if (Status == EStatus.Checking)
 			{
-				States = AllAssets == null ? EAssetStates.Fail : EAssetStates.Success;
-				if (States == EAssetStates.Fail)
+				Status = AllAssets == null ? EStatus.Fail : EStatus.Success;
+				if (Status == EStatus.Fail)
 					YooLogger.Warning($"Failed to load all asset object : {AssetPath}");
 				InvokeCompletion();
 			}

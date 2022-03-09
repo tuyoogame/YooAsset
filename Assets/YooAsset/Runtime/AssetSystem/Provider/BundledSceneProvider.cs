@@ -29,13 +29,13 @@ namespace YooAsset
 			if (IsDone)
 				return;
 
-			if (States == EAssetStates.None)
+			if (Status == EStatus.None)
 			{
-				States = EAssetStates.CheckBundle;
+				Status = EStatus.CheckBundle;
 			}
 
 			// 1. 检测资源包
-			if (States == EAssetStates.CheckBundle)
+			if (Status == EStatus.CheckBundle)
 			{
 				if (DependBundles.IsDone() == false)
 					return;
@@ -44,34 +44,34 @@ namespace YooAsset
 
 				if (OwnerBundle.CacheBundle == null)
 				{
-					States = EAssetStates.Fail;
+					Status = EStatus.Fail;
 					InvokeCompletion();
 				}
 				else
 				{
-					States = EAssetStates.Loading;
+					Status = EStatus.Loading;
 				}
 			}
 
 			// 2. 加载场景
-			if (States == EAssetStates.Loading)
+			if (Status == EStatus.Loading)
 			{
 				_asyncOp = SceneManager.LoadSceneAsync(AssetName, _param.LoadMode);		
 				if (_asyncOp != null)
 				{
 					_asyncOp.allowSceneActivation = true;
-					States = EAssetStates.Checking;
+					Status = EStatus.Checking;
 				}
 				else
 				{
 					YooLogger.Warning($"Failed to load scene : {AssetName}");
-					States = EAssetStates.Fail;
+					Status = EStatus.Fail;
 					InvokeCompletion();
 				}
 			}
 
 			// 3. 检测加载结果
-			if (States == EAssetStates.Checking)
+			if (Status == EStatus.Checking)
 			{
 				if (_asyncOp.isDone)
 				{
@@ -81,7 +81,7 @@ namespace YooAsset
 					if (_param.ActivateOnLoad)
 						instance.Activate();
 
-					States = instance.Scene.IsValid() ? EAssetStates.Success : EAssetStates.Fail;
+					Status = instance.Scene.IsValid() ? EStatus.Success : EStatus.Fail;
 					InvokeCompletion();
 				}
 			}
