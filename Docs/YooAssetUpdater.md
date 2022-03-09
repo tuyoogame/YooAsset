@@ -71,7 +71,7 @@ private IEnumerator Download()
     yield return _downloader;
 
     //检测下载结果
-    if (_downloader.DownloadStates == EDownloaderStates.Succeed)
+    if (_downloader.States == EOperationStatus.Succeed)
     {
         //下载成功
     }
