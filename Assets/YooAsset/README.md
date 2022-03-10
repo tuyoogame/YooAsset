@@ -1,2 +1,2 @@
-# YooAsset
+# README
 Unity assets system
