@@ -194,8 +194,8 @@ namespace YooAsset
 		/// 向网络端请求并更新补丁清单
 		/// </summary>
 		/// <param name="updateResourceVersion">更新的资源版本号</param>
-		/// <param name="timeout">超时时间</param>
-		public static UpdateManifestOperation UpdateManifestAsync(int updateResourceVersion, int timeout)
+		/// <param name="timeout">超时时间（默认值：60秒）</param>
+		public static UpdateManifestOperation UpdateManifestAsync(int updateResourceVersion, int timeout = 60)
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
@@ -220,7 +220,6 @@ namespace YooAsset
 				throw new NotImplementedException();
 			}
 		}
-
 
 		/// <summary>
 		/// 获取资源版本号

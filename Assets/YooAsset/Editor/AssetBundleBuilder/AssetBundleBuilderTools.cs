@@ -53,7 +53,7 @@ namespace YooAsset.Editor
 			foreach (string assetPath in findAssets)
 			{
 				AnimatorController animator= AssetDatabase.LoadAssetAtPath<AnimatorController>(assetPath);
-				if (EditorTools.FindRedundantAnimationState(animator))
+				if (FindRedundantAnimationState(animator))
 				{
 					findCount++;
 					Debug.LogWarning($"发现冗余的动画控制器：{assetPath}");
@@ -83,7 +83,7 @@ namespace YooAsset.Editor
 			foreach (string assetPath in findAssets)
 			{
 				Material mat = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
-				if (EditorTools.ClearMaterialUnusedProperty(mat))
+				if (ClearMaterialUnusedProperty(mat))
 				{
 					removedCount++;
 					Debug.LogWarning($"材质球已被处理：{assetPath}");
@@ -96,6 +96,120 @@ namespace YooAsset.Editor
 				Debug.Log($"没有发现冗余的材质球");
 			else
 				AssetDatabase.SaveAssets();
+		}
+
+
+		/// <summary>
+		/// 清理无用的材质球属性
+		/// </summary>
+		private static bool ClearMaterialUnusedProperty(Material mat)
+		{
+			bool removeUnused = false;
+			SerializedObject so = new SerializedObject(mat);
+			SerializedProperty sp = so.FindProperty("m_SavedProperties");
+
+			sp.Next(true);
+			do
+			{
+				if (sp.isArray == false)
+					continue;
+
+				for (int i = sp.arraySize - 1; i >= 0; --i)
+				{
+					var p1 = sp.GetArrayElementAtIndex(i);
+					if (p1.isArray)
+					{
+						for (int ii = p1.arraySize - 1; ii >= 0; --ii)
+						{
+							var p2 = p1.GetArrayElementAtIndex(ii);
+							var val = p2.FindPropertyRelative("first");
+							if (mat.HasProperty(val.stringValue) == false)
+							{
+								Debug.Log($"Material {mat.name} remove unused property : {val.stringValue}");
+								p1.DeleteArrayElementAtIndex(ii);
+								removeUnused = true;
+							}
+						}
+					}
+					else
+					{
+						var val = p1.FindPropertyRelative("first");
+						if (mat.HasProperty(val.stringValue) == false)
+						{
+							Debug.Log($"Material {mat.name} remove unused property : {val.stringValue}");
+							sp.DeleteArrayElementAtIndex(i);
+							removeUnused = true;
+						}
+					}
+				}
+			}
+			while (sp.Next(false));
+			so.ApplyModifiedProperties();
+			return removeUnused;
+		}
+
+		/// <summary>
+		/// 查找动画控制器里冗余的动画状态机
+		/// </summary>
+		private static bool FindRedundantAnimationState(AnimatorController animatorController)
+		{
+			if (animatorController == null)
+				return false;
+
+			string assetPath = AssetDatabase.GetAssetPath(animatorController);
+
+			// 查找使用的状态机名称
+			List<string> usedStateNames = new List<string>();
+			foreach (var layer in animatorController.layers)
+			{
+				foreach (var state in layer.stateMachine.states)
+				{
+					usedStateNames.Add(state.state.name);
+				}
+			}
+
+			List<string> allLines = new List<string>();
+			List<int> stateIndexList = new List<int>();
+			using (StreamReader reader = File.OpenText(assetPath))
+			{
+				string content;
+				while (null != (content = reader.ReadLine()))
+				{
+					allLines.Add(content);
+					if (content.StartsWith("AnimatorState:"))
+					{
+						stateIndexList.Add(allLines.Count - 1);
+					}
+				}
+			}
+
+			List<string> allStateNames = new List<string>();
+			foreach (var index in stateIndexList)
+			{
+				for (int i = index; i < allLines.Count; i++)
+				{
+					string content = allLines[i];
+					content = content.Trim();
+					if (content.StartsWith("m_Name"))
+					{
+						string[] splits = content.Split(':');
+						string name = splits[1].TrimStart(' '); //移除前面的空格
+						allStateNames.Add(name);
+						break;
+					}
+				}
+			}
+
+			bool foundRedundantState = false;
+			foreach (var stateName in allStateNames)
+			{
+				if (usedStateNames.Contains(stateName) == false)
+				{
+					Debug.LogWarning($"发现冗余的动画文件:{assetPath}={stateName}");
+					foundRedundantState = true;
+				}
+			}
+			return foundRedundantState;
 		}
 	}
 }
