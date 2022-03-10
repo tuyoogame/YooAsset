@@ -44,7 +44,7 @@ private IEnumerator InitializeYooAsset()
 注意：该模式需要构建资源包
 
 - LocationRoot : 资源定位的根路径，所有通过代码加载的资源文件都需要放在资源定位的根路径下。
-- DecryptServices : 如果资源包在构建的时候有加密，那么需要提供实现IDecryptServices接口的实例类。
+- DecryptionServices : 如果资源包在构建的时候有加密，需要提供实现IDecryptionServices接口的实例类。
 - ClearCacheWhenDirty : 安装包在覆盖安装的时候，是否清空沙盒缓存文件夹。
 - IgnoreResourceVersion : 是否忽略资源版本号，请参考进阶教程。
 - DefaultHostServer : 默认的资源服务器IP地址。
@@ -55,7 +55,7 @@ private IEnumerator InitializeYooAsset()
 {
     var createParameters = new YooAssets.HostPlayModeParameters();
     createParameters.LocationRoot = "Assets/GameRes";
-    createParameters.DecryptServices = null;
+    createParameters.DecryptionServices = null;
     createParameters.ClearCacheWhenDirty = false;
     createParameters.IgnoreResourceVersion = false;
     createParameters.DefaultHostServer = "http://127.0.0.1/CDN1/Android";

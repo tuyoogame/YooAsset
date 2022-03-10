@@ -6,6 +6,8 @@
 
 在此之前，需要获取更新的资源版本号，一般通过HTTP访问游戏服务器来获取。
 
+注意：如果资源系统在初始化的时候，选择忽略资源版本号，那么更新的资源版本号可以设置为0。
+
 ````c#
 private IEnumerator UpdatePatchManifest()
 {
@@ -71,7 +73,7 @@ private IEnumerator Download()
     yield return _downloader;
 
     //检测下载结果
-    if (_downloader.States == EOperationStatus.Succeed)
+    if (_downloader.Status == EOperationStatus.Succeed)
     {
         //下载成功
     }
