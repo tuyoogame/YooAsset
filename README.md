@@ -12,7 +12,7 @@ YooAsset是一个基于Unity3D引擎的资源管理插件。
 
 - **灵活高效的加密方案**
 
-  提供多种加密策略，可以自定义加密规则，基于Unity官方的高效解密方案。
+  基于Unity官方的高效解密方案，可以自定义加密规则。
 
 - **基于引用计数方案**
 
@@ -48,7 +48,11 @@ YooAsset是一个基于Unity3D引擎的资源管理插件。
 5. [资源部署](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetDeploy.md)
 
 ## 代码教程
-1. [初始化](https://github.com/tuyoogame/YooAsset/blob/master/Docs/YooAssetInit.md)
-2. [资源更新](https://github.com/tuyoogame/YooAsset/blob/master/Docs/YooAssetUpdater.md)
-3. [资源加载](https://github.com/tuyoogame/YooAsset/blob/master/Docs/YooAssetLoader.md)
+1. [初始化](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial1.md)
+2. [资源更新](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial2.md)
+3. [资源加载](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial3.md)
+
+## 进阶教程
+
+1. [资源版本管理](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AdvancedTutorial1.md)
 

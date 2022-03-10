@@ -118,3 +118,29 @@ void Handle_Completed(AssetOperationHandle handle)
 }
 ````
 
+**原生文件加载范例**
+
+例如：wwise的初始化文件
+
+````c#
+void Start()
+{
+    //获取资源包信息
+    string location = "wwise/init.bnk";
+    BundleInfo bundleInfo = YooAssets.GetBundleInfo(location);
+    
+    //文件路径
+    string fileSourcePath = bundleInfo.LocalPath;
+    string fileDestPath = $"{Application.persistentDataPath}/Audio/init.bnk";
+    
+    //拷贝文件
+    File.Copy(fileSourcePath, fileDestPath, true);
+    
+    //注意：在安卓平台下，可以通过如下方法判断文件是否在APK内部。
+    if(bundleInfo.IsBuildinJarFile())
+    {
+        ...
+    }
+}
+````
+
