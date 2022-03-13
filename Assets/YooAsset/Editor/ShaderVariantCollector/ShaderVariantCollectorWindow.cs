@@ -7,7 +7,7 @@ namespace YooAsset.Editor
 	{
 		static ShaderVariantCollectionWindow _thisInstance;
 
-		[MenuItem("YooAsset/ShaderVariant Collector", false, 203)]
+		[MenuItem("YooAsset/ShaderVariant Collector", false, 201)]
 		static void ShowWindow()
 		{
 			if (_thisInstance == null)
