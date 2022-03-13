@@ -1,3 +1,4 @@
+#if UNITY_2019_4_OR_NEWER
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -239,3 +240,4 @@ namespace YooAsset.Editor
 		}
 	}
 }
+#endif
