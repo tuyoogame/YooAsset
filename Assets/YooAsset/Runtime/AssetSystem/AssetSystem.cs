@@ -304,7 +304,7 @@ namespace YooAsset
 
 			foreach (var provider in _providers)
 			{
-				DebugSummy.DebugProviderInfo providerInfo = new DebugSummy.DebugProviderInfo();
+				DebugProviderInfo providerInfo = new DebugProviderInfo();
 				providerInfo.AssetPath = provider.AssetPath;
 				providerInfo.RefCount = provider.RefCount;
 				providerInfo.Status = (int)provider.Status;

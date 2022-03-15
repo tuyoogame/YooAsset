@@ -36,14 +36,14 @@ namespace YooAsset
 		/// <summary>
 		/// 获取资源包的调试信息列表
 		/// </summary>
-		internal void GetBundleDebugInfos(List<DebugSummy.DebugBundleInfo> output)
+		internal void GetBundleDebugInfos(List<DebugBundleInfo> output)
 		{
-			var ownerInfo = new DebugSummy.DebugBundleInfo();
-			ownerInfo.BundleName = OwnerBundle.BundleFileInfo.BundleName;
-			ownerInfo.Version = OwnerBundle.BundleFileInfo.Version;
-			ownerInfo.RefCount = OwnerBundle.RefCount;
-			ownerInfo.Status = (int)OwnerBundle.Status;
-			output.Add(ownerInfo);
+			var bundleInfo = new DebugBundleInfo();
+			bundleInfo.BundleName = OwnerBundle.BundleFileInfo.BundleName;
+			bundleInfo.Version = OwnerBundle.BundleFileInfo.Version;
+			bundleInfo.RefCount = OwnerBundle.RefCount;
+			bundleInfo.Status = (int)OwnerBundle.Status;
+			output.Add(bundleInfo);
 
 			DependBundles.GetBundleDebugInfos(output);
 		}

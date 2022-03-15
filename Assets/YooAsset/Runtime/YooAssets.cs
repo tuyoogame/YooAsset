@@ -280,7 +280,7 @@ namespace YooAsset
 		/// <summary>
 		/// 获取调试汇总信息
 		/// </summary>
-		public static void GetDebugSummy(DebugSummy summy)
+		internal static void GetDebugSummy(DebugSummy summy)
 		{
 			if (summy == null)
 				YooLogger.Error($"{nameof(DebugSummy)} is null");
