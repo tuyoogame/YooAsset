@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
-	internal class AssetListViewer
+	internal class AssetListBrowserViewer
 	{
 		private VisualTreeAsset _visualAsset;
 		private TemplateContainer _root;
@@ -19,22 +19,22 @@ namespace YooAsset.Editor
 		private PatchManifest _manifest;
 
 		/// <summary>
-		/// ³õÊ¼»¯Ò³Ãæ
+		/// åˆå§‹åŒ–é¡µé¢
 		/// </summary>
 		public void InitViewer()
 		{
-			// ¼ÓÔØ²¼¾ÖÎÄ¼ş
-			string uxml = "Assets/YooAsset/Editor/AssetBundleBrowser/VisualViewers/AssetListViewer.uxml";
+			// åŠ è½½å¸ƒå±€æ–‡ä»¶
+			string uxml = "Assets/YooAsset/Editor/AssetBundleBrowser/VisualViewers/AssetListBrowserViewer.uxml";
 			_visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (_visualAsset == null)
 			{
-				Debug.LogError($"Not found {nameof(AssetListViewer)}.uxml : {uxml}");
+				Debug.LogError($"Not found {nameof(AssetListBrowserViewer)}.uxml : {uxml}");
 				return;
 			}
 			_root = _visualAsset.CloneTree();
 			_root.style.flexGrow = 1f;
 
-			// ×ÊÔ´ÁĞ±í
+			// èµ„æºåˆ—è¡¨
 			_assetListView = _root.Q<ListView>("TopListView");
 			_assetListView.makeItem = MakeAssetListViewItem;
 			_assetListView.bindItem = BindAssetListViewItem;
@@ -44,14 +44,14 @@ namespace YooAsset.Editor
 #else
 			_assetListView.onSelectionChanged += AssetListView_onSelectionChange;
 #endif
-			// ÒÀÀµÁĞ±í
+			// ä¾èµ–åˆ—è¡¨
 			_dependListView = _root.Q<ListView>("BottomListView");
 			_dependListView.makeItem = MakeDependListViewItem;
 			_dependListView.bindItem = BindDependListViewItem;
 		}
 
 		/// <summary>
-		/// Ìî³äÒ³ÃæÊı¾İ
+		/// å¡«å……é¡µé¢æ•°æ®
 		/// </summary>
 		public void FillViewData(PatchManifest manifest, string searchKeyWord)
 		{
@@ -75,7 +75,7 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// ¹Ò½Óµ½¸¸ÀàÒ³ÃæÉÏ
+		/// æŒ‚æ¥åˆ°çˆ¶ç±»é¡µé¢ä¸Š
 		/// </summary>
 		public void AttachParent(VisualElement parent)
 		{
@@ -83,7 +83,7 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// ´Ó¸¸ÀàÒ³ÃæÍÑÀë¿ª
+		/// ä»çˆ¶ç±»é¡µé¢è„±ç¦»å¼€
 		/// </summary>
 		public void DetachParent()
 		{
@@ -91,7 +91,7 @@ namespace YooAsset.Editor
 		}
 
 
-		// ×ÊÔ´ÁĞ±íÏà¹Ø
+		// èµ„æºåˆ—è¡¨ç›¸å…³
 		private VisualElement MakeAssetListViewItem()
 		{
 			VisualElement element = new VisualElement();
@@ -156,7 +156,7 @@ namespace YooAsset.Editor
 			}
 		}
 
-		// ÒÀÀµÁĞ±íÏà¹Ø
+		// ä¾èµ–åˆ—è¡¨ç›¸å…³
 		private VisualElement MakeDependListViewItem()
 		{
 			VisualElement element = new VisualElement();

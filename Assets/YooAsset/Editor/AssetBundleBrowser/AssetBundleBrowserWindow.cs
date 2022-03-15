@@ -15,19 +15,29 @@ namespace YooAsset.Editor
 		public static void ShowExample()
 		{
 			AssetBundleBrowserWindow wnd = GetWindow<AssetBundleBrowserWindow>();
-			wnd.titleContent = new GUIContent("×ÊÔ´°üä¯ÀÀ¹¤¾ß");
+			wnd.titleContent = new GUIContent("èµ„æºåŒ…æµè§ˆå·¥å…·");
 			wnd.minSize = new Vector2(800, 600);
 		}
 
+		/// <summary>
+		/// æ˜¾ç¤ºæ¨¡å¼
+		/// </summary>
 		private enum EShowMode
 		{
+			/// <summary>
+			/// èµ„æºå¯¹è±¡åˆ—è¡¨æ˜¾ç¤ºæ¨¡å¼
+			/// </summary>
 			AssetList,
+
+			/// <summary>
+			/// èµ„æºåŒ…åˆ—è¡¨æ˜¾ç¤ºæ¨¡å¼
+			/// </summary>
 			BundleList,
 		}
 
 		private ToolbarMenu _showModeMenu;
-		private AssetListViewer _assetListViewer;
-		private BundleListViewer _bundleListViewer;
+		private AssetListBrowserViewer _assetListViewer;
+		private BundleListBrowserViewer _bundleListViewer;
 
 		private EShowMode _showMode;
 		private string _searchKeyWord;
@@ -38,7 +48,7 @@ namespace YooAsset.Editor
 		{
 			VisualElement root = this.rootVisualElement;
 
-			// ¼ÓÔØ²¼¾ÖÎÄ¼ş
+			// åŠ è½½å¸ƒå±€æ–‡ä»¶
 			string uxml = "Assets/YooAsset/Editor/AssetBundleBrowser/AssetBundleBrowser.uxml";
 			var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (visualAsset == null)
@@ -48,28 +58,28 @@ namespace YooAsset.Editor
 			}
 			visualAsset.CloneTree(root);
 
-			// µ¼Èë°´Å¥
+			// å¯¼å…¥æŒ‰é’®
 			var importBtn = root.Q<Button>("ImportButton");
 			importBtn.clicked += ImportBtn_onClick;
 
-			// ÏÔÊ¾Ä£Ê½²Ëµ¥
+			// æ˜¾ç¤ºæ¨¡å¼èœå•
 			_showModeMenu = root.Q<ToolbarMenu>("ShowModeMenu");
 			_showModeMenu.menu.AppendAction(EShowMode.AssetList.ToString(), ShowModeMenuAction1);
 			_showModeMenu.menu.AppendAction(EShowMode.BundleList.ToString(), ShowModeMenuAction2);
 
-			// ËÑË÷À¸
+			// æœç´¢æ 
 			var searchField = root.Q<ToolbarPopupSearchField>("SearchField");
 			searchField.RegisterValueChangedCallback(OnSearchKeyWordChange);
 
-			// ¼ÓÔØÒ³Ãæ
-			_assetListViewer = new AssetListViewer();
+			// åŠ è½½é¡µé¢
+			_assetListViewer = new AssetListBrowserViewer();
 			_assetListViewer.InitViewer();
 
-			// ¼ÓÔØÒ³Ãæ
-			_bundleListViewer = new BundleListViewer();
+			// åŠ è½½é¡µé¢
+			_bundleListViewer = new BundleListBrowserViewer();
 			_bundleListViewer.InitViewer();
 
-			// ³õÊ¼Ò³Ãæ
+			// åˆå§‹é¡µé¢
 			_showMode = EShowMode.AssetList;
 			_showModeMenu.text = EShowMode.AssetList.ToString();
 			_assetListViewer.AttachParent(root);
@@ -77,7 +87,7 @@ namespace YooAsset.Editor
 
 		private void ImportBtn_onClick()
 		{
-			string selectFilePath = EditorUtility.OpenFilePanel("µ¼Èë²¹¶¡Çåµ¥", EditorTools.GetProjectPath(), "bytes");
+			string selectFilePath = EditorUtility.OpenFilePanel("å¯¼å…¥è¡¥ä¸æ¸…å•", EditorTools.GetProjectPath(), "bytes");
 			if (string.IsNullOrEmpty(selectFilePath))
 				return;
 
