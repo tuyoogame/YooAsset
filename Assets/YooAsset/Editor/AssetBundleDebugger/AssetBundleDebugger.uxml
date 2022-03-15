@@ -2,6 +2,6 @@
     <uie:Toolbar name="Toolbar" style="display: flex;">
         <uie:ToolbarButton text="Sample" display-tooltip-when-elided="true" name="SampleButton" style="width: 70px; background-color: rgb(20, 134, 171); -unity-text-align: middle-center;" />
         <uie:ToolbarMenu display-tooltip-when-elided="true" name="ShowModeMenu" text="ShowMode" style="width: 100px; flex-grow: 0;" />
-        <uie:ToolbarSearchField focusable="true" name="rSearchField" style="flex-grow: 1;" />
+        <uie:ToolbarSearchField focusable="true" name="SearchField" style="flex-grow: 1;" />
     </uie:Toolbar>
 </ui:UXML>

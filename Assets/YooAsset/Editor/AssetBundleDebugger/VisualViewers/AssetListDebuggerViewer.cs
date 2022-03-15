@@ -24,7 +24,8 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件
-			string uxml = "Assets/YooAsset/Editor/AssetBundleDebugger/VisualViewers/AssetListDebuggerViewer.uxml";
+			string rootPath = EditorTools.GetYooAssetPath();
+			string uxml = $"{rootPath}/Editor/AssetBundleDebugger/VisualViewers/AssetListDebuggerViewer.uxml";
 			_visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (_visualAsset == null)
 			{
@@ -187,7 +188,7 @@ namespace YooAsset.Editor
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
-				label.style.width = 250;
+				label.style.width = 100;
 				element.Add(label);
 			}
 
@@ -197,7 +198,7 @@ namespace YooAsset.Editor
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
-				label.style.width = 150;
+				label.style.width = 120;
 				element.Add(label);
 			}
 

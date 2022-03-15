@@ -25,7 +25,8 @@ namespace YooAsset.Editor
             VisualElement root = rootVisualElement;
 
             // 加载布局文件
-            string uxml = "Assets/YooAsset/Editor/AssetBundleDebugger/AssetBundleDebugger.uxml";
+            string rootPath = EditorTools.GetYooAssetPath();
+            string uxml = $"{rootPath}/Editor/AssetBundleDebugger/AssetBundleDebugger.uxml";
             var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
             if (visualAsset == null)
             {
@@ -39,7 +40,7 @@ namespace YooAsset.Editor
             sampleBtn.clicked += SampleBtn_onClick;
 
             // 搜索栏
-            var searchField = root.Q<ToolbarPopupSearchField>("SearchField");
+            var searchField = root.Q<ToolbarSearchField>("SearchField");
             searchField.RegisterValueChangedCallback(OnSearchKeyWordChange);
 
             // 加载页面
