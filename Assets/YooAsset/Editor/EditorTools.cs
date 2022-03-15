@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.Animations;
 
 namespace YooAsset.Editor
 {
@@ -413,12 +412,45 @@ namespace YooAsset.Editor
 		#endregion
 
 		#region 路径
+		private static string YooAssetPath;
+
 		/// <summary>
 		/// 获取规范的路径
 		/// </summary>
 		public static string GetRegularPath(string path)
 		{
 			return path.Replace('\\', '/').Replace("\\", "/"); //替换为Linux路径格式
+		}
+
+		/// <summary>
+		/// 获取资源框架目录路径
+		/// </summary>
+		public static string GetYooAssetPath()
+		{
+			if (string.IsNullOrEmpty(YooAssetPath) == false)
+				return YooAssetPath;
+
+			string packagesPath = ("Packages/com.tuyoo.yooasset/README.md");
+			var obj = AssetDatabase.LoadAssetAtPath(packagesPath, typeof(TextAsset));
+			if(obj != null)
+			{
+				YooAssetPath = "Packages/com.tuyoo.yooasset/";
+				return YooAssetPath;
+			}
+
+			string[] allDirectorys = Directory.GetDirectories(Application.dataPath, "YooAsset", SearchOption.AllDirectories);
+			if (allDirectorys.Length == 0)
+			{
+				Debug.LogError("Not found YooAsset Folder!");
+				return string.Empty;
+			}
+			if (allDirectorys.Length > 1)
+			{
+				Debug.LogError("Found multiple YooAsset Folders!");
+				return string.Empty;
+			}
+			YooAssetPath = AbsolutePathToAssetPath(allDirectorys[0]);
+			return YooAssetPath;
 		}
 
 		/// <summary>
