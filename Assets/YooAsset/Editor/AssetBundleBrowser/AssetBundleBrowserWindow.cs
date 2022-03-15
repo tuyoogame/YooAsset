@@ -49,7 +49,8 @@ namespace YooAsset.Editor
 			VisualElement root = this.rootVisualElement;
 
 			// 加载布局文件
-			string uxml = "Assets/YooAsset/Editor/AssetBundleBrowser/AssetBundleBrowser.uxml";
+			string rootPath = EditorTools.GetYooAssetPath();
+			string uxml = $"{rootPath}/Editor/AssetBundleBrowser/AssetBundleBrowser.uxml";
 			var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (visualAsset == null)
 			{
@@ -68,7 +69,7 @@ namespace YooAsset.Editor
 			_showModeMenu.menu.AppendAction(EShowMode.BundleList.ToString(), ShowModeMenuAction2);
 
 			// 搜索栏
-			var searchField = root.Q<ToolbarPopupSearchField>("SearchField");
+			var searchField = root.Q<ToolbarSearchField>("SearchField");
 			searchField.RegisterValueChangedCallback(OnSearchKeyWordChange);
 
 			// 加载页面
@@ -99,8 +100,11 @@ namespace YooAsset.Editor
 		private void OnSearchKeyWordChange(ChangeEvent<string> e)
 		{
 			_searchKeyWord = e.newValue;
-			_assetListViewer.FillViewData(_manifest, _searchKeyWord);
-			_bundleListViewer.FillViewData(_manifest, _searchKeyWord);
+			if(_manifest != null)
+			{
+				_assetListViewer.FillViewData(_manifest, _searchKeyWord);
+				_bundleListViewer.FillViewData(_manifest, _searchKeyWord);
+			}
 		}
 		private void ShowModeMenuAction1(DropdownMenuAction action)
 		{

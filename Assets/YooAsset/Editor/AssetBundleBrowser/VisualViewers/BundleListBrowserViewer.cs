@@ -24,7 +24,8 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件
-			string uxml = "Assets/YooAsset/Editor/AssetBundleBrowser/VisualViewers/BundleListBrowserViewer.uxml";
+			string rootPath = EditorTools.GetYooAssetPath();
+			string uxml = $"{rootPath}/Editor/AssetBundleBrowser/VisualViewers/BundleListBrowserViewer.uxml";
 			_visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (_visualAsset == null)
 			{
