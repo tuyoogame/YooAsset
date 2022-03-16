@@ -61,7 +61,7 @@ namespace YooAsset.Editor
 				oldPatchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory);
 			}
 
-			foreach (var bundleInfo in buildMapContext.Report.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				var bundleName = bundleInfo.BundleName;
 				string filePath = $"{buildParameters.PipelineOutputDirectory}/{bundleName}";
@@ -114,7 +114,7 @@ namespace YooAsset.Editor
 		private List<PatchAsset> GetAllPatchAsset(TaskGetBuildMap.BuildMapContext buildMapContext, PatchManifest patchManifest)
 		{
 			List<PatchAsset> result = new List<PatchAsset>(1000);
-			foreach (var bundleInfo in buildMapContext.Report.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				var assetInfos = bundleInfo.GetCollectAssetInfos();
 				foreach (var assetInfo in assetInfos)

@@ -181,6 +181,7 @@ namespace YooAsset.Editor
 				new TaskEncryption(), //加密资源文件
 				new TaskCreatePatchManifest(), //创建清单文件
 				new TaskCreateReadme(), //创建说明文件
+				new TaskCreateReport(), //创建报告文件
 				new TaskCreatePatchPackage(), //制作补丁包
 				new TaskCopyBuildinFiles(), //拷贝内置文件
 			};

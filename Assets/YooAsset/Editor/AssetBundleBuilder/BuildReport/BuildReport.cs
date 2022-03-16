@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace YooAsset.Editor
 {
@@ -11,39 +12,28 @@ namespace YooAsset.Editor
 	public class BuildReport
 	{
 		/// <summary>
+		/// 构建汇总信息
+		/// </summary>
+		public BuildSummary Summary = new BuildSummary();
+
+		/// <summary>
 		/// 资源包列表
 		/// </summary>
-		public readonly List<BuildBundleInfo> BundleInfos = new List<BuildBundleInfo>(1000);
+		public List<BuildBundleInfo> BundleInfos;
 
 		/// <summary>
 		/// 冗余的资源列表
 		/// </summary>
-		public readonly List<string> RedundancyList = new List<string>(1000);
+		public List<string> RedundancyList;
 
 
 		/// <summary>
-		/// 检测是否包含BundleName
+		/// 序列化
 		/// </summary>
-		public bool IsContainsBundle(string bundleFullName)
+		public static void Serialize(string savePath, BuildReport buildReport)
 		{
-			return TryGetBundleInfo(bundleFullName, out BuildBundleInfo bundleInfo);
-		}
-
-		/// <summary>
-		/// 尝试获取资源包类，如果没有返回空
-		/// </summary>
-		public bool TryGetBundleInfo(string bundleFullName, out BuildBundleInfo result)
-		{
-			foreach (var bundleInfo in BundleInfos)
-			{
-				if (bundleInfo.BundleName == bundleFullName)
-				{
-					result = bundleInfo;
-					return true;
-				}
-			}
-			result = null;
-			return false;
+			string json = JsonUtility.ToJson(buildReport, true);
+			FileUtility.CreateFile(savePath, json);
 		}
 	}
 }

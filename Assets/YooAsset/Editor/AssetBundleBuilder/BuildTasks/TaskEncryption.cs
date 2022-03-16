@@ -64,7 +64,7 @@ namespace YooAsset.Editor
 
 			UnityEngine.Debug.Log($"开始加密资源文件");
 			int progressValue = 0;
-			foreach (var bundleInfo in buildMapContext.Report.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				var bundleName = bundleInfo.BundleName;
 				string filePath = $"{buildParameters.PipelineOutputDirectory}/{bundleName}";
@@ -83,7 +83,7 @@ namespace YooAsset.Editor
 				}
 
 				// 进度条
-				EditorTools.DisplayProgressBar("加密资源包", ++progressValue, buildMapContext.Report.BundleInfos.Count);
+				EditorTools.DisplayProgressBar("加密资源包", ++progressValue, buildMapContext.BundleInfos.Count);
 			}
 			EditorTools.ClearProgressBar();
 
