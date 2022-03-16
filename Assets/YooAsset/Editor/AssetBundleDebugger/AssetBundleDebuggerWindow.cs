@@ -16,7 +16,7 @@ namespace YooAsset.Editor
         }
 
         private AssetListDebuggerViewer _assetListViewer;
-        private readonly DebugSummy _summy = new DebugSummy();
+        private readonly DebugReport _debugReport = new DebugReport();
         private string _searchKeyWord;
 
 
@@ -52,13 +52,13 @@ namespace YooAsset.Editor
         }
         private void SampleBtn_onClick()
         {
-            YooAssets.GetDebugSummy(_summy);
-            _assetListViewer.FillViewData(_summy, _searchKeyWord);
+            YooAssets.GetDebugReport(_debugReport);
+            _assetListViewer.FillViewData(_debugReport, _searchKeyWord);
         }
         private void OnSearchKeyWordChange(ChangeEvent<string> e)
         {
             _searchKeyWord = e.newValue;
-            _assetListViewer.FillViewData(_summy, _searchKeyWord);
+            _assetListViewer.FillViewData(_debugReport, _searchKeyWord);
         }
     }
 }

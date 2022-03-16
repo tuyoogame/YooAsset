@@ -16,7 +16,7 @@ namespace YooAsset.Editor
 
 		private ListView _assetListView;
 		private ListView _dependListView;
-		private DebugSummy _summy;
+		private DebugReport _debugReport;
 
 		/// <summary>
 		/// 初始化页面
@@ -54,16 +54,16 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 填充页面数据
 		/// </summary>
-		public void FillViewData(DebugSummy summy, string searchKeyWord)
+		public void FillViewData(DebugReport debugReport, string searchKeyWord)
 		{
-			_summy = summy;
+			_debugReport = debugReport;
 			_assetListView.Clear();
-			_assetListView.itemsSource = FilterViewItems(summy, searchKeyWord);
+			_assetListView.itemsSource = FilterViewItems(debugReport, searchKeyWord);
 		}
-		private List<DebugProviderInfo> FilterViewItems(DebugSummy summy, string searchKeyWord)
+		private List<DebugProviderInfo> FilterViewItems(DebugReport debugReport, string searchKeyWord)
 		{
-			var result = new List<DebugProviderInfo>(summy.ProviderInfos.Count);
-			foreach (var providerInfo in summy.ProviderInfos)
+			var result = new List<DebugProviderInfo>(debugReport.ProviderInfos.Count);
+			foreach (var providerInfo in debugReport.ProviderInfos)
 			{
 				if(string.IsNullOrEmpty(searchKeyWord) == false)
 				{
