@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -8,6 +9,7 @@ namespace YooAsset.Editor
 	/// <summary>
 	/// 构建的资源包信息类
 	/// </summary>
+	[Serializable]
 	public class BuildBundleInfo
 	{
 		/// <summary>

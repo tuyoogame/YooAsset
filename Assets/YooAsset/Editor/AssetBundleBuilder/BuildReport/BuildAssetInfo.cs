@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace YooAsset.Editor
@@ -6,6 +7,7 @@ namespace YooAsset.Editor
 	/// <summary>
 	/// 构建的资源信息类
 	/// </summary>
+	[Serializable]
 	public class BuildAssetInfo
 	{
 		/// <summary>

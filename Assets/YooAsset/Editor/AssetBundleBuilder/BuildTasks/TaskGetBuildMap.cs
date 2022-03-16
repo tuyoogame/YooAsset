@@ -145,11 +145,11 @@ namespace YooAsset.Editor
 			Dictionary<string, BuildAssetInfo> buildAssets = new Dictionary<string, BuildAssetInfo>();
 
 			// 1. 获取主动收集的资源
-			List<AssetCollectInfo> allCollectInfos = AssetBundleCollectorSettingData.GetAllCollectAssets();
+			List<CollectAssetInfo> allCollectInfos = AssetBundleCollectorSettingData.GetAllCollectAssets();
 
 			// 2. 对收集的资源进行依赖分析
 			int progressValue = 0;
-			foreach (AssetCollectInfo collectInfo in allCollectInfos)
+			foreach (CollectAssetInfo collectInfo in allCollectInfos)
 			{
 				string mainAssetPath = collectInfo.AssetPath;
 
