@@ -15,22 +15,12 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 资源包完整名称
 		/// </summary>
-		public string BundleName { private set; get; }
-
-		/// <summary>
-		/// 资源包标签名
-		/// </summary>
-		public string BundleLabel { private set; get; }
-
-		/// <summary>
-		/// 资源包文件格式
-		/// </summary>
-		public string BundleVariant { private set; get; }
+		public string BundleName;
 
 		/// <summary>
 		/// 包含的资源列表
 		/// </summary>
-		public readonly List<BuildAssetInfo> Assets = new List<BuildAssetInfo>();
+		public List<BuildAssetInfo> Assets = new List<BuildAssetInfo>();
 
 		/// <summary>
 		/// 是否为原生文件
@@ -49,11 +39,9 @@ namespace YooAsset.Editor
 		}
 
 
-		public BuildBundleInfo(string bundleLabel, string bundleVariant)
+		public BuildBundleInfo(string bundleName)
 		{
-			BundleLabel = bundleLabel;
-			BundleVariant = bundleVariant;
-			BundleName = AssetBundleBuilderHelper.MakeBundleName(bundleLabel, bundleVariant);
+			BundleName = bundleName;
 		}
 
 		/// <summary>
@@ -108,14 +96,6 @@ namespace YooAsset.Editor
 				}
 			}
 			return result.ToArray();
-		}
-
-		/// <summary>
-		/// 获取主动收集的资源路径列表
-		/// </summary>
-		public string[] GetCollectAssetPaths()
-		{
-			return Assets.Where(t => t.IsCollectAsset).Select(t => t.AssetPath).ToArray();
 		}
 
 		/// <summary>

@@ -77,17 +77,17 @@ namespace YooAsset.Editor
 
 			AppendData(content, "");
 			AppendData(content, $"--冗余列表--");
-			for (int i = 0; i < buildMapContext.RedundancyList.Count; i++)
+			for (int i = 0; i < buildMapContext.Report.RedundancyList.Count; i++)
 			{
-				string redundancyAssetPath = buildMapContext.RedundancyList[i];
+				string redundancyAssetPath = buildMapContext.Report.RedundancyList[i];
 				AppendData(content, redundancyAssetPath);
 			}
 
 			AppendData(content, "");
 			AppendData(content, $"--构建列表--");
-			for (int i = 0; i < buildMapContext.BundleInfos.Count; i++)
+			for (int i = 0; i < buildMapContext.Report.BundleInfos.Count; i++)
 			{
-				string bundleName = buildMapContext.BundleInfos[i].BundleName;
+				string bundleName = buildMapContext.Report.BundleInfos[i].BundleName;
 				AppendData(content, bundleName);
 			}
 

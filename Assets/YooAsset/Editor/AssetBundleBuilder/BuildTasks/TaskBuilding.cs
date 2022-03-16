@@ -31,7 +31,7 @@ namespace YooAsset.Editor
 			context.SetContextObject(unityManifestContext);
 
 			// 拷贝原生文件
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Report.BundleInfos)
 			{
 				if (bundleInfo.IsRawFile)
 				{
@@ -62,7 +62,7 @@ namespace YooAsset.Editor
 
 			// 1. 过滤掉原生Bundle
 			List<BuildBundleInfo> expectBundles = new List<BuildBundleInfo>(buildedBundles.Length);
-			foreach(var bundleInfo in buildMapContext.BundleInfos)
+			foreach(var bundleInfo in buildMapContext.Report.BundleInfos)
 			{
 				if (bundleInfo.IsRawFile == false)
 					expectBundles.Add(bundleInfo);
@@ -77,7 +77,7 @@ namespace YooAsset.Editor
 			// 3. 正向验证Bundle
 			foreach (var bundleName in buildedBundles)
 			{
-				if (buildMapContext.IsContainsBundle(bundleName) == false)
+				if (buildMapContext.Report.IsContainsBundle(bundleName) == false)
 				{
 					throw new Exception($"Should never get here !");
 				}

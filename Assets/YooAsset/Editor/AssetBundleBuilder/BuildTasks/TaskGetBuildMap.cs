@@ -11,31 +11,22 @@ namespace YooAsset.Editor
 	{
 		public class BuildMapContext : IContextObject
 		{
-			/// <summary>
-			/// 资源包列表
-			/// </summary>
-			public readonly List<BuildBundleInfo> BundleInfos = new List<BuildBundleInfo>(1000);
-
-			/// <summary>
-			/// 冗余的资源列表
-			/// </summary>
-			public readonly List<string> RedundancyList = new List<string>(1000);
-
+			public BuildReport Report = new BuildReport();
 
 			/// <summary>
 			/// 添加一个打包资源
 			/// </summary>
 			public void PackAsset(BuildAssetInfo assetInfo)
 			{
-				if (TryGetBundleInfo(assetInfo.GetBundleName(), out BuildBundleInfo bundleInfo))
+				if (Report.TryGetBundleInfo(assetInfo.BundleName, out BuildBundleInfo bundleInfo))
 				{
 					bundleInfo.PackAsset(assetInfo);
 				}
 				else
 				{
-					BuildBundleInfo newBundleInfo = new BuildBundleInfo(assetInfo.BundleLabel, assetInfo.BundleVariant);
+					BuildBundleInfo newBundleInfo = new BuildBundleInfo(assetInfo.BundleName);
 					newBundleInfo.PackAsset(assetInfo);
-					BundleInfos.Add(newBundleInfo);
+					Report.BundleInfos.Add(newBundleInfo);
 				}
 			}
 
@@ -44,8 +35,8 @@ namespace YooAsset.Editor
 			/// </summary>
 			public List<BuildAssetInfo> GetAllAssets()
 			{
-				List<BuildAssetInfo> result = new List<BuildAssetInfo>(BundleInfos.Count);
-				foreach (var bundleInfo in BundleInfos)
+				List<BuildAssetInfo> result = new List<BuildAssetInfo>(Report.BundleInfos.Count);
+				foreach (var bundleInfo in Report.BundleInfos)
 				{
 					result.AddRange(bundleInfo.Assets);
 				}
@@ -57,21 +48,9 @@ namespace YooAsset.Editor
 			/// </summary>
 			public string[] GetAssetTags(string bundleFullName)
 			{
-				if (TryGetBundleInfo(bundleFullName, out BuildBundleInfo bundleInfo))
+				if (Report.TryGetBundleInfo(bundleFullName, out BuildBundleInfo bundleInfo))
 				{
 					return bundleInfo.GetAssetTags();
-				}
-				throw new Exception($"Not found {nameof(BuildBundleInfo)} : {bundleFullName}");
-			}
-
-			/// <summary>
-			/// 获取AssetBundle内收集的资源路径列表
-			/// </summary>
-			public string[] GetCollectAssetPaths(string bundleFullName)
-			{
-				if (TryGetBundleInfo(bundleFullName, out BuildBundleInfo bundleInfo))
-				{
-					return bundleInfo.GetCollectAssetPaths();
 				}
 				throw new Exception($"Not found {nameof(BuildBundleInfo)} : {bundleFullName}");
 			}
@@ -81,7 +60,7 @@ namespace YooAsset.Editor
 			/// </summary>
 			public string[] GetBuildinAssetPaths(string bundleFullName)
 			{
-				if (TryGetBundleInfo(bundleFullName, out BuildBundleInfo bundleInfo))
+				if (Report.TryGetBundleInfo(bundleFullName, out BuildBundleInfo bundleInfo))
 				{
 					return bundleInfo.GetBuildinAssetPaths();
 				}
@@ -93,35 +72,13 @@ namespace YooAsset.Editor
 			/// </summary>
 			public UnityEditor.AssetBundleBuild[] GetPipelineBuilds()
 			{
-				List<AssetBundleBuild> builds = new List<AssetBundleBuild>(BundleInfos.Count);
-				foreach (var bundleInfo in BundleInfos)
+				List<UnityEditor.AssetBundleBuild> builds = new List<UnityEditor.AssetBundleBuild>(Report.BundleInfos.Count);
+				foreach (var bundleInfo in Report.BundleInfos)
 				{
 					if (bundleInfo.IsRawFile == false)
 						builds.Add(bundleInfo.CreatePipelineBuild());
 				}
 				return builds.ToArray();
-			}
-
-			/// <summary>
-			/// 检测是否包含BundleName
-			/// </summary>
-			public bool IsContainsBundle(string bundleFullName)
-			{
-				return TryGetBundleInfo(bundleFullName, out BuildBundleInfo bundleInfo);
-			}
-
-			private bool TryGetBundleInfo(string bundleFullName, out BuildBundleInfo result)
-			{
-				foreach (var bundleInfo in BundleInfos)
-				{
-					if (bundleInfo.BundleName == bundleFullName)
-					{
-						result = bundleInfo;
-						return true;
-					}
-				}
-				result = null;
-				return false;
 			}
 		}
 
@@ -142,7 +99,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		private void SetupBuildMap(BuildMapContext buildMapContext, AssetBundleBuilder.BuildParametersContext buildParameters)
 		{
-			Dictionary<string, BuildAssetInfo> buildAssets = new Dictionary<string, BuildAssetInfo>();
+			Dictionary<string, BuildAssetInfo> buildAssetDic = new Dictionary<string, BuildAssetInfo>();
 
 			// 1. 获取主动收集的资源
 			List<CollectAssetInfo> allCollectInfos = AssetBundleCollectorSettingData.GetAllCollectAssets();
@@ -160,23 +117,19 @@ namespace YooAsset.Editor
 					string assetPath = depends[i].AssetPath;
 
 					// 如果已经存在，则增加该资源的依赖计数
-					if (buildAssets.ContainsKey(assetPath))
-					{
-						buildAssets[assetPath].DependCount++;
-					}
+					if (buildAssetDic.ContainsKey(assetPath))
+						buildAssetDic[assetPath].DependCount++;
 					else
-					{
-						buildAssets.Add(assetPath, depends[i]);
-					}
+						buildAssetDic.Add(assetPath, depends[i]);
 
 					// 添加资源标记
-					buildAssets[assetPath].AddAssetTags(collectInfo.AssetTags);
+					buildAssetDic[assetPath].AddAssetTags(collectInfo.AssetTags);
 
 					// 注意：检测是否为主动收集资源
 					if (assetPath == mainAssetPath)
 					{
-						buildAssets[mainAssetPath].IsCollectAsset = true;
-						buildAssets[mainAssetPath].IsRawAsset = collectInfo.IsRawAsset;
+						buildAssetDic[mainAssetPath].IsCollectAsset = true;
+						buildAssetDic[mainAssetPath].IsRawAsset = collectInfo.IsRawAsset;
 					}
 				}
 
@@ -187,9 +140,9 @@ namespace YooAsset.Editor
 				{
 					string assetPath = depends[i].AssetPath;
 					if (assetPath != mainAssetPath)
-						allDependAssetInfos.Add(buildAssets[assetPath]);
+						allDependAssetInfos.Add(buildAssetDic[assetPath]);
 				}
-				buildAssets[mainAssetPath].SetAllDependAssetInfos(allDependAssetInfos);
+				buildAssetDic[mainAssetPath].SetAllDependAssetInfos(allDependAssetInfos);
 
 				EditorTools.DisplayProgressBar("依赖文件分析", ++progressValue, allCollectInfos.Count);
 			}
@@ -198,7 +151,7 @@ namespace YooAsset.Editor
 			// 3. 移除零依赖的资源
 			var redundancy = CreateAssetRedundancy();
 			List<BuildAssetInfo> undependentAssets = new List<BuildAssetInfo>();
-			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssets)
+			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
 			{
 				var buildAssetInfo = pair.Value;
 				if (buildAssetInfo.IsCollectAsset)
@@ -216,7 +169,7 @@ namespace YooAsset.Editor
 					if(redundancy.Check(buildAssetInfo.AssetPath))
 					{
 						undependentAssets.Add(buildAssetInfo);
-						buildMapContext.RedundancyList.Add(buildAssetInfo.AssetPath);
+						buildMapContext.Report.RedundancyList.Add(buildAssetInfo.AssetPath);
 						continue;
 					}
 				}
@@ -227,18 +180,18 @@ namespace YooAsset.Editor
 					if (AssetBundleCollectorSettingData.HasCollector(buildAssetInfo.AssetPath) == false)
 					{
 						undependentAssets.Add(buildAssetInfo);
-						buildMapContext.RedundancyList.Add(buildAssetInfo.AssetPath);
+						buildMapContext.Report.RedundancyList.Add(buildAssetInfo.AssetPath);
 					}
 				}
 			}
 			foreach (var assetInfo in undependentAssets)
 			{
-				buildAssets.Remove(assetInfo.AssetPath);
+				buildAssetDic.Remove(assetInfo.AssetPath);
 			}
 
 			// 4. 设置资源包名
 			progressValue = 0;
-			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssets)
+			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
 			{
 				var assetInfo = pair.Value;
 				var bundleLabel = AssetBundleCollectorSettingData.GetBundleLabel(assetInfo.AssetPath);
@@ -246,15 +199,14 @@ namespace YooAsset.Editor
 					assetInfo.SetBundleLabelAndVariant(bundleLabel, ResourceSettingData.Setting.RawFileVariant);
 				else
 					assetInfo.SetBundleLabelAndVariant(bundleLabel, ResourceSettingData.Setting.AssetBundleFileVariant);
-				EditorTools.DisplayProgressBar("设置资源包名", ++progressValue, buildAssets.Count);
+				EditorTools.DisplayProgressBar("设置资源包名", ++progressValue, buildAssetDic.Count);
 			}
 			EditorTools.ClearProgressBar();
 
 			// 4. 构建资源包
-			var allAssets = buildAssets.Values.ToList();
+			var allAssets = buildAssetDic.Values.ToList();
 			if (allAssets.Count == 0)
 				throw new Exception("构建的资源列表不能为空");
-			UnityEngine.Debug.Log($"构建的资源列表里总共有{allAssets.Count}个资源");
 			foreach (var assetInfo in allAssets)
 			{
 				buildMapContext.PackAsset(assetInfo);
@@ -285,7 +237,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		private void CheckBuildMapContent(BuildMapContext buildMapContext)
 		{
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Report.BundleInfos)
 			{
 				// 注意：原生文件资源包只能包含一个原生文件
 				bool isRawFile = bundleInfo.IsRawFile;

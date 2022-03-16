@@ -29,7 +29,7 @@ namespace YooAsset.Editor
 			patchManifest.ResourceVersion = buildParameters.Parameters.BuildVersion;
 			patchManifest.BuildinTags = buildParameters.Parameters.BuildinTags;
 			patchManifest.BundleList = GetAllPatchBundle(buildParameters, buildMapContext, encryptionContext);
-			patchManifest.AssetList = GetAllPatchAsset(buildMapContext, patchManifest.BundleList);
+			patchManifest.AssetList = GetAllPatchAsset(buildMapContext, patchManifest);
 
 			// 创建补丁清单文件
 			string manifestFilePath = $"{buildParameters.PipelineOutputDirectory}/{ResourceSettingData.Setting.PatchManifestFileName}";
@@ -61,7 +61,7 @@ namespace YooAsset.Editor
 				oldPatchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory);
 			}
 
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Report.BundleInfos)
 			{
 				var bundleName = bundleInfo.BundleName;
 				string filePath = $"{buildParameters.PipelineOutputDirectory}/{bundleName}";
@@ -111,41 +111,41 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取资源列表
 		/// </summary>
-		private List<PatchAsset> GetAllPatchAsset(TaskGetBuildMap.BuildMapContext buildMapContext, List<PatchBundle> bundleList)
+		private List<PatchAsset> GetAllPatchAsset(TaskGetBuildMap.BuildMapContext buildMapContext, PatchManifest patchManifest)
 		{
 			List<PatchAsset> result = new List<PatchAsset>(1000);
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Report.BundleInfos)
 			{
 				var assetInfos = bundleInfo.GetCollectAssetInfos();
 				foreach (var assetInfo in assetInfos)
 				{
 					PatchAsset patchAsset = new PatchAsset();
 					patchAsset.AssetPath = assetInfo.AssetPath;
-					patchAsset.BundleID = GetAssetBundleID(assetInfo.GetBundleName(), bundleList);
-					patchAsset.DependIDs = GetAssetBundleDependIDs(assetInfo, bundleList);
+					patchAsset.BundleID = GetAssetBundleID(assetInfo.BundleName, patchManifest);
+					patchAsset.DependIDs = GetAssetBundleDependIDs(assetInfo, patchManifest);
 					result.Add(patchAsset);
 				}
 			}
 			return result;
 		}
-		private int[] GetAssetBundleDependIDs(BuildAssetInfo assetInfo, List<PatchBundle> bundleList)
+		private int[] GetAssetBundleDependIDs(BuildAssetInfo assetInfo, PatchManifest patchManifest)
 		{
 			List<int> result = new List<int>();
 			foreach (var dependAssetInfo in assetInfo.AllDependAssetInfos)
 			{
-				if (dependAssetInfo.CheckBundleNameValid() == false)
+				if (dependAssetInfo.BundleNameIsValid() == false)
 					continue;
-				int bundleID = GetAssetBundleID(dependAssetInfo.GetBundleName(), bundleList);
+				int bundleID = GetAssetBundleID(dependAssetInfo.BundleName, patchManifest);
 				if (result.Contains(bundleID) == false)
 					result.Add(bundleID);
 			}
 			return result.ToArray();
 		}
-		private int GetAssetBundleID(string bundleName, List<PatchBundle> bundleList)
+		private int GetAssetBundleID(string bundleName, PatchManifest patchManifest)
 		{
-			for (int index = 0; index < bundleList.Count; index++)
+			for (int index = 0; index < patchManifest.BundleList.Count; index++)
 			{
-				if (bundleList[index].BundleName == bundleName)
+				if (patchManifest.BundleList[index].BundleName == bundleName)
 					return index;
 			}
 			throw new Exception($"Not found bundle name : {bundleName}");
