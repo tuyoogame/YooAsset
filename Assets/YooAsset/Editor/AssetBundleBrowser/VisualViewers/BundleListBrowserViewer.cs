@@ -14,6 +14,14 @@ namespace YooAsset.Editor
 		private VisualTreeAsset _visualAsset;
 		private TemplateContainer _root;
 
+		private ToolbarButton _topBar1;
+		private ToolbarButton _topBar2;
+		private ToolbarButton _topBar3;
+		private ToolbarButton _topBar4;
+		private ToolbarButton _topBar5;
+		private ToolbarButton _bottomBar1;
+		private ToolbarButton _bottomBar2;
+		private ToolbarButton _bottomBar3;
 		private ListView _bundleListView;
 		private ListView _includeListView;
 		private PatchManifest _manifest;
@@ -34,6 +42,18 @@ namespace YooAsset.Editor
 			}
 			_root = _visualAsset.CloneTree();
 			_root.style.flexGrow = 1f;
+
+			// 顶部按钮栏
+			_topBar1 = _root.Q<ToolbarButton>("TopBar1");
+			_topBar2 = _root.Q<ToolbarButton>("TopBar2");
+			_topBar3 = _root.Q<ToolbarButton>("TopBar3");
+			_topBar4 = _root.Q<ToolbarButton>("TopBar4");
+			_topBar5 = _root.Q<ToolbarButton>("TopBar5");
+
+			// 底部按钮栏
+			_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
+			_bottomBar2 = _root.Q<ToolbarButton>("BottomBar2");
+			_bottomBar3 = _root.Q<ToolbarButton>("BottomBar3");
 
 			// 资源包列表
 			_bundleListView = _root.Q<ListView>("TopListView");
@@ -59,6 +79,7 @@ namespace YooAsset.Editor
 			_manifest = manifest;
 			_bundleListView.Clear();
 			_bundleListView.itemsSource = FilterViewItems(manifest, searchKeyWord);
+			_topBar1.text = $"Bundle Name ({_bundleListView.itemsSource.Count})";
 		}
 		private List<PatchBundle> FilterViewItems(PatchManifest manifest, string searchKeyWord)
 		{
@@ -269,6 +290,7 @@ namespace YooAsset.Editor
 			_includeListView.ClearSelection();
 #endif
 			_includeListView.itemsSource = containsList;
+			_bottomBar1.text = $"Include Assets ({containsList.Count})";
 		}
 
 		private string GetAssetFileSize(string assetPath)

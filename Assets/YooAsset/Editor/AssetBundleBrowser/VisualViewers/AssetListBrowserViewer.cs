@@ -14,6 +14,12 @@ namespace YooAsset.Editor
 		private VisualTreeAsset _visualAsset;
 		private TemplateContainer _root;
 
+		private ToolbarButton _topBar1;
+		private ToolbarButton _topBar2;
+		private ToolbarButton _topBar3;
+		private ToolbarButton _bottomBar1;
+		private ToolbarButton _bottomBar2;
+		private ToolbarButton _bottomBar3;
 		private ListView _assetListView;
 		private ListView _dependListView;
 		private PatchManifest _manifest;
@@ -35,6 +41,19 @@ namespace YooAsset.Editor
 			_root = _visualAsset.CloneTree();
 			_root.style.flexGrow = 1f;
 
+			// 顶部按钮栏
+			_topBar1 = _root.Q<ToolbarButton>("TopBar1");
+			_topBar2 = _root.Q<ToolbarButton>("TopBar2");
+			_topBar3 = _root.Q<ToolbarButton>("TopBar3");
+			_topBar1.clicked += TopBar1_clicked;
+			_topBar2.clicked += TopBar2_clicked;
+			_topBar3.clicked += TopBar3_clicked;
+
+			// 底部按钮栏
+			_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
+			_bottomBar2 = _root.Q<ToolbarButton>("BottomBar2");
+			_bottomBar3 = _root.Q<ToolbarButton>("BottomBar3");
+			
 			// 资源列表
 			_assetListView = _root.Q<ListView>("TopListView");
 			_assetListView.makeItem = MakeAssetListViewItem;
@@ -59,6 +78,7 @@ namespace YooAsset.Editor
 			_manifest = manifest;
 			_assetListView.Clear();
 			_assetListView.itemsSource = FilterViewItems(manifest, searchKeyWord);
+			_topBar1.text = $"Asset Path ({_assetListView.itemsSource.Count})";
 		}
 		private List<PatchAsset> FilterViewItems(PatchManifest manifest, string searchKeyWord)
 		{
@@ -156,6 +176,15 @@ namespace YooAsset.Editor
 				FillDependListView(patchAsset);
 			}
 		}
+		private void TopBar1_clicked()
+		{		
+		}
+		private void TopBar2_clicked()
+		{
+		}
+		private void TopBar3_clicked()
+		{
+		}
 
 		// 依赖列表相关
 		private VisualElement MakeDependListViewItem()
@@ -229,6 +258,7 @@ namespace YooAsset.Editor
 			_dependListView.ClearSelection();
 #endif
 			_dependListView.itemsSource = bundles;
+			_bottomBar1.text = $"Depend Bundles ({bundles.Count})";
 		}
 
 		private string GetAssetFileSize(string assetPath)
