@@ -305,9 +305,9 @@ namespace YooAsset.Editor
 		/// 获取所有收集的资源
 		/// 注意：跳过了不写入资源路径的收集器
 		/// </summary>
-		public static List<AssetCollectInfo> GetAllCollectAssets()
+		public static List<CollectAssetInfo> GetAllCollectAssets()
 		{
-			Dictionary<string, AssetCollectInfo> result = new Dictionary<string, AssetCollectInfo>(10000);
+			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
 			for (int i = 0; i < Setting.Collectors.Count; i++)
 			{
 				AssetBundleCollectorSetting.Collector collector = Setting.Collectors[i];
@@ -327,8 +327,8 @@ namespace YooAsset.Editor
 
 					if (result.ContainsKey(assetPath) == false)
 					{
-						var assetCollectInfo = new AssetCollectInfo(assetPath, collector.GetAssetTags(), isRawAsset);
-						result.Add(assetPath, assetCollectInfo);
+						var collectInfo = new CollectAssetInfo(assetPath, collector.GetAssetTags(), isRawAsset);
+						result.Add(assetPath, collectInfo);
 					}
 				}
 			}

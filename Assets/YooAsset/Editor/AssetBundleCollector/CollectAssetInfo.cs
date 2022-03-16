@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
-	public class AssetCollectInfo
+	public class CollectAssetInfo
 	{
 		/// <summary>
 		/// 资源路径
@@ -20,7 +20,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public bool IsRawAsset { private set; get; }
 
-		public AssetCollectInfo(string assetPath, List<string> assetTags, bool isRawAsset)
+		public CollectAssetInfo(string assetPath, List<string> assetTags, bool isRawAsset)
 		{
 			AssetPath = assetPath;
 			AssetTags = assetTags;
