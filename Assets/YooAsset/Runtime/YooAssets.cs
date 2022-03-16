@@ -278,14 +278,14 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取调试汇总信息
+		/// 获取调试信息
 		/// </summary>
-		internal static void GetDebugSummy(DebugSummy summy)
+		internal static void GetDebugReport(DebugReport report)
 		{
-			if (summy == null)
-				YooLogger.Error($"{nameof(DebugSummy)} is null");
+			if (report == null)
+				YooLogger.Error($"{nameof(DebugReport)} is null");
 
-			AssetSystem.GetDebugSummy(summy);
+			AssetSystem.GetDebugReport(report);
 		}
 
 

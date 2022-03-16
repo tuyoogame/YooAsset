@@ -296,11 +296,11 @@ namespace YooAsset
 		}
 
 		#region 调试专属方法
-		internal static void GetDebugSummy(DebugSummy summy)
+		internal static void GetDebugReport(DebugReport report)
 		{
-			summy.ClearAll();
-			summy.BundleCount = _loaders.Count;
-			summy.AssetCount = _providers.Count;
+			report.ClearAll();
+			report.BundleCount = _loaders.Count;
+			report.AssetCount = _providers.Count;
 
 			foreach (var provider in _providers)
 			{
@@ -309,7 +309,7 @@ namespace YooAsset
 				providerInfo.RefCount = provider.RefCount;
 				providerInfo.Status = (int)provider.Status;
 				providerInfo.BundleInfos.Clear();
-				summy.ProviderInfos.Add(providerInfo);
+				report.ProviderInfos.Add(providerInfo);
 
 				if (provider is BundledProvider)
 				{
@@ -319,7 +319,7 @@ namespace YooAsset
 			}
 
 			// 重新排序
-			summy.ProviderInfos.Sort();
+			report.ProviderInfos.Sort();
 		}
 		#endregion
 	}
