@@ -6,21 +6,17 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	/// <summary>
-	/// 构建的资源包信息类
-	/// </summary>
-	[Serializable]
 	public class BuildBundleInfo
 	{
 		/// <summary>
 		/// 资源包完整名称
 		/// </summary>
-		public string BundleName;
+		public string BundleName { private set; get; }
 
 		/// <summary>
 		/// 包含的资源列表
 		/// </summary>
-		public List<BuildAssetInfo> Assets = new List<BuildAssetInfo>();
+		public readonly List<BuildAssetInfo> Assets = new List<BuildAssetInfo>();
 
 		/// <summary>
 		/// 是否为原生文件

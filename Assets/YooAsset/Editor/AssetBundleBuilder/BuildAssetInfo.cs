@@ -4,21 +4,17 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
-	/// <summary>
-	/// 构建的资源信息类
-	/// </summary>
-	[Serializable]
 	public class BuildAssetInfo
 	{
 		/// <summary>
 		/// 资源路径
 		/// </summary>
-		public string AssetPath;
+		public string AssetPath { private set; get; }
 
 		/// <summary>
 		/// 资源包完整名称
 		/// </summary>
-		public string BundleName;
+		public string BundleName { private set; get; }
 
 		/// <summary>
 		/// 是否为原生资源
@@ -31,20 +27,20 @@ namespace YooAsset.Editor
 		public bool IsCollectAsset = false;
 
 		/// <summary>
-		/// 资源标记列表
-		/// </summary>
-		public List<string> AssetTags = new List<string>();
-
-		/// <summary>
 		/// 被依赖次数
 		/// </summary>
 		public int DependCount = 0;
 
 		/// <summary>
+		/// 资源标记列表
+		/// </summary>
+		public readonly List<string> AssetTags = new List<string>();
+
+		/// <summary>
 		/// 依赖的所有资源
 		/// 注意：包括零依赖资源和冗余资源（资源包名无效）
 		/// </summary>
-		public List<BuildAssetInfo> AllDependAssetInfos;
+		public List<BuildAssetInfo> AllDependAssetInfos { private set; get; }
 
 
 		public BuildAssetInfo(string assetPath)
@@ -81,10 +77,18 @@ namespace YooAsset.Editor
 		{
 			foreach (var tag in tags)
 			{
-				if (AssetTags.Contains(tag) == false)
-				{
-					AssetTags.Add(tag);
-				}
+				AddAssetTag(tag);
+			}
+		}
+
+		/// <summary>
+		/// 添加资源标记
+		/// </summary>
+		public void  AddAssetTag(string tag)
+		{
+			if (AssetTags.Contains(tag) == false)
+			{
+				AssetTags.Add(tag);
 			}
 		}
 

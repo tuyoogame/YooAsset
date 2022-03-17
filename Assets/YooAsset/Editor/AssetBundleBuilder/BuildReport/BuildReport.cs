@@ -19,7 +19,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 资源包列表
 		/// </summary>
-		public List<BuildBundleInfo> BundleInfos;
+		public List<ReportBundleInfo> BundleInfos;
 
 		/// <summary>
 		/// 冗余的资源列表
@@ -34,6 +34,15 @@ namespace YooAsset.Editor
 		{
 			string json = JsonUtility.ToJson(buildReport, true);
 			FileUtility.CreateFile(savePath, json);
+		}
+
+		/// <summary>
+		/// 反序列化
+		/// </summary>
+		public static BuildReport Deserialize(string jsonData)
+		{
+			BuildReport report = JsonUtility.FromJson<BuildReport>(jsonData);
+			return report;
 		}
 	}
 }

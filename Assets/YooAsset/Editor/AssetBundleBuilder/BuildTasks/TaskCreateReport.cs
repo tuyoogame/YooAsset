@@ -41,7 +41,7 @@ namespace YooAsset.Editor
 			buildReport.Summary.IsIgnoreTypeTreeChanges = buildParameters.Parameters.IsIgnoreTypeTreeChanges;
 			buildReport.Summary.IsDisableLoadAssetByFileName = buildParameters.Parameters.IsDisableLoadAssetByFileName;
 
-			buildReport.BundleInfos = buildMapContext.BundleInfos;
+			//buildReport.BundleInfos = buildMapContext.BundleInfos;
 			buildReport.RedundancyList = buildMapContext.RedundancyList;
 
 			// 删除旧文件
