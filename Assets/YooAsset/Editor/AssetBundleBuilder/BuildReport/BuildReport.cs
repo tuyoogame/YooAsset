@@ -17,14 +17,14 @@ namespace YooAsset.Editor
 		public BuildSummary Summary = new BuildSummary();
 
 		/// <summary>
-		/// 资源包列表
+		/// 资源对象列表
 		/// </summary>
-		public List<ReportBundleInfo> BundleInfos;
+		public List<ReportAssetInfo> AssetInfos = new List<ReportAssetInfo>();
 
 		/// <summary>
-		/// 冗余的资源列表
+		/// 资源包列表
 		/// </summary>
-		public List<string> RedundancyList;
+		public List<ReportBundleInfo> BundleInfos = new List<ReportBundleInfo>();
 
 
 		/// <summary>

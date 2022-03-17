@@ -47,7 +47,7 @@ namespace YooAsset.Editor
 				List<BuildAssetInfo> result = new List<BuildAssetInfo>(BundleInfos.Count);
 				foreach (var bundleInfo in BundleInfos)
 				{
-					result.AddRange(bundleInfo.Assets);
+					result.AddRange(bundleInfo.BuildinAssets);
 				}
 				return result;
 			}
@@ -98,7 +98,7 @@ namespace YooAsset.Editor
 				return TryGetBundleInfo(bundleFullName, out BuildBundleInfo bundleInfo);
 			}
 
-			private bool TryGetBundleInfo(string bundleFullName, out BuildBundleInfo result)
+			public bool TryGetBundleInfo(string bundleFullName, out BuildBundleInfo result)
 			{
 				foreach (var bundleInfo in BundleInfos)
 				{
@@ -188,6 +188,7 @@ namespace YooAsset.Editor
 				if (buildAssetInfo.IsCollectAsset)
 					continue;
 
+				// 零依赖资源
 				if (buildAssetInfo.DependCount == 0)
 				{
 					undependentAssets.Add(buildAssetInfo);
@@ -274,13 +275,13 @@ namespace YooAsset.Editor
 				bool isRawFile = bundleInfo.IsRawFile;
 				if (isRawFile)
 				{
-					if (bundleInfo.Assets.Count != 1)
+					if (bundleInfo.BuildinAssets.Count != 1)
 						throw new Exception("The bundle does not support multiple raw asset : {bundleInfo.BundleName}");
 					continue;
 				}
 
 				// 注意：原生文件不能被其它资源文件依赖
-				foreach (var assetInfo in bundleInfo.Assets)
+				foreach (var assetInfo in bundleInfo.BuildinAssets)
 				{
 					if (assetInfo.AllDependAssetInfos != null)
 					{

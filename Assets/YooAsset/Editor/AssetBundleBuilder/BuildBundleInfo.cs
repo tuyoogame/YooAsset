@@ -14,9 +14,10 @@ namespace YooAsset.Editor
 		public string BundleName { private set; get; }
 
 		/// <summary>
-		/// 包含的资源列表
+		/// 参与构建的资源列表
+		/// 注意：不包含冗余资源或零依赖资源
 		/// </summary>
-		public readonly List<BuildAssetInfo> Assets = new List<BuildAssetInfo>();
+		public readonly List<BuildAssetInfo> BuildinAssets = new List<BuildAssetInfo>();
 
 		/// <summary>
 		/// 是否为原生文件
@@ -25,7 +26,7 @@ namespace YooAsset.Editor
 		{
 			get
 			{
-				foreach (var asset in Assets)
+				foreach (var asset in BuildinAssets)
 				{
 					if (asset.IsRawAsset)
 						return true;
@@ -45,7 +46,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public bool IsContainsAsset(string assetPath)
 		{
-			foreach (var assetInfo in Assets)
+			foreach (var assetInfo in BuildinAssets)
 			{
 				if (assetInfo.AssetPath == assetPath)
 				{
@@ -63,7 +64,7 @@ namespace YooAsset.Editor
 			if (IsContainsAsset(assetInfo.AssetPath))
 				throw new System.Exception($"Asset is existed : {assetInfo.AssetPath}");
 
-			Assets.Add(assetInfo);
+			BuildinAssets.Add(assetInfo);
 		}
 
 		/// <summary>
@@ -82,8 +83,8 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string[] GetAssetTags()
 		{
-			List<string> result = new List<string>(Assets.Count);
-			foreach (var assetInfo in Assets)
+			List<string> result = new List<string>(BuildinAssets.Count);
+			foreach (var assetInfo in BuildinAssets)
 			{
 				foreach (var assetTag in assetInfo.AssetTags)
 				{
@@ -99,7 +100,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string[] GetBuildinAssetPaths()
 		{
-			return Assets.Select(t => t.AssetPath).ToArray();
+			return BuildinAssets.Select(t => t.AssetPath).ToArray();
 		}
 
 		/// <summary>
@@ -107,7 +108,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public BuildAssetInfo[] GetCollectAssetInfos()
 		{
-			return Assets.Where(t => t.IsCollectAsset).ToArray();
+			return BuildinAssets.Where(t => t.IsCollectAsset).ToArray();
 		}
 
 		/// <summary>
