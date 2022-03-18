@@ -22,6 +22,11 @@ namespace YooAsset.Editor
 		private enum EShowMode
 		{
 			/// <summary>
+			/// 概览
+			/// </summary>
+			Summary,
+
+			/// <summary>
 			/// 资源对象列表显示模式
 			/// </summary>
 			AssetList,
@@ -33,6 +38,7 @@ namespace YooAsset.Editor
 		}
 
 		private ToolbarMenu _showModeMenu;
+		private SummaryReporterViewer _summaryViewer;
 		private AssetListReporterViewer _assetListViewer;
 		private BundleListReporterViewer _bundleListViewer;
 
@@ -62,12 +68,17 @@ namespace YooAsset.Editor
 
 			// 显示模式菜单
 			_showModeMenu = root.Q<ToolbarMenu>("ShowModeMenu");
-			_showModeMenu.menu.AppendAction(EShowMode.AssetList.ToString(), ShowModeMenuAction1);
-			_showModeMenu.menu.AppendAction(EShowMode.BundleList.ToString(), ShowModeMenuAction2);
+			_showModeMenu.menu.AppendAction(EShowMode.Summary.ToString(), ShowModeMenuAction0, ShowModeMenuFun0);
+			_showModeMenu.menu.AppendAction(EShowMode.AssetList.ToString(), ShowModeMenuAction1, ShowModeMenuFun1);
+			_showModeMenu.menu.AppendAction(EShowMode.BundleList.ToString(), ShowModeMenuAction2, ShowModeMenuFun2);
 
 			// 搜索栏
 			var searchField = root.Q<ToolbarSearchField>("SearchField");
 			searchField.RegisterValueChangedCallback(OnSearchKeyWordChange);
+
+			// 加载页面
+			_summaryViewer = new SummaryReporterViewer();
+			_summaryViewer.InitViewer();
 
 			// 加载页面
 			_assetListViewer = new AssetListReporterViewer();
@@ -78,9 +89,9 @@ namespace YooAsset.Editor
 			_bundleListViewer.InitViewer();
 
 			// 初始页面
-			_showMode = EShowMode.AssetList;
-			_showModeMenu.text = EShowMode.AssetList.ToString();
-			_assetListViewer.AttachParent(root);
+			_showMode = EShowMode.Summary;
+			_showModeMenu.text = EShowMode.Summary.ToString();
+			_summaryViewer.AttachParent(root);
 		}
 
 		private void ImportBtn_onClick()
@@ -93,6 +104,7 @@ namespace YooAsset.Editor
 			_buildReport = BuildReport.Deserialize(jsonData);
 			_assetListViewer.FillViewData(_buildReport, _searchKeyWord);
 			_bundleListViewer.FillViewData(_buildReport, _searchKeyWord);
+			_summaryViewer.FillViewData(_buildReport);
 		}
 		private void OnSearchKeyWordChange(ChangeEvent<string> e)
 		{
@@ -103,6 +115,18 @@ namespace YooAsset.Editor
 				_bundleListViewer.FillViewData(_buildReport, _searchKeyWord);
 			}
 		}
+		private void ShowModeMenuAction0(DropdownMenuAction action)
+		{
+			if (_showMode != EShowMode.Summary)
+			{
+				_showMode = EShowMode.Summary;
+				VisualElement root = this.rootVisualElement;
+				_showModeMenu.text = EShowMode.Summary.ToString();
+				_summaryViewer.AttachParent(root);
+				_assetListViewer.DetachParent();
+				_bundleListViewer.DetachParent();
+			}
+		}
 		private void ShowModeMenuAction1(DropdownMenuAction action)
 		{
 			if (_showMode != EShowMode.AssetList)
@@ -110,8 +134,9 @@ namespace YooAsset.Editor
 				_showMode = EShowMode.AssetList;
 				VisualElement root = this.rootVisualElement;
 				_showModeMenu.text = EShowMode.AssetList.ToString();
-				_bundleListViewer.DetachParent();
+				_summaryViewer.DetachParent();
 				_assetListViewer.AttachParent(root);
+				_bundleListViewer.DetachParent();
 			}
 		}
 		private void ShowModeMenuAction2(DropdownMenuAction action)
@@ -121,9 +146,31 @@ namespace YooAsset.Editor
 				_showMode = EShowMode.BundleList;
 				VisualElement root = this.rootVisualElement;
 				_showModeMenu.text = EShowMode.BundleList.ToString();
+				_summaryViewer.DetachParent();
 				_assetListViewer.DetachParent();
 				_bundleListViewer.AttachParent(root);
 			}
+		}
+		private DropdownMenuAction.Status ShowModeMenuFun0(DropdownMenuAction action)
+		{
+			if (_showMode == EShowMode.Summary)
+				return DropdownMenuAction.Status.Checked;
+			else
+				return DropdownMenuAction.Status.Normal;
+		}
+		private DropdownMenuAction.Status ShowModeMenuFun1(DropdownMenuAction action)
+		{
+			if (_showMode == EShowMode.AssetList)
+				return DropdownMenuAction.Status.Checked;
+			else
+				return DropdownMenuAction.Status.Normal;
+		}
+		private DropdownMenuAction.Status ShowModeMenuFun2(DropdownMenuAction action)
+		{
+			if (_showMode == EShowMode.BundleList)
+				return DropdownMenuAction.Status.Checked;
+			else
+				return DropdownMenuAction.Status.Normal;
 		}
 	}
 }
