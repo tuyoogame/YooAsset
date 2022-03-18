@@ -68,21 +68,34 @@ namespace YooAsset.Editor
 			_items.Add(new ItemWrapper("构建耗时", $"{buildReport.Summary.BuildSeconds}秒"));
 			_items.Add(new ItemWrapper("构建平台", $"{buildReport.Summary.BuildTarget}"));
 			_items.Add(new ItemWrapper("构建版本", $"{buildReport.Summary.BuildVersion}"));
-
-			_items.Add(new ItemWrapper("开启自动分包", $"{buildReport.Summary.ApplyRedundancy}"));
-			_items.Add(new ItemWrapper("开启资源包后缀名", $"{buildReport.Summary.AppendFileExtension}"));
-
-			_items.Add(new ItemWrapper("自动收集着色器", $"{buildReport.Summary.IsCollectAllShaders}"));
+			_items.Add(new ItemWrapper("启用自动分包机制", $"{buildReport.Summary.EnableAutoCollect}"));
+			_items.Add(new ItemWrapper("追加文件扩展名", $"{buildReport.Summary.AppendFileExtension}"));
+			_items.Add(new ItemWrapper("自动收集着色器", $"{buildReport.Summary.AutoCollectShaders}"));
 			_items.Add(new ItemWrapper("着色器资源包名称", $"{buildReport.Summary.ShadersBundleName}"));
 
-			_items.Add(new ItemWrapper("高级构建选项", $"---------------------------------"));
-			_items.Add(new ItemWrapper("IsForceRebuild", $"{buildReport.Summary.IsForceRebuild}"));
+			_items.Add(new ItemWrapper(string.Empty, string.Empty));
+			_items.Add(new ItemWrapper("构建参数", string.Empty));
+			_items.Add(new ItemWrapper("ForceRebuild", $"{buildReport.Summary.ForceRebuild}"));
 			_items.Add(new ItemWrapper("BuildinTags", $"{buildReport.Summary.BuildinTags}"));
 			_items.Add(new ItemWrapper("CompressOption", $"{buildReport.Summary.CompressOption}"));
-			_items.Add(new ItemWrapper("IsAppendHash", $"{buildReport.Summary.IsAppendHash}"));
-			_items.Add(new ItemWrapper("IsDisableWriteTypeTree", $"{buildReport.Summary.IsDisableWriteTypeTree}"));
-			_items.Add(new ItemWrapper("IsIgnoreTypeTreeChanges", $"{buildReport.Summary.IsIgnoreTypeTreeChanges}"));
-			_items.Add(new ItemWrapper("IsDisableLoadAssetByFileName", $"{buildReport.Summary.IsDisableLoadAssetByFileName}"));
+			_items.Add(new ItemWrapper("AppendHash", $"{buildReport.Summary.AppendHash}"));
+			_items.Add(new ItemWrapper("DisableWriteTypeTree", $"{buildReport.Summary.DisableWriteTypeTree}"));
+			_items.Add(new ItemWrapper("IgnoreTypeTreeChanges", $"{buildReport.Summary.IgnoreTypeTreeChanges}"));
+			_items.Add(new ItemWrapper("DisableLoadAssetByFileName", $"{buildReport.Summary.DisableLoadAssetByFileName}"));
+
+			_items.Add(new ItemWrapper(string.Empty, string.Empty));
+			_items.Add(new ItemWrapper("构建结果", string.Empty));
+			_items.Add(new ItemWrapper("构建文件总数", $"{buildReport.Summary.AssetFileTotalCount}"));
+			_items.Add(new ItemWrapper("资源包总数", $"{buildReport.Summary.AllBundleTotalCount}"));
+			_items.Add(new ItemWrapper("资源包总大小", ConvertSize(buildReport.Summary.AllBundleTotalSize)));
+			_items.Add(new ItemWrapper("内置资源包总数", $"{buildReport.Summary.BuildinBundleTotalCount}"));
+			_items.Add(new ItemWrapper("内置资源包总大小", ConvertSize(buildReport.Summary.BuildinBundleTotalSize)));
+			_items.Add(new ItemWrapper("加密资源包总数", $"{buildReport.Summary.EncryptedBundleTotalCount}"));
+			_items.Add(new ItemWrapper("加密资源包总大小", ConvertSize(buildReport.Summary.EncryptedBundleTotalSize)));
+			_items.Add(new ItemWrapper("原生资源包总数", $"{buildReport.Summary.RawBundleTotalCount}"));
+			_items.Add(new ItemWrapper("原生资源包总大小", ConvertSize(buildReport.Summary.RawBundleTotalSize)));
+
+			_listView.itemsSource = _items;
 		}
 
 		/// <summary>
@@ -113,7 +126,7 @@ namespace YooAsset.Editor
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
-				label.style.width = 100;
+				label.style.width = 200;
 				element.Add(label);
 			}
 
@@ -140,6 +153,18 @@ namespace YooAsset.Editor
 			// Value
 			var label2 = element.Q<Label>("Label2");
 			label2.text = itemWrapper.Value;
+		}
+
+		private string ConvertSize(long size)
+		{
+			if (size == 0)
+				return "0";
+			if (size < 1024)
+				return $"{size} Bytes";
+			else if (size < 1024 * 1024)
+				return $"{(int)(size / 1024)} KB";
+			else
+				return $"{(int)(size / (1024 * 1024))} MB";
 		}
 	}
 }

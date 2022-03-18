@@ -17,9 +17,9 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 显示模式
+		/// 视口模式
 		/// </summary>
-		private enum EShowMode
+		private enum EViewMode
 		{
 			/// <summary>
 			/// 概览
@@ -29,20 +29,20 @@ namespace YooAsset.Editor
 			/// <summary>
 			/// 资源对象列表显示模式
 			/// </summary>
-			AssetList,
+			AssetView,
 
 			/// <summary>
 			/// 资源包列表显示模式
 			/// </summary>
-			BundleList,
+			BundleView,
 		}
 
-		private ToolbarMenu _showModeMenu;
+		private ToolbarMenu _viewModeMenu;
 		private SummaryReporterViewer _summaryViewer;
 		private AssetListReporterViewer _assetListViewer;
 		private BundleListReporterViewer _bundleListViewer;
 
-		private EShowMode _showMode;
+		private EViewMode _viewMode;
 		private string _searchKeyWord;
 		private BuildReport _buildReport;
 
@@ -67,10 +67,10 @@ namespace YooAsset.Editor
 			importBtn.clicked += ImportBtn_onClick;
 
 			// 显示模式菜单
-			_showModeMenu = root.Q<ToolbarMenu>("ShowModeMenu");
-			_showModeMenu.menu.AppendAction(EShowMode.Summary.ToString(), ShowModeMenuAction0, ShowModeMenuFun0);
-			_showModeMenu.menu.AppendAction(EShowMode.AssetList.ToString(), ShowModeMenuAction1, ShowModeMenuFun1);
-			_showModeMenu.menu.AppendAction(EShowMode.BundleList.ToString(), ShowModeMenuAction2, ShowModeMenuFun2);
+			_viewModeMenu = root.Q<ToolbarMenu>("ShowModeMenu");
+			_viewModeMenu.menu.AppendAction(EViewMode.Summary.ToString(), ViewModeMenuAction0, ViewModeMenuFun0);
+			_viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction1, ViewModeMenuFun1);
+			_viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction2, ViewModeMenuFun2);
 
 			// 搜索栏
 			var searchField = root.Q<ToolbarSearchField>("SearchField");
@@ -89,8 +89,8 @@ namespace YooAsset.Editor
 			_bundleListViewer.InitViewer();
 
 			// 初始页面
-			_showMode = EShowMode.Summary;
-			_showModeMenu.text = EShowMode.Summary.ToString();
+			_viewMode = EViewMode.Summary;
+			_viewModeMenu.text = EViewMode.Summary.ToString();
 			_summaryViewer.AttachParent(root);
 		}
 
@@ -115,59 +115,59 @@ namespace YooAsset.Editor
 				_bundleListViewer.FillViewData(_buildReport, _searchKeyWord);
 			}
 		}
-		private void ShowModeMenuAction0(DropdownMenuAction action)
+		private void ViewModeMenuAction0(DropdownMenuAction action)
 		{
-			if (_showMode != EShowMode.Summary)
+			if (_viewMode != EViewMode.Summary)
 			{
-				_showMode = EShowMode.Summary;
+				_viewMode = EViewMode.Summary;
 				VisualElement root = this.rootVisualElement;
-				_showModeMenu.text = EShowMode.Summary.ToString();
+				_viewModeMenu.text = EViewMode.Summary.ToString();
 				_summaryViewer.AttachParent(root);
 				_assetListViewer.DetachParent();
 				_bundleListViewer.DetachParent();
 			}
 		}
-		private void ShowModeMenuAction1(DropdownMenuAction action)
+		private void ViewModeMenuAction1(DropdownMenuAction action)
 		{
-			if (_showMode != EShowMode.AssetList)
+			if (_viewMode != EViewMode.AssetView)
 			{
-				_showMode = EShowMode.AssetList;
+				_viewMode = EViewMode.AssetView;
 				VisualElement root = this.rootVisualElement;
-				_showModeMenu.text = EShowMode.AssetList.ToString();
+				_viewModeMenu.text = EViewMode.AssetView.ToString();
 				_summaryViewer.DetachParent();
 				_assetListViewer.AttachParent(root);
 				_bundleListViewer.DetachParent();
 			}
 		}
-		private void ShowModeMenuAction2(DropdownMenuAction action)
+		private void ViewModeMenuAction2(DropdownMenuAction action)
 		{
-			if (_showMode != EShowMode.BundleList)
+			if (_viewMode != EViewMode.BundleView)
 			{
-				_showMode = EShowMode.BundleList;
+				_viewMode = EViewMode.BundleView;
 				VisualElement root = this.rootVisualElement;
-				_showModeMenu.text = EShowMode.BundleList.ToString();
+				_viewModeMenu.text = EViewMode.BundleView.ToString();
 				_summaryViewer.DetachParent();
 				_assetListViewer.DetachParent();
 				_bundleListViewer.AttachParent(root);
 			}
 		}
-		private DropdownMenuAction.Status ShowModeMenuFun0(DropdownMenuAction action)
+		private DropdownMenuAction.Status ViewModeMenuFun0(DropdownMenuAction action)
 		{
-			if (_showMode == EShowMode.Summary)
+			if (_viewMode == EViewMode.Summary)
 				return DropdownMenuAction.Status.Checked;
 			else
 				return DropdownMenuAction.Status.Normal;
 		}
-		private DropdownMenuAction.Status ShowModeMenuFun1(DropdownMenuAction action)
+		private DropdownMenuAction.Status ViewModeMenuFun1(DropdownMenuAction action)
 		{
-			if (_showMode == EShowMode.AssetList)
+			if (_viewMode == EViewMode.AssetView)
 				return DropdownMenuAction.Status.Checked;
 			else
 				return DropdownMenuAction.Status.Normal;
 		}
-		private DropdownMenuAction.Status ShowModeMenuFun2(DropdownMenuAction action)
+		private DropdownMenuAction.Status ViewModeMenuFun2(DropdownMenuAction action)
 		{
-			if (_showMode == EShowMode.BundleList)
+			if (_viewMode == EViewMode.BundleView)
 				return DropdownMenuAction.Status.Checked;
 			else
 				return DropdownMenuAction.Status.Normal;
