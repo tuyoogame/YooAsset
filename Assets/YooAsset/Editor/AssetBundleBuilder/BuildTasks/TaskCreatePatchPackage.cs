@@ -30,6 +30,14 @@ namespace YooAsset.Editor
 				UnityEngine.Debug.Log($"拷贝Readme文件到：{destPath}");
 			}
 
+			// 拷贝Report文件
+			{
+				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{ResourceSettingData.Setting.ReportFileName}";
+				string destPath = $"{packageDirectory}/{ResourceSettingData.Setting.ReportFileName}";
+				EditorTools.CopyFile(sourcePath, destPath, true);
+				UnityEngine.Debug.Log($"拷贝Report文件到：{destPath}");
+			}
+
 			// 拷贝PatchManifest文件
 			{
 				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{ResourceSettingData.Setting.PatchManifestFileName}";

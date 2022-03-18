@@ -77,9 +77,9 @@ namespace YooAsset.Editor
 
 			AppendData(content, "");
 			AppendData(content, $"--冗余列表--");
-			for (int i = 0; i < buildMapContext.RedundancyList.Count; i++)
+			for (int i = 0; i < buildMapContext.RedundancyAssetList.Count; i++)
 			{
-				string redundancyAssetPath = buildMapContext.RedundancyList[i];
+				string redundancyAssetPath = buildMapContext.RedundancyAssetList[i];
 				AppendData(content, redundancyAssetPath);
 			}
 

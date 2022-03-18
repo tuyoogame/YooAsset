@@ -26,19 +26,44 @@ namespace YooAsset.Editor
 		/// </summary>
 		public List<ReportBundleInfo> BundleInfos = new List<ReportBundleInfo>();
 
+		/// <summary>
+		/// 冗余的资源列表
+		/// </summary>
+		public List<string> RedundancyAssetList = new List<string>();
+
 
 		/// <summary>
-		/// 序列化
+		/// 获取资源包信息类
 		/// </summary>
+		public ReportBundleInfo GetBundleInfo(string bundleName)
+		{
+			foreach (var bundleInfo in BundleInfos)
+			{
+				if (bundleInfo.BundleName == bundleName)
+					return bundleInfo;
+			}
+			throw new Exception($"Not found bundle : {bundleName}");
+		}
+
+		/// <summary>
+		/// 获取资源信息类
+		/// </summary>
+		public ReportAssetInfo GetAssetInfo(string assetPath)
+		{
+			foreach (var assetInfo in AssetInfos)
+			{
+				if (assetInfo.AssetPath == assetPath)
+					return assetInfo;
+			}
+			throw new Exception($"Not found asset : {assetPath}");
+		}
+
+
 		public static void Serialize(string savePath, BuildReport buildReport)
 		{
 			string json = JsonUtility.ToJson(buildReport, true);
 			FileUtility.CreateFile(savePath, json);
 		}
-
-		/// <summary>
-		/// 反序列化
-		/// </summary>
 		public static BuildReport Deserialize(string jsonData)
 		{
 			BuildReport report = JsonUtility.FromJson<BuildReport>(jsonData);

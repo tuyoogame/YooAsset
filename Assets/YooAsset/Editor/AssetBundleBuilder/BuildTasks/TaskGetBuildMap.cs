@@ -19,7 +19,7 @@ namespace YooAsset.Editor
 			/// <summary>
 			/// 冗余的资源列表
 			/// </summary>
-			public readonly List<string> RedundancyList = new List<string>(1000);
+			public readonly List<string> RedundancyAssetList = new List<string>(1000);
 
 
 			/// <summary>
@@ -201,7 +201,7 @@ namespace YooAsset.Editor
 					if(redundancy.Check(buildAssetInfo.AssetPath))
 					{
 						undependentAssets.Add(buildAssetInfo);
-						buildMapContext.RedundancyList.Add(buildAssetInfo.AssetPath);
+						buildMapContext.RedundancyAssetList.Add(buildAssetInfo.AssetPath);
 						continue;
 					}
 				}
@@ -212,7 +212,7 @@ namespace YooAsset.Editor
 					if (AssetBundleCollectorSettingData.HasCollector(buildAssetInfo.AssetPath) == false)
 					{
 						undependentAssets.Add(buildAssetInfo);
-						buildMapContext.RedundancyList.Add(buildAssetInfo.AssetPath);
+						buildMapContext.RedundancyAssetList.Add(buildAssetInfo.AssetPath);
 					}
 				}
 			}

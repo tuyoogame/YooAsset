@@ -67,6 +67,9 @@ namespace YooAsset.Editor
 				buildReport.BundleInfos.Add(reportBundleInfo);
 			}
 
+			// 冗余资源列表
+			buildReport.RedundancyAssetList = buildMapContext.RedundancyAssetList;
+
 			// 删除旧文件
 			string filePath = $"{buildParameters.PipelineOutputDirectory}/{ResourceSettingData.Setting.ReportFileName}";
 			if (File.Exists(filePath))
