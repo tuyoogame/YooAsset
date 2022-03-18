@@ -101,7 +101,7 @@ namespace YooAsset.Editor
 		}
 		private void OnDrawShader()
 		{
-			bool isCollectAllShader = AssetBundleCollectorSettingData.Setting.IsCollectAllShaders;
+			bool isCollectAllShader = AssetBundleCollectorSettingData.Setting.AutoCollectShaders;
 			string shadersBundleName = AssetBundleCollectorSettingData.Setting.ShadersBundleName;
 
 			EditorGUILayout.Space();

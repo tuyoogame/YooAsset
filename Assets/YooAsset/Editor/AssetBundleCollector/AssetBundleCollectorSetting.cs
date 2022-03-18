@@ -51,12 +51,12 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 是否收集全路径的着色器
+		/// 自动收集着色器
 		/// </summary>
-		public bool IsCollectAllShaders = false;
+		public bool AutoCollectShaders = false;
 
 		/// <summary>
-		/// 收集的着色器Bundle名称
+		/// 自动收集的着色器资源包名
 		/// </summary>
 		public string ShadersBundleName = "myshaders";
 

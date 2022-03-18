@@ -157,7 +157,7 @@ namespace YooAsset.Editor
 		{
 			if (string.IsNullOrEmpty(shadersBundleName))
 				return;
-			Setting.IsCollectAllShaders = isCollectAllShaders;
+			Setting.AutoCollectShaders = isCollectAllShaders;
 			Setting.ShadersBundleName = shadersBundleName;
 			SaveFile();
 		}
@@ -336,7 +336,7 @@ namespace YooAsset.Editor
 		}
 		private static bool IsCollectAsset(string assetPath, string filterRuleName)
 		{
-			if (Setting.IsCollectAllShaders)
+			if (Setting.AutoCollectShaders)
 			{
 				Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
 				if (assetType == typeof(UnityEngine.Shader))
@@ -354,7 +354,7 @@ namespace YooAsset.Editor
 		public static bool HasCollector(string assetPath)
 		{
 			// 如果收集全路径着色器
-			if (Setting.IsCollectAllShaders)
+			if (Setting.AutoCollectShaders)
 			{
 				System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
 				if (assetType == typeof(UnityEngine.Shader))
@@ -400,7 +400,7 @@ namespace YooAsset.Editor
 		public static string GetBundleLabel(string assetPath)
 		{
 			// 如果收集全路径着色器
-			if (Setting.IsCollectAllShaders)
+			if (Setting.AutoCollectShaders)
 			{
 				System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
 				if (assetType == typeof(UnityEngine.Shader))
