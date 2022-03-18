@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
-	internal class AssetListBrowserViewer
+	internal class AssetListReporterViewer
 	{
 		private VisualTreeAsset _visualAsset;
 		private TemplateContainer _root;
@@ -22,7 +22,7 @@ namespace YooAsset.Editor
 		private ToolbarButton _bottomBar3;
 		private ListView _assetListView;
 		private ListView _dependListView;
-		private PatchManifest _manifest;
+		private BuildReport _buildReport;
 
 		/// <summary>
 		/// 初始化页面
@@ -31,11 +31,11 @@ namespace YooAsset.Editor
 		{
 			// 加载布局文件
 			string rootPath = EditorTools.GetYooAssetPath();
-			string uxml = $"{rootPath}/Editor/AssetBundleBrowser/VisualViewers/AssetListBrowserViewer.uxml";
+			string uxml = $"{rootPath}/Editor/AssetBundleReporter/VisualViewers/AssetListReporterViewer.uxml";
 			_visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (_visualAsset == null)
 			{
-				Debug.LogError($"Not found {nameof(AssetListBrowserViewer)}.uxml : {uxml}");
+				Debug.LogError($"Not found {nameof(AssetListReporterViewer)}.uxml : {uxml}");
 				return;
 			}
 			_root = _visualAsset.CloneTree();
@@ -73,24 +73,24 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 填充页面数据
 		/// </summary>
-		public void FillViewData(PatchManifest manifest, string searchKeyWord)
+		public void FillViewData(BuildReport buildReport, string searchKeyWord)
 		{
-			_manifest = manifest;
+			_buildReport = buildReport;
 			_assetListView.Clear();
-			_assetListView.itemsSource = FilterViewItems(manifest, searchKeyWord);
+			_assetListView.itemsSource = FilterViewItems(buildReport, searchKeyWord);
 			_topBar1.text = $"Asset Path ({_assetListView.itemsSource.Count})";
 		}
-		private List<PatchAsset> FilterViewItems(PatchManifest manifest, string searchKeyWord)
+		private List<ReportAssetInfo> FilterViewItems(BuildReport buildReport, string searchKeyWord)
 		{
-			List<PatchAsset> result = new List<PatchAsset>(manifest.AssetList.Count);
-			foreach (var patchAsset in manifest.AssetList)
+			List<ReportAssetInfo> result = new List<ReportAssetInfo>(buildReport.AssetInfos.Count);
+			foreach (var assetInfo in buildReport.AssetInfos)
 			{
 				if(string.IsNullOrEmpty(searchKeyWord) == false)
 				{
-					if (patchAsset.AssetPath.Contains(searchKeyWord) == false)
+					if (assetInfo.AssetPath.Contains(searchKeyWord) == false)
 						continue;					
 				}
-				result.Add(patchAsset);
+				result.Add(assetInfo);
 			}
 			return result;
 		}
@@ -152,28 +152,28 @@ namespace YooAsset.Editor
 		}
 		private void BindAssetListViewItem(VisualElement element, int index)
 		{
-			var sourceData = _assetListView.itemsSource as List<PatchAsset>;
-			var patchAsset = sourceData[index];
-			var patchBundle = _manifest.BundleList[patchAsset.BundleID];
+			var sourceData = _assetListView.itemsSource as List<ReportAssetInfo>;
+			var assetInfo = sourceData[index];
+			var bundleInfo = _buildReport.GetBundleInfo(assetInfo.MainBundle);
 
 			// Asset Path
 			var label1 = element.Q<Label>("Label1");
-			label1.text = patchAsset.AssetPath;
+			label1.text = assetInfo.AssetPath;
 
 			// Size
 			var label2 = element.Q<Label>("Label2");
-			label2.text = GetAssetFileSize(patchAsset.AssetPath);
+			label2.text = GetAssetFileSize(assetInfo.AssetPath);
 
 			// Main Bundle
 			var label3 = element.Q<Label>("Label3");
-			label3.text = patchBundle.BundleName;
+			label3.text = bundleInfo.BundleName;
 		}
 		private void AssetListView_onSelectionChange(IEnumerable<object> objs)
 		{
 			foreach (var item in objs)
 			{
-				PatchAsset patchAsset = item as PatchAsset;
-				FillDependListView(patchAsset);
+				ReportAssetInfo assetInfo = item as ReportAssetInfo;
+				FillDependListView(assetInfo);
 			}
 		}
 		private void TopBar1_clicked()
@@ -187,6 +187,24 @@ namespace YooAsset.Editor
 		}
 
 		// 依赖列表相关
+		private void FillDependListView(ReportAssetInfo assetInfo)
+		{
+			List<ReportBundleInfo> bundles = new List<ReportBundleInfo>();
+			var mainBundle = _buildReport.GetBundleInfo(assetInfo.MainBundle);
+			bundles.Add(mainBundle);
+			foreach(string dependBundleName in assetInfo.DependBundles)
+			{
+				var dependBundle = _buildReport.GetBundleInfo(dependBundleName);
+				bundles.Add(dependBundle);
+			}
+
+			_dependListView.Clear();
+#if UNITY_2020_1_OR_NEWER
+			_dependListView.ClearSelection();
+#endif
+			_dependListView.itemsSource = bundles;
+			_bottomBar1.text = $"Depend Bundles ({bundles.Count})";
+		}
 		private VisualElement MakeDependListViewItem()
 		{
 			VisualElement element = new VisualElement();
@@ -226,39 +244,20 @@ namespace YooAsset.Editor
 		}
 		private void BindDependListViewItem(VisualElement element, int index)
 		{
-			List<PatchBundle> bundles = _dependListView.itemsSource as List<PatchBundle>;
-			PatchBundle patchBundle = bundles[index];
+			List<ReportBundleInfo> bundles = _dependListView.itemsSource as List<ReportBundleInfo>;
+			ReportBundleInfo bundleInfo = bundles[index];
 
 			// Bundle Name
 			var label1 = element.Q<Label>("Label1");
-			label1.text = patchBundle.BundleName;
+			label1.text = bundleInfo.BundleName;
 
 			// Size
 			var label2 = element.Q<Label>("Label2");
-			label2.text = (patchBundle.SizeBytes / 1024f).ToString("f1") + " KB";
+			label2.text = (bundleInfo.SizeBytes / 1024f).ToString("f1") + " KB";
 
 			// Hash
 			var label3 = element.Q<Label>("Label3");
-			label3.text = patchBundle.Hash;
-		}
-		private void FillDependListView(PatchAsset patchAsset)
-		{
-			List<PatchBundle> bundles = new List<PatchBundle>();
-			var mainBundle = _manifest.BundleList[patchAsset.BundleID];
-			bundles.Add(mainBundle);
-			for (int i = 0; i < patchAsset.DependIDs.Length; i++)
-			{
-				int bundleID = patchAsset.DependIDs[i];
-				var dependBundle = _manifest.BundleList[bundleID];
-				bundles.Add(dependBundle);
-			}
-
-			_dependListView.Clear();
-#if UNITY_2020_1_OR_NEWER
-			_dependListView.ClearSelection();
-#endif
-			_dependListView.itemsSource = bundles;
-			_bottomBar1.text = $"Depend Bundles ({bundles.Count})";
+			label3.text = bundleInfo.Hash;
 		}
 
 		private string GetAssetFileSize(string assetPath)

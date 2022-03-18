@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
-	internal class BundleListBrowserViewer
+	internal class BundleListReporterViewer
 	{
 		private VisualTreeAsset _visualAsset;
 		private TemplateContainer _root;
@@ -24,7 +24,7 @@ namespace YooAsset.Editor
 		private ToolbarButton _bottomBar3;
 		private ListView _bundleListView;
 		private ListView _includeListView;
-		private PatchManifest _manifest;
+		private BuildReport _buildReport;
 
 		/// <summary>
 		/// 初始化页面
@@ -33,11 +33,11 @@ namespace YooAsset.Editor
 		{
 			// 加载布局文件
 			string rootPath = EditorTools.GetYooAssetPath();
-			string uxml = $"{rootPath}/Editor/AssetBundleBrowser/VisualViewers/BundleListBrowserViewer.uxml";
+			string uxml = $"{rootPath}/Editor/AssetBundleReporter/VisualViewers/BundleListReporterViewer.uxml";
 			_visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (_visualAsset == null)
 			{
-				Debug.LogError($"Not found {nameof(BundleListBrowserViewer)}.uxml : {uxml}");
+				Debug.LogError($"Not found {nameof(BundleListReporterViewer)}.uxml : {uxml}");
 				return;
 			}
 			_root = _visualAsset.CloneTree();
@@ -74,24 +74,24 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 填充页面数据
 		/// </summary>
-		public void FillViewData(PatchManifest manifest, string searchKeyWord)
+		public void FillViewData(BuildReport buildReport, string searchKeyWord)
 		{
-			_manifest = manifest;
+			_buildReport = buildReport;
 			_bundleListView.Clear();
-			_bundleListView.itemsSource = FilterViewItems(manifest, searchKeyWord);
+			_bundleListView.itemsSource = FilterViewItems(buildReport, searchKeyWord);
 			_topBar1.text = $"Bundle Name ({_bundleListView.itemsSource.Count})";
 		}
-		private List<PatchBundle> FilterViewItems(PatchManifest manifest, string searchKeyWord)
+		private List<ReportBundleInfo> FilterViewItems(BuildReport buildReport, string searchKeyWord)
 		{
-			List<PatchBundle> result = new List<PatchBundle>(manifest.BundleList.Count);
-			foreach (var patchBundle in manifest.BundleList)
+			List<ReportBundleInfo> result = new List<ReportBundleInfo>(buildReport.BundleInfos.Count);
+			foreach (var bundleInfo in buildReport.BundleInfos)
 			{
 				if (string.IsNullOrEmpty(searchKeyWord) == false)
 				{
-					if (patchBundle.BundleName.Contains(searchKeyWord) == false)
+					if (bundleInfo.BundleName.Contains(searchKeyWord) == false)
 						continue;
 				}
-				result.Add(patchBundle);
+				result.Add(bundleInfo);
 			}
 			return result;
 		}
@@ -173,39 +173,55 @@ namespace YooAsset.Editor
 		}
 		private void BindBundleListViewItem(VisualElement element, int index)
 		{
-			var sourceData = _bundleListView.itemsSource as List<PatchBundle>;
-			var patchBundle = sourceData[index];
+			var sourceData = _bundleListView.itemsSource as List<ReportBundleInfo>;
+			var bundleInfo = sourceData[index];
 
 			// Bundle Name
 			var label1 = element.Q<Label>("Label1");
-			label1.text = patchBundle.BundleName;
+			label1.text = bundleInfo.BundleName;
 
 			// Size
 			var label2 = element.Q<Label>("Label2");
-			label2.text = (patchBundle.SizeBytes / 1024f).ToString("f1") + " KB";
+			label2.text = (bundleInfo.SizeBytes / 1024f).ToString("f1") + " KB";
 
 			// Hash
 			var label3 = element.Q<Label>("Label3");
-			label3.text = patchBundle.Hash;
+			label3.text = bundleInfo.Hash;
 
 			// Version
 			var label4 = element.Q<Label>("Label4");
-			label4.text = patchBundle.Version.ToString();
+			label4.text = bundleInfo.Version.ToString();
 
 			// Tags
 			var label5 = element.Q<Label>("Label5");
-			label5.text = GetTagsString(patchBundle.Tags);
+			label5.text = GetTagsString(bundleInfo.Tags);
 		}
 		private void BundleListView_onSelectionChange(IEnumerable<object> objs)
 		{
 			foreach (var item in objs)
 			{
-				PatchBundle patchBundle = item as PatchBundle;
-				FillContainsListView(patchBundle);
+				ReportBundleInfo bundleInfo = item as ReportBundleInfo;
+				FillContainsListView(bundleInfo);
 			}
 		}
 
 		// 依赖列表相关
+		private void FillContainsListView(ReportBundleInfo bundleInfo)
+		{
+			List<string> containsList = new List<string>();
+			foreach (var assetInfo in _buildReport.AssetInfos)
+			{
+				if (assetInfo.MainBundle == bundleInfo.BundleName)
+					containsList.Add(assetInfo.AssetPath);
+			}
+
+			_includeListView.Clear();
+#if UNITY_2020_1_OR_NEWER
+			_includeListView.ClearSelection();
+#endif
+			_includeListView.itemsSource = containsList;
+			_bottomBar1.text = $"Include Assets ({containsList.Count})";
+		}
 		private VisualElement MakeContainsListViewItem()
 		{
 			VisualElement element = new VisualElement();
@@ -260,39 +276,7 @@ namespace YooAsset.Editor
 			var label3 = element.Q<Label>("Label3");
 			label3.text = AssetDatabase.AssetPathToGUID(assetPath);
 		}
-		private void FillContainsListView(PatchBundle patchBundle)
-		{
-			List<string> containsList = new List<string>();
-
-			int bundleID = -1;
-			for (int i = 0; i < _manifest.BundleList.Count; i++)
-			{
-				if (_manifest.BundleList[i] == patchBundle)
-				{
-					bundleID = i;
-					break;
-				}
-			}
-			if (bundleID == -1)
-			{
-				Debug.LogError($"Not found bundle in PatchManifest : {patchBundle.BundleName}");
-				return;
-			}
-
-			foreach (var patchAsset in _manifest.AssetList)
-			{
-				if (patchAsset.BundleID == bundleID)
-					containsList.Add(patchAsset.AssetPath);
-			}
-
-			_includeListView.Clear();
-#if UNITY_2020_1_OR_NEWER
-			_includeListView.ClearSelection();
-#endif
-			_includeListView.itemsSource = containsList;
-			_bottomBar1.text = $"Include Assets ({containsList.Count})";
-		}
-
+		
 		private string GetAssetFileSize(string assetPath)
 		{
 			string fullPath = EditorTools.GetProjectPath() + "/" + assetPath;
