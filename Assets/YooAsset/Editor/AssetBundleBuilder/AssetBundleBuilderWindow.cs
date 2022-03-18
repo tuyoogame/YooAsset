@@ -28,8 +28,8 @@ namespace YooAsset.Editor
 		private int _buildVersion;
 		private BuildTarget _buildTarget;
 		private ECompressOption _compressOption = ECompressOption.Uncompressed;
-		private bool _isAppendExtension = false;
-		private bool _isForceRebuild = false;
+		private bool _appendExtension = false;
+		private bool _forceRebuild = false;
 		private string _buildinTags = string.Empty;
 
 		// GUI相关
@@ -54,9 +54,9 @@ namespace YooAsset.Editor
 			// 构建参数
 			_buildVersion = EditorGUILayout.IntField("Build Version", _buildVersion, GUILayout.MaxWidth(250));
 			_compressOption = (ECompressOption)EditorGUILayout.EnumPopup("Compression", _compressOption, GUILayout.MaxWidth(250));
-			_isAppendExtension = GUILayout.Toggle(_isAppendExtension, "Append Extension", GUILayout.MaxWidth(120));
-			_isForceRebuild = GUILayout.Toggle(_isForceRebuild, "Force Rebuild", GUILayout.MaxWidth(120));
-			if (_isForceRebuild)
+			_appendExtension = GUILayout.Toggle(_appendExtension, "Append Extension", GUILayout.MaxWidth(120));
+			_forceRebuild = GUILayout.Toggle(_forceRebuild, "Force Rebuild", GUILayout.MaxWidth(120));
+			if (_forceRebuild)
 				_buildinTags = EditorGUILayout.TextField("Buildin Tags", _buildinTags);
 
 			// 构建按钮
@@ -65,7 +65,7 @@ namespace YooAsset.Editor
 			{
 				string title;
 				string content;
-				if (_isForceRebuild)
+				if (_forceRebuild)
 				{
 					title = "警告";
 					content = "确定开始强制构建吗，这样会删除所有已有构建的文件";
@@ -114,22 +114,22 @@ namespace YooAsset.Editor
 		private void ExecuteBuild()
 		{
 			string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
-			AssetBundleBuilder.BuildParameters buildParameters = new AssetBundleBuilder.BuildParameters();
-			buildParameters.IsVerifyBuildingResult = true;
+			BuildParameters buildParameters = new BuildParameters();
+			buildParameters.VerifyBuildingResult = true;
 			buildParameters.OutputRoot = defaultOutputRoot;
 			buildParameters.BuildTarget = _buildTarget;
 			buildParameters.BuildVersion = _buildVersion;
 			buildParameters.CompressOption = _compressOption;
-			buildParameters.AppendFileExtension = _isAppendExtension;
-			buildParameters.IsForceRebuild = _isForceRebuild;
+			buildParameters.AppendFileExtension = _appendExtension;
+			buildParameters.ForceRebuild = _forceRebuild;
 			buildParameters.BuildinTags = _buildinTags;
 			_assetBuilder.Run(buildParameters);
 		}
 
 		#region 配置相关
 		private const string StrEditorCompressOption = "StrEditorCompressOption";
-		private const string StrEditorIsAppendExtension = "StrEditorIsAppendExtension";
-		private const string StrEditorIsForceRebuild = "StrEditorIsForceRebuild";
+		private const string StrEditorAppendExtension = "StrEditorAppendExtension";
+		private const string StrEditorForceRebuild = "StrEditorForceRebuild";
 		private const string StrEditorBuildinTags = "StrEditorBuildinTags";
 
 		/// <summary>
@@ -138,8 +138,8 @@ namespace YooAsset.Editor
 		private void SaveSettingsToPlayerPrefs()
 		{
 			EditorTools.PlayerSetEnum<ECompressOption>(StrEditorCompressOption, _compressOption);
-			EditorPrefs.SetBool(StrEditorIsAppendExtension, _isAppendExtension);
-			EditorPrefs.SetBool(StrEditorIsForceRebuild, _isForceRebuild);
+			EditorPrefs.SetBool(StrEditorAppendExtension, _appendExtension);
+			EditorPrefs.SetBool(StrEditorForceRebuild, _forceRebuild);
 			EditorPrefs.SetString(StrEditorBuildinTags, _buildinTags);
 		}
 
@@ -149,8 +149,8 @@ namespace YooAsset.Editor
 		private void LoadSettingsFromPlayerPrefs()
 		{
 			_compressOption = EditorTools.PlayerGetEnum<ECompressOption>(StrEditorCompressOption, ECompressOption.Uncompressed);
-			_isAppendExtension = EditorPrefs.GetBool(StrEditorIsAppendExtension, false);
-			_isForceRebuild = EditorPrefs.GetBool(StrEditorIsForceRebuild, false);
+			_appendExtension = EditorPrefs.GetBool(StrEditorAppendExtension, false);
+			_forceRebuild = EditorPrefs.GetBool(StrEditorForceRebuild, false);
 			_buildinTags = EditorPrefs.GetString(StrEditorBuildinTags, string.Empty);
 		}
 		#endregion

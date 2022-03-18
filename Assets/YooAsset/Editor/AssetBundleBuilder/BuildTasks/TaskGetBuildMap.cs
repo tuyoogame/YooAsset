@@ -12,6 +12,12 @@ namespace YooAsset.Editor
 		public class BuildMapContext : IContextObject
 		{
 			/// <summary>
+			/// 参与构建的资源总数
+			/// 说明：包括主动收集的资源以及其依赖的所有资源
+			/// </summary>
+			public int AssetFileCount;
+
+			/// <summary>
 			/// 资源包列表
 			/// </summary>
 			public readonly List<BuildBundleInfo> BundleInfos = new List<BuildBundleInfo>(1000);
@@ -179,7 +185,10 @@ namespace YooAsset.Editor
 			}
 			EditorTools.ClearProgressBar();
 
-			// 3. 移除零依赖的资源
+			// 3. 记录参与构建的资源总数
+			buildMapContext.AssetFileCount = buildAssetDic.Values.Count;
+
+			// 4. 移除零依赖的资源
 			var redundancy = CreateAssetRedundancy();
 			List<BuildAssetInfo> undependentAssets = new List<BuildAssetInfo>();
 			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
@@ -196,18 +205,15 @@ namespace YooAsset.Editor
 				}
 
 				// 冗余扩展
-				if(redundancy != null)
+				if (redundancy != null && redundancy.Check(buildAssetInfo.AssetPath))
 				{
-					if(redundancy.Check(buildAssetInfo.AssetPath))
-					{
-						undependentAssets.Add(buildAssetInfo);
-						buildMapContext.RedundancyAssetList.Add(buildAssetInfo.AssetPath);
-						continue;
-					}
+					undependentAssets.Add(buildAssetInfo);
+					buildMapContext.RedundancyAssetList.Add(buildAssetInfo.AssetPath);
+					continue;
 				}
 
-				// 冗余机制
-				if (buildParameters.Parameters.ApplyRedundancy)
+				// 如果没有开启自动分包，没有被收集到的资源会造成冗余
+				if (buildParameters.Parameters.EnableAutoCollect == false)
 				{
 					if (AssetBundleCollectorSettingData.HasCollector(buildAssetInfo.AssetPath) == false)
 					{
@@ -221,7 +227,7 @@ namespace YooAsset.Editor
 				buildAssetDic.Remove(assetInfo.AssetPath);
 			}
 
-			// 4. 设置资源包名
+			// 5. 设置资源包名
 			progressValue = 0;
 			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
 			{
@@ -235,7 +241,7 @@ namespace YooAsset.Editor
 			}
 			EditorTools.ClearProgressBar();
 
-			// 4. 构建资源包
+			// 6. 构建资源包
 			var allAssets = buildAssetDic.Values.ToList();
 			if (allAssets.Count == 0)
 				throw new Exception("构建的资源列表不能为空");

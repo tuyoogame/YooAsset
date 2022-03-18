@@ -45,7 +45,7 @@ namespace YooAsset.Editor
 			}
 
 			// 验证构建结果
-			if (buildParametersContext.Parameters.IsVerifyBuildingResult)
+			if (buildParametersContext.Parameters.VerifyBuildingResult)
 			{
 				VerifyingBuildingResult(context, unityManifest);
 			}

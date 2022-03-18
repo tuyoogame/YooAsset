@@ -15,7 +15,7 @@ namespace YooAsset.Editor
 		{
 			// 注意：我们只有在强制重建的时候才会拷贝
 			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
-			if(buildParameters.Parameters.IsForceRebuild)
+			if(buildParameters.Parameters.ForceRebuild)
 			{
 				// 清空流目录
 				AssetBundleBuilderHelper.ClearStreamingAssetsFolder();

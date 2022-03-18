@@ -36,11 +36,11 @@ namespace YooAsset.Editor
 			AppendData(content, $"构建时间：{DateTime.Now}");
 			AppendData(content, $"构建平台：{buildParameters.Parameters.BuildTarget}");
 			AppendData(content, $"构建版本：{buildParameters.Parameters.BuildVersion}");
-			AppendData(content, $"冗余机制：{buildParameters.Parameters.ApplyRedundancy}");
+			AppendData(content, $"自动分包：{buildParameters.Parameters.EnableAutoCollect}");
 
 			AppendData(content, "");
 			AppendData(content, $"--着色器--");
-			AppendData(content, $"IsCollectAllShaders：{AssetBundleCollectorSettingData.Setting.IsCollectAllShaders}");
+			AppendData(content, $"IsCollectAllShaders：{AssetBundleCollectorSettingData.Setting.AutoCollectShaders}");
 			AppendData(content, $"ShadersBundleName：{AssetBundleCollectorSettingData.Setting.ShadersBundleName}");
 
 			AppendData(content, "");
@@ -54,12 +54,12 @@ namespace YooAsset.Editor
 			AppendData(content, "");
 			AppendData(content, $"--构建参数--");
 			AppendData(content, $"CompressOption：{buildParameters.Parameters.CompressOption}");
-			AppendData(content, $"IsForceRebuild：{buildParameters.Parameters.IsForceRebuild}");
+			AppendData(content, $"IsForceRebuild：{buildParameters.Parameters.ForceRebuild}");
 			AppendData(content, $"BuildinTags：{buildParameters.Parameters.BuildinTags}");
-			AppendData(content, $"IsAppendHash：{buildParameters.Parameters.IsAppendHash}");
-			AppendData(content, $"IsDisableWriteTypeTree：{buildParameters.Parameters.IsDisableWriteTypeTree}");
-			AppendData(content, $"IsIgnoreTypeTreeChanges：{buildParameters.Parameters.IsIgnoreTypeTreeChanges}");
-			AppendData(content, $"IsDisableLoadAssetByFileName : {buildParameters.Parameters.IsDisableLoadAssetByFileName}");
+			AppendData(content, $"IsAppendHash：{buildParameters.Parameters.AppendHash}");
+			AppendData(content, $"IsDisableWriteTypeTree：{buildParameters.Parameters.DisableWriteTypeTree}");
+			AppendData(content, $"IsIgnoreTypeTreeChanges：{buildParameters.Parameters.IgnoreTypeTreeChanges}");
+			AppendData(content, $"IsDisableLoadAssetByFileName : {buildParameters.Parameters.DisableLoadAssetByFileName}");
 
 			AppendData(content, "");
 			AppendData(content, $"--构建信息--");

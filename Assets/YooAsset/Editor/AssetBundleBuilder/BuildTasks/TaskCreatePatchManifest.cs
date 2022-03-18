@@ -56,7 +56,7 @@ namespace YooAsset.Editor
 
 			// 加载旧补丁清单
 			PatchManifest oldPatchManifest = null;
-			if (buildParameters.Parameters.IsForceRebuild == false)
+			if (buildParameters.Parameters.ForceRebuild == false)
 			{
 				oldPatchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory);
 			}

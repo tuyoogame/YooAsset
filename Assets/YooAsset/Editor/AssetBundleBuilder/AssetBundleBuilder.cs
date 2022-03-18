@@ -8,94 +8,6 @@ namespace YooAsset.Editor
 {
 	public class AssetBundleBuilder
 	{
-		/// <summary>
-		/// 构建参数
-		/// </summary>
-		public class BuildParameters
-		{
-			/// <summary>
-			/// 是否验证构建结果
-			/// </summary>
-			public bool IsVerifyBuildingResult = false;
-			
-			/// <summary>
-			/// 输出的根目录
-			/// </summary>
-			public string OutputRoot;
-
-			/// <summary>
-			/// 构建的平台
-			/// </summary>
-			public BuildTarget BuildTarget;
-
-			/// <summary>
-			/// 构建的版本（资源版本号）
-			/// </summary>
-			public int BuildVersion;
-
-			/// <summary>
-			/// 是否允许冗余机制
-			/// 说明：冗余机制可以帮助我们减少包体数量
-			/// </summary>
-			public bool ApplyRedundancy = false;
-
-			/// <summary>
-			/// 是否附加上文件扩展名
-			/// </summary>
-			public bool AppendFileExtension = false;
-
-
-			/// <summary>
-			/// 压缩选项
-			/// </summary>
-			public ECompressOption CompressOption;
-
-			/// <summary>
-			/// 是否强制重新构建整个项目，如果为FALSE则是增量打包
-			/// </summary>
-			public bool IsForceRebuild;
-
-			/// <summary>
-			/// 内置资源的标记列表
-			/// 注意：分号为分隔符
-			/// </summary>
-			public string BuildinTags;
-
-			#region 高级选项
-			/// <summary>
-			/// 文件名附加上哈希值
-			/// </summary>
-			public bool IsAppendHash = false;
-
-			/// <summary>
-			/// 禁止写入类型树结构（可以降低包体和内存并提高加载效率）
-			/// </summary>
-			public bool IsDisableWriteTypeTree = false;
-
-			/// <summary>
-			/// 忽略类型树变化
-			/// </summary>
-			public bool IsIgnoreTypeTreeChanges = true;
-
-			/// <summary>
-			/// 禁用名称查找资源（可以降内存并提高加载效率）
-			/// </summary>
-			public bool IsDisableLoadAssetByFileName = false;
-			#endregion
-
-
-			/// <summary>
-			/// 获取内置标记列表
-			/// </summary>
-			public List<string> GetBuildinTags()
-			{
-				return StringUtility.StringToStringList(BuildinTags, ';');
-			}
-		}
-
-		/// <summary>
-		/// 构建参数环境
-		/// </summary>
 		public class BuildParametersContext : IContextObject
 		{
 			/// <summary>
@@ -139,15 +51,15 @@ namespace YooAsset.Editor
 				else if (Parameters.CompressOption == ECompressOption.LZ4)
 					opt |= BuildAssetBundleOptions.ChunkBasedCompression;
 
-				if (Parameters.IsForceRebuild)
+				if (Parameters.ForceRebuild)
 					opt |= BuildAssetBundleOptions.ForceRebuildAssetBundle; //Force rebuild the asset bundles
-				if (Parameters.IsAppendHash)
+				if (Parameters.AppendHash)
 					opt |= BuildAssetBundleOptions.AppendHashToAssetBundleName; //Append the hash to the assetBundle name
-				if (Parameters.IsDisableWriteTypeTree)
+				if (Parameters.DisableWriteTypeTree)
 					opt |= BuildAssetBundleOptions.DisableWriteTypeTree; //Do not include type information within the asset bundle (don't write type tree).
-				if (Parameters.IsIgnoreTypeTreeChanges)
+				if (Parameters.IgnoreTypeTreeChanges)
 					opt |= BuildAssetBundleOptions.IgnoreTypeTreeChanges; //Ignore the type tree changes when doing the incremental build check.
-				if (Parameters.IsDisableLoadAssetByFileName)
+				if (Parameters.DisableLoadAssetByFileName)
 				{
 					opt |= BuildAssetBundleOptions.DisableLoadAssetByFileName; //Disables Asset Bundle LoadAsset by file name.
 					opt |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension; //Disables Asset Bundle LoadAsset by file name with extension.
@@ -156,7 +68,6 @@ namespace YooAsset.Editor
 				return opt;
 			}
 		}
-
 
 		private readonly BuildContext _buildContext = new BuildContext();
 

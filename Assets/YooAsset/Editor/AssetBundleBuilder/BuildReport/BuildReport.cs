@@ -12,9 +12,9 @@ namespace YooAsset.Editor
 	public class BuildReport
 	{
 		/// <summary>
-		/// 构建汇总信息
+		/// 汇总信息
 		/// </summary>
-		public BuildSummary Summary = new BuildSummary();
+		public ReportSummary Summary = new ReportSummary();
 
 		/// <summary>
 		/// 资源对象列表

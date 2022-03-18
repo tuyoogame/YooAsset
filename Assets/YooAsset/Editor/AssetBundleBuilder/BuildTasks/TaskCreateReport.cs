@@ -22,22 +22,37 @@ namespace YooAsset.Editor
 			BuildReport buildReport = new BuildReport();
 
 			// 概述信息
-			buildReport.Summary.UnityVersion = UnityEngine.Application.unityVersion;
-			buildReport.Summary.BuildTime = DateTime.Now.ToString();
-			buildReport.Summary.BuildSeconds = 0;
-			buildReport.Summary.BuildTarget = buildParameters.Parameters.BuildTarget;
-			buildReport.Summary.BuildVersion = buildParameters.Parameters.BuildVersion;
-			buildReport.Summary.ApplyRedundancy = buildParameters.Parameters.ApplyRedundancy;
-			buildReport.Summary.AppendFileExtension = buildParameters.Parameters.AppendFileExtension;
-			buildReport.Summary.IsCollectAllShaders = AssetBundleCollectorSettingData.Setting.IsCollectAllShaders;
-			buildReport.Summary.ShadersBundleName = AssetBundleCollectorSettingData.Setting.ShadersBundleName;
-			buildReport.Summary.IsForceRebuild = buildParameters.Parameters.IsForceRebuild;
-			buildReport.Summary.BuildinTags = buildParameters.Parameters.BuildinTags;
-			buildReport.Summary.CompressOption = buildParameters.Parameters.CompressOption;
-			buildReport.Summary.IsAppendHash = buildParameters.Parameters.IsAppendHash;
-			buildReport.Summary.IsDisableWriteTypeTree = buildParameters.Parameters.IsDisableWriteTypeTree;
-			buildReport.Summary.IsIgnoreTypeTreeChanges = buildParameters.Parameters.IsIgnoreTypeTreeChanges;
-			buildReport.Summary.IsDisableLoadAssetByFileName = buildParameters.Parameters.IsDisableLoadAssetByFileName;
+			{
+				buildReport.Summary.UnityVersion = UnityEngine.Application.unityVersion;
+				buildReport.Summary.BuildTime = DateTime.Now.ToString();
+				buildReport.Summary.BuildSeconds = 0;
+				buildReport.Summary.BuildTarget = buildParameters.Parameters.BuildTarget;
+				buildReport.Summary.BuildVersion = buildParameters.Parameters.BuildVersion;
+				buildReport.Summary.EnableAutoCollect = buildParameters.Parameters.EnableAutoCollect;
+				buildReport.Summary.AppendFileExtension = buildParameters.Parameters.AppendFileExtension;
+				buildReport.Summary.AutoCollectShaders = AssetBundleCollectorSettingData.Setting.AutoCollectShaders;
+				buildReport.Summary.ShadersBundleName = AssetBundleCollectorSettingData.Setting.ShadersBundleName;
+
+				// 构建参数
+				buildReport.Summary.ForceRebuild = buildParameters.Parameters.ForceRebuild;
+				buildReport.Summary.BuildinTags = buildParameters.Parameters.BuildinTags;
+				buildReport.Summary.CompressOption = buildParameters.Parameters.CompressOption;
+				buildReport.Summary.AppendHash = buildParameters.Parameters.AppendHash;
+				buildReport.Summary.DisableWriteTypeTree = buildParameters.Parameters.DisableWriteTypeTree;
+				buildReport.Summary.IgnoreTypeTreeChanges = buildParameters.Parameters.IgnoreTypeTreeChanges;
+				buildReport.Summary.DisableLoadAssetByFileName = buildParameters.Parameters.DisableLoadAssetByFileName;
+
+				// 构建结果
+				buildReport.Summary.AssetFileTotalCount = buildMapContext.AssetFileCount;
+				buildReport.Summary.AllBundleTotalCount = GetAllBundleCount(patchManifest);
+				buildReport.Summary.AllBundleTotalSize = GetAllBundleSize(patchManifest);
+				buildReport.Summary.BuildinBundleTotalCount = GetBuildinBundleCount(patchManifest);
+				buildReport.Summary.BuildinBundleTotalSize = GetBuildinBundleSize(patchManifest);
+				buildReport.Summary.EncryptedBundleTotalCount = GetEncryptedBundleCount(patchManifest);
+				buildReport.Summary.EncryptedBundleTotalSize = GetEncryptedBundleSize(patchManifest);
+				buildReport.Summary.RawBundleTotalCount = GetRawBundleCount(patchManifest);
+				buildReport.Summary.RawBundleTotalSize = GetRawBundleSize(patchManifest);
+			}
 
 			// 资源对象列表
 			buildReport.AssetInfos = new List<ReportAssetInfo>(patchManifest.AssetList.Count);
@@ -85,7 +100,7 @@ namespace YooAsset.Editor
 		private List<string> GetDependBundles(PatchManifest patchManifest, PatchAsset patchAsset)
 		{
 			List<string> dependBundles = new List<string>(patchAsset.DependIDs.Length);
-			foreach(int index in patchAsset.DependIDs)
+			foreach (int index in patchAsset.DependIDs)
 			{
 				string dependBundleName = patchManifest.BundleList[index].BundleName;
 				dependBundles.Add(dependBundleName);
@@ -99,12 +114,12 @@ namespace YooAsset.Editor
 		private List<string> GetDependAssets(TaskGetBuildMap.BuildMapContext buildMapContext, string bundleName, string assetPath)
 		{
 			List<string> result = new List<string>();
-			if(buildMapContext.TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))
+			if (buildMapContext.TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))
 			{
 				BuildAssetInfo findAssetInfo = null;
-				foreach(var buildinAsset in bundleInfo.BuildinAssets)
+				foreach (var buildinAsset in bundleInfo.BuildinAssets)
 				{
-					if(buildinAsset.AssetPath == assetPath)
+					if (buildinAsset.AssetPath == assetPath)
 					{
 						findAssetInfo = buildinAsset;
 						break;
@@ -114,7 +129,7 @@ namespace YooAsset.Editor
 				{
 					throw new Exception($"Not found asset {assetPath} in bunlde {bundleName}");
 				}
-				foreach(var dependAssetInfo in findAssetInfo.AllDependAssetInfos)
+				foreach (var dependAssetInfo in findAssetInfo.AllDependAssetInfos)
 				{
 					result.Add(dependAssetInfo.AssetPath);
 				}
@@ -124,6 +139,80 @@ namespace YooAsset.Editor
 				throw new Exception($"Not found bundle : {bundleName}");
 			}
 			return result;
+		}
+
+		private int GetAllBundleCount(PatchManifest patchManifest)
+		{
+			return patchManifest.BundleList.Count;
+		}
+		private long GetAllBundleSize(PatchManifest patchManifest)
+		{
+			long fileBytes = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				fileBytes += patchBundle.SizeBytes;
+			}
+			return fileBytes;
+		}
+		private int GetBuildinBundleCount(PatchManifest patchManifest)
+		{
+			int fileCount = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				if (patchBundle.IsBuildin)
+					fileCount++;
+			}
+			return fileCount;
+		}
+		private long GetBuildinBundleSize(PatchManifest patchManifest)
+		{
+			long fileBytes = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				if (patchBundle.IsBuildin)
+					fileBytes += patchBundle.SizeBytes;
+			}
+			return fileBytes;
+		}
+		private int GetEncryptedBundleCount(PatchManifest patchManifest)
+		{
+			int fileCount = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				if (patchBundle.IsEncrypted)
+					fileCount++;
+			}
+			return fileCount;
+		}
+		private long GetEncryptedBundleSize(PatchManifest patchManifest)
+		{
+			long fileBytes = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				if (patchBundle.IsEncrypted)
+					fileBytes += patchBundle.SizeBytes;
+			}
+			return fileBytes;
+		}
+		private int GetRawBundleCount(PatchManifest patchManifest)
+		{
+			int fileCount = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				if (patchBundle.IsRawFile)
+					fileCount++;
+			}
+			return fileCount;
+		}
+		private long GetRawBundleSize(PatchManifest patchManifest)
+		{
+			long fileBytes = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				if (patchBundle.IsRawFile)
+					fileBytes += patchBundle.SizeBytes;
+			}
+			return fileBytes;
 		}
 	}
 }
