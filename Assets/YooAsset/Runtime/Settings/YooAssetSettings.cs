@@ -31,12 +31,7 @@ namespace YooAsset
 		public string UnityManifestFileName = "UnityManifest";
 
 		/// <summary>
-		/// 构建输出的说明文件
-		/// </summary>
-		public string ReadmeFileName = "readme.txt";
-
-		/// <summary>
-		/// 构建输出的报告文件、
+		/// 构建输出的报告文件
 		/// </summary>
 		public string ReportFileName = "BuildReport.json";
 	}
