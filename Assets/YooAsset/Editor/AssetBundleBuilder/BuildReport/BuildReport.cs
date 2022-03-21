@@ -27,6 +27,11 @@ namespace YooAsset.Editor
 		public List<ReportBundleInfo> BundleInfos = new List<ReportBundleInfo>();
 
 		/// <summary>
+		/// 收集器信息列表
+		/// </summary>
+		public List<string> CollectorInfoList = new List<string>();
+
+		/// <summary>
 		/// 冗余的资源列表
 		/// </summary>
 		public List<string> RedundancyAssetList = new List<string>();

@@ -10,6 +10,8 @@ namespace YooAsset.Editor
 	{
 		public class BuildParametersContext : IContextObject
 		{
+			private readonly System.Diagnostics.Stopwatch _buildWatch = new System.Diagnostics.Stopwatch();
+
 			/// <summary>
 			/// 构建参数
 			/// </summary>
@@ -67,6 +69,23 @@ namespace YooAsset.Editor
 
 				return opt;
 			}
+
+			/// <summary>
+			/// 获取构建的耗时（单位：秒）
+			/// </summary>
+			public int GetBuildingSeconds()
+			{
+				int seconds = (int)(_buildWatch.ElapsedMilliseconds / 1000);
+				return seconds;
+			}
+			public void BeginWatch()
+			{
+				_buildWatch.Start();
+			}
+			public void StopWatch()
+			{
+				_buildWatch.Stop();
+			}
 		}
 
 		private readonly BuildContext _buildContext = new BuildContext();
@@ -91,7 +110,6 @@ namespace YooAsset.Editor
 				new TaskBuilding(), //开始执行构建			
 				new TaskEncryption(), //加密资源文件
 				new TaskCreatePatchManifest(), //创建清单文件
-				new TaskCreateReadme(), //创建说明文件
 				new TaskCreateReport(), //创建报告文件
 				new TaskCreatePatchPackage(), //制作补丁包
 				new TaskCopyBuildinFiles(), //拷贝内置文件

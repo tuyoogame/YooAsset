@@ -22,14 +22,6 @@ namespace YooAsset.Editor
 			string packageDirectory = buildParameters.GetPackageDirectory();
 			UnityEngine.Debug.Log($"开始拷贝补丁文件到补丁包目录：{packageDirectory}");
 
-			// 拷贝Readme文件
-			{
-				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{ResourceSettingData.Setting.ReadmeFileName}";
-				string destPath = $"{packageDirectory}/{ResourceSettingData.Setting.ReadmeFileName}";
-				EditorTools.CopyFile(sourcePath, destPath, true);
-				UnityEngine.Debug.Log($"拷贝Readme文件到：{destPath}");
-			}
-
 			// 拷贝Report文件
 			{
 				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{ResourceSettingData.Setting.ReportFileName}";

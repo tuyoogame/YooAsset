@@ -20,12 +20,13 @@ namespace YooAsset.Editor
 		{
 			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory);
 			BuildReport buildReport = new BuildReport();
+			buildParameters.StopWatch();
 
 			// 概述信息
 			{
 				buildReport.Summary.UnityVersion = UnityEngine.Application.unityVersion;
 				buildReport.Summary.BuildTime = DateTime.Now.ToString();
-				buildReport.Summary.BuildSeconds = 0;
+				buildReport.Summary.BuildSeconds = buildParameters.GetBuildingSeconds();
 				buildReport.Summary.BuildTarget = buildParameters.Parameters.BuildTarget;
 				buildReport.Summary.BuildVersion = buildParameters.Parameters.BuildVersion;
 				buildReport.Summary.EnableAutoCollect = buildParameters.Parameters.EnableAutoCollect;
@@ -44,6 +45,7 @@ namespace YooAsset.Editor
 
 				// 构建结果
 				buildReport.Summary.AssetFileTotalCount = buildMapContext.AssetFileCount;
+				buildReport.Summary.RedundancyAssetFileCount = buildMapContext.RedundancyAssetList.Count;
 				buildReport.Summary.AllBundleTotalCount = GetAllBundleCount(patchManifest);
 				buildReport.Summary.AllBundleTotalSize = GetAllBundleSize(patchManifest);
 				buildReport.Summary.BuildinBundleTotalCount = GetBuildinBundleCount(patchManifest);
@@ -52,6 +54,8 @@ namespace YooAsset.Editor
 				buildReport.Summary.EncryptedBundleTotalSize = GetEncryptedBundleSize(patchManifest);
 				buildReport.Summary.RawBundleTotalCount = GetRawBundleCount(patchManifest);
 				buildReport.Summary.RawBundleTotalSize = GetRawBundleSize(patchManifest);
+
+
 			}
 
 			// 资源对象列表
@@ -82,8 +86,19 @@ namespace YooAsset.Editor
 				buildReport.BundleInfos.Add(reportBundleInfo);
 			}
 
+			// 收集器列表
+			for (int i = 0; i < AssetBundleCollectorSettingData.Setting.Collectors.Count; i++)
+			{
+				var wrapper = AssetBundleCollectorSettingData.Setting.Collectors[i];
+				buildReport.CollectorInfoList.Add(wrapper.ToString());
+			}
+
 			// 冗余资源列表
-			buildReport.RedundancyAssetList = buildMapContext.RedundancyAssetList;
+			for (int i = 0; i < buildMapContext.RedundancyAssetList.Count; i++)
+			{
+				string redundancyAssetPath = buildMapContext.RedundancyAssetList[i];
+				buildReport.RedundancyAssetList.Add(redundancyAssetPath);
+			}
 
 			// 删除旧文件
 			string filePath = $"{buildParameters.PipelineOutputDirectory}/{ResourceSettingData.Setting.ReportFileName}";

@@ -10,7 +10,8 @@ namespace YooAsset.Editor
 	{
 		void IBuildTask.Run(BuildContext context)
 		{
-			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();		
+			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
+			buildParameters.BeginWatch();
 
 			// 检测构建平台是否合法
 			if (buildParameters.Parameters.BuildTarget == BuildTarget.NoTarget)

@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEditor;
 
 namespace YooAsset.Editor
@@ -62,6 +64,7 @@ namespace YooAsset.Editor
 
 		// 构建结果
 		public int AssetFileTotalCount;
+		public int RedundancyAssetFileCount;
 		public int AllBundleTotalCount;
 		public long AllBundleTotalSize;
 		public int BuildinBundleTotalCount;
