@@ -64,3 +64,15 @@ private IEnumerator InitializeYooAsset()
 }
 ````
 
+**资源文件解密**  
+
+````c#
+public class BundleDecryption : IDecryptionServices
+{
+    public ulong GetFileOffset(BundleInfo bundleInfo)
+    {
+        return 32;
+    }
+}
+````
+

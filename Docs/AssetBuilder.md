@@ -37,6 +37,8 @@
 编写继承IAssetEncrypter接口的加密类。注意：加密类文件需要放置在Editor文件夹里。
 
 ````C#
+using YooAsset.Editor;
+
 public class AssetEncrypter : IAssetEncrypter
 {
     /// <summary>

@@ -103,18 +103,15 @@ foreach (var asset in handle.AllAssets)
 ````c#
 void Start()
 {
-    // 场景加载参数
-    SceneInstanceParam param = new SceneInstanceParam();
-    param.LoadMode = UnityEngine.SceneManagement.LoadSceneMode.Single;
-    param.ActivateOnLoad = true;
+    var sceneMode = UnityEngine.SceneManagement.LoadSceneMode.Single;
+    bool activateOnLoad = true;
 
-    AssetOperationHandle handle = YooAssets.LoadSceneAsync("Scene/Login", param);
+    SceneOperationHandle handle = YooAssets.LoadSceneAsync("Scene/Login", sceneMode, activateOnLoad);
     handle.Completed += Handle_Completed;
 }
-void Handle_Completed(AssetOperationHandle handle)
+void Handle_Completed(SceneOperationHandle handle)
 {
-    SceneInstance instance = handle.AssetInstance as SceneInstance;
-    Debug.Log(instance.Scene.name);
+    Debug.Log(handle.Scene.name);
 }
 ````
 
