@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace YooAsset
 {
@@ -163,21 +164,18 @@ namespace YooAsset
 		/// 异步加载场景
 		/// </summary>
 		/// <param name="scenePath">场景名称</param>
-		public static AssetOperationHandle LoadSceneAsync(string scenePath, SceneInstanceParam instanceParam)
+		public static SceneOperationHandle LoadSceneAsync(string scenePath, LoadSceneMode mode, bool activateOnLoad)
 		{
 			AssetProviderBase provider = TryGetAssetProvider(scenePath);
 			if (provider == null)
 			{
 				if (SimulationOnEditor)
-					provider = new DatabaseSceneProvider(scenePath, instanceParam);
+					provider = new DatabaseSceneProvider(scenePath, mode, activateOnLoad);
 				else
-					provider = new BundledSceneProvider(scenePath, instanceParam);
+					provider = new BundledSceneProvider(scenePath, mode, activateOnLoad);
 				_providers.Add(provider);
 			}
-
-			// 引用计数增加
-			provider.Reference();
-			return provider.Handle;
+			return provider.CreateHandle() as SceneOperationHandle;
 		}
 
 		/// <summary>
@@ -196,10 +194,7 @@ namespace YooAsset
 					provider = new BundledAssetProvider(assetPath, assetType);
 				_providers.Add(provider);
 			}
-
-			// 引用计数增加
-			provider.Reference();
-			return provider.Handle;
+			return provider.CreateHandle() as AssetOperationHandle;
 		}
 
 		/// <summary>
@@ -218,10 +213,7 @@ namespace YooAsset
 					provider = new BundledSubAssetsProvider(assetPath, assetType);
 				_providers.Add(provider);
 			}
-
-			// 引用计数增加
-			provider.Reference();
-			return provider.Handle;
+			return provider.CreateHandle() as AssetOperationHandle;
 		}
 
 

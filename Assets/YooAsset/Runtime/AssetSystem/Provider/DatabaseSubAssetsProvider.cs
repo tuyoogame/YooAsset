@@ -40,7 +40,7 @@ namespace YooAsset
 				else
 				{
 					Status = EStatus.Loading;
-				}		
+				}
 
 				// 注意：模拟异步加载效果提前返回
 				if (IsWaitForAsyncComplete == false)
@@ -50,14 +50,21 @@ namespace YooAsset
 			// 1. 加载资源对象
 			if (Status == EStatus.Loading)
 			{
-				var findAssets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(AssetPath);
-				List<UnityEngine.Object> result = new List<Object>(findAssets.Length);
-				foreach (var findObj in findAssets)
+				if (AssetType == null)
 				{
-					if (findObj.GetType() == AssetType)
-						result.Add(findObj);
+					AllAssets = UnityEditor.AssetDatabase.LoadAllAssetRepresentationsAtPath(AssetPath);
 				}
-				AllAssets = result.ToArray();
+				else
+				{
+					UnityEngine.Object[] findAssets = UnityEditor.AssetDatabase.LoadAllAssetRepresentationsAtPath(AssetPath);
+					List<UnityEngine.Object> result = new List<Object>(findAssets.Length);
+					foreach (var findAsset in findAssets)
+					{
+						if (findAsset.GetType() == AssetType)
+							result.Add(findAsset);
+					}
+					AllAssets = result.ToArray();
+				}
 				Status = EStatus.Checking;
 			}
 
@@ -66,7 +73,7 @@ namespace YooAsset
 			{
 				Status = AllAssets == null ? EStatus.Fail : EStatus.Success;
 				if (Status == EStatus.Fail)
-					YooLogger.Warning($"Failed to load all asset object : {AssetPath}");
+					YooLogger.Warning($"Failed to load sub assets : {AssetName}");
 				InvokeCompletion();
 			}
 #endif

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 namespace YooAsset
 {
@@ -288,69 +289,103 @@ namespace YooAsset
 			AssetSystem.GetDebugReport(report);
 		}
 
+		#region 场景接口
+		/// <summary>
+		/// 异步加载场景
+		/// </summary>
+		/// <param name="location">场景对象相对路径</param>
+		/// <param name="mode">场景加载模式</param>
+		/// <param name="activateOnLoad">加载完毕时是否主动激活</param>
+		public static SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode mode, bool activateOnLoad)
+		{
+			string scenePath = ConvertLocationToAssetPath(location);
+			var handle = AssetSystem.LoadSceneAsync(scenePath, mode, activateOnLoad);
+			return handle;
+		}
+		#endregion
 
 		#region 资源加载接口
 		/// <summary>
 		/// 同步加载资源对象
 		/// </summary>
+		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源对象相对路径</param>
 		public static AssetOperationHandle LoadAssetSync<TObject>(string location) where TObject : class
 		{
 			return LoadAssetInternal(location, typeof(TObject), true);
 		}
-		public static AssetOperationHandle LoadAssetSync(System.Type type, string location)
+
+		/// <summary>
+		/// 同步加载资源对象
+		/// </summary>
+		/// <param name="location">资源对象相对路径</param>
+		/// <param name="type">资源类型</param>
+		public static AssetOperationHandle LoadAssetSync(string location, System.Type type)
 		{
 			return LoadAssetInternal(location, type, true);
 		}
 
 		/// <summary>
-		/// 同步加载子资源对象集合
+		/// 同步加载子资源对象
 		/// </summary>
+		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源对象相对路径</param>
 		public static AssetOperationHandle LoadSubAssetsSync<TObject>(string location)
 		{
 			return LoadSubAssetsInternal(location, typeof(TObject), true);
 		}
-		public static AssetOperationHandle LoadSubAssetsSync(System.Type type, string location)
+
+		/// <summary>
+		/// 同步加载子资源对象
+		/// </summary>
+		/// <param name="location">资源对象相对路径</param>
+		/// <param name="type">子对象类型</param>
+		public static AssetOperationHandle LoadSubAssetsSync(string location, System.Type type)
 		{
 			return LoadSubAssetsInternal(location, type, true);
 		}
 
+
 		/// <summary>
-		/// 异步加载场景
+		/// 异步加载资源对象
 		/// </summary>
-		public static AssetOperationHandle LoadSceneAsync(string location, SceneInstanceParam instanceParam)
+		/// <typeparam name="TObject">资源类型</typeparam>
+		/// <param name="location">资源对象相对路径</param>
+		public static AssetOperationHandle LoadAssetAsync<TObject>(string location)
 		{
-			string scenePath = ConvertLocationToAssetPath(location);
-			var handle = AssetSystem.LoadSceneAsync(scenePath, instanceParam);
-			return handle;
+			return LoadAssetInternal(location, typeof(TObject), false);
 		}
 
 		/// <summary>
 		/// 异步加载资源对象
 		/// </summary>
 		/// <param name="location">资源对象相对路径</param>
-		public static AssetOperationHandle LoadAssetAsync<TObject>(string location)
-		{
-			return LoadAssetInternal(location, typeof(TObject), false);
-		}
-		public static AssetOperationHandle LoadAssetAsync(System.Type type, string location)
+		/// <param name="type">资源类型</param>
+		public static AssetOperationHandle LoadAssetAsync(string location, System.Type type)
 		{
 			return LoadAssetInternal(location, type, false);
 		}
 
 		/// <summary>
-		/// 异步加载子资源对象集合
+		/// 异步加载子资源对象
 		/// </summary>
+		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源对象相对路径</param>
 		public static AssetOperationHandle LoadSubAssetsAsync<TObject>(string location)
 		{
 			return LoadSubAssetsInternal(location, typeof(TObject), false);
 		}
-		public static AssetOperationHandle LoadSubAssetsAsync(System.Type type, string location)
+
+		/// <summary>
+		/// 异步加载子资源对象
+		/// </summary>
+		/// <param name="location">资源对象相对路径</param>
+		/// <param name="type">子对象类型</param>
+		public static AssetOperationHandle LoadSubAssetsAsync(string location, System.Type type)
 		{
 			return LoadSubAssetsInternal(location, type, false);
 		}
+		
 
 		private static AssetOperationHandle LoadAssetInternal(string location, System.Type assetType, bool waitForAsyncComplete)
 		{

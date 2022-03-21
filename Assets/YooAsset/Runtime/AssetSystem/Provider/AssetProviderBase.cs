@@ -1,7 +1,9 @@
-﻿
+﻿using System.Collections;
+using System.Collections.Generic;
+
 namespace YooAsset
 {
-	internal abstract class AssetProviderBase : IAssetProvider
+	internal abstract class AssetProviderBase
 	{
 		public enum EStatus
 		{
@@ -13,19 +15,55 @@ namespace YooAsset
 			Fail,
 		}
 
-		protected bool IsWaitForAsyncComplete { private set; get; } = false;
-		
+		/// <summary>
+		/// 资源路径
+		/// </summary>
 		public string AssetPath { private set; get; }
+
+		/// <summary>
+		/// 资源对象的名称
+		/// </summary>
 		public string AssetName { private set; get; }
+
+		/// <summary>
+		/// 资源对象的类型
+		/// </summary>
 		public System.Type AssetType { private set; get; }
+
+		/// <summary>
+		/// 获取的资源对象
+		/// </summary>
 		public UnityEngine.Object AssetObject { protected set; get; }
+
+		/// <summary>
+		/// 获取的资源对象集合
+		/// </summary>
 		public UnityEngine.Object[] AllAssets { protected set; get; }
-		public IAssetInstance AssetInstance { protected set; get; }
-		public EStatus Status { protected set; get; }
-		public int RefCount { private set; get; }
-		public AssetOperationHandle Handle { private set; get; }
-		public System.Action<AssetOperationHandle> Callback { set; get; }
+
+		/// <summary>
+		/// 获取的场景对象
+		/// </summary>
+		public UnityEngine.SceneManagement.Scene Scene { protected set; get; }
+
+
+		/// <summary>
+		/// 当前的加载状态
+		/// </summary>
+		public EStatus Status { protected set; get; } = EStatus.None;
+
+		/// <summary>
+		/// 引用计数
+		/// </summary>
+		public int RefCount { private set; get; } = 0;
+
+		/// <summary>
+		/// 是否已经销毁
+		/// </summary>
 		public bool IsDestroyed { private set; get; } = false;
+
+		/// <summary>
+		/// 是否完毕（成功或失败）
+		/// </summary>
 		public bool IsDone
 		{
 			get
@@ -33,13 +71,10 @@ namespace YooAsset
 				return Status == EStatus.Success || Status == EStatus.Fail;
 			}
 		}
-		public bool IsValid
-		{
-			get
-			{
-				return IsDestroyed == false;
-			}
-		}
+
+		/// <summary>
+		/// 加载进度
+		/// </summary>
 		public virtual float Progress
 		{
 			get
@@ -47,34 +82,69 @@ namespace YooAsset
 				return 0;
 			}
 		}
-		
+
+
+		protected bool IsWaitForAsyncComplete { private set; get; } = false;
+		private readonly List<OperationHandleBase> _handles = new List<OperationHandleBase>();
+
 
 		public AssetProviderBase(string assetPath, System.Type assetType)
 		{
 			AssetPath = assetPath;
 			AssetName = System.IO.Path.GetFileName(assetPath);
 			AssetType = assetType;
-			Status = EStatus.None;
-			Handle = new AssetOperationHandle(this);
 		}
 
+		/// <summary>
+		/// 轮询更新方法
+		/// </summary>
 		public abstract void Update();
+
+		/// <summary>
+		/// 销毁资源对象
+		/// </summary>
 		public virtual void Destory()
 		{
 			IsDestroyed = true;
 		}
 
-		public void Reference()
+		/// <summary>
+		/// 创建操作句柄
+		/// </summary>
+		/// <returns></returns>
+		public OperationHandleBase CreateHandle()
 		{
+			// 引用计数增加
 			RefCount++;
+
+			OperationHandleBase handle;
+			if (IsSceneProvider())
+				handle = new SceneOperationHandle(this);
+			else
+				handle = new AssetOperationHandle(this);
+
+			_handles.Add(handle);
+			return handle;
 		}
-		public void Release()
+
+		/// <summary>
+		/// 释放操作句柄
+		/// </summary>
+		public void ReleaseHandle(OperationHandleBase handle)
 		{
 			if (RefCount <= 0)
 				YooLogger.Warning("Asset provider reference count is already zero. There may be resource leaks !");
 
+			if (_handles.Remove(handle) == false)
+				throw new System.Exception("Should never get here !");
+
+			// 引用计数减少
 			RefCount--;
 		}
+
+		/// <summary>
+		/// 是否可以销毁
+		/// </summary>
 		public bool CanDestroy()
 		{
 			if (IsDone == false)
@@ -97,7 +167,7 @@ namespace YooAsset
 		/// <summary>
 		/// 等待异步执行完毕
 		/// </summary>
-		public virtual void WaitForAsyncComplete()
+		public void WaitForAsyncComplete()
 		{
 			IsWaitForAsyncComplete = true;
 
@@ -114,7 +184,7 @@ namespace YooAsset
 		/// <summary>
 		/// 异步操作任务
 		/// </summary>
-		System.Threading.Tasks.Task<object> IAssetProvider.Task
+		public System.Threading.Tasks.Task<object> Task
 		{
 			get
 			{
@@ -141,7 +211,10 @@ namespace YooAsset
 		}
 		protected void InvokeCompletion()
 		{
-			Callback?.Invoke(Handle);
+			foreach (var handle in _handles)
+			{
+				handle.InvokeCallback();
+			}
 			_waitHandle?.Set();
 		}
 	}
