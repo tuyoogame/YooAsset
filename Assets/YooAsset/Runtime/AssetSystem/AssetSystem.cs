@@ -128,6 +128,18 @@ namespace YooAsset
 
 
 		/// <summary>
+		/// 异步加载原生文件
+		/// </summary>
+		public static RawFileOperation LoadRawFileAsync(string assetPath, string savePath)
+		{
+			string bundleName = BundleServices.GetBundleName(assetPath);
+			BundleInfo bundleInfo = BundleServices.GetBundleInfo(bundleName);
+			RawFileOperation operation = new RawFileOperation(bundleInfo, savePath);
+			OperationSystem.ProcessOperaiton(operation);
+			return operation;
+		}
+
+		/// <summary>
 		/// 异步加载场景
 		/// </summary>
 		public static SceneOperationHandle LoadSceneAsync(string scenePath, LoadSceneMode sceneMode, bool activateOnLoad, int priority)

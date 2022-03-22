@@ -54,19 +54,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 是否为场景加载器
-		/// </summary>
-		public bool IsSceneLoader()
-		{
-			foreach (var provider in _providers)
-			{
-				if (provider is BundledSceneProvider)
-					return true;
-			}
-			return false;
-		}
-
-		/// <summary>
 		/// 添加附属的资源提供者
 		/// </summary>
 		public void AddProvider(ProviderBase provider)
