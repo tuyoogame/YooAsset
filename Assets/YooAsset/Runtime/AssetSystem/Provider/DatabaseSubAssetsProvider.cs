@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace YooAsset
 {
-	internal sealed class DatabaseSubAssetsProvider : AssetProviderBase
+	internal sealed class DatabaseSubAssetsProvider : ProviderBase
 	{
 		public override float Progress
 		{

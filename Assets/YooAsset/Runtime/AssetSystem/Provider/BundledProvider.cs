@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-    internal abstract class BundledProvider : AssetProviderBase
+    internal abstract class BundledProvider : ProviderBase
     {
 		protected BundleFileLoader OwnerBundle { private set; get; }
 		protected DependBundleGrouper DependBundles { private set; get; }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	internal abstract class AssetProviderBase
+	internal abstract class ProviderBase
 	{
 		public enum EStatus
 		{
@@ -88,7 +88,7 @@ namespace YooAsset
 		private readonly List<OperationHandleBase> _handles = new List<OperationHandleBase>();
 
 
-		public AssetProviderBase(string assetPath, System.Type assetType)
+		public ProviderBase(string assetPath, System.Type assetType)
 		{
 			AssetPath = assetPath;
 			AssetName = System.IO.Path.GetFileName(assetPath);

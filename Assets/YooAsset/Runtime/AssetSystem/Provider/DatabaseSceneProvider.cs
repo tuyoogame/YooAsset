@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 namespace YooAsset
 {
-	internal sealed class DatabaseSceneProvider : AssetProviderBase
+	internal sealed class DatabaseSceneProvider : ProviderBase
 	{
 		public readonly LoadSceneMode SceneMode;
 		private readonly bool _activateOnLoad;

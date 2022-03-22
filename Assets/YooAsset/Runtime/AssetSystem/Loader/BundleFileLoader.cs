@@ -38,7 +38,7 @@ namespace YooAsset
 		/// </summary>
 		public bool IsDestroyed { private set; get; } = false;
 
-		private readonly List<AssetProviderBase> _providers = new List<AssetProviderBase>(100);
+		private readonly List<ProviderBase> _providers = new List<ProviderBase>(100);
 		private bool _isWaitForAsyncComplete = false;
 		private bool _isShowWaitForAsyncError = false;
 		private FileDownloader _fileDownloader;
@@ -69,7 +69,7 @@ namespace YooAsset
 		/// <summary>
 		/// 添加附属的资源提供者
 		/// </summary>
-		public void AddProvider(AssetProviderBase provider)
+		public void AddProvider(ProviderBase provider)
 		{
 			if (_providers.Contains(provider) == false)
 				_providers.Add(provider);

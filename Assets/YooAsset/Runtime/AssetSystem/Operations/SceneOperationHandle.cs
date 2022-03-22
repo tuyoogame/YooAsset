@@ -111,7 +111,7 @@ namespace YooAsset
 
 		private System.Action<SceneOperationHandle> _callback;
 
-		internal SceneOperationHandle(AssetProviderBase provider) : base(provider)
+		internal SceneOperationHandle(ProviderBase provider) : base(provider)
 		{
 		}
 		internal override void InvokeCallback()
@@ -189,7 +189,7 @@ namespace YooAsset
 				return operation;
 			}
 
-			AssetProviderBase provider = _provider;
+			ProviderBase provider = _provider;
 
 			// 释放场景句柄
 			ReleaseInternal();
@@ -222,7 +222,7 @@ namespace YooAsset
 			}
 		}
 
-		private bool IsAdditiveScene(AssetProviderBase provider)
+		private bool IsAdditiveScene(ProviderBase provider)
 		{
 			if (provider is DatabaseSceneProvider)
 			{

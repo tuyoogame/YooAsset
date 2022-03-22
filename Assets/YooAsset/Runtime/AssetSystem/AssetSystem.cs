@@ -9,7 +9,7 @@ namespace YooAsset
 	internal static class AssetSystem
 	{
 		private static readonly List<BundleFileLoader> _loaders = new List<BundleFileLoader>(1000);
-		private static readonly List<AssetProviderBase> _providers = new List<AssetProviderBase>(1000);
+		private static readonly List<ProviderBase> _providers = new List<ProviderBase>(1000);
 
 		/// <summary>
 		/// 在编辑器下模拟运行
@@ -132,7 +132,7 @@ namespace YooAsset
 		/// </summary>
 		public static SceneOperationHandle LoadSceneAsync(string scenePath, LoadSceneMode sceneMode, bool activateOnLoad, int priority)
 		{
-			AssetProviderBase provider = TryGetAssetProvider(scenePath);
+			ProviderBase provider = TryGetProvider(scenePath);
 			if (provider == null)
 			{
 				if (SimulationOnEditor)
@@ -149,7 +149,7 @@ namespace YooAsset
 		/// </summary>
 		public static AssetOperationHandle LoadAssetAsync(string assetPath, System.Type assetType)
 		{
-			AssetProviderBase provider = TryGetAssetProvider(assetPath);
+			ProviderBase provider = TryGetProvider(assetPath);
 			if (provider == null)
 			{
 				if (SimulationOnEditor)
@@ -166,7 +166,7 @@ namespace YooAsset
 		/// </summary>
 		public static SubAssetsOperationHandle LoadSubAssetsAsync(string assetPath, System.Type assetType)
 		{
-			AssetProviderBase provider = TryGetAssetProvider(assetPath);
+			ProviderBase provider = TryGetProvider(assetPath);
 			if (provider == null)
 			{
 				if (SimulationOnEditor)
@@ -200,7 +200,7 @@ namespace YooAsset
 			}
 			return result;
 		}
-		internal static void RemoveBundleProviders(List<AssetProviderBase> providers)
+		internal static void RemoveBundleProviders(List<ProviderBase> providers)
 		{
 			foreach (var provider in providers)
 			{
@@ -234,12 +234,12 @@ namespace YooAsset
 			}
 			return loader;
 		}
-		private static AssetProviderBase TryGetAssetProvider(string assetPath)
+		private static ProviderBase TryGetProvider(string assetPath)
 		{
-			AssetProviderBase provider = null;
+			ProviderBase provider = null;
 			for (int i = 0; i < _providers.Count; i++)
 			{
-				AssetProviderBase temp = _providers[i];
+				ProviderBase temp = _providers[i];
 				if (temp.AssetPath.Equals(assetPath))
 				{
 					provider = temp;

@@ -4,9 +4,9 @@ namespace YooAsset
 {
 	public abstract class OperationHandleBase : IEnumerator
 	{
-		internal AssetProviderBase _provider { private set; get; }
+		internal ProviderBase _provider { private set; get; }
 		
-		internal OperationHandleBase(AssetProviderBase provider)
+		internal OperationHandleBase(ProviderBase provider)
 		{
 			_provider = provider;
 		}
@@ -21,9 +21,9 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					return EOperationStatus.None;
-				if (_provider.Status == AssetProviderBase.EStatus.Fail)
+				if (_provider.Status == ProviderBase.EStatus.Fail)
 					return EOperationStatus.Failed;
-				else if (_provider.Status == AssetProviderBase.EStatus.Success)
+				else if (_provider.Status == ProviderBase.EStatus.Success)
 					return EOperationStatus.Succeed;
 				else
 					return EOperationStatus.None;
