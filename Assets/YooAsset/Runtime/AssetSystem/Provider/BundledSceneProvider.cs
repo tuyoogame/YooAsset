@@ -7,8 +7,9 @@ namespace YooAsset
 {
 	internal sealed class BundledSceneProvider : BundledProvider
 	{
-		private readonly LoadSceneMode _sceneMode;
+		public readonly LoadSceneMode SceneMode;
 		private readonly bool _activateOnLoad;
+		private readonly int _priority;
 		private AsyncOperation _asyncOp;
 		public override float Progress
 		{
@@ -20,11 +21,12 @@ namespace YooAsset
 			}
 		}
 
-		public BundledSceneProvider(string scenePath, LoadSceneMode sceneMode, bool activateOnLoad)
+		public BundledSceneProvider(string scenePath, LoadSceneMode sceneMode, bool activateOnLoad, int priority)
 			: base(scenePath, null)
 		{
-			_sceneMode = sceneMode;
+			SceneMode = sceneMode;
 			_activateOnLoad = activateOnLoad;
+			_priority = priority;
 		}
 		public override void Update()
 		{
@@ -58,10 +60,11 @@ namespace YooAsset
 			// 2. 加载场景
 			if (Status == EStatus.Loading)
 			{
-				_asyncOp = SceneManager.LoadSceneAsync(AssetName, _sceneMode);
+				_asyncOp = SceneManager.LoadSceneAsync(AssetName, SceneMode);
 				if (_asyncOp != null)
 				{
 					_asyncOp.allowSceneActivation = true;
+					_asyncOp.priority = _priority;
 					Status = EStatus.Checking;
 				}
 				else
@@ -77,24 +80,13 @@ namespace YooAsset
 			{
 				if (_asyncOp.isDone)
 				{
-					Scene = SceneManager.GetSceneByName(AssetName);
-					if (_activateOnLoad)
-						SceneManager.SetActiveScene(Scene);
+					SceneObject = SceneManager.GetSceneByName(AssetName);
+					if (SceneObject.IsValid() && _activateOnLoad)
+						SceneManager.SetActiveScene(SceneObject);
 
-					Status = Scene.IsValid() ? EStatus.Success : EStatus.Fail;
+					Status = SceneObject.IsValid() ? EStatus.Success : EStatus.Fail;
 					InvokeCompletion();
 				}
-			}
-		}
-		public override void Destory()
-		{
-			base.Destory();
-
-			// 卸载附加场景（异步方式卸载）
-			if (_sceneMode == LoadSceneMode.Additive)
-			{
-				if (Scene.IsValid() && Scene.isLoaded)
-					SceneManager.UnloadSceneAsync(Scene);
 			}
 		}
 	}

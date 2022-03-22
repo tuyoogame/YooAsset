@@ -43,7 +43,7 @@ namespace YooAsset
 		/// <summary>
 		/// 获取的场景对象
 		/// </summary>
-		public UnityEngine.SceneManagement.Scene Scene { protected set; get; }
+		public UnityEngine.SceneManagement.Scene SceneObject { protected set; get; }
 
 
 		/// <summary>
@@ -109,6 +109,17 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 是否可以销毁
+		/// </summary>
+		public bool CanDestroy()
+		{
+			if (IsDone == false)
+				return false;
+
+			return RefCount <= 0;
+		}
+
+		/// <summary>
 		/// 创建操作句柄
 		/// </summary>
 		/// <returns></returns>
@@ -120,6 +131,8 @@ namespace YooAsset
 			OperationHandleBase handle;
 			if (IsSceneProvider())
 				handle = new SceneOperationHandle(this);
+			else if (IsSubAssetsProvider())
+				handle = new SubAssetsOperationHandle(this);
 			else
 				handle = new AssetOperationHandle(this);
 
@@ -143,22 +156,22 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 是否可以销毁
-		/// </summary>
-		public bool CanDestroy()
-		{
-			if (IsDone == false)
-				return false;
-
-			return RefCount <= 0;
-		}
-
-		/// <summary>
 		/// 是否为场景提供者
 		/// </summary>
 		public bool IsSceneProvider()
 		{
 			if (this is BundledSceneProvider || this is DatabaseSceneProvider)
+				return true;
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// 是否为子资源对象提供者
+		/// </summary>
+		public bool IsSubAssetsProvider()
+		{
+			if (this is BundledSubAssetsProvider || this is DatabaseSubAssetsProvider)
 				return true;
 			else
 				return false;

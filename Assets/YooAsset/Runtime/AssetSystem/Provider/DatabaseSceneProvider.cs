@@ -5,8 +5,9 @@ namespace YooAsset
 {
 	internal sealed class DatabaseSceneProvider : AssetProviderBase
 	{
-		private readonly LoadSceneMode _sceneMode;
+		public readonly LoadSceneMode SceneMode;
 		private readonly bool _activateOnLoad;
+		private readonly int _priority;
 		private AsyncOperation _asyncOp;
 		public override float Progress
 		{
@@ -18,11 +19,12 @@ namespace YooAsset
 			}
 		}
 
-		public DatabaseSceneProvider(string scenePath, LoadSceneMode sceneMode, bool activateOnLoad)
+		public DatabaseSceneProvider(string scenePath, LoadSceneMode sceneMode, bool activateOnLoad, int priority)
 			: base(scenePath, null)
 		{
-			_sceneMode = sceneMode;
+			SceneMode = sceneMode;
 			_activateOnLoad = activateOnLoad;
+			_priority = priority;
 		}
 		public override void Update()
 		{
@@ -39,11 +41,12 @@ namespace YooAsset
 			if (Status == EStatus.Loading)
 			{
 				LoadSceneParameters loadSceneParameters = new LoadSceneParameters();
-				loadSceneParameters.loadSceneMode = _sceneMode;
+				loadSceneParameters.loadSceneMode = SceneMode;
 				_asyncOp = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(AssetPath, loadSceneParameters);
 				if (_asyncOp != null)
 				{
 					_asyncOp.allowSceneActivation = true;
+					_asyncOp.priority = _priority;
 					Status = EStatus.Checking;
 				}
 				else
@@ -59,26 +62,13 @@ namespace YooAsset
 			{
 				if (_asyncOp.isDone)
 				{
-					Scene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
-					if (_activateOnLoad)
-						SceneManager.SetActiveScene(Scene);
+					SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
+					if (SceneObject.IsValid() && _activateOnLoad)
+						SceneManager.SetActiveScene(SceneObject);
 
-					Status = Scene.IsValid() ? EStatus.Success : EStatus.Fail;
+					Status = SceneObject.IsValid() ? EStatus.Success : EStatus.Fail;
 					InvokeCompletion();
 				}
-			}
-#endif
-		}
-		public override void Destory()
-		{
-#if UNITY_EDITOR
-			base.Destory();
-
-			// 卸载附加场景（异步方式卸载）
-			if (_sceneMode == LoadSceneMode.Additive)
-			{
-				if (Scene.IsValid() && Scene.isLoaded)
-					SceneManager.UnloadSceneAsync(Scene);
 			}
 #endif
 		}

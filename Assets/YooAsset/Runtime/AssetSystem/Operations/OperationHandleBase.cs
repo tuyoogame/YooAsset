@@ -70,7 +70,7 @@ namespace YooAsset
 		/// <summary>
 		/// 释放句柄
 		/// </summary>
-		public void Release()
+		internal void ReleaseInternal()
 		{
 			if (IsValid == false)
 				return;

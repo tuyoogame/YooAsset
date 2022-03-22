@@ -76,5 +76,13 @@ namespace YooAsset
 				return;
 			_provider.WaitForAsyncComplete();
 		}
+
+		/// <summary>
+		/// 释放资源句柄
+		/// </summary>
+		public void Release()
+		{
+			this.ReleaseInternal();
+		}
 	}
 }

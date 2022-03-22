@@ -68,40 +68,6 @@ namespace YooAsset
 						loadingCount++;
 				}
 			}
-
-			// 注意：需要立刻卸载场景
-			if (SimulationOnEditor)
-			{
-				for (int i = _providers.Count - 1; i >= 0; i--)
-				{
-					AssetProviderBase provider = _providers[i];
-					if (provider.IsSceneProvider() && provider.CanDestroy())
-					{
-						provider.Destory();
-						_providers.RemoveAt(i);
-					}
-				}
-			}
-			else
-			{
-				for (int i = _loaders.Count - 1; i >= 0; i--)
-				{
-					BundleFileLoader loader = _loaders[i];
-					if (loader.IsSceneLoader())
-					{
-						loader.TryDestroyAllProviders();
-					}
-				}
-				for (int i = _loaders.Count - 1; i >= 0; i--)
-				{
-					BundleFileLoader loader = _loaders[i];
-					if (loader.IsSceneLoader() && loader.CanDestroy())
-					{
-						loader.Destroy(false);
-						_loaders.RemoveAt(i);
-					}
-				}
-			}
 		}
 
 		/// <summary>
@@ -160,19 +126,19 @@ namespace YooAsset
 			Resources.UnloadUnusedAssets();
 		}
 
+
 		/// <summary>
 		/// 异步加载场景
 		/// </summary>
-		/// <param name="scenePath">场景名称</param>
-		public static SceneOperationHandle LoadSceneAsync(string scenePath, LoadSceneMode mode, bool activateOnLoad)
+		public static SceneOperationHandle LoadSceneAsync(string scenePath, LoadSceneMode sceneMode, bool activateOnLoad, int priority)
 		{
 			AssetProviderBase provider = TryGetAssetProvider(scenePath);
 			if (provider == null)
 			{
 				if (SimulationOnEditor)
-					provider = new DatabaseSceneProvider(scenePath, mode, activateOnLoad);
+					provider = new DatabaseSceneProvider(scenePath, sceneMode, activateOnLoad, priority);
 				else
-					provider = new BundledSceneProvider(scenePath, mode, activateOnLoad);
+					provider = new BundledSceneProvider(scenePath, sceneMode, activateOnLoad, priority);
 				_providers.Add(provider);
 			}
 			return provider.CreateHandle() as SceneOperationHandle;
@@ -181,8 +147,6 @@ namespace YooAsset
 		/// <summary>
 		/// 异步加载资源对象
 		/// </summary>
-		/// <param name="assetPath">资源路径</param>
-		/// <param name="assetType">资源类型</param>
 		public static AssetOperationHandle LoadAssetAsync(string assetPath, System.Type assetType)
 		{
 			AssetProviderBase provider = TryGetAssetProvider(assetPath);
@@ -200,9 +164,7 @@ namespace YooAsset
 		/// <summary>
 		/// 异步加载所有子资源对象
 		/// </summary>
-		/// <param name="assetPath">资源路径</param>
-		/// <param name="assetType">资源类型</param>、
-		public static AssetOperationHandle LoadSubAssetsAsync(string assetPath, System.Type assetType)
+		public static SubAssetsOperationHandle LoadSubAssetsAsync(string assetPath, System.Type assetType)
 		{
 			AssetProviderBase provider = TryGetAssetProvider(assetPath);
 			if (provider == null)
@@ -213,7 +175,7 @@ namespace YooAsset
 					provider = new BundledSubAssetsProvider(assetPath, assetType);
 				_providers.Add(provider);
 			}
-			return provider.CreateHandle() as AssetOperationHandle;
+			return provider.CreateHandle() as SubAssetsOperationHandle;
 		}
 
 

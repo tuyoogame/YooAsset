@@ -289,17 +289,18 @@ namespace YooAsset
 			AssetSystem.GetDebugReport(report);
 		}
 
-		#region 场景接口
+		#region 场景加载接口
 		/// <summary>
 		/// 异步加载场景
 		/// </summary>
 		/// <param name="location">场景对象相对路径</param>
-		/// <param name="mode">场景加载模式</param>
+		/// <param name="sceneMode">场景加载模式</param>
 		/// <param name="activateOnLoad">加载完毕时是否主动激活</param>
-		public static SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode mode, bool activateOnLoad)
+		/// <param name="priority">优先级</param>
+		public static SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool activateOnLoad = true, int priority = 100)
 		{
 			string scenePath = ConvertLocationToAssetPath(location);
-			var handle = AssetSystem.LoadSceneAsync(scenePath, mode, activateOnLoad);
+			var handle = AssetSystem.LoadSceneAsync(scenePath, sceneMode, activateOnLoad, priority);
 			return handle;
 		}
 		#endregion
@@ -330,7 +331,7 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源对象相对路径</param>
-		public static AssetOperationHandle LoadSubAssetsSync<TObject>(string location)
+		public static SubAssetsOperationHandle LoadSubAssetsSync<TObject>(string location)
 		{
 			return LoadSubAssetsInternal(location, typeof(TObject), true);
 		}
@@ -340,7 +341,7 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="location">资源对象相对路径</param>
 		/// <param name="type">子对象类型</param>
-		public static AssetOperationHandle LoadSubAssetsSync(string location, System.Type type)
+		public static SubAssetsOperationHandle LoadSubAssetsSync(string location, System.Type type)
 		{
 			return LoadSubAssetsInternal(location, type, true);
 		}
@@ -371,7 +372,7 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源对象相对路径</param>
-		public static AssetOperationHandle LoadSubAssetsAsync<TObject>(string location)
+		public static SubAssetsOperationHandle LoadSubAssetsAsync<TObject>(string location)
 		{
 			return LoadSubAssetsInternal(location, typeof(TObject), false);
 		}
@@ -381,7 +382,7 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="location">资源对象相对路径</param>
 		/// <param name="type">子对象类型</param>
-		public static AssetOperationHandle LoadSubAssetsAsync(string location, System.Type type)
+		public static SubAssetsOperationHandle LoadSubAssetsAsync(string location, System.Type type)
 		{
 			return LoadSubAssetsInternal(location, type, false);
 		}
@@ -395,7 +396,7 @@ namespace YooAsset
 				handle.WaitForAsyncComplete();
 			return handle;
 		}
-		private static AssetOperationHandle LoadSubAssetsInternal(string location, System.Type assetType, bool waitForAsyncComplete)
+		private static SubAssetsOperationHandle LoadSubAssetsInternal(string location, System.Type assetType, bool waitForAsyncComplete)
 		{
 			string assetPath = ConvertLocationToAssetPath(location);
 			var handle = AssetSystem.LoadSubAssetsAsync(assetPath, assetType);
