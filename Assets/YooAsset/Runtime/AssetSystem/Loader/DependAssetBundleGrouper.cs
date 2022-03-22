@@ -4,16 +4,16 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	internal class DependBundleGrouper
+	internal class DependAssetBundleGrouper
 	{
 		/// <summary>
 		/// 依赖的资源包加载器列表
 		/// </summary>
-		private readonly List<BundleFileLoader> _dependBundles;
+		private readonly List<AssetBundleLoader> _dependBundles;
 
-		public DependBundleGrouper(string assetPath)
+		public DependAssetBundleGrouper(string assetPath)
 		{
-			_dependBundles = AssetSystem.CreateDependBundleLoaders(assetPath);
+			_dependBundles = AssetSystem.CreateDependAssetBundleLoaders(assetPath);
 		}
 
 		/// <summary>

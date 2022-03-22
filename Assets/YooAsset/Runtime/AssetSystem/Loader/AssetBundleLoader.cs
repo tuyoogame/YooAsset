@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace YooAsset
 {
-	internal class BundleFileLoader
+	internal class AssetBundleLoader
 	{
 		public enum EStatus
 		{
@@ -46,7 +46,7 @@ namespace YooAsset
 		internal AssetBundle CacheBundle { private set; get; }
 
 
-		public BundleFileLoader(BundleInfo bundleInfo)
+		public AssetBundleLoader(BundleInfo bundleInfo)
 		{
 			BundleFileInfo = bundleInfo;
 			RefCount = 0;
@@ -157,7 +157,7 @@ namespace YooAsset
 				if (BundleFileInfo.IsEncrypted)
 				{
 					if (AssetSystem.DecryptionServices == null)
-						throw new Exception($"{nameof(BundleFileLoader)} need IDecryptServices : {BundleFileInfo.BundleName}");
+						throw new Exception($"{nameof(AssetBundleLoader)} need IDecryptServices : {BundleFileInfo.BundleName}");
 
 					ulong offset = AssetSystem.DecryptionServices.GetFileOffset(BundleFileInfo);
 					if (_isWaitForAsyncComplete)

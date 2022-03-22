@@ -5,15 +5,15 @@ namespace YooAsset
 {
     internal abstract class BundledProvider : ProviderBase
     {
-		protected BundleFileLoader OwnerBundle { private set; get; }
-		protected DependBundleGrouper DependBundles { private set; get; }
+		protected AssetBundleLoader OwnerBundle { private set; get; }
+		protected DependAssetBundleGrouper DependBundles { private set; get; }
 
 		public BundledProvider(string assetPath, System.Type assetType) : base(assetPath, assetType)
 		{
-			OwnerBundle = AssetSystem.CreateOwnerBundleLoader(assetPath);
+			OwnerBundle = AssetSystem.CreateOwnerAssetBundleLoader(assetPath);
 			OwnerBundle.Reference();
 			OwnerBundle.AddProvider(this);
-			DependBundles = new DependBundleGrouper(assetPath);
+			DependBundles = new DependAssetBundleGrouper(assetPath);
 			DependBundles.Reference();
 		}
 		public override void Destory()
