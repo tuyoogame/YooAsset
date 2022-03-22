@@ -9,7 +9,7 @@ namespace YooAsset
 	/// 下载器
 	/// 说明：UnityWebRequest(UWR) supports reading streaming assets since 2017.1
 	/// </summary>
-	internal class UnityWebRequester
+	internal class UnityWebDataRequester
 	{
 		protected UnityWebRequest _webRequest;
 		protected UnityWebRequestAsyncOperation _operationHandle;

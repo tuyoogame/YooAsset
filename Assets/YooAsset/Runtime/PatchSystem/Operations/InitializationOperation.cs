@@ -41,7 +41,7 @@ namespace YooAsset
 
 		private OfflinePlayModeImpl _impl;
 		private ESteps _steps = ESteps.None;
-		private UnityWebRequester _downloader;
+		private UnityWebDataRequester _downloader;
 		private string _downloadURL;
 
 		internal OfflinePlayModeInitializationOperation(OfflinePlayModeImpl impl)
@@ -61,7 +61,7 @@ namespace YooAsset
 			{
 				string filePath = PathHelper.MakeStreamingLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
 				_downloadURL = PathHelper.ConvertToWWWPath(filePath);
-				_downloader = new UnityWebRequester();
+				_downloader = new UnityWebDataRequester();
 				_downloader.SendRequest(_downloadURL);
 				_steps = ESteps.CheckAppManifest;
 			}
@@ -106,7 +106,7 @@ namespace YooAsset
 
 		private HostPlayModeImpl _impl;
 		private ESteps _steps = ESteps.None;
-		private UnityWebRequester _downloader;
+		private UnityWebDataRequester _downloader;
 		private string _downloadURL;
 
 		internal HostPlayModeInitializationOperation(HostPlayModeImpl impl)
@@ -151,7 +151,7 @@ namespace YooAsset
 				YooLogger.Log($"Load application patch manifest.");
 				string filePath = PathHelper.MakeStreamingLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
 				_downloadURL = PathHelper.ConvertToWWWPath(filePath);
-				_downloader = new UnityWebRequester();
+				_downloader = new UnityWebDataRequester();
 				_downloader.SendRequest(_downloadURL);
 				_steps = ESteps.CheckAppManifest;
 			}

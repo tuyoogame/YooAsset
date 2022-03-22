@@ -64,8 +64,8 @@ namespace YooAsset
 		private readonly int _updateResourceVersion;
 		private readonly int _timeout;
 		private ESteps _steps = ESteps.None;
-		private UnityWebRequester _downloaderHash;
-		private UnityWebRequester _downloaderManifest;
+		private UnityWebDataRequester _downloaderHash;
+		private UnityWebDataRequester _downloaderManifest;
 		private float _verifyTime;
 
 		public HostPlayModeUpdateManifestOperation(HostPlayModeImpl impl, int updateResourceVersion, int timeout)
@@ -97,7 +97,7 @@ namespace YooAsset
 			{
 				string webURL = GetPatchManifestRequestURL(_updateResourceVersion, ResourceSettingData.Setting.PatchManifestHashFileName);
 				YooLogger.Log($"Beginning to request patch manifest hash : {webURL}");
-				_downloaderHash = new UnityWebRequester();
+				_downloaderHash = new UnityWebDataRequester();
 				_downloaderHash.SendRequest(webURL, _timeout);
 				_steps = ESteps.CheckWebManifestHash;
 			}
@@ -139,7 +139,7 @@ namespace YooAsset
 			{
 				string webURL = GetPatchManifestRequestURL(_updateResourceVersion, ResourceSettingData.Setting.PatchManifestFileName);
 				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
-				_downloaderManifest = new UnityWebRequester();
+				_downloaderManifest = new UnityWebDataRequester();
 				_downloaderManifest.SendRequest(webURL, _timeout);
 				_steps = ESteps.CheckWebManifest;
 			}

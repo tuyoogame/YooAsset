@@ -238,5 +238,13 @@ namespace YooAsset
 		{
 			YooLogger.Error($"Failed to download : {_requestURL} Error : {_lastError}");
 		}
+
+		/// <summary>
+		/// 获取最近一条错误日志
+		/// </summary>
+		public string GetLastError()
+		{
+			return _lastError;
+		}
 	}
 }
