@@ -307,6 +307,16 @@ namespace YooAsset
 
 		#region 资源加载接口
 		/// <summary>
+		/// 异步加载原生文件
+		/// </summary>
+		public static RawFileOperation LoadRawFileAsync(string location, string savePath)
+		{
+			string assetPath = ConvertLocationToAssetPath(location);
+			return AssetSystem.LoadRawFileAsync(assetPath, savePath);
+		}
+
+
+		/// <summary>
 		/// 同步加载资源对象
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
