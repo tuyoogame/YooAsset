@@ -121,9 +121,9 @@ IEnumerator Start()
 IEnumerator Start()
 {
     string location = "wwise/init.bnk";
-    string savePath = $"{Application.persistentDataPath}/Audio/init.bnk"
+    string savePath = $"{Application.persistentDataPath}/Audio/init.bnk";
     RawFileOperation operation = YooAssets.LoadRawFileAsync(location, savePath);
-    yield return operation;    
+    yield return operation;
     byte[] fileData = operation.GetFileData();
     string fileText = operation.GetFileText();
 }
