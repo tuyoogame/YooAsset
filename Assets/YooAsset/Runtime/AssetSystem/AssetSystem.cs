@@ -273,7 +273,7 @@ namespace YooAsset
 				DebugProviderInfo providerInfo = new DebugProviderInfo();
 				providerInfo.AssetPath = provider.AssetPath;
 				providerInfo.RefCount = provider.RefCount;
-				providerInfo.Status = (int)provider.Status;
+				providerInfo.Status = provider.Status;
 				providerInfo.BundleInfos.Clear();
 				report.ProviderInfos.Add(providerInfo);
 
