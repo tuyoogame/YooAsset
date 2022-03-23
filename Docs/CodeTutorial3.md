@@ -2,13 +2,14 @@
 
 在加载资源对象的时候只需要提供相对路径，统一约定该相对路径名称为：location
 
-资源加载接口：
+加载接口：
 
 - YooAssets.LoadAssetSync() 同步加载资源对象接口
 - YooAssets.LoadSubAssetsSync() 同步加载子资源对象接口
 - YooAssets.LoadAssetAsync() 异步加载资源对象接口
 - YooAssets.LoadSubAssetsAsync() 异步加载子资源对象接口
 - YooAssets.LoadSceneAsync() 异步加载场景接口
+- YooAssets.LoadRawFileAsync() 异步读取原生文件接口
 
 **加载路径的匹配方式**
 
@@ -64,54 +65,51 @@ async Task AsyncLoad()
 **资源卸载范例**
 
 ````C#
-void Start()
+IEnumerator Start()
 {
     AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
-
+    yield return handle;
     ...
-
     handle.Release();
 }
 ````
 
-**预制体同步加载范例**
+**预制体加载范例**
 
 ````C#
-var handle = YooAssets.LoadAssetSync<GameObject>(location);
-GameObject go = handle.InstantiateObject;
+IEnumerator Start()
+{
+    AssetOperationHandle handle = YooAssets.LoadAssetAsync<GameObject>("Panel/login.prefab");
+    yield return handle;
+    GameObject go = handle.InstantiateSync();
+    Debug.Log($"Prefab name is {go.name}");
+}
 ````
 
-````c#
-var handle = YooAssets.LoadAssetSync<GameObject>(location);
-GameObject go = UnityEngine.Object.Instantiate(handle.AssetObject as GameObject);
-````
-
-**子对象同步加载范例**
+**子对象加载范例**
 
 例如：通过TexturePacker创建的图集，如果需要访问图集的精灵对象，可以通过子对象加载接口。
 
 ````c#
-var handle = YooAssets.LoadSubAssetsSync<Sprite>(location);
-foreach (var asset in handle.AllAssets)
+IEnumerator Start()
 {
-    Debug.Log($"Sprite name is {asset.name}");
+    SubAssetsOperationHandle handle = YooAssets.LoadSubAssetsAsync<Sprite>(location);
+    yield return handle;
+    var sprite = handle.GetSubAssetObject<Sprite>("spriteName");
+    Debug.Log($"Sprite name is {sprite.name}");
 }
 ````
 
 **场景异步加载范例**
 
 ````c#
-void Start()
+IEnumerator Start()
 {
     var sceneMode = UnityEngine.SceneManagement.LoadSceneMode.Single;
     bool activateOnLoad = true;
-
     SceneOperationHandle handle = YooAssets.LoadSceneAsync("Scene/Login", sceneMode, activateOnLoad);
-    handle.Completed += Handle_Completed;
-}
-void Handle_Completed(SceneOperationHandle handle)
-{
-    Debug.Log(handle.Scene.name);
+    yield return handle;
+    Debug.Log($"Scene name is {handle.Scene.name}");
 }
 ````
 
@@ -120,24 +118,14 @@ void Handle_Completed(SceneOperationHandle handle)
 例如：wwise的初始化文件
 
 ````c#
-void Start()
+IEnumerator Start()
 {
-    //获取资源包信息
     string location = "wwise/init.bnk";
-    BundleInfo bundleInfo = YooAssets.GetBundleInfo(location);
-    
-    //文件路径
-    string fileSourcePath = bundleInfo.LocalPath;
-    string fileDestPath = $"{Application.persistentDataPath}/Audio/init.bnk";
-    
-    //拷贝文件
-    File.Copy(fileSourcePath, fileDestPath, true);
-    
-    //注意：在安卓平台下，可以通过如下方法判断文件是否在APK内部。
-    if(bundleInfo.IsBuildinJarFile())
-    {
-        ...
-    }
+    string savePath = $"{Application.persistentDataPath}/Audio/init.bnk"
+    RawFileOperation operation = YooAssets.LoadRawFileAsync(location, savePath);
+    yield return operation;    
+    byte[] fileData = operation.GetFileData();
+    string fileText = operation.GetFileText();
 }
 ````
 
