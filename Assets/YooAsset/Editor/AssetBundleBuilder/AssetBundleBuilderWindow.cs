@@ -140,10 +140,10 @@ namespace YooAsset.Editor
 			buildParameters.OutputRoot = defaultOutputRoot;
 			buildParameters.BuildTarget = _buildTarget;
 			buildParameters.BuildVersion = _buildVersion;
-			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
-			buildParameters.RedundancyServices = CreateRedundancyServicesInstance();
 			buildParameters.CompressOption = _compressOption;
 			buildParameters.AppendFileExtension = _appendExtension;
+			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
+			buildParameters.RedundancyServices = CreateRedundancyServicesInstance();
 			buildParameters.ForceRebuild = _forceRebuild;
 			buildParameters.BuildinTags = _buildinTags;
 			_assetBuilder.Run(buildParameters);

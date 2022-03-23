@@ -234,9 +234,9 @@ namespace YooAsset.Editor
 				var assetInfo = pair.Value;
 				var bundleLabel = AssetBundleCollectorSettingData.GetBundleLabel(assetInfo.AssetPath);
 				if (assetInfo.IsRawAsset)
-					assetInfo.SetBundleLabelAndVariant(bundleLabel, ResourceSettingData.Setting.RawFileVariant);
+					assetInfo.SetBundleLabelAndVariant(bundleLabel, YooAssetSettingsData.Setting.RawFileVariant);
 				else
-					assetInfo.SetBundleLabelAndVariant(bundleLabel, ResourceSettingData.Setting.AssetBundleFileVariant);
+					assetInfo.SetBundleLabelAndVariant(bundleLabel, YooAssetSettingsData.Setting.AssetBundleFileVariant);
 				EditorTools.DisplayProgressBar("设置资源包名", ++progressValue, buildAssetDic.Count);
 			}
 			EditorTools.ClearProgressBar();

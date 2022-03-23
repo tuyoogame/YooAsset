@@ -32,12 +32,12 @@ namespace YooAsset.Editor
 			patchManifest.AssetList = GetAllPatchAsset(buildMapContext, patchManifest);
 
 			// 创建补丁清单文件
-			string manifestFilePath = $"{buildParameters.PipelineOutputDirectory}/{ResourceSettingData.Setting.PatchManifestFileName}";
+			string manifestFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.PatchManifestFileName}";
 			UnityEngine.Debug.Log($"创建补丁清单文件：{manifestFilePath}");
 			PatchManifest.Serialize(manifestFilePath, patchManifest);
 
 			// 创建补丁清单哈希文件
-			string manifestHashFilePath = $"{buildParameters.PipelineOutputDirectory}/{ResourceSettingData.Setting.PatchManifestHashFileName}";
+			string manifestHashFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.PatchManifestHashFileName}";
 			string manifestHash = HashUtility.FileMD5(manifestFilePath);
 			UnityEngine.Debug.Log($"创建补丁清单哈希文件：{manifestHashFilePath}");
 			FileUtility.CreateFile(manifestHashFilePath, manifestHash);

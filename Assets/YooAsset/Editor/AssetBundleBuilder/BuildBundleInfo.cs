@@ -73,9 +73,9 @@ namespace YooAsset.Editor
 		public string GetAppendExtension()
 		{
 			if (IsRawFile)
-				return $".{ResourceSettingData.Setting.RawFileVariant}";
+				return $".{YooAssetSettingsData.Setting.RawFileVariant}";
 			else
-				return $".{ResourceSettingData.Setting.AssetBundleFileVariant}";
+				return $".{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
 		}
 
 		/// <summary>

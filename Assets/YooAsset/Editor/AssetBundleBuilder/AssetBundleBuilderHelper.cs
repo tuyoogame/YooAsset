@@ -22,7 +22,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public static string MakePipelineOutputDirectory(string outputRoot, BuildTarget buildTarget)
 		{
-			return $"{outputRoot}/{buildTarget}/{ResourceSettingData.Setting.UnityManifestFileName}";
+			return $"{outputRoot}/{buildTarget}/{YooAssetSettingsData.Setting.UnityManifestFileName}";
 		}
 
 		/// <summary>
@@ -126,7 +126,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		internal static PatchManifest LoadPatchManifestFile(string fileDirectory)
 		{
-			string filePath = $"{fileDirectory}/{ResourceSettingData.Setting.PatchManifestFileName}";
+			string filePath = $"{fileDirectory}/{YooAssetSettingsData.Setting.PatchManifestFileName}";
 			if (File.Exists(filePath) == false)
 			{
 				throw new System.Exception($"Not found patch manifest file : {filePath}");

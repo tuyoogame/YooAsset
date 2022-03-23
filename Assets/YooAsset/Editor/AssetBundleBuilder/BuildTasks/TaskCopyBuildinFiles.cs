@@ -45,15 +45,15 @@ namespace YooAsset.Editor
 
 			// 拷贝清单文件
 			{
-				string sourcePath = $"{pipelineOutputDirectory}/{ResourceSettingData.Setting.PatchManifestFileName}";
-				string destPath = $"{Application.dataPath}/StreamingAssets/{ResourceSettingData.Setting.PatchManifestFileName}";
+				string sourcePath = $"{pipelineOutputDirectory}/{YooAssetSettingsData.Setting.PatchManifestFileName}";
+				string destPath = $"{Application.dataPath}/StreamingAssets/{YooAssetSettingsData.Setting.PatchManifestFileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
 			// 拷贝清单哈希文件
 			{
-				string sourcePath = $"{pipelineOutputDirectory}/{ResourceSettingData.Setting.PatchManifestHashFileName}";
-				string destPath = $"{Application.dataPath}/StreamingAssets/{ResourceSettingData.Setting.PatchManifestHashFileName}";
+				string sourcePath = $"{pipelineOutputDirectory}/{YooAssetSettingsData.Setting.PatchManifestHashFileName}";
+				string destPath = $"{Application.dataPath}/StreamingAssets/{YooAssetSettingsData.Setting.PatchManifestHashFileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
