@@ -52,6 +52,25 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 等待异步执行完毕
+		/// </summary>
+		public void WaitForAsyncComplete()
+		{
+			if (IsValid == false)
+				return;
+			_provider.WaitForAsyncComplete();
+		}
+
+		/// <summary>
+		/// 释放资源句柄
+		/// </summary>
+		public void Release()
+		{
+			this.ReleaseInternal();
+		}
+
+
+		/// <summary>
 		/// 获取子资源对象
 		/// </summary>
 		/// <typeparam name="TObject">子资源对象类型</typeparam>
@@ -69,24 +88,6 @@ namespace YooAsset
 
 			YooLogger.Warning($"Not found sub asset {assetName} in {_provider.AssetPath}");
 			return null;
-		}
-
-		/// <summary>
-		/// 等待异步执行完毕
-		/// </summary>
-		public void WaitForAsyncComplete()
-		{
-			if (IsValid == false)
-				return;
-			_provider.WaitForAsyncComplete();
-		}
-
-		/// <summary>
-		/// 释放资源句柄
-		/// </summary>
-		public void Release()
-		{
-			this.ReleaseInternal();
 		}
 	}
 }

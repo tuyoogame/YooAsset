@@ -53,8 +53,40 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 等待异步执行完毕
+		/// </summary>
+		public void WaitForAsyncComplete()
+		{
+			if (IsValid == false)
+				return;
+			_provider.WaitForAsyncComplete();
+		}
+
+		/// <summary>
+		/// 释放资源句柄
+		/// </summary>
+		public void Release()
+		{
+			this.ReleaseInternal();
+		}
+
+
+		/// <summary>
 		/// 同步初始化游戏对象
 		/// </summary>
+		/// <param name="parent">父类对象</param>
+		/// <returns></returns>
+		public GameObject InstantiateSync(Transform parent = null)
+		{
+			return InstantiateSync(Vector3.zero, Quaternion.identity, parent);
+		}
+
+		/// <summary>
+		/// 同步初始化游戏对象
+		/// </summary>
+		/// <param name="position">坐标</param>
+		/// <param name="rotation">角度</param>
+		/// <param name="parent">父类对象</param>
 		public GameObject InstantiateSync(Vector3 position, Quaternion rotation, Transform parent = null)
 		{
 			if (IsValid == false)
@@ -71,29 +103,23 @@ namespace YooAsset
 		/// <summary>
 		/// 异步初始化游戏对象
 		/// </summary>
+		/// <param name="parent">父类对象</param>
+		public InstantiateOperation InstantiateAsync(Transform parent = null)
+		{
+			return InstantiateAsync(Vector3.zero, Quaternion.identity, parent);
+		}
+
+		/// <summary>
+		/// 异步初始化游戏对象
+		/// </summary>
+		/// <param name="position">坐标</param>
+		/// <param name="rotation">角度</param>
+		/// <param name="parent">父类对象</param>
 		public InstantiateOperation InstantiateAsync(Vector3 position, Quaternion rotation, Transform parent = null)
 		{
 			InstantiateOperation operation = new InstantiateOperation(this, position, rotation, parent);
 			OperationSystem.ProcessOperaiton(operation);
 			return operation;
-		}
-
-		/// <summary>
-		/// 等待异步执行完毕
-		/// </summary>
-		public void WaitForAsyncComplete()
-		{
-			if (IsValid == false)
-				return;
-			_provider.WaitForAsyncComplete();
-		}
-
-		/// <summary>
-		/// 释放资源句柄
-		/// </summary>
-		public void Release()
-		{
-			this.ReleaseInternal();
 		}
 	}
 }
