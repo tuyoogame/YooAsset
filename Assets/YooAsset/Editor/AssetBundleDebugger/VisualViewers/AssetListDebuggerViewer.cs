@@ -65,10 +65,10 @@ namespace YooAsset.Editor
 			var result = new List<DebugProviderInfo>(debugReport.ProviderInfos.Count);
 			foreach (var providerInfo in debugReport.ProviderInfos)
 			{
-				if(string.IsNullOrEmpty(searchKeyWord) == false)
+				if (string.IsNullOrEmpty(searchKeyWord) == false)
 				{
 					if (providerInfo.AssetPath.Contains(searchKeyWord) == false)
-						continue;					
+						continue;
 				}
 				result.Add(providerInfo);
 			}
@@ -134,18 +134,27 @@ namespace YooAsset.Editor
 		{
 			var sourceData = _assetListView.itemsSource as List<DebugProviderInfo>;
 			var providerInfo = sourceData[index];
-			
+
+			StyleColor textColor;
+			if (providerInfo.Status == ProviderBase.EStatus.Fail)
+				textColor = new StyleColor(Color.yellow);
+			else
+				textColor = new StyleColor(StyleKeyword.Initial);
+
 			// Asset Path
 			var label1 = element.Q<Label>("Label1");
 			label1.text = providerInfo.AssetPath;
+			label1.style.color = textColor;
 
 			// Ref Count
 			var label2 = element.Q<Label>("Label2");
 			label2.text = providerInfo.RefCount.ToString();
+			label2.style.color = textColor;
 
 			// Status
 			var label3 = element.Q<Label>("Label3");
 			label3.text = providerInfo.Status.ToString();
+			label3.style.color = textColor;
 		}
 		private void AssetListView_onSelectionChange(IEnumerable<object> objs)
 		{
