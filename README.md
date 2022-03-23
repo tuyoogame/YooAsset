@@ -1,7 +1,7 @@
 # YooAsset
 YooAsset是一个基于Unity3D引擎的资源管理插件。
 
-## 特点
+### 特点
 - **强大灵活的打包系统**
 
   可以自定义打包策略，可以自定义冗余规则，自动分析依赖实现资源零冗余，基于资源对象的资源包依赖管理方案，避免了资源包之间循环依赖的问题。
@@ -40,19 +40,23 @@ YooAsset是一个基于Unity3D引擎的资源管理插件。
 
   支持线上版本快速回退，支持区分审核版本，测试版本，线上版本，支持灰度更新及测试。
 
-## 入门教程
+### 入门教程
 1. [快速开始](https://github.com/tuyoogame/YooAsset/blob/master/Docs/QuickStart.md)
 2. [全局配置](https://github.com/tuyoogame/YooAsset/blob/master/Docs/Settings.md)
 3. [资源收集](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetCollector.md)
 4. [资源打包](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBuilder.md)
 5. [资源部署](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetDeploy.md)
 
-## 代码教程
+### 代码教程
 1. [初始化](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial1.md)
 2. [资源更新](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial2.md)
 3. [资源加载](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial3.md)
 
-## 进阶教程
+### 进阶教程
 
 1. [资源版本管理](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AdvancedTutorial1.md)
+
+### 友情链接
+
+[huatuo](https://github.com/focus-creative-games/huatuo)：huatuo是一个**特性完整、零成本、高性能、低内存**的**近乎完美**的c#热更新方案。
 
