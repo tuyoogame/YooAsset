@@ -47,7 +47,7 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					return null;
-				return _provider.AllAssets;
+				return _provider.AllAssetObjects;
 			}
 		}
 
@@ -61,7 +61,7 @@ namespace YooAsset
 			if (IsValid == false)
 				return null;
 
-			foreach (var asset in _provider.AllAssets)
+			foreach (var asset in _provider.AllAssetObjects)
 			{
 				if (asset.name == assetName)
 					return asset as TObject;

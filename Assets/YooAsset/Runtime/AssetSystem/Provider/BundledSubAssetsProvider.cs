@@ -62,9 +62,9 @@ namespace YooAsset
 				if (IsWaitForAsyncComplete)
 				{
 					if (AssetType == null)
-						AllAssets = OwnerBundle.CacheBundle.LoadAssetWithSubAssets(AssetName);
+						AllAssetObjects = OwnerBundle.CacheBundle.LoadAssetWithSubAssets(AssetName);
 					else
-						AllAssets = OwnerBundle.CacheBundle.LoadAssetWithSubAssets(AssetName, AssetType);
+						AllAssetObjects = OwnerBundle.CacheBundle.LoadAssetWithSubAssets(AssetName, AssetType);
 				}
 				else
 				{
@@ -85,17 +85,17 @@ namespace YooAsset
 					{
 						// 强制挂起主线程（注意：该操作会很耗时）
 						YooLogger.Warning("Suspend the main thread to load unity asset.");
-						AllAssets = _cacheRequest.allAssets;
+						AllAssetObjects = _cacheRequest.allAssets;
 					}
 					else
 					{
 						if (_cacheRequest.isDone == false)
 							return;
-						AllAssets = _cacheRequest.allAssets;
+						AllAssetObjects = _cacheRequest.allAssets;
 					}
 				}
 
-				Status = AllAssets == null ? EStatus.Fail : EStatus.Success;
+				Status = AllAssetObjects == null ? EStatus.Fail : EStatus.Success;
 				if (Status == EStatus.Fail)
 					YooLogger.Warning($"Failed to load sub assets : {AssetName} from bundle : {OwnerBundle.BundleFileInfo.BundleName}");
 				InvokeCompletion();

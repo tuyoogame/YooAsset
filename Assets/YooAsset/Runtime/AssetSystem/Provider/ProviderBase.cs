@@ -38,7 +38,7 @@ namespace YooAsset
 		/// <summary>
 		/// 获取的资源对象集合
 		/// </summary>
-		public UnityEngine.Object[] AllAssets { protected set; get; }
+		public UnityEngine.Object[] AllAssetObjects { protected set; get; }
 
 		/// <summary>
 		/// 获取的场景对象
@@ -210,7 +210,7 @@ namespace YooAsset
 			}
 		}
 
-		// 异步操作相关
+		#region 异步编程相关
 		private System.Threading.EventWaitHandle _waitHandle;
 		private System.Threading.WaitHandle WaitHandle
 		{
@@ -230,5 +230,6 @@ namespace YooAsset
 			}
 			_waitHandle?.Set();
 		}
+		#endregion
 	}
 }

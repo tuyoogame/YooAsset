@@ -53,9 +53,10 @@ namespace YooAsset
 		internal void Finish()
 		{
 			_callback?.Invoke(this);
+			_waitHandle?.Set();
 		}
 
-		#region 异步相关
+		#region 异步编程相关
 		public bool MoveNext()
 		{
 			return !IsDone;
@@ -64,6 +65,29 @@ namespace YooAsset
 		{
 		}
 		public object Current => null;
+
+		private System.Threading.EventWaitHandle _waitHandle;
+		private System.Threading.WaitHandle WaitHandle
+		{
+			get
+			{
+				if (_waitHandle == null)
+					_waitHandle = new System.Threading.EventWaitHandle(false, System.Threading.EventResetMode.ManualReset);
+				_waitHandle.Reset();
+				return _waitHandle;
+			}
+		}
+		public System.Threading.Tasks.Task Task
+		{
+			get
+			{
+				var handle = WaitHandle;
+				return System.Threading.Tasks.Task.Factory.StartNew(o =>
+				{
+					handle.WaitOne();
+				}, this);
+			}
+		}
 		#endregion
 	}
 }

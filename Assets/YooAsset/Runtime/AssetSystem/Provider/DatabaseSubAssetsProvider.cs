@@ -52,7 +52,7 @@ namespace YooAsset
 			{
 				if (AssetType == null)
 				{
-					AllAssets = UnityEditor.AssetDatabase.LoadAllAssetRepresentationsAtPath(AssetPath);
+					AllAssetObjects = UnityEditor.AssetDatabase.LoadAllAssetRepresentationsAtPath(AssetPath);
 				}
 				else
 				{
@@ -63,7 +63,7 @@ namespace YooAsset
 						if (findAsset.GetType() == AssetType)
 							result.Add(findAsset);
 					}
-					AllAssets = result.ToArray();
+					AllAssetObjects = result.ToArray();
 				}
 				Status = EStatus.Checking;
 			}
@@ -71,7 +71,7 @@ namespace YooAsset
 			// 2. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
-				Status = AllAssets == null ? EStatus.Fail : EStatus.Success;
+				Status = AllAssetObjects == null ? EStatus.Fail : EStatus.Success;
 				if (Status == EStatus.Fail)
 					YooLogger.Warning($"Failed to load sub assets : {AssetName}");
 				InvokeCompletion();

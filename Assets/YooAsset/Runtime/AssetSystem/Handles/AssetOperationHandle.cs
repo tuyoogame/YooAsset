@@ -53,18 +53,29 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 初始化的游戏对象（只限于请求的资源对象类型为GameObject）
+		/// 同步初始化游戏对象
 		/// </summary>
-		public GameObject InstantiateObject
+		public GameObject InstantiateSync(Vector3 position, Quaternion rotation, Transform parent = null)
 		{
-			get
-			{
-				if (IsValid == false)
-					return null;
-				if (_provider.AssetObject == null)
-					return null;
-				return UnityEngine.Object.Instantiate(_provider.AssetObject as GameObject);
-			}
+			if (IsValid == false)
+				return null;
+			if (_provider.AssetObject == null)
+				return null;
+
+			if (parent == null)
+				return UnityEngine.Object.Instantiate(_provider.AssetObject as GameObject, position, rotation);
+			else
+				return UnityEngine.Object.Instantiate(_provider.AssetObject as GameObject, position, rotation, parent);
+		}
+
+		/// <summary>
+		/// 异步初始化游戏对象
+		/// </summary>
+		public InstantiateOperation InstantiateAsync(Vector3 position, Quaternion rotation, Transform parent = null)
+		{
+			InstantiateOperation operation = new InstantiateOperation(this, position, rotation, parent);
+			OperationSystem.ProcessOperaiton(operation);
+			return operation;
 		}
 
 		/// <summary>
