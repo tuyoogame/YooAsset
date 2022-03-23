@@ -59,7 +59,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadAppManifest)
 			{
-				string filePath = PathHelper.MakeStreamingLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+				string filePath = PathHelper.MakeStreamingLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
 				_downloadURL = PathHelper.ConvertToWWWPath(filePath);
 				_downloader = new UnityWebDataRequester();
 				_downloader.SendRequest(_downloadURL);
@@ -149,7 +149,7 @@ namespace YooAsset
 			{
 				// 加载APP内的补丁清单
 				YooLogger.Log($"Load application patch manifest.");
-				string filePath = PathHelper.MakeStreamingLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+				string filePath = PathHelper.MakeStreamingLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
 				_downloadURL = PathHelper.ConvertToWWWPath(filePath);
 				_downloader = new UnityWebDataRequester();
 				_downloader.SendRequest(_downloadURL);
@@ -184,7 +184,7 @@ namespace YooAsset
 				if (SandboxHelper.CheckSandboxPatchManifestFileExist())
 				{
 					YooLogger.Log($"Load sandbox patch manifest.");
-					string filePath = PathHelper.MakePersistentLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+					string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
 					string jsonData = File.ReadAllText(filePath);
 					_impl.LocalPatchManifest = PatchManifest.Deserialize(jsonData);
 				}

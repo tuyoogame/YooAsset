@@ -95,7 +95,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadWebManifestHash)
 			{
-				string webURL = GetPatchManifestRequestURL(_updateResourceVersion, ResourceSettingData.Setting.PatchManifestHashFileName);
+				string webURL = GetPatchManifestRequestURL(_updateResourceVersion, YooAssetSettingsData.Setting.PatchManifestHashFileName);
 				YooLogger.Log($"Beginning to request patch manifest hash : {webURL}");
 				_downloaderHash = new UnityWebDataRequester();
 				_downloaderHash.SendRequest(webURL, _timeout);
@@ -137,7 +137,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadWebManifest)
 			{
-				string webURL = GetPatchManifestRequestURL(_updateResourceVersion, ResourceSettingData.Setting.PatchManifestFileName);
+				string webURL = GetPatchManifestRequestURL(_updateResourceVersion, YooAssetSettingsData.Setting.PatchManifestFileName);
 				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
 				_downloaderManifest = new UnityWebDataRequester();
 				_downloaderManifest.SendRequest(webURL, _timeout);
@@ -206,7 +206,7 @@ namespace YooAsset
 
 			// 注意：这里会覆盖掉沙盒内的补丁清单文件
 			YooLogger.Log("Save remote patch manifest file.");
-			string savePath = PathHelper.MakePersistentLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+			string savePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
 			PatchManifest.Serialize(savePath, _impl.LocalPatchManifest);
 		}
 
