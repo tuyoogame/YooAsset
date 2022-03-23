@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset.Editor
 {
-	public interface IAssetEncrypter
+	public interface IEncryptionServices
 	{
 		/// <summary>
 		/// 检测是否需要加密

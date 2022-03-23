@@ -33,7 +33,11 @@ namespace YooAsset.Editor
 				buildReport.Summary.AppendFileExtension = buildParameters.Parameters.AppendFileExtension;
 				buildReport.Summary.AutoCollectShaders = AssetBundleCollectorSettingData.Setting.AutoCollectShaders;
 				buildReport.Summary.ShadersBundleName = AssetBundleCollectorSettingData.Setting.ShadersBundleName;
-
+				buildReport.Summary.EncryptionServicesClassName = buildParameters.Parameters.EncryptionServices == null ?
+					"null" : buildParameters.Parameters.EncryptionServices.GetType().FullName;
+				buildReport.Summary.RedundancyServicesClassName = buildParameters.Parameters.RedundancyServices == null ?
+					"null" : buildParameters.Parameters.RedundancyServices.GetType().FullName;
+				
 				// 构建参数
 				buildReport.Summary.ForceRebuild = buildParameters.Parameters.ForceRebuild;
 				buildReport.Summary.BuildinTags = buildParameters.Parameters.BuildinTags;

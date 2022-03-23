@@ -189,7 +189,7 @@ namespace YooAsset.Editor
 			buildMapContext.AssetFileCount = buildAssetDic.Values.Count;
 
 			// 4. 移除零依赖的资源
-			var redundancy = CreateAssetRedundancy();
+			var redundancyServices = buildParameters.Parameters.RedundancyServices;
 			List<BuildAssetInfo> undependentAssets = new List<BuildAssetInfo>();
 			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
 			{
@@ -205,7 +205,7 @@ namespace YooAsset.Editor
 				}
 
 				// 冗余扩展
-				if (redundancy != null && redundancy.Check(buildAssetInfo.AssetPath))
+				if (redundancyServices != null && redundancyServices.Check(buildAssetInfo.AssetPath))
 				{
 					undependentAssets.Add(buildAssetInfo);
 					buildMapContext.RedundancyAssetList.Add(buildAssetInfo.AssetPath);
@@ -299,22 +299,6 @@ namespace YooAsset.Editor
 					}
 				}
 			}
-		}
-
-		/// <summary>
-		/// 创建冗余类
-		/// </summary>
-		/// <returns>如果没有定义类型，则返回NULL</returns>
-		private IAssetRedundancy CreateAssetRedundancy()
-		{
-			var types = AssemblyUtility.GetAssignableTypes(AssemblyUtility.UnityDefaultAssemblyEditorName, typeof(IAssetRedundancy));
-			if (types.Count == 0)
-				return null;
-			if (types.Count != 1)
-				throw new Exception($"Found more {nameof(IAssetRedundancy)} types. We only support one.");
-
-			UnityEngine.Debug.Log($"创建实例类 : {types[0].FullName}");
-			return (IAssetRedundancy)Activator.CreateInstance(types[0]);
 		}
 	}
 }

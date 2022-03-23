@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset.Editor
 {
-	public interface IAssetRedundancy
+	public interface IRedundancyServices
 	{
 		/// <summary>
 		/// 检测是否冗余
