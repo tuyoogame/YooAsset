@@ -33,6 +33,6 @@ namespace YooAsset
 		/// <summary>
 		/// 构建输出的报告文件
 		/// </summary>
-		public string ReportFileName = "BuildReport.json";
+		public const string ReportFileName = "BuildReport.json";
 	}
 }

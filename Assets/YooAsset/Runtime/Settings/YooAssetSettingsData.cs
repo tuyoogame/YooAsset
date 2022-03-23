@@ -2,7 +2,7 @@
 
 namespace YooAsset
 {
-	internal static class ResourceSettingData
+	internal static class YooAssetSettingsData
 	{
 		private static YooAssetSettings _setting = null;
 		public static YooAssetSettings Setting
