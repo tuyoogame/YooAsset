@@ -51,6 +51,11 @@ namespace YooAsset
 			/// 资源加载的最大数量
 			/// </summary>
 			public int AssetLoadingMaxNumber = int.MaxValue;
+
+			/// <summary>
+			/// 异步操作系统每帧允许运行的最大时间切片（单位：毫秒）
+			/// </summary>
+			public long OperationSystemMaxTimeSlice = long.MaxValue;
 		}
 
 		/// <summary>
@@ -112,7 +117,7 @@ namespace YooAsset
 		public static InitializationOperation InitializeAsync(CreateParameters parameters)
 		{
 			if (parameters == null)
-				throw new Exception($"YooAsset create parameters is invalid.");
+				throw new Exception($"YooAsset create parameters is null.");
 
 #if !UNITY_EDITOR
 			if (parameters is EditorPlayModeParameters)
@@ -132,21 +137,23 @@ namespace YooAsset
 				throw new Exception("YooAsset is initialized yet.");
 			}
 
-			// 检测创建参数
-			if (parameters.AssetLoadingMaxNumber < 3)
+			if (parameters.AssetLoadingMaxNumber < 1)
 			{
-				parameters.AssetLoadingMaxNumber = 3;
-				YooLogger.Warning($"{nameof(parameters.AssetLoadingMaxNumber)} minimum is 3");
+				parameters.AssetLoadingMaxNumber = 1;
+				YooLogger.Warning($"{nameof(parameters.AssetLoadingMaxNumber)} minimum value is 1");
 			}
 
-			// 创建间隔计时器
-			if (parameters.AutoReleaseInterval > 0)
+			if (parameters.OperationSystemMaxTimeSlice < 33)
 			{
-				_releaseCD = parameters.AutoReleaseInterval;
+				parameters.OperationSystemMaxTimeSlice = 33;
+				YooLogger.Warning($"{nameof(parameters.OperationSystemMaxTimeSlice)} minimum value is 33 milliseconds");
 			}
 
 			if (string.IsNullOrEmpty(parameters.LocationRoot) == false)
 				_locationRoot = PathHelper.GetRegularPath(parameters.LocationRoot);
+
+			if (parameters.AutoReleaseInterval > 0)
+				_releaseCD = parameters.AutoReleaseInterval;
 
 			// 运行模式
 			if (parameters is EditorPlayModeParameters)
@@ -158,7 +165,10 @@ namespace YooAsset
 			else
 				throw new NotImplementedException();
 
-			// 初始化
+			// 初始化异步操作系统
+			OperationSystem.Initialize(parameters.OperationSystemMaxTimeSlice);
+
+			// 初始化资源系统
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
 				_editorPlayModeImpl = new EditorPlayModeImpl();
@@ -396,7 +406,7 @@ namespace YooAsset
 		{
 			return LoadSubAssetsInternal(location, type, false);
 		}
-		
+
 
 		private static AssetOperationHandle LoadAssetInternal(string location, System.Type assetType, bool waitForAsyncComplete)
 		{
@@ -511,7 +521,7 @@ namespace YooAsset
 		{
 			return CreatePatchUnpacker(new string[] { tag }, unpackingMaxNumber, failedTryAgain);
 		}
-		
+
 		/// <summary>
 		/// 创建补丁解压器
 		/// </summary>
