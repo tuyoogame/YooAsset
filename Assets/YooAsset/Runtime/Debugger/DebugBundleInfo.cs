@@ -21,6 +21,6 @@ namespace YooAsset
 		/// <summary>
 		/// 加载状态
 		/// </summary>
-		public int Status { set; get; }
+		public AssetBundleLoader.EStatus Status { set; get; }
 	}
 }
