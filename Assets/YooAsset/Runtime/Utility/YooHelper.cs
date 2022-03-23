@@ -146,7 +146,7 @@ namespace YooAsset
 		/// </summary>
 		public static void DeleteSandboxPatchManifestFile()
 		{
-			string filePath = PathHelper.MakePersistentLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
 			if (File.Exists(filePath))
 				File.Delete(filePath);
 		}
@@ -194,7 +194,7 @@ namespace YooAsset
 		/// </summary>
 		public static bool CheckSandboxPatchManifestFileExist()
 		{
-			string filePath = PathHelper.MakePersistentLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
 			return File.Exists(filePath);
 		}
 
@@ -205,7 +205,7 @@ namespace YooAsset
 		/// <returns></returns>
 		public static string GetSandboxPatchManifestFileHash()
 		{
-			string filePath = PathHelper.MakePersistentLoadPath(ResourceSettingData.Setting.PatchManifestFileName);
+			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
 			if (File.Exists(filePath))
 				return HashUtility.FileMD5(filePath);
 			else
