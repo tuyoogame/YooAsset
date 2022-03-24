@@ -37,11 +37,7 @@ void Handle_Completed(AssetOperationHandle handle)
 ````
 ````C#
 // 协程加载方式
-void Start()
-{
-    this.StartCoroutine(AsyncLoad());
-}
-IEnumerator AsyncLoad()
+IEnumerator Start()
 {
     AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
     yield return handle;   
@@ -51,10 +47,6 @@ IEnumerator AsyncLoad()
 ````C#
 // Task加载方式
 async void Start()
-{
-    await AsyncLoad();
-}
-async Task AsyncLoad()
 {
     AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
     await handle.Task;
