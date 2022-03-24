@@ -95,12 +95,20 @@ namespace YooAsset
 			// 4. 检测文件
 			if (_steps == ESteps.CheckFile)
 			{
-				// 注意：本地已经存在的文件不保证完整性
+				// 注意：如果原生文件已经存在，则验证其完整性
 				if (File.Exists(_savePath))
 				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Succeed;
-					return;
+					bool result = DownloadSystem.CheckContentIntegrity(_savePath, _bundleInfo.SizeBytes, _bundleInfo.CRC);
+					if (result)
+					{
+						_steps = ESteps.Done;
+						Status = EOperationStatus.Succeed;
+						return;
+					}
+					else
+					{
+						File.Delete(_savePath);
+					}
 				}
 
 				if (_bundleInfo.IsBuildinJarFile())
@@ -166,7 +174,7 @@ namespace YooAsset
 				return null;
 			return File.ReadAllBytes(_savePath);
 		}
-		
+
 		/// <summary>
 		/// 获取原生文件的文本数据
 		/// </summary>

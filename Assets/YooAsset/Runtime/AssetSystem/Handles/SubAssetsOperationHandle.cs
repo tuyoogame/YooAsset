@@ -86,7 +86,7 @@ namespace YooAsset
 					return asset as TObject;
 			}
 
-			YooLogger.Warning($"Not found sub asset {assetName} in {_provider.AssetPath}");
+			YooLogger.Warning($"Not found sub asset object : {assetName}");
 			return null;
 		}
 	}
