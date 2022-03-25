@@ -7,7 +7,7 @@ namespace YooAsset
 	internal class OfflinePlayModeImpl : IBundleServices
 	{
 		internal PatchManifest AppPatchManifest;
-		
+
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
@@ -24,8 +24,18 @@ namespace YooAsset
 		public int GetResourceVersion()
 		{
 			if (AppPatchManifest == null)
-				return 0;			
+				return 0;
 			return AppPatchManifest.ResourceVersion;
+		}
+
+		/// <summary>
+		/// 创建解压器
+		/// </summary>
+		public DownloaderOperation CreateUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
+		{
+			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByTags(AppPatchManifest, tags);
+			var operation = new DownloaderOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
+			return operation;
 		}
 
 		#region IBundleServices接口

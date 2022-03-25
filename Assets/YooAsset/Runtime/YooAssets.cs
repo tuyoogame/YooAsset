@@ -538,9 +538,9 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new DownloaderOperation(downloadList, unpackingMaxNumber, failedTryAgain);
-				return operation;
+				if (_offlinePlayModeImpl == null)
+					throw new Exception("YooAsset is not initialized.");
+				return _offlinePlayModeImpl.CreateUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain);
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{

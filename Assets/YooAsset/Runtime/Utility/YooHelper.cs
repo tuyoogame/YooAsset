@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Collections.Generic;
 
 namespace YooAsset
 {
@@ -218,6 +219,64 @@ namespace YooAsset
 		public static string MakeSandboxCacheFilePath(string fileName)
 		{
 			return PathHelper.MakePersistentLoadPath($"{StrCacheFolderName}/{fileName}");
+		}
+	}
+
+	/// <summary>
+	/// 补丁包帮助类
+	/// </summary>
+	internal static class PatchHelper
+	{
+		/// <summary>
+		/// 获取内置资源解压列表
+		/// </summary>
+		public static List<BundleInfo> GetUnpackListByTags(PatchManifest appPatchManifest, string[] tags)
+		{
+			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
+			foreach (var patchBundle in appPatchManifest.BundleList)
+			{
+				// 如果已经在沙盒内
+				string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+				if (System.IO.File.Exists(filePath))
+					continue;
+
+				// 如果不是内置资源
+				if (patchBundle.IsBuildin == false)
+					continue;
+
+				// 如果是纯内置资源
+				if (patchBundle.IsPureBuildin())
+				{
+					downloadList.Add(patchBundle);
+				}
+				else
+				{
+					// 查询DLC资源
+					if (patchBundle.HasTag(tags))
+					{
+						downloadList.Add(patchBundle);
+					}
+				}
+			}
+
+			return ConvertToUnpackList(downloadList);
+		}
+		private static List<BundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
+		{
+			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
+			foreach (var patchBundle in unpackList)
+			{
+				var bundleInfo = ConvertToUnpackInfo(patchBundle);
+				result.Add(bundleInfo);
+			}
+			return result;
+		}
+		private static BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
+		{
+			string sandboxPath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+			string streamingLoadPath = PathHelper.MakeStreamingLoadPath(patchBundle.Hash);
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, streamingLoadPath, streamingLoadPath);
+			return bundleInfo;
 		}
 	}
 }

@@ -160,51 +160,20 @@ namespace YooAsset
 		/// </summary>
 		public DownloaderOperation CreateUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
 		{
-			List<BundleInfo> unpcakList = GetUnpackListByTags(tags);
+			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByTags(AppPatchManifest, tags);
 			var operation = new DownloaderOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
 			return operation;
 		}
-		private List<BundleInfo> GetUnpackListByTags(string[] tags)
-		{
-			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
-			foreach (var patchBundle in AppPatchManifest.BundleList)
-			{
-				// 如果已经在沙盒内
-				string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
-				if (System.IO.File.Exists(filePath))
-					continue;
-
-				// 如果不是内置资源
-				if (patchBundle.IsBuildin == false)
-					continue;
-
-				// 如果是纯内置资源
-				if (patchBundle.IsPureBuildin())
-				{
-					downloadList.Add(patchBundle);
-				}
-				else
-				{
-					// 查询DLC资源
-					if (patchBundle.HasTag(tags))
-					{
-						downloadList.Add(patchBundle);
-					}
-				}
-			}
-
-			return ConvertToUnpackList(downloadList);
-		}
 
 		// WEB相关
-		internal string GetPatchDownloadMainURL(int resourceVersion, string fileName)
+		public string GetPatchDownloadMainURL(int resourceVersion, string fileName)
 		{
 			if (IgnoreResourceVersion)
 				return $"{_defaultHostServer}/{fileName}";
 			else
 				return $"{_defaultHostServer}/{resourceVersion}/{fileName}";
 		}
-		internal string GetPatchDownloadFallbackURL(int resourceVersion, string fileName)
+		public string GetPatchDownloadFallbackURL(int resourceVersion, string fileName)
 		{
 			if (IgnoreResourceVersion)
 				return $"{_fallbackHostServer}/{fileName}";
@@ -213,15 +182,6 @@ namespace YooAsset
 		}
 
 		// 下载相关
-		private BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
-		{
-			// 注意：资源版本号只用于确定下载路径
-			string sandboxPath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
-			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.Version, patchBundle.Hash);
-			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.Version, patchBundle.Hash);
-			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, remoteMainURL, remoteFallbackURL);
-			return bundleInfo;
-		}
 		private List<BundleInfo> ConvertToDownloadList(List<PatchBundle> downloadList)
 		{
 			List<BundleInfo> result = new List<BundleInfo>(downloadList.Count);
@@ -232,24 +192,14 @@ namespace YooAsset
 			}
 			return result;
 		}
-
-		// 解压相关
-		private BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
+		private BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
 		{
+			// 注意：资源版本号只用于确定下载路径
 			string sandboxPath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
-			string streamingLoadPath = PathHelper.MakeStreamingLoadPath(patchBundle.Hash);
-			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, streamingLoadPath, streamingLoadPath);
+			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.Version, patchBundle.Hash);
+			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.Version, patchBundle.Hash);
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, remoteMainURL, remoteFallbackURL);
 			return bundleInfo;
-		}
-		private List<BundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
-		{
-			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
-			foreach (var patchBundle in unpackList)
-			{
-				var bundleInfo = ConvertToUnpackInfo(patchBundle);
-				result.Add(bundleInfo);
-			}
-			return result;
 		}
 
 		#region IBundleServices接口
