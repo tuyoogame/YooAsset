@@ -67,8 +67,8 @@ namespace YooAsset.Editor
 
 			// 包含列表
 			_includeListView = _root.Q<ListView>("BottomListView");
-			_includeListView.makeItem = MakeContainsListViewItem;
-			_includeListView.bindItem = BindContainsListViewItem;
+			_includeListView.makeItem = MakeIncludeListViewItem;
+			_includeListView.bindItem = BindIncludeListViewItem;
 		}
 
 		/// <summary>
@@ -113,7 +113,7 @@ namespace YooAsset.Editor
 		}
 
 
-		// 资源列表相关
+		// 顶部列表相关
 		private VisualElement MakeBundleListViewItem()
 		{
 			VisualElement element = new VisualElement();
@@ -201,12 +201,12 @@ namespace YooAsset.Editor
 			foreach (var item in objs)
 			{
 				ReportBundleInfo bundleInfo = item as ReportBundleInfo;
-				FillContainsListView(bundleInfo);
+				FillIncludeListView(bundleInfo);
 			}
 		}
 
-		// 依赖列表相关
-		private void FillContainsListView(ReportBundleInfo bundleInfo)
+		// 底部列表相关
+		private void FillIncludeListView(ReportBundleInfo bundleInfo)
 		{
 			List<string> containsList = new List<string>();
 			foreach (var assetInfo in _buildReport.AssetInfos)
@@ -222,7 +222,7 @@ namespace YooAsset.Editor
 			_includeListView.itemsSource = containsList;
 			_bottomBar1.text = $"Include Assets ({containsList.Count})";
 		}
-		private VisualElement MakeContainsListViewItem()
+		private VisualElement MakeIncludeListViewItem()
 		{
 			VisualElement element = new VisualElement();
 			element.style.flexDirection = FlexDirection.Row;
@@ -259,7 +259,7 @@ namespace YooAsset.Editor
 
 			return element;
 		}
-		private void BindContainsListViewItem(VisualElement element, int index)
+		private void BindIncludeListViewItem(VisualElement element, int index)
 		{
 			List<string> containsList = _includeListView.itemsSource as List<string>;
 			string assetPath = containsList[index];
