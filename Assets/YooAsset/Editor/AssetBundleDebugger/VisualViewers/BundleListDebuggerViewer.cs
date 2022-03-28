@@ -148,28 +148,24 @@ namespace YooAsset.Editor
 			var sourceData = _bundleListView.itemsSource as List<DebugBundleInfo>;
 			var bundleInfo = sourceData[index];
 
-			StyleColor textColor;
-			if (bundleInfo.Status == AssetBundleLoader.EStatus.Fail)
-				textColor = new StyleColor(Color.yellow);
-			else
-				textColor = new StyleColor(StyleKeyword.Initial);
-
 			// Bundle Name
 			var label1 = element.Q<Label>("Label1");
 			label1.text = bundleInfo.BundleName;
-			label1.style.color = textColor;
 
 			// Version
 			var label2 = element.Q<Label>("Label2");
 			label2.text = bundleInfo.Version.ToString();
-			label2.style.color = textColor;
 
 			// Ref Count
 			var label3 = element.Q<Label>("Label3");
 			label3.text = bundleInfo.RefCount.ToString();
-			label3.style.color = textColor;
 
 			// Status
+			StyleColor textColor;
+			if (bundleInfo.Status == AssetBundleLoader.EStatus.Fail)
+				textColor = new StyleColor(Color.yellow);
+			else
+				textColor = label1.style.color;
 			var label4 = element.Q<Label>("Label4");
 			label4.text = bundleInfo.Status.ToString();
 			label4.style.color = textColor;
