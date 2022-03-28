@@ -1,3 +1,19 @@
 # 构建报告
 
+资源包报告工具，可以查看概览信息（Summary），资源对象列表信息（AssetView），资源包列表信息（BundleView）。
 
+### 概览视图
+
+![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img1.jpg)
+
+### 资源对象列表视图
+
+可以查看资源对象列表以及每个资源对象所依赖的资源包。
+
+![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img2.jpg)
+
+### 资源包列表视图
+
+可以查看资源包列表以及每个资源包所包含的资源对象。
+
+![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img3.jpg)
