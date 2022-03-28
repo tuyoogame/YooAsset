@@ -46,6 +46,8 @@ YooAsset是一个基于Unity3D引擎的资源管理插件。
 3. [资源收集](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetCollector.md)
 4. [资源打包](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBuilder.md)
 5. [资源部署](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetDeploy.md)
+5. [构建报告](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetReporter.md)
+5. [调试器](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetDebugger.md)
 
 ### 代码教程
 1. [初始化](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial1.md)
@@ -58,5 +60,5 @@ YooAsset是一个基于Unity3D引擎的资源管理插件。
 
 ### 友情链接
 
-[huatuo](https://github.com/focus-creative-games/huatuo)：huatuo是一个**特性完整、零成本、高性能、低内存**的**近乎完美**的c#热更新方案。
+[huatuo](https://github.com/focus-creative-games/huatuo)：华佗是一个**特性完整、零成本、高性能、低内存**的近乎完美的c#热更新方案。
 
