@@ -33,7 +33,7 @@ namespace YooAsset
 			/// <summary>
 			/// 下载结果（成功或失败）
 			/// </summary>
-			public bool Result = false;
+			public bool Result = true;
 
 			/// <summary>
 			/// 错误日志
@@ -93,19 +93,18 @@ namespace YooAsset
 				{
 					// 创建文件流
 					fileStream = new FileStream(_savePath, FileMode.OpenOrCreate, FileAccess.Write);
-					long fileLength = fileStream.Length;
+					long fileLength = fileStream.Length - 1;
 
 					// 创建HTTP下载请求
 					HttpWebRequest fileRequest = WebRequest.Create(_url) as HttpWebRequest;
-					fileRequest.Timeout = _timeout;
-					fileRequest.ReadWriteTimeout = _timeout;
+					fileRequest.Timeout = _timeout * 1000;
 					fileRequest.ProtocolVersion = HttpVersion.Version10;
 					if (fileLength > 0)
 					{
 						// 注意：设置远端请求文件的起始位置
 						fileRequest.AddRange(fileLength);
 						// 注意：设置本地文件流的起始位置
-						fileStream.Seek(fileLength, SeekOrigin.Begin);
+						fileStream.Seek(-1, SeekOrigin.End);
 					}
 
 					// 读取下载数据并保存到文件
@@ -126,18 +125,6 @@ namespace YooAsset
 						float progress = fileLength / fileTotalSize;
 						DownloadProgress = progress;
 						DownloadedBytes = (ulong)fileLength;
-					}
-
-					// 验证下载文件完整性
-					bool verfiyResult = DownloadSystem.CheckContentIntegrity(_savePath, _fileSize, _fileCRC);
-					if (verfiyResult)
-					{
-						Result = true;
-					}
-					else
-					{
-						Result = false;
-						Error = $"Verify file content failed : {_fileHash}";
 					}
 				}
 				catch (Exception e)
@@ -160,8 +147,21 @@ namespace YooAsset
 
 					if (fileStream != null)
 					{
+						fileStream.Flush();
 						fileStream.Close();
-						fileStream.Dispose();
+					}
+
+					// 验证下载文件完整性
+					if (Result)
+					{
+						bool verfiyResult = DownloadSystem.CheckContentIntegrity(_savePath, _fileSize, _fileCRC);
+						if (verfiyResult == false)
+						{
+							Result = false;
+							Error = $"Verify file content failed : {_fileHash}";
+							if (File.Exists(_savePath))
+								File.Delete(_savePath);
+						}
 					}
 
 					IsDone = true;
@@ -212,9 +212,6 @@ namespace YooAsset
 				{
 					_lastError = _threadDownloader.Error;
 					ReportError();
-
-					if (File.Exists(_bundleInfo.LocalPath))
-						File.Delete(_bundleInfo.LocalPath);
 
 					// 失败后重新尝试
 					if (_failedTryAgain > 0)

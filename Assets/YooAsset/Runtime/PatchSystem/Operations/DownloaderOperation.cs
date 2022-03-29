@@ -22,8 +22,8 @@ namespace YooAsset
 		private readonly int _failedTryAgain;
 		private readonly List<BundleInfo> _downloadList;
 		private readonly List<BundleInfo> _loadFailedList = new List<BundleInfo>();
-		private readonly List<FileDownloader> _downloaders = new List<FileDownloader>();
-		private readonly List<FileDownloader> _removeList = new List<FileDownloader>(MAX_LOADER_COUNT);
+		private readonly List<DownloaderBase> _downloaders = new List<DownloaderBase>();
+		private readonly List<DownloaderBase> _removeList = new List<DownloaderBase>(MAX_LOADER_COUNT);
 
 		// 数据相关
 		private ESteps _steps = ESteps.None;

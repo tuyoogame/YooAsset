@@ -12,7 +12,7 @@ namespace YooAsset
 	/// </summary>
 	internal static class DownloadSystem
 	{
-		private static readonly Dictionary<string, FileDownloader> _downloaderDic = new Dictionary<string, FileDownloader>();
+		private static readonly Dictionary<string, DownloaderBase> _downloaderDic = new Dictionary<string, DownloaderBase>();
 		private static readonly List<string> _removeList = new List<string>(100);
 		private static readonly Dictionary<string, string> _cachedHashList = new Dictionary<string, string>(1000);
 
@@ -43,7 +43,7 @@ namespace YooAsset
 		/// 开始下载资源文件
 		/// 注意：只有第一次请求的参数才是有效的
 		/// </summary>
-		public static FileDownloader BeginDownload(BundleInfo bundleInfo, int failedTryAgain, int timeout = 60)
+		public static DownloaderBase BeginDownload(BundleInfo bundleInfo, int failedTryAgain, int timeout = 60)
 		{
 			// 查询存在的下载器
 			if (_downloaderDic.TryGetValue(bundleInfo.Hash, out var downloader))
@@ -63,7 +63,7 @@ namespace YooAsset
 			{
 				YooLogger.Log($"Beginning to download file : {bundleInfo.BundleName} URL : {bundleInfo.RemoteMainURL}");
 				FileUtility.CreateFileDirectory(bundleInfo.LocalPath);
-				var newDownloader = new FileDownloader(bundleInfo);
+				var newDownloader = new HttpDownloader(bundleInfo);
 				newDownloader.SendRequest(failedTryAgain, timeout);
 				_downloaderDic.Add(bundleInfo.Hash, newDownloader);
 				return newDownloader;

@@ -19,7 +19,7 @@ namespace YooAsset
 		private readonly BundleInfo _bundleInfo;
 		private readonly string _savePath;
 		private ESteps _steps = ESteps.None;
-		private FileDownloader _fileDownloader;
+		private DownloaderBase _downloader;
 		private UnityWebFileRequester _fileRequester;
 
 		/// <summary>
@@ -67,21 +67,21 @@ namespace YooAsset
 			if (_steps == ESteps.DownloadFromWeb)
 			{
 				int failedTryAgain = int.MaxValue;
-				_fileDownloader = DownloadSystem.BeginDownload(_bundleInfo, failedTryAgain);
+				_downloader = DownloadSystem.BeginDownload(_bundleInfo, failedTryAgain);
 				_steps = ESteps.CheckDownloadFromWeb;
 			}
 
 			// 3. 检测服务器下载结果
 			if (_steps == ESteps.CheckDownloadFromWeb)
 			{
-				if (_fileDownloader.IsDone() == false)
+				if (_downloader.IsDone() == false)
 					return;
 
-				if (_fileDownloader.HasError())
+				if (_downloader.HasError())
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _fileDownloader.GetLastError();
+					Error = _downloader.GetLastError();
 				}
 				else
 				{

@@ -41,7 +41,7 @@ namespace YooAsset
 		private readonly List<ProviderBase> _providers = new List<ProviderBase>(100);
 		private bool _isWaitForAsyncComplete = false;
 		private bool _isShowWaitForAsyncError = false;
-		private FileDownloader _fileDownloader;
+		private DownloaderBase _downloader;
 		private AssetBundleCreateRequest _cacheRequest;
 		internal AssetBundle CacheBundle { private set; get; }
 
@@ -106,19 +106,19 @@ namespace YooAsset
 			if (Status == EStatus.Download)
 			{
 				int failedTryAgain = int.MaxValue;
-				_fileDownloader = DownloadSystem.BeginDownload(BundleFileInfo, failedTryAgain);
+				_downloader = DownloadSystem.BeginDownload(BundleFileInfo, failedTryAgain);
 				Status = EStatus.CheckDownload;
 			}
 
 			// 2. 检测服务器下载结果
 			if (Status == EStatus.CheckDownload)
 			{
-				if (_fileDownloader.IsDone() == false)
+				if (_downloader.IsDone() == false)
 					return;
 
-				if (_fileDownloader.HasError())
+				if (_downloader.HasError())
 				{
-					_fileDownloader.ReportError();
+					_downloader.ReportError();
 					Status = EStatus.Fail;
 				}
 				else
