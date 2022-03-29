@@ -4,6 +4,8 @@
 
 未来计划支持在编辑器下通过远程调试真机信息。
 
+注意：该工具仅支持Unity2019+
+
 ### 资源对象列表视图
 
 ![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetDebugger-img1.jpg)

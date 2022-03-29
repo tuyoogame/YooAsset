@@ -1,6 +1,8 @@
 # 构建报告
 
-资源包报告工具，可以查看概览信息（Summary），资源对象列表信息（AssetView），资源包列表信息（BundleView）。
+报告工具，可以查看概览信息（Summary），资源对象列表信息（AssetView），资源包列表信息（BundleView）。
+
+注意：该工具仅支持Unity2019+
 
 ### 概览视图
 
