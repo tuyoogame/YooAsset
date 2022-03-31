@@ -25,7 +25,7 @@ namespace YooAsset.Editor
 		{
 			// 加载布局文件
 			string rootPath = EditorTools.GetYooAssetPath();
-			string uxml = $"{rootPath}/Editor/AssetBundleDebugger/VisualViewers/AssetListDebuggerViewer.uxml";
+			string uxml = $"{rootPath}/Editor/AssetBundleDebugger/VisualViewers/{nameof(AssetListDebuggerViewer)}.uxml";
 			_visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (_visualAsset == null)
 			{
@@ -39,12 +39,12 @@ namespace YooAsset.Editor
 			_assetListView = _root.Q<ListView>("TopListView");
 			_assetListView.makeItem = MakeAssetListViewItem;
 			_assetListView.bindItem = BindAssetListViewItem;
-
 #if UNITY_2020_1_OR_NEWER
 			_assetListView.onSelectionChange += AssetListView_onSelectionChange;
 #else
 			_assetListView.onSelectionChanged += AssetListView_onSelectionChange;
 #endif
+
 			// 依赖列表
 			_dependListView = _root.Q<ListView>("BottomListView");
 			_dependListView.makeItem = MakeDependListViewItem;
