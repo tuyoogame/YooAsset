@@ -53,11 +53,11 @@ namespace YooAsset.Editor
 
 			// 加载布局文件
 			string rootPath = EditorTools.GetYooAssetPath();
-			string uxml = $"{rootPath}/Editor/AssetBundleReporter/AssetBundleReporter.uxml";
+			string uxml = $"{rootPath}/Editor/AssetBundleReporter/{nameof(AssetBundleReporterWindow)}.uxml";
 			var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (visualAsset == null)
 			{
-				Debug.LogError($"Not found AssetBundleReporter.uxml : {uxml}");
+				Debug.LogError($"Not found {nameof(AssetBundleReporterWindow)}.uxml : {uxml}");
 				return;
 			}
 			visualAsset.CloneTree(root);

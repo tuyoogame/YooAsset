@@ -33,7 +33,7 @@ namespace YooAsset.Editor
 		{
 			// 加载布局文件
 			string rootPath = EditorTools.GetYooAssetPath();
-			string uxml = $"{rootPath}/Editor/AssetBundleReporter/VisualViewers/BundleListReporterViewer.uxml";
+			string uxml = $"{rootPath}/Editor/AssetBundleReporter/VisualViewers/{nameof(BundleListReporterViewer)}.uxml";
 			_visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (_visualAsset == null)
 			{
