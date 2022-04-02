@@ -45,11 +45,6 @@ namespace YooAsset.Editor
 		/// </summary>
 		public IEncryptionServices EncryptionServices;
 
-		/// <summary>
-		/// 冗余类
-		/// </summary>
-		public IRedundancyServices RedundancyServices;
-
 
 		/// <summary>
 		/// 强制重新构建整个项目，如果为FALSE则是增量打包

@@ -38,11 +38,6 @@ namespace YooAsset.Editor
 		private string[] _encryptionServicesClassNames;
 		private int _encryptionServicesSelectIndex = -1;
 
-		// 冗余类相关
-		private List<Type> _redundancyServicesClassTypes;
-		private string[] _redundancyServicesClassNames;
-		private int _redundancyServicesSelectIndex = -1;
-
 		// GUI相关
 		private bool _isInit = false;
 		private GUIStyle _centerStyle;
@@ -67,8 +62,6 @@ namespace YooAsset.Editor
 			_compressOption = (ECompressOption)EditorGUILayout.EnumPopup("Compression", _compressOption, GUILayout.MaxWidth(300));
 			if (_encryptionServicesClassNames.Length > 0)
 				_encryptionServicesSelectIndex = EditorGUILayout.Popup("Encryption Services", _encryptionServicesSelectIndex, _encryptionServicesClassNames, GUILayout.MaxWidth(300));
-			if (_redundancyServicesClassNames.Length > 0)
-				_redundancyServicesSelectIndex = EditorGUILayout.Popup("Redundancy Services", _redundancyServicesSelectIndex, _redundancyServicesClassNames, GUILayout.MaxWidth(300));
 			_appendExtension = GUILayout.Toggle(_appendExtension, "Append Extension", GUILayout.MaxWidth(120));
 			_forceRebuild = GUILayout.Toggle(_forceRebuild, "Force Rebuild", GUILayout.MaxWidth(120));
 			if (_forceRebuild)
@@ -122,9 +115,6 @@ namespace YooAsset.Editor
 			_encryptionServicesClassTypes = GetEncryptionServicesClassTypes();
 			_encryptionServicesClassNames = _encryptionServicesClassTypes.Select(t => t.FullName).ToArray();
 
-			_redundancyServicesClassTypes = GetRedundancyServicesClassTypes();
-			_redundancyServicesClassNames = _redundancyServicesClassTypes.Select(t => t.FullName).ToArray();
-
 			// 读取配置
 			LoadSettingsFromPlayerPrefs();
 		}
@@ -143,7 +133,6 @@ namespace YooAsset.Editor
 			buildParameters.CompressOption = _compressOption;
 			buildParameters.AppendFileExtension = _appendExtension;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
-			buildParameters.RedundancyServices = CreateRedundancyServicesInstance();
 			buildParameters.ForceRebuild = _forceRebuild;
 			buildParameters.BuildinTags = _buildinTags;
 			_assetBuilder.Run(buildParameters);
@@ -160,19 +149,6 @@ namespace YooAsset.Editor
 				return null;
 			var classType = _encryptionServicesClassTypes[_encryptionServicesSelectIndex];
 			return (IEncryptionServices)Activator.CreateInstance(classType);
-		}
-
-		private List<Type> GetRedundancyServicesClassTypes()
-		{
-			List<Type> classTypes = AssemblyUtility.GetAssignableTypes(AssemblyUtility.UnityDefaultAssemblyEditorName, typeof(IRedundancyServices));
-			return classTypes;
-		}
-		private IRedundancyServices CreateRedundancyServicesInstance()
-		{
-			if (_redundancyServicesSelectIndex < 0)
-				return null;
-			var classType = _redundancyServicesClassTypes[_redundancyServicesSelectIndex];
-			return (IRedundancyServices)Activator.CreateInstance(classType);
 		}
 
 		#region 配置相关

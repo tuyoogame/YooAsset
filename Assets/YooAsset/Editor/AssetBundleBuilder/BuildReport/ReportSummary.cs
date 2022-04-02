@@ -58,11 +58,6 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string EncryptionServicesClassName;
 
-		/// <summary>
-		/// 冗余服务类名称
-		/// </summary>
-		public string RedundancyServicesClassName;
-
 		// 构建参数
 		public bool ForceRebuild;
 		public string BuildinTags;
