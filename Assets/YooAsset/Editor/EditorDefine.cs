@@ -7,6 +7,11 @@ namespace YooAsset.Editor
 		/// 资源包收集工具的配置文件存储路径
 		/// </summary>
 		public const string AssetBundleCollectorSettingFilePath = "Assets/YooAssetSetting/AssetBundleCollectorSetting.asset";
+
+		/// <summary>
+		/// 资源包分组工具的配置文件存储路径
+		/// </summary>
+		public const string AssetBundleGrouperSettingFilePath = "Assets/YooAssetSetting/AssetBundleGrouperSetting.asset";
 	}
 
 	/// <summary>
