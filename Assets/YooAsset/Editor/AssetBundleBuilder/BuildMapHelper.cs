@@ -15,6 +15,9 @@ namespace YooAsset.Editor
 			BuildMapContext context = new BuildMapContext();
 			Dictionary<string, BuildAssetInfo> buildAssetDic = new Dictionary<string, BuildAssetInfo>();
 
+			// 0. 检测配置合法性
+			AssetBundleGrouperSettingData.Setting.CheckConfigError();
+
 			// 1. 获取主动收集的资源
 			List<CollectAssetInfo> collectAssetInfos = AssetBundleGrouperSettingData.Setting.GetAllCollectAssets();
 
