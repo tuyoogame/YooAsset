@@ -8,7 +8,7 @@ namespace YooAsset.Editor
 	public class ReportBundleInfo
 	{
 		/// <summary>
-		/// 资源包完整名称
+		/// 资源包名称
 		/// </summary>
 		public string BundleName;
 

@@ -7,24 +7,29 @@ namespace YooAsset.Editor
 	public class BuildAssetInfo
 	{
 		/// <summary>
+		/// 资源包名称
+		/// </summary>
+		public string BundleName { private set; get; }
+
+		/// <summary>
 		/// 资源路径
 		/// </summary>
 		public string AssetPath { private set; get; }
 
 		/// <summary>
-		/// 资源包完整名称
-		/// </summary>
-		public string BundleName { private set; get; }
-
-		/// <summary>
 		/// 是否为原生资源
 		/// </summary>
-		public bool IsRawAsset = false;
+		public bool IsRawAsset { private set; get; }
+
+		/// <summary>
+		/// 不写入资源列表
+		/// </summary>
+		public bool NotWriteToAssetList { private set; get; }
 
 		/// <summary>
 		/// 是否为主动收集资源
 		/// </summary>
-		public bool IsCollectAsset = false;
+		public bool IsCollectAsset { private set; get; }
 
 		/// <summary>
 		/// 被依赖次数
@@ -32,7 +37,7 @@ namespace YooAsset.Editor
 		public int DependCount = 0;
 
 		/// <summary>
-		/// 资源标记列表
+		/// 资源分类标签列表
 		/// </summary>
 		public readonly List<string> AssetTags = new List<string>();
 
@@ -43,9 +48,19 @@ namespace YooAsset.Editor
 		public List<BuildAssetInfo> AllDependAssetInfos { private set; get; }
 
 
+		public BuildAssetInfo(string assetPath, bool isRawAsset, bool notWriteToAssetList)
+		{
+			AssetPath = assetPath;
+			IsRawAsset = isRawAsset;
+			NotWriteToAssetList = notWriteToAssetList;
+			IsCollectAsset = true;
+		}
 		public BuildAssetInfo(string assetPath)
 		{
 			AssetPath = assetPath;
+			IsRawAsset = false;
+			NotWriteToAssetList = true;
+			IsCollectAsset = false;
 		}
 
 		/// <summary>
@@ -60,18 +75,18 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 设置资源包的标签和文件格式
+		/// 设置资源包名称
 		/// </summary>
-		public void SetBundleLabelAndVariant(string bundleLabel, string bundleVariant)
+		public void SetBundleName(string bundleName)
 		{
 			if (string.IsNullOrEmpty(BundleName) == false)
 				throw new System.Exception("Should never get here !");
 
-			BundleName = AssetBundleBuilderHelper.MakeBundleName(bundleLabel, bundleVariant);
+			BundleName = bundleName;	
 		}
 
 		/// <summary>
-		/// 添加资源标记
+		/// 添加资源分类标签
 		/// </summary>
 		public void AddAssetTags(List<string> tags)
 		{
@@ -82,7 +97,7 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 添加资源标记
+		/// 添加资源分类标签
 		/// </summary>
 		public void  AddAssetTag(string tag)
 		{
@@ -93,7 +108,7 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 资源包名是否有效
+		/// 资源包名称是否有效
 		/// </summary>
 		public bool BundleNameIsValid()
 		{

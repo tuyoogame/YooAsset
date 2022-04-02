@@ -18,7 +18,7 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParametersContext = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
-			var buildMapContext = context.GetContextObject<TaskGetBuildMap.BuildMapContext>();
+			var buildMapContext = context.GetContextObject<BuildMapContext>();
 
 			Debug.Log($"开始构建......");
 			BuildAssetBundleOptions opt = buildParametersContext.GetPipelineBuildOptions();
@@ -57,7 +57,7 @@ namespace YooAsset.Editor
 		private void VerifyingBuildingResult(BuildContext context, AssetBundleManifest unityManifest)
 		{
 			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
-			var buildMapContext = context.GetContextObject<TaskGetBuildMap.BuildMapContext>();
+			var buildMapContext = context.GetContextObject<BuildMapContext>();
 			string[] buildedBundles = unityManifest.GetAllAssetBundles();
 
 			// 1. 过滤掉原生Bundle

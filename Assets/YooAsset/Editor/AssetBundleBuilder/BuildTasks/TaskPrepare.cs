@@ -25,10 +25,6 @@ namespace YooAsset.Editor
 			if (string.IsNullOrEmpty(buildParameters.PipelineOutputDirectory))
 				throw new Exception("输出目录不能为空");
 
-			// 检测资源收集配置文件
-			if (AssetBundleCollectorSettingData.GetCollecterCount() == 0)
-				throw new Exception("配置的资源收集路径为空");
-
 			// 增量更新时候的必要检测
 			if (buildParameters.Parameters.ForceRebuild == false)
 			{
@@ -46,10 +42,10 @@ namespace YooAsset.Editor
 				if (Directory.Exists(packageDirectory))
 					throw new Exception($"补丁包已经存在：{packageDirectory}");
 
-				// 检测内置资源标记是否一致
+				// 检测内置资源分类标签是否一致
 				PatchManifest oldPatchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory);
 				if (buildParameters.Parameters.BuildinTags != oldPatchManifest.BuildinTags)
-					throw new Exception($"增量更新时内置资源标记必须一致：{buildParameters.Parameters.BuildinTags} != {oldPatchManifest.BuildinTags}");
+					throw new Exception($"增量更新时内置资源标签必须一致：{buildParameters.Parameters.BuildinTags} != {oldPatchManifest.BuildinTags}");
 			}
 
 			// 如果是强制重建

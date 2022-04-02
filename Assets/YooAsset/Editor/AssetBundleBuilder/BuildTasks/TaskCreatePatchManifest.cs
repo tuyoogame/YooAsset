@@ -14,7 +14,7 @@ namespace YooAsset.Editor
 		{
 			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
 			var encryptionContext = context.GetContextObject<TaskEncryption.EncryptionContext>();
-			var buildMapContext = context.GetContextObject<TaskGetBuildMap.BuildMapContext>();
+			var buildMapContext = context.GetContextObject<BuildMapContext>();
 			CreatePatchManifestFile(buildParameters, buildMapContext, encryptionContext);
 		}
 
@@ -22,7 +22,7 @@ namespace YooAsset.Editor
 		/// 创建补丁清单文件到输出目录
 		/// </summary>
 		private void CreatePatchManifestFile(AssetBundleBuilder.BuildParametersContext buildParameters,
-			TaskGetBuildMap.BuildMapContext buildMapContext, TaskEncryption.EncryptionContext encryptionContext)
+			BuildMapContext buildMapContext, TaskEncryption.EncryptionContext encryptionContext)
 		{
 			// 创建新补丁清单
 			PatchManifest patchManifest = new PatchManifest();
@@ -47,7 +47,7 @@ namespace YooAsset.Editor
 		/// 获取资源包列表
 		/// </summary>
 		private List<PatchBundle> GetAllPatchBundle(AssetBundleBuilder.BuildParametersContext buildParameters,
-			TaskGetBuildMap.BuildMapContext buildMapContext, TaskEncryption.EncryptionContext encryptionContext)
+			BuildMapContext buildMapContext, TaskEncryption.EncryptionContext encryptionContext)
 		{
 			List<PatchBundle> result = new List<PatchBundle>(1000);
 
@@ -111,12 +111,12 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取资源列表
 		/// </summary>
-		private List<PatchAsset> GetAllPatchAsset(TaskGetBuildMap.BuildMapContext buildMapContext, PatchManifest patchManifest)
+		private List<PatchAsset> GetAllPatchAsset(BuildMapContext buildMapContext, PatchManifest patchManifest)
 		{
 			List<PatchAsset> result = new List<PatchAsset>(1000);
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
-				var assetInfos = bundleInfo.GetCollectAssetInfos();
+				var assetInfos = bundleInfo.GetAllPatchAssetInfos();
 				foreach (var assetInfo in assetInfos)
 				{
 					PatchAsset patchAsset = new PatchAsset();

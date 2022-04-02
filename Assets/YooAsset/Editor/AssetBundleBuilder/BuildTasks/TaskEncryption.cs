@@ -24,7 +24,7 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
-			var buildMapContext = context.GetContextObject<TaskGetBuildMap.BuildMapContext>();
+			var buildMapContext = context.GetContextObject<BuildMapContext>();
 
 			EncryptionContext encryptionContext = new EncryptionContext();
 			encryptionContext.EncryptList = EncryptFiles(buildParameters, buildMapContext);
@@ -34,7 +34,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 加密文件
 		/// </summary>
-		private List<string> EncryptFiles(AssetBundleBuilder.BuildParametersContext buildParameters, TaskGetBuildMap.BuildMapContext buildMapContext)
+		private List<string> EncryptFiles(AssetBundleBuilder.BuildParametersContext buildParameters, BuildMapContext buildMapContext)
 		{
 			var encryptionServices = buildParameters.Parameters.EncryptionServices;
 

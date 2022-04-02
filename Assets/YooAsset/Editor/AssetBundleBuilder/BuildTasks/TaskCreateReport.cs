@@ -12,11 +12,11 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
-			var buildMapContext = context.GetContextObject<TaskGetBuildMap.BuildMapContext>();
+			var buildMapContext = context.GetContextObject<BuildMapContext>();
 			CreateReportFile(buildParameters, buildMapContext);
 		}
 
-		private void CreateReportFile(AssetBundleBuilder.BuildParametersContext buildParameters, TaskGetBuildMap.BuildMapContext buildMapContext)
+		private void CreateReportFile(AssetBundleBuilder.BuildParametersContext buildParameters, BuildMapContext buildMapContext)
 		{
 			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory);
 			BuildReport buildReport = new BuildReport();
@@ -31,8 +31,8 @@ namespace YooAsset.Editor
 				buildReport.Summary.BuildVersion = buildParameters.Parameters.BuildVersion;
 				buildReport.Summary.EnableAutoCollect = buildParameters.Parameters.EnableAutoCollect;
 				buildReport.Summary.AppendFileExtension = buildParameters.Parameters.AppendFileExtension;
-				buildReport.Summary.AutoCollectShaders = AssetBundleCollectorSettingData.Setting.AutoCollectShaders;
-				buildReport.Summary.ShadersBundleName = AssetBundleCollectorSettingData.Setting.ShadersBundleName;
+				buildReport.Summary.AutoCollectShaders = AssetBundleGrouperSettingData.Setting.AutoCollectShaders;
+				buildReport.Summary.ShadersBundleName = AssetBundleGrouperSettingData.Setting.ShadersBundleName;
 				buildReport.Summary.EncryptionServicesClassName = buildParameters.Parameters.EncryptionServices == null ?
 					"null" : buildParameters.Parameters.EncryptionServices.GetType().FullName;
 				buildReport.Summary.RedundancyServicesClassName = buildParameters.Parameters.RedundancyServices == null ?
@@ -49,7 +49,6 @@ namespace YooAsset.Editor
 
 				// 构建结果
 				buildReport.Summary.AssetFileTotalCount = buildMapContext.AssetFileCount;
-				buildReport.Summary.RedundancyAssetFileCount = buildMapContext.RedundancyAssetList.Count;
 				buildReport.Summary.AllBundleTotalCount = GetAllBundleCount(patchManifest);
 				buildReport.Summary.AllBundleTotalSize = GetAllBundleSize(patchManifest);
 				buildReport.Summary.BuildinBundleTotalCount = GetBuildinBundleCount(patchManifest);
@@ -58,8 +57,6 @@ namespace YooAsset.Editor
 				buildReport.Summary.EncryptedBundleTotalSize = GetEncryptedBundleSize(patchManifest);
 				buildReport.Summary.RawBundleTotalCount = GetRawBundleCount(patchManifest);
 				buildReport.Summary.RawBundleTotalSize = GetRawBundleSize(patchManifest);
-
-
 			}
 
 			// 资源对象列表
@@ -90,20 +87,6 @@ namespace YooAsset.Editor
 				buildReport.BundleInfos.Add(reportBundleInfo);
 			}
 
-			// 收集器列表
-			for (int i = 0; i < AssetBundleCollectorSettingData.Setting.Collectors.Count; i++)
-			{
-				var wrapper = AssetBundleCollectorSettingData.Setting.Collectors[i];
-				buildReport.CollectorInfoList.Add(wrapper.ToString());
-			}
-
-			// 冗余资源列表
-			for (int i = 0; i < buildMapContext.RedundancyAssetList.Count; i++)
-			{
-				string redundancyAssetPath = buildMapContext.RedundancyAssetList[i];
-				buildReport.RedundancyAssetList.Add(redundancyAssetPath);
-			}
-
 			// 删除旧文件
 			string filePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettings.ReportFileName}";
 			if (File.Exists(filePath))
@@ -130,7 +113,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取资源对象依赖的其它所有资源
 		/// </summary>
-		private List<string> GetDependAssets(TaskGetBuildMap.BuildMapContext buildMapContext, string bundleName, string assetPath)
+		private List<string> GetDependAssets(BuildMapContext buildMapContext, string bundleName, string assetPath)
 		{
 			List<string> result = new List<string>();
 			if (buildMapContext.TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))

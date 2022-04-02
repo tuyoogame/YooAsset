@@ -9,13 +9,13 @@ namespace YooAsset.Editor
 	public class BuildBundleInfo
 	{
 		/// <summary>
-		/// 资源包完整名称
+		/// 资源包名称
 		/// </summary>
 		public string BundleName { private set; get; }
 
 		/// <summary>
 		/// 参与构建的资源列表
-		/// 注意：不包含冗余资源或零依赖资源
+		/// 注意：不包含零依赖资源
 		/// </summary>
 		public readonly List<BuildAssetInfo> BuildinAssets = new List<BuildAssetInfo>();
 
@@ -42,6 +42,17 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
+		/// 添加一个打包资源
+		/// </summary>
+		public void PackAsset(BuildAssetInfo assetInfo)
+		{
+			if (IsContainsAsset(assetInfo.AssetPath))
+				throw new System.Exception($"Asset is existed : {assetInfo.AssetPath}");
+
+			BuildinAssets.Add(assetInfo);
+		}
+
+		/// <summary>
 		/// 是否包含指定资源
 		/// </summary>
 		public bool IsContainsAsset(string assetPath)
@@ -57,29 +68,7 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 添加一个打包资源
-		/// </summary>
-		public void PackAsset(BuildAssetInfo assetInfo)
-		{
-			if (IsContainsAsset(assetInfo.AssetPath))
-				throw new System.Exception($"Asset is existed : {assetInfo.AssetPath}");
-
-			BuildinAssets.Add(assetInfo);
-		}
-
-		/// <summary>
-		/// 获取文件的扩展名
-		/// </summary>
-		public string GetAppendExtension()
-		{
-			if (IsRawFile)
-				return $".{YooAssetSettingsData.Setting.RawFileVariant}";
-			else
-				return $".{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-		}
-
-		/// <summary>
-		/// 获取资源标记列表
+		/// 获取资源标签列表
 		/// </summary>
 		public string[] GetAssetTags()
 		{
@@ -96,6 +85,17 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
+		/// 获取文件的扩展名
+		/// </summary>
+		public string GetAppendExtension()
+		{
+			if (IsRawFile)
+				return $".{YooAssetSettingsData.Setting.RawFileVariant}";
+			else
+				return $".{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+		}
+
+		/// <summary>
 		/// 获取构建的资源路径列表
 		/// </summary>
 		public string[] GetBuildinAssetPaths()
@@ -104,11 +104,11 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 获取主动收集的资源信息列表
+		/// 获取所有写入补丁清单的资源
 		/// </summary>
-		public BuildAssetInfo[] GetCollectAssetInfos()
+		public BuildAssetInfo[] GetAllPatchAssetInfos()
 		{
-			return BuildinAssets.Where(t => t.IsCollectAsset).ToArray();
+			return BuildinAssets.Where(t => t.IsCollectAsset && t.NotWriteToAssetList == false).ToArray();
 		}
 
 		/// <summary>
