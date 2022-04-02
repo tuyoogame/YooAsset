@@ -47,7 +47,7 @@ namespace YooAsset
 
 
 		/// <summary>
-		/// 获取内置资源标记列表
+		/// 获取内置资源标签列表
 		/// </summary>
 		public string[] GetBuildinTags()
 		{
