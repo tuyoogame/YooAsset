@@ -107,9 +107,9 @@ namespace YooAsset.Editor
 		/// <param name="title">标题名称</param>
 		/// <param name="defaultPath">默认搜索路径</param>
 		/// <returns>返回选择的文件夹绝对路径，如果无效返回NULL</returns>
-		public static string OpenFolderPanel(string title, string defaultPath)
+		public static string OpenFolderPanel(string title, string defaultPath, string defaultName = "")
 		{
-			string openPath = EditorUtility.OpenFolderPanel(title, defaultPath, string.Empty);
+			string openPath = EditorUtility.OpenFolderPanel(title, defaultPath, defaultName);
 			if (string.IsNullOrEmpty(openPath))
 				return null;
 
