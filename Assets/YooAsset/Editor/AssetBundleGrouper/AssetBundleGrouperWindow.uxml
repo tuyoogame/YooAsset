@@ -4,27 +4,29 @@
         <ui:Button text="导出" display-tooltip-when-elided="true" name="ExportButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
         <ui:Button text="导入" display-tooltip-when-elided="true" name="ImportButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
     </uie:Toolbar>
-    <ui:VisualElement name="ShaderContainer" style="height: 24px; background-color: rgb(77, 77, 77); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; flex-direction: row; border-top-left-radius: 2px; border-bottom-left-radius: 2px; border-top-right-radius: 2px; border-bottom-right-radius: 2px;">
-        <ui:Toggle label="Auto Collect Shaders" name="AutoCollectShader" style="width: 196px; -unity-text-align: middle-left;" />
-        <ui:TextField picking-mode="Ignore" label="Shader Bundle Name" name="ShaderBundleName" style="flex-grow: 1; -unity-text-align: middle-left;" />
-    </ui:VisualElement>
     <ui:VisualElement name="ContentContainer" style="flex-grow: 1; flex-direction: row;">
         <ui:VisualElement name="LeftContainer" style="width: 200px; flex-grow: 0; background-color: rgb(67, 67, 67); border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">
-            <ui:VisualElement name="GrouperAddContainer" style="height: 20px; flex-direction: row;">
-                <ui:Button text=" - " display-tooltip-when-elided="true" name="RemoveBtn" />
-                <ui:Button text=" + " display-tooltip-when-elided="true" name="AddBtn" />
-            </ui:VisualElement>
             <ui:ListView focusable="true" name="GrouperListView" item-height="20" style="flex-grow: 1;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="RightContainer" style="flex-grow: 1; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">
-            <ui:TextField picking-mode="Ignore" label="Grouper Name" name="GrouperName" />
-            <ui:TextField picking-mode="Ignore" label="Grouper Desc" name="GrouperDesc" />
-            <ui:TextField picking-mode="Ignore" label="Grouper Asset Tags" name="GrouperAssetTags" />
-            <ui:VisualElement name="CollectorAddContainer" style="height: 20px; flex-direction: row-reverse;">
+            <ui:VisualElement name="GrouperAddContainer" style="height: 20px; flex-direction: row; justify-content: center;">
                 <ui:Button text=" - " display-tooltip-when-elided="true" name="RemoveBtn" />
                 <ui:Button text=" + " display-tooltip-when-elided="true" name="AddBtn" />
             </ui:VisualElement>
-            <ui:ListView focusable="true" name="CollectorListView" item-height="50" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="RightContainer" style="flex-direction: column; flex-grow: 1;">
+            <ui:VisualElement name="ShaderContainer" style="height: 30px; background-color: rgb(67, 67, 67); flex-direction: row; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">
+                <ui:Toggle label="Auto Collect Shaders" name="AutoCollectShader" style="width: 196px; -unity-text-align: middle-left;" />
+                <ui:TextField picking-mode="Ignore" label="Shader Bundle Name" name="ShaderBundleName" style="flex-grow: 1; -unity-text-align: middle-left;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="GrouperContainer" style="flex-grow: 1; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">
+                <ui:TextField picking-mode="Ignore" label="Grouper Name" name="GrouperName" />
+                <ui:TextField picking-mode="Ignore" label="Grouper Desc" name="GrouperDesc" />
+                <ui:TextField picking-mode="Ignore" label="Grouper Asset Tags" name="GrouperAssetTags" />
+                <ui:VisualElement name="CollectorAddContainer" style="height: 20px; flex-direction: row-reverse;">
+                    <ui:Button text=" - " display-tooltip-when-elided="true" name="RemoveBtn" />
+                    <ui:Button text=" + " display-tooltip-when-elided="true" name="AddBtn" />
+                </ui:VisualElement>
+                <ui:ListView focusable="true" name="CollectorListView" item-height="50" style="flex-grow: 1;" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

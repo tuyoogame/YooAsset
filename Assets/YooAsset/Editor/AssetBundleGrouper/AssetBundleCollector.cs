@@ -36,6 +36,21 @@ namespace YooAsset.Editor
 
 
 		/// <summary>
+		/// 检测配置错误
+		/// </summary>
+		public void CheckConfigError()
+		{
+			if(AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(CollectPath) == null)
+				throw new Exception($"Invalid collect path : {CollectPath}");
+
+			if (AssetBundleGrouperSettingData.HasPackRuleName(PackRuleName) == false)
+				throw new Exception($"Invalid {nameof(IPackRule)} class type : {PackRuleName}");
+
+			if (AssetBundleGrouperSettingData.HasFilterRuleName(FilterRuleName) == false)
+				throw new Exception($"Invalid {nameof(IFilterRule)} class type : {FilterRuleName}");
+		}
+
+		/// <summary>
 		/// 获取打包收集的资源文件
 		/// </summary>
 		public List<CollectAssetInfo> GetAllCollectAssets(AssetBundleGrouper grouper)

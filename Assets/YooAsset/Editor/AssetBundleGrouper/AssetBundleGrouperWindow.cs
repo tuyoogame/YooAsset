@@ -28,7 +28,7 @@ namespace YooAsset.Editor
 		private TextField _grouperNameTxt;
 		private TextField _grouperDescTxt;
 		private TextField _grouperAssetTagsTxt;
-		private VisualElement _rightContainer;
+		private VisualElement _grouperContainer;
 
 		public void CreateGUI()
 		{
@@ -50,16 +50,20 @@ namespace YooAsset.Editor
 
 			try
 			{
+				// 导入导出按钮
+				var exportBtn = root.Q<Button>("ExportButton");
+				exportBtn.clicked += ExportBtn_clicked;
+				var importBtn = root.Q<Button>("ImportButton");
+				importBtn.clicked += ImportBtn_clicked;
+
 				// 着色器相关
 				_autoCollectShaderToogle = root.Q<Toggle>("AutoCollectShader");
-				_autoCollectShaderToogle.SetValueWithoutNotify(AssetBundleGrouperSettingData.Setting.AutoCollectShaders);
 				_autoCollectShaderToogle.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleGrouperSettingData.ModifyShader(evt.newValue, _shaderBundleNameTxt.value);
+					_shaderBundleNameTxt.SetEnabled(evt.newValue);	
 				});
-
 				_shaderBundleNameTxt = root.Q<TextField>("ShaderBundleName");
-				_shaderBundleNameTxt.SetValueWithoutNotify(AssetBundleGrouperSettingData.Setting.ShadersBundleName);
 				_shaderBundleNameTxt.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleGrouperSettingData.ModifyShader(_autoCollectShaderToogle.value, evt.newValue);
@@ -84,9 +88,8 @@ namespace YooAsset.Editor
 					removeBtn.clicked += RemoveGrouperBtn_clicked;
 				}
 
-				// 右侧容器
-				_rightContainer = root.Q("RightContainer");
-				_rightContainer.visible = false;
+				// 分组容器
+				_grouperContainer = root.Q("GrouperContainer");
 
 				// 分组信息相关
 				_grouperNameTxt = root.Q<TextField>("GrouperName");
@@ -141,12 +144,42 @@ namespace YooAsset.Editor
 					removeBtn.clicked += RemoveCollectorBtn_clicked;
 				}
 
-				// 初始化界面
-				FillGrouperViewData();
+				// 刷新窗体
+				RefreshWindow();
 			}
 			catch (System.Exception e)
 			{
 				Debug.LogError(e.ToString());
+			}
+		}
+		
+		// 刷新窗体
+		private void RefreshWindow()
+		{
+			_autoCollectShaderToogle.SetValueWithoutNotify(AssetBundleGrouperSettingData.Setting.AutoCollectShaders);
+			_shaderBundleNameTxt.SetEnabled(AssetBundleGrouperSettingData.Setting.AutoCollectShaders);
+			_shaderBundleNameTxt.SetValueWithoutNotify(AssetBundleGrouperSettingData.Setting.ShadersBundleName);
+			_grouperContainer.visible = false;
+
+			FillGrouperViewData();
+		}
+
+		// 导入导出按钮
+		private void ExportBtn_clicked()
+		{
+			string resultPath = EditorTools.OpenFolderPanel("Export XML", "Assets/");
+			if (resultPath != null)
+			{
+				AssetBundleGrouperConfig.ExportXmlConfig($"{resultPath}/{nameof(AssetBundleGrouperConfig)}.xml");
+			}
+		}
+		private void ImportBtn_clicked()
+		{
+			string resultPath = EditorTools.OpenFilePath("Import XML", "Assets/", "xml");
+			if (resultPath != null)
+			{
+				AssetBundleGrouperConfig.ImportXmlConfig(resultPath);
+				RefreshWindow();
 			}
 		}
 
@@ -178,7 +211,10 @@ namespace YooAsset.Editor
 
 			// Grouper Name
 			var textField1 = element.Q<Label>("Label1");
-			textField1.text = grouper.GrouperName;
+			if (string.IsNullOrEmpty(grouper.GrouperDesc))
+				textField1.text = grouper.GrouperName;
+			else
+				textField1.text = $"{grouper.GrouperName} ({grouper.GrouperDesc})";
 		}
 		private void GrouperListView_onSelectionChange(IEnumerable<object> objs)
 		{
@@ -205,11 +241,11 @@ namespace YooAsset.Editor
 			var selectGrouper = _grouperListView.selectedItem as AssetBundleGrouper;
 			if (selectGrouper == null)
 			{
-				_rightContainer.visible = false;
+				_grouperContainer.visible = false;
 				return;
 			}
 
-			_rightContainer.visible = true;
+			_grouperContainer.visible = true;
 			_collectorListView.Clear();
 			_collectorListView.ClearSelection();
 			_collectorListView.itemsSource = selectGrouper.Collectors;

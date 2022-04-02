@@ -32,6 +32,17 @@ namespace YooAsset.Editor
 
 
 		/// <summary>
+		/// 检测配置错误
+		/// </summary>
+		public void CheckConfigError()
+		{
+			foreach(var collector in Collectors)
+			{
+				collector.CheckConfigError();
+			}
+		}
+
+		/// <summary>
 		/// 获取打包收集的资源文件
 		/// </summary>
 		public List<CollectAssetInfo> GetAllCollectAssets()
