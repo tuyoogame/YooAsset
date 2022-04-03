@@ -50,9 +50,9 @@ YooAsset是一套用于Unity3D的资源管理系统，用于帮助研发团队�
 2. [资源更新](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial2.md)
 3. [资源加载](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial3.md)
 
-### 进阶教程
+### 视频教程
 
-1. [资源版本管理](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AdvancedTutorial1.md)
+Coming soon...
 
 ### 友情链接
 
