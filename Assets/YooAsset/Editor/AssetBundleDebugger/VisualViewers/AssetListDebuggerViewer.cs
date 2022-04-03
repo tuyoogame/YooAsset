@@ -234,9 +234,7 @@ namespace YooAsset.Editor
 		private void FillDependListView(DebugProviderInfo providerInfo)
 		{
 			_dependListView.Clear();
-#if UNITY_2020_1_OR_NEWER
 			_dependListView.ClearSelection();
-#endif
 			_dependListView.itemsSource = providerInfo.BundleInfos;
 		}
 	}

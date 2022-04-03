@@ -237,9 +237,7 @@ namespace YooAsset.Editor
 		private void FillIncludeListView(DebugBundleInfo bundleInfo)
 		{
 			_includeListView.Clear();
-#if UNITY_2020_1_OR_NEWER
 			_includeListView.ClearSelection();
-#endif
 
 			List<DebugProviderInfo> source = new List<DebugProviderInfo>();		
 			foreach(var providerInfo in _debugReport.ProviderInfos)
