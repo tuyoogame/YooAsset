@@ -216,9 +216,7 @@ namespace YooAsset.Editor
 			}
 
 			_includeListView.Clear();
-#if UNITY_2020_1_OR_NEWER
 			_includeListView.ClearSelection();
-#endif
 			_includeListView.itemsSource = containsList;
 			_bottomBar1.text = $"Include Assets ({containsList.Count})";
 		}

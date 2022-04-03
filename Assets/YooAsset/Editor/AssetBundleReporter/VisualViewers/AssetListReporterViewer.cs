@@ -199,9 +199,7 @@ namespace YooAsset.Editor
 			}
 
 			_dependListView.Clear();
-#if UNITY_2020_1_OR_NEWER
 			_dependListView.ClearSelection();
-#endif
 			_dependListView.itemsSource = bundles;
 			_bottomBar1.text = $"Depend Bundles ({bundles.Count})";
 		}
