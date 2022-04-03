@@ -15,7 +15,7 @@ namespace YooAsset.Editor
 	/// </summary>
 	public static class EditorTools
 	{
-		#region Assembly
+#region Assembly
 		/// <summary>
 		/// 调用私有的静态方法
 		/// </summary>
@@ -49,9 +49,9 @@ namespace YooAsset.Editor
 			}
 			return methodInfo.Invoke(null, parameters);
 		}
-		#endregion
+#endregion
 
-		#region EditorUtility
+#region EditorUtility
 		/// <summary>
 		/// 搜集资源
 		/// </summary>
@@ -156,9 +156,9 @@ namespace YooAsset.Editor
 		{
 			EditorUtility.ClearProgressBar();
 		}
-		#endregion
+#endregion
 
-		#region EditorWindow
+#region EditorWindow
 		public static void FocusUnitySceneWindow()
 		{
 			EditorWindow.FocusWindowIfItsOpen<SceneView>();
@@ -188,9 +188,9 @@ namespace YooAsset.Editor
 			System.Type T = Assembly.Load("UnityEditor").GetType("UnityEditor.ConsoleWindow");
 			EditorWindow.GetWindow(T, false, "Console", true);
 		}
-		#endregion
+#endregion
 
-		#region 控制台
+#region 控制台
 		private static MethodInfo _clearConsoleMethod;
 		private static MethodInfo ClearConsoleMethod
 		{
@@ -213,9 +213,9 @@ namespace YooAsset.Editor
 		{
 			ClearConsoleMethod.Invoke(new object(), null);
 		}
-		#endregion
+#endregion
 
-		#region 文件
+#region 文件
 		/// <summary>
 		/// 创建文件所在的目录
 		/// </summary>
@@ -409,9 +409,9 @@ namespace YooAsset.Editor
 			else
 				return Encoding.UTF8.GetString(bytes.ToArray());
 		}
-		#endregion
+#endregion
 
-		#region 路径
+#region 路径
 		private static string YooAssetPath;
 
 		/// <summary>
@@ -504,9 +504,9 @@ namespace YooAsset.Editor
 			}
 			return string.Empty;
 		}
-		#endregion
+#endregion
 
-		#region 字符串
+#region 字符串
 		/// <summary>
 		/// 是否含有中文
 		/// </summary>
@@ -567,9 +567,9 @@ namespace YooAsset.Editor
 			else
 				return content.Substring(startIndex + key.Length);
 		}
-		#endregion
+#endregion
 
-		#region 玩家偏好
+#region 玩家偏好
 		// 枚举
 		public static void PlayerSetEnum<T>(string key, T value)
 		{
@@ -581,6 +581,6 @@ namespace YooAsset.Editor
 			string enumName = EditorPrefs.GetString(key, defaultValue.ToString());
 			return StringUtility.NameToEnum<T>(enumName);
 		}
-		#endregion
+#endregion
 	}
 }
