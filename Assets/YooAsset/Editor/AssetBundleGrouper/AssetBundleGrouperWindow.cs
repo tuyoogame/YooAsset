@@ -11,7 +11,7 @@ namespace YooAsset.Editor
 {
 	public class AssetBundleGrouperWindow : EditorWindow
 	{
-		[MenuItem("YooAsset/AssetBundle Grouper", false, 100)]
+		[MenuItem("YooAsset/AssetBundle Grouper", false, 101)]
 		public static void ShowExample()
 		{
 			AssetBundleGrouperWindow window = GetWindow<AssetBundleGrouperWindow>();
