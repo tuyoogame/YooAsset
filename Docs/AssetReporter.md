@@ -2,11 +2,11 @@
 
 报告工具，可以查看概览信息（Summary），资源对象列表信息（AssetView），资源包列表信息（BundleView）。
 
-注意：该工具仅支持Unity2019+
+**注意**：该工具仅支持Unity2019+
 
 ### 概览视图
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img1.jpg)
+![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img1.png)
 
 ### 资源对象列表视图
 

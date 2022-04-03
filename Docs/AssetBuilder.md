@@ -1,6 +1,6 @@
 # 资源构建
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetBuilder-img1.jpg)
+![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetBuilder-img1.png)
 
 ### 界面介绍
 
@@ -19,10 +19,6 @@
 - **Encryption Services**
 
   加密服务类列表。
-
-- **Redundancy Services**
-
-  冗余服务类列表。
 
 - **Append Extension**
 
@@ -110,7 +106,6 @@ private static void BuildInternal(BuildTarget buildTarget)
     buildParameters.CompressOption = ECompressOption.LZ4;
     buildParameters.AppendFileExtension = false;
     buildParameters.EncryptionServices = new GameEncryption();
-    buildParameters.RedundancyServices = null;
     buildParameters.IsForceRebuild = true;
     buildParameters.BuildinTags = "buildin";
 
