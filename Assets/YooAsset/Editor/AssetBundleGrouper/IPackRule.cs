@@ -1,9 +1,6 @@
 ﻿
 namespace YooAsset.Editor
 {
-	/// <summary>
-	/// 打包规则数据
-	/// </summary>
 	public struct PackRuleData
 	{
 		public string AssetPath;		

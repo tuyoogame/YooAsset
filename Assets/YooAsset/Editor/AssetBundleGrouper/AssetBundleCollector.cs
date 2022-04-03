@@ -40,7 +40,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public void CheckConfigError()
 		{
-			if(AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(CollectPath) == null)
+			if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(CollectPath) == null)
 				throw new Exception($"Invalid collect path : {CollectPath}");
 
 			if (AssetBundleGrouperSettingData.HasPackRuleName(PackRuleName) == false)
@@ -137,7 +137,7 @@ namespace YooAsset.Editor
 
 			// 根据规则设置过滤资源文件
 			IFilterRule filterRuleInstance = AssetBundleGrouperSettingData.GetFilterRuleInstance(FilterRuleName);
-			return filterRuleInstance.IsCollectAsset(assetPath);
+			return filterRuleInstance.IsCollectAsset(new FilterRuleData(assetPath));
 		}
 		private string GetBundleName(AssetBundleGrouper grouper, string assetPath)
 		{

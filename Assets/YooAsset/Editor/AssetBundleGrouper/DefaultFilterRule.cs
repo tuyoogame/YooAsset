@@ -9,7 +9,7 @@ namespace YooAsset.Editor
 	/// </summary>
 	public class CollectAll : IFilterRule
 	{
-		public bool IsCollectAsset(string assetPath)
+		public bool IsCollectAsset(FilterRuleData data)
 		{
 			return true;
 		}
@@ -20,9 +20,9 @@ namespace YooAsset.Editor
 	/// </summary>
 	public class CollectScene : IFilterRule
 	{
-		public bool IsCollectAsset(string assetPath)
+		public bool IsCollectAsset(FilterRuleData data)
 		{
-			return Path.GetExtension(assetPath) == ".unity";
+			return Path.GetExtension(data.AssetPath) == ".unity";
 		}
 	}
 	
@@ -31,9 +31,9 @@ namespace YooAsset.Editor
 	/// </summary>
 	public class CollectPrefab : IFilterRule
 	{
-		public bool IsCollectAsset(string assetPath)
+		public bool IsCollectAsset(FilterRuleData data)
 		{
-			return Path.GetExtension(assetPath) == ".prefab";
+			return Path.GetExtension(data.AssetPath) == ".prefab";
 		}
 	}
 
@@ -42,9 +42,9 @@ namespace YooAsset.Editor
 	/// </summary>
 	public class CollectSprite : IFilterRule
 	{
-		public bool IsCollectAsset(string assetPath)
+		public bool IsCollectAsset(FilterRuleData data)
 		{
-			if (AssetDatabase.GetMainAssetTypeAtPath(assetPath) == typeof(Sprite))
+			if (AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath) == typeof(Sprite))
 				return true;
 			else
 				return false;
