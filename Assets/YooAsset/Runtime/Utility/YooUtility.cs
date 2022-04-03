@@ -200,9 +200,10 @@ namespace YooAsset
 				string[] splits = str.Split(separator);
 				foreach (string split in splits)
 				{
-					if (!String.IsNullOrEmpty(split))
+					string value = split.Trim(); //移除首尾空格
+					if (!String.IsNullOrEmpty(value))
 					{
-						result.Add(split);
+						result.Add(value);
 					}
 				}
 			}
