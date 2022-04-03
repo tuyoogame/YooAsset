@@ -1,122 +1,141 @@
-﻿using System;
-using System.IO;
+﻿#if UNITY_2019_4_OR_NEWER
+using System;
 using System.Linq;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
 	public class AssetBundleBuilderWindow : EditorWindow
 	{
-		static AssetBundleBuilderWindow _thisInstance;
-
 		[MenuItem("YooAsset/AssetBundle Builder", false, 102)]
-		static void ShowWindow()
+		public static void ShowExample()
 		{
-			if (_thisInstance == null)
-			{
-				_thisInstance = EditorWindow.GetWindow(typeof(AssetBundleBuilderWindow), false, "资源包构建工具", true) as AssetBundleBuilderWindow;
-				_thisInstance.minSize = new Vector2(800, 600);
-			}
-			_thisInstance.Show();
+			AssetBundleBuilderWindow window = GetWindow<AssetBundleBuilderWindow>();
+			window.titleContent = new GUIContent("资源包构建工具");
+			window.minSize = new Vector2(800, 600);
 		}
 
-		// 构建器
-		private readonly AssetBundleBuilder _assetBuilder = new AssetBundleBuilder();
-
-		// 构建参数
-		private int _buildVersion;
 		private BuildTarget _buildTarget;
-		private ECompressOption _compressOption;
-		private bool _appendExtension = false;
-		private bool _forceRebuild = false;
-		private string _buildinTags = string.Empty;
-
-		// 加密类相关
 		private List<Type> _encryptionServicesClassTypes;
-		private string[] _encryptionServicesClassNames;
-		private int _encryptionServicesSelectIndex = -1;
+		private List<string> _encryptionServicesClassNames;
 
-		// GUI相关
-		private bool _isInit = false;
-		private GUIStyle _centerStyle;
-		private GUIStyle _leftStyle;
+		private TextField _buildOutputTxt;
+		private IntegerField _buildVersionField;
+		private EnumField _compressionField;
+		private PopupField<string> _encryptionField;
+		private Toggle _appendExtensionToggle;
+		private Toggle _forceRebuildToggle;
+		private TextField _buildTagsTxt;
 
 
-		private void OnGUI()
+		public void CreateGUI()
 		{
-			InitInternal();
+			VisualElement root = this.rootVisualElement;
 
-			// 标题
-			EditorGUILayout.LabelField("Build setup", _centerStyle);
-			EditorGUILayout.Space();
-
-			// 输出路径
-			string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
-			string pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(defaultOutputRoot, _buildTarget);
-			EditorGUILayout.LabelField("Build Output", pipelineOutputDirectory);
-
-			// 构建参数
-			_buildVersion = EditorGUILayout.IntField("Build Version", _buildVersion, GUILayout.MaxWidth(300));
-			_compressOption = (ECompressOption)EditorGUILayout.EnumPopup("Compression", _compressOption, GUILayout.MaxWidth(300));
-			if (_encryptionServicesClassNames.Length > 0)
-				_encryptionServicesSelectIndex = EditorGUILayout.Popup("Encryption Services", _encryptionServicesSelectIndex, _encryptionServicesClassNames, GUILayout.MaxWidth(300));
-			_appendExtension = GUILayout.Toggle(_appendExtension, "Append Extension", GUILayout.MaxWidth(120));
-			_forceRebuild = GUILayout.Toggle(_forceRebuild, "Force Rebuild", GUILayout.MaxWidth(120));
-			if (_forceRebuild)
-				_buildinTags = EditorGUILayout.TextField("Buildin Tags", _buildinTags);
-
-			// 构建按钮
-			EditorGUILayout.Space();
-			if (GUILayout.Button("Build", GUILayout.MaxHeight(40)))
+			// 加载布局文件
+			string rootPath = EditorTools.GetYooAssetPath();
+			string uxml = $"{rootPath}/Editor/AssetBundleBuilder/{nameof(AssetBundleBuilderWindow)}.uxml";
+			var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
+			if (visualAsset == null)
 			{
-				string title;
-				string content;
-				if (_forceRebuild)
+				Debug.LogError($"Not found {nameof(AssetBundleBuilderWindow)}.uxml : {uxml}");
+				return;
+			}
+			visualAsset.CloneTree(root);
+
+			try
+			{
+				_buildTarget = EditorUserBuildSettings.activeBuildTarget;
+				_encryptionServicesClassTypes = GetEncryptionServicesClassTypes();
+				_encryptionServicesClassNames = _encryptionServicesClassTypes.Select(t => t.FullName).ToList();
+
+				// 输出目录
+				string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
+				string pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(defaultOutputRoot, _buildTarget);
+				_buildOutputTxt = root.Q<TextField>("BuildOutput");
+				_buildOutputTxt.SetValueWithoutNotify(pipelineOutputDirectory);
+				_buildOutputTxt.SetEnabled(false);
+
+				// 构建版本
+				var appVersion = new Version(Application.version);
+				_buildVersionField = root.Q<IntegerField>("BuildVersion");
+				_buildVersionField.SetValueWithoutNotify(appVersion.Revision);
+
+				// 压缩方式
+				_compressionField = root.Q<EnumField>("Compression");
+				_compressionField.Init(ECompressOption.LZ4);
+				_compressionField.SetValueWithoutNotify(ECompressOption.LZ4);
+				_compressionField.style.width = 300;
+
+				// 加密方法
+				var encryptionContainer = root.Q("EncryptionContainer");
+				if (_encryptionServicesClassNames.Count > 0)
 				{
-					title = "警告";
-					content = "确定开始强制构建吗，这样会删除所有已有构建的文件";
+					_encryptionField = new PopupField<string>(_encryptionServicesClassNames, 0);
+					_encryptionField.label = "Encryption";
+					_encryptionField.style.width = 300;
+					encryptionContainer.Add(_encryptionField);
 				}
 				else
 				{
-					title = "提示";
-					content = "确定开始增量构建吗";
+					_encryptionField = new PopupField<string>();
+					_encryptionField.label = "Encryption";
+					_encryptionField.style.width = 300;
+					encryptionContainer.Add(_encryptionField);
 				}
-				if (EditorUtility.DisplayDialog(title, content, "Yes", "No"))
+
+				// 附加后缀格式
+				_appendExtensionToggle = root.Q<Toggle>("AppendExtension");
+
+				// 强制构建
+				_forceRebuildToggle = root.Q<Toggle>("ForceRebuild");
+				_forceRebuildToggle.SetValueWithoutNotify(true);
+				_forceRebuildToggle.RegisterValueChangedCallback(evt =>
 				{
-					SaveSettingsToPlayerPrefs();
-					EditorTools.ClearUnityConsole();
-					EditorApplication.delayCall += ExecuteBuild;
-				}
-				else
-				{
-					Debug.LogWarning("[Build] 打包已经取消");
-				}
+					_buildTagsTxt.SetEnabled(_forceRebuildToggle.value);
+				});
+
+				// 内置标签
+				_buildTagsTxt = root.Q<TextField>("BuildinTags");
+				_buildTagsTxt.SetEnabled(_forceRebuildToggle.value);
+
+				// 构建按钮
+				var buildButton = root.Q<Button>("Build");
+				buildButton.clicked += BuildButton_clicked; ;
+			}
+			catch (Exception e)
+			{
+				Debug.LogError(e.ToString());
 			}
 		}
-		private void InitInternal()
+
+		private void BuildButton_clicked()
 		{
-			if (_isInit)
-				return;
-			_isInit = true;
-
-			// GUI相关
-			_centerStyle = new GUIStyle(GUI.skin.GetStyle("Label"));
-			_centerStyle.alignment = TextAnchor.UpperCenter;
-			_leftStyle = new GUIStyle(GUI.skin.GetStyle("Label"));
-			_leftStyle.alignment = TextAnchor.MiddleLeft;
-
-			// 构建参数
-			var appVersion = new Version(Application.version);
-			_buildVersion = appVersion.Revision;
-			_buildTarget = EditorUserBuildSettings.activeBuildTarget;
-
-			_encryptionServicesClassTypes = GetEncryptionServicesClassTypes();
-			_encryptionServicesClassNames = _encryptionServicesClassTypes.Select(t => t.FullName).ToArray();
-
-			// 读取配置
-			LoadSettingsFromPlayerPrefs();
+			string title;
+			string content;
+			if (_forceRebuildToggle.value)
+			{
+				title = "警告";
+				content = "确定开始强制构建吗，这样会删除所有已有构建的文件";
+			}
+			else
+			{
+				title = "提示";
+				content = "确定开始增量构建吗";
+			}
+			if (EditorUtility.DisplayDialog(title, content, "Yes", "No"))
+			{
+				EditorTools.ClearUnityConsole();
+				EditorApplication.delayCall += ExecuteBuild;
+			}
+			else
+			{
+				Debug.LogWarning("[Build] 打包已经取消");
+			}
 		}
 
 		/// <summary>
@@ -129,55 +148,36 @@ namespace YooAsset.Editor
 			buildParameters.VerifyBuildingResult = true;
 			buildParameters.OutputRoot = defaultOutputRoot;
 			buildParameters.BuildTarget = _buildTarget;
-			buildParameters.BuildVersion = _buildVersion;
-			buildParameters.CompressOption = _compressOption;
-			buildParameters.AppendFileExtension = _appendExtension;
+			buildParameters.BuildVersion = _buildVersionField.value;
+			buildParameters.CompressOption = (ECompressOption)_compressionField.value;
+			buildParameters.AppendFileExtension = _appendExtensionToggle.value;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
-			buildParameters.ForceRebuild = _forceRebuild;
-			buildParameters.BuildinTags = _buildinTags;
-			_assetBuilder.Run(buildParameters);
+			buildParameters.ForceRebuild = _forceRebuildToggle.value;
+			buildParameters.BuildinTags = _buildTagsTxt.value;
+
+			AssetBundleBuilder builder = new AssetBundleBuilder();
+			builder.Run(buildParameters);
 		}
 
+		/// <summary>
+		/// 获取加密类的类型列表
+		/// </summary>
 		private List<Type> GetEncryptionServicesClassTypes()
 		{
 			List<Type> classTypes = AssemblyUtility.GetAssignableTypes(AssemblyUtility.UnityDefaultAssemblyEditorName, typeof(IEncryptionServices));
 			return classTypes;
 		}
+
+		/// <summary>
+		/// 创建加密类的实例
+		/// </summary>
 		private IEncryptionServices CreateEncryptionServicesInstance()
 		{
-			if (_encryptionServicesSelectIndex < 0)
+			if (_encryptionField.index < 0)
 				return null;
-			var classType = _encryptionServicesClassTypes[_encryptionServicesSelectIndex];
+			var classType = _encryptionServicesClassTypes[_encryptionField.index];
 			return (IEncryptionServices)Activator.CreateInstance(classType);
 		}
-
-		#region 配置相关
-		private const string StrEditorCompressOption = "StrEditorCompressOption";
-		private const string StrEditorAppendExtension = "StrEditorAppendExtension";
-		private const string StrEditorForceRebuild = "StrEditorForceRebuild";
-		private const string StrEditorBuildinTags = "StrEditorBuildinTags";
-
-		/// <summary>
-		/// 存储配置
-		/// </summary>
-		private void SaveSettingsToPlayerPrefs()
-		{
-			EditorTools.PlayerSetEnum<ECompressOption>(StrEditorCompressOption, _compressOption);
-			EditorPrefs.SetBool(StrEditorAppendExtension, _appendExtension);
-			EditorPrefs.SetBool(StrEditorForceRebuild, _forceRebuild);
-			EditorPrefs.SetString(StrEditorBuildinTags, _buildinTags);
-		}
-
-		/// <summary>
-		/// 读取配置
-		/// </summary>
-		private void LoadSettingsFromPlayerPrefs()
-		{
-			_compressOption = EditorTools.PlayerGetEnum<ECompressOption>(StrEditorCompressOption, ECompressOption.Uncompressed);
-			_appendExtension = EditorPrefs.GetBool(StrEditorAppendExtension, false);
-			_forceRebuild = EditorPrefs.GetBool(StrEditorForceRebuild, false);
-			_buildinTags = EditorPrefs.GetString(StrEditorBuildinTags, string.Empty);
-		}
-		#endregion
 	}
 }
+#endif

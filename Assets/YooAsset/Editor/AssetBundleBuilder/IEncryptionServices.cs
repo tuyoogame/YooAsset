@@ -6,8 +6,8 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 检测是否需要加密
 		/// </summary>
-		bool Check(string filePath);
-
+		bool Check(string bundleName);
+		
 		/// <summary>
 		/// 加密方法
 		/// </summary>

@@ -49,13 +49,18 @@ namespace YooAsset.Editor
 			int progressValue = 0;
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
-				var bundleName = bundleInfo.BundleName;
-				string filePath = $"{buildParameters.PipelineOutputDirectory}/{bundleName}";
-				if (encryptionServices.Check(filePath))
+				if (encryptionServices.Check(bundleInfo.BundleName))
 				{
-					encryptList.Add(bundleName);
+					if (bundleInfo.IsRawFile)
+					{
+						UnityEngine.Debug.LogWarning($"Encryption not support raw file : {bundleInfo.BundleName}");
+						continue;
+					}
+
+					encryptList.Add(bundleInfo.BundleName);
 
 					// 注意：通过判断文件合法性，规避重复加密一个文件
+					string filePath = $"{buildParameters.PipelineOutputDirectory}/{bundleInfo.BundleName}";
 					byte[] fileData = File.ReadAllBytes(filePath);
 					if (EditorTools.CheckBundleFileValid(fileData))
 					{
