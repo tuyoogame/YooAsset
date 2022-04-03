@@ -8,7 +8,7 @@
 
 **系统需求**
 
-支持版本: Unity2018.4+
+支持版本: Unity2019.4+
 
 支持平台: Windows、OSX、Android、iOS
 

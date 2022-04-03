@@ -6,6 +6,8 @@
 
 导出按钮可以将配置数据导出为XML文件，导入按钮可以导入保存的XML文件。
 
+**注意**：该工具仅支持Unity2019+
+
 #### 着色器收集
 
 - Auto Collect Shaders
@@ -89,5 +91,4 @@ public class CollectScene : IFilterRule
 - **AssetTags**
 
   资源分类标签列表，该收集器下收集的资源会全部被打上该标签。
-
 
