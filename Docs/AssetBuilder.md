@@ -16,9 +16,9 @@
 
   资源包的压缩方式。
 
-- **Encryption Services**
+- **Encryption**
 
-  加密服务类列表。
+  加密类列表。
 
 - **Append Extension**
 
@@ -32,9 +32,9 @@
 
   标记为安装包里的资源标签列表。构建成功后，会将相关标记的资源包拷贝到StreamingAssets文件夹下。
 
-- **Build**
+- **构建**
 
-  点击Build按钮会开始构建流程，构建流程分为多个节点顺序执行，如果某个节点发生错误，会导致构建失败。错误信息可以在控制台查看。
+  点击构建按钮会开始构建流程，构建流程分为多个节点顺序执行，如果某个节点发生错误，会导致构建失败。错误信息可以在控制台查看。
 
 ### 资源包加密
 
@@ -49,10 +49,10 @@ public class GameEncryption : IEncryptionServices
     /// <summary>
     /// 检测资源包是否需要加密
     /// </summary>
-    bool IEncryptionServices.Check(string filePath)
+    bool IEncryptionServices.Check(string bundleName)
     {
         // 对配置表相关的资源包进行加密
-        return filePath.Contains("Assets/Config/");
+        return bundleName.Contains("assets/config/");
     }
 
     /// <summary>
