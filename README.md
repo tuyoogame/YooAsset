@@ -1,4 +1,4 @@
-###### [![License](https://img.shields.io/github/license/tuyoogame/YooAsset)](https://github/tuyoogame/YooAsset/LICENSE)
+###### [![License](https://img.shields.io/github/license/tuyoogame/YooAsset)](https://github.com/tuyoogame/YooAsset/blob/master/LICENSE)
 
 # YooAsset
 
