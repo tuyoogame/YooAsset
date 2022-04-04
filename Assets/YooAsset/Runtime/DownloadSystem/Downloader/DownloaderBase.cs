@@ -44,11 +44,11 @@ namespace YooAsset
 		}
 
 
-		internal DownloaderBase(BundleInfo bundleInfo)
+		public DownloaderBase(BundleInfo bundleInfo)
 		{
 			_bundleInfo = bundleInfo;
 		}
-		internal void SendRequest(int failedTryAgain, int timeout)
+		public void SendRequest(int failedTryAgain, int timeout)
 		{
 			if (string.IsNullOrEmpty(_bundleInfo.LocalPath))
 				throw new System.ArgumentNullException();
@@ -60,12 +60,9 @@ namespace YooAsset
 				_steps = ESteps.CreateDownload;
 			}
 		}
-		internal void SetDone()
-		{
-			_steps = ESteps.Succeed;
-		}
-		internal abstract void Update();
-
+		public abstract void Update();
+		public abstract void Abort();
+		
 		/// <summary>
 		/// 获取网络请求地址
 		/// </summary>

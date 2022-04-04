@@ -18,6 +18,7 @@ namespace YooAsset
 			private const int BufferSize = 1042 * 4;
 
 			private Thread _thread;
+			private bool _running = true;
 			private string _url;
 			private string _savePath;
 			private string _fileHash;
@@ -29,11 +30,6 @@ namespace YooAsset
 			/// 下载是否结束
 			/// </summary>
 			public bool IsDone = false;
-
-			/// <summary>
-			/// 下载结果（成功或失败）
-			/// </summary>
-			public bool Result = true;
 
 			/// <summary>
 			/// 错误日志
@@ -69,51 +65,57 @@ namespace YooAsset
 			}
 
 			/// <summary>
-			/// 销毁下载器
+			/// 中断下载线程
 			/// </summary>
-			public void Dispose()
+			public void Abort()
 			{
-				if (_thread != null)
-				{
-					_thread.Abort();
-					_thread = null;
-				}
+				_running = false;
 			}
 
+			/// <summary>
+			/// 下载结果
+			/// </summary>
+			public bool HasError()
+			{
+				if (string.IsNullOrEmpty(Error))
+					return false;
+				else
+					return true;
+			}
 
 			private void ThreadRun()
 			{
 				long fileTotalSize = _fileSize;
 
 				FileStream fileStream = null;
-				Stream webStream = null;
-				HttpWebResponse fileResponse = null;
+				HttpWebResponse webResponse = null;
+				Stream responseStream = null;
 
 				try
 				{
 					// 创建文件流
 					fileStream = new FileStream(_savePath, FileMode.OpenOrCreate, FileAccess.Write);
-					long fileLength = fileStream.Length - 1;
+					long fileLength = fileStream.Length;
 
 					// 创建HTTP下载请求
-					HttpWebRequest fileRequest = WebRequest.Create(_url) as HttpWebRequest;
-					fileRequest.Timeout = _timeout * 1000;
-					fileRequest.ProtocolVersion = HttpVersion.Version10;
+					HttpWebRequest webRequest = WebRequest.Create(_url) as HttpWebRequest;
+					webRequest.Timeout = _timeout * 1000;
+					webRequest.ProtocolVersion = HttpVersion.Version10;
 					if (fileLength > 0)
 					{
 						// 注意：设置远端请求文件的起始位置
-						fileRequest.AddRange(fileLength);
+						webRequest.AddRange(fileLength);
 						// 注意：设置本地文件流的起始位置
-						fileStream.Seek(-1, SeekOrigin.End);
+						fileStream.Seek(fileLength, SeekOrigin.Begin);
 					}
 
 					// 读取下载数据并保存到文件
-					fileResponse = fileRequest.GetResponse() as HttpWebResponse;
-					webStream = fileResponse.GetResponseStream();
+					webResponse = webRequest.GetResponse() as HttpWebResponse;
+					responseStream = webResponse.GetResponseStream();
 					byte[] buffer = new byte[BufferSize];
-					while (true)
+					while (_running)
 					{
-						int length = webStream.Read(buffer, 0, buffer.Length);
+						int length = responseStream.Read(buffer, 0, buffer.Length);
 						if (length <= 0)
 							break;
 
@@ -129,20 +131,20 @@ namespace YooAsset
 				}
 				catch (Exception e)
 				{
-					Result = false;
 					Error = e.Message;
 				}
 				finally
 				{
-					if (webStream != null)
+					if (responseStream != null)
 					{
-						webStream.Close();
-						webStream.Dispose();
+						responseStream.Close();
+						responseStream.Dispose();
 					}
 
-					if (fileResponse != null)
+					if (webResponse != null)
 					{
-						fileResponse.Close();
+						webResponse.Close();
+						webResponse.Dispose();
 					}
 
 					if (fileStream != null)
@@ -152,16 +154,19 @@ namespace YooAsset
 					}
 
 					// 验证下载文件完整性
-					if (Result)
+					if (DownloadedBytes == (ulong)_fileSize)
 					{
 						bool verfiyResult = DownloadSystem.CheckContentIntegrity(_savePath, _fileSize, _fileCRC);
 						if (verfiyResult == false)
 						{
-							Result = false;
-							Error = $"Verify file content failed : {_fileHash}";
+							Error = $"Verify download content failed : {_fileHash}";
 							if (File.Exists(_savePath))
 								File.Delete(_savePath);
 						}
+					}
+					else
+					{
+						Error = $"Download content is incomplete : {_fileHash}";
 					}
 
 					IsDone = true;
@@ -173,10 +178,10 @@ namespace YooAsset
 		private ThreadDownloader _threadDownloader;
 		private float _tryAgainTimer;
 
-		internal HttpDownloader(BundleInfo bundleInfo) : base(bundleInfo)
+		public HttpDownloader(BundleInfo bundleInfo) : base(bundleInfo)
 		{
 		}
-		internal override void Update()
+		public override void Update()
 		{
 			if (_steps == ESteps.None)
 				return;
@@ -203,12 +208,7 @@ namespace YooAsset
 				if (_threadDownloader.IsDone == false)
 					return;
 
-				if (_threadDownloader.Result)
-				{
-					DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.BundleName);
-					_steps = ESteps.Succeed;
-				}
-				else
+				if (_threadDownloader.HasError())
 				{
 					_lastError = _threadDownloader.Error;
 					ReportError();
@@ -219,9 +219,11 @@ namespace YooAsset
 					else
 						_steps = ESteps.Failed;
 				}
-
-				// 释放下载器
-				_threadDownloader.Dispose();
+				else
+				{
+					DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.BundleName);
+					_steps = ESteps.Succeed;
+				}
 			}
 
 			// 重新尝试下载
@@ -233,6 +235,19 @@ namespace YooAsset
 					_failedTryAgain--;
 					_steps = ESteps.CreateDownload;
 					YooLogger.Warning($"Try again download : {_requestURL}");
+				}
+			}
+		}
+		public override void Abort()
+		{
+			if(IsDone() == false)
+			{
+				_steps = ESteps.Failed;
+				_lastError = "user abort";
+				if (_threadDownloader != null)
+				{
+					_threadDownloader.Abort();
+					_threadDownloader = null;
 				}
 			}
 		}

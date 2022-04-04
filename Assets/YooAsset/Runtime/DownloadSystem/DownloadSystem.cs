@@ -15,7 +15,15 @@ namespace YooAsset
 		private static readonly Dictionary<string, DownloaderBase> _downloaderDic = new Dictionary<string, DownloaderBase>();
 		private static readonly List<string> _removeList = new List<string>(100);
 		private static readonly Dictionary<string, string> _cachedHashList = new Dictionary<string, string>(1000);
+		private static int _breakpointResumeFileSize;
 
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		public static void Initialize(int breakpointResumeFileSize)
+		{
+			_breakpointResumeFileSize = breakpointResumeFileSize;
+		}
 
 		/// <summary>
 		/// 更新所有下载器
@@ -40,6 +48,21 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 销毁所有下载器
+		/// </summary>
+		public static void DestroyAll()
+		{
+			foreach (var valuePair in _downloaderDic)
+			{
+				var downloader = valuePair.Value;
+				downloader.Abort();
+			}
+			_downloaderDic.Clear();
+			YooLogger.Log("DownloadSystem destroy all !");
+		}
+
+
+		/// <summary>
 		/// 开始下载资源文件
 		/// 注意：只有第一次请求的参数才是有效的
 		/// </summary>
@@ -52,18 +75,21 @@ namespace YooAsset
 			}
 
 			// 如果资源已经缓存
-			if(ContainsVerifyFile(bundleInfo.Hash))
+			if (ContainsVerifyFile(bundleInfo.Hash))
 			{
-				var newDownloader = new FileDownloader(bundleInfo);
-				newDownloader.SetDone();
-				return newDownloader;
+				var tempDownloader = new TempDownloader(bundleInfo);
+				return tempDownloader;
 			}
 
 			// 创建新的下载器	
 			{
 				YooLogger.Log($"Beginning to download file : {bundleInfo.BundleName} URL : {bundleInfo.RemoteMainURL}");
 				FileUtility.CreateFileDirectory(bundleInfo.LocalPath);
-				var newDownloader = new HttpDownloader(bundleInfo);
+				DownloaderBase newDownloader;
+				if (bundleInfo.SizeBytes >= _breakpointResumeFileSize)
+					newDownloader = new HttpDownloader(bundleInfo);
+				else
+					newDownloader = new FileDownloader(bundleInfo);
 				newDownloader.SendRequest(failedTryAgain, timeout);
 				_downloaderDic.Add(bundleInfo.Hash, newDownloader);
 				return newDownloader;

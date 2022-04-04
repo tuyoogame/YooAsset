@@ -19,10 +19,10 @@ namespace YooAsset
 		private float _tryAgainTimer;
 
 
-		internal FileDownloader(BundleInfo bundleInfo) : base(bundleInfo)
+		public FileDownloader(BundleInfo bundleInfo) : base(bundleInfo)
 		{
 		}
-		internal override void Update()
+		public override void Update()
 		{
 			if (_steps == ESteps.None)
 				return;
@@ -123,6 +123,16 @@ namespace YooAsset
 				}
 			}
 		}
+		public override void Abort()
+		{
+			if (IsDone() == false)
+			{
+				_steps = ESteps.Failed;
+				_lastError = "user abort";
+				DisposeWebRequest();
+			}
+		}
+
 		private void CheckTimeout()
 		{
 			// 注意：在连续时间段内无新增下载数据及判定为超时
