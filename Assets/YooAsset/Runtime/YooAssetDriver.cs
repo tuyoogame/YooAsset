@@ -2,11 +2,16 @@
 
 namespace YooAsset
 {
-    internal class YooAssetDriver : MonoBehaviour
-    {
-        void Update()
-        {
-            YooAssets.InternalUpdate();
-        }
-    }
+	internal class YooAssetDriver : MonoBehaviour
+	{
+		void Update()
+		{
+			YooAssets.InternalUpdate();
+		}
+
+		void OnApplicationQuit()
+		{
+			DownloadSystem.DestroyAll();
+		}
+	}
 }
