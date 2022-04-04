@@ -96,6 +96,11 @@ namespace YooAsset
 			/// 备用的资源服务器下载地址
 			/// </summary>
 			public string FallbackHostServer;
+
+			/// <summary>
+			/// 启用断点续传功能的文件大小
+			/// </summary>
+			public int BreakpointResumeFileSize = int.MaxValue;
 		}
 
 
@@ -167,6 +172,13 @@ namespace YooAsset
 
 			// 初始化异步操作系统
 			OperationSystem.Initialize(parameters.OperationSystemMaxTimeSlice);
+
+			// 初始化下载系统
+			if (_playMode == EPlayMode.HostPlayMode)
+			{
+				var hostPlayModeParameters = parameters as HostPlayModeParameters;
+				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize);
+			}
 
 			// 初始化资源系统
 			if (_playMode == EPlayMode.EditorPlayMode)
