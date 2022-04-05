@@ -1,0 +1,14 @@
+{
+    "name": "com.tuyoogame.yooasset",
+    "displayName": "YooAsset",
+    "version": "0.0.1-preview",
+    "unity": "2019.4",
+    "keywords": [ "YooAsset", "Resources", "AssetBundle" ],
+    "description": "unity3d resources management system",
+    "author": {
+        "name": "TuYoo Games",
+        "url": "https://github.com/tuyoogame/YooAsset"
+    },
+    "dependencies": {
+    }
+}
