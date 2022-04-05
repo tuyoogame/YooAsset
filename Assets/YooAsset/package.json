@@ -9,6 +9,10 @@
         "name": "TuYoo Games",
         "url": "https://github.com/tuyoogame/YooAsset"
     },
-    "dependencies": {
-    }
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tuyoogame/YooAsset"
+    },
+    "relatedPackages": {},
+    "dependencies": {}
 }
