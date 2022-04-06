@@ -1,8 +1,8 @@
 # 快速开始
 
-**下载安装**
+#### **下载安装**
 
-1. 通过PackageManager安装
+1. **通过PackageManager安装**
 
    打开管理界面 **Edit/Project Settings/Package Manager**
 
@@ -19,7 +19,7 @@
 
    ![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/QuickStart-img2.jpg)
 
-2. 通过Packages清单安装
+2. **通过Packages清单安装**
 
    直接修改Packages文件夹下的清单文件manifest.json
 
@@ -41,11 +41,11 @@
    }
    ````
 
-3. 通过Github下载安装
+3. **通过Github下载安装**
 
-   
+   在发布的Release版本中，选择最新版本下载Source Code压缩包。
 
-**系统需求**
+#### **系统需求**
 
 支持版本: Unity2019.4+
 
@@ -53,7 +53,7 @@
 
 开发环境: .NET4.x
 
-**目录结构**
+#### **目录结构**
 
 ````
 Assets
