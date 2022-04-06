@@ -2,9 +2,48 @@
 
 **下载安装**
 
-1. 通过OpenUPM安装
-2. 通过Packages安装
-3. 通过GIT安装
+1. 通过PackageManager安装
+
+   打开管理界面 **Edit/Project Settings/Package Manager**
+
+   ````
+   // 输入以下内容
+   Name: package.openupm.cn
+   URL: https://package.openupm.cn
+   Scope(s): com.tuyoogame.yooasset
+   ````
+
+   ![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/QuickStart-img1.jpg)
+
+   打开管理界面 **Edit/Windows/Package Manager**
+
+   ![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/QuickStart-img2.jpg)
+
+2. 通过Packages清单安装
+
+   直接修改Packages文件夹下的清单文件manifest.json
+
+   ````json
+   {
+     "dependencies": {
+       "com.tuyoogame.yooasset": "0.0.1-preview",
+       ......
+     },
+     "scopedRegistries": [
+       {
+         "name": "package.openupm.cn",
+         "url": "https://package.openupm.cn",
+         "scopes": [
+           "com.tuyoogame.yooasset"
+         ]
+       }
+     ]
+   }
+   ````
+
+3. 通过Github下载安装
+
+   
 
 **系统需求**
 
