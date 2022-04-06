@@ -59,7 +59,12 @@
 
 Coming soon...
 
+### 社区
+
+**QQ群：963240451**
+
+
+
 ### 友情链接
 
 [huatuo](https://github.com/focus-creative-games/huatuo)：华佗是一个**特性完整、零成本、高性能、低内存**的近乎完美的c#热更新方案。
-
