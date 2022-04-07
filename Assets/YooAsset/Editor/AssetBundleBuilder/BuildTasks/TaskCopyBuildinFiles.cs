@@ -38,7 +38,7 @@ namespace YooAsset.Editor
 					continue;
 
 				string sourcePath = $"{pipelineOutputDirectory}/{patchBundle.BundleName}";
-				string destPath = $"{Application.dataPath}/StreamingAssets/{patchBundle.Hash}";
+				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{patchBundle.Hash}";
 				Debug.Log($"拷贝内置文件到流目录：{patchBundle.BundleName}");
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
@@ -46,14 +46,14 @@ namespace YooAsset.Editor
 			// 拷贝清单文件
 			{
 				string sourcePath = $"{pipelineOutputDirectory}/{YooAssetSettingsData.Setting.PatchManifestFileName}";
-				string destPath = $"{Application.dataPath}/StreamingAssets/{YooAssetSettingsData.Setting.PatchManifestFileName}";
+				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{YooAssetSettingsData.Setting.PatchManifestFileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
 			// 拷贝清单哈希文件
 			{
 				string sourcePath = $"{pipelineOutputDirectory}/{YooAssetSettingsData.Setting.PatchManifestHashFileName}";
-				string destPath = $"{Application.dataPath}/StreamingAssets/{YooAssetSettingsData.Setting.PatchManifestHashFileName}";
+				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{YooAssetSettingsData.Setting.PatchManifestHashFileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
