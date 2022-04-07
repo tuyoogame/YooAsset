@@ -224,9 +224,14 @@ namespace YooAsset
 		}
 		protected void InvokeCompletion()
 		{
-			foreach (var handle in _handles)
+			// 注意：创建临时列表是为了防止外部逻辑在回调函数内创建或者释放资源句柄。
+			List<OperationHandleBase> tempers = new List<OperationHandleBase>(_handles);
+			foreach (var hande in tempers)
 			{
-				handle.InvokeCallback();
+				if (hande.IsValid)
+				{
+					hande.InvokeCallback();
+				}
 			}
 			_waitHandle?.Set();
 		}

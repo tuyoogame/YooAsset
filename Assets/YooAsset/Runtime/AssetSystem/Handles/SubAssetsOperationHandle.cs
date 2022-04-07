@@ -10,10 +10,7 @@ namespace YooAsset
 		}
 		internal override void InvokeCallback()
 		{
-			if (IsValid)
-			{
-				_callback?.Invoke(this);
-			}
+			_callback?.Invoke(this);
 		}
 
 		/// <summary>
