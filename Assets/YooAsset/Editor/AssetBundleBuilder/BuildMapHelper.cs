@@ -94,7 +94,7 @@ namespace YooAsset.Editor
 				if (buildAssetInfo.BundleNameIsValid() == false)
 				{
 					string bundleName = defaultPackRule.GetBundleName(new PackRuleData(buildAssetInfo.AssetPath));
-					bundleName =  AssetBundleCollector.RevisedBundleName(bundleName);	
+					bundleName =  AssetBundleCollector.RevisedBundleName(bundleName, false);	
 					buildAssetInfo.SetBundleName(bundleName);	
 				}
 			}

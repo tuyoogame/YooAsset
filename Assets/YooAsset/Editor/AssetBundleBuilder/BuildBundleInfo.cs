@@ -89,10 +89,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string GetAppendExtension()
 		{
-			if (IsRawFile)
-				return $".{YooAssetSettingsData.Setting.RawFileVariant}";
-			else
-				return $".{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+			return System.IO.Path.GetExtension(BundleName);
 		}
 
 		/// <summary>

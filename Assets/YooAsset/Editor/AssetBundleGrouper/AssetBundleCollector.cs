@@ -71,7 +71,7 @@ namespace YooAsset.Editor
 						continue;
 					if (result.ContainsKey(assetPath) == false)
 					{
-						string bundleName = GetBundleName(grouper, assetPath);
+						string bundleName = GetBundleName(grouper, assetPath, isRawAsset);
 						List<string> assetTags = GetAssetTags(grouper);
 						var collectAssetInfo = new CollectAssetInfo(bundleName, assetPath, assetTags, isRawAsset, NotWriteToAssetList);
 						collectAssetInfo.DependAssets = GetAllDependencies(assetPath);
@@ -91,7 +91,7 @@ namespace YooAsset.Editor
 					if (isRawAsset && NotWriteToAssetList)
 						UnityEngine.Debug.LogWarning($"Are you sure raw file are not write to asset list : {assetPath}");
 
-					string bundleName = GetBundleName(grouper, assetPath);
+					string bundleName = GetBundleName(grouper, assetPath, isRawAsset);
 					List<string> assetTags = GetAssetTags(grouper);
 					var collectAssetInfo = new CollectAssetInfo(bundleName, assetPath, assetTags, isRawAsset, NotWriteToAssetList);
 					result.Add(assetPath, collectAssetInfo);
@@ -139,7 +139,7 @@ namespace YooAsset.Editor
 			IFilterRule filterRuleInstance = AssetBundleGrouperSettingData.GetFilterRuleInstance(FilterRuleName);
 			return filterRuleInstance.IsCollectAsset(new FilterRuleData(assetPath));
 		}
-		private string GetBundleName(AssetBundleGrouper grouper, string assetPath)
+		private string GetBundleName(AssetBundleGrouper grouper, string assetPath, bool isRawAsset)
 		{
 			// 如果收集全路径着色器
 			if (AssetBundleGrouperSettingData.Setting.AutoCollectShaders)
@@ -147,14 +147,17 @@ namespace YooAsset.Editor
 				System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
 				if (assetType == typeof(UnityEngine.Shader))
 				{
-					return RevisedBundleName(AssetBundleGrouperSettingData.Setting.ShadersBundleName);
+					string bundleName = AssetBundleGrouperSettingData.Setting.ShadersBundleName;
+					return RevisedBundleName(bundleName, false);
 				}
 			}
 
 			// 根据规则设置获取资源包名称
-			IPackRule packRuleInstance = AssetBundleGrouperSettingData.GetPackRuleInstance(PackRuleName);
-			string bundleName = packRuleInstance.GetBundleName(new PackRuleData(assetPath, CollectPath, grouper.GrouperName));
-			return RevisedBundleName(bundleName);
+			{
+				IPackRule packRuleInstance = AssetBundleGrouperSettingData.GetPackRuleInstance(PackRuleName);
+				string bundleName = packRuleInstance.GetBundleName(new PackRuleData(assetPath, CollectPath, grouper.GrouperName));
+				return RevisedBundleName(bundleName, isRawAsset);
+			}
 		}
 		private List<string> GetAssetTags(AssetBundleGrouper grouper)
 		{
@@ -183,9 +186,18 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 修正资源包名
 		/// </summary>
-		public static string RevisedBundleName(string bundleName)
+		public static string RevisedBundleName(string bundleName, bool isRawBundle)
 		{
-			return EditorTools.GetRegularPath(bundleName).ToLower();
+			if (isRawBundle)
+			{
+				string fullName = $"{bundleName}.{YooAssetSettingsData.Setting.RawFileVariant}";
+				return EditorTools.GetRegularPath(fullName).ToLower();
+			}
+			else
+			{
+				string fullName = $"{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+				return EditorTools.GetRegularPath(fullName).ToLower(); ;
+			}
 		}
 	}
 }
