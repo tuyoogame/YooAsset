@@ -8,7 +8,7 @@
 
 它可以满足商业化游戏的各类需求，并且经历多款百万DAU游戏产品的验证。
 
-### 系统特点
+## 系统特点
 - **安全高效的分包方案**
 
   基于资源对象的标签分包方案，自动对依赖资源包进行分类，避免人工维护成本。可以非常方便的实现零资源安装包，或者全量资源安装包。
@@ -41,7 +41,7 @@
 
   支持线上版本快速回退，支持区分审核版本，测试版本，线上版本，支持灰度更新及测试。
 
-### 入门教程
+## 入门教程
 1. [快速开始](https://github.com/tuyoogame/YooAsset/blob/master/Docs/QuickStart.md)
 2. [全局配置](https://github.com/tuyoogame/YooAsset/blob/master/Docs/Settings.md)
 3. [资源配置](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetGrouper.md)
@@ -50,23 +50,21 @@
 5. [构建报告](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetReporter.md)
 5. [调试器](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetDebugger.md)
 
-### 代码教程
+## 代码教程
 1. [初始化](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial1.md)
 2. [资源更新](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial2.md)
 3. [资源加载](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial3.md)
 
-### 视频教程
+## 视频教程
 
 Coming soon...
 
-### 社区
+## 社区
 
-**QQ群：963240451**
+QQ群：963240451
 
-[**致谢名单**](https://github.com/tuyoogame/YooAsset/blob/master/Docs/Contributor.md)
+[致谢名单](https://github.com/tuyoogame/YooAsset/blob/master/Docs/Contributor.md)👯
 
-
-
-### 友情链接
+## 友情链接
 
 [huatuo](https://github.com/focus-creative-games/huatuo)：华佗是一个**特性完整、零成本、高性能、低内存**的近乎完美的c#热更新方案。
