@@ -2,6 +2,17 @@
 
 All notable changes to this package will be documented in this file.   
 
+## [1.0.2] - 2022-04-07
+
+### Fixed
+
+- 修复在资源加载完成回调内释放自身资源句柄时的异常报错。
+- 修复了资源分组在特殊情况下打包报错的问题。
+
+### Changed
+
+- StreamingAssets目录下增加了用于存放打包资源的总文件夹
+
 ## [1.0.1] - 2022-04-07
 
 ### Fixed
