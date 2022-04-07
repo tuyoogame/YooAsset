@@ -63,6 +63,8 @@ Coming soon...
 
 **QQ群：963240451**
 
+[**致谢名单**](https://github.com/tuyoogame/YooAsset/blob/master/Docs/Contributor.md)
+
 
 
 ### 友情链接
