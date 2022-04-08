@@ -15,6 +15,7 @@ namespace YooAsset
 		private readonly Vector3 _position;
 		private readonly Quaternion _rotation;
 		private readonly Transform _parent;
+		private readonly bool _setPositionRotation;
 		private ESteps _steps = ESteps.None;
 
 		/// <summary>
@@ -23,12 +24,13 @@ namespace YooAsset
 		public GameObject Result = null;
 
 
-		internal InstantiateOperation(AssetOperationHandle handle, Vector3 position, Quaternion rotation, Transform parent)
+		internal InstantiateOperation(AssetOperationHandle handle, Vector3 position, Quaternion rotation, Transform parent, bool setPositionRotation)
 		{
 			_handle = handle;
 			_position = position;
 			_rotation = rotation;
 			_parent = parent;
+			_setPositionRotation = setPositionRotation;
 		}
 		internal override void Start()
 		{
@@ -54,10 +56,20 @@ namespace YooAsset
 					Error = $"{nameof(AssetOperationHandle.AssetObject)} is null.";
 				}
 
-				if (_parent == null)
-					Result = Object.Instantiate(_handle.AssetObject as GameObject, _position, _rotation);
+				if(_setPositionRotation)
+				{
+					if (_parent == null)
+						Result = Object.Instantiate(_handle.AssetObject as GameObject, _position, _rotation);
+					else
+						Result = Object.Instantiate(_handle.AssetObject as GameObject, _position, _rotation, _parent);
+				}
 				else
-					Result = Object.Instantiate(_handle.AssetObject as GameObject, _position, _rotation, _parent);
+				{
+					if (_parent == null)
+						Result = Object.Instantiate(_handle.AssetObject as GameObject);
+					else
+						Result = Object.Instantiate(_handle.AssetObject as GameObject, _parent);
+				}
 
 				_steps = ESteps.Done;
 				Status = EOperationStatus.Succeed;
