@@ -15,7 +15,7 @@ namespace YooAsset.Editor
 		private TemplateContainer _root;
 
 		private ListView _bundleListView;
-		private ListView _includeListView;
+		private ListView _usingListView;
 		private DebugReport _debugReport;
 
 		/// <summary>
@@ -35,7 +35,7 @@ namespace YooAsset.Editor
 			_root = _visualAsset.CloneTree();
 			_root.style.flexGrow = 1f;
 
-			// 资源列表
+			// 资源包列表
 			_bundleListView = _root.Q<ListView>("TopListView");
 			_bundleListView.makeItem = MakeAssetListViewItem;
 			_bundleListView.bindItem = BindAssetListViewItem;
@@ -45,10 +45,10 @@ namespace YooAsset.Editor
 #else
 			_bundleListView.onSelectionChanged += BundleListView_onSelectionChange;
 #endif
-			// 依赖列表
-			_includeListView = _root.Q<ListView>("BottomListView");
-			_includeListView.makeItem = MakeIncludeListViewItem;
-			_includeListView.bindItem = BindIncludeListViewItem;
+			// 使用列表
+			_usingListView = _root.Q<ListView>("BottomListView");
+			_usingListView.makeItem = MakeIncludeListViewItem;
+			_usingListView.bindItem = BindIncludeListViewItem;
 		}
 
 		/// <summary>
@@ -62,7 +62,7 @@ namespace YooAsset.Editor
 		}
 		private List<DebugBundleInfo> FilterViewItems(DebugReport debugReport, string searchKeyWord)
 		{
-			var result = new List<DebugBundleInfo>(debugReport.ProviderInfos.Count);
+			Dictionary<string, DebugBundleInfo> result = new Dictionary<string, DebugBundleInfo>(debugReport.ProviderInfos.Count);
 			foreach (var providerInfo in debugReport.ProviderInfos)
 			{
 				foreach(var bundleInfo in providerInfo.BundleInfos)
@@ -72,10 +72,11 @@ namespace YooAsset.Editor
 						if (bundleInfo.BundleName.Contains(searchKeyWord) == false)
 							continue;
 					}
-					result.Add(bundleInfo);
+					if(result.ContainsKey(bundleInfo.BundleName) == false)
+						result.Add(bundleInfo.BundleName, bundleInfo);
 				}
 			}
-			return result;
+			return result.Values.ToList();
 		}
 
 		/// <summary>
@@ -175,7 +176,7 @@ namespace YooAsset.Editor
 			foreach (var item in objs)
 			{
 				DebugBundleInfo bundleInfo = item as DebugBundleInfo;
-				FillIncludeListView(bundleInfo);
+				FillUsingListView(bundleInfo.BundleName);
 			}
 		}
 
@@ -219,7 +220,7 @@ namespace YooAsset.Editor
 		}
 		private void BindIncludeListViewItem(VisualElement element, int index)
 		{
-			List<DebugProviderInfo> providers = _includeListView.itemsSource as List<DebugProviderInfo>;
+			List<DebugProviderInfo> providers = _usingListView.itemsSource as List<DebugProviderInfo>;
 			DebugProviderInfo providerInfo = providers[index];
 
 			// Asset Path
@@ -234,18 +235,24 @@ namespace YooAsset.Editor
 			var label3 = element.Q<Label>("Label3");
 			label3.text = providerInfo.Status.ToString();
 		}
-		private void FillIncludeListView(DebugBundleInfo bundleInfo)
+		private void FillUsingListView(string bundleName)
 		{
-			_includeListView.Clear();
-			_includeListView.ClearSelection();
+			_usingListView.Clear();
+			_usingListView.ClearSelection();
 
 			List<DebugProviderInfo> source = new List<DebugProviderInfo>();		
 			foreach(var providerInfo in _debugReport.ProviderInfos)
 			{
-				if (providerInfo.BundleInfos.Contains(bundleInfo))
-					source.Add(providerInfo);
+				foreach(var bundleInfo in providerInfo.BundleInfos)
+				{
+					if (bundleInfo.BundleName == bundleName)
+					{
+						source.Add(providerInfo);
+						continue;
+					}					
+				}
 			}
-			_includeListView.itemsSource = source;
+			_usingListView.itemsSource = source;
 		}
 	}
 }
