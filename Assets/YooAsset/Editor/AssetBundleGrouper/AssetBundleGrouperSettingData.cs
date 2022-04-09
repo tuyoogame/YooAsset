@@ -14,6 +14,11 @@ namespace YooAsset.Editor
 		private static readonly Dictionary<string, System.Type> _cacheFilterRuleTypes = new Dictionary<string, System.Type>();
 		private static readonly Dictionary<string, IFilterRule> _cacheFilterRuleInstance = new Dictionary<string, IFilterRule>();
 
+		/// <summary>
+		/// 配置数据是否被修改
+		/// </summary>
+		public static bool IsDirty { private set; get; } = false;
+
 
 		private static AssetBundleGrouperSetting _setting = null;
 		public static AssetBundleGrouperSetting Setting
@@ -147,8 +152,10 @@ namespace YooAsset.Editor
 		{
 			if (Setting != null)
 			{
+				IsDirty = false;
 				EditorUtility.SetDirty(Setting);
 				AssetDatabase.SaveAssets();
+				Debug.Log($"{nameof(AssetBundleGrouperSetting)}.asset is saved!");
 			}
 		}
 
@@ -202,42 +209,42 @@ namespace YooAsset.Editor
 		// 着色器编辑相关
 		public static void ModifyShader(bool isCollectAllShaders, string shadersBundleName)
 		{
-			if (string.IsNullOrEmpty(shadersBundleName))
-				return;
 			Setting.AutoCollectShaders = isCollectAllShaders;
 			Setting.ShadersBundleName = shadersBundleName;
-			SaveFile();
+			IsDirty = true;
 		}
 
 		// 资源分组编辑相关
-		public static void CreateGrouper(string grouperName, string grouperDesc, string assetTags, bool saveFile = true)
+		public static void CreateGrouper(string grouperName, string grouperDesc, string assetTags)
 		{
 			AssetBundleGrouper grouper = new AssetBundleGrouper();
 			grouper.GrouperName = grouperName;
 			grouper.GrouperDesc = grouperDesc;
 			grouper.AssetTags = assetTags;
 			Setting.Groupers.Add(grouper);
-
-			if (saveFile)
-				SaveFile();
+			IsDirty = true;
 		}
 		public static void RemoveGrouper(AssetBundleGrouper grouper)
 		{
 			if (Setting.Groupers.Remove(grouper))
 			{
-				SaveFile();
+				IsDirty = true;
+			}
+			else
+			{
+				Debug.LogWarning($"Failed remove grouper : {grouper.GrouperName}");
 			}
 		}
 		public static void ModifyGrouper(AssetBundleGrouper grouper)
 		{
 			if (grouper != null)
 			{
-				SaveFile();
+				IsDirty = true;
 			}
 		}
 
 		// 资源收集器编辑相关
-		public static void CreateCollector(AssetBundleGrouper grouper, string collectPath, string packRuleName, string filterRuleName, bool notWriteToAssetList, bool saveFile = true)
+		public static void CreateCollector(AssetBundleGrouper grouper, string collectPath, string packRuleName, string filterRuleName, bool notWriteToAssetList)
 		{
 			AssetBundleCollector collector = new AssetBundleCollector();
 			collector.CollectPath = collectPath;
@@ -245,22 +252,24 @@ namespace YooAsset.Editor
 			collector.FilterRuleName = filterRuleName;
 			collector.NotWriteToAssetList = notWriteToAssetList;
 			grouper.Collectors.Add(collector);
-
-			if (saveFile)
-				SaveFile();
+			IsDirty = true;
 		}
 		public static void RemoveCollector(AssetBundleGrouper grouper, AssetBundleCollector collector)
 		{
 			if (grouper.Collectors.Remove(collector))
 			{
-				SaveFile();
+				IsDirty = true;
+			}
+			else
+			{
+				Debug.LogWarning($"Failed remove collector : {collector.CollectPath}");
 			}
 		}
 		public static void ModifyCollector(AssetBundleGrouper grouper, AssetBundleCollector collector)
 		{
 			if (grouper != null && collector != null)
 			{
-				SaveFile();
+				IsDirty = true;
 			}
 		}
 	}

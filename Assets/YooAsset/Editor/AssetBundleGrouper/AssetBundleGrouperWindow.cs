@@ -152,7 +152,12 @@ namespace YooAsset.Editor
 				Debug.LogError(e.ToString());
 			}
 		}
-		
+		public void OnDestroy()
+		{
+			if (AssetBundleGrouperSettingData.IsDirty)
+				AssetBundleGrouperSettingData.SaveFile();
+		}
+
 		// 刷新窗体
 		private void RefreshWindow()
 		{
@@ -222,7 +227,7 @@ namespace YooAsset.Editor
 		}
 		private void AddGrouperBtn_clicked()
 		{
-			AssetBundleGrouperSettingData.CreateGrouper("Default Grouper", string.Empty, string.Empty, true);
+			AssetBundleGrouperSettingData.CreateGrouper("Default Grouper", string.Empty, string.Empty);
 			FillGrouperViewData();
 		}
 		private void RemoveGrouperBtn_clicked()
