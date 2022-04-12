@@ -9,7 +9,7 @@ namespace YooAsset
 		/// <summary>
 		/// 依赖的资源包加载器列表
 		/// </summary>
-		private readonly List<AssetBundleLoader> _dependBundles;
+		private readonly List<AssetBundleLoaderBase> _dependBundles;
 
 		public DependAssetBundleGrouper(string assetPath)
 		{

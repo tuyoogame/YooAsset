@@ -8,7 +8,7 @@ namespace YooAsset
 {
 	internal static class AssetSystem
 	{
-		private static readonly List<AssetBundleLoader> _loaders = new List<AssetBundleLoader>(1000);
+		private static readonly List<AssetBundleLoaderBase> _loaders = new List<AssetBundleLoaderBase>(1000);
 		private static readonly List<ProviderBase> _providers = new List<ProviderBase>(1000);
 
 		/// <summary>
@@ -90,12 +90,12 @@ namespace YooAsset
 			{
 				for (int i = _loaders.Count - 1; i >= 0; i--)
 				{
-					AssetBundleLoader loader = _loaders[i];
+					AssetBundleLoaderBase loader = _loaders[i];
 					loader.TryDestroyAllProviders();
 				}
 				for (int i = _loaders.Count - 1; i >= 0; i--)
 				{
-					AssetBundleLoader loader = _loaders[i];
+					AssetBundleLoaderBase loader = _loaders[i];
 					if (loader.CanDestroy())
 					{
 						loader.Destroy(false);
@@ -191,22 +191,22 @@ namespace YooAsset
 		}
 
 
-		internal static AssetBundleLoader CreateOwnerAssetBundleLoader(string assetPath)
+		internal static AssetBundleLoaderBase CreateOwnerAssetBundleLoader(string assetPath)
 		{
 			string bundleName = BundleServices.GetBundleName(assetPath);
 			BundleInfo bundleInfo = BundleServices.GetBundleInfo(bundleName);
 			return CreateAssetBundleLoaderInternal(bundleInfo);
 		}
-		internal static List<AssetBundleLoader> CreateDependAssetBundleLoaders(string assetPath)
+		internal static List<AssetBundleLoaderBase> CreateDependAssetBundleLoaders(string assetPath)
 		{
-			List<AssetBundleLoader> result = new List<AssetBundleLoader>();
+			List<AssetBundleLoaderBase> result = new List<AssetBundleLoaderBase>();
 			string[] depends = BundleServices.GetAllDependencies(assetPath);
 			if (depends != null)
 			{
 				foreach (var dependBundleName in depends)
 				{
 					BundleInfo dependBundleInfo = BundleServices.GetBundleInfo(dependBundleName);
-					AssetBundleLoader dependLoader = CreateAssetBundleLoaderInternal(dependBundleInfo);
+					AssetBundleLoaderBase dependLoader = CreateAssetBundleLoaderInternal(dependBundleInfo);
 					result.Add(dependLoader);
 				}
 			}
@@ -220,24 +220,29 @@ namespace YooAsset
 			}
 		}
 
-		private static AssetBundleLoader CreateAssetBundleLoaderInternal(BundleInfo bundleInfo)
+		private static AssetBundleLoaderBase CreateAssetBundleLoaderInternal(BundleInfo bundleInfo)
 		{
 			// 如果加载器已经存在
-			AssetBundleLoader loader = TryGetAssetBundleLoader(bundleInfo.BundleName);
+			AssetBundleLoaderBase loader = TryGetAssetBundleLoader(bundleInfo.BundleName);
 			if (loader != null)
 				return loader;
 
 			// 新增下载需求
-			loader = new AssetBundleLoader(bundleInfo);
+#if UNITY_WEBGL
+			loader = new AssetBundleWebLoader(bundleInfo);
+#else
+			loader = new AssetBundleFileLoader(bundleInfo);
+#endif
+
 			_loaders.Add(loader);
 			return loader;
 		}
-		private static AssetBundleLoader TryGetAssetBundleLoader(string bundleName)
+		private static AssetBundleLoaderBase TryGetAssetBundleLoader(string bundleName)
 		{
-			AssetBundleLoader loader = null;
+			AssetBundleLoaderBase loader = null;
 			for (int i = 0; i < _loaders.Count; i++)
 			{
-				AssetBundleLoader temp = _loaders[i];
+				AssetBundleLoaderBase temp = _loaders[i];
 				if (temp.BundleFileInfo.BundleName.Equals(bundleName))
 				{
 					loader = temp;

@@ -5,7 +5,7 @@ namespace YooAsset
 {
     internal abstract class BundledProvider : ProviderBase
     {
-		protected AssetBundleLoader OwnerBundle { private set; get; }
+		protected AssetBundleLoaderBase OwnerBundle { private set; get; }
 		protected DependAssetBundleGrouper DependBundles { private set; get; }
 
 		public BundledProvider(string assetPath, System.Type assetType) : base(assetPath, assetType)

@@ -61,7 +61,6 @@ namespace YooAsset
 		/// </summary>
 		public static string ConvertToWWWPath(string path)
 		{
-			// 注意：WWW加载方式，必须要在路径前面加file://
 #if UNITY_EDITOR
 			return StringUtility.Format("file:///{0}", path);
 #elif UNITY_IPHONE
@@ -70,6 +69,8 @@ namespace YooAsset
 			return path;
 #elif UNITY_STANDALONE
 			return StringUtility.Format("file:///{0}", path);
+#elif UNITY_WEBGL
+			return path;
 #endif
 		}
 
@@ -203,7 +204,6 @@ namespace YooAsset
 		/// 获取沙盒内补丁清单文件的哈希值
 		/// 注意：如果沙盒内补丁清单文件不存在，返回空字符串
 		/// </summary>
-		/// <returns></returns>
 		public static string GetSandboxPatchManifestFileHash()
 		{
 			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);

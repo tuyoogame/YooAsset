@@ -176,8 +176,12 @@ namespace YooAsset
 			// 初始化下载系统
 			if (_playMode == EPlayMode.HostPlayMode)
 			{
+#if UNITY_WEBGL
+				throw new Exception($"{EPlayMode.HostPlayMode} not supports WebGL platform !");
+#else
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
 				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize);
+#endif
 			}
 
 			// 初始化资源系统
