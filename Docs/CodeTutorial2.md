@@ -1,18 +1,39 @@
 # 资源更新
 
+**获取资源版本**
+
+对于联机运行模式，在更新补丁清单之前，需要获取一个资源版本号。
+
+该资源版本号，可以通过YooAssets提供的接口来更新，也可以通过HTTP访问游戏服务器来获取。
+
+````c#
+private IEnumerator UpdateStaticVersion()
+{
+    UpdateStaticVersionOperation operation = YooAssets.UpdateStaticVersionAsync();
+    yield return operation;
+
+    if (operation.Status == EOperationStatus.Succeed)
+    {
+        //更新成功
+        int resourceVersion = operation.ResourceVersion;
+        Debug.Log($"Update resource Version : {resourceVersion}");
+    }
+    else
+    {
+        //更新失败
+        Debug.LogError(operation.Error);
+    }
+}
+````
+
 **更新补丁清单**
 
-对于联机运行模式，在初始化资源系统之后，需要立刻更新资源清单。
-
-**注意**：在初始化资源系统的时候，可以选择是否忽略资源版本号，这会影响到我们的更新步骤。
-
-- 没有忽略资源版本号：在更新之前先获取更新的资源版本号，一般通过HTTP访问游戏服务器来获取。
-- 忽略资源版本号：在更新的时候，资源版本号可以设置为0。
+对于联机运行模式，在获取到资源版本号之后，就可以更新资源清单了。
 
 ````c#
 private IEnumerator UpdatePatchManifest()
 {
-    UpdateManifestOperation operation = YooAssets.UpdateManifestAsync(updateResourceVersion);
+    UpdateManifestOperation operation = YooAssets.UpdateManifestAsync(resourceVersion);
     yield return operation;
 
     if (operation.Status == EOperationStatus.Succeed)
