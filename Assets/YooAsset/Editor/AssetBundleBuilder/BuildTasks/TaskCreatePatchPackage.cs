@@ -19,31 +19,40 @@ namespace YooAsset.Editor
 		/// </summary>
 		private void CopyPatchFiles(AssetBundleBuilder.BuildParametersContext buildParameters)
 		{
+			int resourceVersion = buildParameters.Parameters.BuildVersion;
 			string packageDirectory = buildParameters.GetPackageDirectory();
-			UnityEngine.Debug.Log($"开始拷贝补丁文件到补丁包目录：{packageDirectory}");
+			UnityEngine.Debug.Log($"准备开始拷贝补丁文件到补丁包目录：{packageDirectory}");
 
 			// 拷贝Report文件
 			{
 				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettings.ReportFileName}";
 				string destPath = $"{packageDirectory}/{YooAssetSettings.ReportFileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
-				UnityEngine.Debug.Log($"拷贝Report文件到：{destPath}");
+				UnityEngine.Debug.Log($"拷贝构建报告文件到：{destPath}");
 			}
 
-			// 拷贝PatchManifest文件
+			// 拷贝补丁清单文件
 			{
-				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.PatchManifestFileName}";
-				string destPath = $"{packageDirectory}/{YooAssetSettingsData.Setting.PatchManifestFileName}";
+				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.GetPatchManifestFileName(resourceVersion)}";
+				string destPath = $"{packageDirectory}/{YooAssetSettingsData.GetPatchManifestFileName(resourceVersion)}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
-				UnityEngine.Debug.Log($"拷贝PatchManifest文件到：{destPath}");
+				UnityEngine.Debug.Log($"拷贝补丁清单文件到：{destPath}");
 			}
 
-			// 拷贝PatchManifest哈希文件
+			// 拷贝补丁清单哈希文件
 			{
-				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.PatchManifestHashFileName}";
-				string destPath = $"{packageDirectory}/{YooAssetSettingsData.Setting.PatchManifestHashFileName}";
+				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.GetPatchManifestHashFileName(resourceVersion)}";
+				string destPath = $"{packageDirectory}/{YooAssetSettingsData.GetPatchManifestHashFileName(resourceVersion)}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
-				UnityEngine.Debug.Log($"拷贝PatchManifest哈希文件到：{destPath}");
+				UnityEngine.Debug.Log($"拷贝补丁清单哈希文件到：{destPath}");
+			}
+
+			// 拷贝静态版本文件
+			{
+				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettings.VersionFileName}";
+				string destPath = $"{packageDirectory}/{YooAssetSettings.VersionFileName}";
+				EditorTools.CopyFile(sourcePath, destPath, true);
+				UnityEngine.Debug.Log($"拷贝静态版本文件到：{destPath}");
 			}
 
 			// 拷贝UnityManifest序列化文件
@@ -62,20 +71,16 @@ namespace YooAsset.Editor
 			}
 
 			// 拷贝所有补丁文件
-			// 注意：拷贝的补丁文件都是需要玩家热更新的文件
 			int progressValue = 0;
-			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory);
+			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory, buildParameters.Parameters.BuildVersion);
 			int patchFileTotalCount = patchManifest.BundleList.Count;
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
-				if (patchBundle.Version == buildParameters.Parameters.BuildVersion)
-				{
-					string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{patchBundle.BundleName}";
-					string destPath = $"{packageDirectory}/{patchBundle.Hash}";
-					EditorTools.CopyFile(sourcePath, destPath, true);
-					UnityEngine.Debug.Log($"拷贝补丁文件到补丁包：{patchBundle.BundleName}");
-					EditorTools.DisplayProgressBar("拷贝补丁文件", ++progressValue, patchFileTotalCount);
-				}
+				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{patchBundle.BundleName}";
+				string destPath = $"{packageDirectory}/{patchBundle.Hash}";
+				EditorTools.CopyFile(sourcePath, destPath, true);
+				UnityEngine.Debug.Log($"拷贝补丁文件到补丁包：{patchBundle.BundleName}");
+				EditorTools.DisplayProgressBar("拷贝补丁文件", ++progressValue, patchFileTotalCount);
 			}
 			EditorTools.ClearProgressBar();
 		}

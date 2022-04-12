@@ -12,22 +12,29 @@ namespace YooAsset
 
 		// 参数相关
 		internal bool ClearCacheWhenDirty { private set; get; }
-		internal bool IgnoreResourceVersion { private set; get; }
 		private string _defaultHostServer;
 		private string _fallbackHostServer;
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(bool clearCacheWhenDirty, bool ignoreResourceVersion,
-			 string defaultHostServer, string fallbackHostServer)
+		public InitializationOperation InitializeAsync(bool clearCacheWhenDirty, string defaultHostServer, string fallbackHostServer)
 		{
 			ClearCacheWhenDirty = clearCacheWhenDirty;
-			IgnoreResourceVersion = ignoreResourceVersion;
 			_defaultHostServer = defaultHostServer;
 			_fallbackHostServer = fallbackHostServer;
 
 			var operation = new HostPlayModeInitializationOperation(this);
+			OperationSystem.ProcessOperaiton(operation);
+			return operation;
+		}
+
+		/// <summary>
+		/// 异步更新资源版本号
+		/// </summary>
+		public UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout)
+		{
+			var operation = new HostPlayModeUpdateStaticVersionOperation(this, timeout);
 			OperationSystem.ProcessOperaiton(operation);
 			return operation;
 		}
@@ -166,19 +173,13 @@ namespace YooAsset
 		}
 
 		// WEB相关
-		public string GetPatchDownloadMainURL(int resourceVersion, string fileName)
+		public string GetPatchDownloadMainURL(string fileName)
 		{
-			if (IgnoreResourceVersion)
-				return $"{_defaultHostServer}/{fileName}";
-			else
-				return $"{_defaultHostServer}/{resourceVersion}/{fileName}";
+			return $"{_defaultHostServer}/{fileName}";
 		}
-		public string GetPatchDownloadFallbackURL(int resourceVersion, string fileName)
+		public string GetPatchDownloadFallbackURL(string fileName)
 		{
-			if (IgnoreResourceVersion)
-				return $"{_fallbackHostServer}/{fileName}";
-			else
-				return $"{_fallbackHostServer}/{resourceVersion}/{fileName}";
+			return $"{_fallbackHostServer}/{fileName}";
 		}
 
 		// 下载相关
@@ -196,8 +197,8 @@ namespace YooAsset
 		{
 			// 注意：资源版本号只用于确定下载路径
 			string sandboxPath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
-			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.Version, patchBundle.Hash);
-			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.Version, patchBundle.Hash);
+			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.Hash);
+			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.Hash);
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, remoteMainURL, remoteFallbackURL);
 			return bundleInfo;
 		}

@@ -34,15 +34,13 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			LoadAppManifest,
-			CheckAppManifest,
+			Update,
 			Done,
 		}
 
-		private OfflinePlayModeImpl _impl;
+		private readonly OfflinePlayModeImpl _impl;
+		private readonly AppManifestLoader _appManifestLoader = new AppManifestLoader();
 		private ESteps _steps = ESteps.None;
-		private UnityWebDataRequester _downloader;
-		private string _downloadURL;
 
 		internal OfflinePlayModeInitializationOperation(OfflinePlayModeImpl impl)
 		{
@@ -50,41 +48,32 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.LoadAppManifest;
+			_steps = ESteps.Update;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
-
-			if (_steps == ESteps.LoadAppManifest)
+			
+			if (_steps == ESteps.Update)
 			{
-				string filePath = PathHelper.MakeStreamingLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
-				_downloadURL = PathHelper.ConvertToWWWPath(filePath);
-				_downloader = new UnityWebDataRequester();
-				_downloader.SendRequest(_downloadURL);
-				_steps = ESteps.CheckAppManifest;
-			}
-
-			if (_steps == ESteps.CheckAppManifest)
-			{
-				if (_downloader.IsDone() == false)
+				_appManifestLoader.Update();
+				if (_appManifestLoader.IsDone() == false)
 					return;
 
-				if (_downloader.HasError())
-				{
-					Error = _downloader.GetError();
-					_downloader.Dispose();
+				if (_appManifestLoader.Result == null)
+				{			
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					throw new System.Exception($"Fatal error : Failed load application patch manifest file : {_downloadURL}");
+					Error = _appManifestLoader.Error;
+					throw new System.Exception($"FATAL : {_appManifestLoader.Error}");
 				}
-
-				// 解析APP里的补丁清单
-				_impl.AppPatchManifest = PatchManifest.Deserialize(_downloader.GetText());
-				_downloader.Dispose();
-				_steps = ESteps.Done;
-				Status = EOperationStatus.Succeed;
+				else
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
+					_impl.AppPatchManifest = _appManifestLoader.Result;
+				}
 			}
 		}
 	}
@@ -98,16 +87,13 @@ namespace YooAsset
 		{
 			None,
 			InitCache,
-			LoadAppManifest,
-			CheckAppManifest,
-			LoadSandboxManifest,
+			Update,
 			Done,
 		}
 
-		private HostPlayModeImpl _impl;
+		private readonly HostPlayModeImpl _impl;
+		private readonly AppManifestLoader _appManifestLoader = new AppManifestLoader();
 		private ESteps _steps = ESteps.None;
-		private UnityWebDataRequester _downloader;
-		private string _downloadURL;
 
 		internal HostPlayModeInitializationOperation(HostPlayModeImpl impl)
 		{
@@ -137,60 +123,137 @@ namespace YooAsset
 						SandboxHelper.DeleteSandboxCacheFolder();
 					}
 
-					// 删除清单文件
-					SandboxHelper.DeleteSandboxPatchManifestFile();
 					// 更新缓存文件
 					PatchCache.UpdateCache();
 				}
-				_steps = ESteps.LoadAppManifest;
+				_steps = ESteps.Update;
+			}
+
+			if (_steps == ESteps.Update)
+			{
+				_appManifestLoader.Update();
+				if (_appManifestLoader.IsDone() == false)
+					return;
+
+				if (_appManifestLoader.Result == null)
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = _appManifestLoader.Error;
+					throw new System.Exception($"FATAL : {_appManifestLoader.Error}");
+				}
+				else
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
+					_impl.AppPatchManifest = _appManifestLoader.Result;
+					_impl.LocalPatchManifest = _appManifestLoader.Result;
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// 内置补丁清单加载器
+	/// </summary>
+	internal class AppManifestLoader
+	{
+		private enum ESteps
+		{
+			LoadStaticVersion,
+			CheckStaticVersion,
+			LoadAppManifest,
+			CheckAppManifest,
+			Succeed,
+			Failed,
+		}
+
+		private ESteps _steps = ESteps.LoadStaticVersion;
+		private UnityWebDataRequester _downloader1;
+		private UnityWebDataRequester _downloader2;
+		private int _staticVersion = 0;
+
+		/// <summary>
+		/// 错误日志
+		/// </summary>
+		public string Error { private set; get; }
+
+		/// <summary>
+		/// 补丁清单
+		/// </summary>
+		public PatchManifest Result { private set; get; }
+
+		/// <summary>
+		/// 是否已经完成
+		/// </summary>
+		public bool IsDone()
+		{
+			if (_steps == ESteps.Succeed || _steps == ESteps.Failed)
+				return true;
+			else
+				return false;
+		}
+
+		public void Update()
+		{
+			if (IsDone())
+				return;
+
+			if (_steps == ESteps.LoadStaticVersion)
+			{
+				YooLogger.Log($"Load application static version.");
+				string filePath = PathHelper.MakeStreamingLoadPath(YooAssetSettings.VersionFileName);
+				string url = PathHelper.ConvertToWWWPath(filePath);
+				_downloader1 = new UnityWebDataRequester();
+				_downloader1.SendRequest(url);
+				_steps = ESteps.CheckStaticVersion;
+			}
+
+			if (_steps == ESteps.CheckStaticVersion)
+			{
+				if (_downloader1.IsDone() == false)
+					return;
+
+				if (_downloader1.HasError())
+				{
+					Error = _downloader1.GetError();
+					_steps = ESteps.Failed;
+				}
+				else
+				{
+					_staticVersion = int.Parse(_downloader1.GetText());
+					_steps = ESteps.LoadAppManifest;
+				}
+				_downloader1.Dispose();
 			}
 
 			if (_steps == ESteps.LoadAppManifest)
 			{
-				// 加载APP内的补丁清单
 				YooLogger.Log($"Load application patch manifest.");
-				string filePath = PathHelper.MakeStreamingLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
-				_downloadURL = PathHelper.ConvertToWWWPath(filePath);
-				_downloader = new UnityWebDataRequester();
-				_downloader.SendRequest(_downloadURL);
+				string filePath = PathHelper.MakeStreamingLoadPath(YooAssetSettingsData.GetPatchManifestFileName(_staticVersion));
+				string url = PathHelper.ConvertToWWWPath(filePath);
+				_downloader2 = new UnityWebDataRequester();
+				_downloader2.SendRequest(url);
 				_steps = ESteps.CheckAppManifest;
 			}
 
 			if (_steps == ESteps.CheckAppManifest)
 			{
-				if (_downloader.IsDone() == false)
+				if (_downloader2.IsDone() == false)
 					return;
 
-				if (_downloader.HasError())
+				if (_downloader2.HasError())
 				{
-					Error = _downloader.GetError();
-					_downloader.Dispose();
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					throw new System.Exception($"Fatal error : Failed load application patch manifest file : {_downloadURL}");
+					Error = _downloader2.GetError();		
+					_steps = ESteps.Failed;
 				}
-
-				// 解析补丁清单
-				string jsonData = _downloader.GetText();
-				_impl.AppPatchManifest = PatchManifest.Deserialize(jsonData);
-				_impl.LocalPatchManifest = _impl.AppPatchManifest;
-				_downloader.Dispose();
-				_steps = ESteps.LoadSandboxManifest;
-			}
-
-			if (_steps == ESteps.LoadSandboxManifest)
-			{
-				// 加载沙盒内的补丁清单	
-				if (SandboxHelper.CheckSandboxPatchManifestFileExist())
+				else
 				{
-					YooLogger.Log($"Load sandbox patch manifest.");
-					string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
-					string jsonData = File.ReadAllText(filePath);
-					_impl.LocalPatchManifest = PatchManifest.Deserialize(jsonData);
+					// 解析APP里的补丁清单
+					Result = PatchManifest.Deserialize(_downloader2.GetText());
+					_steps = ESteps.Succeed;
 				}
-
-				_steps = ESteps.Done;
-				Status = EOperationStatus.Succeed;
+				_downloader2.Dispose();
 			}
 		}
 	}

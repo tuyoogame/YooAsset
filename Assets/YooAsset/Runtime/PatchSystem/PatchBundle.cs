@@ -27,11 +27,6 @@ namespace YooAsset
 		public long SizeBytes;
 
 		/// <summary>
-		/// 文件版本
-		/// </summary>
-		public int Version;
-
-		/// <summary>
 		/// Tags
 		/// </summary>
 		public string[] Tags;
@@ -59,13 +54,12 @@ namespace YooAsset
 
 
 
-		public PatchBundle(string bundleName, string hash, string crc, long sizeBytes, int version, string[] tags)
+		public PatchBundle(string bundleName, string hash, string crc, long sizeBytes, string[] tags)
 		{
 			BundleName = bundleName;
 			Hash = hash;
 			CRC = crc;
 			SizeBytes = sizeBytes;
-			Version = version;
 			Tags = tags;
 		}
 

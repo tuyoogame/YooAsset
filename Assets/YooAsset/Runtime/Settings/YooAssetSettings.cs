@@ -18,12 +18,7 @@ namespace YooAsset
 		/// <summary>
 		/// 构建输出的补丁清单文件名称
 		/// </summary>
-		public string PatchManifestFileName = "PatchManifest.bytes";
-
-		/// <summary>
-		/// 构建输出的补丁清单哈希文件名称
-		/// </summary>
-		public string PatchManifestHashFileName = "PatchManifestHash.bytes";
+		public string PatchManifestFileName = "PatchManifest";
 
 		/// <summary>
 		/// 构建输出的Unity清单文件名称
@@ -34,5 +29,10 @@ namespace YooAsset
 		/// 构建输出的报告文件
 		/// </summary>
 		public const string ReportFileName = "BuildReport.json";
+
+		/// <summary>
+		/// 静态版本文件
+		/// </summary>
+		public const string VersionFileName = "StaticVersion.bytes";
 	}
 }

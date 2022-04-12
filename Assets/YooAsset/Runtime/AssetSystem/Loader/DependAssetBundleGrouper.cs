@@ -72,7 +72,6 @@ namespace YooAsset
 			{
 				var bundleInfo = new DebugBundleInfo();
 				bundleInfo.BundleName = loader.BundleFileInfo.BundleName;
-				bundleInfo.Version = loader.BundleFileInfo.Version;
 				bundleInfo.RefCount = loader.RefCount;
 				bundleInfo.Status = loader.Status;
 				output.Add(bundleInfo);

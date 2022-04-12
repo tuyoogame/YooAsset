@@ -59,7 +59,6 @@ namespace YooAsset
 		}
 
 		private static int RequestCount = 0;
-
 		private readonly HostPlayModeImpl _impl;
 		private readonly int _updateResourceVersion;
 		private readonly int _timeout;
@@ -78,15 +77,6 @@ namespace YooAsset
 		{
 			RequestCount++;
 			_steps = ESteps.LoadWebManifestHash;
-
-			if (_impl.IgnoreResourceVersion && _updateResourceVersion > 0)
-			{
-				YooLogger.Warning($"Update resource version {_updateResourceVersion} is invalid when ignore resource version.");
-			}
-			else
-			{
-				YooLogger.Log($"Update patch manifest : update resource version is  {_updateResourceVersion}");
-			}
 		}
 		internal override void Update()
 		{
@@ -95,7 +85,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadWebManifestHash)
 			{
-				string webURL = GetPatchManifestRequestURL(_updateResourceVersion, YooAssetSettingsData.Setting.PatchManifestHashFileName);
+				string webURL = GetPatchManifestRequestURL(YooAssetSettingsData.GetPatchManifestHashFileName(_updateResourceVersion));
 				YooLogger.Log($"Beginning to request patch manifest hash : {webURL}");
 				_downloaderHash = new UnityWebDataRequester();
 				_downloaderHash.SendRequest(webURL, _timeout);
@@ -107,37 +97,36 @@ namespace YooAsset
 				if (_downloaderHash.IsDone() == false)
 					return;
 
-				// Check fatal
+				// Check error
 				if (_downloaderHash.HasError())
 				{
-					Error = _downloaderHash.GetError();				
-					_downloaderHash.Dispose();
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					return;
-				}
-
-				// 获取补丁清单文件的哈希值
-				string webManifestHash = _downloaderHash.GetText();
-				_downloaderHash.Dispose();
-
-				// 如果补丁清单文件的哈希值相同
-				string currentFileHash = SandboxHelper.GetSandboxPatchManifestFileHash();
-				if (currentFileHash == webManifestHash)
-				{
-					YooLogger.Log($"Patch manifest file hash is not change : {webManifestHash}");
-					_steps = ESteps.InitPrepareCache;
+					Error = _downloaderHash.GetError();
 				}
 				else
 				{
-					YooLogger.Log($"Patch manifest hash is change : {webManifestHash} -> {currentFileHash}");
-					_steps = ESteps.LoadWebManifest;
+					string webManifestHash = _downloaderHash.GetText();
+					string cachedManifestHash = GetSandboxPatchManifestFileHash(_updateResourceVersion);
+
+					// 如果补丁清单文件的哈希值相同
+					if (cachedManifestHash == webManifestHash)
+					{
+						YooLogger.Log($"Patch manifest file hash is not change : {webManifestHash}");
+						_steps = ESteps.InitPrepareCache;
+					}
+					else
+					{
+						YooLogger.Log($"Patch manifest hash is change : {webManifestHash} -> {cachedManifestHash}");
+						_steps = ESteps.LoadWebManifest;
+					}
 				}
+				_downloaderHash.Dispose();
 			}
 
 			if (_steps == ESteps.LoadWebManifest)
 			{
-				string webURL = GetPatchManifestRequestURL(_updateResourceVersion, YooAssetSettingsData.Setting.PatchManifestFileName);
+				string webURL = GetPatchManifestRequestURL(YooAssetSettingsData.GetPatchManifestFileName(_updateResourceVersion));
 				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
 				_downloaderManifest = new UnityWebDataRequester();
 				_downloaderManifest.SendRequest(webURL, _timeout);
@@ -149,20 +138,28 @@ namespace YooAsset
 				if (_downloaderManifest.IsDone() == false)
 					return;
 
-				// Check fatal
+				// Check error
 				if (_downloaderManifest.HasError())
-				{
-					Error = _downloaderManifest.GetError();			
-					_downloaderManifest.Dispose();
+				{			
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					return;
+					Error = _downloaderManifest.GetError();
 				}
-
-				// 解析补丁清单			
-				ParseAndSaveRemotePatchManifest(_downloaderManifest.GetText());
+				else
+				{
+					// 解析补丁清单			
+					if (ParseAndSaveRemotePatchManifest(_updateResourceVersion, _downloaderManifest.GetText()))
+					{
+						_steps = ESteps.InitPrepareCache;
+					}
+					else
+					{
+						_steps = ESteps.Done;
+						Status = EOperationStatus.Failed;
+						Error = $"URL : {_downloaderManifest.URL} Error : remote patch manifest content is invalid";
+					}
+				}
 				_downloaderManifest.Dispose();
-				_steps = ESteps.InitPrepareCache;
 			}
 
 			if (_steps == ESteps.InitPrepareCache)
@@ -184,30 +181,47 @@ namespace YooAsset
 			}
 		}
 
-		private string GetPatchManifestRequestURL(int updateResourceVersion, string fileName)
+		private string GetPatchManifestRequestURL(string fileName)
 		{
-			string url;
-
 			// 轮流返回请求地址
 			if (RequestCount % 2 == 0)
-				url = _impl.GetPatchDownloadFallbackURL(updateResourceVersion, fileName);
+				return _impl.GetPatchDownloadFallbackURL(fileName);
 			else
-				url = _impl.GetPatchDownloadMainURL(updateResourceVersion, fileName);
-
-			// 注意：在URL末尾添加时间戳
-			if (_impl.IgnoreResourceVersion)
-				url = $"{url}?{System.DateTime.UtcNow.Ticks}";
-
-			return url;
+				return _impl.GetPatchDownloadMainURL(fileName);
 		}
-		private void ParseAndSaveRemotePatchManifest(string content)
-		{
-			_impl.LocalPatchManifest = PatchManifest.Deserialize(content);
 
-			// 注意：这里会覆盖掉沙盒内的补丁清单文件
-			YooLogger.Log("Save remote patch manifest file.");
-			string savePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
-			PatchManifest.Serialize(savePath, _impl.LocalPatchManifest);
+		/// <summary>
+		/// 解析并保存远端请求的补丁清单
+		/// </summary>
+		private bool ParseAndSaveRemotePatchManifest(int updateResourceVersion, string content)
+		{
+			try
+			{
+				_impl.LocalPatchManifest = PatchManifest.Deserialize(content);
+
+				YooLogger.Log("Save remote patch manifest file.");
+				string savePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.GetPatchManifestFileName(updateResourceVersion));
+				PatchManifest.Serialize(savePath, _impl.LocalPatchManifest);
+				return true;
+			}
+			catch (Exception e)
+			{
+				YooLogger.Warning(e.ToString());
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// 获取沙盒内补丁清单文件的哈希值
+		/// 注意：如果沙盒内补丁清单文件不存在，返回空字符串
+		/// </summary>
+		private string GetSandboxPatchManifestFileHash(int updateResourceVersion)
+		{
+			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.GetPatchManifestFileName(updateResourceVersion));
+			if (File.Exists(filePath))
+				return HashUtility.FileMD5(filePath);
+			else
+				return string.Empty;
 		}
 
 		#region 多线程相关

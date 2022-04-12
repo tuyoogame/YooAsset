@@ -83,11 +83,6 @@ namespace YooAsset
 			public bool ClearCacheWhenDirty;
 
 			/// <summary>
-			/// 忽略资源版本号
-			/// </summary>
-			public bool IgnoreResourceVersion;
-
-			/// <summary>
 			/// 默认的资源服务器下载地址
 			/// </summary>
 			public string DefaultHostServer;
@@ -207,7 +202,6 @@ namespace YooAsset
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
 				return _hostPlayModeImpl.InitializeAsync(
 					hostPlayModeParameters.ClearCacheWhenDirty,
-					hostPlayModeParameters.IgnoreResourceVersion,
 					hostPlayModeParameters.DefaultHostServer,
 					hostPlayModeParameters.FallbackHostServer);
 			}
@@ -217,6 +211,37 @@ namespace YooAsset
 			}
 		}
 
+		/// <summary>
+		/// 向网络端请求静态资源版本号
+		/// </summary>
+		/// <param name="timeout">超时时间（默认值：60秒）</param>
+		/// <returns></returns>
+		public static UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
+		{
+			if (_playMode == EPlayMode.EditorPlayMode)
+			{
+				var operation = new EditorModeUpdateStaticVersionOperation();
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				var operation = new OfflinePlayModeUpdateStaticVersionOperation();
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.HostPlayMode)
+			{
+				if (_hostPlayModeImpl == null)
+					throw new Exception("YooAsset is not initialized.");
+				return _hostPlayModeImpl.UpdateStaticVersionAsync(timeout);
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
+		
 		/// <summary>
 		/// 向网络端请求并更新补丁清单
 		/// </summary>

@@ -28,11 +28,6 @@ namespace YooAsset.Editor
 		public long SizeBytes;
 
 		/// <summary>
-		/// 文件版本
-		/// </summary>
-		public int Version;
-
-		/// <summary>
 		/// Tags
 		/// </summary>
 		public string[] Tags;

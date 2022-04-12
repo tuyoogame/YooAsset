@@ -68,20 +68,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 资源版本
-		/// </summary>
-		public int Version
-		{
-			get
-			{
-				if (_patchBundle == null)
-					return 0;
-				else
-					return _patchBundle.Version;
-			}
-		}
-
-		/// <summary>
 		/// 是否为加密文件
 		/// </summary>
 		public bool IsEncrypted

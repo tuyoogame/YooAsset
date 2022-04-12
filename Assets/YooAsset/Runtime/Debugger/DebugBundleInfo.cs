@@ -9,11 +9,6 @@ namespace YooAsset
 		public string BundleName { set; get; }
 
 		/// <summary>
-		/// 资源版本
-		/// </summary>
-		public int Version { set; get; }
-
-		/// <summary>
 		/// 引用计数
 		/// </summary>
 		public int RefCount { set; get; }

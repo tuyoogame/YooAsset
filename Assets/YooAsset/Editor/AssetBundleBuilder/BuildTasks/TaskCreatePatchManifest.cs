@@ -24,6 +24,8 @@ namespace YooAsset.Editor
 		private void CreatePatchManifestFile(AssetBundleBuilder.BuildParametersContext buildParameters,
 			BuildMapContext buildMapContext, TaskEncryption.EncryptionContext encryptionContext)
 		{
+			int resourceVersion = buildParameters.Parameters.BuildVersion;
+
 			// 创建新补丁清单
 			PatchManifest patchManifest = new PatchManifest();
 			patchManifest.ResourceVersion = buildParameters.Parameters.BuildVersion;
@@ -32,15 +34,21 @@ namespace YooAsset.Editor
 			patchManifest.AssetList = GetAllPatchAsset(buildMapContext, patchManifest);
 
 			// 创建补丁清单文件
-			string manifestFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.PatchManifestFileName}";
+			string manifestFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.GetPatchManifestFileName(resourceVersion)}";
 			UnityEngine.Debug.Log($"创建补丁清单文件：{manifestFilePath}");
 			PatchManifest.Serialize(manifestFilePath, patchManifest);
 
 			// 创建补丁清单哈希文件
-			string manifestHashFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.PatchManifestHashFileName}";
+			string manifestHashFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.GetPatchManifestHashFileName(resourceVersion)}";
 			string manifestHash = HashUtility.FileMD5(manifestFilePath);
 			UnityEngine.Debug.Log($"创建补丁清单哈希文件：{manifestHashFilePath}");
 			FileUtility.CreateFile(manifestHashFilePath, manifestHash);
+
+			// 创建静态版本文件
+			string staticVersionFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettings.VersionFileName}";
+			string staticVersion = resourceVersion.ToString();
+			UnityEngine.Debug.Log($"创建静态版本文件：{staticVersionFilePath}");
+			FileUtility.CreateFile(staticVersionFilePath, staticVersion);
 		}
 
 		/// <summary>
@@ -54,19 +62,12 @@ namespace YooAsset.Editor
 			// 内置标记列表
 			List<string> buildinTags = buildParameters.Parameters.GetBuildinTags();
 
-			// 加载旧补丁清单
-			PatchManifest oldPatchManifest = null;
-			if (buildParameters.Parameters.ForceRebuild == false)
-			{
-				oldPatchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory);
-			}
-
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				var bundleName = bundleInfo.BundleName;
 				string filePath = $"{buildParameters.PipelineOutputDirectory}/{bundleName}";
 				string hash = HashUtility.FileMD5(filePath);
-				string crc = HashUtility.FileCRC32(filePath);
+				string crc32 = HashUtility.FileCRC32(filePath);
 				long size = FileUtility.GetFileSize(filePath);
 				int version = buildParameters.Parameters.BuildVersion;
 				string[] tags = buildMapContext.GetAssetTags(bundleName);
@@ -80,14 +81,7 @@ namespace YooAsset.Editor
 					hash += bundleInfo.GetAppendExtension();
 				}
 
-				// 注意：如果文件没有变化使用旧版本号
-				if (oldPatchManifest != null && oldPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle value))
-				{
-					if (value.Hash == hash)
-						version = value.Version;
-				}
-
-				PatchBundle patchBundle = new PatchBundle(bundleName, hash, crc, size, version, tags);
+				PatchBundle patchBundle = new PatchBundle(bundleName, hash, crc32, size, tags);
 				patchBundle.SetFlagsValue(isEncrypted, isBuildin, isRawFile);
 				result.Add(patchBundle);
 			}

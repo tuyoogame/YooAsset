@@ -31,5 +31,21 @@ namespace YooAsset
 				YooLogger.Log("YooAsset use custom settings.");
 			}
 		}
+
+		/// <summary>
+		/// 获取补丁清单文件完整名称
+		/// </summary>
+		public static string GetPatchManifestFileName(int resourceVersion)
+		{
+			return $"{Setting.PatchManifestFileName}_{resourceVersion}.bytes";
+		}
+
+		/// <summary>
+		/// 获取补丁清单哈希文件完整名称
+		/// </summary>
+		public static string GetPatchManifestHashFileName(int resourceVersion)
+		{
+			return $"{Setting.PatchManifestFileName}_{resourceVersion}.hash";
+		}
 	}
 }

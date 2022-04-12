@@ -151,16 +151,6 @@ namespace YooAsset.Editor
 
 			{
 				var label = new Label();
-				label.name = "Label4";
-				label.style.unityTextAlign = TextAnchor.MiddleLeft;
-				label.style.marginLeft = 3f;
-				//label.style.flexGrow = 1f;
-				label.style.width = 60;
-				element.Add(label);
-			}
-
-			{
-				var label = new Label();
 				label.name = "Label5";
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
@@ -187,10 +177,6 @@ namespace YooAsset.Editor
 			// Hash
 			var label3 = element.Q<Label>("Label3");
 			label3.text = bundleInfo.Hash;
-
-			// Version
-			var label4 = element.Q<Label>("Label4");
-			label4.text = bundleInfo.Version.ToString();
 
 			// Tags
 			var label5 = element.Q<Label>("Label5");

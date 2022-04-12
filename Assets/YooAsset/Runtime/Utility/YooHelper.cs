@@ -144,16 +144,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 删除沙盒内补丁清单文件
-		/// </summary>
-		public static void DeleteSandboxPatchManifestFile()
-		{
-			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
-			if (File.Exists(filePath))
-				File.Delete(filePath);
-		}
-
-		/// <summary>
 		/// 删除沙盒内的缓存文件
 		/// </summary>
 		public static void DeleteSandboxCacheFile()
@@ -189,28 +179,6 @@ namespace YooAsset
 		{
 			string filePath = GetSandboxCacheFilePath();
 			return File.Exists(filePath);
-		}
-
-		/// <summary>
-		/// 检测沙盒内补丁清单文件是否存在
-		/// </summary>
-		public static bool CheckSandboxPatchManifestFileExist()
-		{
-			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
-			return File.Exists(filePath);
-		}
-
-		/// <summary>
-		/// 获取沙盒内补丁清单文件的哈希值
-		/// 注意：如果沙盒内补丁清单文件不存在，返回空字符串
-		/// </summary>
-		public static string GetSandboxPatchManifestFileHash()
-		{
-			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.Setting.PatchManifestFileName);
-			if (File.Exists(filePath))
-				return HashUtility.FileMD5(filePath);
-			else
-				return string.Empty;
 		}
 
 		/// <summary>

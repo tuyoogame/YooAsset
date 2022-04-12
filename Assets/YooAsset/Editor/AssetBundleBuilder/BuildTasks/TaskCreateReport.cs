@@ -18,7 +18,7 @@ namespace YooAsset.Editor
 
 		private void CreateReportFile(AssetBundleBuilder.BuildParametersContext buildParameters, BuildMapContext buildMapContext)
 		{
-			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory);
+			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory, buildParameters.Parameters.BuildVersion);
 			BuildReport buildReport = new BuildReport();
 			buildParameters.StopWatch();
 
@@ -79,7 +79,6 @@ namespace YooAsset.Editor
 				reportBundleInfo.Hash = patchBundle.Hash;
 				reportBundleInfo.CRC = patchBundle.CRC;
 				reportBundleInfo.SizeBytes = patchBundle.SizeBytes;
-				reportBundleInfo.Version = patchBundle.Version;
 				reportBundleInfo.Tags = patchBundle.Tags;
 				reportBundleInfo.Flags = patchBundle.Flags;
 				buildReport.BundleInfos.Add(reportBundleInfo);
