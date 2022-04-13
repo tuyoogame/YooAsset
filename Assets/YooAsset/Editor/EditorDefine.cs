@@ -4,9 +4,9 @@ namespace YooAsset.Editor
 	public class EditorDefine
 	{
 		/// <summary>
-		/// 资源包收集工具的配置文件存储路径
+		/// 资源包构建工具的配置文件存储路径
 		/// </summary>
-		public const string AssetBundleCollectorSettingFilePath = "Assets/YooAssetSetting/AssetBundleCollectorSetting.asset";
+		public const string AssetBundleBuilderSettingFilePath = "Assets/YooAssetSetting/AssetBundleBuilderSetting.asset";
 
 		/// <summary>
 		/// 资源包分组工具的配置文件存储路径

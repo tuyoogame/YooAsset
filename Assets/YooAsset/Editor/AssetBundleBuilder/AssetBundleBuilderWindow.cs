@@ -61,23 +61,43 @@ namespace YooAsset.Editor
 				_buildOutputTxt.SetEnabled(false);
 
 				// 构建版本
-				var appVersion = new Version(Application.version);
 				_buildVersionField = root.Q<IntegerField>("BuildVersion");
-				_buildVersionField.SetValueWithoutNotify(appVersion.Revision);
+				_buildVersionField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.BuildVersion);
+				_buildVersionField.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleBuilderSettingData.Setting.BuildVersion = _buildVersionField.value;
+				});
 
 				// 压缩方式
 				_compressionField = root.Q<EnumField>("Compression");
-				_compressionField.Init(ECompressOption.LZ4);
-				_compressionField.SetValueWithoutNotify(ECompressOption.LZ4);
+				_compressionField.Init(AssetBundleBuilderSettingData.Setting.CompressOption);
+				_compressionField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.CompressOption);
 				_compressionField.style.width = 300;
+				_compressionField.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleBuilderSettingData.Setting.CompressOption = (ECompressOption)_compressionField.value;
+				});
 
 				// 加密方法
 				var encryptionContainer = root.Q("EncryptionContainer");
 				if (_encryptionServicesClassNames.Count > 0)
 				{
-					_encryptionField = new PopupField<string>(_encryptionServicesClassNames, 0);
+					int defaultIndex = 0;
+					for (int index = 0; index < _encryptionServicesClassNames.Count; index++)
+					{
+						if (_encryptionServicesClassNames[index] == AssetBundleBuilderSettingData.Setting.EncyptionClassName)
+						{
+							defaultIndex = index;
+							break;
+						}
+					}
+					_encryptionField = new PopupField<string>(_encryptionServicesClassNames, defaultIndex);
 					_encryptionField.label = "Encryption";
 					_encryptionField.style.width = 300;
+					_encryptionField.RegisterValueChangedCallback(evt =>
+					{
+						AssetBundleBuilderSettingData.Setting.EncyptionClassName = _encryptionField.value;
+					});
 					encryptionContainer.Add(_encryptionField);
 				}
 				else
@@ -90,18 +110,29 @@ namespace YooAsset.Editor
 
 				// 附加后缀格式
 				_appendExtensionToggle = root.Q<Toggle>("AppendExtension");
+				_appendExtensionToggle.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.AppendExtension);
+				_appendExtensionToggle.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleBuilderSettingData.Setting.AppendExtension = _appendExtensionToggle.value;
+				});
 
 				// 强制构建
 				_forceRebuildToggle = root.Q<Toggle>("ForceRebuild");
-				_forceRebuildToggle.SetValueWithoutNotify(true);
+				_forceRebuildToggle.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.ForceRebuild);
 				_forceRebuildToggle.RegisterValueChangedCallback(evt =>
 				{
+					AssetBundleBuilderSettingData.Setting.ForceRebuild = _forceRebuildToggle.value;
 					_buildTagsTxt.SetEnabled(_forceRebuildToggle.value);
 				});
 
 				// 内置标签
 				_buildTagsTxt = root.Q<TextField>("BuildinTags");
 				_buildTagsTxt.SetEnabled(_forceRebuildToggle.value);
+				_buildTagsTxt.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.BuildTags);
+				_buildTagsTxt.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleBuilderSettingData.Setting.BuildTags = _buildTagsTxt.value;
+				});
 
 				// 构建按钮
 				var buildButton = root.Q<Button>("Build");
@@ -111,6 +142,10 @@ namespace YooAsset.Editor
 			{
 				Debug.LogError(e.ToString());
 			}
+		}
+		public void OnDestroy()
+		{
+			AssetBundleBuilderSettingData.SaveFile();
 		}
 
 		private void BuildButton_clicked()
