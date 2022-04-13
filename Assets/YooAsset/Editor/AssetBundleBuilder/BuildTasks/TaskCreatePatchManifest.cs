@@ -116,13 +116,13 @@ namespace YooAsset.Editor
 					PatchAsset patchAsset = new PatchAsset();
 					patchAsset.AssetPath = assetInfo.AssetPath;
 					patchAsset.BundleID = GetAssetBundleID(assetInfo.BundleName, patchManifest);
-					patchAsset.DependIDs = GetAssetBundleDependIDs(assetInfo, patchManifest);
+					patchAsset.DependIDs = GetAssetBundleDependIDs(patchAsset.BundleID, assetInfo, patchManifest);
 					result.Add(patchAsset);
 				}
 			}
 			return result;
 		}
-		private int[] GetAssetBundleDependIDs(BuildAssetInfo assetInfo, PatchManifest patchManifest)
+		private int[] GetAssetBundleDependIDs(int mainBundleID, BuildAssetInfo assetInfo, PatchManifest patchManifest)
 		{
 			List<int> result = new List<int>();
 			foreach (var dependAssetInfo in assetInfo.AllDependAssetInfos)
@@ -130,8 +130,11 @@ namespace YooAsset.Editor
 				if (dependAssetInfo.BundleNameIsValid() == false)
 					continue;
 				int bundleID = GetAssetBundleID(dependAssetInfo.BundleName, patchManifest);
-				if (result.Contains(bundleID) == false)
-					result.Add(bundleID);
+				if (mainBundleID != bundleID)
+				{
+					if (result.Contains(bundleID) == false)
+						result.Add(bundleID);
+				}
 			}
 			return result.ToArray();
 		}
