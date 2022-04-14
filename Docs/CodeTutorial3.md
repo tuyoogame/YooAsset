@@ -1,7 +1,5 @@
 # 资源加载
 
-在加载资源对象的时候只需要提供相对路径，统一约定该相对路径名称为：location
-
 加载接口：
 
 - YooAssets.LoadAssetSync() 同步加载资源对象接口
@@ -10,6 +8,8 @@
 - YooAssets.LoadSubAssetsAsync() 异步加载子资源对象接口
 - YooAssets.LoadSceneAsync() 异步加载场景接口
 - YooAssets.LoadRawFileAsync() 异步读取原生文件接口
+
+统一约定：location为资源的定位地址，也是加载资源对象的唯一标识符。
 
 **加载路径的匹配方式**
 
