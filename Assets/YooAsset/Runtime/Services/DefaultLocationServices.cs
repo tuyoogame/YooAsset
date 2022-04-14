@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using UnityEngine;
 
 namespace YooAsset
 {
@@ -13,6 +14,10 @@ namespace YooAsset
 		}
 		public string ConvertLocationToAssetPath(YooAssets.EPlayMode playMode, string location)
 		{
+#if UNITY_EDITOR
+			CheckLocation(location);
+#endif
+
 			if (playMode == YooAssets.EPlayMode.EditorPlayMode)
 			{
 				string filePath = CombineAssetPath(_resourceRoot, location);
@@ -73,5 +78,28 @@ namespace YooAsset
 			throw new System.NotImplementedException();
 #endif
 		}
+
+#if UNITY_EDITOR
+		private void CheckLocation(string location)
+		{
+			if (string.IsNullOrEmpty(location))
+			{
+				Debug.LogError("location param is null or empty!");
+			}
+			else
+			{
+				// 检查路径末尾是否有空格
+				int index = location.LastIndexOf(" ");
+				if (index != -1)
+				{
+					if (location.Length == index + 1)
+						Debug.LogWarning($"Found blank character in location : \"{location}\"");
+				}
+
+				if (location.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+					Debug.LogWarning($"Found illegal character in location : \"{location}\"");
+			}
+		}
+#endif
 	}
 }
