@@ -94,6 +94,7 @@ namespace YooAsset.Editor
 					string bundleName = GetBundleName(grouper, assetPath, isRawAsset);
 					List<string> assetTags = GetAssetTags(grouper);
 					var collectAssetInfo = new CollectAssetInfo(bundleName, assetPath, assetTags, isRawAsset, NotWriteToAssetList);
+					collectAssetInfo.DependAssets = GetAllDependencies(assetPath);
 					result.Add(assetPath, collectAssetInfo);
 				}
 				else
@@ -120,7 +121,7 @@ namespace YooAsset.Editor
 				return false;
 
 			string ext = System.IO.Path.GetExtension(assetPath);
-			if (ext == "" || ext == ".dll" || ext == ".cs" || ext == ".js" || ext == ".boo" || ext == ".meta")
+			if (ext == "" || ext == ".dll" || ext == ".cs" || ext == ".js" || ext == ".boo" || ext == ".meta" || ext == ".cginc")
 				return false;
 
 			return true;
@@ -141,22 +142,15 @@ namespace YooAsset.Editor
 		}
 		private string GetBundleName(AssetBundleGrouper grouper, string assetPath, bool isRawAsset)
 		{
-			// 如果收集全路径着色器
-			if (AssetBundleGrouperSettingData.Setting.AutoCollectShaders)
-			{
-				System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-				if (assetType == typeof(UnityEngine.Shader))
-				{
-					string bundleName = AssetBundleGrouperSettingData.Setting.ShadersBundleName;
-					return RevisedBundleName(bundleName, false);
-				}
-			}
+			string shaderBundleName = CollectShaderBundleName(assetPath);
+			if (string.IsNullOrEmpty(shaderBundleName) == false)
+				return shaderBundleName;
 
 			// 根据规则设置获取资源包名称
 			{
 				IPackRule packRuleInstance = AssetBundleGrouperSettingData.GetPackRuleInstance(PackRuleName);
 				string bundleName = packRuleInstance.GetBundleName(new PackRuleData(assetPath, CollectPath, grouper.GrouperName));
-				return RevisedBundleName(bundleName, isRawAsset);
+				return CorrectBundleName(bundleName, isRawAsset);
 			}
 		}
 		private List<string> GetAssetTags(AssetBundleGrouper grouper)
@@ -182,11 +176,28 @@ namespace YooAsset.Editor
 			return result;
 		}
 
+		/// <summary>
+		/// 收集着色器的资源包名称
+		/// </summary>
+		public static string CollectShaderBundleName(string assetPath)
+		{
+			// 如果自动收集所有的着色器
+			if (AssetBundleGrouperSettingData.Setting.AutoCollectShaders)
+			{
+				System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+				if (assetType == typeof(UnityEngine.Shader))
+				{
+					string bundleName = AssetBundleGrouperSettingData.Setting.ShadersBundleName;
+					return CorrectBundleName(bundleName, false);
+				}
+			}
+			return null;
+		}
 
 		/// <summary>
-		/// 修正资源包名
+		/// 修正资源包名称
 		/// </summary>
-		public static string RevisedBundleName(string bundleName, bool isRawBundle)
+		public static string CorrectBundleName(string bundleName, bool isRawBundle)
 		{
 			if (isRawBundle)
 			{

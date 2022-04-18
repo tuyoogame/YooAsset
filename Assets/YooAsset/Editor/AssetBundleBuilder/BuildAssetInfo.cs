@@ -32,6 +32,11 @@ namespace YooAsset.Editor
 		public bool IsCollectAsset { private set; get; }
 
 		/// <summary>
+		/// 是否为着色器资源
+		/// </summary>
+		public bool IsShaderAsset { private set; get; }
+
+		/// <summary>
 		/// 被依赖次数
 		/// </summary>
 		public int DependCount = 0;
@@ -54,6 +59,12 @@ namespace YooAsset.Editor
 			IsRawAsset = isRawAsset;
 			NotWriteToAssetList = notWriteToAssetList;
 			IsCollectAsset = true;
+
+			System.Type assetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+			if (assetType == typeof(UnityEngine.Shader))
+				IsShaderAsset = true;
+			else
+				IsShaderAsset = false;
 		}
 		public BuildAssetInfo(string assetPath)
 		{
@@ -61,6 +72,12 @@ namespace YooAsset.Editor
 			IsRawAsset = false;
 			NotWriteToAssetList = true;
 			IsCollectAsset = false;
+
+			System.Type assetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+			if (assetType == typeof(UnityEngine.Shader))
+				IsShaderAsset = true;
+			else
+				IsShaderAsset = false;
 		}
 
 		/// <summary>
@@ -82,7 +99,7 @@ namespace YooAsset.Editor
 			if (string.IsNullOrEmpty(BundleName) == false)
 				throw new System.Exception("Should never get here !");
 
-			BundleName = bundleName;	
+			BundleName = bundleName;
 		}
 
 		/// <summary>
@@ -99,7 +116,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 添加资源分类标签
 		/// </summary>
-		public void  AddAssetTag(string tag)
+		public void AddAssetTag(string tag)
 		{
 			if (AssetTags.Contains(tag) == false)
 			{
