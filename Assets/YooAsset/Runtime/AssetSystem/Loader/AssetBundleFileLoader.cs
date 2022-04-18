@@ -18,6 +18,7 @@ namespace YooAsset
 		}
 
 		private ESteps _steps = ESteps.None;
+		private string _fileLoadPath;
 		private bool _isWaitForAsyncComplete = false;
 		private bool _isShowWaitForAsyncError = false;
 		private DownloaderBase _downloader;
@@ -38,18 +39,32 @@ namespace YooAsset
 
 			if (_steps == ESteps.None)
 			{
-				// 检测加载地址是否为空
-				if (string.IsNullOrEmpty(BundleFileInfo.LocalPath))
+				if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.None)
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
 					return;
 				}
 
-				if (string.IsNullOrEmpty(BundleFileInfo.RemoteMainURL))
-					_steps = ESteps.LoadFile;
-				else
+				if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
+				{
 					_steps = ESteps.Download;
+					_fileLoadPath = BundleFileInfo.GetCacheLoadPath();
+				}
+				else if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
+				{
+					_steps = ESteps.LoadFile;
+					_fileLoadPath = BundleFileInfo.GetStreamingLoadPath();
+				}
+				else if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
+				{
+					_steps = ESteps.LoadFile;
+					_fileLoadPath = BundleFileInfo.GetCacheLoadPath();
+				}
+				else
+				{
+					throw new System.NotImplementedException(BundleFileInfo.LoadMode.ToString());
+				}
 			}
 
 			// 1. 从服务器下载
@@ -83,9 +98,9 @@ namespace YooAsset
 			{
 #if UNITY_EDITOR
 				// 注意：Unity2017.4编辑器模式下，如果AssetBundle文件不存在会导致编辑器崩溃，这里做了预判。
-				if (System.IO.File.Exists(BundleFileInfo.LocalPath) == false)
+				if (System.IO.File.Exists(_fileLoadPath) == false)
 				{
-					YooLogger.Warning($"Not found assetBundle file : {BundleFileInfo.LocalPath}");
+					YooLogger.Warning($"Not found assetBundle file : {_fileLoadPath}");
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
 					return;
@@ -96,20 +111,20 @@ namespace YooAsset
 				if (BundleFileInfo.IsEncrypted)
 				{
 					if (AssetSystem.DecryptionServices == null)
-						throw new Exception($"{nameof(AssetBundleFileLoader)} need IDecryptServices : {BundleFileInfo.BundleName}");
+						throw new Exception($"{nameof(AssetBundleFileLoader)} need {nameof(IDecryptionServices)} : {BundleFileInfo.BundleName}");
 
 					ulong offset = AssetSystem.DecryptionServices.GetFileOffset(BundleFileInfo);
 					if (_isWaitForAsyncComplete)
-						CacheBundle = AssetBundle.LoadFromFile(BundleFileInfo.LocalPath, 0, offset);
+						CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath, 0, offset);
 					else
-						_cacheRequest = AssetBundle.LoadFromFileAsync(BundleFileInfo.LocalPath, 0, offset);
+						_cacheRequest = AssetBundle.LoadFromFileAsync(_fileLoadPath, 0, offset);
 				}
 				else
 				{
 					if (_isWaitForAsyncComplete)
-						CacheBundle = AssetBundle.LoadFromFile(BundleFileInfo.LocalPath);
+						CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath);
 					else
-						_cacheRequest = AssetBundle.LoadFromFileAsync(BundleFileInfo.LocalPath);
+						_cacheRequest = AssetBundle.LoadFromFileAsync(_fileLoadPath);
 				}
 				_steps = ESteps.CheckFile;
 			}

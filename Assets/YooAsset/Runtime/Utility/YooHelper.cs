@@ -150,6 +150,7 @@ namespace YooAsset
 		/// </summary>
 		public static List<BundleInfo> GetUnpackListByTags(PatchManifest appPatchManifest, string[] tags)
 		{
+			// 注意：离线运行模式也依赖下面逻辑，所以判断沙盒内文件是否存在不能通过缓存系统去验证。
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
 			foreach (var patchBundle in appPatchManifest.BundleList)
 			{
@@ -162,18 +163,10 @@ namespace YooAsset
 				if (patchBundle.IsBuildin == false)
 					continue;
 
-				// 如果是纯内置资源
-				if (patchBundle.IsPureBuildin())
+				// 查询DLC资源
+				if (patchBundle.HasTag(tags))
 				{
 					downloadList.Add(patchBundle);
-				}
-				else
-				{
-					// 查询DLC资源
-					if (patchBundle.HasTag(tags))
-					{
-						downloadList.Add(patchBundle);
-					}
 				}
 			}
 
@@ -191,9 +184,10 @@ namespace YooAsset
 		}
 		private static BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
 		{
-			string sandboxPath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
-			string streamingLoadPath = PathHelper.MakeStreamingLoadPath(patchBundle.Hash);
-			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, streamingLoadPath, streamingLoadPath);
+			// 注意：我们把流加载路径指定为远端下载地址
+			string streamingPath = PathHelper.MakeStreamingLoadPath(patchBundle.Hash);
+			streamingPath = PathHelper.ConvertToWWWPath(streamingPath);
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, streamingPath, streamingPath);
 			return bundleInfo;
 		}
 	}

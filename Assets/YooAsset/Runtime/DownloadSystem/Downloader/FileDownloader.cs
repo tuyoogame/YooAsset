@@ -42,7 +42,7 @@ namespace YooAsset
 
 				_requestURL = GetRequestURL();
 				_webRequest = new UnityWebRequest(_requestURL, UnityWebRequest.kHttpVerbGET);
-				DownloadHandlerFile handler = new DownloadHandlerFile(_bundleInfo.LocalPath);
+				DownloadHandlerFile handler = new DownloadHandlerFile(_bundleInfo.GetCacheLoadPath());
 				handler.removeFileOnAbort = true;
 				_webRequest.downloadHandler = handler;
 				_webRequest.disposeDownloadHandlerOnDispose = true;
@@ -97,8 +97,9 @@ namespace YooAsset
 				{
 					ReportError();
 
-					if (File.Exists(_bundleInfo.LocalPath))
-						File.Delete(_bundleInfo.LocalPath);
+					string cacheFilePath = _bundleInfo.GetCacheLoadPath();
+					if (File.Exists(cacheFilePath))
+						File.Delete(cacheFilePath);
 
 					// 失败后重新尝试
 					if (_failedTryAgain > 0)

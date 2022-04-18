@@ -10,31 +10,40 @@ namespace YooAsset
 			Prepare,
 			DownloadFromWeb,
 			CheckDownloadFromWeb,
-			CheckFile,
 			DownloadFromApk,
 			CheckDownloadFromApk,
+			CheckAndCopyFile,
 			Done,
 		}
 
 		private readonly BundleInfo _bundleInfo;
-		private readonly string _savePath;
 		private ESteps _steps = ESteps.None;
 		private DownloaderBase _downloader;
 		private UnityWebFileRequester _fileRequester;
 
 		/// <summary>
-		/// 原生文件的存储路径
+		/// 原生文件的拷贝路径
 		/// </summary>
-		public string SavePath
+		public string CopyPath { private set; get; }
+
+		/// <summary>
+		/// 原生文件的缓存路径
+		/// </summary>
+		public string CachePath
 		{
-			get { return _savePath; }
+			get
+			{
+				if (_bundleInfo == null)
+					return string.Empty;
+				return _bundleInfo.GetCacheLoadPath();
+			}
 		}
 
 
-		internal RawFileOperation(BundleInfo bundleInfo, string savePath)
+		internal RawFileOperation(BundleInfo bundleInfo, string copyPath)
 		{
 			_bundleInfo = bundleInfo;
-			_savePath = savePath;
+			CopyPath = copyPath;
 		}
 		internal override void Start()
 		{
@@ -48,19 +57,30 @@ namespace YooAsset
 			// 1. 准备工作
 			if (_steps == ESteps.Prepare)
 			{
-				// 检测加载地址是否为空
-				if (string.IsNullOrEmpty(_bundleInfo.LocalPath))
+				if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.None)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = "Local path is null or empty.";
+					Error = $"Bundle info is invalid : {_bundleInfo.BundleName}";
 					return;
 				}
 
-				if (string.IsNullOrEmpty(_bundleInfo.RemoteMainURL))
-					_steps = ESteps.CheckFile;
-				else
+				if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
+				{
 					_steps = ESteps.DownloadFromWeb;
+				}
+				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
+				{
+					_steps = ESteps.DownloadFromApk;
+				}
+				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
+				{
+					_steps = ESteps.CheckAndCopyFile;
+				}
+				else
+				{
+					throw new System.NotImplementedException(_bundleInfo.LoadMode.ToString());
+				}
 			}
 
 			// 2. 从服务器下载
@@ -85,65 +105,20 @@ namespace YooAsset
 				}
 				else
 				{
-					// 注意：当文件更新之后，需要删除旧文件			
-					if (File.Exists(_savePath))
-						File.Delete(_savePath);
-					_steps = ESteps.CheckFile;
+					_steps = ESteps.CheckAndCopyFile;
 				}
 			}
 
-			// 4. 检测文件
-			if (_steps == ESteps.CheckFile)
-			{
-				// 注意：如果原生文件已经存在，则验证其完整性
-				if (File.Exists(_savePath))
-				{
-					bool result = DownloadSystem.CheckContentIntegrity(_savePath, _bundleInfo.SizeBytes, _bundleInfo.CRC);
-					if (result)
-					{
-						_steps = ESteps.Done;
-						Status = EOperationStatus.Succeed;
-						return;
-					}
-					else
-					{
-						File.Delete(_savePath);
-					}
-				}
-
-				if (_bundleInfo.IsBuildinJarFile())
-				{
-					_steps = ESteps.DownloadFromApk;
-				}
-				else
-				{
-					try
-					{
-						File.Copy(_bundleInfo.LocalPath, _savePath, true);
-					}
-					catch (System.Exception e)
-					{
-						_steps = ESteps.Done;
-						Status = EOperationStatus.Failed;
-						Error = e.ToString();
-						return;
-					}
-
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Succeed;
-				}
-			}
-
-			// 5. 从APK拷贝文件
+			// 4. 从APK拷贝文件
 			if (_steps == ESteps.DownloadFromApk)
 			{
-				string downloadURL = PathHelper.ConvertToWWWPath(_bundleInfo.LocalPath);
+				string downloadURL = PathHelper.ConvertToWWWPath(_bundleInfo.GetStreamingLoadPath());
 				_fileRequester = new UnityWebFileRequester();
-				_fileRequester.SendRequest(downloadURL, _savePath);
+				_fileRequester.SendRequest(downloadURL, _bundleInfo.GetCacheLoadPath());
 				_steps = ESteps.CheckDownloadFromApk;
 			}
 
-			// 6. 检测APK拷贝文件结果
+			// 5. 检测APK拷贝文件结果
 			if (_steps == ESteps.CheckDownloadFromApk)
 			{
 				if (_fileRequester.IsDone() == false)
@@ -157,11 +132,51 @@ namespace YooAsset
 				}
 				else
 				{
+					_steps = ESteps.CheckAndCopyFile;
+				}
+				_fileRequester.Dispose();
+			}
+
+			// 6. 检测并拷贝原生文件
+			if (_steps == ESteps.CheckAndCopyFile)
+			{
+				// 如果不需要保存文件
+				if (string.IsNullOrEmpty(CopyPath))
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
+					return;
+				}
+
+				// 如果原生文件已经存在，则验证其完整性
+				if (File.Exists(CopyPath))
+				{
+					bool result = DownloadSystem.CheckContentIntegrity(CopyPath, _bundleInfo.SizeBytes, _bundleInfo.CRC);
+					if (result)
+					{
+						_steps = ESteps.Done;
+						Status = EOperationStatus.Succeed;
+						return;
+					}
+					else
+					{
+						File.Delete(CopyPath);
+					}
+				}
+
+				try
+				{
+					FileUtility.CreateFileDirectory(CopyPath);
+					File.Copy(_bundleInfo.GetCacheLoadPath(), CopyPath, true);
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
 				}
-
-				_fileRequester.Dispose();
+				catch (System.Exception e)
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = e.ToString();
+				}
 			}
 		}
 
@@ -170,9 +185,10 @@ namespace YooAsset
 		/// </summary>
 		public byte[] GetFileData()
 		{
-			if (File.Exists(_savePath) == false)
+			string cachePath = _bundleInfo.GetCacheLoadPath();
+			if (File.Exists(cachePath) == false)
 				return null;
-			return File.ReadAllBytes(_savePath);
+			return File.ReadAllBytes(cachePath);
 		}
 
 		/// <summary>
@@ -180,9 +196,10 @@ namespace YooAsset
 		/// </summary>
 		public string GetFileText()
 		{
-			if (File.Exists(_savePath) == false)
+			string cachePath = _bundleInfo.GetCacheLoadPath();
+			if (File.Exists(cachePath) == false)
 				return string.Empty;
-			return File.ReadAllText(_savePath, System.Text.Encoding.UTF8);
+			return File.ReadAllText(cachePath, System.Text.Encoding.UTF8);
 		}
 	}
 }

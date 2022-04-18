@@ -3,17 +3,24 @@ namespace YooAsset
 {
 	public class BundleInfo
 	{
+		internal enum ELoadMode
+		{
+			None,
+			LoadFromStreaming,
+			LoadFromCache,
+			LoadFromRemote,
+		}
+
 		private readonly PatchBundle _patchBundle;
-		
+		internal readonly ELoadMode LoadMode;
+
+		private string _streamingPath;
+		private string _cachePath;
+
 		/// <summary>
 		/// 资源包名称
 		/// </summary>
 		public string BundleName { private set; get; }
-
-		/// <summary>
-		/// 本地存储的路径
-		/// </summary>
-		public string LocalPath { private set; get; }
 
 		/// <summary>
 		/// 远端下载地址
@@ -96,30 +103,57 @@ namespace YooAsset
 		}
 
 
+		/// <summary>
+		/// 获取流文件夹的加载路径
+		/// </summary>
+		public string GetStreamingLoadPath()
+		{
+			if (_patchBundle == null)
+				return string.Empty;
+
+			if (string.IsNullOrEmpty(_streamingPath))
+				_streamingPath = PathHelper.MakeStreamingLoadPath(_patchBundle.Hash);
+			return _streamingPath;
+		}
+
+		/// <summary>
+		/// 获取缓存文件夹的加载路径
+		/// </summary>
+		public string GetCacheLoadPath()
+		{
+			if (_patchBundle == null)
+				return string.Empty;
+
+			if (string.IsNullOrEmpty(_cachePath))
+				_cachePath = SandboxHelper.MakeSandboxCacheFilePath(_patchBundle.Hash);
+			return _cachePath;
+		}
+
+
 		private BundleInfo()
 		{
 		}
-		internal BundleInfo(PatchBundle patchBundle, string localPath, string mainURL, string fallbackURL)
+		internal BundleInfo(PatchBundle patchBundle, ELoadMode loadMode, string mainURL, string fallbackURL)
 		{
 			_patchBundle = patchBundle;
+			LoadMode = loadMode;
 			BundleName = patchBundle.BundleName;
-			LocalPath = localPath;
 			RemoteMainURL = mainURL;
 			RemoteFallbackURL = fallbackURL;
 		}
-		internal BundleInfo(PatchBundle patchBundle, string localPath)
+		internal BundleInfo(PatchBundle patchBundle, ELoadMode loadMode)
 		{
 			_patchBundle = patchBundle;
+			LoadMode = loadMode;
 			BundleName = patchBundle.BundleName;
-			LocalPath = localPath;
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
 		}
-		internal BundleInfo(string bundleName, string localPath)
+		internal BundleInfo(string bundleName)
 		{
 			_patchBundle = null;
+			LoadMode = ELoadMode.None;
 			BundleName = bundleName;
-			LocalPath = localPath;
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
 		}
@@ -127,9 +161,9 @@ namespace YooAsset
 		/// <summary>
 		/// 是否为JAR包内文件
 		/// </summary>
-		public bool IsBuildinJarFile()
+		public static bool IsBuildinJarFile(string streamingPath)
 		{
-			return LocalPath.StartsWith("jar:");
+			return streamingPath.StartsWith("jar:");
 		}
 	}
 }

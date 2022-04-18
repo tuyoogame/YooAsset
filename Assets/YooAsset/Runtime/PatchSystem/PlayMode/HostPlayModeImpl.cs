@@ -196,10 +196,9 @@ namespace YooAsset
 		private BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
 		{
 			// 注意：资源版本号只用于确定下载路径
-			string sandboxPath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
 			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.Hash);
 			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.Hash);
-			BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxPath, remoteMainURL, remoteFallbackURL);
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, remoteMainURL, remoteFallbackURL);
 			return bundleInfo;
 		}
 
@@ -207,27 +206,25 @@ namespace YooAsset
 		BundleInfo IBundleServices.GetBundleInfo(string bundleName)
 		{
 			if (string.IsNullOrEmpty(bundleName))
-				return new BundleInfo(string.Empty, string.Empty);
+				return new BundleInfo(string.Empty);
 
 			if (LocalPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
 			{
+				// 查询沙盒资源				
+				if (DownloadSystem.ContainsVerifyFile(patchBundle.Hash))
+				{
+					BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromCache);
+					return bundleInfo;
+				}
+
 				// 查询APP资源
 				if (AppPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle appPatchBundle))
 				{
 					if (appPatchBundle.IsBuildin && appPatchBundle.Hash == patchBundle.Hash)
 					{
-						string appLoadPath = PathHelper.MakeStreamingLoadPath(appPatchBundle.Hash);
-						BundleInfo bundleInfo = new BundleInfo(appPatchBundle, appLoadPath);
+						BundleInfo bundleInfo = new BundleInfo(appPatchBundle, BundleInfo.ELoadMode.LoadFromStreaming);
 						return bundleInfo;
 					}
-				}
-
-				// 查询沙盒资源				
-				if (DownloadSystem.ContainsVerifyFile(patchBundle.Hash))
-				{
-					string sandboxLoadPath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
-					BundleInfo bundleInfo = new BundleInfo(patchBundle, sandboxLoadPath);
-					return bundleInfo;
 				}
 
 				// 从服务端下载
@@ -236,7 +233,7 @@ namespace YooAsset
 			else
 			{
 				YooLogger.Warning($"Not found bundle in patch manifest : {bundleName}");
-				BundleInfo bundleInfo = new BundleInfo(bundleName, string.Empty);
+				BundleInfo bundleInfo = new BundleInfo(bundleName);
 				return bundleInfo;
 			}
 		}

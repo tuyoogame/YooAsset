@@ -197,7 +197,7 @@ namespace YooAsset
 
 				_requestURL = GetRequestURL();
 				_threadDownloader = new ThreadDownloader();
-				_threadDownloader.Run(_requestURL, _bundleInfo.LocalPath, _bundleInfo.Hash, _bundleInfo.CRC, _bundleInfo.SizeBytes, _timeout);
+				_threadDownloader.Run(_requestURL, _bundleInfo.GetCacheLoadPath(), _bundleInfo.Hash, _bundleInfo.CRC, _bundleInfo.SizeBytes, _timeout);
 				_steps = ESteps.CheckDownload;
 			}
 

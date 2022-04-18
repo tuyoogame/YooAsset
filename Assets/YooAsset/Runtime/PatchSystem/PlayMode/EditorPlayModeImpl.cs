@@ -28,7 +28,7 @@ namespace YooAsset
 		BundleInfo IBundleServices.GetBundleInfo(string bundleName)
 		{
 			YooLogger.Warning($"Editor play mode can not get bundle info.");
-			BundleInfo bundleInfo = new BundleInfo(bundleName, bundleName);
+			BundleInfo bundleInfo = new BundleInfo(bundleName);
 			return bundleInfo;
 		}
 		string IBundleServices.GetBundleName(string assetPath)

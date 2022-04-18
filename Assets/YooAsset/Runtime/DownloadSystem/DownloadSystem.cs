@@ -84,7 +84,7 @@ namespace YooAsset
 			// 创建新的下载器	
 			{
 				YooLogger.Log($"Beginning to download file : {bundleInfo.BundleName} URL : {bundleInfo.RemoteMainURL}");
-				FileUtility.CreateFileDirectory(bundleInfo.LocalPath);
+				FileUtility.CreateFileDirectory(bundleInfo.GetCacheLoadPath());
 				DownloaderBase newDownloader;
 				if (bundleInfo.SizeBytes >= _breakpointResumeFileSize)
 					newDownloader = new HttpDownloader(bundleInfo);
@@ -146,7 +146,7 @@ namespace YooAsset
 		// 验证文件完整性
 		public static bool CheckContentIntegrity(BundleInfo bundleInfo)
 		{
-			return CheckContentIntegrity(bundleInfo.LocalPath, bundleInfo.SizeBytes, bundleInfo.CRC);
+			return CheckContentIntegrity(bundleInfo.GetCacheLoadPath(), bundleInfo.SizeBytes, bundleInfo.CRC);
 		}
 		public static bool CheckContentIntegrity(PatchBundle patchBundle)
 		{

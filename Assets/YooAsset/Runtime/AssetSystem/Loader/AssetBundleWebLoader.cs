@@ -37,19 +37,22 @@ namespace YooAsset
 
 			if (_steps == ESteps.None)
 			{
-				// 检测加载地址是否为空
-				if (string.IsNullOrEmpty(BundleFileInfo.LocalPath))
+				if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.None)
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
 					return;
 				}
 
-				if (string.IsNullOrEmpty(BundleFileInfo.RemoteMainURL))
-					_webURL = BundleFileInfo.LocalPath;
+				if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
+				{
+					_steps = ESteps.LoadFile;
+					_webURL = BundleFileInfo.GetStreamingLoadPath();
+				}
 				else
-					_webURL = BundleFileInfo.RemoteMainURL;
-				_steps = ESteps.LoadFile;
+				{
+					throw new System.NotImplementedException(BundleFileInfo.LoadMode.ToString());
+				}
 			}
 
 			// 1. 从服务器或缓存中获取AssetBundle文件

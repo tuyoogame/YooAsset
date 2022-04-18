@@ -364,10 +364,12 @@ namespace YooAsset
 		/// <summary>
 		/// 异步加载原生文件
 		/// </summary>
-		public static RawFileOperation LoadRawFileAsync(string location, string savePath)
+		/// <param name="location">资源的定位地址</param>
+		/// <param name="copyPath">拷贝路径</param>
+		public static RawFileOperation LoadRawFileAsync(string location, string copyPath = null)
 		{
 			string assetPath = _locationServices.ConvertLocationToAssetPath(_playMode, location);
-			return AssetSystem.LoadRawFileAsync(assetPath, savePath);
+			return AssetSystem.LoadRawFileAsync(assetPath, copyPath);
 		}
 
 
@@ -375,7 +377,7 @@ namespace YooAsset
 		/// 同步加载资源对象
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
-		/// <param name="location">资源对象相对路径</param>
+		/// <param name="location">资源的定位地址</param>
 		public static AssetOperationHandle LoadAssetSync<TObject>(string location) where TObject : class
 		{
 			return LoadAssetInternal(location, typeof(TObject), true);
@@ -384,7 +386,7 @@ namespace YooAsset
 		/// <summary>
 		/// 同步加载资源对象
 		/// </summary>
-		/// <param name="location">资源对象相对路径</param>
+		/// <param name="location">资源的定位地址</param>
 		/// <param name="type">资源类型</param>
 		public static AssetOperationHandle LoadAssetSync(string location, System.Type type)
 		{
@@ -395,7 +397,7 @@ namespace YooAsset
 		/// 同步加载子资源对象
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
-		/// <param name="location">资源对象相对路径</param>
+		/// <param name="location">资源的定位地址</param>
 		public static SubAssetsOperationHandle LoadSubAssetsSync<TObject>(string location)
 		{
 			return LoadSubAssetsInternal(location, typeof(TObject), true);
@@ -404,7 +406,7 @@ namespace YooAsset
 		/// <summary>
 		/// 同步加载子资源对象
 		/// </summary>
-		/// <param name="location">资源对象相对路径</param>
+		/// <param name="location">资源的定位地址</param>
 		/// <param name="type">子对象类型</param>
 		public static SubAssetsOperationHandle LoadSubAssetsSync(string location, System.Type type)
 		{
@@ -416,7 +418,7 @@ namespace YooAsset
 		/// 异步加载资源对象
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
-		/// <param name="location">资源对象相对路径</param>
+		/// <param name="location">资源的定位地址</param>
 		public static AssetOperationHandle LoadAssetAsync<TObject>(string location)
 		{
 			return LoadAssetInternal(location, typeof(TObject), false);
@@ -425,7 +427,7 @@ namespace YooAsset
 		/// <summary>
 		/// 异步加载资源对象
 		/// </summary>
-		/// <param name="location">资源对象相对路径</param>
+		/// <param name="location">资源的定位地址</param>
 		/// <param name="type">资源类型</param>
 		public static AssetOperationHandle LoadAssetAsync(string location, System.Type type)
 		{
@@ -436,7 +438,7 @@ namespace YooAsset
 		/// 异步加载子资源对象
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
-		/// <param name="location">资源对象相对路径</param>
+		/// <param name="location">资源的定位地址</param>
 		public static SubAssetsOperationHandle LoadSubAssetsAsync<TObject>(string location)
 		{
 			return LoadSubAssetsInternal(location, typeof(TObject), false);
@@ -445,7 +447,7 @@ namespace YooAsset
 		/// <summary>
 		/// 异步加载子资源对象
 		/// </summary>
-		/// <param name="location">资源对象相对路径</param>
+		/// <param name="location">资源的定位地址</param>
 		/// <param name="type">子对象类型</param>
 		public static SubAssetsOperationHandle LoadSubAssetsAsync(string location, System.Type type)
 		{

@@ -50,9 +50,6 @@ namespace YooAsset
 		}
 		public void SendRequest(int failedTryAgain, int timeout)
 		{
-			if (string.IsNullOrEmpty(_bundleInfo.LocalPath))
-				throw new System.ArgumentNullException();
-
 			if (_steps == ESteps.None)
 			{
 				_failedTryAgain = failedTryAgain;
@@ -62,7 +59,7 @@ namespace YooAsset
 		}
 		public abstract void Update();
 		public abstract void Abort();
-		
+
 		/// <summary>
 		/// 获取网络请求地址
 		/// </summary>

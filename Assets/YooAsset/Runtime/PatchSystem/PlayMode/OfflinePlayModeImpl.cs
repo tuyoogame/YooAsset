@@ -42,18 +42,17 @@ namespace YooAsset
 		BundleInfo IBundleServices.GetBundleInfo(string bundleName)
 		{
 			if (string.IsNullOrEmpty(bundleName))
-				return new BundleInfo(string.Empty, string.Empty);
+				return new BundleInfo(string.Empty);
 
 			if (AppPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
 			{
-				string localPath = PathHelper.MakeStreamingLoadPath(patchBundle.Hash);
-				BundleInfo bundleInfo = new BundleInfo(patchBundle, localPath);
+				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming);
 				return bundleInfo;
 			}
 			else
 			{
 				YooLogger.Warning($"Not found bundle in patch manifest : {bundleName}");
-				BundleInfo bundleInfo = new BundleInfo(bundleName, string.Empty);
+				BundleInfo bundleInfo = new BundleInfo(bundleName);
 				return bundleInfo;
 			}
 		}
