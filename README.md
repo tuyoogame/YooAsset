@@ -57,7 +57,7 @@
 
 ## 视频教程
 
-Coming soon...
+[B站](https://space.bilibili.com/328590743/channel/seriesdetail?sid=2207858)
 
 ## 社区
 
