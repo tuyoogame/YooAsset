@@ -113,6 +113,7 @@ namespace YooAsset
 					if (cachedManifestHash == webManifestHash)
 					{
 						YooLogger.Log($"Patch manifest file hash is not change : {webManifestHash}");
+						LoadSandboxPatchManifest(_updateResourceVersion);
 						_steps = ESteps.InitPrepareCache;
 					}
 					else
@@ -140,7 +141,7 @@ namespace YooAsset
 
 				// Check error
 				if (_downloaderManifest.HasError())
-				{			
+				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = _downloaderManifest.GetError();
@@ -209,6 +210,17 @@ namespace YooAsset
 				YooLogger.Warning(e.ToString());
 				return false;
 			}
+		}
+
+		/// <summary>
+		/// 加载沙盒内的补丁清单
+		/// </summary>
+		private void LoadSandboxPatchManifest(int updateResourceVersion)
+		{
+			YooLogger.Log("Load sandbox patch manifest file.");
+			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.GetPatchManifestFileName(updateResourceVersion));
+			string jsonData = File.ReadAllText(filePath);
+			_impl.LocalPatchManifest = PatchManifest.Deserialize(jsonData);
 		}
 
 		/// <summary>
