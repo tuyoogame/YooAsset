@@ -2,6 +2,18 @@
 
 All notable changes to this package will be documented in this file.   
 
+## [1.0.4] - 2022-04-18
+
+### Fixed
+
+- 修复资源清单附加版本之后引发的一个流程错误。
+- 修复原生文件拷贝目录不存导致的加载失败。
+
+### Changed
+
+- 在编辑器下检测资源路径是否合法并警告。
+- 完善原生文件异步加载接口。
+
 ## [1.0.3] - 2022-04-14
 
 ### Fixed
