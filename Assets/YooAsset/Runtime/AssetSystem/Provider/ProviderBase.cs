@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace YooAsset
 {
@@ -106,6 +107,7 @@ namespace YooAsset
 		public virtual void Destory()
 		{
 			IsDestroyed = true;
+			_taskCompletionSource = null;
 		}
 
 		/// <summary>
@@ -197,31 +199,22 @@ namespace YooAsset
 		/// <summary>
 		/// 异步操作任务
 		/// </summary>
-		public System.Threading.Tasks.Task<object> Task
+		public Task<object> Task
 		{
 			get
 			{
-				var handle = WaitHandle;
-				return System.Threading.Tasks.Task.Factory.StartNew(o =>
+				if(_taskCompletionSource == null)
 				{
-					handle.WaitOne();
-					return AssetObject as object;
-				}, this);
+					_taskCompletionSource = new TaskCompletionSource<object>();
+					if (IsDone)
+						_taskCompletionSource.SetResult(this);
+				}
+				return _taskCompletionSource.Task;
 			}
 		}
 
 		#region 异步编程相关
-		private System.Threading.EventWaitHandle _waitHandle;
-		private System.Threading.WaitHandle WaitHandle
-		{
-			get
-			{
-				if (_waitHandle == null)
-					_waitHandle = new System.Threading.EventWaitHandle(false, System.Threading.EventResetMode.ManualReset);
-				_waitHandle.Reset();
-				return _waitHandle;
-			}
-		}
+		private TaskCompletionSource<object> _taskCompletionSource;
 		protected void InvokeCompletion()
 		{
 			// 注意：创建临时列表是为了防止外部逻辑在回调函数内创建或者释放资源句柄。
@@ -233,7 +226,9 @@ namespace YooAsset
 					hande.InvokeCallback();
 				}
 			}
-			_waitHandle?.Set();
+
+			if(_taskCompletionSource != null)
+				_taskCompletionSource.TrySetResult(this);
 		}
 		#endregion
 	}
