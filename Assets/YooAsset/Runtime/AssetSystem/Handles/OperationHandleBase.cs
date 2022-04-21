@@ -95,7 +95,7 @@ namespace YooAsset
 		/// <summary>
 		/// 异步操作任务
 		/// </summary>
-		public System.Threading.Tasks.Task<object> Task
+		public System.Threading.Tasks.Task Task
 		{
 			get { return _provider.Task; }
 		}

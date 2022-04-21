@@ -199,7 +199,7 @@ namespace YooAsset
 		/// <summary>
 		/// 异步操作任务
 		/// </summary>
-		public Task<object> Task
+		public Task Task
 		{
 			get
 			{
@@ -207,7 +207,7 @@ namespace YooAsset
 				{
 					_taskCompletionSource = new TaskCompletionSource<object>();
 					if (IsDone)
-						_taskCompletionSource.SetResult(this);
+						_taskCompletionSource.SetResult(null);
 				}
 				return _taskCompletionSource.Task;
 			}
@@ -228,7 +228,7 @@ namespace YooAsset
 			}
 
 			if(_taskCompletionSource != null)
-				_taskCompletionSource.TrySetResult(this);
+				_taskCompletionSource.TrySetResult(null);
 		}
 		#endregion
 	}
