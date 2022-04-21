@@ -16,7 +16,7 @@ namespace YooAsset
 	/// <summary>
 	/// 编辑器下模拟运行的更新清单操作
 	/// </summary>
-	internal class EditorModeUpdateManifestOperation : UpdateManifestOperation
+	internal sealed class EditorPlayModeUpdateManifestOperation : UpdateManifestOperation
 	{
 		internal override void Start()
 		{
@@ -30,7 +30,7 @@ namespace YooAsset
 	/// <summary>
 	/// 离线模式的更新清单操作
 	/// </summary>
-	internal class OfflinePlayModeUpdateManifestOperation : UpdateManifestOperation
+	internal sealed class OfflinePlayModeUpdateManifestOperation : UpdateManifestOperation
 	{
 		internal override void Start()
 		{
@@ -44,7 +44,7 @@ namespace YooAsset
 	/// <summary>
 	/// 网络模式的更新清单操作
 	/// </summary>
-	internal class HostPlayModeUpdateManifestOperation : UpdateManifestOperation
+	internal sealed class HostPlayModeUpdateManifestOperation : UpdateManifestOperation
 	{
 		private enum ESteps
 		{

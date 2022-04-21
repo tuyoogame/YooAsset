@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 namespace YooAsset
@@ -15,7 +14,7 @@ namespace YooAsset
 	/// <summary>
 	/// 编辑器下模拟运行的初始化操作
 	/// </summary>
-	internal class EditorModeInitializationOperation : InitializationOperation
+	internal sealed class EditorPlayModeInitializationOperation : InitializationOperation
 	{
 		internal override void Start()
 		{
@@ -29,7 +28,7 @@ namespace YooAsset
 	/// <summary>
 	/// 离线模式的初始化操作
 	/// </summary>
-	internal class OfflinePlayModeInitializationOperation : InitializationOperation
+	internal sealed class OfflinePlayModeInitializationOperation : InitializationOperation
 	{
 		private enum ESteps
 		{
@@ -81,7 +80,7 @@ namespace YooAsset
 	/// <summary>
 	/// 网络模式的初始化操作
 	/// </summary>
-	internal class HostPlayModeInitializationOperation : InitializationOperation
+	internal sealed class HostPlayModeInitializationOperation : InitializationOperation
 	{
 		private enum ESteps
 		{

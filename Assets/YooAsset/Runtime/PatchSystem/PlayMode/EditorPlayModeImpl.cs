@@ -11,7 +11,7 @@ namespace YooAsset
 		/// </summary>
 		public InitializationOperation InitializeAsync()
 		{
-			var operation = new EditorModeInitializationOperation();
+			var operation = new EditorPlayModeInitializationOperation();
 			OperationSystem.ProcessOperaiton(operation);
 			return operation;
 		}

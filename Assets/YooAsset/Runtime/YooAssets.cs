@@ -219,12 +219,11 @@ namespace YooAsset
 		/// 向网络端请求静态资源版本号
 		/// </summary>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		/// <returns></returns>
 		public static UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
-				var operation = new EditorModeUpdateStaticVersionOperation();
+				var operation = new EditorPlayModeUpdateStaticVersionOperation();
 				OperationSystem.ProcessOperaiton(operation);
 				return operation;
 			}
@@ -255,7 +254,7 @@ namespace YooAsset
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
-				var operation = new EditorModeUpdateManifestOperation();
+				var operation = new EditorPlayModeUpdateManifestOperation();
 				OperationSystem.ProcessOperaiton(operation);
 				return operation;
 			}
@@ -369,7 +368,35 @@ namespace YooAsset
 		public static RawFileOperation LoadRawFileAsync(string location, string copyPath = null)
 		{
 			string assetPath = _locationServices.ConvertLocationToAssetPath(_playMode, location);
-			return AssetSystem.LoadRawFileAsync(assetPath, copyPath);
+			if (_playMode == EPlayMode.EditorPlayMode)
+			{
+				BundleInfo bundleInfo = new BundleInfo(assetPath);
+				RawFileOperation operation = new EditorPlayModeRawFileOperation(bundleInfo, copyPath);
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				IBundleServices bundleServices = _offlinePlayModeImpl;
+				string bundleName = bundleServices.GetBundleName(assetPath);
+				BundleInfo bundleInfo = bundleServices.GetBundleInfo(bundleName);
+				RawFileOperation operation = new OfflinePlayModeRawFileOperation(bundleInfo, copyPath);
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.HostPlayMode)
+			{
+				IBundleServices bundleServices = _hostPlayModeImpl;
+				string bundleName = bundleServices.GetBundleName(assetPath);
+				BundleInfo bundleInfo = bundleServices.GetBundleInfo(bundleName);
+				RawFileOperation operation = new HostPlayModeRawFileOperation(bundleInfo, copyPath);
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
 		}
 
 

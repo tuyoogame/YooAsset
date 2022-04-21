@@ -1,7 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
 
 namespace YooAsset
 {
@@ -19,7 +17,7 @@ namespace YooAsset
 	/// <summary>
 	/// 编辑器下模拟运行的更新静态版本操作
 	/// </summary>
-	internal class EditorModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
+	internal sealed class EditorPlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
 	{
 		internal override void Start()
 		{
@@ -33,7 +31,7 @@ namespace YooAsset
 	/// <summary>
 	/// 离线模式的更新静态版本操作
 	/// </summary>
-	internal class OfflinePlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
+	internal sealed class OfflinePlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
 	{
 		internal override void Start()
 		{
@@ -47,7 +45,7 @@ namespace YooAsset
 	/// <summary>
 	/// 网络模式的更新静态版本操作
 	/// </summary>
-	internal class HostPlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
+	internal sealed class HostPlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
 	{
 		private enum ESteps
 		{
