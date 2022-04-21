@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-	public class SubAssetsOperationHandle : OperationHandleBase
+	public sealed class SubAssetsOperationHandle : OperationHandleBase
 	{
 		private System.Action<SubAssetsOperationHandle> _callback;
 

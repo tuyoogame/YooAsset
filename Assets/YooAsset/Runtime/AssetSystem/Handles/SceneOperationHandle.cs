@@ -69,10 +69,35 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 异步卸载场景
+		/// 是否为主场景
+		/// </summary>
+		public bool IsMainScene()
+		{
+			if (IsValid == false)
+				return false;
+
+			if (_provider is DatabaseSceneProvider)
+			{
+				var temp = _provider as DatabaseSceneProvider;
+				return temp.SceneMode == LoadSceneMode.Single;
+			}
+			else if (_provider is BundledSceneProvider)
+			{
+				var temp = _provider as BundledSceneProvider;
+				return temp.SceneMode == LoadSceneMode.Single;
+			}
+			else
+			{
+				throw new System.NotImplementedException();
+			}
+		}
+
+		/// <summary>
+		/// 异步卸载子场景
 		/// </summary>
 		public UnloadSceneOperation UnloadAsync()
 		{
+			// 如果句柄无效
 			if (IsValid == false)
 			{
 				string error = $"{nameof(SceneOperationHandle)} is invalid.";
@@ -81,54 +106,23 @@ namespace YooAsset
 				return operation;
 			}
 
-			ProviderBase provider = _provider;
-
-			// 释放场景句柄
-			ReleaseInternal();
-
-			// 卸载未被使用的资源（包括场景）
-			AssetSystem.UnloadUnusedAssets();
-
-			// 返回场景卸载异步操作类
-			if (provider.IsDestroyed == false)
+			// 如果是主场景
+			if (IsMainScene())
 			{
-				YooLogger.Warning($"Scene can not unload. The provider not destroyed : {provider.AssetPath}");
-				var operation = new UnloadSceneOperation();
+				string error = $"Cannot unload main scene. Use {nameof(YooAssets.LoadSceneAsync)} method to change the main scene !";
+				YooLogger.Error(error);
+				var operation = new UnloadSceneOperation(error);
 				OperationSystem.ProcessOperaiton(operation);
 				return operation;
 			}
-			else
-			{
-				if (IsAdditiveScene(provider))
-				{
-					var operation = new UnloadSceneOperation(provider.SceneObject);
-					OperationSystem.ProcessOperaiton(operation);
-					return operation;
-				}
-				else
-				{
-					var operation = new UnloadSceneOperation();
-					OperationSystem.ProcessOperaiton(operation);
-					return operation;
-				}
-			}
-		}
 
-		private bool IsAdditiveScene(ProviderBase provider)
-		{
-			if (provider is DatabaseSceneProvider)
+			// 卸载子场景
+			Scene sceneObject = SceneObject;
+			AssetSystem.UnloadSubScene(_provider);
 			{
-				var temp = provider as DatabaseSceneProvider;
-				return temp.SceneMode == LoadSceneMode.Additive;
-			}
-			else if (provider is BundledSceneProvider)
-			{
-				var temp = provider as BundledSceneProvider;
-				return temp.SceneMode == LoadSceneMode.Additive;
-			}
-			else
-			{
-				throw new System.NotImplementedException();
+				var operation = new UnloadSceneOperation(sceneObject);
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
 			}
 		}
 	}

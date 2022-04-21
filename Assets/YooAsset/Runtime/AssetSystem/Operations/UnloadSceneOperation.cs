@@ -12,7 +12,6 @@ namespace YooAsset
 		{
 			Normal,
 			Error,
-			Skip,
 		}
 		private enum ESteps
 		{
@@ -40,10 +39,6 @@ namespace YooAsset
 			}
 		}
 
-		internal UnloadSceneOperation()
-		{
-			_flag = EFlag.Skip;
-		}
 		internal UnloadSceneOperation(string error)
 		{
 			_flag = EFlag.Error;
@@ -59,11 +54,6 @@ namespace YooAsset
 			if (_flag == EFlag.Normal)
 			{
 				_steps = ESteps.UnLoad;
-			}
-			else if (_flag == EFlag.Skip)
-			{
-				_steps = ESteps.Done;
-				Status = EOperationStatus.Succeed;
 			}
 			else if (_flag == EFlag.Error)
 			{

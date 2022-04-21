@@ -4,11 +4,13 @@ namespace YooAsset
 {
 	public abstract class OperationHandleBase : IEnumerator
 	{
+		private readonly string _cachedAssetPath;
 		internal ProviderBase _provider { private set; get; }
-		
+
 		internal OperationHandleBase(ProviderBase provider)
 		{
 			_provider = provider;
+			_cachedAssetPath = provider.AssetPath;
 		}
 		internal abstract void InvokeCallback();
 
@@ -63,7 +65,18 @@ namespace YooAsset
 		{
 			get
 			{
-				return _provider != null && _provider.IsDestroyed == false;
+				if (_provider != null && _provider.IsDestroyed == false)
+				{
+					return true;
+				}
+				else
+				{
+					if (_provider == null)
+						YooLogger.Warning($"Operation handle is released : {_cachedAssetPath}");
+					else if (_provider.IsDestroyed)
+						YooLogger.Warning($"Provider is destroyed : {_cachedAssetPath}");
+					return false;
+				}
 			}
 		}
 

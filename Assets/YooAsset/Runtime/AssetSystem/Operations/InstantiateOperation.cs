@@ -48,12 +48,15 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = $"{nameof(AssetOperationHandle)} is invalid.";
+					return;
 				}
+
 				if (_handle.AssetObject == null)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = $"{nameof(AssetOperationHandle.AssetObject)} is null.";
+					return;
 				}
 
 				if(_setPositionRotation)
