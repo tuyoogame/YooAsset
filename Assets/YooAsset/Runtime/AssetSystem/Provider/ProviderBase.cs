@@ -107,7 +107,6 @@ namespace YooAsset
 		public virtual void Destory()
 		{
 			IsDestroyed = true;
-			_taskCompletionSource = null;
 		}
 
 		/// <summary>
