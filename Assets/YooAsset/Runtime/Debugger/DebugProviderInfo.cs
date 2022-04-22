@@ -12,6 +12,16 @@ namespace YooAsset
 		public string AssetPath { set; get; }
 
 		/// <summary>
+		/// 资源出生的场景
+		/// </summary>
+		public string SpawnScene { set; get; }
+
+		/// <summary>
+		/// 资源出生的时间
+		/// </summary>
+		public string SpawnTime { set; get; }
+
+		/// <summary>
 		/// 引用计数
 		/// </summary>
 		public int RefCount { set; get; }

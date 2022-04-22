@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace YooAsset
@@ -202,7 +203,7 @@ namespace YooAsset
 		{
 			get
 			{
-				if(_taskCompletionSource == null)
+				if (_taskCompletionSource == null)
 				{
 					_taskCompletionSource = new TaskCompletionSource<object>();
 					if (IsDone)
@@ -226,8 +227,34 @@ namespace YooAsset
 				}
 			}
 
-			if(_taskCompletionSource != null)
+			if (_taskCompletionSource != null)
 				_taskCompletionSource.TrySetResult(null);
+		}
+		#endregion
+
+		#region 调试信息相关
+		/// <summary>
+		/// 出生的场景
+		/// </summary>
+		public string SpawnScene = string.Empty;
+
+		/// <summary>
+		/// 出生的时间
+		/// </summary>
+		public string SpawnTime = string.Empty;
+
+		[Conditional("DEBUG")]
+		public void SetSpawnDebugInfo(string spawnScene)
+		{
+			SpawnScene = spawnScene;
+			SpawnTime = SpawnTimeToString(UnityEngine.Time.realtimeSinceStartup);
+		}
+		private string SpawnTimeToString(float spawnTime)
+		{
+			float h = UnityEngine.Mathf.FloorToInt(spawnTime / 3600f);
+			float m = UnityEngine.Mathf.FloorToInt(spawnTime / 60f - h * 60f);
+			float s = UnityEngine.Mathf.FloorToInt(spawnTime - m * 60f - h * 3600f);
+			return h.ToString("00") + ":" + m.ToString("00") + ":" + s.ToString("00");
 		}
 		#endregion
 	}

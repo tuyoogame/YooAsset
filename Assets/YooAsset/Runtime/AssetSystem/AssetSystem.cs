@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,7 +12,8 @@ namespace YooAsset
 		private static readonly List<AssetBundleLoaderBase> _loaders = new List<AssetBundleLoaderBase>(1000);
 		private static readonly List<ProviderBase> _providers = new List<ProviderBase>(1000);
 		private static readonly Dictionary<string, SceneOperationHandle> _sceneHandles = new Dictionary<string, SceneOperationHandle>(100);
-
+		private static string _mainSceneName = string.Empty;
+		
 		/// <summary>
 		/// 在编辑器下模拟运行
 		/// </summary>
@@ -36,6 +38,7 @@ namespace YooAsset
 			AssetLoadingMaxNumber = assetLoadingMaxNumber;
 			DecryptionServices = decryptionServices;
 			BundleServices = bundleServices;
+			_mainSceneName = SceneManager.GetActiveScene().name;
 		}
 
 		/// <summary>
@@ -139,7 +142,10 @@ namespace YooAsset
 
 			// 如果加载的是主场景，则卸载所有缓存的场景
 			if (sceneMode == LoadSceneMode.Single)
+			{
 				UnloadAllScene();
+				_mainSceneName = Path.GetFileName(scenePath);
+			}
 
 			ProviderBase provider = TryGetProvider(scenePath);
 			if (provider == null)
@@ -148,8 +154,10 @@ namespace YooAsset
 					provider = new DatabaseSceneProvider(scenePath, sceneMode, activateOnLoad, priority);
 				else
 					provider = new BundledSceneProvider(scenePath, sceneMode, activateOnLoad, priority);
+				provider.SetSpawnDebugInfo(_mainSceneName);
 				_providers.Add(provider);
 			}
+
 			var handle = provider.CreateHandle() as SceneOperationHandle;
 			_sceneHandles.Add(scenePath, handle);
 			return handle;
@@ -167,6 +175,7 @@ namespace YooAsset
 					provider = new DatabaseAssetProvider(assetPath, assetType);
 				else
 					provider = new BundledAssetProvider(assetPath, assetType);
+				provider.SetSpawnDebugInfo(_mainSceneName);
 				_providers.Add(provider);
 			}
 			return provider.CreateHandle() as AssetOperationHandle;
@@ -184,6 +193,7 @@ namespace YooAsset
 					provider = new DatabaseSubAssetsProvider(assetPath, assetType);
 				else
 					provider = new BundledSubAssetsProvider(assetPath, assetType);
+				provider.SetSpawnDebugInfo(_mainSceneName);
 				_providers.Add(provider);
 			}
 			return provider.CreateHandle() as SubAssetsOperationHandle;
@@ -319,6 +329,8 @@ namespace YooAsset
 			{
 				DebugProviderInfo providerInfo = new DebugProviderInfo();
 				providerInfo.AssetPath = provider.AssetPath;
+				providerInfo.SpawnScene = provider.SpawnScene;
+				providerInfo.SpawnTime = provider.SpawnTime;
 				providerInfo.RefCount = provider.RefCount;
 				providerInfo.Status = provider.Status;
 				providerInfo.BundleInfos.Clear();

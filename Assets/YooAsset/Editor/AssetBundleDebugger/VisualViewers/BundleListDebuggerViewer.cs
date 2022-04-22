@@ -65,14 +65,14 @@ namespace YooAsset.Editor
 			Dictionary<string, DebugBundleInfo> result = new Dictionary<string, DebugBundleInfo>(debugReport.ProviderInfos.Count);
 			foreach (var providerInfo in debugReport.ProviderInfos)
 			{
-				foreach(var bundleInfo in providerInfo.BundleInfos)
+				foreach (var bundleInfo in providerInfo.BundleInfos)
 				{
 					if (string.IsNullOrEmpty(searchKeyWord) == false)
 					{
 						if (bundleInfo.BundleName.Contains(searchKeyWord) == false)
 							continue;
 					}
-					if(result.ContainsKey(bundleInfo.BundleName) == false)
+					if (result.ContainsKey(bundleInfo.BundleName) == false)
 						result.Add(bundleInfo.BundleName, bundleInfo);
 				}
 			}
@@ -95,7 +95,7 @@ namespace YooAsset.Editor
 			_root.RemoveFromHierarchy();
 		}
 
-		
+
 		// 顶部列表相关
 		private VisualElement MakeAssetListViewItem()
 		{
@@ -188,7 +188,7 @@ namespace YooAsset.Editor
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
-				label.style.width = 100;
+				label.style.width = 150;
 				element.Add(label);
 			}
 
@@ -198,7 +198,27 @@ namespace YooAsset.Editor
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
+				label.style.width = 150;
+				element.Add(label);
+			}
+
+			{
+				var label = new Label();
+				label.name = "Label4";
+				label.style.unityTextAlign = TextAnchor.MiddleLeft;
+				label.style.marginLeft = 3f;
+				//label.style.flexGrow = 1f;
 				label.style.width = 100;
+				element.Add(label);
+			}
+
+			{
+				var label = new Label();
+				label.name = "Label5";
+				label.style.unityTextAlign = TextAnchor.MiddleLeft;
+				label.style.marginLeft = 3f;
+				//label.style.flexGrow = 1f;
+				label.style.width = 120;
 				element.Add(label);
 			}
 
@@ -213,29 +233,37 @@ namespace YooAsset.Editor
 			var label1 = element.Q<Label>("Label1");
 			label1.text = providerInfo.AssetPath;
 
-			// Ref Count
+			// Spawn Scene
 			var label2 = element.Q<Label>("Label2");
-			label2.text = providerInfo.RefCount.ToString();
+			label2.text = providerInfo.SpawnScene;
+
+			// Spawn Time
+			var label3 = element.Q<Label>("Label3");
+			label3.text = providerInfo.SpawnTime;
+
+			// Ref Count
+			var label4 = element.Q<Label>("Label4");
+			label4.text = providerInfo.RefCount.ToString();
 
 			// Status
-			var label3 = element.Q<Label>("Label3");
-			label3.text = providerInfo.Status.ToString();
+			var label5 = element.Q<Label>("Label5");
+			label5.text = providerInfo.Status.ToString();
 		}
 		private void FillUsingListView(string bundleName)
 		{
 			_usingListView.Clear();
 			_usingListView.ClearSelection();
 
-			List<DebugProviderInfo> source = new List<DebugProviderInfo>();		
-			foreach(var providerInfo in _debugReport.ProviderInfos)
+			List<DebugProviderInfo> source = new List<DebugProviderInfo>();
+			foreach (var providerInfo in _debugReport.ProviderInfos)
 			{
-				foreach(var bundleInfo in providerInfo.BundleInfos)
+				foreach (var bundleInfo in providerInfo.BundleInfos)
 				{
 					if (bundleInfo.BundleName == bundleName)
 					{
 						source.Add(providerInfo);
 						continue;
-					}					
+					}
 				}
 			}
 			_usingListView.itemsSource = source;
