@@ -12,7 +12,6 @@ namespace YooAsset
 		private static readonly List<AssetBundleLoaderBase> _loaders = new List<AssetBundleLoaderBase>(1000);
 		private static readonly List<ProviderBase> _providers = new List<ProviderBase>(1000);
 		private static readonly Dictionary<string, SceneOperationHandle> _sceneHandles = new Dictionary<string, SceneOperationHandle>(100);
-		private static string _mainSceneName = string.Empty;
 		
 		/// <summary>
 		/// 在编辑器下模拟运行
@@ -38,7 +37,6 @@ namespace YooAsset
 			AssetLoadingMaxNumber = assetLoadingMaxNumber;
 			DecryptionServices = decryptionServices;
 			BundleServices = bundleServices;
-			_mainSceneName = SceneManager.GetActiveScene().name;
 		}
 
 		/// <summary>
@@ -144,7 +142,6 @@ namespace YooAsset
 			if (sceneMode == LoadSceneMode.Single)
 			{
 				UnloadAllScene();
-				_mainSceneName = Path.GetFileName(scenePath);
 			}
 
 			ProviderBase provider = TryGetProvider(scenePath);
@@ -154,7 +151,7 @@ namespace YooAsset
 					provider = new DatabaseSceneProvider(scenePath, sceneMode, activateOnLoad, priority);
 				else
 					provider = new BundledSceneProvider(scenePath, sceneMode, activateOnLoad, priority);
-				provider.SetSpawnDebugInfo(_mainSceneName);
+				provider.InitSpawnDebugInfo();
 				_providers.Add(provider);
 			}
 
@@ -175,7 +172,7 @@ namespace YooAsset
 					provider = new DatabaseAssetProvider(assetPath, assetType);
 				else
 					provider = new BundledAssetProvider(assetPath, assetType);
-				provider.SetSpawnDebugInfo(_mainSceneName);
+				provider.InitSpawnDebugInfo();
 				_providers.Add(provider);
 			}
 			return provider.CreateHandle() as AssetOperationHandle;
@@ -193,7 +190,7 @@ namespace YooAsset
 					provider = new DatabaseSubAssetsProvider(assetPath, assetType);
 				else
 					provider = new BundledSubAssetsProvider(assetPath, assetType);
-				provider.SetSpawnDebugInfo(_mainSceneName);
+				provider.InitSpawnDebugInfo();
 				_providers.Add(provider);
 			}
 			return provider.CreateHandle() as SubAssetsOperationHandle;

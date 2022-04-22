@@ -244,9 +244,9 @@ namespace YooAsset
 		public string SpawnTime = string.Empty;
 
 		[Conditional("DEBUG")]
-		public void SetSpawnDebugInfo(string spawnScene)
+		public void InitSpawnDebugInfo()
 		{
-			SpawnScene = spawnScene;
+			SpawnScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name; ;
 			SpawnTime = SpawnTimeToString(UnityEngine.Time.realtimeSinceStartup);
 		}
 		private string SpawnTimeToString(float spawnTime)
