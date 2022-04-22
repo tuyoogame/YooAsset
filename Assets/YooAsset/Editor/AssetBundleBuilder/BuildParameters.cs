@@ -47,6 +47,11 @@ namespace YooAsset.Editor
 
 
 		/// <summary>
+		/// 演练构建模式
+		/// </summary>
+		public bool DryRunBuild;
+
+		/// <summary>
 		/// 强制重新构建整个项目，如果为FALSE则是增量打包
 		/// </summary>
 		public bool ForceRebuild;

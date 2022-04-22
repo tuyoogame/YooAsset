@@ -59,6 +59,7 @@ namespace YooAsset.Editor
 		public string EncryptionServicesClassName;
 
 		// 构建参数
+		public bool DryRunBuild;
 		public bool ForceRebuild;
 		public string BuildinTags;
 		public ECompressOption CompressOption;

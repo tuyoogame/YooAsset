@@ -35,8 +35,9 @@ namespace YooAsset.Editor
 				buildReport.Summary.ShadersBundleName = AssetBundleGrouperSettingData.Setting.ShadersBundleName;
 				buildReport.Summary.EncryptionServicesClassName = buildParameters.Parameters.EncryptionServices == null ?
 					"null" : buildParameters.Parameters.EncryptionServices.GetType().FullName;
-				
+
 				// 构建参数
+				buildReport.Summary.DryRunBuild = buildParameters.Parameters.DryRunBuild;
 				buildReport.Summary.ForceRebuild = buildParameters.Parameters.ForceRebuild;
 				buildReport.Summary.BuildinTags = buildParameters.Parameters.BuildinTags;
 				buildReport.Summary.CompressOption = buildParameters.Parameters.CompressOption;

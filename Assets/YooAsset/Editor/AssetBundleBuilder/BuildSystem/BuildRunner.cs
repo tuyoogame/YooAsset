@@ -28,7 +28,8 @@ namespace YooAsset.Editor
 				}
 				catch (Exception e)
 				{
-					Debug.LogError($"Build task {task.GetType().Name} failed : {e}");
+					Debug.LogError($"Build task {task.GetType().Name} failed !");
+					Debug.LogError($"Detail error : {e}");
 					succeed = false;
 					break;
 				}

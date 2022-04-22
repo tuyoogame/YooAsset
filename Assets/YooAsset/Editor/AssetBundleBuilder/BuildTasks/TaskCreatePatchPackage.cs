@@ -11,7 +11,10 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
-			CopyPatchFiles(buildParameters);
+			if (buildParameters.Parameters.DryRunBuild == false)
+			{
+				CopyPatchFiles(buildParameters);
+			}
 		}
 
 		/// <summary>

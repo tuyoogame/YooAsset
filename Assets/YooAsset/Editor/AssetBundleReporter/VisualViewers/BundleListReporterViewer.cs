@@ -145,7 +145,7 @@ namespace YooAsset.Editor
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
-				label.style.width = 250;
+				label.style.width = 280;
 				element.Add(label);
 			}
 
@@ -237,7 +237,7 @@ namespace YooAsset.Editor
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
-				label.style.width = 250;
+				label.style.width = 280;
 				element.Add(label);
 			}
 

@@ -76,6 +76,7 @@ namespace YooAsset.Editor
 
 			_items.Add(new ItemWrapper(string.Empty, string.Empty));
 			_items.Add(new ItemWrapper("构建参数", string.Empty));
+			_items.Add(new ItemWrapper("DryRunBuild", $"{buildReport.Summary.DryRunBuild}"));
 			_items.Add(new ItemWrapper("ForceRebuild", $"{buildReport.Summary.ForceRebuild}"));
 			_items.Add(new ItemWrapper("BuildinTags", $"{buildReport.Summary.BuildinTags}"));
 			_items.Add(new ItemWrapper("CompressOption", $"{buildReport.Summary.CompressOption}"));

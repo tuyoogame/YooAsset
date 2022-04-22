@@ -62,14 +62,14 @@ namespace YooAsset.Editor
 			// 内置标记列表
 			List<string> buildinTags = buildParameters.Parameters.GetBuildinTags();
 
+			bool dryRunBuild = buildParameters.Parameters.DryRunBuild;
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				var bundleName = bundleInfo.BundleName;
 				string filePath = $"{buildParameters.PipelineOutputDirectory}/{bundleName}";
-				string hash = HashUtility.FileMD5(filePath);
-				string crc32 = HashUtility.FileCRC32(filePath);
-				long size = FileUtility.GetFileSize(filePath);
-				int version = buildParameters.Parameters.BuildVersion;
+				string hash = GetFileHash(filePath, dryRunBuild);
+				string crc32 = GetFileCRC(filePath, dryRunBuild);
+				long size = GetFileSize(filePath, dryRunBuild);
 				string[] tags = buildMapContext.GetAssetTags(bundleName);
 				bool isEncrypted = encryptionContext.IsEncryptFile(bundleName);
 				bool isBuildin = IsBuildinBundle(tags, buildinTags);
@@ -100,6 +100,27 @@ namespace YooAsset.Editor
 					return true;
 			}
 			return false;
+		}
+		private string GetFileHash(string filePath, bool dryRunBuild)
+		{
+			if (dryRunBuild)
+				return "00000000000000000000000000000000"; //32位
+			else
+				return HashUtility.FileMD5(filePath);
+		}
+		private string GetFileCRC(string filePath, bool dryRunBuild)
+		{
+			if (dryRunBuild)
+				return "00000000"; //8位
+			else
+				return HashUtility.FileCRC32(filePath);
+		}
+		private long GetFileSize(string filePath, bool dryRunBuild)
+		{
+			if (dryRunBuild)
+				return 0;
+			else
+				return FileUtility.GetFileSize(filePath);
 		}
 
 		/// <summary>
