@@ -51,8 +51,9 @@ namespace YooAsset
 				}
 				else
 				{
-					YooLogger.Warning($"Failed to load scene : {AssetName}");
 					Status = EStatus.Fail;
+					LastError = $"Failed to load scene : {AssetPath}";
+					YooLogger.Error(LastError);
 					InvokeCompletion();
 				}
 			}
@@ -67,6 +68,11 @@ namespace YooAsset
 						SceneManager.SetActiveScene(SceneObject);
 
 					Status = SceneObject.IsValid() ? EStatus.Success : EStatus.Fail;
+					if (Status == EStatus.Fail)
+					{
+						LastError = $"The load scene is invalid : {AssetPath}";
+						YooLogger.Error(LastError);
+					}
 					InvokeCompletion();
 				}
 			}

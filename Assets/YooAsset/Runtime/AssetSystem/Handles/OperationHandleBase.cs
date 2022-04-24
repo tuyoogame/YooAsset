@@ -33,6 +33,19 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 最近的错误信息
+		/// </summary>
+		public string LastError
+		{
+			get
+			{
+				if (IsValid == false)
+					return string.Empty;
+				return _provider.LastError;
+			}
+		}
+
+		/// <summary>
 		/// 加载进度
 		/// </summary>
 		public float Progress

@@ -95,17 +95,21 @@ namespace YooAsset
 				}
 				else
 				{
-					ReportError();
-
 					string cacheFilePath = _bundleInfo.GetCacheLoadPath();
 					if (File.Exists(cacheFilePath))
 						File.Delete(cacheFilePath);
 
 					// 失败后重新尝试
 					if (_failedTryAgain > 0)
+					{
+						ReportWarning();
 						_steps = ESteps.TryAgain;
+					}
 					else
+					{
+						ReportError();
 						_steps = ESteps.Failed;
+					}
 				}
 
 				// 释放下载器

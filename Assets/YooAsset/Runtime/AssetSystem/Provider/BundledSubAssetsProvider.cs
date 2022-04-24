@@ -45,15 +45,23 @@ namespace YooAsset
 				if (OwnerBundle.IsDone() == false)
 					return;
 
-				if (OwnerBundle.CacheBundle == null)
+				if (DependBundles.IsSucceed() == false)
 				{
 					Status = EStatus.Fail;
+					LastError = DependBundles.GetLastError();
 					InvokeCompletion();
+					return;
 				}
-				else
+
+				if (OwnerBundle.Status != AssetBundleLoaderBase.EStatus.Succeed)
 				{
-					Status = EStatus.Loading;
+					Status = EStatus.Fail;
+					LastError = OwnerBundle.LastError;
+					InvokeCompletion();
+					return;
 				}
+
+				Status = EStatus.Loading;
 			}
 
 			// 2. 加载资源对象
@@ -97,7 +105,10 @@ namespace YooAsset
 
 				Status = AllAssetObjects == null ? EStatus.Fail : EStatus.Success;
 				if (Status == EStatus.Fail)
-					YooLogger.Warning($"Failed to load sub assets : {AssetName} from bundle : {OwnerBundle.BundleFileInfo.BundleName}");
+				{
+					LastError = $"Failed to load sub assets : {AssetName} from bundle : {OwnerBundle.BundleFileInfo.BundleName}";
+					YooLogger.Error(LastError);
+				}
 				InvokeCompletion();
 			}
 		}

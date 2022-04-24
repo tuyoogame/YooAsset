@@ -46,15 +46,23 @@ namespace YooAsset
 				if (OwnerBundle.IsDone() == false)
 					return;
 
-				if (OwnerBundle.CacheBundle == null)
+				if (DependBundles.IsSucceed() == false)
 				{
 					Status = EStatus.Fail;
+					LastError = DependBundles.GetLastError();
 					InvokeCompletion();
+					return;
 				}
-				else
+
+				if (OwnerBundle.Status != AssetBundleLoaderBase.EStatus.Succeed)
 				{
-					Status = EStatus.Loading;
+					Status = EStatus.Fail;
+					LastError = OwnerBundle.LastError;
+					InvokeCompletion();
+					return;
 				}
+
+				Status = EStatus.Loading;
 			}
 
 			// 2. 加载场景
@@ -69,8 +77,9 @@ namespace YooAsset
 				}
 				else
 				{
-					YooLogger.Warning($"Failed to load scene : {AssetName}");
 					Status = EStatus.Fail;
+					LastError = $"Failed to load scene : {AssetName}";
+					YooLogger.Error(LastError);
 					InvokeCompletion();
 				}
 			}
@@ -85,6 +94,11 @@ namespace YooAsset
 						SceneManager.SetActiveScene(SceneObject);
 
 					Status = SceneObject.IsValid() ? EStatus.Success : EStatus.Fail;
+					if(Status == EStatus.Fail)
+					{
+						LastError = $"The load scene is invalid : {AssetPath}";
+						YooLogger.Error(LastError);
+					}
 					InvokeCompletion();
 				}
 			}

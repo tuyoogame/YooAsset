@@ -98,19 +98,27 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 报告错误信息
+		/// 按照错误级别打印错误
 		/// </summary>
 		public void ReportError()
 		{
-			YooLogger.Error($"Failed to download : {_requestURL} Error : {_lastError}");
+			YooLogger.Error(GetLastError());
 		}
 
 		/// <summary>
-		/// 获取最近一条错误日志
+		/// 按照警告级别打印错误
+		/// </summary>
+		public void ReportWarning()
+		{
+			YooLogger.Warning(GetLastError());
+		}
+
+		/// <summary>
+		/// 获取最近发生的错误信息
 		/// </summary>
 		public string GetLastError()
 		{
-			return _lastError;
+			return $"Failed to download : {_requestURL} Error : {_lastError}";
 		}
 	}
 }

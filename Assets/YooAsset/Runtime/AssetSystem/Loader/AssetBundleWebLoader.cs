@@ -41,10 +41,10 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
-					return;
+					LastError = $"Invalid load mode : {BundleFileInfo.BundleName}";
+					YooLogger.Error(LastError);
 				}
-
-				if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
+				else if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
 					_steps = ESteps.LoadFile;
 					_webURL = BundleFileInfo.GetStreamingLoadPath();
@@ -76,7 +76,7 @@ namespace YooAsset
 				if (_webRequest.isNetworkError || _webRequest.isHttpError)
 #endif
 				{
-					Debug.LogWarning($"Failed to get asset bundle form web : {_webURL} Error : {_webRequest.error}");
+					YooLogger.Warning($"Failed to get asset bundle form web : {_webURL} Error : {_webRequest.error}");
 					_steps = ESteps.TryLoad;
 					_tryTimer = 0;
 				}
@@ -85,9 +85,10 @@ namespace YooAsset
 					CacheBundle = DownloadHandlerAssetBundle.GetContent(_webRequest);
 					if (CacheBundle == null)
 					{
-						Debug.LogError($"Get asset bundle error : {_webRequest.error}");
 						_steps = ESteps.Done;
 						Status = EStatus.Failed;
+						LastError = $"AssetBundle file is invalid : {BundleFileInfo.BundleName}";
+						YooLogger.Error(LastError);
 					}
 					else
 					{

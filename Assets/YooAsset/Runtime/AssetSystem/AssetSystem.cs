@@ -83,7 +83,7 @@ namespace YooAsset
 				{
 					if (_providers[i].CanDestroy())
 					{
-						_providers[i].Destory();
+						_providers[i].Destroy();
 						_providers.RemoveAt(i);
 					}
 				}
@@ -114,7 +114,7 @@ namespace YooAsset
 		{
 			foreach (var provider in _providers)
 			{
-				provider.Destory();
+				provider.Destroy();
 			}
 			_providers.Clear();
 

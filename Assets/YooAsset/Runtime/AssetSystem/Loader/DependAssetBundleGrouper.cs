@@ -11,6 +11,7 @@ namespace YooAsset
 		/// </summary>
 		private readonly List<AssetBundleLoaderBase> _dependBundles;
 
+
 		public DependAssetBundleGrouper(string assetPath)
 		{
 			_dependBundles = AssetSystem.CreateDependAssetBundleLoaders(assetPath);
@@ -27,6 +28,36 @@ namespace YooAsset
 					return false;
 			}
 			return true;
+		}
+
+		/// <summary>
+		/// 依赖资源包是否全部加载成功
+		/// </summary>
+		public bool IsSucceed()
+		{
+			foreach (var loader in _dependBundles)
+			{
+				if (loader.Status != AssetBundleLoaderBase.EStatus.Succeed)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// 获取某个加载失败的资源包错误信息
+		/// </summary>
+		public string GetLastError()
+		{
+			foreach (var loader in _dependBundles)
+			{
+				if (loader.Status != AssetBundleLoaderBase.EStatus.Succeed)
+				{
+					return loader.LastError;
+				}
+			}
+			return string.Empty;
 		}
 
 		/// <summary>

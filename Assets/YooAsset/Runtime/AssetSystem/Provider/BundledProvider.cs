@@ -16,9 +16,9 @@ namespace YooAsset
 			DependBundles = new DependAssetBundleGrouper(assetPath);
 			DependBundles.Reference();
 		}
-		public override void Destory()
+		public override void Destroy()
 		{
-			base.Destory();
+			base.Destroy();
 
 			// 释放资源包
 			if (OwnerBundle != null)

@@ -30,6 +30,11 @@ namespace YooAsset
 		public EStatus Status { protected set; get; }
 
 		/// <summary>
+		/// 最近的错误信息
+		/// </summary>
+		public string LastError { protected set; get; }
+
+		/// <summary>
 		/// 是否已经销毁
 		/// </summary>
 		public bool IsDestroyed { private set; get; } = false;
@@ -139,7 +144,7 @@ namespace YooAsset
 			// 销毁所有Providers
 			foreach (var provider in _providers)
 			{
-				provider.Destory();
+				provider.Destroy();
 			}
 
 			// 从列表里移除Providers

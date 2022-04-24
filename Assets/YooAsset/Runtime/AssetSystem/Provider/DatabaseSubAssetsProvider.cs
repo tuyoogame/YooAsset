@@ -34,6 +34,8 @@ namespace YooAsset
 				if (string.IsNullOrEmpty(guid))
 				{
 					Status = EStatus.Fail;
+					LastError = $"Not found asset : {AssetPath}";
+					YooLogger.Error(LastError);
 					InvokeCompletion();
 					return;
 				}
@@ -73,7 +75,10 @@ namespace YooAsset
 			{
 				Status = AllAssetObjects == null ? EStatus.Fail : EStatus.Success;
 				if (Status == EStatus.Fail)
-					YooLogger.Warning($"Failed to load sub assets : {AssetName}");
+				{
+					LastError = $"Failed to load sub assets : {nameof(AssetType)} in {AssetPath}";
+					YooLogger.Error(LastError);
+				}
 				InvokeCompletion();
 			}
 #endif

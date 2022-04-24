@@ -84,7 +84,7 @@ namespace YooAsset
 		{
 			if (string.IsNullOrEmpty(location))
 			{
-				Debug.LogError("location param is null or empty!");
+				YooLogger.Error("location param is null or empty!");
 			}
 			else
 			{
@@ -93,11 +93,11 @@ namespace YooAsset
 				if (index != -1)
 				{
 					if (location.Length == index + 1)
-						Debug.LogWarning($"Found blank character in location : \"{location}\"");
+						YooLogger.Warning($"Found blank character in location : \"{location}\"");
 				}
 
 				if (location.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
-					Debug.LogWarning($"Found illegal character in location : \"{location}\"");
+					YooLogger.Warning($"Found illegal character in location : \"{location}\"");
 			}
 		}
 #endif

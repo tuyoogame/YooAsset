@@ -34,6 +34,8 @@ namespace YooAsset
 				if (string.IsNullOrEmpty(guid))
 				{
 					Status = EStatus.Fail;
+					LastError = $"Not found asset : {AssetPath}";
+					YooLogger.Error(LastError);
 					InvokeCompletion();
 					return;
 				}
@@ -41,7 +43,7 @@ namespace YooAsset
 				{
 					Status = EStatus.Loading;
 				}
-			
+
 				// 注意：模拟异步加载效果提前返回
 				if (IsWaitForAsyncComplete == false)
 					return;
@@ -59,7 +61,10 @@ namespace YooAsset
 			{
 				Status = AssetObject == null ? EStatus.Fail : EStatus.Success;
 				if (Status == EStatus.Fail)
-					YooLogger.Warning($"Failed to load asset object : {AssetPath}");
+				{
+					LastError = $"Failed to load asset object : {AssetPath}";
+					YooLogger.Error(LastError);
+				}
 				InvokeCompletion();
 			}
 #endif

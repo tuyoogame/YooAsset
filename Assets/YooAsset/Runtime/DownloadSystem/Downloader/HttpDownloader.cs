@@ -211,13 +211,18 @@ namespace YooAsset
 				if (_threadDownloader.HasError())
 				{
 					_lastError = _threadDownloader.Error;
-					ReportError();
 
 					// 失败后重新尝试
 					if (_failedTryAgain > 0)
+					{
+						ReportWarning();
 						_steps = ESteps.TryAgain;
+					}
 					else
+					{
+						ReportError();
 						_steps = ESteps.Failed;
+					}
 				}
 				else
 				{
@@ -240,7 +245,7 @@ namespace YooAsset
 		}
 		public override void Abort()
 		{
-			if(IsDone() == false)
+			if (IsDone() == false)
 			{
 				_steps = ESteps.Failed;
 				_lastError = "user abort";

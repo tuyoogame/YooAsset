@@ -43,10 +43,10 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
-					return;
+					LastError = $"Invalid load mode : {BundleFileInfo.BundleName}";
+					YooLogger.Error(LastError);
 				}
-
-				if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
+				else if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
 					_steps = ESteps.Download;
 					_fileLoadPath = BundleFileInfo.GetCacheLoadPath();
@@ -83,9 +83,9 @@ namespace YooAsset
 
 				if (_downloader.HasError())
 				{
-					_downloader.ReportError();
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
+					LastError = _downloader.GetLastError();
 				}
 				else
 				{
@@ -100,9 +100,10 @@ namespace YooAsset
 				// 注意：Unity2017.4编辑器模式下，如果AssetBundle文件不存在会导致编辑器崩溃，这里做了预判。
 				if (System.IO.File.Exists(_fileLoadPath) == false)
 				{
-					YooLogger.Warning($"Not found assetBundle file : {_fileLoadPath}");
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
+					LastError = $"Not found assetBundle file : {_fileLoadPath}";
+					YooLogger.Error(LastError);
 					return;
 				}
 #endif
@@ -151,9 +152,10 @@ namespace YooAsset
 				// Check error			
 				if (CacheBundle == null)
 				{
-					YooLogger.Error($"Failed to load assetBundle file : {BundleFileInfo.BundleName}");
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
+					LastError = $"Failed to load assetBundle : {BundleFileInfo.BundleName}";
+					YooLogger.Error(LastError);
 				}
 				else
 				{

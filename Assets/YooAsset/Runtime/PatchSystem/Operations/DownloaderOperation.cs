@@ -105,7 +105,6 @@ namespace YooAsset
 					// 检测是否下载失败
 					if (downloader.HasError())
 					{
-						downloader.ReportError();
 						_removeList.Add(downloader);
 						_loadFailedList.Add(bundleInfo);
 						continue;

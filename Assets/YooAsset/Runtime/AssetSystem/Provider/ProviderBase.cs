@@ -54,6 +54,11 @@ namespace YooAsset
 		public EStatus Status { protected set; get; } = EStatus.None;
 
 		/// <summary>
+		/// 最近的错误信息
+		/// </summary>
+		public string LastError { protected set; get; } = string.Empty;
+
+		/// <summary>
 		/// 引用计数
 		/// </summary>
 		public int RefCount { private set; get; } = 0;
@@ -105,7 +110,7 @@ namespace YooAsset
 		/// <summary>
 		/// 销毁资源对象
 		/// </summary>
-		public virtual void Destory()
+		public virtual void Destroy()
 		{
 			IsDestroyed = true;
 		}
