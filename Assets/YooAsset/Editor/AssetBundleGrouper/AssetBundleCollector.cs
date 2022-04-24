@@ -34,6 +34,9 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string AssetTags = string.Empty;
 
+		[NonSerialized]
+		public object UserData;
+
 
 		/// <summary>
 		/// 检测配置错误

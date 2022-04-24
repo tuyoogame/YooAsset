@@ -22,7 +22,7 @@ namespace YooAsset.Editor
 		private List<string> _packRuleList;
 		private List<string> _filterRuleList;
 		private ListView _grouperListView;
-		private ListView _collectorListView;
+		private ScrollView _collectorScrollView;
 		private Toggle _autoCollectShaderToogle;
 		private TextField _shaderBundleNameTxt;
 		private TextField _grouperNameTxt;
@@ -61,7 +61,7 @@ namespace YooAsset.Editor
 				_autoCollectShaderToogle.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleGrouperSettingData.ModifyShader(evt.newValue, _shaderBundleNameTxt.value);
-					_shaderBundleNameTxt.SetEnabled(evt.newValue);	
+					_shaderBundleNameTxt.SetEnabled(evt.newValue);
 				});
 				_shaderBundleNameTxt = root.Q<TextField>("ShaderBundleName");
 				_shaderBundleNameTxt.RegisterValueChangedCallback(evt =>
@@ -126,22 +126,15 @@ namespace YooAsset.Editor
 				});
 
 				// 收集列表相关
-				_collectorListView = root.Q<ListView>("CollectorListView");
-				_collectorListView.makeItem = MakeCollectorListViewItem;
-				_collectorListView.bindItem = BindCollectorListViewItem;
-#if UNITY_2020_1_OR_NEWER
-				_collectorListView.onSelectionChange += CollectorListView_onSelectionChange;
-#else
-				_collectorListView.onSelectionChanged += CollectorListView_onSelectionChange;
-#endif
+				_collectorScrollView = root.Q<ScrollView>("CollectorScrollView");
+				_collectorScrollView.style.height = new Length(100, LengthUnit.Percent);
+				_collectorScrollView.viewDataKey = "scrollView";
 
-				// 收集添加删除按钮
+				// 收集器创建按钮
 				var collectorAddContainer = root.Q("CollectorAddContainer");
 				{
 					var addBtn = collectorAddContainer.Q<Button>("AddBtn");
 					addBtn.clicked += AddCollectorBtn_clicked;
-					var removeBtn = collectorAddContainer.Q<Button>("RemoveBtn");
-					removeBtn.clicked += RemoveCollectorBtn_clicked;
 				}
 
 				// 刷新窗体
@@ -194,6 +187,7 @@ namespace YooAsset.Editor
 			_grouperListView.Clear();
 			_grouperListView.ClearSelection();
 			_grouperListView.itemsSource = AssetBundleGrouperSettingData.Setting.Groupers;
+			_grouperListView.Rebuild();
 		}
 		private VisualElement MakeGrouperListViewItem()
 		{
@@ -251,13 +245,20 @@ namespace YooAsset.Editor
 			}
 
 			_grouperContainer.visible = true;
-			_collectorListView.Clear();
-			_collectorListView.ClearSelection();
-			_collectorListView.itemsSource = selectGrouper.Collectors;
-
 			_grouperNameTxt.SetValueWithoutNotify(selectGrouper.GrouperName);
 			_grouperDescTxt.SetValueWithoutNotify(selectGrouper.GrouperDesc);
 			_grouperAssetTagsTxt.SetValueWithoutNotify(selectGrouper.AssetTags);
+
+			// 填充数据
+			_collectorScrollView.Clear();
+			for (int i = 0; i < selectGrouper.Collectors.Count; i++)
+			{
+				var collector = selectGrouper.Collectors[i];
+				VisualElement element = MakeCollectorListViewItem();
+				collector.UserData = element;
+				BindCollectorListViewItem(element, i);
+				_collectorScrollView.Add(element);
+			}
 		}
 		private VisualElement MakeCollectorListViewItem()
 		{
@@ -271,17 +272,29 @@ namespace YooAsset.Editor
 			elementBottom.style.flexDirection = FlexDirection.Row;
 			element.Add(elementBottom);
 
+			VisualElement elementFold = new VisualElement();
+			elementFold.style.flexDirection = FlexDirection.Row;
+			element.Add(elementFold);
+
 			// Top VisualElement
 			{
 				var objectField = new ObjectField();
 				objectField.name = "ObjectField1";
-				objectField.label = "Collect Path";
+				objectField.label = "Collecter";
 				objectField.objectType = typeof(UnityEngine.Object);
 				objectField.style.unityTextAlign = TextAnchor.MiddleLeft;
 				objectField.style.flexGrow = 1f;
 				elementTop.Add(objectField);
 				var label = objectField.Q<Label>();
 				label.style.minWidth = 80;
+			}
+			{
+				var button = new Button();
+				button.name = "Button1";
+				button.text = "[ - ]";
+				button.style.unityTextAlign = TextAnchor.MiddleCenter;
+				button.style.flexGrow = 0f;
+				elementTop.Add(button);
 			}
 
 			// Bottom VisualElement
@@ -336,6 +349,8 @@ namespace YooAsset.Editor
 				return;
 
 			var collector = selectGrouper.Collectors[index];
+			collector.UserData = element;
+
 			var collectObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(collector.CollectPath);
 			if (collectObject != null)
 				collectObject.name = collector.CollectPath;
@@ -349,6 +364,13 @@ namespace YooAsset.Editor
 				objectField1.value.name = collector.CollectPath;
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
 			});
+
+			// Remove Button
+			var removeBtn = element.Q<Button>("Button1");
+			removeBtn.clicked += ()=> 
+			{
+				RemoveCollectorBtn_clicked(collector);
+			};
 
 			// Pack Rule
 			var popupField1 = element.Q<PopupField<string>>("PopupField1");
@@ -386,9 +408,6 @@ namespace YooAsset.Editor
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
 			});
 		}
-		private void CollectorListView_onSelectionChange(IEnumerable<object> objs)
-		{
-		}
 		private void AddCollectorBtn_clicked()
 		{
 			var selectGrouper = _grouperListView.selectedItem as AssetBundleGrouper;
@@ -398,16 +417,13 @@ namespace YooAsset.Editor
 			AssetBundleGrouperSettingData.CreateCollector(selectGrouper, string.Empty, nameof(PackDirectory), nameof(CollectAll), false);
 			FillCollectorViewData();
 		}
-		private void RemoveCollectorBtn_clicked()
+		private void RemoveCollectorBtn_clicked(AssetBundleCollector selectCollector)
 		{
 			var selectGrouper = _grouperListView.selectedItem as AssetBundleGrouper;
 			if (selectGrouper == null)
 				return;
-
-			var selectCollector = _collectorListView.selectedItem as AssetBundleCollector;
 			if (selectCollector == null)
 				return;
-
 			AssetBundleGrouperSettingData.RemoveCollector(selectGrouper, selectCollector);
 			FillCollectorViewData();
 		}

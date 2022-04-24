@@ -77,7 +77,9 @@ namespace YooAsset.Editor
 		{
 			_buildReport = buildReport;
 			_assetListView.Clear();
+			_assetListView.ClearSelection();
 			_assetListView.itemsSource = FilterViewItems(buildReport, searchKeyWord);
+			_assetListView.Rebuild();
 			_topBar1.text = $"Asset Path ({_assetListView.itemsSource.Count})";
 		}
 		private List<ReportAssetInfo> FilterViewItems(BuildReport buildReport, string searchKeyWord)
@@ -201,6 +203,7 @@ namespace YooAsset.Editor
 			_dependListView.Clear();
 			_dependListView.ClearSelection();
 			_dependListView.itemsSource = bundles;
+			_dependListView.Rebuild();
 			_bottomBar1.text = $"Depend Bundles ({bundles.Count})";
 		}
 		private VisualElement MakeDependListViewItem()

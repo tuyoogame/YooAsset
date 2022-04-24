@@ -4,6 +4,6 @@
             <uie:ToolbarButton text="概览" display-tooltip-when-elided="true" name="TopBar1" style="width: 200px; -unity-text-align: middle-left; flex-grow: 0;" />
             <uie:ToolbarButton text="参数" display-tooltip-when-elided="true" name="TopBar2" style="width: 150px; -unity-text-align: middle-left; flex-grow: 1;" />
         </uie:Toolbar>
-        <ui:ListView focusable="true" name="ListView" item-height="18" style="flex-grow: 1;" />
+        <ui:ListView focusable="true" name="ListView" item-height="18" virtualization-method="DynamicHeight" style="flex-grow: 1;" />
     </ui:VisualElement>
 </ui:UXML>

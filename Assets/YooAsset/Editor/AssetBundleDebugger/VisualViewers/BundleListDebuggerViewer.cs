@@ -58,7 +58,9 @@ namespace YooAsset.Editor
 		{
 			_debugReport = debugReport;
 			_bundleListView.Clear();
+			_bundleListView.ClearSelection();
 			_bundleListView.itemsSource = FilterViewItems(debugReport, searchKeyWord);
+			_bundleListView.Rebuild();
 		}
 		private List<DebugBundleInfo> FilterViewItems(DebugReport debugReport, string searchKeyWord)
 		{
@@ -250,10 +252,7 @@ namespace YooAsset.Editor
 			label5.text = providerInfo.Status.ToString();
 		}
 		private void FillUsingListView(string bundleName)
-		{
-			_usingListView.Clear();
-			_usingListView.ClearSelection();
-
+		{	
 			List<DebugProviderInfo> source = new List<DebugProviderInfo>();
 			foreach (var providerInfo in _debugReport.ProviderInfos)
 			{
@@ -266,7 +265,11 @@ namespace YooAsset.Editor
 					}
 				}
 			}
+
+			_usingListView.Clear();
+			_usingListView.ClearSelection();
 			_usingListView.itemsSource = source;
+			_usingListView.Rebuild();
 		}
 	}
 }

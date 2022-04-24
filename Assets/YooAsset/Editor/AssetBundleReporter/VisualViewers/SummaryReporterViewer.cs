@@ -60,9 +60,8 @@ namespace YooAsset.Editor
 		public void FillViewData(BuildReport buildReport)
 		{
 			_buildReport = buildReport;
-			_listView.Clear();
+			
 			_items.Clear();
-
 			_items.Add(new ItemWrapper("引擎版本", buildReport.Summary.UnityVersion));
 			_items.Add(new ItemWrapper("构建时间", buildReport.Summary.BuildTime));
 			_items.Add(new ItemWrapper("构建耗时", $"{buildReport.Summary.BuildSeconds}秒"));
@@ -97,7 +96,10 @@ namespace YooAsset.Editor
 			_items.Add(new ItemWrapper("原生资源包总数", $"{buildReport.Summary.RawBundleTotalCount}"));
 			_items.Add(new ItemWrapper("原生资源包总大小", ConvertSize(buildReport.Summary.RawBundleTotalSize)));
 
+			_listView.Clear();
+			_listView.ClearSelection();
 			_listView.itemsSource = _items;
+			_listView.Rebuild();
 		}
 
 		/// <summary>
