@@ -1,4 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("YooAsset.Editor")]
-[assembly: InternalsVisibleTo("YooAsset.EditorExtend")]
+[assembly: InternalsVisibleTo("YooAsset.EditorExtension")]
