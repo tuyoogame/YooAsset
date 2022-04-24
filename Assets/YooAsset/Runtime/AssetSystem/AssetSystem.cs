@@ -90,14 +90,9 @@ namespace YooAsset
 			}
 			else
 			{
-				for (int i = _loaders.Count - 1; i >= 0; i--)
-				{
+				for (int i = _loaders.Count-1; i >= 0; i--) {
 					AssetBundleLoaderBase loader = _loaders[i];
 					loader.TryDestroyAllProviders();
-				}
-				for (int i = _loaders.Count - 1; i >= 0; i--)
-				{
-					AssetBundleLoaderBase loader = _loaders[i];
 					if (loader.CanDestroy())
 					{
 						loader.Destroy(false);
