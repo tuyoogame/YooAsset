@@ -11,8 +11,7 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/AssetBundle Reporter", false, 103)]
 		public static void ShowExample()
 		{
-			AssetBundleReporterWindow window = GetWindow<AssetBundleReporterWindow>();
-			window.titleContent = new GUIContent("资源包报告工具");
+			AssetBundleReporterWindow window = GetWindow<AssetBundleReporterWindow>("资源包报告工具", true, EditorDefine.DockedWindowTypes);
 			window.minSize = new Vector2(800, 600);
 		}
 

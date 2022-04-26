@@ -14,8 +14,7 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/AssetBundle Grouper", false, 101)]
 		public static void ShowExample()
 		{
-			AssetBundleGrouperWindow window = GetWindow<AssetBundleGrouperWindow>();
-			window.titleContent = new GUIContent("资源包分组工具");
+			AssetBundleGrouperWindow window = GetWindow<AssetBundleGrouperWindow>("资源包分组工具", true, EditorDefine.DockedWindowTypes);
 			window.minSize = new Vector2(800, 600);
 		}
 

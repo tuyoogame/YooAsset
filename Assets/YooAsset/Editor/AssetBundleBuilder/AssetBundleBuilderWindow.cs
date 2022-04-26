@@ -14,8 +14,7 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/AssetBundle Builder", false, 102)]
 		public static void ShowExample()
 		{
-			AssetBundleBuilderWindow window = GetWindow<AssetBundleBuilderWindow>();
-			window.titleContent = new GUIContent("资源包构建工具");
+			AssetBundleBuilderWindow window = GetWindow<AssetBundleBuilderWindow>("资源包构建工具", true, EditorDefine.DockedWindowTypes);
 			window.minSize = new Vector2(800, 600);
 		}
 
