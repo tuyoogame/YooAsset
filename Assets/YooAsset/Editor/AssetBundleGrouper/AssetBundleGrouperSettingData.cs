@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 
@@ -110,7 +111,9 @@ namespace YooAsset.Editor
 					typeof(PackGrouper),
 					typeof(PackRawFile),
 				};
-				var customTypes = AssemblyUtility.GetAssignableTypes(AssemblyUtility.UnityDefaultAssemblyEditorName, typeof(IPackRule));
+
+				TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom<IPackRule>();
+				var customTypes = collection.ToList();
 				types.AddRange(customTypes);
 				for (int i = 0; i < types.Count; i++)
 				{
@@ -134,7 +137,9 @@ namespace YooAsset.Editor
 					typeof(CollectPrefab),
 					typeof(CollectSprite)
 				};
-				var customTypes = AssemblyUtility.GetAssignableTypes(AssemblyUtility.UnityDefaultAssemblyEditorName, typeof(IFilterRule));
+
+				TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom<IFilterRule>();
+				var customTypes = collection.ToList();
 				types.AddRange(customTypes);
 				for (int i = 0; i < types.Count; i++)
 				{
