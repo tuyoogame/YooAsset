@@ -198,8 +198,9 @@ namespace YooAsset.Editor
 		/// 获取加密类的类型列表
 		/// </summary>
 		private List<Type> GetEncryptionServicesClassTypes()
-		{
-			List<Type> classTypes = AssemblyUtility.GetAssignableTypes(AssemblyUtility.UnityDefaultAssemblyEditorName, typeof(IEncryptionServices));
+		{ 
+			TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom<IEncryptionServices>();
+			List<Type> classTypes = collection.ToList();
 			return classTypes;
 		}
 
