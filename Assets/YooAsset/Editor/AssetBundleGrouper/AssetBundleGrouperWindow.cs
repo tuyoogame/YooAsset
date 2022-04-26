@@ -32,6 +32,9 @@ namespace YooAsset.Editor
 
 		public void CreateGUI()
 		{
+			Undo.undoRedoPerformed -= RefreshWindow;
+			Undo.undoRedoPerformed += RefreshWindow;
+			
 			VisualElement root = this.rootVisualElement;
 
 			_packRuleList = AssetBundleGrouperSettingData.GetPackRuleNames();
@@ -221,6 +224,7 @@ namespace YooAsset.Editor
 		}
 		private void AddGrouperBtn_clicked()
 		{
+			Undo.RecordObject(AssetBundleGrouperSettingData.Setting, "YooAsset AddGrouper");
 			AssetBundleGrouperSettingData.CreateGrouper("Default Grouper", string.Empty, string.Empty);
 			FillGrouperViewData();
 		}
@@ -230,6 +234,8 @@ namespace YooAsset.Editor
 			if (selectGrouper == null)
 				return;
 
+			Undo.RecordObject(AssetBundleGrouperSettingData.Setting, "YooAsset RemoveGrouper");
+			
 			AssetBundleGrouperSettingData.RemoveGrouper(selectGrouper);
 			FillGrouperViewData();
 		}
