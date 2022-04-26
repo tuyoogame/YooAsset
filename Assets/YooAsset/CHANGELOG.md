@@ -2,6 +2,19 @@
 
 All notable changes to this package will be documented in this file.   
 
+## [1.0.6] - 2022-04-26
+
+### Fixed
+
+- 修复工具界面显示异常在Unity2021版本下。
+
+### Changed
+
+- 操作句柄支持错误信息查询。
+- 支持UniTask异步操作库。
+- 优化类型搜索方式，改为全域搜索类型。
+- AssetBundleGrouper窗口添加和移除Grouper支持操作回退。
+
 ## [1.0.5] - 2022-04-22
 
 ### Fixed
