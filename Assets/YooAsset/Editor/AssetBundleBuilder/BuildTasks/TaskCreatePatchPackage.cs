@@ -28,8 +28,9 @@ namespace YooAsset.Editor
 
 			// 拷贝Report文件
 			{
-				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettings.ReportFileName}";
-				string destPath = $"{packageDirectory}/{YooAssetSettings.ReportFileName}";
+				string reportFileName = YooAssetSettingsData.GetReportFileName(buildParameters.Parameters.BuildVersion);
+				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{reportFileName}";
+				string destPath = $"{packageDirectory}/{reportFileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 				UnityEngine.Debug.Log($"拷贝构建报告文件到：{destPath}");
 			}

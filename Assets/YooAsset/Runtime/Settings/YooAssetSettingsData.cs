@@ -33,6 +33,14 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取构建报告文件名
+		/// </summary>
+		public static string GetReportFileName(int resourceVersion)
+		{
+			return $"{YooAssetSettings.ReportFileName}_{resourceVersion}.json";
+		}
+
+		/// <summary>
 		/// 获取补丁清单文件完整名称
 		/// </summary>
 		public static string GetPatchManifestFileName(int resourceVersion)

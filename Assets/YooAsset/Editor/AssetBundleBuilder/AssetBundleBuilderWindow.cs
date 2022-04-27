@@ -29,6 +29,7 @@ namespace YooAsset.Editor
 		private PopupField<string> _encryptionField;
 		private Toggle _appendExtensionToggle;
 		private Toggle _forceRebuildToggle;
+		private Toggle _dryRunBuildToggle;
 		private TextField _buildTagsTxt;
 
 
@@ -73,6 +74,7 @@ namespace YooAsset.Editor
 				_compressionField.Init(AssetBundleBuilderSettingData.Setting.CompressOption);
 				_compressionField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.CompressOption);
 				_compressionField.style.width = 300;
+				_compressionField.SetEnabled(AssetBundleBuilderSettingData.Setting.DryRunBuild == false);
 				_compressionField.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleBuilderSettingData.Setting.CompressOption = (ECompressOption)_compressionField.value;
@@ -94,6 +96,7 @@ namespace YooAsset.Editor
 					_encryptionField = new PopupField<string>(_encryptionServicesClassNames, defaultIndex);
 					_encryptionField.label = "Encryption";
 					_encryptionField.style.width = 300;
+					_encryptionField.SetEnabled(AssetBundleBuilderSettingData.Setting.DryRunBuild == false);
 					_encryptionField.RegisterValueChangedCallback(evt =>
 					{
 						AssetBundleBuilderSettingData.Setting.EncyptionClassName = _encryptionField.value;
@@ -105,12 +108,14 @@ namespace YooAsset.Editor
 					_encryptionField = new PopupField<string>();
 					_encryptionField.label = "Encryption";
 					_encryptionField.style.width = 300;
+					_encryptionField.SetEnabled(AssetBundleBuilderSettingData.Setting.DryRunBuild == false);
 					encryptionContainer.Add(_encryptionField);
 				}
 
 				// 附加后缀格式
 				_appendExtensionToggle = root.Q<Toggle>("AppendExtension");
 				_appendExtensionToggle.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.AppendExtension);
+				_appendExtensionToggle.SetEnabled(AssetBundleBuilderSettingData.Setting.DryRunBuild == false);
 				_appendExtensionToggle.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleBuilderSettingData.Setting.AppendExtension = _appendExtensionToggle.value;
@@ -119,10 +124,23 @@ namespace YooAsset.Editor
 				// 强制构建
 				_forceRebuildToggle = root.Q<Toggle>("ForceRebuild");
 				_forceRebuildToggle.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.ForceRebuild);
+				_forceRebuildToggle.SetEnabled(AssetBundleBuilderSettingData.Setting.DryRunBuild == false);
 				_forceRebuildToggle.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleBuilderSettingData.Setting.ForceRebuild = _forceRebuildToggle.value;
 					_buildTagsTxt.SetEnabled(_forceRebuildToggle.value);
+				});
+
+				// 演练构建
+				_dryRunBuildToggle = root.Q<Toggle>("DryRunBuild");
+				_dryRunBuildToggle.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.DryRunBuild);
+				_dryRunBuildToggle.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleBuilderSettingData.Setting.DryRunBuild = _dryRunBuildToggle.value;
+					_compressionField.SetEnabled(_dryRunBuildToggle.value == false);
+					_encryptionField.SetEnabled(_dryRunBuildToggle.value == false);
+					_appendExtensionToggle.SetEnabled(_dryRunBuildToggle.value == false);
+					_forceRebuildToggle.SetEnabled(_dryRunBuildToggle.value == false);
 				});
 
 				// 内置标签
@@ -188,6 +206,7 @@ namespace YooAsset.Editor
 			buildParameters.AppendFileExtension = _appendExtensionToggle.value;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.ForceRebuild = _forceRebuildToggle.value;
+			buildParameters.DryRunBuild = _dryRunBuildToggle.value;
 			buildParameters.BuildinTags = _buildTagsTxt.value;
 
 			AssetBundleBuilder builder = new AssetBundleBuilder();
@@ -198,7 +217,7 @@ namespace YooAsset.Editor
 		/// 获取加密类的类型列表
 		/// </summary>
 		private List<Type> GetEncryptionServicesClassTypes()
-		{ 
+		{
 			TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom<IEncryptionServices>();
 			List<Type> classTypes = collection.ToList();
 			return classTypes;

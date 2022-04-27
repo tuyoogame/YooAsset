@@ -86,7 +86,7 @@ namespace YooAsset.Editor
 			}
 
 			// 删除旧文件
-			string filePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettings.ReportFileName}";
+			string filePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.GetReportFileName(buildParameters.Parameters.BuildVersion)}";
 			if (File.Exists(filePath))
 				File.Delete(filePath);
 

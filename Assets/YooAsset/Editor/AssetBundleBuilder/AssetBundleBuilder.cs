@@ -26,7 +26,10 @@ namespace YooAsset.Editor
 			public BuildParametersContext(BuildParameters parameters)
 			{
 				Parameters = parameters;
+
 				PipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(parameters.OutputRoot, parameters.BuildTarget);
+				if (parameters.DryRunBuild)
+					PipelineOutputDirectory += "_DryRunBuild";
 			}
 
 			/// <summary>

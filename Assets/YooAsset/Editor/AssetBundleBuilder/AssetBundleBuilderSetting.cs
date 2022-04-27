@@ -31,6 +31,11 @@ namespace YooAsset.Editor
 		public bool ForceRebuild = false;
 
 		/// <summary>
+		/// 演练构建
+		/// </summary>
+		public bool DryRunBuild = false;
+
+		/// <summary>
 		/// 内置标签
 		/// </summary>
 		public string BuildTags = string.Empty;
