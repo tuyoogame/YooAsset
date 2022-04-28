@@ -14,8 +14,16 @@ namespace YooAsset.Editor
 		/// 资源包分组工具的配置文件存储路径
 		/// </summary>
 		public const string AssetBundleGrouperSettingFilePath = "Assets/YooAssetSetting/AssetBundleGrouperSetting.asset";
-		
-		public static readonly Type[] DockedWindowTypes = { typeof(AssetBundleBuilderWindow), typeof(AssetBundleGrouperWindow), typeof(AssetBundleDebuggerWindow), typeof(AssetBundleReporterWindow) , typeof(ShaderVariantCollectionWindow)};
+
+		/// <summary>
+		/// 着色器变种收集工具的配置文件存储路径
+		/// </summary>
+		public const string ShaderVariantCollectorSettingFilePath = "Assets/YooAssetSetting/ShaderVariantCollectorSetting.asset";
+
+		/// <summary>
+		/// 停靠窗口类型集合
+		/// </summary>
+		public static readonly Type[] DockedWindowTypes = { typeof(AssetBundleBuilderWindow), typeof(AssetBundleGrouperWindow), typeof(AssetBundleDebuggerWindow), typeof(AssetBundleReporterWindow)};
 	}
 
 	/// <summary>

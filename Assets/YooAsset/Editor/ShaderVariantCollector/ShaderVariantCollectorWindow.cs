@@ -12,19 +12,18 @@ namespace YooAsset.Editor
 		{
 			if (_thisInstance == null)
 			{
-				_thisInstance = GetWindow<ShaderVariantCollectionWindow>("ShaderVariant Collector", true, EditorDefine.DockedWindowTypes);
+				_thisInstance = GetWindow<ShaderVariantCollectionWindow>("着色器变种收集工具");
 				_thisInstance.minSize = new Vector2(800, 600);
 			}
 			_thisInstance.Show();
 		}
 
-		private string _saveFilePath = "Assets/MyShaderVariants.shadervariants";
 		private ShaderVariantCollection _selectSVC;
 
 		private void OnGUI()
 		{
 			EditorGUILayout.Space();
-			_saveFilePath = EditorGUILayout.TextField("收集文件保存路径", _saveFilePath);
+			ShaderVariantCollectorSettingData.Setting.SavePath = EditorGUILayout.TextField("收集文件保存路径", ShaderVariantCollectorSettingData.Setting.SavePath);
 
 			int currentShaderCount = ShaderVariantCollector.GetCurrentShaderVariantCollectionShaderCount();
 			int currentVariantCount = ShaderVariantCollector.GetCurrentShaderVariantCollectionVariantCount();
@@ -35,7 +34,7 @@ namespace YooAsset.Editor
 			EditorGUILayout.Space();
 			if (GUILayout.Button("搜集变种", GUILayout.MaxWidth(80)))
 			{
-				ShaderVariantCollector.Run(_saveFilePath);
+				ShaderVariantCollector.Run(ShaderVariantCollectorSettingData.Setting.SavePath);
 			}
 
 			// 查询
@@ -53,6 +52,10 @@ namespace YooAsset.Editor
 				EditorGUILayout.LabelField($"ShaderCount : {_selectSVC.shaderCount}");
 				EditorGUILayout.LabelField($"VariantCount : {_selectSVC.variantCount}");
 			}
+		}
+		private void OnDestroy()
+		{
+			ShaderVariantCollectorSettingData.SaveFile();
 		}
 	}
 }
