@@ -66,6 +66,15 @@ IEnumerator Start()
 }
 ````
 
+**资源释放范例**
+
+````c#
+private void UnloadAssets()
+{
+    YooAssets.UnloadUnusedAssets();
+}
+````
+
 **预制体加载范例**
 
 ````C#
@@ -93,6 +102,8 @@ IEnumerator Start()
 ````
 
 **场景异步加载范例**
+
+注意：当加载新的主场景的时候，会自动释放之前加载的主场景以及附加场景。
 
 ````c#
 IEnumerator Start()
