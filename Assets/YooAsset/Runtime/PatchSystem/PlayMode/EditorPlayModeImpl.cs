@@ -31,6 +31,10 @@ namespace YooAsset
 			BundleInfo bundleInfo = new BundleInfo(bundleName);
 			return bundleInfo;
 		}
+		string IBundleServices.ConvertAddress(string address)
+		{
+			throw new Exception($"Editor play mode not support addressable.");
+		}
 		string IBundleServices.GetBundleName(string assetPath)
 		{
 			return assetPath;

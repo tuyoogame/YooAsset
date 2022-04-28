@@ -9,6 +9,9 @@ namespace YooAsset.Editor
 {
 	public class AssetBundleGrouperSettingData
 	{
+		private static readonly Dictionary<string, System.Type> _cacheAddressRuleTypes = new Dictionary<string, System.Type>();
+		private static readonly Dictionary<string, IAddressRule> _cacheAddressRuleInstance = new Dictionary<string, IAddressRule>();
+
 		private static readonly Dictionary<string, System.Type> _cachePackRuleTypes = new Dictionary<string, System.Type>();
 		private static readonly Dictionary<string, IPackRule> _cachePackRuleInstance = new Dictionary<string, IPackRule>();
 
@@ -32,6 +35,18 @@ namespace YooAsset.Editor
 			}
 		}
 
+		public static List<string> GetAddressRuleNames()
+		{
+			if (_setting == null)
+				LoadSettingData();
+
+			List<string> names = new List<string>();
+			foreach (var pair in _cacheAddressRuleTypes)
+			{
+				names.Add(pair.Key);
+			}
+			return names;
+		}
 		public static List<string> GetPackRuleNames()
 		{
 			if (_setting == null)
@@ -56,6 +71,15 @@ namespace YooAsset.Editor
 			}
 			return names;
 		}
+		public static bool HasAddressRuleName(string ruleName)
+		{
+			foreach (var pair in _cacheAddressRuleTypes)
+			{
+				if (pair.Key == ruleName)
+					return true;
+			}
+			return false;
+		}
 		public static bool HasPackRuleName(string ruleName)
 		{
 			foreach (var pair in _cachePackRuleTypes)
@@ -74,6 +98,7 @@ namespace YooAsset.Editor
 			}
 			return false;
 		}
+
 
 		/// <summary>
 		/// 加载配置文件
@@ -148,6 +173,31 @@ namespace YooAsset.Editor
 						_cacheFilterRuleTypes.Add(type.Name, type);
 				}
 			}
+
+			// IAddressRule
+			{
+				// 清空缓存集合
+				_cacheAddressRuleTypes.Clear();
+				_cacheAddressRuleInstance.Clear();
+
+				// 获取所有类型
+				List<Type> types = new List<Type>(100)
+				{
+					typeof(AddressByFileName),
+					typeof(AddressByCollectorAndFileName),
+					typeof(AddressByGrouperAndFileName)
+				};
+
+				TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom<IAddressRule>();
+				var customTypes = collection.ToList();
+				types.AddRange(customTypes);
+				for (int i = 0; i < types.Count; i++)
+				{
+					Type type = types[i];
+					if (_cacheAddressRuleTypes.ContainsKey(type.Name) == false)
+						_cacheAddressRuleTypes.Add(type.Name, type);
+				}
+			}
 		}
 
 		/// <summary>
@@ -176,6 +226,23 @@ namespace YooAsset.Editor
 		}
 
 		// 实例类相关
+		public static IAddressRule GetAddressRuleInstance(string ruleName)
+		{
+			if (_cacheAddressRuleInstance.TryGetValue(ruleName, out IAddressRule instance))
+				return instance;
+
+			// 如果不存在创建类的实例
+			if (_cacheAddressRuleTypes.TryGetValue(ruleName, out Type type))
+			{
+				instance = (IAddressRule)Activator.CreateInstance(type);
+				_cacheAddressRuleInstance.Add(ruleName, instance);
+				return instance;
+			}
+			else
+			{
+				throw new Exception($"{nameof(IAddressRule)}类型无效：{ruleName}");
+			}
+		}
 		public static IPackRule GetPackRuleInstance(string ruleName)
 		{
 			if (_cachePackRuleInstance.TryGetValue(ruleName, out IPackRule instance))
@@ -211,6 +278,13 @@ namespace YooAsset.Editor
 			}
 		}
 
+		// 可寻址编辑相关
+		public static void ModifyAddressable(bool enableAddressable)
+		{
+			Setting.EnableAddressable = enableAddressable;
+			IsDirty = true;
+		}
+
 		// 着色器编辑相关
 		public static void ModifyShader(bool isCollectAllShaders, string shadersBundleName)
 		{
@@ -220,12 +294,10 @@ namespace YooAsset.Editor
 		}
 
 		// 资源分组编辑相关
-		public static void CreateGrouper(string grouperName, string grouperDesc, string assetTags)
+		public static void CreateGrouper(string grouperName)
 		{
 			AssetBundleGrouper grouper = new AssetBundleGrouper();
 			grouper.GrouperName = grouperName;
-			grouper.GrouperDesc = grouperDesc;
-			grouper.AssetTags = assetTags;
 			Setting.Groupers.Add(grouper);
 			IsDirty = true;
 		}
@@ -249,13 +321,13 @@ namespace YooAsset.Editor
 		}
 
 		// 资源收集器编辑相关
-		public static void CreateCollector(AssetBundleGrouper grouper, string collectPath, string packRuleName, string filterRuleName, bool notWriteToAssetList)
+		public static void CreateCollector(AssetBundleGrouper grouper, string collectPath, string addressRuleName, string packRuleName, string filterRuleName)
 		{
 			AssetBundleCollector collector = new AssetBundleCollector();
 			collector.CollectPath = collectPath;
+			collector.AddressRuleName = addressRuleName;
 			collector.PackRuleName = packRuleName;
 			collector.FilterRuleName = filterRuleName;
-			collector.NotWriteToAssetList = notWriteToAssetList;
 			grouper.Collectors.Add(collector);
 			IsDirty = true;
 		}

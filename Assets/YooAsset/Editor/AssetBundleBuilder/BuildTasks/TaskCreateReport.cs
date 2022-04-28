@@ -29,6 +29,7 @@ namespace YooAsset.Editor
 				buildReport.Summary.BuildSeconds = buildParameters.GetBuildingSeconds();
 				buildReport.Summary.BuildTarget = buildParameters.Parameters.BuildTarget;
 				buildReport.Summary.BuildVersion = buildParameters.Parameters.BuildVersion;
+				buildReport.Summary.EnableAddressable = buildParameters.Parameters.EnableAddressable;
 				buildReport.Summary.EnableAutoCollect = buildParameters.Parameters.EnableAutoCollect;
 				buildReport.Summary.AppendFileExtension = buildParameters.Parameters.AppendFileExtension;
 				buildReport.Summary.AutoCollectShaders = AssetBundleGrouperSettingData.Setting.AutoCollectShaders;

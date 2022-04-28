@@ -18,6 +18,7 @@ namespace YooAsset.Editor
 		public const string XmlGrouperDesc = "GrouperDesc";
 		public const string XmlCollector = "Collector";
 		public const string XmlDirectory = "CollectPath";
+		public const string XmlAddressRule = "AddressRule";
 		public const string XmlPackRule = "PackRule";
 		public const string XmlFilterRule = "FilterRule";
 		public const string XmlNotWriteToAssetList = "NotWriteToAssetList";
@@ -82,6 +83,8 @@ namespace YooAsset.Editor
 					XmlElement collectorElement = collectorNode as XmlElement;
 					if (collectorElement.HasAttribute(XmlDirectory) == false)
 						throw new Exception($"Not found attribute {XmlDirectory} in {XmlCollector}");
+					if (collectorElement.HasAttribute(XmlAddressRule) == false)
+						throw new Exception($"Not found attribute {XmlAddressRule} in {XmlCollector}");
 					if (collectorElement.HasAttribute(XmlPackRule) == false)
 						throw new Exception($"Not found attribute {XmlPackRule} in {XmlCollector}");
 					if (collectorElement.HasAttribute(XmlFilterRule) == false)
@@ -93,6 +96,7 @@ namespace YooAsset.Editor
 
 					AssetBundleCollector collector = new AssetBundleCollector();
 					collector.CollectPath = collectorElement.GetAttribute(XmlDirectory);
+					collector.AddressRuleName = collectorElement.GetAttribute(XmlAddressRule);
 					collector.PackRuleName = collectorElement.GetAttribute(XmlPackRule);
 					collector.FilterRuleName = collectorElement.GetAttribute(XmlFilterRule);
 					collector.NotWriteToAssetList = collectorElement.GetAttribute(XmlNotWriteToAssetList) == "True" ? true : false;
@@ -146,6 +150,7 @@ namespace YooAsset.Editor
 				{
 					var collectorElement = xmlDoc.CreateElement(XmlCollector);
 					collectorElement.SetAttribute(XmlDirectory, collector.CollectPath);
+					collectorElement.SetAttribute(XmlAddressRule, collector.AddressRuleName);
 					collectorElement.SetAttribute(XmlPackRule, collector.PackRuleName);
 					collectorElement.SetAttribute(XmlFilterRule, collector.FilterRuleName);
 					collectorElement.SetAttribute(XmlNotWriteToAssetList, collector.NotWriteToAssetList.ToString());

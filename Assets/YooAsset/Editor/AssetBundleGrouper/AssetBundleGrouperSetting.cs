@@ -9,6 +9,11 @@ namespace YooAsset.Editor
 	public class AssetBundleGrouperSetting : ScriptableObject
 	{
 		/// <summary>
+		/// 是否启用可寻址资源定位
+		/// </summary>
+		public bool EnableAddressable = false;
+
+		/// <summary>
 		/// 自动收集着色器
 		/// </summary>
 		public bool AutoCollectShaders = true;
@@ -40,6 +45,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public List<CollectAssetInfo> GetAllCollectAssets()
 		{
+			Dictionary<string, string> adressTemper = new Dictionary<string, string>(10000);
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
 			foreach (var grouper in Groupers)
 			{
@@ -56,6 +62,24 @@ namespace YooAsset.Editor
 					}
 				}
 			}
+
+			// 检测可寻址地址是否重复
+			if (EnableAddressable)
+			{
+				foreach (var collectInfo in result)
+				{
+					string address = collectInfo.Value.Address;
+					if (adressTemper.ContainsKey(address) == false)
+					{
+						adressTemper.Add(address, address);
+					}
+					else
+					{
+						throw new Exception($"The address is existed : {address}");
+					}
+				}
+			}
+
 			return result.Values.ToList();
 		}
 	}

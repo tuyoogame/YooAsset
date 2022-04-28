@@ -28,10 +28,11 @@ namespace YooAsset.Editor
 
 			// 创建新补丁清单
 			PatchManifest patchManifest = new PatchManifest();
+			patchManifest.EnableAddressable = buildParameters.Parameters.EnableAddressable;
 			patchManifest.ResourceVersion = buildParameters.Parameters.BuildVersion;
 			patchManifest.BuildinTags = buildParameters.Parameters.BuildinTags;
 			patchManifest.BundleList = GetAllPatchBundle(buildParameters, buildMapContext, encryptionContext);
-			patchManifest.AssetList = GetAllPatchAsset(buildMapContext, patchManifest);
+			patchManifest.AssetList = GetAllPatchAsset(buildParameters, buildMapContext, patchManifest);
 
 			// 创建补丁清单文件
 			string manifestFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.GetPatchManifestFileName(resourceVersion)}";
@@ -126,7 +127,8 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取资源列表
 		/// </summary>
-		private List<PatchAsset> GetAllPatchAsset(BuildMapContext buildMapContext, PatchManifest patchManifest)
+		private List<PatchAsset> GetAllPatchAsset(AssetBundleBuilder.BuildParametersContext buildParameters,
+			BuildMapContext buildMapContext, PatchManifest patchManifest)
 		{
 			List<PatchAsset> result = new List<PatchAsset>(1000);
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
@@ -135,6 +137,10 @@ namespace YooAsset.Editor
 				foreach (var assetInfo in assetInfos)
 				{
 					PatchAsset patchAsset = new PatchAsset();
+					if (buildParameters.Parameters.EnableAddressable)
+						patchAsset.Address = assetInfo.Address;
+					else
+						patchAsset.Address = string.Empty;
 					patchAsset.AssetPath = assetInfo.AssetPath;
 					patchAsset.BundleID = GetAssetBundleID(assetInfo.BundleName, patchManifest);
 					patchAsset.DependIDs = GetAssetBundleDependIDs(patchAsset.BundleID, assetInfo, patchManifest);

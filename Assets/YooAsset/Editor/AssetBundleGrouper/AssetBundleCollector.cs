@@ -15,6 +15,11 @@ namespace YooAsset.Editor
 		public string CollectPath = string.Empty;
 
 		/// <summary>
+		/// 寻址规则类名
+		/// </summary>
+		public string AddressRuleName = string.Empty;
+
+		/// <summary>
 		/// 打包规则类名
 		/// </summary>
 		public string PackRuleName = string.Empty;
@@ -23,6 +28,7 @@ namespace YooAsset.Editor
 		/// 过滤规则类名
 		/// </summary>
 		public string FilterRuleName = string.Empty;
+
 
 		/// <summary>
 		/// 不写入资源列表
@@ -34,9 +40,22 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string AssetTags = string.Empty;
 
-		[NonSerialized]
-		public object UserData;
 
+		/// <summary>
+		/// 收集器是否有效
+		/// </summary>
+		public bool IsValid()
+		{
+			if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(CollectPath) == null)
+				return false;
+			if (AssetBundleGrouperSettingData.HasPackRuleName(PackRuleName) == false)
+				return false;
+			if (AssetBundleGrouperSettingData.HasFilterRuleName(FilterRuleName) == false)
+				return false;
+			if (AssetBundleGrouperSettingData.HasAddressRuleName(AddressRuleName) == false)
+				return false;
+			return true;
+		}
 
 		/// <summary>
 		/// 检测配置错误
@@ -51,6 +70,9 @@ namespace YooAsset.Editor
 
 			if (AssetBundleGrouperSettingData.HasFilterRuleName(FilterRuleName) == false)
 				throw new Exception($"Invalid {nameof(IFilterRule)} class type : {FilterRuleName}");
+
+			if (AssetBundleGrouperSettingData.HasAddressRuleName(AddressRuleName) == false)
+				throw new Exception($"Invalid {nameof(IAddressRule)} class type : {AddressRuleName}");
 		}
 
 		/// <summary>
@@ -58,6 +80,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public List<CollectAssetInfo> GetAllCollectAssets(AssetBundleGrouper grouper)
 		{
+			Dictionary<string, string> adressTemper = new Dictionary<string, string>(1000);
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(1000);
 			bool isRawAsset = PackRuleName == nameof(PackRawFile);
 
@@ -74,9 +97,10 @@ namespace YooAsset.Editor
 						continue;
 					if (result.ContainsKey(assetPath) == false)
 					{
+						string address = GetAddress(grouper, assetPath);
 						string bundleName = GetBundleName(grouper, assetPath, isRawAsset);
 						List<string> assetTags = GetAssetTags(grouper);
-						var collectAssetInfo = new CollectAssetInfo(bundleName, assetPath, assetTags, isRawAsset, NotWriteToAssetList);
+						var collectAssetInfo = new CollectAssetInfo(bundleName, address, assetPath, assetTags, isRawAsset, NotWriteToAssetList);
 						collectAssetInfo.DependAssets = GetAllDependencies(assetPath);
 						result.Add(assetPath, collectAssetInfo);
 					}
@@ -94,9 +118,10 @@ namespace YooAsset.Editor
 					if (isRawAsset && NotWriteToAssetList)
 						UnityEngine.Debug.LogWarning($"Are you sure raw file are not write to asset list : {assetPath}");
 
+					string address = GetAddress(grouper, assetPath);
 					string bundleName = GetBundleName(grouper, assetPath, isRawAsset);
 					List<string> assetTags = GetAssetTags(grouper);
-					var collectAssetInfo = new CollectAssetInfo(bundleName, assetPath, assetTags, isRawAsset, NotWriteToAssetList);
+					var collectAssetInfo = new CollectAssetInfo(bundleName, address, assetPath, assetTags, isRawAsset, NotWriteToAssetList);
 					collectAssetInfo.DependAssets = GetAllDependencies(assetPath);
 					result.Add(assetPath, collectAssetInfo);
 				}
@@ -106,9 +131,27 @@ namespace YooAsset.Editor
 				}
 			}
 
+			// 检测可寻址地址是否重复
+			if (AssetBundleGrouperSettingData.Setting.EnableAddressable)
+			{
+				foreach (var collectInfo in result)
+				{
+					string address = collectInfo.Value.Address;
+					if (adressTemper.ContainsKey(address) == false)
+					{
+						adressTemper.Add(address, address);
+					}
+					else
+					{
+						throw new Exception($"The address is existed : {address} in collector : {CollectPath}");
+					}
+				}
+			}
+
 			// 返回列表
 			return result.Values.ToList();
 		}
+
 
 		private bool IsValidateAsset(string assetPath)
 		{
@@ -143,9 +186,18 @@ namespace YooAsset.Editor
 			IFilterRule filterRuleInstance = AssetBundleGrouperSettingData.GetFilterRuleInstance(FilterRuleName);
 			return filterRuleInstance.IsCollectAsset(new FilterRuleData(assetPath));
 		}
+		private string GetAddress(AssetBundleGrouper grouper, string assetPath)
+		{
+			if (NotWriteToAssetList)
+				return assetPath;
+
+			IAddressRule addressRuleInstance = AssetBundleGrouperSettingData.GetAddressRuleInstance(AddressRuleName);
+			string adressValue = addressRuleInstance.GetAssetAddress(new AddressRuleData(assetPath, CollectPath, grouper.GrouperName));
+			return adressValue;
+		}
 		private string GetBundleName(AssetBundleGrouper grouper, string assetPath, bool isRawAsset)
 		{
-			string shaderBundleName = CollectShaderBundleName(assetPath);
+			string shaderBundleName = AssetBundleGrouperSettingHelper.CollectShaderBundleName(assetPath);
 			if (string.IsNullOrEmpty(shaderBundleName) == false)
 				return shaderBundleName;
 
@@ -153,7 +205,7 @@ namespace YooAsset.Editor
 			{
 				IPackRule packRuleInstance = AssetBundleGrouperSettingData.GetPackRuleInstance(PackRuleName);
 				string bundleName = packRuleInstance.GetBundleName(new PackRuleData(assetPath, CollectPath, grouper.GrouperName));
-				return CorrectBundleName(bundleName, isRawAsset);
+				return AssetBundleGrouperSettingHelper.CorrectBundleName(bundleName, isRawAsset);
 			}
 		}
 		private List<string> GetAssetTags(AssetBundleGrouper grouper)
@@ -177,41 +229,6 @@ namespace YooAsset.Editor
 				}
 			}
 			return result;
-		}
-
-		/// <summary>
-		/// 收集着色器的资源包名称
-		/// </summary>
-		public static string CollectShaderBundleName(string assetPath)
-		{
-			// 如果自动收集所有的着色器
-			if (AssetBundleGrouperSettingData.Setting.AutoCollectShaders)
-			{
-				System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-				if (assetType == typeof(UnityEngine.Shader))
-				{
-					string bundleName = AssetBundleGrouperSettingData.Setting.ShadersBundleName;
-					return CorrectBundleName(bundleName, false);
-				}
-			}
-			return null;
-		}
-
-		/// <summary>
-		/// 修正资源包名称
-		/// </summary>
-		public static string CorrectBundleName(string bundleName, bool isRawBundle)
-		{
-			if (isRawBundle)
-			{
-				string fullName = $"{bundleName}.{YooAssetSettingsData.Setting.RawFileVariant}";
-				return EditorTools.GetRegularPath(fullName).ToLower();
-			}
-			else
-			{
-				string fullName = $"{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-				return EditorTools.GetRegularPath(fullName).ToLower(); ;
-			}
 		}
 	}
 }

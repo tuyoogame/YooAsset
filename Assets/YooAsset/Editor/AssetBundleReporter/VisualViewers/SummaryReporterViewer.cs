@@ -67,6 +67,7 @@ namespace YooAsset.Editor
 			_items.Add(new ItemWrapper("构建耗时", $"{buildReport.Summary.BuildSeconds}秒"));
 			_items.Add(new ItemWrapper("构建平台", $"{buildReport.Summary.BuildTarget}"));
 			_items.Add(new ItemWrapper("构建版本", $"{buildReport.Summary.BuildVersion}"));
+			_items.Add(new ItemWrapper("启用可寻址资源定位", $"{buildReport.Summary.EnableAddressable}"));
 			_items.Add(new ItemWrapper("启用自动分包机制", $"{buildReport.Summary.EnableAutoCollect}"));
 			_items.Add(new ItemWrapper("追加文件扩展名", $"{buildReport.Summary.AppendFileExtension}"));
 			_items.Add(new ItemWrapper("自动收集着色器", $"{buildReport.Summary.AutoCollectShaders}"));

@@ -377,18 +377,16 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				IBundleServices bundleServices = _offlinePlayModeImpl;
-				string bundleName = bundleServices.GetBundleName(assetPath);
-				BundleInfo bundleInfo = bundleServices.GetBundleInfo(bundleName);
+				string bundleName = _bundleServices.GetBundleName(assetPath);
+				BundleInfo bundleInfo = _bundleServices.GetBundleInfo(bundleName);
 				RawFileOperation operation = new OfflinePlayModeRawFileOperation(bundleInfo, copyPath);
 				OperationSystem.ProcessOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				IBundleServices bundleServices = _hostPlayModeImpl;
-				string bundleName = bundleServices.GetBundleName(assetPath);
-				BundleInfo bundleInfo = bundleServices.GetBundleInfo(bundleName);
+				string bundleName = _bundleServices.GetBundleName(assetPath);
+				BundleInfo bundleInfo = _bundleServices.GetBundleInfo(bundleName);
 				RawFileOperation operation = new HostPlayModeRawFileOperation(bundleInfo, copyPath);
 				OperationSystem.ProcessOperaiton(operation);
 				return operation;
@@ -650,9 +648,6 @@ namespace YooAsset
 		#endregion
 
 		#region 内部方法
-		/// <summary>
-		/// 更新资源系统
-		/// </summary>
 		internal static void InternalUpdate()
 		{
 			// 更新异步请求操作
@@ -674,6 +669,10 @@ namespace YooAsset
 					AssetSystem.UnloadUnusedAssets();
 				}
 			}
+		}
+		internal static string ConvertAddress(string address)
+		{
+			return _bundleServices.ConvertAddress(address);
 		}
 		#endregion
 	}

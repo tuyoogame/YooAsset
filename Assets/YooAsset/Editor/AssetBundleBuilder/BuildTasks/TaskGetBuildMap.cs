@@ -30,7 +30,7 @@ namespace YooAsset.Editor
 				if (isRawFile)
 				{
 					if (bundleInfo.BuildinAssets.Count != 1)
-						throw new Exception("The bundle does not support multiple raw asset : {bundleInfo.BundleName}");
+						throw new Exception($"The bundle does not support multiple raw asset : {bundleInfo.BundleName}");
 					continue;
 				}
 

@@ -30,6 +30,11 @@ namespace YooAsset.Editor
 		public int BuildVersion;
 
 		/// <summary>
+		/// 启用可寻址资源定位
+		/// </summary>
+		public bool EnableAddressable = false;
+
+		/// <summary>
 		/// 启用自动分包机制
 		/// 说明：自动分包机制可以实现资源零冗余
 		/// </summary>

@@ -237,6 +237,10 @@ namespace YooAsset
 				return bundleInfo;
 			}
 		}
+		string IBundleServices.ConvertAddress(string address)
+		{
+			return LocalPatchManifest.ConvertAddress(address);
+		}
 		string IBundleServices.GetBundleName(string assetPath)
 		{
 			return LocalPatchManifest.GetBundleName(assetPath);

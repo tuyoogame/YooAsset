@@ -26,7 +26,7 @@ namespace YooAsset.Editor
 			{
 				if (buildAssetDic.ContainsKey(collectAssetInfo.AssetPath) == false)
 				{
-					var buildAssetInfo = new BuildAssetInfo(collectAssetInfo.AssetPath, collectAssetInfo.IsRawAsset, collectAssetInfo.NotWriteToAssetList);
+					var buildAssetInfo = new BuildAssetInfo(collectAssetInfo.Address, collectAssetInfo.AssetPath, collectAssetInfo.IsRawAsset, collectAssetInfo.NotWriteToAssetList);
 					buildAssetInfo.SetBundleName(collectAssetInfo.BundleName);
 					buildAssetInfo.AddAssetTags(collectAssetInfo.AssetTags);
 					buildAssetDic.Add(collectAssetInfo.AssetPath, buildAssetInfo);
@@ -100,7 +100,7 @@ namespace YooAsset.Editor
 				var buildAssetInfo = pair.Value;
 				if (buildAssetInfo.BundleNameIsValid() == false)
 				{
-					string shaderBundleName = AssetBundleCollector.CollectShaderBundleName(buildAssetInfo.AssetPath);
+					string shaderBundleName = AssetBundleGrouperSettingHelper.CollectShaderBundleName(buildAssetInfo.AssetPath);
 					if (string.IsNullOrEmpty(shaderBundleName) == false)
 					{
 						buildAssetInfo.SetBundleName(shaderBundleName);
@@ -108,7 +108,7 @@ namespace YooAsset.Editor
 					else
 					{
 						string bundleName = defaultPackRule.GetBundleName(new PackRuleData(buildAssetInfo.AssetPath));
-						bundleName = AssetBundleCollector.CorrectBundleName(bundleName, false);
+						bundleName = AssetBundleGrouperSettingHelper.CorrectBundleName(bundleName, false);
 						buildAssetInfo.SetBundleName(bundleName);
 					}
 				}

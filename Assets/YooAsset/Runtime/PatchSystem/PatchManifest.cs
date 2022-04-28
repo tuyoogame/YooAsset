@@ -13,6 +13,11 @@ namespace YooAsset
 	internal class PatchManifest
 	{
 		/// <summary>
+		/// 启用可寻址资源定位
+		/// </summary>
+		public bool EnableAddressable;
+
+		/// <summary>
 		/// 资源版本号
 		/// </summary>
 		public int ResourceVersion;
@@ -44,6 +49,12 @@ namespace YooAsset
 		/// </summary>
 		[NonSerialized]
 		public readonly Dictionary<string, PatchAsset> Assets = new Dictionary<string, PatchAsset>();
+
+		/// <summary>
+		/// 可寻址地址映射集合
+		/// </summary>
+		[NonSerialized]
+		public readonly Dictionary<string, string> AddressDic = new Dictionary<string, string>();
 
 
 		/// <summary>
@@ -108,6 +119,22 @@ namespace YooAsset
 			}
 		}
 
+		/// <summary>
+		/// 可寻址地址转换为资源路径
+		/// </summary>
+		public string ConvertAddress(string address)
+		{
+			if (AddressDic.TryGetValue(address, out string assetPath))
+			{
+				return assetPath;
+			}
+			else
+			{
+				YooLogger.Warning($"Not found address in patch manifest : {address}");
+				return string.Empty;
+			}
+		}
+
 
 		/// <summary>
 		/// 序列化
@@ -152,6 +179,19 @@ namespace YooAsset
 						YooLogger.Warning($"Asset path have existed : {assetPathWithoutExtension}");
 					else
 						patchManifest.Assets.Add(assetPathWithoutExtension, patchAsset);
+				}
+			}
+
+			// Address
+			if (patchManifest.EnableAddressable)
+			{
+				foreach (var patchAsset in patchManifest.AssetList)
+				{
+					string address = patchAsset.Address;
+					if (patchManifest.AddressDic.ContainsKey(address))
+						throw new Exception($"Address have existed : {address}");
+					else
+						patchManifest.AddressDic.Add(address, patchAsset.AssetPath);
 				}
 			}
 

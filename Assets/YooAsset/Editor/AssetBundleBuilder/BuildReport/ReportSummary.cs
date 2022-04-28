@@ -34,6 +34,11 @@ namespace YooAsset.Editor
 		public int BuildVersion;
 
 		/// <summary>
+		/// 启用可寻址资源定位
+		/// </summary>
+		public bool EnableAddressable;
+
+		/// <summary>
 		/// 启用自动分包机制
 		/// </summary>
 		public bool EnableAutoCollect;

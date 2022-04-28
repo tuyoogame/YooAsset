@@ -12,6 +12,11 @@ namespace YooAsset.Editor
 		public string BundleName { private set; get; }
 
 		/// <summary>
+		/// 可寻址地址
+		/// </summary>
+		public string Address { private set; get; }
+
+		/// <summary>
 		/// 资源路径
 		/// </summary>
 		public string AssetPath { private set; get; }
@@ -53,8 +58,9 @@ namespace YooAsset.Editor
 		public List<BuildAssetInfo> AllDependAssetInfos { private set; get; }
 
 
-		public BuildAssetInfo(string assetPath, bool isRawAsset, bool notWriteToAssetList)
+		public BuildAssetInfo(string address, string assetPath, bool isRawAsset, bool notWriteToAssetList)
 		{
+			Address = address;
 			AssetPath = assetPath;
 			IsRawAsset = isRawAsset;
 			NotWriteToAssetList = notWriteToAssetList;

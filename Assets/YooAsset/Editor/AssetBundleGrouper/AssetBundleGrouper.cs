@@ -36,7 +36,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public void CheckConfigError()
 		{
-			foreach(var collector in Collectors)
+			foreach (var collector in Collectors)
 			{
 				collector.CheckConfigError();
 			}
@@ -47,13 +47,14 @@ namespace YooAsset.Editor
 		/// </summary>
 		public List<CollectAssetInfo> GetAllCollectAssets()
 		{
+			Dictionary<string, string> adressTemper = new Dictionary<string, string>(10000);
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
-			foreach(var collector in Collectors)
+			foreach (var collector in Collectors)
 			{
 				var temper = collector.GetAllCollectAssets(this);
-				foreach(var assetInfo in temper)
+				foreach (var assetInfo in temper)
 				{
-					if(result.ContainsKey(assetInfo.AssetPath) == false)
+					if (result.ContainsKey(assetInfo.AssetPath) == false)
 					{
 						result.Add(assetInfo.AssetPath, assetInfo);
 					}
@@ -63,6 +64,24 @@ namespace YooAsset.Editor
 					}
 				}
 			}
+
+			// 检测可寻址地址是否重复
+			if (AssetBundleGrouperSettingData.Setting.EnableAddressable)
+			{
+				foreach (var collectInfo in result)
+				{
+					string address = collectInfo.Value.Address;
+					if (adressTemper.ContainsKey(address) == false)
+					{
+						adressTemper.Add(address, address);
+					}
+					else
+					{
+						throw new Exception($"The address is existed : {address} in grouper : {GrouperName}");
+					}
+				}
+			}
+
 			return result.Values.ToList();
 		}
 	}

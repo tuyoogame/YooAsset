@@ -11,6 +11,11 @@ namespace YooAsset.Editor
 		public string BundleName { private set; get; }
 
 		/// <summary>
+		/// 可寻址地址
+		/// </summary>
+		public string Address { private set; get; }
+		
+		/// <summary>
 		/// 资源路径
 		/// </summary>
 		public string AssetPath { private set; get; }
@@ -36,17 +41,10 @@ namespace YooAsset.Editor
 		public List<string> DependAssets = new List<string>();
 
 
-		public CollectAssetInfo(string bundleName, string assetPath, List<string> assetTags, bool isRawAsset, bool notWriteToAssetList)
+		public CollectAssetInfo(string bundleName, string address, string assetPath, List<string> assetTags, bool isRawAsset, bool notWriteToAssetList)
 		{
 			BundleName = bundleName;
-			AssetPath = assetPath;
-			AssetTags = assetTags;
-			IsRawAsset = isRawAsset;
-			NotWriteToAssetList = notWriteToAssetList;
-		}
-		public CollectAssetInfo(string assetPath, List<string> assetTags, bool isRawAsset, bool notWriteToAssetList)
-		{
-			BundleName = string.Empty;
+			Address = address;
 			AssetPath = assetPath;
 			AssetTags = assetTags;
 			IsRawAsset = isRawAsset;

@@ -9,6 +9,11 @@ namespace YooAsset
 		BundleInfo GetBundleInfo(string bundleName);
 
 		/// <summary>
+		/// 可寻址地址转换为资源路径
+		/// </summary>
+		string ConvertAddress(string address);
+
+		/// <summary>
 		/// 获取资源所属的资源包名称
 		/// </summary>
 		string GetBundleName(string assetPath);

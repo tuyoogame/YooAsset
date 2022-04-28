@@ -19,10 +19,12 @@ namespace YooAsset.Editor
 			window.minSize = new Vector2(800, 600);
 		}
 
+		private List<string> _addressRuleList;
 		private List<string> _packRuleList;
 		private List<string> _filterRuleList;
 		private ListView _grouperListView;
 		private ScrollView _collectorScrollView;
+		private Toggle _enableAddressableToogle;
 		private Toggle _autoCollectShaderToogle;
 		private TextField _shaderBundleNameTxt;
 		private TextField _grouperNameTxt;
@@ -34,9 +36,10 @@ namespace YooAsset.Editor
 		{
 			Undo.undoRedoPerformed -= RefreshWindow;
 			Undo.undoRedoPerformed += RefreshWindow;
-			
+
 			VisualElement root = this.rootVisualElement;
 
+			_addressRuleList = AssetBundleGrouperSettingData.GetAddressRuleNames();
 			_packRuleList = AssetBundleGrouperSettingData.GetPackRuleNames();
 			_filterRuleList = AssetBundleGrouperSettingData.GetFilterRuleNames();
 
@@ -59,7 +62,12 @@ namespace YooAsset.Editor
 				var importBtn = root.Q<Button>("ImportButton");
 				importBtn.clicked += ImportBtn_clicked;
 
-				// 着色器相关
+				// 公共设置相关
+				_enableAddressableToogle = root.Q<Toggle>("EnableAddressable");
+				_enableAddressableToogle.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleGrouperSettingData.ModifyAddressable(evt.newValue);
+				});
 				_autoCollectShaderToogle = root.Q<Toggle>("AutoCollectShader");
 				_autoCollectShaderToogle.RegisterValueChangedCallback(evt =>
 				{
@@ -157,6 +165,7 @@ namespace YooAsset.Editor
 		// 刷新窗体
 		private void RefreshWindow()
 		{
+			_enableAddressableToogle.SetValueWithoutNotify(AssetBundleGrouperSettingData.Setting.EnableAddressable);
 			_autoCollectShaderToogle.SetValueWithoutNotify(AssetBundleGrouperSettingData.Setting.AutoCollectShaders);
 			_shaderBundleNameTxt.SetEnabled(AssetBundleGrouperSettingData.Setting.AutoCollectShaders);
 			_shaderBundleNameTxt.SetValueWithoutNotify(AssetBundleGrouperSettingData.Setting.ShadersBundleName);
@@ -225,7 +234,7 @@ namespace YooAsset.Editor
 		private void AddGrouperBtn_clicked()
 		{
 			Undo.RecordObject(AssetBundleGrouperSettingData.Setting, "YooAsset AddGrouper");
-			AssetBundleGrouperSettingData.CreateGrouper("Default Grouper", string.Empty, string.Empty);
+			AssetBundleGrouperSettingData.CreateGrouper("Default Grouper");
 			FillGrouperViewData();
 		}
 		private void RemoveGrouperBtn_clicked()
@@ -235,7 +244,7 @@ namespace YooAsset.Editor
 				return;
 
 			Undo.RecordObject(AssetBundleGrouperSettingData.Setting, "YooAsset RemoveGrouper");
-			
+
 			AssetBundleGrouperSettingData.RemoveGrouper(selectGrouper);
 			FillGrouperViewData();
 		}
@@ -259,9 +268,7 @@ namespace YooAsset.Editor
 			_collectorScrollView.Clear();
 			for (int i = 0; i < selectGrouper.Collectors.Count; i++)
 			{
-				var collector = selectGrouper.Collectors[i];
 				VisualElement element = MakeCollectorListViewItem();
-				collector.UserData = element;
 				BindCollectorListViewItem(element, i);
 				_collectorScrollView.Add(element);
 			}
@@ -278,11 +285,23 @@ namespace YooAsset.Editor
 			elementBottom.style.flexDirection = FlexDirection.Row;
 			element.Add(elementBottom);
 
-			VisualElement elementFold = new VisualElement();
-			elementFold.style.flexDirection = FlexDirection.Row;
-			element.Add(elementFold);
+			VisualElement elementFoldout = new VisualElement();
+			elementFoldout.style.flexDirection = FlexDirection.Row;
+			element.Add(elementFoldout);
+
+			VisualElement elementSpace = new VisualElement();
+			elementSpace.style.flexDirection = FlexDirection.Column;
+			element.Add(elementSpace);
 
 			// Top VisualElement
+			{
+				var button = new Button();
+				button.name = "Button1";
+				button.text = "-";
+				button.style.unityTextAlign = TextAnchor.MiddleCenter;
+				button.style.flexGrow = 0f;
+				elementTop.Add(button);
+			}
 			{
 				var objectField = new ObjectField();
 				objectField.name = "ObjectField1";
@@ -292,33 +311,33 @@ namespace YooAsset.Editor
 				objectField.style.flexGrow = 1f;
 				elementTop.Add(objectField);
 				var label = objectField.Q<Label>();
-				label.style.minWidth = 80;
-			}
-			{
-				var button = new Button();
-				button.name = "Button1";
-				button.text = "[ - ]";
-				button.style.unityTextAlign = TextAnchor.MiddleCenter;
-				button.style.flexGrow = 0f;
-				elementTop.Add(button);
+				label.style.minWidth = 63;
 			}
 
 			// Bottom VisualElement
 			{
 				var label = new Label();
-				label.style.width = 80;
+				label.style.width = 90;
 				elementBottom.Add(label);
+			}
+			if (_enableAddressableToogle.value)
+			{
+				var popupField = new PopupField<string>(_addressRuleList, 0);
+				popupField.name = "PopupField1";
+				popupField.style.unityTextAlign = TextAnchor.MiddleLeft;
+				popupField.style.width = 200;
+				elementBottom.Add(popupField);
 			}
 			{
 				var popupField = new PopupField<string>(_packRuleList, 0);
-				popupField.name = "PopupField1";
+				popupField.name = "PopupField2";
 				popupField.style.unityTextAlign = TextAnchor.MiddleLeft;
 				popupField.style.width = 150;
 				elementBottom.Add(popupField);
 			}
 			{
 				var popupField = new PopupField<string>(_filterRuleList, 0);
-				popupField.name = "PopupField2";
+				popupField.name = "PopupField3";
 				popupField.style.unityTextAlign = TextAnchor.MiddleLeft;
 				popupField.style.width = 150;
 				elementBottom.Add(popupField);
@@ -346,6 +365,27 @@ namespace YooAsset.Editor
 				label.style.minWidth = 40;
 			}
 
+			// Foldout VisualElement
+			{
+				var label = new Label();
+				label.style.width = 90;
+				elementFoldout.Add(label);
+			}
+			{
+				var foldout = new Foldout();
+				foldout.name = "Foldout1";
+				foldout.value = false;
+				foldout.text = "Assets";
+				elementFoldout.Add(foldout);
+			}
+
+			// Space VisualElement
+			{
+				var label = new Label();
+				label.style.height = 10;
+				elementSpace.Add(label);
+			}
+
 			return element;
 		}
 		private void BindCollectorListViewItem(VisualElement element, int index)
@@ -355,11 +395,20 @@ namespace YooAsset.Editor
 				return;
 
 			var collector = selectGrouper.Collectors[index];
-			collector.UserData = element;
-
 			var collectObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(collector.CollectPath);
 			if (collectObject != null)
 				collectObject.name = collector.CollectPath;
+
+			// Foldout
+			var foldout = element.Q<Foldout>("Foldout1");
+			RefreshFoldout(foldout, selectGrouper, collector);
+
+			// Remove Button
+			var removeBtn = element.Q<Button>("Button1");
+			removeBtn.clicked += () =>
+			{
+				RemoveCollectorBtn_clicked(collector);
+			};
 
 			// Collect Path
 			var objectField1 = element.Q<ObjectField>("ObjectField1");
@@ -369,31 +418,40 @@ namespace YooAsset.Editor
 				collector.CollectPath = AssetDatabase.GetAssetPath(evt.newValue);
 				objectField1.value.name = collector.CollectPath;
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
+				RefreshFoldout(foldout, selectGrouper, collector);
 			});
 
-			// Remove Button
-			var removeBtn = element.Q<Button>("Button1");
-			removeBtn.clicked += ()=> 
+			// Address Rule
+			var popupField1 = element.Q<PopupField<string>>("PopupField1");
+			if (popupField1 != null)
 			{
-				RemoveCollectorBtn_clicked(collector);
-			};
+				popupField1.index = GetAddressRuleIndex(collector.AddressRuleName);
+				popupField1.RegisterValueChangedCallback(evt =>
+				{
+					collector.AddressRuleName = evt.newValue;
+					AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
+					RefreshFoldout(foldout, selectGrouper, collector);
+				});
+			}
 
 			// Pack Rule
-			var popupField1 = element.Q<PopupField<string>>("PopupField1");
-			popupField1.index = GetPackRuleIndex(collector.PackRuleName);
-			popupField1.RegisterValueChangedCallback(evt =>
+			var popupField2 = element.Q<PopupField<string>>("PopupField2");
+			popupField2.index = GetPackRuleIndex(collector.PackRuleName);
+			popupField2.RegisterValueChangedCallback(evt =>
 			{
 				collector.PackRuleName = evt.newValue;
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
+				RefreshFoldout(foldout, selectGrouper, collector);
 			});
 
 			// Filter Rule
-			var popupField2 = element.Q<PopupField<string>>("PopupField2");
-			popupField2.index = GetFilterRuleIndex(collector.FilterRuleName);
-			popupField2.RegisterValueChangedCallback(evt =>
+			var popupField3 = element.Q<PopupField<string>>("PopupField3");
+			popupField3.index = GetFilterRuleIndex(collector.FilterRuleName);
+			popupField3.RegisterValueChangedCallback(evt =>
 			{
 				collector.FilterRuleName = evt.newValue;
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
+				RefreshFoldout(foldout, selectGrouper, collector);
 			});
 
 			// NotWriteToAssetList
@@ -403,6 +461,7 @@ namespace YooAsset.Editor
 			{
 				collector.NotWriteToAssetList = evt.newValue;
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
+				RefreshFoldout(foldout, selectGrouper, collector);
 			});
 
 			// Tags
@@ -414,13 +473,48 @@ namespace YooAsset.Editor
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
 			});
 		}
+		private void RefreshFoldout(Foldout foldout, AssetBundleGrouper grouper, AssetBundleCollector collector)
+		{
+			// 清空旧元素
+			foldout.Clear();
+
+			if (collector.IsValid() && collector.NotWriteToAssetList == false)
+			{
+				var collectAssetInfos = collector.GetAllCollectAssets(grouper);
+				foreach (var collectAssetInfo in collectAssetInfos)
+				{
+					VisualElement elementRow = new VisualElement();
+					elementRow.style.flexDirection = FlexDirection.Row;
+					foldout.Add(elementRow);
+
+					string showInfo = collectAssetInfo.AssetPath;
+					if (_enableAddressableToogle.value)
+					{
+						IAddressRule instance = AssetBundleGrouperSettingData.GetAddressRuleInstance(collector.AddressRuleName);
+						AddressRuleData ruleData = new AddressRuleData(collectAssetInfo.AssetPath, collector.CollectPath, grouper.GrouperName);
+						string addressValue = instance.GetAssetAddress(ruleData);
+						showInfo = $"[{addressValue}] {showInfo}";
+					}
+
+					var label = new Label();
+					label.text = showInfo;
+					label.style.width = 300;
+					label.style.marginLeft = 0;
+					label.style.flexGrow = 1;
+					elementRow.Add(label);
+				}
+			}
+		}
 		private void AddCollectorBtn_clicked()
 		{
 			var selectGrouper = _grouperListView.selectedItem as AssetBundleGrouper;
 			if (selectGrouper == null)
 				return;
 
-			AssetBundleGrouperSettingData.CreateCollector(selectGrouper, string.Empty, nameof(PackDirectory), nameof(CollectAll), false);
+			string addressRuleName = nameof(AddressByFileName);
+			string packRuleName = nameof(PackDirectory);
+			string filterRuleName = nameof(CollectAll);
+			AssetBundleGrouperSettingData.CreateCollector(selectGrouper, string.Empty, addressRuleName, packRuleName, filterRuleName);
 			FillCollectorViewData();
 		}
 		private void RemoveCollectorBtn_clicked(AssetBundleCollector selectCollector)
@@ -434,20 +528,29 @@ namespace YooAsset.Editor
 			FillCollectorViewData();
 		}
 
-		private int GetPackRuleIndex(string packRuleName)
+		private int GetAddressRuleIndex(string ruleName)
 		{
-			for (int i = 0; i < _packRuleList.Count; i++)
+			for (int i = 0; i < _addressRuleList.Count; i++)
 			{
-				if (_packRuleList[i] == packRuleName)
+				if (_addressRuleList[i] == ruleName)
 					return i;
 			}
 			return 0;
 		}
-		private int GetFilterRuleIndex(string filterRuleName)
+		private int GetPackRuleIndex(string ruleName)
+		{
+			for (int i = 0; i < _packRuleList.Count; i++)
+			{
+				if (_packRuleList[i] == ruleName)
+					return i;
+			}
+			return 0;
+		}
+		private int GetFilterRuleIndex(string ruleName)
 		{
 			for (int i = 0; i < _filterRuleList.Count; i++)
 			{
-				if (_filterRuleList[i] == filterRuleName)
+				if (_filterRuleList[i] == ruleName)
 					return i;
 			}
 			return 0;

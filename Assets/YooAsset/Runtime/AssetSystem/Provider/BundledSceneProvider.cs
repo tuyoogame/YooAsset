@@ -8,6 +8,7 @@ namespace YooAsset
 	internal sealed class BundledSceneProvider : BundledProvider
 	{
 		public readonly LoadSceneMode SceneMode;
+		private readonly string _sceneName;
 		private readonly bool _activateOnLoad;
 		private readonly int _priority;
 		private AsyncOperation _asyncOp;
@@ -25,6 +26,7 @@ namespace YooAsset
 			: base(scenePath, null)
 		{
 			SceneMode = sceneMode;
+			_sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
 			_activateOnLoad = activateOnLoad;
 			_priority = priority;
 		}
@@ -68,7 +70,7 @@ namespace YooAsset
 			// 2. 加载场景
 			if (Status == EStatus.Loading)
 			{
-				_asyncOp = SceneManager.LoadSceneAsync(AssetName, SceneMode);
+				_asyncOp = SceneManager.LoadSceneAsync(_sceneName, SceneMode);
 				if (_asyncOp != null)
 				{
 					_asyncOp.allowSceneActivation = true;
@@ -78,7 +80,7 @@ namespace YooAsset
 				else
 				{
 					Status = EStatus.Fail;
-					LastError = $"Failed to load scene : {AssetName}";
+					LastError = $"Failed to load scene : {_sceneName}";
 					YooLogger.Error(LastError);
 					InvokeCompletion();
 				}
@@ -89,7 +91,7 @@ namespace YooAsset
 			{
 				if (_asyncOp.isDone)
 				{
-					SceneObject = SceneManager.GetSceneByName(AssetName);
+					SceneObject = SceneManager.GetSceneByName(_sceneName);
 					if (SceneObject.IsValid() && _activateOnLoad)
 						SceneManager.SetActiveScene(SceneObject);
 

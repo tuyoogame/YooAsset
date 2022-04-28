@@ -6,6 +6,11 @@ namespace YooAsset
 	internal class PatchAsset
 	{
 		/// <summary>
+		/// 可寻址地址
+		/// </summary>
+		public string Address;
+		
+		/// <summary>
 		/// 资源路径
 		/// </summary>
 		public string AssetPath;

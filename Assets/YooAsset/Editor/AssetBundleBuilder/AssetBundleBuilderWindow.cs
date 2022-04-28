@@ -202,6 +202,7 @@ namespace YooAsset.Editor
 			buildParameters.OutputRoot = defaultOutputRoot;
 			buildParameters.BuildTarget = _buildTarget;
 			buildParameters.BuildVersion = _buildVersionField.value;
+			buildParameters.EnableAddressable = AssetBundleGrouperSettingData.Setting.EnableAddressable;
 			buildParameters.CompressOption = (ECompressOption)_compressionField.value;
 			buildParameters.AppendFileExtension = _appendExtensionToggle.value;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
