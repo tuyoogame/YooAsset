@@ -101,7 +101,7 @@ namespace YooAsset.Editor
 				// 分组容器
 				_grouperContainer = root.Q("GrouperContainer");
 
-				// 分组信息相关
+				// 分组名称
 				_grouperNameTxt = root.Q<TextField>("GrouperName");
 				_grouperNameTxt.RegisterValueChangedCallback(evt =>
 				{
@@ -113,6 +113,7 @@ namespace YooAsset.Editor
 					}
 				});
 
+				// 分组备注
 				_grouperDescTxt = root.Q<TextField>("GrouperDesc");
 				_grouperDescTxt.RegisterValueChangedCallback(evt =>
 				{
@@ -124,6 +125,7 @@ namespace YooAsset.Editor
 					}
 				});
 
+				// 分组的资源标签
 				_grouperAssetTagsTxt = root.Q<TextField>("GrouperAssetTags");
 				_grouperAssetTagsTxt.RegisterValueChangedCallback(evt =>
 				{
@@ -161,7 +163,6 @@ namespace YooAsset.Editor
 				AssetBundleGrouperSettingData.SaveFile();
 		}
 
-		// 刷新窗体
 		private void RefreshWindow()
 		{
 			_enableAddressableToogle.SetValueWithoutNotify(AssetBundleGrouperSettingData.Setting.EnableAddressable);
@@ -172,8 +173,6 @@ namespace YooAsset.Editor
 
 			FillGrouperViewData();
 		}
-
-		// 导入导出按钮
 		private void ExportBtn_clicked()
 		{
 			string resultPath = EditorTools.OpenFolderPanel("Export XML", "Assets/");
