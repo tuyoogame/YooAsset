@@ -9,7 +9,7 @@ namespace YooAsset
 		
 		public static void InitEditorPlayMode(bool enableAddressable)
 		{
-			AssetBundleGrouperSettingHelperClassType = Assembly.Load("YooAsset.Editor").GetType("YooAsset.Editor.AssetBundleGrouperSettingHelper");
+			AssetBundleGrouperSettingHelperClassType = Assembly.Load("YooAsset.Editor").GetType("YooAsset.Editor.AssetBundleGrouperHelper");
 			InvokePublicStaticMethod(AssetBundleGrouperSettingHelperClassType, "InitEditorPlayMode", enableAddressable);
 		}
 		public static string ConvertLocationToAssetPath(string location)

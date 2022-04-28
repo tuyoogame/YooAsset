@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	public static class AssetBundleGrouperSettingHelper
+	public static class AssetBundleGrouperHelper
 	{
 		/// <summary>
 		/// 收集着色器的资源包名称

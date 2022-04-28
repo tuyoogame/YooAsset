@@ -197,7 +197,7 @@ namespace YooAsset.Editor
 		}
 		private string GetBundleName(AssetBundleGrouper grouper, string assetPath, bool isRawAsset)
 		{
-			string shaderBundleName = AssetBundleGrouperSettingHelper.CollectShaderBundleName(assetPath);
+			string shaderBundleName = AssetBundleGrouperHelper.CollectShaderBundleName(assetPath);
 			if (string.IsNullOrEmpty(shaderBundleName) == false)
 				return shaderBundleName;
 
@@ -205,7 +205,7 @@ namespace YooAsset.Editor
 			{
 				IPackRule packRuleInstance = AssetBundleGrouperSettingData.GetPackRuleInstance(PackRuleName);
 				string bundleName = packRuleInstance.GetBundleName(new PackRuleData(assetPath, CollectPath, grouper.GrouperName));
-				return AssetBundleGrouperSettingHelper.CorrectBundleName(bundleName, isRawAsset);
+				return AssetBundleGrouperHelper.CorrectBundleName(bundleName, isRawAsset);
 			}
 		}
 		private List<string> GetAssetTags(AssetBundleGrouper grouper)

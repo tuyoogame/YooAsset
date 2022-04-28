@@ -100,7 +100,7 @@ namespace YooAsset.Editor
 				var buildAssetInfo = pair.Value;
 				if (buildAssetInfo.BundleNameIsValid() == false)
 				{
-					string shaderBundleName = AssetBundleGrouperSettingHelper.CollectShaderBundleName(buildAssetInfo.AssetPath);
+					string shaderBundleName = AssetBundleGrouperHelper.CollectShaderBundleName(buildAssetInfo.AssetPath);
 					if (string.IsNullOrEmpty(shaderBundleName) == false)
 					{
 						buildAssetInfo.SetBundleName(shaderBundleName);
@@ -108,7 +108,7 @@ namespace YooAsset.Editor
 					else
 					{
 						string bundleName = defaultPackRule.GetBundleName(new PackRuleData(buildAssetInfo.AssetPath));
-						bundleName = AssetBundleGrouperSettingHelper.CorrectBundleName(bundleName, false);
+						bundleName = AssetBundleGrouperHelper.CorrectBundleName(bundleName, false);
 						buildAssetInfo.SetBundleName(bundleName);
 					}
 				}
