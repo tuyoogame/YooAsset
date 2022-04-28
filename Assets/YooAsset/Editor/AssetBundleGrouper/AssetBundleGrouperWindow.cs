@@ -479,28 +479,41 @@ namespace YooAsset.Editor
 
 			if (collector.IsValid() && collector.NotWriteToAssetList == false)
 			{
-				var collectAssetInfos = collector.GetAllCollectAssets(grouper);
-				foreach (var collectAssetInfo in collectAssetInfos)
+				List<CollectAssetInfo> collectAssetInfos = null;
+
+				try
 				{
-					VisualElement elementRow = new VisualElement();
-					elementRow.style.flexDirection = FlexDirection.Row;
-					foldout.Add(elementRow);
+					collectAssetInfos = collector.GetAllCollectAssets(grouper);
+				}
+				catch(System.Exception e)
+				{
+					Debug.LogError(e.ToString());
+				}
 
-					string showInfo = collectAssetInfo.AssetPath;
-					if (_enableAddressableToogle.value)
+				if(collectAssetInfos != null)
+				{
+					foreach (var collectAssetInfo in collectAssetInfos)
 					{
-						IAddressRule instance = AssetBundleGrouperSettingData.GetAddressRuleInstance(collector.AddressRuleName);
-						AddressRuleData ruleData = new AddressRuleData(collectAssetInfo.AssetPath, collector.CollectPath, grouper.GrouperName);
-						string addressValue = instance.GetAssetAddress(ruleData);
-						showInfo = $"[{addressValue}] {showInfo}";
-					}
+						VisualElement elementRow = new VisualElement();
+						elementRow.style.flexDirection = FlexDirection.Row;
+						foldout.Add(elementRow);
 
-					var label = new Label();
-					label.text = showInfo;
-					label.style.width = 300;
-					label.style.marginLeft = 0;
-					label.style.flexGrow = 1;
-					elementRow.Add(label);
+						string showInfo = collectAssetInfo.AssetPath;
+						if (_enableAddressableToogle.value)
+						{
+							IAddressRule instance = AssetBundleGrouperSettingData.GetAddressRuleInstance(collector.AddressRuleName);
+							AddressRuleData ruleData = new AddressRuleData(collectAssetInfo.AssetPath, collector.CollectPath, grouper.GrouperName);
+							string addressValue = instance.GetAssetAddress(ruleData);
+							showInfo = $"[{addressValue}] {showInfo}";
+						}
+
+						var label = new Label();
+						label.text = showInfo;
+						label.style.width = 300;
+						label.style.marginLeft = 0;
+						label.style.flexGrow = 1;
+						elementRow.Add(label);
+					}
 				}
 			}
 		}

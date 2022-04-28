@@ -582,19 +582,5 @@ namespace YooAsset.Editor
 				return content.Substring(startIndex + key.Length);
 		}
 		#endregion
-
-		#region 玩家偏好
-		// 枚举
-		public static void PlayerSetEnum<T>(string key, T value)
-		{
-			string enumName = value.ToString();
-			EditorPrefs.SetString(key, enumName);
-		}
-		public static T PlayerGetEnum<T>(string key, T defaultValue)
-		{
-			string enumName = EditorPrefs.GetString(key, defaultValue.ToString());
-			return StringUtility.NameToEnum<T>(enumName);
-		}
-		#endregion
 	}
 }
