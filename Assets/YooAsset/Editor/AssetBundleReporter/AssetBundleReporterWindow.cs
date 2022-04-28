@@ -51,7 +51,7 @@ namespace YooAsset.Editor
 			VisualElement root = this.rootVisualElement;
 
 			// 加载布局文件
-			string rootPath = EditorTools.GetYooAssetPath();
+			string rootPath = EditorTools.GetYooAssetSourcePath();
 			string uxml = $"{rootPath}/Editor/AssetBundleReporter/{nameof(AssetBundleReporterWindow)}.uxml";
 			var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (visualAsset == null)

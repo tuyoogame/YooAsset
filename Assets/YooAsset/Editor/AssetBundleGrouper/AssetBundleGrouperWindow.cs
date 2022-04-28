@@ -43,7 +43,7 @@ namespace YooAsset.Editor
 			_filterRuleList = AssetBundleGrouperSettingData.GetFilterRuleNames();
 
 			// 加载布局文件
-			string rootPath = EditorTools.GetYooAssetPath();
+			string rootPath = EditorTools.GetYooAssetSourcePath();
 			string uxml = $"{rootPath}/Editor/AssetBundleGrouper/{nameof(AssetBundleGrouperWindow)}.uxml";
 			var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
 			if (visualAsset == null)

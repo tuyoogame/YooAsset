@@ -412,7 +412,8 @@ namespace YooAsset.Editor
 		#endregion
 
 		#region 路径
-		private static string YooAssetPath;
+		private static string YooAssetSourcePath;
+		private static string YooAssetSettingPath;
 
 		/// <summary>
 		/// 获取规范的路径
@@ -423,27 +424,30 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 获取资源框架目录路径
+		/// 获取资源框架源码路径
 		/// </summary>
-		public static string GetYooAssetPath()
+		public static string GetYooAssetSourcePath()
 		{
-			if (string.IsNullOrEmpty(YooAssetPath) == false)
-				return YooAssetPath;
+			if (string.IsNullOrEmpty(YooAssetSourcePath) == false)
+			{
+				if (Directory.Exists(YooAssetSourcePath))
+					return YooAssetSourcePath;
+			}
 
 			// 从Pakcages目录下搜索
-			string packagesPath = ("Packages/com.tuyoogame.yooasset/README.md");
+			string packagesPath = "Packages/com.tuyoogame.yooasset/README.md";
 			var obj = AssetDatabase.LoadAssetAtPath(packagesPath, typeof(TextAsset));
 			if (obj != null)
 			{
-				YooAssetPath = "Packages/com.tuyoogame.yooasset/";
-				return YooAssetPath;
+				YooAssetSourcePath = "Packages/com.tuyoogame.yooasset/";
+				return YooAssetSourcePath;
 			}
 
 			// 从Assets目录下搜索
 			string[] allDirectorys = Directory.GetDirectories(Application.dataPath, "YooAsset", SearchOption.AllDirectories);
 			if (allDirectorys.Length == 0)
 			{
-				Debug.LogError("Not found YooAsset Package !");
+				Debug.LogError("Not found YooAsset package !");
 				return string.Empty;
 			}
 
@@ -463,8 +467,37 @@ namespace YooAsset.Editor
 				return string.Empty;
 			}
 
-			YooAssetPath = AbsolutePathToAssetPath(targetDirectory);
-			return YooAssetPath;
+			YooAssetSourcePath = AbsolutePathToAssetPath(targetDirectory);
+			return YooAssetSourcePath;
+		}
+
+		/// <summary>
+		/// 获取资源框架配置路径
+		/// </summary>
+		public static string GetYooAssetSettingPath()
+		{
+			if (string.IsNullOrEmpty(YooAssetSettingPath) == false)
+			{
+				if (Directory.Exists(YooAssetSettingPath))
+					return YooAssetSettingPath;
+			}
+
+			// 从Assets目录下搜索
+			string[] allDirectorys = Directory.GetDirectories(Application.dataPath, "YooAssetSetting", SearchOption.AllDirectories);
+			if (allDirectorys.Length == 0)
+			{
+				YooAssetSettingPath = "Assets/YooAssetSetting";
+				return YooAssetSettingPath;
+			}
+
+			string targetDirectory = allDirectorys[0];
+			if (allDirectorys.Length != 1)
+			{
+				Debug.LogError("Found multiple YooAssetSetting folder !");
+			}
+
+			YooAssetSettingPath = AbsolutePathToAssetPath(targetDirectory);
+			return YooAssetSettingPath;
 		}
 
 		/// <summary>

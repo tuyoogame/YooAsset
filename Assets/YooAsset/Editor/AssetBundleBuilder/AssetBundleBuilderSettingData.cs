@@ -25,13 +25,14 @@ namespace YooAsset.Editor
 		private static void LoadSettingData()
 		{
 			// 加载配置文件
-			_setting = AssetDatabase.LoadAssetAtPath<AssetBundleBuilderSetting>(EditorDefine.AssetBundleBuilderSettingFilePath);
+			string settingFilePath = $"{EditorTools.GetYooAssetSettingPath()}/{nameof(AssetBundleBuilderSetting)}.asset";
+			_setting = AssetDatabase.LoadAssetAtPath<AssetBundleBuilderSetting>(settingFilePath);
 			if (_setting == null)
 			{
-				Debug.LogWarning($"Create new {nameof(AssetBundleBuilderSetting)}.asset : {EditorDefine.AssetBundleBuilderSettingFilePath}");
+				Debug.LogWarning($"Create new {nameof(AssetBundleBuilderSetting)}.asset : {settingFilePath}");
 				_setting = ScriptableObject.CreateInstance<AssetBundleBuilderSetting>();
-				EditorTools.CreateFileDirectory(EditorDefine.AssetBundleBuilderSettingFilePath);
-				AssetDatabase.CreateAsset(Setting, EditorDefine.AssetBundleBuilderSettingFilePath);
+				EditorTools.CreateFileDirectory(settingFilePath);
+				AssetDatabase.CreateAsset(Setting, settingFilePath);
 				AssetDatabase.SaveAssets();
 				AssetDatabase.Refresh();
 			}

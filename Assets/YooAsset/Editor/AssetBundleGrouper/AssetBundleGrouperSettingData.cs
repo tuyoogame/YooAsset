@@ -106,13 +106,14 @@ namespace YooAsset.Editor
 		private static void LoadSettingData()
 		{
 			// 加载配置文件
-			_setting = AssetDatabase.LoadAssetAtPath<AssetBundleGrouperSetting>(EditorDefine.AssetBundleGrouperSettingFilePath);
+			string settingFilePath = $"{EditorTools.GetYooAssetSettingPath()}/{nameof(AssetBundleGrouperSetting)}.asset";
+			_setting = AssetDatabase.LoadAssetAtPath<AssetBundleGrouperSetting>(settingFilePath);
 			if (_setting == null)
 			{
-				Debug.LogWarning($"Create new {nameof(AssetBundleGrouperSetting)}.asset : {EditorDefine.AssetBundleGrouperSettingFilePath}");
+				Debug.LogWarning($"Create new {nameof(AssetBundleGrouperSetting)}.asset : {settingFilePath}");
 				_setting = ScriptableObject.CreateInstance<AssetBundleGrouperSetting>();
-				EditorTools.CreateFileDirectory(EditorDefine.AssetBundleGrouperSettingFilePath);
-				AssetDatabase.CreateAsset(Setting, EditorDefine.AssetBundleGrouperSettingFilePath);
+				EditorTools.CreateFileDirectory(settingFilePath);
+				AssetDatabase.CreateAsset(Setting, settingFilePath);
 				AssetDatabase.SaveAssets();
 				AssetDatabase.Refresh();
 			}
