@@ -29,7 +29,7 @@ namespace YooAsset
 		/// <summary>
 		/// 获取原生文件的二进制数据
 		/// </summary>
-		public byte[] GetFileData()
+		public byte[] LoadFileData()
 		{
 			string filePath = GetCachePath();
 			if (File.Exists(filePath) == false)
@@ -40,7 +40,7 @@ namespace YooAsset
 		/// <summary>
 		/// 获取原生文件的文本数据
 		/// </summary>
-		public string GetFileText()
+		public string LoadFileText()
 		{
 			string filePath = GetCachePath();
 			if (File.Exists(filePath) == false)

@@ -361,11 +361,11 @@ namespace YooAsset
 
 		#region 资源加载接口
 		/// <summary>
-		/// 异步加载原生文件
+		/// 异步获取原生文件
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
 		/// <param name="copyPath">拷贝路径</param>
-		public static RawFileOperation LoadRawFileAsync(string location, string copyPath = null)
+		public static RawFileOperation GetRawFileAsync(string location, string copyPath = null)
 		{
 			string assetPath = _locationServices.ConvertLocationToAssetPath(_playMode, location);
 			if (_playMode == EPlayMode.EditorPlayMode)
@@ -396,7 +396,7 @@ namespace YooAsset
 				throw new NotImplementedException();
 			}
 		}
-
+		
 
 		/// <summary>
 		/// 同步加载资源对象
