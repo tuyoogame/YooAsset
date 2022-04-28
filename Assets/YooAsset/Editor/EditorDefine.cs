@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace YooAsset.Editor
 {
 	public class EditorDefine
@@ -12,6 +14,8 @@ namespace YooAsset.Editor
 		/// 资源包分组工具的配置文件存储路径
 		/// </summary>
 		public const string AssetBundleGrouperSettingFilePath = "Assets/YooAssetSetting/AssetBundleGrouperSetting.asset";
+		
+		public static readonly Type[] DockedWindowTypes = { typeof(AssetBundleBuilderWindow), typeof(AssetBundleGrouperWindow), typeof(AssetBundleDebuggerWindow), typeof(AssetBundleReporterWindow) , typeof(ShaderVariantCollectionWindow)};
 	}
 
 	/// <summary>

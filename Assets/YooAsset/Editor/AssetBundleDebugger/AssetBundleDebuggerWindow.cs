@@ -11,8 +11,7 @@ namespace YooAsset.Editor
         [MenuItem("YooAsset/AssetBundle Debugger", false, 104)]
         public static void ShowExample()
         {
-            AssetBundleDebuggerWindow wnd = GetWindow<AssetBundleDebuggerWindow>();
-            wnd.titleContent = new GUIContent("资源包调试工具");
+            AssetBundleDebuggerWindow wnd = GetWindow<AssetBundleDebuggerWindow>("资源包调试工具", true, EditorDefine.DockedWindowTypes);
             wnd.minSize = new Vector2(800, 600);
         }
 

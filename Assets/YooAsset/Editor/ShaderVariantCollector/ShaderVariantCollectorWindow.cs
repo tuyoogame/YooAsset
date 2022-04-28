@@ -12,7 +12,7 @@ namespace YooAsset.Editor
 		{
 			if (_thisInstance == null)
 			{
-				_thisInstance = EditorWindow.GetWindow(typeof(ShaderVariantCollectionWindow), false, "着色器变种收集工具", true) as ShaderVariantCollectionWindow;
+				_thisInstance = GetWindow<ShaderVariantCollectionWindow>("ShaderVariant Collector", true, EditorDefine.DockedWindowTypes);
 				_thisInstance.minSize = new Vector2(800, 600);
 			}
 			_thisInstance.Show();
