@@ -17,17 +17,17 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 寻址规则类名
 		/// </summary>
-		public string AddressRuleName = string.Empty;
+		public string AddressRuleName = nameof(AddressByFileName);
 
 		/// <summary>
 		/// 打包规则类名
 		/// </summary>
-		public string PackRuleName = string.Empty;
+		public string PackRuleName = nameof(PackDirectory);
 
 		/// <summary>
 		/// 过滤规则类名
 		/// </summary>
-		public string FilterRuleName = string.Empty;
+		public string FilterRuleName = nameof(CollectAll);
 
 
 		/// <summary>

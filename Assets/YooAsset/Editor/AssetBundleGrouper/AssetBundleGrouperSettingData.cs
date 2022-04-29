@@ -323,13 +323,10 @@ namespace YooAsset.Editor
 		}
 
 		// 资源收集器编辑相关
-		public static void CreateCollector(AssetBundleGrouper grouper, string collectPath, string addressRuleName, string packRuleName, string filterRuleName)
+		public static void CreateCollector(AssetBundleGrouper grouper, string collectPath)
 		{
 			AssetBundleCollector collector = new AssetBundleCollector();
 			collector.CollectPath = collectPath;
-			collector.AddressRuleName = addressRuleName;
-			collector.PackRuleName = packRuleName;
-			collector.FilterRuleName = filterRuleName;
 			grouper.Collectors.Add(collector);
 			IsDirty = true;
 		}

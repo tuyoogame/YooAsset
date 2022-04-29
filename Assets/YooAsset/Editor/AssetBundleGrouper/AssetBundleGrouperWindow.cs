@@ -522,10 +522,7 @@ namespace YooAsset.Editor
 			if (selectGrouper == null)
 				return;
 
-			string addressRuleName = nameof(AddressByFileName);
-			string packRuleName = nameof(PackDirectory);
-			string filterRuleName = nameof(CollectAll);
-			AssetBundleGrouperSettingData.CreateCollector(selectGrouper, string.Empty, addressRuleName, packRuleName, filterRuleName);
+			AssetBundleGrouperSettingData.CreateCollector(selectGrouper, string.Empty);
 			FillCollectorViewData();
 		}
 		private void RemoveCollectorBtn_clicked(AssetBundleCollector selectCollector)
