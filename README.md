@@ -72,3 +72,6 @@ QQ群：963240451
 ## 友情链接
 
 [huatuo](https://github.com/focus-creative-games/huatuo)：华佗是一个**特性完整、零成本、高性能、低内存**的近乎完美的c#热更新方案。
+
+[YooAssetEx](https://gitee.com/liu_zhongxiu/yoo-asset-ex/tree/master)： YooAsset Odin扩展工具，用于支持Unity2017和Unity2018版本。
+
