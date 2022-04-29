@@ -104,6 +104,22 @@ namespace YooAsset
 
 
 		/// <summary>
+		/// 资源包是否有效
+		/// </summary>
+		public bool IsValid()
+		{
+			return _patchBundle != null;
+		}
+
+		/// <summary>
+		/// 资源包文件是否在云端
+		/// </summary>
+		public bool InCloud()
+		{
+			return LoadMode == ELoadMode.LoadFromRemote;
+		}
+
+		/// <summary>
 		/// 获取流文件夹的加载路径
 		/// </summary>
 		public string GetStreamingLoadPath()
