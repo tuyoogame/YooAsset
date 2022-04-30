@@ -6,45 +6,11 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	public static class AssetBundleGrouperHelper
+	/// <summary>
+	/// 编辑器下运行时支持
+	/// </summary>
+	public static class AssetBundleGrouperRuntimeSupport
 	{
-		/// <summary>
-		/// 收集着色器的资源包名称
-		/// </summary>
-		public static string CollectShaderBundleName(string assetPath)
-		{
-			// 如果自动收集所有的着色器
-			if (AssetBundleGrouperSettingData.Setting.AutoCollectShaders)
-			{
-				System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-				if (assetType == typeof(UnityEngine.Shader))
-				{
-					string bundleName = AssetBundleGrouperSettingData.Setting.ShadersBundleName;
-					return CorrectBundleName(bundleName, false);
-				}
-			}
-			return null;
-		}
-
-		/// <summary>
-		/// 修正资源包名称
-		/// </summary>
-		public static string CorrectBundleName(string bundleName, bool isRawBundle)
-		{
-			if (isRawBundle)
-			{
-				string fullName = $"{bundleName}.{YooAssetSettingsData.Setting.RawFileVariant}";
-				return EditorTools.GetRegularPath(fullName).ToLower();
-			}
-			else
-			{
-				string fullName = $"{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-				return EditorTools.GetRegularPath(fullName).ToLower(); ;
-			}
-		}
-
-
-		#region 编辑器下运行时支持
 		private static readonly Dictionary<string, CollectAssetInfo> _locationDic = new Dictionary<string, CollectAssetInfo>(1000);
 
 		public static void InitEditorPlayMode(bool enableAddressable)
@@ -56,7 +22,7 @@ namespace YooAsset.Editor
 				var collectAssetList = AssetBundleGrouperSettingData.Setting.GetAllCollectAssets();
 				foreach (var collectAsset in collectAssetList)
 				{
-					if (collectAsset.NotWriteToAssetList)
+					if(collectAsset.CollectorType != ECollectorType.MainCollector)
 						continue;
 
 					string address = collectAsset.Address;
@@ -71,7 +37,7 @@ namespace YooAsset.Editor
 				var collectAssetList = AssetBundleGrouperSettingData.Setting.GetAllCollectAssets();
 				foreach (var collectAsset in collectAssetList)
 				{
-					if (collectAsset.NotWriteToAssetList)
+					if (collectAsset.CollectorType != ECollectorType.MainCollector)
 						continue;
 
 					// 添加原始路径
@@ -128,6 +94,5 @@ namespace YooAsset.Editor
 					UnityEngine.Debug.LogWarning($"Found illegal character in location : \"{location}\"");
 			}
 		}
-		#endregion
 	}
 }

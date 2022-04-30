@@ -25,13 +25,17 @@ namespace YooAsset.Editor
 		/// </summary>
 		public void PackAsset(BuildAssetInfo assetInfo)
 		{
-			if (TryGetBundleInfo(assetInfo.BundleName, out BuildBundleInfo bundleInfo))
+			string bundleName = assetInfo.GetBundleName();
+			if (string.IsNullOrEmpty(bundleName))
+				throw new Exception("Should never get here !");
+
+			if (TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))
 			{
 				bundleInfo.PackAsset(assetInfo);
 			}
 			else
 			{
-				BuildBundleInfo newBundleInfo = new BuildBundleInfo(assetInfo.BundleName);
+				BuildBundleInfo newBundleInfo = new BuildBundleInfo(bundleName);
 				newBundleInfo.PackAsset(assetInfo);
 				BundleInfos.Add(newBundleInfo);
 			}

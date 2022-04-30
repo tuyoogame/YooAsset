@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace YooAsset.Editor
 {
 	public class BuildAssetInfo
 	{
+		private string _mainBundleName;
+		private string _shareBundleName;
+		private readonly HashSet<string> _dependBundleNames = new HashSet<string>();
+
 		/// <summary>
-		/// 资源包名称
+		/// 收集器类型
 		/// </summary>
-		public string BundleName { private set; get; }
+		public ECollectorType CollectorType { private set; get; }
 
 		/// <summary>
 		/// 可寻址地址
@@ -27,24 +32,9 @@ namespace YooAsset.Editor
 		public bool IsRawAsset { private set; get; }
 
 		/// <summary>
-		/// 不写入资源列表
-		/// </summary>
-		public bool NotWriteToAssetList { private set; get; }
-
-		/// <summary>
-		/// 是否为主动收集资源
-		/// </summary>
-		public bool IsCollectAsset { private set; get; }
-
-		/// <summary>
 		/// 是否为着色器资源
 		/// </summary>
 		public bool IsShaderAsset { private set; get; }
-
-		/// <summary>
-		/// 被依赖次数
-		/// </summary>
-		public int DependCount = 0;
 
 		/// <summary>
 		/// 资源分类标签列表
@@ -58,13 +48,13 @@ namespace YooAsset.Editor
 		public List<BuildAssetInfo> AllDependAssetInfos { private set; get; }
 
 
-		public BuildAssetInfo(string address, string assetPath, bool isRawAsset, bool notWriteToAssetList)
+		public BuildAssetInfo(ECollectorType collectorType, string mainBundleName, string address, string assetPath, bool isRawAsset)
 		{
+			_mainBundleName = mainBundleName;
+			CollectorType = collectorType;
 			Address = address;
 			AssetPath = assetPath;
 			IsRawAsset = isRawAsset;
-			NotWriteToAssetList = notWriteToAssetList;
-			IsCollectAsset = true;
 
 			System.Type assetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
 			if (assetType == typeof(UnityEngine.Shader))
@@ -72,12 +62,12 @@ namespace YooAsset.Editor
 			else
 				IsShaderAsset = false;
 		}
-		public BuildAssetInfo(string assetPath)
+		public BuildAssetInfo(ECollectorType collectorType, string assetPath)
 		{
+			CollectorType = collectorType;
+			Address = string.Empty;
 			AssetPath = assetPath;
 			IsRawAsset = false;
-			NotWriteToAssetList = true;
-			IsCollectAsset = false;
 
 			System.Type assetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
 			if (assetType == typeof(UnityEngine.Shader))
@@ -85,6 +75,7 @@ namespace YooAsset.Editor
 			else
 				IsShaderAsset = false;
 		}
+
 
 		/// <summary>
 		/// 设置所有依赖的资源
@@ -98,47 +89,97 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 设置资源包名称
-		/// </summary>
-		public void SetBundleName(string bundleName)
-		{
-			if (string.IsNullOrEmpty(BundleName) == false)
-				throw new System.Exception("Should never get here !");
-
-			BundleName = bundleName;
-		}
-
-		/// <summary>
 		/// 添加资源分类标签
 		/// </summary>
 		public void AddAssetTags(List<string> tags)
 		{
 			foreach (var tag in tags)
 			{
-				AddAssetTag(tag);
+				if (AssetTags.Contains(tag) == false)
+				{
+					AssetTags.Add(tag);
+				}
 			}
 		}
 
 		/// <summary>
-		/// 添加资源分类标签
+		/// 资源包名是否存在
 		/// </summary>
-		public void AddAssetTag(string tag)
+		public bool HasBundleName()
 		{
-			if (AssetTags.Contains(tag) == false)
-			{
-				AssetTags.Add(tag);
-			}
-		}
-
-		/// <summary>
-		/// 资源包名称是否有效
-		/// </summary>
-		public bool BundleNameIsValid()
-		{
-			if (string.IsNullOrEmpty(BundleName))
+			string bundleName = GetBundleName();
+			if (string.IsNullOrEmpty(bundleName))
 				return false;
 			else
 				return true;
+		}
+
+		/// <summary>
+		/// 获取资源包名称
+		/// </summary>
+		public string GetBundleName()
+		{
+			if (CollectorType == ECollectorType.None)
+				return _shareBundleName;
+			else
+				return _mainBundleName;
+		}
+
+		/// <summary>
+		/// 设置依赖资源包名称
+		/// </summary>
+		public void AddDependBundleName(string bundleName)
+		{
+			if (string.IsNullOrEmpty(bundleName))
+				throw new Exception("Should never get here !");
+
+			if (_dependBundleNames.Contains(bundleName) == false)
+				_dependBundleNames.Add(bundleName);
+		}
+
+		/// <summary>
+		/// 计算主资源或共享资源的完整包名
+		/// </summary>
+		public void CalculateFullBundleName()
+		{
+			if (CollectorType == ECollectorType.None)
+			{
+				if (IsRawAsset)
+					throw new Exception("Should never get here !");
+
+				if (AssetBundleGrouperSettingData.Setting.AutoCollectShaders)
+				{
+					if (IsShaderAsset)
+					{
+						string shareBundleName = $"{AssetBundleGrouperSettingData.Setting.ShadersBundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+						_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
+						return;
+					}
+				}
+
+				if (_dependBundleNames.Count > 1)
+				{
+					var bundleNameList = _dependBundleNames.ToList();
+					bundleNameList.Sort();
+					string combineName = string.Join("|", bundleNameList);
+					var combineNameHash = HashUtility.StringSHA1(combineName);
+					var shareBundleName = $"share_{combineNameHash}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+					_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
+				}
+			}
+			else
+			{
+				if (IsRawAsset)
+				{
+					string mainBundleName = $"{_mainBundleName}.{YooAssetSettingsData.Setting.RawFileVariant}";
+					_mainBundleName = EditorTools.GetRegularPath(mainBundleName).ToLower();
+				}
+				else
+				{
+					string mainBundleName = $"{_mainBundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+					_mainBundleName = EditorTools.GetRegularPath(mainBundleName).ToLower(); ;
+				}
+			}
 		}
 	}
 }

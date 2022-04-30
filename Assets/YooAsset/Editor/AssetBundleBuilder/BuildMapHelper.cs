@@ -13,21 +13,20 @@ namespace YooAsset.Editor
 		public static BuildMapContext SetupBuildMap()
 		{
 			BuildMapContext context = new BuildMapContext();
-			Dictionary<string, BuildAssetInfo> buildAssetDic = new Dictionary<string, BuildAssetInfo>();
+			Dictionary<string, BuildAssetInfo> buildAssetDic = new Dictionary<string, BuildAssetInfo>(1000);
 
-			// 0. 检测配置合法性
+			// 1. 检测配置合法性
 			AssetBundleGrouperSettingData.Setting.CheckConfigError();
 
-			// 1. 获取主动收集的资源
-			List<CollectAssetInfo> collectAssetInfos = AssetBundleGrouperSettingData.Setting.GetAllCollectAssets();
+			// 2. 获取所有主动收集的资源
+			List<CollectAssetInfo> allCollectAssets = AssetBundleGrouperSettingData.Setting.GetAllCollectAssets();
 
-			// 2. 录入主动收集的资源
-			foreach (var collectAssetInfo in collectAssetInfos)
+			// 3. 录入主动收集的资源
+			foreach (var collectAssetInfo in allCollectAssets)
 			{
 				if (buildAssetDic.ContainsKey(collectAssetInfo.AssetPath) == false)
 				{
-					var buildAssetInfo = new BuildAssetInfo(collectAssetInfo.Address, collectAssetInfo.AssetPath, collectAssetInfo.IsRawAsset, collectAssetInfo.NotWriteToAssetList);
-					buildAssetInfo.SetBundleName(collectAssetInfo.BundleName);
+					var buildAssetInfo = new BuildAssetInfo(collectAssetInfo.CollectorType, collectAssetInfo.BundleName, collectAssetInfo.Address, collectAssetInfo.AssetPath, collectAssetInfo.IsRawAsset);
 					buildAssetInfo.AddAssetTags(collectAssetInfo.AssetTags);
 					buildAssetDic.Add(collectAssetInfo.AssetPath, buildAssetInfo);
 				}
@@ -37,28 +36,29 @@ namespace YooAsset.Editor
 				}
 			}
 
-			// 3. 录入并分析依赖资源
-			foreach (var collectAssetInfo in collectAssetInfos)
+			// 4. 录入相关依赖的资源
+			foreach (var collectAssetInfo in allCollectAssets)
 			{
 				foreach (var dependAssetPath in collectAssetInfo.DependAssets)
 				{
 					if (buildAssetDic.ContainsKey(dependAssetPath))
 					{
-						buildAssetDic[dependAssetPath].DependCount++;
 						buildAssetDic[dependAssetPath].AddAssetTags(collectAssetInfo.AssetTags);
+						buildAssetDic[dependAssetPath].AddDependBundleName(collectAssetInfo.BundleName);
 					}
 					else
 					{
-						var buildAssetInfo = new BuildAssetInfo(dependAssetPath);
+						var buildAssetInfo = new BuildAssetInfo(ECollectorType.None, dependAssetPath);
 						buildAssetInfo.AddAssetTags(collectAssetInfo.AssetTags);
+						buildAssetInfo.AddDependBundleName(collectAssetInfo.BundleName);
 						buildAssetDic.Add(dependAssetPath, buildAssetInfo);
 					}
 				}
 			}
 			context.AssetFileCount = buildAssetDic.Count;
 
-			// 4. 设置主动收集资源的依赖列表
-			foreach (var collectAssetInfo in collectAssetInfos)
+			// 5. 填充主动收集资源的依赖列表
+			foreach (var collectAssetInfo in allCollectAssets)
 			{
 				var dependAssetInfos = new List<BuildAssetInfo>(collectAssetInfo.DependAssets.Count);
 				foreach (var dependAssetPath in collectAssetInfo.DependAssets)
@@ -71,21 +71,18 @@ namespace YooAsset.Editor
 				buildAssetDic[collectAssetInfo.AssetPath].SetAllDependAssetInfos(dependAssetInfos);
 			}
 
-			// 5. 移除零依赖的资源
+			// 6. 计算完整的资源包名
+			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
+			{
+				pair.Value.CalculateFullBundleName();
+			}
+
+			// 7. 移除未参与构建的资源
 			List<BuildAssetInfo> removeList = new List<BuildAssetInfo>();
 			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
 			{
 				var buildAssetInfo = pair.Value;
-				if (buildAssetInfo.IsCollectAsset)
-					continue;
-
-				if (AssetBundleGrouperSettingData.Setting.AutoCollectShaders)
-				{
-					if (buildAssetInfo.IsShaderAsset)
-						continue;
-				}
-
-				if (buildAssetInfo.DependCount == 0)
+				if (buildAssetInfo.HasBundleName() == false)
 					removeList.Add(buildAssetInfo);
 			}
 			foreach (var removeValue in removeList)
@@ -93,32 +90,11 @@ namespace YooAsset.Editor
 				buildAssetDic.Remove(removeValue.AssetPath);
 			}
 
-			// 6. 设置未命名的资源包
-			IPackRule defaultPackRule = new PackDirectory();
-			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
-			{
-				var buildAssetInfo = pair.Value;
-				if (buildAssetInfo.BundleNameIsValid() == false)
-				{
-					string shaderBundleName = AssetBundleGrouperHelper.CollectShaderBundleName(buildAssetInfo.AssetPath);
-					if (string.IsNullOrEmpty(shaderBundleName) == false)
-					{
-						buildAssetInfo.SetBundleName(shaderBundleName);
-					}
-					else
-					{
-						string bundleName = defaultPackRule.GetBundleName(new PackRuleData(buildAssetInfo.AssetPath));
-						bundleName = AssetBundleGrouperHelper.CorrectBundleName(bundleName, false);
-						buildAssetInfo.SetBundleName(bundleName);
-					}
-				}
-			}
-
-			// 7. 构建资源包
-			var allBuildAssets = buildAssetDic.Values.ToList();
-			if (allBuildAssets.Count == 0)
+			// 8. 构建资源包
+			var allBuildinAssets = buildAssetDic.Values.ToList();
+			if (allBuildinAssets.Count == 0)
 				throw new Exception("构建的资源列表不能为空");
-			foreach (var assetInfo in allBuildAssets)
+			foreach (var assetInfo in allBuildinAssets)
 			{
 				context.PackAsset(assetInfo);
 			}

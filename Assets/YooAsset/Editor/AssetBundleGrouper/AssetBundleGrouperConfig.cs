@@ -17,14 +17,13 @@ namespace YooAsset.Editor
 		public const string XmlGrouperName = "GrouperName";
 		public const string XmlGrouperDesc = "GrouperDesc";
 		public const string XmlCollector = "Collector";
-		public const string XmlDirectory = "CollectPath";
+		public const string XmlCollectPath = "CollectPath";
+		public const string XmlCollectorType = "CollectType";
 		public const string XmlAddressRule = "AddressRule";
 		public const string XmlPackRule = "PackRule";
 		public const string XmlFilterRule = "FilterRule";
-		public const string XmlNotWriteToAssetList = "NotWriteToAssetList";
 		public const string XmlAssetTags = "AssetTags";
-
-
+		
 		/// <summary>
 		/// 导入XML配置表
 		/// </summary>
@@ -81,25 +80,25 @@ namespace YooAsset.Editor
 				foreach (var collectorNode in collectorNodeList)
 				{
 					XmlElement collectorElement = collectorNode as XmlElement;
-					if (collectorElement.HasAttribute(XmlDirectory) == false)
-						throw new Exception($"Not found attribute {XmlDirectory} in {XmlCollector}");
+					if (collectorElement.HasAttribute(XmlCollectPath) == false)
+						throw new Exception($"Not found attribute {XmlCollectPath} in {XmlCollector}");
+					if (collectorElement.HasAttribute(XmlCollectorType) == false)
+						throw new Exception($"Not found attribute {XmlCollectorType} in {XmlCollector}");
 					if (collectorElement.HasAttribute(XmlAddressRule) == false)
 						throw new Exception($"Not found attribute {XmlAddressRule} in {XmlCollector}");
 					if (collectorElement.HasAttribute(XmlPackRule) == false)
 						throw new Exception($"Not found attribute {XmlPackRule} in {XmlCollector}");
 					if (collectorElement.HasAttribute(XmlFilterRule) == false)
 						throw new Exception($"Not found attribute {XmlFilterRule} in {XmlCollector}");
-					if (collectorElement.HasAttribute(XmlNotWriteToAssetList) == false)
-						throw new Exception($"Not found attribute {XmlNotWriteToAssetList} in {XmlCollector}");
 					if (collectorElement.HasAttribute(XmlAssetTags) == false)
 						throw new Exception($"Not found attribute {XmlAssetTags} in {XmlCollector}");
 
 					AssetBundleCollector collector = new AssetBundleCollector();
-					collector.CollectPath = collectorElement.GetAttribute(XmlDirectory);
+					collector.CollectPath = collectorElement.GetAttribute(XmlCollectPath);
+					collector.CollectorType = StringUtility.NameToEnum<ECollectorType>(collectorElement.GetAttribute(XmlCollectorType));
 					collector.AddressRuleName = collectorElement.GetAttribute(XmlAddressRule);
 					collector.PackRuleName = collectorElement.GetAttribute(XmlPackRule);
 					collector.FilterRuleName = collectorElement.GetAttribute(XmlFilterRule);
-					collector.NotWriteToAssetList = collectorElement.GetAttribute(XmlNotWriteToAssetList) == "True" ? true : false;
 					collector.AssetTags = collectorElement.GetAttribute(XmlAssetTags); ;
 					grouper.Collectors.Add(collector);
 				}
@@ -149,11 +148,11 @@ namespace YooAsset.Editor
 				foreach (var collector in grouper.Collectors)
 				{
 					var collectorElement = xmlDoc.CreateElement(XmlCollector);
-					collectorElement.SetAttribute(XmlDirectory, collector.CollectPath);
+					collectorElement.SetAttribute(XmlCollectPath, collector.CollectPath);
+					collectorElement.SetAttribute(XmlCollectorType, collector.CollectorType.ToString());
 					collectorElement.SetAttribute(XmlAddressRule, collector.AddressRuleName);
 					collectorElement.SetAttribute(XmlPackRule, collector.PackRuleName);
 					collectorElement.SetAttribute(XmlFilterRule, collector.FilterRuleName);
-					collectorElement.SetAttribute(XmlNotWriteToAssetList, collector.NotWriteToAssetList.ToString());
 					collectorElement.SetAttribute(XmlAssetTags, collector.AssetTags);
 					grouperElement.AppendChild(collectorElement);
 				}

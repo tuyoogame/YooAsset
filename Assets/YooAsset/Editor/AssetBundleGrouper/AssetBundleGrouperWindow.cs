@@ -18,6 +18,7 @@ namespace YooAsset.Editor
 			window.minSize = new Vector2(800, 600);
 		}
 
+		private List<string> _collectorTypeList;
 		private List<string> _addressRuleList;
 		private List<string> _packRuleList;
 		private List<string> _filterRuleList;
@@ -38,6 +39,7 @@ namespace YooAsset.Editor
 
 			VisualElement root = this.rootVisualElement;
 
+			_collectorTypeList = new List<string>() { $"{nameof(ECollectorType.MainCollector)}", $"{nameof(ECollectorType.StaticCollector)}"};
 			_addressRuleList = AssetBundleGrouperSettingData.GetAddressRuleNames();
 			_packRuleList = AssetBundleGrouperSettingData.GetPackRuleNames();
 			_filterRuleList = AssetBundleGrouperSettingData.GetFilterRuleNames();
@@ -318,6 +320,13 @@ namespace YooAsset.Editor
 				label.style.width = 90;
 				elementBottom.Add(label);
 			}
+			{
+				var popupField = new PopupField<string>(_collectorTypeList, 0);
+				popupField.name = "PopupField0";
+				popupField.style.unityTextAlign = TextAnchor.MiddleLeft;
+				popupField.style.width = 150;
+				elementBottom.Add(popupField);
+			}
 			if (_enableAddressableToogle.value)
 			{
 				var popupField = new PopupField<string>(_addressRuleList, 0);
@@ -339,17 +348,6 @@ namespace YooAsset.Editor
 				popupField.style.unityTextAlign = TextAnchor.MiddleLeft;
 				popupField.style.width = 150;
 				elementBottom.Add(popupField);
-			}
-			{
-				var toggle = new Toggle();
-				toggle.name = "Toggle1";
-				toggle.label = "NotWriteToAssetList";
-				toggle.style.unityTextAlign = TextAnchor.MiddleLeft;
-				toggle.style.width = 150;
-				toggle.style.marginLeft = 20;
-				elementBottom.Add(toggle);
-				var label = toggle.Q<Label>();
-				label.style.minWidth = 130;
 			}
 			{
 				var textField = new TextField();
@@ -408,13 +406,23 @@ namespace YooAsset.Editor
 				RemoveCollectorBtn_clicked(collector);
 			};
 
-			// Collect Path
+			// Collector Path
 			var objectField1 = element.Q<ObjectField>("ObjectField1");
 			objectField1.SetValueWithoutNotify(collectObject);
 			objectField1.RegisterValueChangedCallback(evt =>
 			{
 				collector.CollectPath = AssetDatabase.GetAssetPath(evt.newValue);
 				objectField1.value.name = collector.CollectPath;
+				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
+				RefreshFoldout(foldout, selectGrouper, collector);
+			});
+
+			// Collector Type
+			var popupField0 = element.Q<PopupField<string>>("PopupField0");
+			popupField0.index = GetCollectorTypeIndex(collector.CollectorType.ToString());
+			popupField0.RegisterValueChangedCallback(evt =>
+			{
+				collector.CollectorType = StringUtility.NameToEnum<ECollectorType>(evt.newValue);
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
 				RefreshFoldout(foldout, selectGrouper, collector);
 			});
@@ -452,16 +460,6 @@ namespace YooAsset.Editor
 				RefreshFoldout(foldout, selectGrouper, collector);
 			});
 
-			// NotWriteToAssetList
-			var toggle1 = element.Q<Toggle>("Toggle1");
-			toggle1.SetValueWithoutNotify(collector.NotWriteToAssetList);
-			toggle1.RegisterValueChangedCallback(evt =>
-			{
-				collector.NotWriteToAssetList = evt.newValue;
-				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
-				RefreshFoldout(foldout, selectGrouper, collector);
-			});
-
 			// Tags
 			var textFiled1 = element.Q<TextField>("TextField1");
 			textFiled1.SetValueWithoutNotify(collector.AssetTags);
@@ -476,7 +474,7 @@ namespace YooAsset.Editor
 			// 清空旧元素
 			foldout.Clear();
 
-			if (collector.IsValid() && collector.NotWriteToAssetList == false)
+			if (collector.IsValid() && collector.CollectorType == ECollectorType.MainCollector)
 			{
 				List<CollectAssetInfo> collectAssetInfos = null;
 
@@ -484,12 +482,12 @@ namespace YooAsset.Editor
 				{
 					collectAssetInfos = collector.GetAllCollectAssets(grouper);
 				}
-				catch(System.Exception e)
+				catch (System.Exception e)
 				{
 					Debug.LogError(e.ToString());
 				}
 
-				if(collectAssetInfos != null)
+				if (collectAssetInfos != null)
 				{
 					foreach (var collectAssetInfo in collectAssetInfos)
 					{
@@ -536,6 +534,15 @@ namespace YooAsset.Editor
 			FillCollectorViewData();
 		}
 
+		private int GetCollectorTypeIndex(string typeName)
+		{
+			for (int i = 0; i < _collectorTypeList.Count; i++)
+			{
+				if (_collectorTypeList[i] == typeName)
+					return i;
+			}
+			return 0;
+		}
 		private int GetAddressRuleIndex(string ruleName)
 		{
 			for (int i = 0; i < _addressRuleList.Count; i++)

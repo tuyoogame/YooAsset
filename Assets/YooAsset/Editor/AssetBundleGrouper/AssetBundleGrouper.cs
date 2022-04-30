@@ -47,41 +47,39 @@ namespace YooAsset.Editor
 		/// </summary>
 		public List<CollectAssetInfo> GetAllCollectAssets()
 		{
-			Dictionary<string, string> adressTemper = new Dictionary<string, string>(10000);
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
+
+			// 收集打包资源
 			foreach (var collector in Collectors)
 			{
 				var temper = collector.GetAllCollectAssets(this);
 				foreach (var assetInfo in temper)
 				{
 					if (result.ContainsKey(assetInfo.AssetPath) == false)
-					{
 						result.Add(assetInfo.AssetPath, assetInfo);
-					}
 					else
-					{
 						throw new Exception($"The collecting asset file is existed : {assetInfo.AssetPath} in grouper : {GrouperName}");
-					}
 				}
 			}
 
 			// 检测可寻址地址是否重复
 			if (AssetBundleGrouperSettingData.Setting.EnableAddressable)
 			{
-				foreach (var collectInfo in result)
+				HashSet<string> adressTemper = new HashSet<string>();
+				foreach (var collectInfoPair in result)
 				{
-					string address = collectInfo.Value.Address;
-					if (adressTemper.ContainsKey(address) == false)
+					if (collectInfoPair.Value.CollectorType == ECollectorType.MainCollector)
 					{
-						adressTemper.Add(address, address);
-					}
-					else
-					{
-						throw new Exception($"The address is existed : {address} in grouper : {GrouperName}");
+						string address = collectInfoPair.Value.Address;
+						if (adressTemper.Contains(address) == false)
+							adressTemper.Add(address);
+						else
+							throw new Exception($"The address is existed : {address} in grouper : {GrouperName}");
 					}
 				}
 			}
 
+			// 返回列表
 			return result.Values.ToList();
 		}
 	}
