@@ -105,7 +105,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public BuildAssetInfo[] GetAllPatchAssetInfos()
 		{
-			return BuildinAssets.Where(t => t.CollectorType == ECollectorType.MainCollector).ToArray();
+			return BuildinAssets.Where(t => t.CollectorType == ECollectorType.MainAssetCollector).ToArray();
 		}
 
 		/// <summary>

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
+	[TaskAttribute("资源包加密")]
 	public class TaskEncryption : IBuildTask
 	{
 		public class EncryptionContext : IContextObject
@@ -54,7 +55,6 @@ namespace YooAsset.Editor
 			if (encryptionServices == null)
 				return encryptList;
 
-			UnityEngine.Debug.Log($"开始加密资源文件");
 			int progressValue = 0;
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
@@ -84,6 +84,8 @@ namespace YooAsset.Editor
 			}
 			EditorTools.ClearProgressBar();
 
+			if(encryptList.Count == 0)
+				UnityEngine.Debug.LogWarning($"没有发现需要加密的文件！");
 			return encryptList;
 		}
 	}

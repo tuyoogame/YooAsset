@@ -9,7 +9,7 @@ namespace YooAsset.Editor
 	{
 		private string _mainBundleName;
 		private string _shareBundleName;
-		private readonly HashSet<string> _dependBundleNames = new HashSet<string>();
+		private readonly HashSet<string> _referenceBundleNames = new HashSet<string>();
 
 		/// <summary>
 		/// 收集器类型
@@ -126,15 +126,15 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 设置依赖资源包名称
+		/// 添加关联的资源包名称
 		/// </summary>
-		public void AddDependBundleName(string bundleName)
+		public void AddReferenceBundleName(string bundleName)
 		{
 			if (string.IsNullOrEmpty(bundleName))
 				throw new Exception("Should never get here !");
 
-			if (_dependBundleNames.Contains(bundleName) == false)
-				_dependBundleNames.Add(bundleName);
+			if (_referenceBundleNames.Contains(bundleName) == false)
+				_referenceBundleNames.Add(bundleName);
 		}
 
 		/// <summary>
@@ -157,9 +157,9 @@ namespace YooAsset.Editor
 					}
 				}
 
-				if (_dependBundleNames.Count > 1)
+				if (_referenceBundleNames.Count > 1)
 				{
-					var bundleNameList = _dependBundleNames.ToList();
+					var bundleNameList = _referenceBundleNames.ToList();
 					bundleNameList.Sort();
 					string combineName = string.Join("|", bundleNameList);
 					var combineNameHash = HashUtility.StringSHA1(combineName);

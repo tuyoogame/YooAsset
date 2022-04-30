@@ -17,7 +17,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 收集器类型
 		/// </summary>
-		public ECollectorType CollectorType = ECollectorType.MainCollector;
+		public ECollectorType CollectorType = ECollectorType.MainAssetCollector;
 
 		/// <summary>
 		/// 寻址规则类名
@@ -47,12 +47,19 @@ namespace YooAsset.Editor
 		{
 			if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(CollectPath) == null)
 				return false;
-			if (AssetBundleGrouperSettingData.HasPackRuleName(PackRuleName) == false)
+
+			if (CollectorType == ECollectorType.None)
 				return false;
-			if (AssetBundleGrouperSettingData.HasFilterRuleName(FilterRuleName) == false)
-				return false;
+
 			if (AssetBundleGrouperSettingData.HasAddressRuleName(AddressRuleName) == false)
 				return false;
+
+			if (AssetBundleGrouperSettingData.HasPackRuleName(PackRuleName) == false)
+				return false;
+
+			if (AssetBundleGrouperSettingData.HasFilterRuleName(FilterRuleName) == false)
+				return false;
+
 			return true;
 		}
 
@@ -86,8 +93,8 @@ namespace YooAsset.Editor
 			bool isRawAsset = PackRuleName == nameof(PackRawFile);
 
 			// 检测原生资源包的收集器类型
-			if (isRawAsset && CollectorType != ECollectorType.MainCollector)
-				throw new Exception($"The raw file must be set to {nameof(ECollectorType)}.{ECollectorType.MainCollector} : {CollectPath}");
+			if (isRawAsset && CollectorType != ECollectorType.MainAssetCollector)
+				throw new Exception($"The raw file must be set to {nameof(ECollectorType)}.{ECollectorType.MainAssetCollector} : {CollectPath}");
 
 			// 收集打包资源
 			if (AssetDatabase.IsValidFolder(CollectPath))
@@ -130,7 +137,7 @@ namespace YooAsset.Editor
 				HashSet<string> adressTemper = new HashSet<string>();
 				foreach (var collectInfoPair in result)
 				{
-					if (collectInfoPair.Value.CollectorType == ECollectorType.MainCollector)
+					if (collectInfoPair.Value.CollectorType == ECollectorType.MainAssetCollector)
 					{
 						string address = collectInfoPair.Value.Address;
 						if (adressTemper.Contains(address) == false)
@@ -189,7 +196,7 @@ namespace YooAsset.Editor
 		}
 		private string GetAddress(AssetBundleGrouper grouper, string assetPath)
 		{
-			if (CollectorType != ECollectorType.MainCollector)
+			if (CollectorType != ECollectorType.MainAssetCollector)
 				return string.Empty;
 
 			IAddressRule addressRuleInstance = AssetBundleGrouperSettingData.GetAddressRuleInstance(AddressRuleName);

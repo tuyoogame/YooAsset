@@ -39,7 +39,12 @@ namespace YooAsset.Editor
 
 			VisualElement root = this.rootVisualElement;
 
-			_collectorTypeList = new List<string>() { $"{nameof(ECollectorType.MainCollector)}", $"{nameof(ECollectorType.StaticCollector)}"};
+			_collectorTypeList = new List<string>()
+			{
+				$"{nameof(ECollectorType.MainAssetCollector)}",
+				$"{nameof(ECollectorType.StaticAssetCollector)}",
+				$"{nameof(ECollectorType.DependAssetCollector)}"
+			};
 			_addressRuleList = AssetBundleGrouperSettingData.GetAddressRuleNames();
 			_packRuleList = AssetBundleGrouperSettingData.GetPackRuleNames();
 			_filterRuleList = AssetBundleGrouperSettingData.GetFilterRuleNames();
@@ -371,7 +376,7 @@ namespace YooAsset.Editor
 				var foldout = new Foldout();
 				foldout.name = "Foldout1";
 				foldout.value = false;
-				foldout.text = "Assets";
+				foldout.text = "Main Assets";
 				elementFoldout.Add(foldout);
 			}
 
@@ -474,7 +479,13 @@ namespace YooAsset.Editor
 			// 清空旧元素
 			foldout.Clear();
 
-			if (collector.IsValid() && collector.CollectorType == ECollectorType.MainCollector)
+			if (collector.IsValid() == false)
+			{
+				Debug.LogWarning($"The collector is invalid : {collector.CollectPath} in grouper : {grouper.GrouperName}");
+				return;
+			}
+
+			if (collector.CollectorType == ECollectorType.MainAssetCollector || collector.CollectorType == ECollectorType.StaticAssetCollector)
 			{
 				List<CollectAssetInfo> collectAssetInfos = null;
 

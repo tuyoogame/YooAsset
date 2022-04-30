@@ -7,12 +7,14 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
+	[TaskAttribute("获取资源构建内容")]
 	public class TaskGetBuildMap : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
 		{
-			var buildMapContext = BuildMapHelper.SetupBuildMap();
+			var buildMapContext = BuildMapCreater.CreateBuildMap();
 			context.SetContextObject(buildMapContext);
+			UnityEngine.Debug.Log("构建内容准备完毕！");
 
 			// 检测构建结果
 			CheckBuildMapContent(buildMapContext);

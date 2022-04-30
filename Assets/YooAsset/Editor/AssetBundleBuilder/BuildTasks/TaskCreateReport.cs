@@ -4,9 +4,7 @@ using System.IO;
 
 namespace YooAsset.Editor
 {
-	/// <summary>
-	/// 创建报告文件
-	/// </summary>
+	[TaskAttribute("创建构建报告文件")]
 	public class TaskCreateReport : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
@@ -93,6 +91,7 @@ namespace YooAsset.Editor
 
 			// 序列化文件
 			BuildReport.Serialize(filePath, buildReport);
+			UnityEngine.Debug.Log($"资源构建报告文件创建完成：{filePath}");
 		}
 
 		/// <summary>

@@ -6,6 +6,7 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
+	[TaskAttribute("资源构建准备工作")]
 	public class TaskPrepare : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

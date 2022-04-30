@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace YooAsset.Editor
@@ -24,6 +25,8 @@ namespace YooAsset.Editor
 				IBuildTask task = pipeline[i];
 				try
 				{
+					var taskAttribute = task.GetType().GetCustomAttribute<TaskAttribute>();
+					Debug.Log($"---------------------------------------->{taskAttribute.Desc}");
 					task.Run(context);
 				}
 				catch (Exception e)

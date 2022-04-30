@@ -22,14 +22,14 @@ namespace YooAsset.Editor
 				var collectAssetList = AssetBundleGrouperSettingData.Setting.GetAllCollectAssets();
 				foreach (var collectAsset in collectAssetList)
 				{
-					if(collectAsset.CollectorType != ECollectorType.MainCollector)
-						continue;
-
-					string address = collectAsset.Address;
-					if (_locationDic.ContainsKey(address))
-						UnityEngine.Debug.LogWarning($"Address have existed : {address}");
-					else
-						_locationDic.Add(address, collectAsset);
+					if(collectAsset.CollectorType == ECollectorType.MainAssetCollector)
+					{
+						string address = collectAsset.Address;
+						if (_locationDic.ContainsKey(address))
+							throw new Exception($"The address is existed : {address} in grouper setting.");
+						else
+							_locationDic.Add(address, collectAsset);
+					}
 				}
 			}
 			else
@@ -37,24 +37,25 @@ namespace YooAsset.Editor
 				var collectAssetList = AssetBundleGrouperSettingData.Setting.GetAllCollectAssets();
 				foreach (var collectAsset in collectAssetList)
 				{
-					if (collectAsset.CollectorType != ECollectorType.MainCollector)
-						continue;
-
-					// 添加原始路径
-					string assetPath = collectAsset.AssetPath;
-					if (_locationDic.ContainsKey(assetPath))
-						UnityEngine.Debug.LogWarning($"Asset path have existed : {assetPath}");
-					else
-						_locationDic.Add(assetPath, collectAsset);
-
-					// 添加去掉后缀名的路径
-					if (Path.HasExtension(assetPath))
+					if (collectAsset.CollectorType == ECollectorType.MainAssetCollector)
 					{
-						string assetPathWithoutExtension = StringUtility.RemoveExtension(assetPath);
-						if (_locationDic.ContainsKey(assetPathWithoutExtension))
-							UnityEngine.Debug.LogWarning($"Asset path have existed : {assetPathWithoutExtension}");
+						// 添加原始路径
+						// 注意：我们不允许原始路径存在重名
+						string assetPath = collectAsset.AssetPath;
+						if (_locationDic.ContainsKey(assetPath))
+							throw new Exception($"Asset path have existed : {assetPath}");
 						else
-							_locationDic.Add(assetPathWithoutExtension, collectAsset);
+							_locationDic.Add(assetPath, collectAsset);
+
+						// 添加去掉后缀名的路径
+						if (Path.HasExtension(assetPath))
+						{
+							string assetPathWithoutExtension = StringUtility.RemoveExtension(assetPath);
+							if (_locationDic.ContainsKey(assetPathWithoutExtension))
+								UnityEngine.Debug.LogWarning($"Asset path have existed : {assetPathWithoutExtension}");
+							else
+								_locationDic.Add(assetPathWithoutExtension, collectAsset);
+						}
 					}
 				}
 			}

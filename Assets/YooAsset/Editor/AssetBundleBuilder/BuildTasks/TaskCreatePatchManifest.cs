@@ -5,9 +5,7 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
-	/// <summary>
-	/// 创建补丁清单文件
-	/// </summary>
+	[TaskAttribute("创建补丁清单文件")]
 	public class TaskCreatePatchManifest : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

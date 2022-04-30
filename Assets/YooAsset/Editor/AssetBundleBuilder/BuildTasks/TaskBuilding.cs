@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace YooAsset.Editor
 {
+	[TaskAttribute("资源构建内容打包")]
 	public class TaskBuilding : IBuildTask
 	{
 		public class UnityManifestContext : IContextObject
@@ -20,12 +21,12 @@ namespace YooAsset.Editor
 			var buildParametersContext = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 
-			Debug.Log($"开始构建......");
 			BuildAssetBundleOptions opt = buildParametersContext.GetPipelineBuildOptions();
 			AssetBundleManifest unityManifest = BuildPipeline.BuildAssetBundles(buildParametersContext.PipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), opt, buildParametersContext.Parameters.BuildTarget);
 			if (unityManifest == null)
 				throw new Exception("构建过程中发生错误！");
 
+			Debug.Log("Unity引擎打包成功！");
 			UnityManifestContext unityManifestContext = new UnityManifestContext();
 			unityManifestContext.UnityManifest = unityManifest;
 			context.SetContextObject(unityManifestContext);

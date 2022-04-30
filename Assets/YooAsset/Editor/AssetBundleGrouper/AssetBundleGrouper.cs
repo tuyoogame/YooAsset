@@ -68,7 +68,7 @@ namespace YooAsset.Editor
 				HashSet<string> adressTemper = new HashSet<string>();
 				foreach (var collectInfoPair in result)
 				{
-					if (collectInfoPair.Value.CollectorType == ECollectorType.MainCollector)
+					if (collectInfoPair.Value.CollectorType == ECollectorType.MainAssetCollector)
 					{
 						string address = collectInfoPair.Value.Address;
 						if (adressTemper.Contains(address) == false)
