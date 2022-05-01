@@ -62,6 +62,38 @@ namespace YooAsset
 		/// <summary>
 		/// 创建下载器
 		/// </summary>
+		public DownloaderOperation CreateDownloaderByAll(int fileLoadingMaxNumber, int failedTryAgain)
+		{
+			List<BundleInfo> downloadList = GetDownloadListByAll();
+			var operation = new DownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
+			return operation;
+		}
+		private List<BundleInfo> GetDownloadListByAll()
+		{
+			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
+			foreach (var patchBundle in LocalPatchManifest.BundleList)
+			{
+				// 忽略缓存文件
+				if (DownloadSystem.ContainsVerifyFile(patchBundle.Hash))
+					continue;
+
+				// 忽略APP资源
+				// 注意：如果是APP资源并且哈希值相同，则不需要下载
+				if (AppPatchManifest.Bundles.TryGetValue(patchBundle.BundleName, out PatchBundle appPatchBundle))
+				{
+					if (appPatchBundle.IsBuildin && appPatchBundle.Hash == patchBundle.Hash)
+						continue;
+				}
+
+				downloadList.Add(patchBundle);
+			}
+
+			return ConvertToDownloadList(downloadList);
+		}
+
+		/// <summary>
+		/// 创建下载器
+		/// </summary>
 		public DownloaderOperation CreateDownloaderByTags(string[] tags, int fileLoadingMaxNumber, int failedTryAgain)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByTags(tags);
