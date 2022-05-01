@@ -177,7 +177,7 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
 					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
-					YooLogger.Log($"Verify files total time : {costTime}");
+					YooLogger.Log($"Verify result : Success {_verifySuccessCount}, Fail {_verifyFailCount}, Elapsed time {costTime} seconds");
 				}
 			}
 		}
@@ -249,10 +249,12 @@ namespace YooAsset
 			}
 		}
 
-		private readonly List<PatchBundle> _cacheList = new List<PatchBundle>(1000);
-		private readonly List<PatchBundle> _verifyList = new List<PatchBundle>(100);
+		private readonly List<PatchBundle> _waitingList = new List<PatchBundle>(1000);
+		private readonly List<PatchBundle> _verifyingList = new List<PatchBundle>(100);
 		private readonly ThreadSyncContext _syncContext = new ThreadSyncContext();
-		private const int VerifyMaxCount = 32;
+		private int _verifyMaxNum = 32;
+		private int _verifySuccessCount = 0;
+		private int _verifyFailCount = 0;
 
 		private void InitPrepareCache()
 		{
@@ -276,33 +278,38 @@ namespace YooAsset
 				if (File.Exists(filePath) == false)
 					continue;
 
-				_cacheList.Add(patchBundle);
+				_waitingList.Add(patchBundle);
 			}
+
+			// 设置同时验证的最大数
+			ThreadPool.GetMaxThreads(out int workerThreads, out int ioThreads);
+			YooLogger.Log($"Work threads : {workerThreads}, IO threads : {ioThreads}");
+			_verifyMaxNum = Math.Min(workerThreads, ioThreads);
 		}
 		private bool UpdatePrepareCache()
 		{
 			_syncContext.Update();
 
-			if (_cacheList.Count == 0 && _verifyList.Count == 0)
+			if (_waitingList.Count == 0 && _verifyingList.Count == 0)
 				return true;
 
-			if (_verifyList.Count >= VerifyMaxCount)
+			if (_verifyingList.Count >= _verifyMaxNum)
 				return false;
 
-			for (int i = _cacheList.Count - 1; i >= 0; i--)
+			for (int i = _waitingList.Count - 1; i >= 0; i--)
 			{
-				if (_verifyList.Count >= VerifyMaxCount)
+				if (_verifyingList.Count >= _verifyMaxNum)
 					break;
 
-				var patchBundle = _cacheList[i];
+				var patchBundle = _waitingList[i];
 				if (RunThread(patchBundle))
 				{
-					_cacheList.RemoveAt(i);
-					_verifyList.Add(patchBundle);
+					_waitingList.RemoveAt(i);
+					_verifyingList.Add(patchBundle);
 				}
 				else
 				{
-					YooLogger.Warning("Failed to run verify thread.");
+					YooLogger.Warning("The thread pool is failed queued.");
 					break;
 				}
 			}
@@ -313,21 +320,38 @@ namespace YooAsset
 		{
 			string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
 			ThreadInfo info = new ThreadInfo(filePath, patchBundle);
-			return ThreadPool.QueueUserWorkItem(new WaitCallback(VerifyFile), info);
+			return ThreadPool.QueueUserWorkItem(new WaitCallback(VerifyInThread), info);
 		}
-		private void VerifyFile(object infoObj)
+		private void VerifyInThread(object infoObj)
 		{
 			// 验证沙盒内的文件
 			ThreadInfo info = (ThreadInfo)infoObj;
-			info.Result = DownloadSystem.CheckContentIntegrity(info.FilePath, info.Bundle.SizeBytes, info.Bundle.CRC);
+			try
+			{
+				info.Result = DownloadSystem.CheckContentIntegrity(info.FilePath, info.Bundle.SizeBytes, info.Bundle.CRC);
+			}
+			catch (Exception)
+			{
+				info.Result = false;
+			}
 			_syncContext.Post(VerifyCallback, info);
 		}
 		private void VerifyCallback(object obj)
 		{
 			ThreadInfo info = (ThreadInfo)obj;
 			if (info.Result)
+			{
+				_verifySuccessCount++;
 				DownloadSystem.CacheVerifyFile(info.Bundle.Hash, info.Bundle.BundleName);
-			_verifyList.Remove(info.Bundle);
+			}
+			else
+			{
+				_verifyFailCount++;
+				YooLogger.Warning($"Failed to verify file : {info.FilePath}");
+				if (File.Exists(info.FilePath))
+					File.Delete(info.FilePath);
+			}
+			_verifyingList.Remove(info.Bundle);
 		}
 		#endregion
 	}
