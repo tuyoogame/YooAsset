@@ -6,7 +6,7 @@ namespace YooAsset
 	/// <summary>
 	/// 场景卸载异步操作类
 	/// </summary>
-	public class UnloadSceneOperation : AsyncOperationBase
+	public sealed class UnloadSceneOperation : AsyncOperationBase
 	{
 		private enum EFlag
 		{

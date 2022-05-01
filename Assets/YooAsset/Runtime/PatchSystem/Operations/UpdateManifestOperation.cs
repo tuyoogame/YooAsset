@@ -53,24 +53,24 @@ namespace YooAsset
 			CheckWebManifestHash,
 			LoadWebManifest,
 			CheckWebManifest,
-			InitPrepareCache,
-			UpdatePrepareCache,
+			InitVerifyingCache,
+			UpdateVerifyingCache,
 			Done,
 		}
 
 		private static int RequestCount = 0;
 		private readonly HostPlayModeImpl _impl;
-		private readonly int _updateResourceVersion;
+		private readonly int _resourceVersion;
 		private readonly int _timeout;
 		private ESteps _steps = ESteps.None;
 		private UnityWebDataRequester _downloaderHash;
 		private UnityWebDataRequester _downloaderManifest;
 		private float _verifyTime;
 
-		public HostPlayModeUpdateManifestOperation(HostPlayModeImpl impl, int updateResourceVersion, int timeout)
+		internal HostPlayModeUpdateManifestOperation(HostPlayModeImpl impl, int resourceVersion, int timeout)
 		{
 			_impl = impl;
-			_updateResourceVersion = updateResourceVersion;
+			_resourceVersion = resourceVersion;
 			_timeout = timeout;
 		}
 		internal override void Start()
@@ -85,7 +85,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadWebManifestHash)
 			{
-				string webURL = GetPatchManifestRequestURL(YooAssetSettingsData.GetPatchManifestHashFileName(_updateResourceVersion));
+				string webURL = GetPatchManifestRequestURL(YooAssetSettingsData.GetPatchManifestHashFileName(_resourceVersion));
 				YooLogger.Log($"Beginning to request patch manifest hash : {webURL}");
 				_downloaderHash = new UnityWebDataRequester();
 				_downloaderHash.SendRequest(webURL, _timeout);
@@ -107,14 +107,14 @@ namespace YooAsset
 				else
 				{
 					string webManifestHash = _downloaderHash.GetText();
-					string cachedManifestHash = GetSandboxPatchManifestFileHash(_updateResourceVersion);
+					string cachedManifestHash = GetSandboxPatchManifestFileHash(_resourceVersion);
 
 					// 如果补丁清单文件的哈希值相同
 					if (cachedManifestHash == webManifestHash)
 					{
 						YooLogger.Log($"Patch manifest file hash is not change : {webManifestHash}");
-						LoadSandboxPatchManifest(_updateResourceVersion);
-						_steps = ESteps.InitPrepareCache;
+						LoadSandboxPatchManifest(_resourceVersion);
+						_steps = ESteps.InitVerifyingCache;
 					}
 					else
 					{
@@ -127,7 +127,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadWebManifest)
 			{
-				string webURL = GetPatchManifestRequestURL(YooAssetSettingsData.GetPatchManifestFileName(_updateResourceVersion));
+				string webURL = GetPatchManifestRequestURL(YooAssetSettingsData.GetPatchManifestFileName(_resourceVersion));
 				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
 				_downloaderManifest = new UnityWebDataRequester();
 				_downloaderManifest.SendRequest(webURL, _timeout);
@@ -149,9 +149,9 @@ namespace YooAsset
 				else
 				{
 					// 解析补丁清单			
-					if (ParseAndSaveRemotePatchManifest(_updateResourceVersion, _downloaderManifest.GetText()))
+					if (ParseAndSaveRemotePatchManifest(_resourceVersion, _downloaderManifest.GetText()))
 					{
-						_steps = ESteps.InitPrepareCache;
+						_steps = ESteps.InitVerifyingCache;
 					}
 					else
 					{
@@ -163,16 +163,16 @@ namespace YooAsset
 				_downloaderManifest.Dispose();
 			}
 
-			if (_steps == ESteps.InitPrepareCache)
+			if (_steps == ESteps.InitVerifyingCache)
 			{
-				InitPrepareCache();
+				InitVerifyingCache();
 				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
-				_steps = ESteps.UpdatePrepareCache;
+				_steps = ESteps.UpdateVerifyingCache;
 			}
 
-			if (_steps == ESteps.UpdatePrepareCache)
+			if (_steps == ESteps.UpdateVerifyingCache)
 			{
-				if (UpdatePrepareCache())
+				if (UpdateVerifyingCache())
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
@@ -182,6 +182,9 @@ namespace YooAsset
 			}
 		}
 
+		/// <summary>
+		/// 获取补丁清单请求地址
+		/// </summary>
 		private string GetPatchManifestRequestURL(string fileName)
 		{
 			// 轮流返回请求地址
@@ -256,7 +259,7 @@ namespace YooAsset
 		private int _verifySuccessCount = 0;
 		private int _verifyFailCount = 0;
 
-		private void InitPrepareCache()
+		private void InitVerifyingCache()
 		{
 			// 遍历所有文件然后验证并缓存合法文件
 			foreach (var patchBundle in _impl.LocalPatchManifest.BundleList)
@@ -286,7 +289,7 @@ namespace YooAsset
 			YooLogger.Log($"Work threads : {workerThreads}, IO threads : {ioThreads}");
 			_verifyMaxNum = Math.Min(workerThreads, ioThreads);
 		}
-		private bool UpdatePrepareCache()
+		private bool UpdateVerifyingCache()
 		{
 			_syncContext.Update();
 

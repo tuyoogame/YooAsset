@@ -31,10 +31,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建解压器
 		/// </summary>
-		public DownloaderOperation CreateUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
+		public PatchUnpackerOperation CreatePatchUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
 		{
 			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByTags(AppPatchManifest, tags);
-			var operation = new DownloaderOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
+			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
 			return operation;
 		}
 

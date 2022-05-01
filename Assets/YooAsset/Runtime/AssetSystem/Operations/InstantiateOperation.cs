@@ -2,7 +2,7 @@
 
 namespace YooAsset
 {
-	public class InstantiateOperation : AsyncOperationBase
+	public sealed class InstantiateOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{

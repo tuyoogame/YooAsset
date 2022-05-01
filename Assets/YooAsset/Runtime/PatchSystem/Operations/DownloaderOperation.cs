@@ -3,11 +3,12 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	public class DownloaderOperation : AsyncOperationBase
+	public abstract class DownloaderOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
 			None,
+			Check,
 			Loading,
 			Done,
 		}
@@ -17,8 +18,8 @@ namespace YooAsset
 		public delegate void OnDownloadOver(bool isSucceed);
 		public delegate void OnDownloadProgress(int totalDownloadCount, int currentDownloadCount, long totalDownloadBytes, long currentDownloadBytes);
 		public delegate void OnDownloadFileFailed(string fileName);
-		
-		private readonly int _fileLoadingMaxNumber;
+
+		private readonly int _downloadingMaxNumber;
 		private readonly int _failedTryAgain;
 		private readonly List<BundleInfo> _downloadList;
 		private readonly List<BundleInfo> _loadFailedList = new List<BundleInfo>();
@@ -67,27 +68,44 @@ namespace YooAsset
 		public OnDownloadFileFailed OnDownloadFileFailedCallback { set; get; }
 
 
-		internal DownloaderOperation(List<BundleInfo> downloadList, int fileLoadingMaxNumber, int failedTryAgain)
+		internal DownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain)
 		{
 			_downloadList = downloadList;
-			_fileLoadingMaxNumber = UnityEngine.Mathf.Clamp(fileLoadingMaxNumber, 1, MAX_LOADER_COUNT); ;
+			_downloadingMaxNumber = UnityEngine.Mathf.Clamp(downloadingMaxNumber, 1, MAX_LOADER_COUNT); ;
 			_failedTryAgain = failedTryAgain;
 
-			TotalDownloadCount = downloadList.Count;
-			foreach (var patchBundle in downloadList)
+			if (downloadList != null)
 			{
-				TotalDownloadBytes += patchBundle.SizeBytes;
+				TotalDownloadCount = downloadList.Count;
+				foreach (var patchBundle in downloadList)
+				{
+					TotalDownloadBytes += patchBundle.SizeBytes;
+				}
 			}
 		}
 		internal override void Start()
 		{
 			YooLogger.Log($"Begine to download : {TotalDownloadCount} files and {TotalDownloadBytes} bytes");
-			_steps = ESteps.Loading;
+			_steps = ESteps.Check;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
+
+			if (_steps == ESteps.Check)
+			{
+				if (_downloadList == null)
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = "Download list is null.";
+				}
+				else
+				{
+					_steps = ESteps.Loading;
+				}
+			}
 
 			if (_steps == ESteps.Loading)
 			{
@@ -134,7 +152,7 @@ namespace YooAsset
 				// 注意：如果期间有下载失败的文件，暂停动态创建下载器
 				if (_downloadList.Count > 0 && _loadFailedList.Count == 0)
 				{
-					if (_downloaders.Count < _fileLoadingMaxNumber)
+					if (_downloaders.Count < _downloadingMaxNumber)
 					{
 						int index = _downloadList.Count - 1;
 						var operation = DownloadSystem.BeginDownload(_downloadList[index], _failedTryAgain);
@@ -175,6 +193,28 @@ namespace YooAsset
 			{
 				OperationSystem.ProcessOperaiton(this);
 			}
+		}
+	}
+
+	public sealed class PackageDownloaderOperation : DownloaderOperation
+	{
+		internal PackageDownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain)
+			: base(downloadList, downloadingMaxNumber, failedTryAgain)
+		{
+		}
+	}
+	public sealed class PatchDownloaderOperation : DownloaderOperation
+	{
+		internal PatchDownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain)
+			: base(downloadList, downloadingMaxNumber, failedTryAgain)
+		{
+		}
+	}
+	public sealed class PatchUnpackerOperation : DownloaderOperation
+	{
+		internal PatchUnpackerOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain)
+			: base(downloadList, downloadingMaxNumber, failedTryAgain)
+		{
 		}
 	}
 }

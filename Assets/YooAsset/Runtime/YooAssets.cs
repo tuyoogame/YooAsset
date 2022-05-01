@@ -216,7 +216,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 向网络端请求静态资源版本号
+		/// 向网络端请求静态资源版本
 		/// </summary>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
 		public static UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
@@ -248,9 +248,9 @@ namespace YooAsset
 		/// <summary>
 		/// 向网络端请求并更新补丁清单
 		/// </summary>
-		/// <param name="updateResourceVersion">更新的资源版本号</param>
+		/// <param name="resourceVersion">更新的资源版本</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public static UpdateManifestOperation UpdateManifestAsync(int updateResourceVersion, int timeout = 60)
+		public static UpdateManifestOperation UpdateManifestAsync(int resourceVersion, int timeout = 60)
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
@@ -268,7 +268,7 @@ namespace YooAsset
 			{
 				if (_hostPlayModeImpl == null)
 					throw new Exception("YooAsset is not initialized.");
-				return _hostPlayModeImpl.UpdatePatchManifestAsync(updateResourceVersion, timeout);
+				return _hostPlayModeImpl.UpdatePatchManifestAsync(resourceVersion, timeout);
 			}
 			else
 			{
@@ -343,7 +343,7 @@ namespace YooAsset
 			AssetSystem.GetDebugReport(report);
 		}
 
-		#region 场景加载接口
+		#region 场景加载
 		/// <summary>
 		/// 异步加载场景
 		/// </summary>
@@ -359,7 +359,7 @@ namespace YooAsset
 		}
 		#endregion
 
-		#region 资源加载接口
+		#region 资源加载
 		/// <summary>
 		/// 异步获取原生文件
 		/// </summary>
@@ -498,37 +498,37 @@ namespace YooAsset
 		}
 		#endregion
 
-		#region 资源下载接口
+		#region 资源下载
 		/// <summary>
-		/// 创建补丁下载器，用于更新下载资源标签指定的文件
+		/// 创建补丁下载器，用于下载更新资源标签指定的资源包文件
 		/// </summary>
 		/// <param name="tag">资源标签</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public static DownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain)
+		public static PatchDownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain)
 		{
 			return CreatePatchDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain);
 		}
 
 		/// <summary>
-		/// 创建补丁下载器，用于更新下载资源标签指定的文件
+		/// 创建补丁下载器，用于下载更新资源标签指定的资源包文件
 		/// </summary>
 		/// <param name="tags">资源标签列表</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public static DownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain)
+		public static PatchDownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain)
 		{
 			if (_playMode == EPlayMode.EditorPlayMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
 				if (_hostPlayModeImpl == null)
 					throw new Exception("YooAsset is not initialized.");
-				return _hostPlayModeImpl.CreateDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain);
 			}
 			else
 			{
@@ -537,23 +537,23 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 创建补丁下载器，用于更新下载所有文件
+		/// 创建补丁下载器，用于下载更新当前资源版本所有的资源包文件
 		/// </summary>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public static DownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain)
+		public static PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain)
 		{
 			if (_playMode == EPlayMode.EditorPlayMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
 				if (_hostPlayModeImpl == null)
 					throw new Exception("YooAsset is not initialized.");
-				return _hostPlayModeImpl.CreateDownloaderByAll(downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchDownloaderByAll(downloadingMaxNumber, failedTryAgain);
 			}
 			else
 			{
@@ -562,17 +562,17 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 创建资源包下载器，用于更新下载指定的资源列表
+		/// 创建补丁下载器，用于下载更新指定的资源列表依赖的资源包文件
 		/// </summary>
 		/// <param name="locations">资源列表</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public static DownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain)
+		public static PatchDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain)
 		{
 			if (_playMode == EPlayMode.EditorPlayMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new DownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
@@ -586,7 +586,7 @@ namespace YooAsset
 					string assetPath = _locationServices.ConvertLocationToAssetPath(_playMode, location);
 					assetPaths.Add(assetPath);
 				}
-				return _hostPlayModeImpl.CreateDownloaderByPaths(assetPaths, downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetPaths, downloadingMaxNumber, failedTryAgain);
 			}
 			else
 			{
@@ -595,14 +595,14 @@ namespace YooAsset
 		}
 		#endregion
 
-		#region 资源解压接口
+		#region 资源解压
 		/// <summary>
 		/// 创建补丁解压器
 		/// </summary>
 		/// <param name="tag">资源标签</param>
 		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
 		/// <param name="failedTryAgain">解压失败的重试次数</param>
-		public static DownloaderOperation CreatePatchUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
+		public static PatchUnpackerOperation CreatePatchUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
 		{
 			return CreatePatchUnpacker(new string[] { tag }, unpackingMaxNumber, failedTryAgain);
 		}
@@ -613,25 +613,58 @@ namespace YooAsset
 		/// <param name="tags">资源标签列表</param>
 		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
 		/// <param name="failedTryAgain">解压失败的重试次数</param>
-		public static DownloaderOperation CreatePatchUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
+		public static PatchUnpackerOperation CreatePatchUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
 		{
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new DownloaderOperation(downloadList, unpackingMaxNumber, failedTryAgain);
+				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				if (_offlinePlayModeImpl == null)
 					throw new Exception("YooAsset is not initialized.");
-				return _offlinePlayModeImpl.CreateUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain);
+				return _offlinePlayModeImpl.CreatePatchUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain);
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
 				if (_hostPlayModeImpl == null)
 					throw new Exception("YooAsset is not initialized.");
-				return _hostPlayModeImpl.CreateUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain);
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
+		#endregion
+
+		#region 包裹更新
+		/// <summary>
+		/// 创建资源包裹下载器，用于下载更新指定资源版本所有的资源包文件
+		/// </summary>
+		/// <param name="resourceVersion">指定更新的资源版本</param>
+		/// <param name="timeout">超时时间</param>
+		public static UpdatePackageOperation UpdatePackageAsync(int resourceVersion, int timeout = 60)
+		{
+			if (_playMode == EPlayMode.EditorPlayMode)
+			{
+				var operation = new EditorPlayModeUpdatePackageOperation();
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				var operation = new OfflinePlayModeUpdatePackageOperation();
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.HostPlayMode)
+			{
+				if (_hostPlayModeImpl == null)
+					throw new Exception("YooAsset is not initialized.");
+				return _hostPlayModeImpl.UpdatePackageAsync(resourceVersion, timeout);
 			}
 			else
 			{

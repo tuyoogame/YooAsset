@@ -42,9 +42,19 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新补丁清单
 		/// </summary>
-		public UpdateManifestOperation UpdatePatchManifestAsync(int updateResourceVersion, int timeout)
+		public UpdateManifestOperation UpdatePatchManifestAsync(int resourceVersion, int timeout)
 		{
-			var operation = new HostPlayModeUpdateManifestOperation(this, updateResourceVersion, timeout);
+			var operation = new HostPlayModeUpdateManifestOperation(this, resourceVersion, timeout);
+			OperationSystem.ProcessOperaiton(operation);
+			return operation;
+		}
+
+		/// <summary>
+		/// 异步更新资源包裹
+		/// </summary>
+		public UpdatePackageOperation UpdatePackageAsync(int resourceVersion, int timeout)
+		{
+			var operation = new HostPlayModeUpdatePackageOperation(this, resourceVersion, timeout);
 			OperationSystem.ProcessOperaiton(operation);
 			return operation;
 		}
@@ -62,10 +72,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建下载器
 		/// </summary>
-		public DownloaderOperation CreateDownloaderByAll(int fileLoadingMaxNumber, int failedTryAgain)
+		public PatchDownloaderOperation CreatePatchDownloaderByAll(int fileLoadingMaxNumber, int failedTryAgain)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByAll();
-			var operation = new DownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
+			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
 			return operation;
 		}
 		private List<BundleInfo> GetDownloadListByAll()
@@ -94,10 +104,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建下载器
 		/// </summary>
-		public DownloaderOperation CreateDownloaderByTags(string[] tags, int fileLoadingMaxNumber, int failedTryAgain)
+		public PatchDownloaderOperation CreatePatchDownloaderByTags(string[] tags, int fileLoadingMaxNumber, int failedTryAgain)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByTags(tags);
-			var operation = new DownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
+			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
 			return operation;
 		}
 		private List<BundleInfo> GetDownloadListByTags(string[] tags)
@@ -140,10 +150,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建下载器
 		/// </summary>
-		public DownloaderOperation CreateDownloaderByPaths(List<string> assetPaths, int fileLoadingMaxNumber, int failedTryAgain)
+		public PatchDownloaderOperation CreatePatchDownloaderByPaths(List<string> assetPaths, int fileLoadingMaxNumber, int failedTryAgain)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByPaths(assetPaths);
-			var operation = new DownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
+			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
 			return operation;
 		}
 		private List<BundleInfo> GetDownloadListByPaths(List<string> assetPaths)
@@ -197,10 +207,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建解压器
 		/// </summary>
-		public DownloaderOperation CreateUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
+		public PatchUnpackerOperation CreatePatchUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
 		{
 			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByTags(AppPatchManifest, tags);
-			var operation = new DownloaderOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
+			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
 			return operation;
 		}
 
@@ -215,7 +225,7 @@ namespace YooAsset
 		}
 
 		// 下载相关
-		private List<BundleInfo> ConvertToDownloadList(List<PatchBundle> downloadList)
+		public List<BundleInfo> ConvertToDownloadList(List<PatchBundle> downloadList)
 		{
 			List<BundleInfo> result = new List<BundleInfo>(downloadList.Count);
 			foreach (var patchBundle in downloadList)
@@ -225,7 +235,7 @@ namespace YooAsset
 			}
 			return result;
 		}
-		private BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
+		public BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
 		{
 			// 注意：资源版本号只用于确定下载路径
 			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.Hash);

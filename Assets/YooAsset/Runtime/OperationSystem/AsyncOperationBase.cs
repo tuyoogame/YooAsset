@@ -77,14 +77,14 @@ namespace YooAsset
 		}
 
 		#region 异步编程相关
-		public bool MoveNext()
+		bool IEnumerator.MoveNext()
 		{
 			return !IsDone;
 		}
-		public void Reset()
+		void IEnumerator.Reset()
 		{
 		}
-		public object Current => null;
+		object IEnumerator.Current => null;
 
 		private TaskCompletionSource<object> _taskCompletionSource;
 		#endregion
