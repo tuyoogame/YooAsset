@@ -8,11 +8,11 @@ namespace YooAsset
 	public abstract class UpdatePackageOperation : AsyncOperationBase
 	{
 		/// <summary>
-		/// 开始下载
+		/// 创建包裹下载器
 		/// </summary>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public abstract PackageDownloaderOperation BeginDownloadPackage(int downloadingMaxNumber, int failedTryAgain);
+		public abstract PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain);
 	}
 
 	/// <summary>
@@ -29,13 +29,12 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 开始下载
+		/// 创建包裹下载器
 		/// </summary>
-		public override PackageDownloaderOperation BeginDownloadPackage(int downloadingMaxNumber, int failedTryAgain)
+		public override PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain)
 		{
 			List<BundleInfo> downloadList = new List<BundleInfo>();
 			var operation = new PackageDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
-			operation.BeginDownload();
 			return operation;
 		}
 	}
@@ -54,13 +53,12 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 开始下载
+		/// 创建包裹下载器
 		/// </summary>
-		public override PackageDownloaderOperation BeginDownloadPackage(int downloadingMaxNumber, int failedTryAgain)
+		public override PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain)
 		{
 			List<BundleInfo> downloadList = new List<BundleInfo>();
 			var operation = new PackageDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
-			operation.BeginDownload();
 			return operation;
 		}
 	}
@@ -143,22 +141,20 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 开始下载
+		/// 创建包裹下载器
 		/// </summary>
-		public override PackageDownloaderOperation BeginDownloadPackage(int downloadingMaxNumber, int failedTryAgain)
+		public override PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain)
 		{
 			if (Status == EOperationStatus.Succeed)
 			{
 				List<BundleInfo> downloadList = GetDownloadList();
 				var operation = new PackageDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
-				operation.BeginDownload();
 				return operation;
 			}
 			else
 			{
 				YooLogger.Error($"{nameof(UpdatePackageOperation)} status is failed !");
 				var operation = new PackageDownloaderOperation(null, downloadingMaxNumber, failedTryAgain);
-				operation.BeginDownload();
 				return operation;
 			}
 		}
