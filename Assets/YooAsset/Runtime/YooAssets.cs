@@ -675,21 +675,36 @@ namespace YooAsset
 
 		#region 沙盒相关
 		/// <summary>
-		/// 清空沙盒目录
-		/// 注意：可以使用该方法修复我们本地的客户端
-		/// </summary>
-		public static void ClearSandbox()
-		{
-			YooLogger.Warning("Clear sandbox.");
-			SandboxHelper.ClearSandbox();
-		}
-
-		/// <summary>
-		/// 获取沙盒文件夹的路径
+		/// 获取沙盒的根路径
 		/// </summary>
 		public static string GetSandboxRoot()
 		{
 			return PathHelper.MakePersistentRootPath();
+		}
+
+		/// <summary>
+		/// 清空沙盒目录
+		/// </summary>
+		public static void ClearSandbox()
+		{
+			SandboxHelper.DeleteSandbox();
+		}
+
+		/// <summary>
+		/// 清空所有的缓存文件
+		/// </summary>
+		public static void ClearAllCacheFiles()
+		{
+			SandboxHelper.DeleteCacheFolder();
+		}
+
+		/// <summary>
+		/// 清空未被使用的缓存文件
+		/// </summary>
+		public static void ClearUnusedCacheFiles()
+		{
+			if (_playMode == EPlayMode.HostPlayMode)
+				_hostPlayModeImpl.ClearUnusedCacheFiles();
 		}
 		#endregion
 

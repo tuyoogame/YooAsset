@@ -210,7 +210,7 @@ namespace YooAsset
 
 				// 注意：下载系统只会验证当前游戏版本的资源文件，对于其它游戏版本的差异文件不会在初始化的时候去做校验。
 				// 注意：通过比对文件大小做实时的文件校验方式！
-				string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+				string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
 				if (File.Exists(filePath))
 				{
 					long fileSize = FileUtility.GetFileSize(filePath);

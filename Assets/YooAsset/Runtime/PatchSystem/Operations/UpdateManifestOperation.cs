@@ -277,7 +277,7 @@ namespace YooAsset
 				}
 
 				// 查看文件是否存在
-				string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+				string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
 				if (File.Exists(filePath) == false)
 					continue;
 
@@ -321,7 +321,7 @@ namespace YooAsset
 		}
 		private bool RunThread(PatchBundle patchBundle)
 		{
-			string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+			string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
 			ThreadInfo info = new ThreadInfo(filePath, patchBundle);
 			return ThreadPool.QueueUserWorkItem(new WaitCallback(VerifyInThread), info);
 		}

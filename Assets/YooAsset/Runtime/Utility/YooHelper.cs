@@ -80,13 +80,12 @@ namespace YooAsset
 	/// </summary>
 	internal static class SandboxHelper
 	{
-		private const string StrCacheFileName = "Cache.bytes";
-		private const string StrCacheFolderName = "CacheFiles";
+		private const string CacheFolderName = "CacheFiles";
 
 		/// <summary>
-		/// 清空沙盒目录
+		/// 删除沙盒总目录
 		/// </summary>
-		public static void ClearSandbox()
+		public static void DeleteSandbox()
 		{
 			string directoryPath = PathHelper.MakePersistentLoadPath(string.Empty);
 			if (Directory.Exists(directoryPath))
@@ -94,49 +93,29 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 删除沙盒内的缓存文件
-		/// </summary>
-		public static void DeleteSandboxCacheFile()
-		{
-			string filePath = GetSandboxCacheFilePath();
-			if (File.Exists(filePath))
-				File.Delete(filePath);
-		}
-
-		/// <summary>
 		/// 删除沙盒内的缓存文件夹
 		/// </summary>
-		public static void DeleteSandboxCacheFolder()
+		public static void DeleteCacheFolder()
 		{
-			string directoryPath = PathHelper.MakePersistentLoadPath(StrCacheFolderName);
+			string directoryPath = GetCacheFolderPath();
 			if (Directory.Exists(directoryPath))
 				Directory.Delete(directoryPath, true);
 		}
 
-
 		/// <summary>
-		/// 获取沙盒内缓存文件的路径
+		/// 获取缓存文件夹路径
 		/// </summary>
-		public static string GetSandboxCacheFilePath()
+		public static string GetCacheFolderPath()
 		{
-			return PathHelper.MakePersistentLoadPath(StrCacheFileName);
-		}
-
-		/// <summary>
-		/// 检测沙盒内缓存文件是否存在
-		/// </summary>
-		public static bool CheckSandboxCacheFileExist()
-		{
-			string filePath = GetSandboxCacheFilePath();
-			return File.Exists(filePath);
+			return PathHelper.MakePersistentLoadPath(CacheFolderName);
 		}
 
 		/// <summary>
 		/// 获取缓存文件的存储路径
 		/// </summary>
-		public static string MakeSandboxCacheFilePath(string fileName)
+		public static string MakeCacheFilePath(string fileName)
 		{
-			return PathHelper.MakePersistentLoadPath($"{StrCacheFolderName}/{fileName}");
+			return PathHelper.MakePersistentLoadPath($"{CacheFolderName}/{fileName}");
 		}
 	}
 
@@ -155,7 +134,7 @@ namespace YooAsset
 			foreach (var patchBundle in appPatchManifest.BundleList)
 			{
 				// 如果已经在沙盒内
-				string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+				string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
 				if (System.IO.File.Exists(filePath))
 					continue;
 

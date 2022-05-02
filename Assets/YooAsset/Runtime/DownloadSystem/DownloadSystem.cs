@@ -112,7 +112,7 @@ namespace YooAsset
 		{
 			if (_cachedHashList.ContainsKey(hash))
 			{
-				string filePath = SandboxHelper.MakeSandboxCacheFilePath(hash);
+				string filePath = SandboxHelper.MakeCacheFilePath(hash);
 				if (File.Exists(filePath))
 				{
 					return true;
@@ -150,7 +150,7 @@ namespace YooAsset
 		}
 		public static bool CheckContentIntegrity(PatchBundle patchBundle)
 		{
-			string filePath = SandboxHelper.MakeSandboxCacheFilePath(patchBundle.Hash);
+			string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
 			return CheckContentIntegrity(filePath, patchBundle.SizeBytes, patchBundle.CRC);
 		}
 		public static bool CheckContentIntegrity(string filePath, long size, string crc)

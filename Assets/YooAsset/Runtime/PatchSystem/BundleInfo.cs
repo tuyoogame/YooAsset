@@ -25,12 +25,12 @@ namespace YooAsset
 		/// <summary>
 		/// 远端下载地址
 		/// </summary>
-		public string RemoteMainURL { private set; get; }
+		internal string RemoteMainURL { private set; get; }
 
 		/// <summary>
 		/// 远端下载备用地址
 		/// </summary>
-		public string RemoteFallbackURL { private set; get; }
+		internal string RemoteFallbackURL { private set; get; }
 
 		/// <summary>
 		/// 文件哈希值
@@ -103,49 +103,6 @@ namespace YooAsset
 		}
 
 
-		/// <summary>
-		/// 资源包是否有效
-		/// </summary>
-		public bool IsValid()
-		{
-			return _patchBundle != null;
-		}
-
-		/// <summary>
-		/// 资源包文件是否在云端
-		/// </summary>
-		public bool InCloud()
-		{
-			return LoadMode == ELoadMode.LoadFromRemote;
-		}
-
-		/// <summary>
-		/// 获取流文件夹的加载路径
-		/// </summary>
-		public string GetStreamingLoadPath()
-		{
-			if (_patchBundle == null)
-				return string.Empty;
-
-			if (string.IsNullOrEmpty(_streamingPath))
-				_streamingPath = PathHelper.MakeStreamingLoadPath(_patchBundle.Hash);
-			return _streamingPath;
-		}
-
-		/// <summary>
-		/// 获取缓存文件夹的加载路径
-		/// </summary>
-		public string GetCacheLoadPath()
-		{
-			if (_patchBundle == null)
-				return string.Empty;
-
-			if (string.IsNullOrEmpty(_cachePath))
-				_cachePath = SandboxHelper.MakeSandboxCacheFilePath(_patchBundle.Hash);
-			return _cachePath;
-		}
-
-
 		private BundleInfo()
 		{
 		}
@@ -173,6 +130,49 @@ namespace YooAsset
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
 		}
+
+		/// <summary>
+		/// 资源包是否有效
+		/// </summary>
+		public bool IsValid()
+		{
+			return _patchBundle != null;
+		}
+
+		/// <summary>
+		/// 资源包文件是否在云端
+		/// </summary>
+		public bool InCloud()
+		{
+			return LoadMode == ELoadMode.LoadFromRemote;
+		}
+
+		/// <summary>
+		/// 获取流文件夹的加载路径
+		/// </summary>
+		internal string GetStreamingLoadPath()
+		{
+			if (_patchBundle == null)
+				return string.Empty;
+
+			if (string.IsNullOrEmpty(_streamingPath))
+				_streamingPath = PathHelper.MakeStreamingLoadPath(_patchBundle.Hash);
+			return _streamingPath;
+		}
+
+		/// <summary>
+		/// 获取缓存文件夹的加载路径
+		/// </summary>
+		internal string GetCacheLoadPath()
+		{
+			if (_patchBundle == null)
+				return string.Empty;
+
+			if (string.IsNullOrEmpty(_cachePath))
+				_cachePath = SandboxHelper.MakeCacheFilePath(_patchBundle.Hash);
+			return _cachePath;
+		}
+
 
 		/// <summary>
 		/// 是否为JAR包内文件

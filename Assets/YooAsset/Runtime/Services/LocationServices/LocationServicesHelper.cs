@@ -5,17 +5,17 @@ namespace YooAsset
 {
 	internal static class LocationServicesHelper
 	{
-		private static System.Type AssetBundleGrouperSettingHelperClassType;
-		
+		private static System.Type _classType;
+
 		public static void InitEditorPlayMode(bool enableAddressable)
 		{
-			AssetBundleGrouperSettingHelperClassType = Assembly.Load("YooAsset.Editor").GetType("YooAsset.Editor.AssetBundleGrouperRuntimeSupport");
-			InvokePublicStaticMethod(AssetBundleGrouperSettingHelperClassType, "InitEditorPlayMode", enableAddressable);
+			_classType = Assembly.Load("YooAsset.Editor").GetType("YooAsset.Editor.AssetBundleGrouperRuntimeSupport");
+			InvokePublicStaticMethod(_classType, "InitEditorPlayMode", enableAddressable);
 		}
 		public static string ConvertLocationToAssetPath(string location)
 		{
-			return (string)InvokePublicStaticMethod(AssetBundleGrouperSettingHelperClassType, "ConvertLocationToAssetPath", location);
-		}	
+			return (string)InvokePublicStaticMethod(_classType, "ConvertLocationToAssetPath", location);
+		}
 		private static object InvokePublicStaticMethod(System.Type type, string method, params object[] parameters)
 		{
 			var methodInfo = type.GetMethod(method, BindingFlags.Public | BindingFlags.Static);

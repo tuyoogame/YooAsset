@@ -53,7 +53,7 @@ namespace YooAsset
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
-			
+
 			if (_steps == ESteps.Update)
 			{
 				_appManifestLoader.Update();
@@ -61,7 +61,7 @@ namespace YooAsset
 					return;
 
 				if (_appManifestLoader.Result == null)
-				{			
+				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = _appManifestLoader.Error;
@@ -110,20 +110,20 @@ namespace YooAsset
 			if (_steps == ESteps.InitCache)
 			{
 				// 每次启动时比对APP版本号是否一致	
-				PatchCache cache = PatchCache.LoadCache();
-				if (cache.CacheAppVersion != Application.version)
+				CacheData cacheData = CacheData.LoadCache();
+				if (cacheData.CacheAppVersion != Application.version)
 				{
-					YooLogger.Warning($"Cache is dirty ! Cache app version is {cache.CacheAppVersion}, Current app version is {Application.version}");
+					YooLogger.Warning($"Cache is dirty ! Cache application version is {cacheData.CacheAppVersion}, Current application version is {Application.version}");
 
 					// 注意：在覆盖安装的时候，会保留APP沙盒目录，可以选择清空缓存目录
 					if (_impl.ClearCacheWhenDirty)
 					{
 						YooLogger.Warning("Clear cache files.");
-						SandboxHelper.DeleteSandboxCacheFolder();
+						SandboxHelper.DeleteCacheFolder();
 					}
 
 					// 更新缓存文件
-					PatchCache.UpdateCache();
+					CacheData.UpdateCache();
 				}
 				_steps = ESteps.Update;
 			}
@@ -243,7 +243,7 @@ namespace YooAsset
 
 				if (_downloader2.HasError())
 				{
-					Error = _downloader2.GetError();		
+					Error = _downloader2.GetError();
 					_steps = ESteps.Failed;
 				}
 				else

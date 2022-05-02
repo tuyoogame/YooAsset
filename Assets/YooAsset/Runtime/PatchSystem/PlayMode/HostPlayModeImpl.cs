@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace YooAsset
 {
@@ -67,6 +68,35 @@ namespace YooAsset
 			if (LocalPatchManifest == null)
 				return 0;
 			return LocalPatchManifest.ResourceVersion;
+		}
+
+		/// <summary>
+		/// 清空未被使用的缓存文件
+		/// </summary>
+		public void ClearUnusedCacheFiles()
+		{
+			string cacheFolderPath = SandboxHelper.GetCacheFolderPath();
+			if (Directory.Exists(cacheFolderPath) == false)
+				return;
+
+			DirectoryInfo directoryInfo = new DirectoryInfo(cacheFolderPath);
+			foreach (FileInfo fileInfo in directoryInfo.GetFiles())
+			{
+				bool used = false;
+				foreach (var patchBundle in LocalPatchManifest.BundleList)
+				{
+					if (fileInfo.Name == patchBundle.Hash)
+					{
+						used = true;
+						break;
+					}
+				}
+				if(used == false)
+				{
+					YooLogger.Log($"Delete unused cache file : {fileInfo.Name}");
+					File.Delete(fileInfo.FullName);
+				}
+			}
 		}
 
 		/// <summary>
