@@ -23,7 +23,7 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					throw new System.Exception($"{nameof(SceneOperationHandle)} is invalid");
-				if (_provider.IsDone)
+				if (Provider.IsDone)
 					value.Invoke(this);
 				else
 					_callback += value;
@@ -45,7 +45,7 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					return new Scene();
-				return _provider.SceneObject;
+				return Provider.SceneObject;
 			}
 		}
 
@@ -76,14 +76,14 @@ namespace YooAsset
 			if (IsValid == false)
 				return false;
 
-			if (_provider is DatabaseSceneProvider)
+			if (Provider is DatabaseSceneProvider)
 			{
-				var temp = _provider as DatabaseSceneProvider;
+				var temp = Provider as DatabaseSceneProvider;
 				return temp.SceneMode == LoadSceneMode.Single;
 			}
-			else if (_provider is BundledSceneProvider)
+			else if (Provider is BundledSceneProvider)
 			{
-				var temp = _provider as BundledSceneProvider;
+				var temp = Provider as BundledSceneProvider;
 				return temp.SceneMode == LoadSceneMode.Single;
 			}
 			else
@@ -118,7 +118,7 @@ namespace YooAsset
 
 			// 卸载子场景
 			Scene sceneObject = SceneObject;
-			AssetSystem.UnloadSubScene(_provider);
+			AssetSystem.UnloadSubScene(Provider);
 			{
 				var operation = new UnloadSceneOperation(sceneObject);
 				OperationSystem.ProcessOperaiton(operation);

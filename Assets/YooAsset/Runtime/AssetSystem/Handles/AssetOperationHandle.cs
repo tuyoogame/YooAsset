@@ -23,7 +23,7 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					throw new System.Exception($"{nameof(AssetOperationHandle)} is invalid");
-				if (_provider.IsDone)
+				if (Provider.IsDone)
 					value.Invoke(this);
 				else
 					_callback += value;
@@ -45,7 +45,7 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					return null;
-				return _provider.AssetObject;
+				return Provider.AssetObject;
 			}
 		}
 
@@ -56,7 +56,7 @@ namespace YooAsset
 		{
 			if (IsValid == false)
 				return;
-			_provider.WaitForAsyncComplete();
+			Provider.WaitForAsyncComplete();
 		}
 
 		/// <summary>
@@ -114,22 +114,22 @@ namespace YooAsset
 		{
 			if (IsValid == false)
 				return null;
-			if (_provider.AssetObject == null)
+			if (Provider.AssetObject == null)
 				return null;
 
 			if (setPositionRotation)
 			{
 				if (parent == null)
-					return UnityEngine.Object.Instantiate(_provider.AssetObject as GameObject, position, rotation);
+					return UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, position, rotation);
 				else
-					return UnityEngine.Object.Instantiate(_provider.AssetObject as GameObject, position, rotation, parent);
+					return UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, position, rotation, parent);
 			}
 			else
 			{
 				if (parent == null)
-					return UnityEngine.Object.Instantiate(_provider.AssetObject as GameObject);
+					return UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject);
 				else
-					return UnityEngine.Object.Instantiate(_provider.AssetObject as GameObject, parent);
+					return UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, parent);
 			}
 		}
 		private InstantiateOperation InstantiateAsyncInternal(Vector3 position, Quaternion rotation, Transform parent, bool setPositionRotation)

@@ -22,7 +22,7 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					throw new System.Exception($"{nameof(SubAssetsOperationHandle)} is invalid");
-				if (_provider.IsDone)
+				if (Provider.IsDone)
 					value.Invoke(this);
 				else
 					_callback += value;
@@ -44,7 +44,7 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					return null;
-				return _provider.AllAssetObjects;
+				return Provider.AllAssetObjects;
 			}
 		}
 
@@ -55,7 +55,7 @@ namespace YooAsset
 		{
 			if (IsValid == false)
 				return;
-			_provider.WaitForAsyncComplete();
+			Provider.WaitForAsyncComplete();
 		}
 
 		/// <summary>
@@ -77,7 +77,7 @@ namespace YooAsset
 			if (IsValid == false)
 				return null;
 
-			foreach (var asset in _provider.AllAssetObjects)
+			foreach (var asset in Provider.AllAssetObjects)
 			{
 				if (asset.name == assetName)
 					return asset as TObject;

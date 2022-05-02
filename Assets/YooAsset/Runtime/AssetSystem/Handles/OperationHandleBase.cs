@@ -5,11 +5,11 @@ namespace YooAsset
 	public abstract class OperationHandleBase : IEnumerator
 	{
 		private readonly string _cachedAssetPath;
-		internal ProviderBase _provider { private set; get; }
+		internal ProviderBase Provider { private set; get; }
 
 		internal OperationHandleBase(ProviderBase provider)
 		{
-			_provider = provider;
+			Provider = provider;
 			_cachedAssetPath = provider.AssetPath;
 		}
 		internal abstract void InvokeCallback();
@@ -23,9 +23,9 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					return EOperationStatus.None;
-				if (_provider.Status == ProviderBase.EStatus.Fail)
+				if (Provider.Status == ProviderBase.EStatus.Fail)
 					return EOperationStatus.Failed;
-				else if (_provider.Status == ProviderBase.EStatus.Success)
+				else if (Provider.Status == ProviderBase.EStatus.Success)
 					return EOperationStatus.Succeed;
 				else
 					return EOperationStatus.None;
@@ -41,7 +41,7 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					return string.Empty;
-				return _provider.LastError;
+				return Provider.LastError;
 			}
 		}
 
@@ -54,7 +54,7 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					return 0;
-				return _provider.Progress;
+				return Provider.Progress;
 			}
 		}
 
@@ -67,7 +67,7 @@ namespace YooAsset
 			{
 				if (IsValid == false)
 					return false;
-				return _provider.IsDone;
+				return Provider.IsDone;
 			}
 		}
 
@@ -78,15 +78,15 @@ namespace YooAsset
 		{
 			get
 			{
-				if (_provider != null && _provider.IsDestroyed == false)
+				if (Provider != null && Provider.IsDestroyed == false)
 				{
 					return true;
 				}
 				else
 				{
-					if (_provider == null)
+					if (Provider == null)
 						YooLogger.Warning($"Operation handle is released : {_cachedAssetPath}");
-					else if (_provider.IsDestroyed)
+					else if (Provider.IsDestroyed)
 						YooLogger.Warning($"Provider is destroyed : {_cachedAssetPath}");
 					return false;
 				}
@@ -100,8 +100,8 @@ namespace YooAsset
 		{
 			if (IsValid == false)
 				return;
-			_provider.ReleaseHandle(this);
-			_provider = null;
+			Provider.ReleaseHandle(this);
+			Provider = null;
 		}
 
 		#region 异步操作相关
@@ -110,7 +110,7 @@ namespace YooAsset
 		/// </summary>
 		public System.Threading.Tasks.Task Task
 		{
-			get { return _provider.Task; }
+			get { return Provider.Task; }
 		}
 
 		// 协程相关
@@ -123,7 +123,7 @@ namespace YooAsset
 		}
 		object IEnumerator.Current
 		{
-			get { return _provider; }
+			get { return Provider; }
 		}
 		#endregion
 	}
