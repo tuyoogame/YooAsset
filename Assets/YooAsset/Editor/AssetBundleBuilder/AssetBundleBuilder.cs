@@ -28,8 +28,10 @@ namespace YooAsset.Editor
 				Parameters = parameters;
 
 				PipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(parameters.OutputRoot, parameters.BuildTarget);
-				if (parameters.DryRunBuild)
-					PipelineOutputDirectory += "_DryRunBuild";
+				if (parameters.BuildMode == EBuildMode.DryRunBuild)
+					PipelineOutputDirectory += $"_{EBuildMode.DryRunBuild}";
+				else if(parameters.BuildMode == EBuildMode.FastRunBuild)
+					PipelineOutputDirectory += $"_{EBuildMode.FastRunBuild}";
 			}
 
 			/// <summary>
@@ -51,7 +53,12 @@ namespace YooAsset.Editor
 				BuildAssetBundleOptions opt = BuildAssetBundleOptions.None;
 				opt |= BuildAssetBundleOptions.StrictMode; //Do not allow the build to succeed if any errors are reporting during it.
 
-				if (Parameters.DryRunBuild)
+				if (Parameters.BuildMode == EBuildMode.FastRunBuild)
+				{
+					throw new Exception("Should never get here !");
+				}
+
+				if (Parameters.BuildMode == EBuildMode.DryRunBuild)
 				{
 					opt |= BuildAssetBundleOptions.DryRunBuild;
 					return opt;
@@ -62,7 +69,7 @@ namespace YooAsset.Editor
 				else if (Parameters.CompressOption == ECompressOption.LZ4)
 					opt |= BuildAssetBundleOptions.ChunkBasedCompression;
 
-				if (Parameters.ForceRebuild)
+				if (Parameters.BuildMode == EBuildMode.ForceRebuild)
 					opt |= BuildAssetBundleOptions.ForceRebuildAssetBundle; //Force rebuild the asset bundles
 				if (Parameters.AppendHash)
 					opt |= BuildAssetBundleOptions.AppendHashToAssetBundleName; //Append the hash to the assetBundle name
@@ -125,11 +132,16 @@ namespace YooAsset.Editor
 				new TaskCopyBuildinFiles(), //拷贝内置文件
 			};
 
+			if (buildParameters.BuildMode == EBuildMode.FastRunBuild)
+				BuildRunner.EnableLog = false;
+			else
+				BuildRunner.EnableLog = true;
+
 			bool succeed = BuildRunner.Run(pipeline, _buildContext);
 			if (succeed)
-				Debug.Log($"构建成功！");
+				Debug.Log($"{buildParameters.BuildMode}模式构建成功！");
 			else
-				Debug.LogWarning($"构建失败！");
+				Debug.LogWarning($"{buildParameters.BuildMode}模式构建失败！");
 			return succeed;
 		}
 	}

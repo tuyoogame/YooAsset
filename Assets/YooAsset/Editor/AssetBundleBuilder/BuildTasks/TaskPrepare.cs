@@ -27,7 +27,8 @@ namespace YooAsset.Editor
 				throw new Exception("输出目录不能为空");
 
 			// 增量更新时候的必要检测
-			if (buildParameters.Parameters.DryRunBuild == false && buildParameters.Parameters.ForceRebuild == false)
+			var buildMode = buildParameters.Parameters.BuildMode;
+			if (buildMode == EBuildMode.IncrementalBuild)
 			{
 				// 检测历史版本是否存在
 				if (AssetBundleBuilderHelper.HasAnyPackageVersion(buildParameters.Parameters.BuildTarget, buildParameters.Parameters.OutputRoot) == false)
@@ -50,20 +51,20 @@ namespace YooAsset.Editor
 			}
 
 			// 如果是强制重建
-			if (buildParameters.Parameters.DryRunBuild == false && buildParameters.Parameters.ForceRebuild)
+			if (buildMode == EBuildMode.ForceRebuild)
 			{
 				// 删除平台总目录
 				string platformDirectory = $"{buildParameters.Parameters.OutputRoot}/{buildParameters.Parameters.BuildTarget}";
 				if (EditorTools.DeleteDirectory(platformDirectory))
 				{
-					UnityEngine.Debug.Log($"删除平台总目录：{platformDirectory}");
+					BuildRunner.Log($"删除平台总目录：{platformDirectory}");
 				}
 			}
 
 			// 如果输出目录不存在
 			if (EditorTools.CreateDirectory(buildParameters.PipelineOutputDirectory))
 			{
-				UnityEngine.Debug.Log($"创建输出目录：{buildParameters.PipelineOutputDirectory}");
+				BuildRunner.Log($"创建输出目录：{buildParameters.PipelineOutputDirectory}");
 			}
 		}
 	}

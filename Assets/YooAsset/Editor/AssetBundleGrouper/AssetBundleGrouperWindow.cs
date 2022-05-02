@@ -310,7 +310,7 @@ namespace YooAsset.Editor
 			{
 				var objectField = new ObjectField();
 				objectField.name = "ObjectField1";
-				objectField.label = "Collecter";
+				objectField.label = "Collector";
 				objectField.objectType = typeof(UnityEngine.Object);
 				objectField.style.unityTextAlign = TextAnchor.MiddleLeft;
 				objectField.style.flexGrow = 1f;

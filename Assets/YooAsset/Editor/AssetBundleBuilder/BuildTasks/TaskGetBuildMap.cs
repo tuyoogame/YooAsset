@@ -14,7 +14,7 @@ namespace YooAsset.Editor
 		{
 			var buildMapContext = BuildMapCreater.CreateBuildMap();
 			context.SetContextObject(buildMapContext);
-			UnityEngine.Debug.Log("构建内容准备完毕！");
+			BuildRunner.Log("构建内容准备完毕！");
 
 			// 检测构建结果
 			CheckBuildMapContent(buildMapContext);

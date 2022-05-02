@@ -79,7 +79,7 @@ namespace YooAsset
 			// 1. 准备工作
 			if (_steps == ESteps.Prepare)
 			{
-				if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.None)
+				if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromEditor)
 				{
 					_steps = ESteps.CheckAndCopyFile;
 					return; // 模拟实现异步操作
@@ -130,7 +130,7 @@ namespace YooAsset
 		{
 			if (_bundleInfo == null)
 				return string.Empty;
-			return _bundleInfo.BundleName;
+			return _bundleInfo.EditorAssetPath;
 		}
 	}
 

@@ -11,6 +11,16 @@ namespace YooAsset.Editor
 		public int BuildVersion = 0;
 
 		/// <summary>
+		/// 构建模式
+		/// </summary>
+		public EBuildMode BuildMode = EBuildMode.ForceRebuild;
+
+		/// <summary>
+		/// 内置资源标签
+		/// </summary>
+		public string BuildTags = string.Empty;
+
+		/// <summary>
 		/// 压缩方式
 		/// </summary>
 		public ECompressOption CompressOption = ECompressOption.LZ4;
@@ -24,20 +34,5 @@ namespace YooAsset.Editor
 		/// 附加后缀格式
 		/// </summary>
 		public bool AppendExtension = false;
-
-		/// <summary>
-		/// 强制构建
-		/// </summary>
-		public bool ForceRebuild = false;
-
-		/// <summary>
-		/// 演练构建
-		/// </summary>
-		public bool DryRunBuild = false;
-
-		/// <summary>
-		/// 内置标签
-		/// </summary>
-		public string BuildTags = string.Empty;
 	}
 }

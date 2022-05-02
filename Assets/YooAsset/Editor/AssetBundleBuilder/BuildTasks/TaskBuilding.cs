@@ -21,18 +21,23 @@ namespace YooAsset.Editor
 			var buildParametersContext = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 
+			// 快速构建模式下跳过引擎构建
+			var buildMode = buildParametersContext.Parameters.BuildMode;
+			if (buildMode == EBuildMode.FastRunBuild)
+				return;
+
 			BuildAssetBundleOptions opt = buildParametersContext.GetPipelineBuildOptions();
 			AssetBundleManifest unityManifest = BuildPipeline.BuildAssetBundles(buildParametersContext.PipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), opt, buildParametersContext.Parameters.BuildTarget);
 			if (unityManifest == null)
 				throw new Exception("构建过程中发生错误！");
 
-			Debug.Log("Unity引擎打包成功！");
+			BuildRunner.Log("Unity引擎打包成功！");
 			UnityManifestContext unityManifestContext = new UnityManifestContext();
 			unityManifestContext.UnityManifest = unityManifest;
 			context.SetContextObject(unityManifestContext);
 
 			// 拷贝原生文件
-			if (buildParametersContext.Parameters.DryRunBuild == false)
+			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
 				CopyRawBundle(buildMapContext, buildParametersContext);
 			}

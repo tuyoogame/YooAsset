@@ -51,10 +51,10 @@ namespace YooAsset
 		public readonly Dictionary<string, PatchAsset> Assets = new Dictionary<string, PatchAsset>();
 
 		/// <summary>
-		/// 可寻址地址映射集合
+		/// 资源路径映射集合
 		/// </summary>
 		[NonSerialized]
-		public readonly Dictionary<string, string> AddressDic = new Dictionary<string, string>();
+		public readonly Dictionary<string, string> AssetPathMapping = new Dictionary<string, string>();
 
 
 		/// <summary>
@@ -120,17 +120,39 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 可寻址地址转换为资源路径
+		/// 尝试获取资源包的主资源路径
 		/// </summary>
-		public string ConvertAddress(string address)
+		public string TryGetBundleMainAssetPath(string bundleName)
 		{
-			if (AddressDic.TryGetValue(address, out string assetPath))
+			foreach (var patchAsset in AssetList)
+			{
+				int bundleID = patchAsset.BundleID;
+				if (bundleID >= 0 && bundleID < BundleList.Count)
+				{
+					var patchBundle = BundleList[bundleID];
+					if (patchBundle.BundleName == bundleName)
+						return patchAsset.AssetPath;
+				}
+				else
+				{
+					throw new Exception($"Invalid depend id : {bundleID} Asset path : {patchAsset.AssetPath}");
+				}
+			}
+			return string.Empty;
+		}
+
+		/// <summary>
+		/// 映射为资源路径
+		/// </summary>
+		public string MappingToAssetPath(string location)
+		{
+			if (AssetPathMapping.TryGetValue(location, out string assetPath))
 			{
 				return assetPath;
 			}
 			else
 			{
-				YooLogger.Warning($"Not found address in patch manifest : {address}");
+				YooLogger.Warning($"Failed to mapping location to asset path  : {location}");
 				return string.Empty;
 			}
 		}
@@ -162,36 +184,47 @@ namespace YooAsset
 			// AssetList
 			foreach (var patchAsset in patchManifest.AssetList)
 			{
-				string assetPath = patchAsset.AssetPath;
-
-				// 添加原始路径
 				// 注意：我们不允许原始路径存在重名
+				string assetPath = patchAsset.AssetPath;
 				if (patchManifest.Assets.ContainsKey(assetPath))
-					throw new Exception($"Asset path have existed : {assetPath}");
+					throw new Exception($"AssetPath have existed : {assetPath}");
 				else
 					patchManifest.Assets.Add(assetPath, patchAsset);
-
-				// 添加去掉后缀名的路径
-				if (Path.HasExtension(assetPath))
-				{
-					string assetPathWithoutExtension = StringUtility.RemoveExtension(assetPath);
-					if (patchManifest.Assets.ContainsKey(assetPathWithoutExtension))
-						YooLogger.Warning($"Asset path have existed : {assetPathWithoutExtension}");
-					else
-						patchManifest.Assets.Add(assetPathWithoutExtension, patchAsset);
-				}
 			}
 
-			// Address
+			// AssetPathMapping
 			if (patchManifest.EnableAddressable)
 			{
 				foreach (var patchAsset in patchManifest.AssetList)
 				{
 					string address = patchAsset.Address;
-					if (patchManifest.AddressDic.ContainsKey(address))
+					if (patchManifest.AssetPathMapping.ContainsKey(address))
 						throw new Exception($"Address have existed : {address}");
 					else
-						patchManifest.AddressDic.Add(address, patchAsset.AssetPath);
+						patchManifest.AssetPathMapping.Add(address, patchAsset.AssetPath);
+				}
+			}
+			else
+			{
+				foreach (var patchAsset in patchManifest.AssetList)
+				{
+					string assetPath = patchAsset.AssetPath;
+
+					// 添加原生路径的映射
+					if (patchManifest.AssetPathMapping.ContainsKey(assetPath))
+						throw new Exception($"AssetPath have existed : {assetPath}");
+					else
+						patchManifest.AssetPathMapping.Add(assetPath, assetPath);
+
+					// 添加无后缀名路径的映射
+					if (Path.HasExtension(assetPath))
+					{
+						string assetPathWithoutExtension = StringUtility.RemoveExtension(assetPath);
+						if (patchManifest.AssetPathMapping.ContainsKey(assetPathWithoutExtension))
+							YooLogger.Warning($"AssetPath have existed : {assetPathWithoutExtension}");
+						else
+							patchManifest.AssetPathMapping.Add(assetPathWithoutExtension, assetPath);
+					}
 				}
 			}
 

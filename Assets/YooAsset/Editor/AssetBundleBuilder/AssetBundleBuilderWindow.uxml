@@ -3,11 +3,10 @@
     <ui:VisualElement name="BuildContainer">
         <ui:TextField picking-mode="Ignore" label="Build Output" name="BuildOutput" />
         <uie:IntegerField label="Build Version" value="0" name="BuildVersion" />
-        <uie:EnumField label="Compression" value="Center" name="Compression" />
+        <uie:EnumField label="Build Mode" name="BuildMode" />
         <ui:VisualElement name="EncryptionContainer" style="height: 24px;" />
+        <uie:EnumField label="Compression" value="Center" name="Compression" />
         <ui:Toggle label="Append Extension" name="AppendExtension" style="height: 15px;" />
-        <ui:Toggle label="Force Rebuild" name="ForceRebuild" />
-        <ui:Toggle label="Dry Run Build" name="DryRunBuild" />
         <ui:TextField picking-mode="Ignore" label="Buildin Tags" name="BuildinTags" />
         <ui:Button text="构建" display-tooltip-when-elided="true" name="Build" style="height: 50px; background-color: rgb(40, 106, 42); margin-top: 10px;" />
     </ui:VisualElement>

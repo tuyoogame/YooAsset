@@ -9,34 +9,19 @@ namespace YooAsset
 		{
 			if (string.IsNullOrEmpty(resourceRoot) == false)
 				_resourceRoot = PathHelper.GetRegularPath(resourceRoot);
+		}
 
-#if UNITY_EDITOR
-			LocationServicesHelper.InitEditorPlayMode(false);
-#endif
-		}
-		
-		public string ConvertLocationToAssetPath(YooAssets.EPlayMode playMode, string location)
+		public string ConvertLocationToAssetPath(string location)
 		{
-			location = CombineAssetPath(_resourceRoot, location);
-			if (playMode == YooAssets.EPlayMode.EditorPlayMode)
+			if (string.IsNullOrEmpty(_resourceRoot))
 			{
-#if UNITY_EDITOR
-				return LocationServicesHelper.ConvertLocationToAssetPath(location);
-#else
-				throw new System.NotImplementedException();
-#endif
+				return YooAssets.MappingToAssetPath(location);
 			}
 			else
 			{
-				return location;
+				string tempLocation = $"{_resourceRoot}/{location}";
+				return YooAssets.MappingToAssetPath(tempLocation);
 			}
-		}
-		private string CombineAssetPath(string root, string location)
-		{
-			if (string.IsNullOrEmpty(root))
-				return location;
-			else
-				return $"{root}/{location}";
 		}
 	}
 }

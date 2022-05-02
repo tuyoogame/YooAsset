@@ -66,7 +66,10 @@ namespace YooAsset.Editor
 			_items.Add(new ItemWrapper("构建时间", buildReport.Summary.BuildTime));
 			_items.Add(new ItemWrapper("构建耗时", $"{buildReport.Summary.BuildSeconds}秒"));
 			_items.Add(new ItemWrapper("构建平台", $"{buildReport.Summary.BuildTarget}"));
+			_items.Add(new ItemWrapper("构建模式", $"{buildReport.Summary.BuildMode}"));
 			_items.Add(new ItemWrapper("构建版本", $"{buildReport.Summary.BuildVersion}"));
+			_items.Add(new ItemWrapper("内置资源标签", $"{buildReport.Summary.BuildinTags}"));
+
 			_items.Add(new ItemWrapper("启用可寻址资源定位", $"{buildReport.Summary.EnableAddressable}"));
 			_items.Add(new ItemWrapper("启用自动分包机制", $"{buildReport.Summary.EnableAutoCollect}"));
 			_items.Add(new ItemWrapper("追加文件扩展名", $"{buildReport.Summary.AppendFileExtension}"));
@@ -76,9 +79,6 @@ namespace YooAsset.Editor
 
 			_items.Add(new ItemWrapper(string.Empty, string.Empty));
 			_items.Add(new ItemWrapper("构建参数", string.Empty));
-			_items.Add(new ItemWrapper("DryRunBuild", $"{buildReport.Summary.DryRunBuild}"));
-			_items.Add(new ItemWrapper("ForceRebuild", $"{buildReport.Summary.ForceRebuild}"));
-			_items.Add(new ItemWrapper("BuildinTags", $"{buildReport.Summary.BuildinTags}"));
 			_items.Add(new ItemWrapper("CompressOption", $"{buildReport.Summary.CompressOption}"));
 			_items.Add(new ItemWrapper("AppendHash", $"{buildReport.Summary.AppendHash}"));
 			_items.Add(new ItemWrapper("DisableWriteTypeTree", $"{buildReport.Summary.DisableWriteTypeTree}"));

@@ -9,7 +9,8 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
-			if (buildParameters.Parameters.DryRunBuild == false)
+			var buildMode = buildParameters.Parameters.BuildMode;
+			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
 				CopyPatchFiles(buildParameters);
 			}
@@ -22,7 +23,7 @@ namespace YooAsset.Editor
 		{
 			int resourceVersion = buildParameters.Parameters.BuildVersion;
 			string packageDirectory = buildParameters.GetPackageDirectory();
-			UnityEngine.Debug.Log($"开始拷贝补丁文件到补丁包目录：{packageDirectory}");
+			BuildRunner.Log($"开始拷贝补丁文件到补丁包目录：{packageDirectory}");
 
 			// 拷贝Report文件
 			{

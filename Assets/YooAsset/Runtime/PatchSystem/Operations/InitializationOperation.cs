@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace YooAsset
@@ -16,12 +17,50 @@ namespace YooAsset
 	/// </summary>
 	internal sealed class EditorPlayModeInitializationOperation : InitializationOperation
 	{
+		private enum ESteps
+		{
+			None,
+			Builder,
+			Done,
+		}
+
+		private readonly EditorPlayModeImpl _impl;
+		private ESteps _steps = ESteps.None;
+
+		internal EditorPlayModeInitializationOperation(EditorPlayModeImpl impl)
+		{
+			_impl = impl;
+		}
 		internal override void Start()
 		{
-			Status = EOperationStatus.Succeed;
+			_steps = ESteps.Builder;
 		}
 		internal override void Update()
 		{
+			if (_steps == ESteps.Builder)
+			{
+				string manifestFilePath = EditorPlayModeHelper.DryRunBuild();
+				if (string.IsNullOrEmpty(manifestFilePath))
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = "Dry run build failed, see the detail info on the console window.";
+					return;
+				}
+				if (File.Exists(manifestFilePath) == false)
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = $"Manifest file not found : {manifestFilePath}";
+					return;
+				}
+
+				YooLogger.Log($"Load manifest file in editor play mode : {manifestFilePath}");
+				string jsonContent = FileUtility.ReadFile(manifestFilePath);
+				_impl.AppPatchManifest = PatchManifest.Deserialize(jsonContent);
+				_steps = ESteps.Done;
+				Status = EOperationStatus.Succeed;
+			}
 		}
 	}
 
@@ -151,6 +190,7 @@ namespace YooAsset
 			}
 		}
 	}
+
 
 	/// <summary>
 	/// 内置补丁清单加载器

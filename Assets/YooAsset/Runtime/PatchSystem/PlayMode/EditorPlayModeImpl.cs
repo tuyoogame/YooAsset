@@ -6,12 +6,14 @@ namespace YooAsset
 {
 	internal class EditorPlayModeImpl : IBundleServices
 	{
+		internal PatchManifest AppPatchManifest;
+
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
 		public InitializationOperation InitializeAsync()
 		{
-			var operation = new EditorPlayModeInitializationOperation();
+			var operation = new EditorPlayModeInitializationOperation(this);
 			OperationSystem.ProcessOperaiton(operation);
 			return operation;
 		}
@@ -21,27 +23,41 @@ namespace YooAsset
 		/// </summary>
 		public int GetResourceVersion()
 		{
-			return 0;
+			if (AppPatchManifest == null)
+				return 0;
+			return AppPatchManifest.ResourceVersion;
 		}
 
 		#region IBundleServices接口
 		BundleInfo IBundleServices.GetBundleInfo(string bundleName)
 		{
-			YooLogger.Warning($"Editor play mode can not get bundle info.");
-			BundleInfo bundleInfo = new BundleInfo(bundleName);
-			return bundleInfo;
+			if (string.IsNullOrEmpty(bundleName))
+				return new BundleInfo(string.Empty);
+
+			if (AppPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
+			{
+				string mainAssetPath = AppPatchManifest.TryGetBundleMainAssetPath(bundleName);
+				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromEditor, mainAssetPath);
+				return bundleInfo;
+			}
+			else
+			{
+				YooLogger.Warning($"Not found bundle in patch manifest : {bundleName}");
+				BundleInfo bundleInfo = new BundleInfo(bundleName);
+				return bundleInfo;
+			}
 		}
-		string IBundleServices.ConvertAddress(string address)
+		string IBundleServices.MappingToAssetPath(string location)
 		{
-			throw new Exception($"Editor play mode not support addressable.");
+			return AppPatchManifest.MappingToAssetPath(location);
 		}
 		string IBundleServices.GetBundleName(string assetPath)
 		{
-			return assetPath;
+			return AppPatchManifest.GetBundleName(assetPath);
 		}
 		string[] IBundleServices.GetAllDependencies(string assetPath)
 		{
-			return new string[] { };
+			return AppPatchManifest.GetAllDependencies(assetPath);
 		}
 		#endregion
 	}

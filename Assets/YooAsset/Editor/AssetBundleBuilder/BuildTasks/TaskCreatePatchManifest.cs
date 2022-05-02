@@ -34,19 +34,19 @@ namespace YooAsset.Editor
 
 			// 创建补丁清单文件
 			string manifestFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.GetPatchManifestFileName(resourceVersion)}";
-			UnityEngine.Debug.Log($"创建补丁清单文件：{manifestFilePath}");
+			BuildRunner.Log($"创建补丁清单文件：{manifestFilePath}");
 			PatchManifest.Serialize(manifestFilePath, patchManifest);
 
 			// 创建补丁清单哈希文件
 			string manifestHashFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.GetPatchManifestHashFileName(resourceVersion)}";
 			string manifestHash = HashUtility.FileMD5(manifestFilePath);
-			UnityEngine.Debug.Log($"创建补丁清单哈希文件：{manifestHashFilePath}");
+			BuildRunner.Log($"创建补丁清单哈希文件：{manifestHashFilePath}");
 			FileUtility.CreateFile(manifestHashFilePath, manifestHash);
 
 			// 创建静态版本文件
 			string staticVersionFilePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettings.VersionFileName}";
 			string staticVersion = resourceVersion.ToString();
-			UnityEngine.Debug.Log($"创建静态版本文件：{staticVersionFilePath}");
+			BuildRunner.Log($"创建静态版本文件：{staticVersionFilePath}");
 			FileUtility.CreateFile(staticVersionFilePath, staticVersion);
 		}
 
@@ -61,14 +61,15 @@ namespace YooAsset.Editor
 			// 内置标记列表
 			List<string> buildinTags = buildParameters.Parameters.GetBuildinTags();
 
-			bool dryRunBuild = buildParameters.Parameters.DryRunBuild;
+			var buildMode = buildParameters.Parameters.BuildMode;
+			bool standardBuild = buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild;
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				var bundleName = bundleInfo.BundleName;
 				string filePath = $"{buildParameters.PipelineOutputDirectory}/{bundleName}";
-				string hash = GetFileHash(filePath, dryRunBuild);
-				string crc32 = GetFileCRC(filePath, dryRunBuild);
-				long size = GetFileSize(filePath, dryRunBuild);
+				string hash = GetFileHash(filePath, standardBuild);
+				string crc32 = GetFileCRC(filePath, standardBuild);
+				long size = GetFileSize(filePath, standardBuild);
 				string[] tags = buildMapContext.GetAssetTags(bundleName);
 				bool isEncrypted = encryptionContext.IsEncryptFile(bundleName);
 				bool isBuildin = IsBuildinBundle(tags, buildinTags);
@@ -100,26 +101,26 @@ namespace YooAsset.Editor
 			}
 			return false;
 		}
-		private string GetFileHash(string filePath, bool dryRunBuild)
+		private string GetFileHash(string filePath, bool standardBuild)
 		{
-			if (dryRunBuild)
-				return "00000000000000000000000000000000"; //32位
-			else
+			if (standardBuild)
 				return HashUtility.FileMD5(filePath);
-		}
-		private string GetFileCRC(string filePath, bool dryRunBuild)
-		{
-			if (dryRunBuild)
-				return "00000000"; //8位
 			else
+				return "00000000000000000000000000000000"; //32位
+		}
+		private string GetFileCRC(string filePath, bool standardBuild)
+		{
+			if (standardBuild)
 				return HashUtility.FileCRC32(filePath);
-		}
-		private long GetFileSize(string filePath, bool dryRunBuild)
-		{
-			if (dryRunBuild)
-				return 0;
 			else
+				return "00000000"; //8位
+		}
+		private long GetFileSize(string filePath, bool standardBuild)
+		{
+			if (standardBuild)
 				return FileUtility.GetFileSize(filePath);
+			else
+				return 0;
 		}
 
 		/// <summary>

@@ -309,9 +309,9 @@ namespace YooAsset
 				return bundleInfo;
 			}
 		}
-		string IBundleServices.ConvertAddress(string address)
+		string IBundleServices.MappingToAssetPath(string location)
 		{
-			return LocalPatchManifest.ConvertAddress(address);
+			return LocalPatchManifest.MappingToAssetPath(location);
 		}
 		string IBundleServices.GetBundleName(string assetPath)
 		{

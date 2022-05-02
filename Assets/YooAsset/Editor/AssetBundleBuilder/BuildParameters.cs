@@ -10,11 +10,6 @@ namespace YooAsset.Editor
 	public class BuildParameters
 	{
 		/// <summary>
-		/// 验证构建结果
-		/// </summary>
-		public bool VerifyBuildingResult = false;
-
-		/// <summary>
 		/// 输出的根目录
 		/// </summary>
 		public string OutputRoot;
@@ -25,9 +20,26 @@ namespace YooAsset.Editor
 		public BuildTarget BuildTarget;
 
 		/// <summary>
+		/// 构建模式
+		/// </summary>
+		public EBuildMode BuildMode;
+
+		/// <summary>
 		/// 构建的版本（资源版本号）
 		/// </summary>
 		public int BuildVersion;
+
+		/// <summary>
+		/// 内置资源的标记列表
+		/// 注意：分号为分隔符
+		/// </summary>
+		public string BuildinTags;
+
+
+		/// <summary>
+		/// 验证构建结果
+		/// </summary>
+		public bool VerifyBuildingResult = false;
 
 		/// <summary>
 		/// 启用可寻址资源定位
@@ -45,32 +57,16 @@ namespace YooAsset.Editor
 		/// </summary>
 		public bool AppendFileExtension = false;
 
+
 		/// <summary>
 		/// 加密类
 		/// </summary>
-		public IEncryptionServices EncryptionServices;
-
-
-		/// <summary>
-		/// 演练构建模式
-		/// </summary>
-		public bool DryRunBuild;
-
-		/// <summary>
-		/// 强制重新构建整个项目，如果为FALSE则是增量打包
-		/// </summary>
-		public bool ForceRebuild;
-
-		/// <summary>
-		/// 内置资源的标记列表
-		/// 注意：分号为分隔符
-		/// </summary>
-		public string BuildinTags;
+		public IEncryptionServices EncryptionServices = null;
 
 		/// <summary>
 		/// 压缩选项
 		/// </summary>
-		public ECompressOption CompressOption;
+		public ECompressOption CompressOption = ECompressOption.Uncompressed;
 
 		/// <summary>
 		/// 文件名附加上哈希值

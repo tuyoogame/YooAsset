@@ -127,7 +127,7 @@ namespace YooAsset.Editor
 				}
 			}
 
-			UnityEngine.Debug.Log($"发现未被依赖的资源并自动移除 : {dependAssetPath}");
+			BuildRunner.Log($"发现未被依赖的资源并自动移除 : {dependAssetPath}");
 			return true;
 		}
 	}

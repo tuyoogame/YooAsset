@@ -13,7 +13,7 @@ namespace YooAsset.Editor
 		{
 			// 注意：我们只有在强制重建的时候才会拷贝
 			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
-			if (buildParameters.Parameters.DryRunBuild == false && buildParameters.Parameters.ForceRebuild)
+			if (buildParameters.Parameters.BuildMode == EBuildMode.ForceRebuild)
 			{
 				// 清空流目录
 				AssetBundleBuilderHelper.ClearStreamingAssetsFolder();
@@ -62,7 +62,7 @@ namespace YooAsset.Editor
 
 			// 刷新目录
 			AssetDatabase.Refresh();
-			Debug.Log($"内置文件拷贝完成：{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}");
+			BuildRunner.Log($"内置文件拷贝完成：{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}");
 		}
 	}
 }

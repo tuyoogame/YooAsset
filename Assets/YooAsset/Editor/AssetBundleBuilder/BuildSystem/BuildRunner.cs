@@ -8,6 +8,8 @@ namespace YooAsset.Editor
 {
 	public class BuildRunner
 	{
+		public static bool EnableLog = true;
+
 		/// <summary>
 		/// 执行构建流程
 		/// </summary>
@@ -26,7 +28,7 @@ namespace YooAsset.Editor
 				try
 				{
 					var taskAttribute = task.GetType().GetCustomAttribute<TaskAttribute>();
-					Debug.Log($"---------------------------------------->{taskAttribute.Desc}");
+					Log($"---------------------------------------->{taskAttribute.Desc}");
 					task.Run(context);
 				}
 				catch (Exception e)
@@ -40,6 +42,17 @@ namespace YooAsset.Editor
 
 			// 返回运行结果
 			return succeed;
+		}
+
+		/// <summary>
+		/// 普通日志输出
+		/// </summary>
+		public static void Log(string info)
+		{
+			if (EnableLog)
+			{
+				UnityEngine.Debug.Log(info);
+			}	
 		}
 	}
 }

@@ -9,6 +9,7 @@ namespace YooAsset
 			LoadFromStreaming,
 			LoadFromCache,
 			LoadFromRemote,
+			LoadFromEditor,
 		}
 
 		private readonly PatchBundle _patchBundle;
@@ -31,6 +32,11 @@ namespace YooAsset
 		/// 远端下载备用地址
 		/// </summary>
 		internal string RemoteFallbackURL { private set; get; }
+
+		/// <summary>
+		/// 编辑器资源路径
+		/// </summary>
+		public string EditorAssetPath { private set; get; }
 
 		/// <summary>
 		/// 文件哈希值
@@ -113,6 +119,16 @@ namespace YooAsset
 			BundleName = patchBundle.BundleName;
 			RemoteMainURL = mainURL;
 			RemoteFallbackURL = fallbackURL;
+			EditorAssetPath = string.Empty;
+		}
+		internal BundleInfo(PatchBundle patchBundle, ELoadMode loadMode, string editorAssetPath)
+		{
+			_patchBundle = patchBundle;
+			LoadMode = loadMode;
+			BundleName = patchBundle.BundleName;
+			RemoteMainURL = string.Empty;
+			RemoteFallbackURL = string.Empty;
+			EditorAssetPath = editorAssetPath;
 		}
 		internal BundleInfo(PatchBundle patchBundle, ELoadMode loadMode)
 		{
@@ -121,6 +137,7 @@ namespace YooAsset
 			BundleName = patchBundle.BundleName;
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
+			EditorAssetPath = string.Empty;
 		}
 		internal BundleInfo(string bundleName)
 		{
@@ -129,6 +146,7 @@ namespace YooAsset
 			BundleName = bundleName;
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
+			EditorAssetPath = string.Empty;
 		}
 
 		/// <summary>

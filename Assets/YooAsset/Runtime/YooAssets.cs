@@ -310,7 +310,7 @@ namespace YooAsset
 		/// </summary>
 		public static BundleInfo GetBundleInfo(string location)
 		{
-			string assetPath = _locationServices.ConvertLocationToAssetPath(_playMode, location);
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
 			string bundleName = _bundleServices.GetBundleName(assetPath);
 			return _bundleServices.GetBundleInfo(bundleName);
 		}
@@ -353,7 +353,7 @@ namespace YooAsset
 		/// <param name="priority">优先级</param>
 		public static SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool activateOnLoad = true, int priority = 100)
 		{
-			string scenePath = _locationServices.ConvertLocationToAssetPath(_playMode, location);
+			string scenePath = _locationServices.ConvertLocationToAssetPath(location);
 			var handle = AssetSystem.LoadSceneAsync(scenePath, sceneMode, activateOnLoad, priority);
 			return handle;
 		}
@@ -367,10 +367,11 @@ namespace YooAsset
 		/// <param name="copyPath">拷贝路径</param>
 		public static RawFileOperation GetRawFileAsync(string location, string copyPath = null)
 		{
-			string assetPath = _locationServices.ConvertLocationToAssetPath(_playMode, location);
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
 			if (_playMode == EPlayMode.EditorPlayMode)
 			{
-				BundleInfo bundleInfo = new BundleInfo(assetPath);
+				string bundleName = _bundleServices.GetBundleName(assetPath);
+				BundleInfo bundleInfo = _bundleServices.GetBundleInfo(bundleName);
 				RawFileOperation operation = new EditorPlayModeRawFileOperation(bundleInfo, copyPath);
 				OperationSystem.ProcessOperaiton(operation);
 				return operation;
@@ -482,7 +483,7 @@ namespace YooAsset
 
 		private static AssetOperationHandle LoadAssetInternal(string location, System.Type assetType, bool waitForAsyncComplete)
 		{
-			string assetPath = _locationServices.ConvertLocationToAssetPath(_playMode, location);
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
 			var handle = AssetSystem.LoadAssetAsync(assetPath, assetType);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
@@ -490,7 +491,7 @@ namespace YooAsset
 		}
 		private static SubAssetsOperationHandle LoadSubAssetsInternal(string location, System.Type assetType, bool waitForAsyncComplete)
 		{
-			string assetPath = _locationServices.ConvertLocationToAssetPath(_playMode, location);
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
 			var handle = AssetSystem.LoadSubAssetsAsync(assetPath, assetType);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
@@ -583,7 +584,7 @@ namespace YooAsset
 				List<string> assetPaths = new List<string>(locations.Length);
 				foreach (var location in locations)
 				{
-					string assetPath = _locationServices.ConvertLocationToAssetPath(_playMode, location);
+					string assetPath = _locationServices.ConvertLocationToAssetPath(location);
 					assetPaths.Add(assetPath);
 				}
 				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetPaths, downloadingMaxNumber, failedTryAgain);
@@ -731,10 +732,37 @@ namespace YooAsset
 				}
 			}
 		}
-		internal static string ConvertAddress(string address)
+		internal static string MappingToAssetPath(string location)
 		{
-			return _bundleServices.ConvertAddress(address);
+#if UNITY_EDITOR
+			CheckLocation(location);
+#endif
+
+			return _bundleServices.MappingToAssetPath(location);
 		}
+
+#if UNITY_EDITOR
+		private static void CheckLocation(string location)
+		{
+			if (string.IsNullOrEmpty(location))
+			{
+				UnityEngine.Debug.LogError("location param is null or empty!");
+			}
+			else
+			{
+				// 检查路径末尾是否有空格
+				int index = location.LastIndexOf(" ");
+				if (index != -1)
+				{
+					if (location.Length == index + 1)
+						UnityEngine.Debug.LogWarning($"Found blank character in location : \"{location}\"");
+				}
+
+				if (location.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
+					UnityEngine.Debug.LogWarning($"Found illegal character in location : \"{location}\"");
+			}
+		}
+#endif
 		#endregion
 	}
 }

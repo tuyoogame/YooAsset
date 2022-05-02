@@ -26,7 +26,9 @@ namespace YooAsset.Editor
 				buildReport.Summary.BuildTime = DateTime.Now.ToString();
 				buildReport.Summary.BuildSeconds = buildParameters.GetBuildingSeconds();
 				buildReport.Summary.BuildTarget = buildParameters.Parameters.BuildTarget;
+				buildReport.Summary.BuildMode = buildParameters.Parameters.BuildMode;
 				buildReport.Summary.BuildVersion = buildParameters.Parameters.BuildVersion;
+				buildReport.Summary.BuildinTags = buildParameters.Parameters.BuildinTags;
 				buildReport.Summary.EnableAddressable = buildParameters.Parameters.EnableAddressable;
 				buildReport.Summary.EnableAutoCollect = buildParameters.Parameters.EnableAutoCollect;
 				buildReport.Summary.AppendFileExtension = buildParameters.Parameters.AppendFileExtension;
@@ -36,9 +38,6 @@ namespace YooAsset.Editor
 					"null" : buildParameters.Parameters.EncryptionServices.GetType().FullName;
 
 				// 构建参数
-				buildReport.Summary.DryRunBuild = buildParameters.Parameters.DryRunBuild;
-				buildReport.Summary.ForceRebuild = buildParameters.Parameters.ForceRebuild;
-				buildReport.Summary.BuildinTags = buildParameters.Parameters.BuildinTags;
 				buildReport.Summary.CompressOption = buildParameters.Parameters.CompressOption;
 				buildReport.Summary.AppendHash = buildParameters.Parameters.AppendHash;
 				buildReport.Summary.DisableWriteTypeTree = buildParameters.Parameters.DisableWriteTypeTree;
@@ -91,7 +90,7 @@ namespace YooAsset.Editor
 
 			// 序列化文件
 			BuildReport.Serialize(filePath, buildReport);
-			UnityEngine.Debug.Log($"资源构建报告文件创建完成：{filePath}");
+			BuildRunner.Log($"资源构建报告文件创建完成：{filePath}");
 		}
 
 		/// <summary>

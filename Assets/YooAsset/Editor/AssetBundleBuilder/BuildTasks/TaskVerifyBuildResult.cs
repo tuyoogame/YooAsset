@@ -14,11 +14,15 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParametersContext = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
-			var unityManifestContext = context.GetContextObject<TaskBuilding.UnityManifestContext>();
+			
+			// 快速构建模式下跳过验证
+			if (buildParametersContext.Parameters.BuildMode == EBuildMode.FastRunBuild)
+				return;
 
 			// 验证构建结果
 			if (buildParametersContext.Parameters.VerifyBuildingResult)
 			{
+				var unityManifestContext = context.GetContextObject<TaskBuilding.UnityManifestContext>();
 				VerifyingBuildingResult(context, unityManifestContext.UnityManifest);
 			}
 		}
@@ -80,7 +84,8 @@ namespace YooAsset.Editor
 			}
 
 			// 5. 验证Asset
-			if(buildParameters.Parameters.DryRunBuild == false)
+			var buildMode = buildParameters.Parameters.BuildMode;
+			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
 				int progressValue = 0;
 				foreach (var buildedBundle in buildedBundles)
@@ -133,7 +138,7 @@ namespace YooAsset.Editor
 			}
 
 			// 卸载所有加载的Bundle
-			Debug.Log("构建结果验证成功！");
+			BuildRunner.Log("构建结果验证成功！");
 		}
 
 		/// <summary>

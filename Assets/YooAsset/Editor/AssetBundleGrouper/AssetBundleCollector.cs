@@ -96,6 +96,9 @@ namespace YooAsset.Editor
 			if (isRawAsset && CollectorType != ECollectorType.MainAssetCollector)
 				throw new Exception($"The raw file must be set to {nameof(ECollectorType)}.{ECollectorType.MainAssetCollector} : {CollectPath}");
 
+			if (string.IsNullOrEmpty(CollectPath))
+				throw new Exception($"The collect path is null or empty in grouper : {grouper.GrouperName}");
+
 			// 收集打包资源
 			if (AssetDatabase.IsValidFolder(CollectPath))
 			{

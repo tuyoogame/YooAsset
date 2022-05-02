@@ -29,9 +29,19 @@ namespace YooAsset.Editor
 		public BuildTarget BuildTarget;
 
 		/// <summary>
+		/// 构建模式
+		/// </summary>
+		public EBuildMode BuildMode;
+
+		/// <summary>
 		/// 构建版本
 		/// </summary>
 		public int BuildVersion;
+
+		/// <summary>
+		/// 内置资源标签
+		/// </summary>
+		public string BuildinTags;
 
 		/// <summary>
 		/// 启用可寻址资源定位
@@ -64,9 +74,6 @@ namespace YooAsset.Editor
 		public string EncryptionServicesClassName;
 
 		// 构建参数
-		public bool DryRunBuild;
-		public bool ForceRebuild;
-		public string BuildinTags;
 		public ECompressOption CompressOption;
 		public bool AppendHash;
 		public bool DisableWriteTypeTree;
