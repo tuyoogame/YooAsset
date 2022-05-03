@@ -8,7 +8,11 @@
 
 **注意**：该工具仅支持Unity2019+
 
-#### 着色器收集
+#### 公共设置
+
+- Enable Addressable
+
+  启用可寻址资源定位系统。
 
 - Auto Collect Shaders
 
@@ -40,53 +44,75 @@
 
   收集路径，可以指定文件夹或单个资源文件。
 
+- **Collector Type**
+
+  收集器类型：
+
+  - MainAssetCollector 收集参与打包的主资源对象，并写入到资源清单的资源列表里（可以通过代码加载）。
+  - StaticAssetCollector 收集参与打包的主资源对象，但不写入到资源清单的资源列表里（无法通过代码加载）。
+  - DependAssetCollector 收集参与打包的依赖资源对象，但不写入到资源清单的资源列表里（无法通过代码加载）。
+  
+- **AddressRule**
+
+  可寻址规则，规则可以自定义扩展。下面是内置规则：
+
+  - AddressByFileName 以文件名为定位地址。
+
+  - AddressByGrouperAndFileName 以分组名称+文件名为定位地址。
+
+  - AddressByCollectorAndFileName 以收集器名+文件名为定位地址。
+
+  ````c#
+  public class AddressByFileName : IAddressRule
+  {
+    string IAddressRule.GetAssetAddress(AddressRuleData data)
+    {
+      return Path.GetFileNameWithoutExtension(data.AssetPath);
+    }
+  }
+  ````
+
 - **PackRule**
 
-  打包规则，规则可以自定义扩展。下面是内置的打包规则：
+  打包规则，规则可以自定义扩展。下面是内置规则：
 
   - PackSeparately 以文件路径作为资源包名，每个资源文件单独打包。
-  - PackDirectory 以父类文件夹路径作为资源包名，打进一个资源包。
-  - PackCollector 以收集器路径作为资源包名，打进一个资源包。
-  - PackGrouper 以分组名称作为资源包名，打进一个资源包。
+  - PackDirectory 以父类文件夹路径作为资源包名，文件夹下所有文件打进一个资源包。
+  - PackTopDirectory 以收集器路径下顶级文件夹为资源包名，文件夹下所有文件打进一个资源包。
+  - PackCollector 以收集器路径作为资源包名，收集的所有文件打进一个资源包。
+  - PackGrouper 以分组名称作为资源包名，收集的所有文件打进一个资源包。
   - PackRawFile 目录下的资源文件会被处理为原生资源包。
 
-````c#
-//自定义扩展范例
-public class PackDirectory : IPackRule
-{
+  ````c#
+  //自定义扩展范例
+  public class PackDirectory : IPackRule
+  {
     string IPackRule.GetBundleName(PackRuleData data)
     {
-        return Path.GetDirectoryName(data.AssetPath); //"Assets/Config/test.txt" --> "Assets/Config"
+      return Path.GetDirectoryName(data.AssetPath); //"Assets/Config/test.txt" --> "Assets/Config"
     }
-}
-````
+  }
+  ````
 
 - **FilterRule**
 
-  过滤规则，规则可以自定义扩展。下面是内置的过滤规则：
+  过滤规则，规则可以自定义扩展。下面是内置规则：
 
   - CollectAll 收集目录下的所有资源文件
-
   - CollectScene 只收集目录下的场景文件
-
   - CollectPrefab 只收集目录下的预制体文件
-
   - CollectSprite 只收集目录下的精灵类型的文件
 
-````c#
-//自定义扩展范例
-public class CollectScene : IFilterRule
-{
+  ````c#
+  //自定义扩展范例
+  public class CollectScene : IFilterRule
+  {
     public bool IsCollectAsset(FilterRuleData data)
     {
-        return Path.GetExtension(data.AssetPath) == ".unity";
+      return Path.GetExtension(data.AssetPath) == ".unity";
     }
-}
-````
-
-- **NotWriteToAssetList**
-
-  资源对象不写入资源列表
+  }
+  ````
 
 - **AssetTags**
 

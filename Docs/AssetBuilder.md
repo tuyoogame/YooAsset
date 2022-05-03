@@ -12,21 +12,21 @@
 
   构建版本号，也是资源版本号，版本号必须大于零。
 
-- **Compression**
+- **Build Mode**
 
-  资源包的压缩方式。
+  构建模式：强制构建模式，增量构建模式，快速构建模式，演练构建模式。
 
 - **Encryption**
 
   加密类列表。
 
+- **Compression**
+
+  资源包的压缩方式。
+
 - **Append Extension**
 
   构建的资源包文件名是否包含后缀格式。
-
-- **Force Rebuild**
-
-  是否为强制重新构建，如果不勾选则为增量构建模式。注意：强制重建会删除当前平台下所有的补丁包文件。
 
 - **Buildin Tags**
 
@@ -76,13 +76,13 @@ public class GameEncryption : IEncryptionServices
 
 资源包文件都是以文件的哈希值命名。
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetBuilder-img4.jpg)
+![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetBuilder-img4.png)
 
 ### 补丁清单
 
-补丁清单是一个Json格式的文本文件，里面包含了所有资源包的信息，例如：名称，版本，大小，CRC等。
+补丁清单是一个Json格式的文本文件，里面包含了所有资源包的信息，例如：名称，大小，CRC等。
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetBuilder-img2.jpg)
+![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetBuilder-img2.png)
 
 ### Jenkins支持
 
@@ -99,22 +99,20 @@ private static void BuildInternal(BuildTarget buildTarget)
     // 构建参数
     string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
     AssetBundleBuilder.BuildParameters buildParameters = new AssetBundleBuilder.BuildParameters();
-    buildParameters.IsVerifyBuildingResult = true;
     buildParameters.OutputRoot = defaultOutputRoot;
     buildParameters.BuildTarget = buildTarget;
+    buildParameters.BuildMode = EBuildMode.ForceRebuild;
     buildParameters.BuildVersion = buildVersion;
-    buildParameters.CompressOption = ECompressOption.LZ4;
-    buildParameters.AppendFileExtension = false;
-    buildParameters.EncryptionServices = new GameEncryption();
-    buildParameters.IsForceRebuild = true;
     buildParameters.BuildinTags = "buildin";
+    buildParameters.VerifyBuildingResult = true;
+    buildParameters.EnableAddressable = false;
+    buildParameters.AppendFileExtension = false;   
+    buildParameters.EncryptionServices = new GameEncryption();
+    buildParameters.CompressOption = ECompressOption.LZ4;
 
     // 执行构建
     AssetBundleBuilder builder = new AssetBundleBuilder();
     builder.Run(buildParameters);
-
-    // 构建完成
-    Debug.Log("构建完成");
 }
 
 // 从构建命令里获取参数

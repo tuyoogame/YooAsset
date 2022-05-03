@@ -56,16 +56,24 @@ private IEnumerator UpdatePatchManifest()
 
 补丁包下载接口：
 
-- YooAssets.CreatePatchDownloader(string[] tags) 根据资源标签列表下载相关资源包文件
-- YooAssets.CreateBundleDownloader(string[] locations) 根据资源对象列表下载相关资源包文件
+- YooAssets.CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain)
+
+  用于下载更新当前资源版本所有的资源包文件。
+
+- YooAssets.CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain)
+
+  用于下载更新资源标签指定的资源包文件。
+
+- YooAssets.CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain)
+
+  用于下载更新指定的资源列表依赖的资源包文件。
 
 ````c#
 IEnumerator Download()
 {
-    string[] tags = { "buildin", "config" };
     int downloadingMaxNum = 10;
     int failedTryAgain = 3;
-    DownloaderOperation downloader = YooAssets.CreatePatchDownloader(tags, downloadingMaxNum, failedTryAgain);
+    DownloaderOperation downloader = YooAssets.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
     
     //没有需要下载的资源
     if (downloader.TotalDownloadCount == 0)

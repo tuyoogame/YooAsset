@@ -12,10 +12,10 @@
 
 可以查看资源对象列表以及每个资源对象所依赖的资源包。
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img2.jpg)
+![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img2.png)
 
 ### 资源包列表视图
 
 可以查看资源包列表以及每个资源包所包含的资源对象。
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img3.jpg)
+![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img3.png)

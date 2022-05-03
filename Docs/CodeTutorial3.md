@@ -11,6 +11,12 @@
 
 统一约定：location为资源的定位地址，也是加载资源对象的唯一标识符。
 
+DefaultLocationServices 默认资源定位服务，location代表的是资源对象的相对路径。
+
+AddressLocationServices 可寻址资源定位服务，location代表的是资源对象可寻址地址。
+
+**注意**：以下范例执行环境是在DefaultLocationServices下。
+
 **加载路径的匹配方式**
 
 ````C#
@@ -68,6 +74,10 @@ IEnumerator Start()
 
 **资源释放范例**
 
+可以在切换场景之后调用资源释放方法或者写定时器间隔时间去释放。
+
+注意：只有调用资源释放方法，资源对象才会在内存里被移除。
+
 ````c#
 private void UnloadAssets()
 {
@@ -124,8 +134,8 @@ IEnumerator Start()
 IEnumerator Start()
 {
     string location = "wwise/init.bnk";
-    string savePath = $"{Application.persistentDataPath}/Audio/init.bnk";
-    RawFileOperation operation = YooAssets.LoadRawFileAsync(location, savePath);
+    string copyPath = $"{Application.persistentDataPath}/Audio/init.bnk";
+    RawFileOperation operation = YooAssets.LoadRawFileAsync(location, copyPath);
     yield return operation;
     byte[] fileData = operation.GetFileData();
     string fileText = operation.GetFileText();
