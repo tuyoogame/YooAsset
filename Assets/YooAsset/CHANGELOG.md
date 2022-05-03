@@ -20,27 +20,18 @@ All notable changes to this package will be documented in this file.
 ### Added
 
 - 支持可寻址资源定位系统，包括编辑器和运行时环境。
-
 - 增加快速构建模式，用于EditorPlayMode完美模拟线上环境。
-
 - 增加了Window Dock功能，已打开的界面会自动停靠在一个窗体下。
-
 - 增加一个新的打包规则：PackTopDirectory。
-
 - 增加获取资源信息的方法。
-
   ```c#
   public static AssetInfo[] GetAssetInfos(string tag)
   ```
-
 - 增加补丁下载器下载全部资源的方法。
-
   ```c#
   public static PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain)
   ```
-
 - 增加指定资源版本的资源更新下载方法。
-
   ```c#
   public static UpdatePackageOperation UpdatePackageAsync(int resourceVersion, int timeout = 60)
   ```
