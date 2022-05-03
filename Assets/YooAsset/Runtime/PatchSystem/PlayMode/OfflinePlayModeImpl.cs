@@ -56,6 +56,10 @@ namespace YooAsset
 				return bundleInfo;
 			}
 		}
+		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
+		{
+			return PatchHelper.GetAssetsInfoByTag(AppPatchManifest, tags);
+		}
 		string IBundleServices.MappingToAssetPath(string location)
 		{
 			return AppPatchManifest.MappingToAssetPath(location);

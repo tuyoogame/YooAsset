@@ -169,5 +169,25 @@ namespace YooAsset
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, streamingPath, streamingPath);
 			return bundleInfo;
 		}
+
+		/// <summary>
+		/// 获取资源信息列表
+		/// </summary>
+		public static AssetInfo[] GetAssetsInfoByTag(PatchManifest patchManifest, string[] tags)
+		{
+			List<AssetInfo> result = new List<AssetInfo>(100);
+			foreach (var patchAsset in patchManifest.AssetList)
+			{
+				string bundleName = patchManifest.GetBundleName(patchAsset.AssetPath);
+				if(patchManifest.Bundles.TryGetValue(bundleName, out PatchBundle bundle))
+				{
+					if(bundle.HasTag(tags))
+					{
+						result.Add(new AssetInfo(patchAsset.AssetPath));
+					}
+				}
+			}
+			return result.ToArray();
+		}
 	}
 }

@@ -82,7 +82,7 @@ namespace YooAsset
 					}
 					else
 					{
-						throw new Exception($"Invalid depend id : {dependID} Asset path : {assetPath}");
+						throw new Exception($"Invalid bundle id : {dependID} Asset path : {assetPath}");
 					}
 				}
 				return result.ToArray();
@@ -109,7 +109,7 @@ namespace YooAsset
 				}
 				else
 				{
-					throw new Exception($"Invalid depend id : {bundleID} Asset path : {assetPath}");
+					throw new Exception($"Invalid bundle id : {bundleID} Asset path : {assetPath}");
 				}
 			}
 			else
@@ -135,7 +135,7 @@ namespace YooAsset
 				}
 				else
 				{
-					throw new Exception($"Invalid depend id : {bundleID} Asset path : {patchAsset.AssetPath}");
+					throw new Exception($"Invalid bundle id : {bundleID} Asset path : {patchAsset.AssetPath}");
 				}
 			}
 			return string.Empty;
