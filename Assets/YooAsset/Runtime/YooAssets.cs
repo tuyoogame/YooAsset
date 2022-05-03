@@ -44,12 +44,6 @@ namespace YooAsset
 			public IDecryptionServices DecryptionServices = null;
 
 			/// <summary>
-			/// 资源系统自动释放零引用资源的间隔秒数
-			/// 注意：如果小于等于零代表不自动释放，可以使用YooAssets.UnloadUnusedAssets接口主动释放
-			/// </summary>
-			public float AutoReleaseInterval = -1;
-
-			/// <summary>
 			/// 资源加载的最大数量
 			/// </summary>
 			public int AssetLoadingMaxNumber = int.MaxValue;
@@ -109,9 +103,6 @@ namespace YooAsset
 		private static OfflinePlayModeImpl _offlinePlayModeImpl;
 		private static HostPlayModeImpl _hostPlayModeImpl;
 
-		private static float _releaseTimer;
-		private static float _releaseCD = -1f;
-
 
 		/// <summary>
 		/// 异步初始化
@@ -155,9 +146,6 @@ namespace YooAsset
 				parameters.OperationSystemMaxTimeSlice = 33;
 				YooLogger.Warning($"{nameof(parameters.OperationSystemMaxTimeSlice)} minimum value is 33 milliseconds");
 			}
-
-			if (parameters.AutoReleaseInterval > 0)
-				_releaseCD = parameters.AutoReleaseInterval;
 
 			// 运行模式
 			if (parameters is EditorPlayModeParameters)
@@ -844,17 +832,6 @@ namespace YooAsset
 
 			// 轮询更新资源系统
 			AssetSystem.Update();
-
-			// 自动释放零引用资源
-			if (_releaseCD > 0)
-			{
-				_releaseTimer += UnityEngine.Time.unscaledDeltaTime;
-				if (_releaseTimer >= _releaseCD)
-				{
-					_releaseTimer = 0f;
-					AssetSystem.UnloadUnusedAssets();
-				}
-			}
 		}
 		internal static string MappingToAssetPath(string location)
 		{
