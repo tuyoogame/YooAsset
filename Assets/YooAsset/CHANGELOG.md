@@ -1,6 +1,53 @@
 # CHANGELOG
 
-All notable changes to this package will be documented in this file.   
+All notable changes to this package will be documented in this file.
+
+## [1.0.7] - 2022-05-04
+
+### Fixed
+
+- 修复了异步操作系统的Task再次等待无效的问题。
+
+### Changed
+
+- YooAssets.LoadRawFileAsync()方法重新命名为YooAssets.GetRawFileAsync()
+- YooAssetSetting文件夹支持了全路径搜索定位。
+- 优化了打包的核心逻辑，对依赖资源进行自动划分，以及支持设置依赖资源收集器。
+- 初始化的时候，删除验证失败的资源文件。
+- 构建报告浏览窗口支持排序功能。
+- 着色器变种收集工具支持了配置缓存。
+
+### Added
+
+- 支持可寻址资源定位系统，包括编辑器和运行时环境。
+
+- 增加快速构建模式，用于EditorPlayMode完美模拟线上环境。
+
+- 增加了Window Dock功能，已打开的界面会自动停靠在一个窗体下。
+
+- 增加一个新的打包规则：PackTopDirectory。
+
+- 增加获取资源信息的方法。
+
+  ```c#
+  public static AssetInfo[] GetAssetInfos(string tag)
+  ```
+
+- 增加补丁下载器下载全部资源的方法。
+
+  ```c#
+  public static PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain)
+  ```
+
+- 增加指定资源版本的资源更新下载方法。
+
+  ```c#
+  public static UpdatePackageOperation UpdatePackageAsync(int resourceVersion, int timeout = 60)
+  ```
+
+### Removed
+
+- 移除了自动释放资源的初始化参数。
 
 ## [1.0.6] - 2022-04-26
 
