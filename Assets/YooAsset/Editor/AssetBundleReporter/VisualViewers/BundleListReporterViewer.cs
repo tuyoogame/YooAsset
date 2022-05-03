@@ -1,4 +1,5 @@
 #if UNITY_2019_4_OR_NEWER
+using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -11,6 +12,13 @@ namespace YooAsset.Editor
 {
 	internal class BundleListReporterViewer
 	{
+		private enum ESortMode
+		{
+			BundleName,
+			BundleSize,
+			BundleTags
+		}
+
 		private VisualTreeAsset _visualAsset;
 		private TemplateContainer _root;
 
@@ -18,13 +26,15 @@ namespace YooAsset.Editor
 		private ToolbarButton _topBar2;
 		private ToolbarButton _topBar3;
 		private ToolbarButton _topBar4;
-		private ToolbarButton _topBar5;
 		private ToolbarButton _bottomBar1;
-		private ToolbarButton _bottomBar2;
-		private ToolbarButton _bottomBar3;
 		private ListView _bundleListView;
 		private ListView _includeListView;
+
 		private BuildReport _buildReport;
+		private string _searchKeyWord;
+		private ESortMode _sortMode = ESortMode.BundleName;
+		private bool _descendingSort = false;
+
 
 		/// <summary>
 		/// 初始化页面
@@ -40,35 +50,44 @@ namespace YooAsset.Editor
 				Debug.LogError($"Not found {nameof(BundleListReporterViewer)}.uxml : {uxml}");
 				return;
 			}
-			_root = _visualAsset.CloneTree();
-			_root.style.flexGrow = 1f;
 
-			// 顶部按钮栏
-			_topBar1 = _root.Q<ToolbarButton>("TopBar1");
-			_topBar2 = _root.Q<ToolbarButton>("TopBar2");
-			_topBar3 = _root.Q<ToolbarButton>("TopBar3");
-			_topBar4 = _root.Q<ToolbarButton>("TopBar4");
-			_topBar5 = _root.Q<ToolbarButton>("TopBar5");
+			try
+			{
+				_root = _visualAsset.CloneTree();
+				_root.style.flexGrow = 1f;
 
-			// 底部按钮栏
-			_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
-			_bottomBar2 = _root.Q<ToolbarButton>("BottomBar2");
-			_bottomBar3 = _root.Q<ToolbarButton>("BottomBar3");
+				// 顶部按钮栏
+				_topBar1 = _root.Q<ToolbarButton>("TopBar1");
+				_topBar2 = _root.Q<ToolbarButton>("TopBar2");
+				_topBar3 = _root.Q<ToolbarButton>("TopBar3");
+				_topBar4 = _root.Q<ToolbarButton>("TopBar4");
+				_topBar1.clicked += TopBar1_clicked;
+				_topBar2.clicked += TopBar2_clicked;
+				_topBar3.clicked += TopBar3_clicked;
+				_topBar4.clicked += TopBar4_clicked;
 
-			// 资源包列表
-			_bundleListView = _root.Q<ListView>("TopListView");
-			_bundleListView.makeItem = MakeBundleListViewItem;
-			_bundleListView.bindItem = BindBundleListViewItem;
+				// 底部按钮栏
+				_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
+
+				// 资源包列表
+				_bundleListView = _root.Q<ListView>("TopListView");
+				_bundleListView.makeItem = MakeBundleListViewItem;
+				_bundleListView.bindItem = BindBundleListViewItem;
 #if UNITY_2020_1_OR_NEWER
-			_bundleListView.onSelectionChange += BundleListView_onSelectionChange;
+				_bundleListView.onSelectionChange += BundleListView_onSelectionChange;
 #else
-			_bundleListView.onSelectionChanged += BundleListView_onSelectionChange;
+				_bundleListView.onSelectionChanged += BundleListView_onSelectionChange;
 #endif
 
-			// 包含列表
-			_includeListView = _root.Q<ListView>("BottomListView");
-			_includeListView.makeItem = MakeIncludeListViewItem;
-			_includeListView.bindItem = BindIncludeListViewItem;
+				// 包含列表
+				_includeListView = _root.Q<ListView>("BottomListView");
+				_includeListView.makeItem = MakeIncludeListViewItem;
+				_includeListView.bindItem = BindIncludeListViewItem;
+			}
+			catch (Exception e)
+			{
+				Debug.LogError(e.ToString());
+			}
 		}
 
 		/// <summary>
@@ -77,25 +96,92 @@ namespace YooAsset.Editor
 		public void FillViewData(BuildReport buildReport, string searchKeyWord)
 		{
 			_buildReport = buildReport;
+			_searchKeyWord = searchKeyWord;
+			RefreshView();
+		}
+		private void RefreshView()
+		{
 			_bundleListView.Clear();
 			_bundleListView.ClearSelection();
-			_bundleListView.itemsSource = FilterViewItems(buildReport, searchKeyWord);
+			_bundleListView.itemsSource = FilterAndSortViewItems();
 			_bundleListView.Rebuild();
-			_topBar1.text = $"Bundle Name ({_bundleListView.itemsSource.Count})";
+			RefreshSortingSymbol();
 		}
-		private List<ReportBundleInfo> FilterViewItems(BuildReport buildReport, string searchKeyWord)
+		private List<ReportBundleInfo> FilterAndSortViewItems()
 		{
-			List<ReportBundleInfo> result = new List<ReportBundleInfo>(buildReport.BundleInfos.Count);
-			foreach (var bundleInfo in buildReport.BundleInfos)
+			List<ReportBundleInfo> result = new List<ReportBundleInfo>(_buildReport.BundleInfos.Count);
+
+			// 过滤列表
+			foreach (var bundleInfo in _buildReport.BundleInfos)
 			{
-				if (string.IsNullOrEmpty(searchKeyWord) == false)
+				if (string.IsNullOrEmpty(_searchKeyWord) == false)
 				{
-					if (bundleInfo.BundleName.Contains(searchKeyWord) == false)
+					if (bundleInfo.BundleName.Contains(_searchKeyWord) == false)
 						continue;
 				}
 				result.Add(bundleInfo);
 			}
-			return result;
+
+			// 排序列表
+			if (_sortMode == ESortMode.BundleName)
+			{
+				if (_descendingSort)
+					return result.OrderByDescending(a => a.BundleName).ToList();
+				else
+					return result.OrderBy(a => a.BundleName).ToList();
+			}
+			else if (_sortMode == ESortMode.BundleSize)
+			{
+				if (_descendingSort)
+					return result.OrderByDescending(a => a.SizeBytes).ToList();
+				else
+					return result.OrderBy(a => a.SizeBytes).ToList();
+			}
+			else if (_sortMode == ESortMode.BundleTags)
+			{
+				if(_descendingSort)
+					return result.OrderByDescending(a => a.GetTagsString()).ToList();
+				else
+					return result.OrderBy(a => a.GetTagsString()).ToList();
+			}
+			else
+			{
+				throw new System.NotImplementedException();
+			}
+		}
+		private void RefreshSortingSymbol()
+		{
+			// 刷新符号
+			_topBar1.text = $"Bundle Name ({_bundleListView.itemsSource.Count})";
+			_topBar2.text = "Size";
+			_topBar3.text = "Hash";
+			_topBar4.text = "Tags";
+
+			if (_sortMode == ESortMode.BundleName)
+			{
+				if (_descendingSort)
+					_topBar1.text = $"Bundle Name ({_bundleListView.itemsSource.Count}) ↓";
+				else
+					_topBar1.text = $"Bundle Name ({_bundleListView.itemsSource.Count}) ↑";
+			}
+			else if (_sortMode == ESortMode.BundleSize)
+			{
+				if (_descendingSort)
+					_topBar2.text = "Size ↓";
+				else
+					_topBar2.text = "Size ↑";
+			}
+			else if(_sortMode == ESortMode.BundleTags)
+			{
+				if (_descendingSort)
+					_topBar4.text = "Tags ↓";
+				else
+					_topBar4.text = "Tags ↑";
+			}
+			else
+			{
+				throw new System.NotImplementedException();
+			}
 		}
 
 		/// <summary>
@@ -182,7 +268,7 @@ namespace YooAsset.Editor
 
 			// Tags
 			var label5 = element.Q<Label>("Label5");
-			label5.text = GetTagsString(bundleInfo.Tags);
+			label5.text = bundleInfo.GetTagsString();
 		}
 		private void BundleListView_onSelectionChange(IEnumerable<object> objs)
 		{
@@ -192,15 +278,60 @@ namespace YooAsset.Editor
 				FillIncludeListView(bundleInfo);
 			}
 		}
+		private void TopBar1_clicked()
+		{
+			if (_sortMode != ESortMode.BundleName)
+			{
+				_sortMode = ESortMode.BundleName;
+				_descendingSort = false;
+				RefreshView();
+			}
+			else
+			{
+				_descendingSort = !_descendingSort;
+				RefreshView();
+			}
+		}
+		private void TopBar2_clicked()
+		{
+			if (_sortMode != ESortMode.BundleSize)
+			{
+				_sortMode = ESortMode.BundleSize;
+				_descendingSort = false;
+				RefreshView();
+			}
+			else
+			{
+				_descendingSort = !_descendingSort;
+				RefreshView();
+			}
+		}
+		private void TopBar3_clicked()
+		{
+		}
+		private void TopBar4_clicked()
+		{
+			if (_sortMode != ESortMode.BundleTags)
+			{
+				_sortMode = ESortMode.BundleTags;
+				_descendingSort = false;
+				RefreshView();
+			}
+			else
+			{
+				_descendingSort = !_descendingSort;
+				RefreshView();
+			}
+		}
 
 		// 底部列表相关
 		private void FillIncludeListView(ReportBundleInfo bundleInfo)
 		{
-			List<string> containsList = new List<string>();
+			List<ReportAssetInfo> containsList = new List<ReportAssetInfo>();
 			foreach (var assetInfo in _buildReport.AssetInfos)
 			{
-				if (assetInfo.MainBundle == bundleInfo.BundleName)
-					containsList.Add(assetInfo.AssetPath);
+				if (assetInfo.MainBundleName == bundleInfo.BundleName)
+					containsList.Add(assetInfo);
 			}
 
 			_includeListView.Clear();
@@ -229,16 +360,6 @@ namespace YooAsset.Editor
 				label.name = "Label2";
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
-				//assetSizeLabel.style.flexGrow = 1f;
-				label.style.width = 100;
-				element.Add(label);
-			}
-
-			{
-				var label = new Label();
-				label.name = "Label3";
-				label.style.unityTextAlign = TextAnchor.MiddleLeft;
-				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
 				label.style.width = 280;
 				element.Add(label);
@@ -248,42 +369,16 @@ namespace YooAsset.Editor
 		}
 		private void BindIncludeListViewItem(VisualElement element, int index)
 		{
-			List<string> containsList = _includeListView.itemsSource as List<string>;
-			string assetPath = containsList[index];
+			List<ReportAssetInfo> containsList = _includeListView.itemsSource as List<ReportAssetInfo>;
+			ReportAssetInfo assetInfo = containsList[index];
 
 			// Asset Path
 			var label1 = element.Q<Label>("Label1");
-			label1.text = assetPath;
-
-			// Size
-			var label2 = element.Q<Label>("Label2");
-			label2.text = GetAssetFileSize(assetPath);
+			label1.text = assetInfo.AssetPath;
 
 			// GUID
-			var label3 = element.Q<Label>("Label3");
-			label3.text = AssetDatabase.AssetPathToGUID(assetPath);
-		}
-		
-		private string GetAssetFileSize(string assetPath)
-		{
-			string fullPath = EditorTools.GetProjectPath() + "/" + assetPath;
-			if (File.Exists(fullPath) == false)
-				return "unknown";
-			else
-				return (EditorTools.GetFileSize(fullPath) / 1024f).ToString("f1") + " KB";
-		}
-		private string GetTagsString(string[] tags)
-		{
-			string result = string.Empty;
-			if (tags != null)
-			{
-				for (int i = 0; i < tags.Length; i++)
-				{
-					result += tags[i];
-					result += ";";
-				}
-			}
-			return result;
+			var label2 = element.Q<Label>("Label2");
+			label2.text = assetInfo.AssetGUID;
 		}
 	}
 }

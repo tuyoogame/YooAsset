@@ -1,5 +1,5 @@
 #if UNITY_2019_4_OR_NEWER
-using System.IO;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEditor;
@@ -11,18 +11,26 @@ namespace YooAsset.Editor
 {
 	internal class AssetListReporterViewer
 	{
+		private enum ESortMode
+		{
+			AssetPath,
+			BundleName
+		}
+
 		private VisualTreeAsset _visualAsset;
 		private TemplateContainer _root;
 
 		private ToolbarButton _topBar1;
 		private ToolbarButton _topBar2;
-		private ToolbarButton _topBar3;
 		private ToolbarButton _bottomBar1;
-		private ToolbarButton _bottomBar2;
-		private ToolbarButton _bottomBar3;
 		private ListView _assetListView;
 		private ListView _dependListView;
+
 		private BuildReport _buildReport;
+		private string _searchKeyWord;
+		private ESortMode _sortMode = ESortMode.AssetPath;
+		private bool _descendingSort = false;
+
 
 		/// <summary>
 		/// 初始化页面
@@ -38,36 +46,40 @@ namespace YooAsset.Editor
 				Debug.LogError($"Not found {nameof(AssetListReporterViewer)}.uxml : {uxml}");
 				return;
 			}
-			_root = _visualAsset.CloneTree();
-			_root.style.flexGrow = 1f;
 
-			// 顶部按钮栏
-			_topBar1 = _root.Q<ToolbarButton>("TopBar1");
-			_topBar2 = _root.Q<ToolbarButton>("TopBar2");
-			_topBar3 = _root.Q<ToolbarButton>("TopBar3");
-			_topBar1.clicked += TopBar1_clicked;
-			_topBar2.clicked += TopBar2_clicked;
-			_topBar3.clicked += TopBar3_clicked;
+			try
+			{
+				_root = _visualAsset.CloneTree();
+				_root.style.flexGrow = 1f;
 
-			// 底部按钮栏
-			_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
-			_bottomBar2 = _root.Q<ToolbarButton>("BottomBar2");
-			_bottomBar3 = _root.Q<ToolbarButton>("BottomBar3");
-			
-			// 资源列表
-			_assetListView = _root.Q<ListView>("TopListView");
-			_assetListView.makeItem = MakeAssetListViewItem;
-			_assetListView.bindItem = BindAssetListViewItem;
+				// 顶部按钮栏
+				_topBar1 = _root.Q<ToolbarButton>("TopBar1");
+				_topBar2 = _root.Q<ToolbarButton>("TopBar2");
+				_topBar1.clicked += TopBar1_clicked;
+				_topBar2.clicked += TopBar2_clicked;
 
+				// 底部按钮栏
+				_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
+
+				// 资源列表
+				_assetListView = _root.Q<ListView>("TopListView");
+				_assetListView.makeItem = MakeAssetListViewItem;
+				_assetListView.bindItem = BindAssetListViewItem;
 #if UNITY_2020_1_OR_NEWER
-			_assetListView.onSelectionChange += AssetListView_onSelectionChange;
+				_assetListView.onSelectionChange += AssetListView_onSelectionChange;
 #else
-			_assetListView.onSelectionChanged += AssetListView_onSelectionChange;
+				_assetListView.onSelectionChanged += AssetListView_onSelectionChange;
 #endif
-			// 依赖列表
-			_dependListView = _root.Q<ListView>("BottomListView");
-			_dependListView.makeItem = MakeDependListViewItem;
-			_dependListView.bindItem = BindDependListViewItem;
+
+				// 依赖列表
+				_dependListView = _root.Q<ListView>("BottomListView");
+				_dependListView.makeItem = MakeDependListViewItem;
+				_dependListView.bindItem = BindDependListViewItem;
+			}
+			catch (Exception e)
+			{
+				Debug.LogError(e.ToString());
+			}
 		}
 
 		/// <summary>
@@ -76,25 +88,76 @@ namespace YooAsset.Editor
 		public void FillViewData(BuildReport buildReport, string searchKeyWord)
 		{
 			_buildReport = buildReport;
+			_searchKeyWord = searchKeyWord;
+			RefreshView();
+		}
+		private void RefreshView()
+		{
 			_assetListView.Clear();
 			_assetListView.ClearSelection();
-			_assetListView.itemsSource = FilterViewItems(buildReport, searchKeyWord);
+			_assetListView.itemsSource = FilterAndSortViewItems();
 			_assetListView.Rebuild();
-			_topBar1.text = $"Asset Path ({_assetListView.itemsSource.Count})";
+			RefreshSortingSymbol();
 		}
-		private List<ReportAssetInfo> FilterViewItems(BuildReport buildReport, string searchKeyWord)
+		private List<ReportAssetInfo> FilterAndSortViewItems()
 		{
-			List<ReportAssetInfo> result = new List<ReportAssetInfo>(buildReport.AssetInfos.Count);
-			foreach (var assetInfo in buildReport.AssetInfos)
+			List<ReportAssetInfo> result = new List<ReportAssetInfo>(_buildReport.AssetInfos.Count);
+
+			// 过滤列表
+			foreach (var assetInfo in _buildReport.AssetInfos)
 			{
-				if(string.IsNullOrEmpty(searchKeyWord) == false)
+				if (string.IsNullOrEmpty(_searchKeyWord) == false)
 				{
-					if (assetInfo.AssetPath.Contains(searchKeyWord) == false)
-						continue;					
+					if (assetInfo.AssetPath.Contains(_searchKeyWord) == false)
+						continue;
 				}
 				result.Add(assetInfo);
 			}
-			return result;
+
+			// 排序列表
+			if (_sortMode == ESortMode.AssetPath)
+			{
+				if (_descendingSort)
+					return result.OrderByDescending(a => a.AssetPath).ToList();
+				else
+					return result.OrderBy(a => a.AssetPath).ToList();
+			}
+			else if (_sortMode == ESortMode.BundleName)
+			{
+				if (_descendingSort)
+					return result.OrderByDescending(a => a.MainBundleName).ToList();
+				else
+					return result.OrderBy(a => a.MainBundleName).ToList();
+			}
+			else
+			{
+				throw new System.NotImplementedException();
+			}
+		}
+		private void RefreshSortingSymbol()
+		{
+			// 刷新符号
+			_topBar1.text = $"Asset Path ({_assetListView.itemsSource.Count})";
+			_topBar2.text = "Main Bundle";
+
+			if (_sortMode == ESortMode.AssetPath)
+			{
+				if (_descendingSort)
+					_topBar1.text = $"Asset Path ({_assetListView.itemsSource.Count}) ↓";
+				else
+					_topBar1.text = $"Asset Path ({_assetListView.itemsSource.Count}) ↑";
+			}
+			else if (_sortMode == ESortMode.BundleName)
+			{
+				if (_descendingSort)
+					_topBar2.text = "Main Bundle ↓";
+				else
+					_topBar2.text = "Main Bundle ↑";
+			}
+			else
+			{
+				throw new System.NotImplementedException();
+			}
 		}
 
 		/// <summary>
@@ -135,18 +198,8 @@ namespace YooAsset.Editor
 				label.name = "Label2";
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
-				//label.style.flexGrow = 1f;
-				label.style.width = 100;
-				element.Add(label);
-			}
-
-			{
-				var label = new Label();
-				label.name = "Label3";
-				label.style.unityTextAlign = TextAnchor.MiddleLeft;
-				label.style.marginLeft = 3f;
 				label.style.flexGrow = 1f;
-				label.style.width = 145;
+				label.style.width = 150;
 				element.Add(label);
 			}
 
@@ -156,19 +209,15 @@ namespace YooAsset.Editor
 		{
 			var sourceData = _assetListView.itemsSource as List<ReportAssetInfo>;
 			var assetInfo = sourceData[index];
-			var bundleInfo = _buildReport.GetBundleInfo(assetInfo.MainBundle);
+			var bundleInfo = _buildReport.GetBundleInfo(assetInfo.MainBundleName);
 
 			// Asset Path
 			var label1 = element.Q<Label>("Label1");
 			label1.text = assetInfo.AssetPath;
 
-			// Size
-			var label2 = element.Q<Label>("Label2");
-			label2.text = GetAssetFileSize(assetInfo.AssetPath);
-
 			// Main Bundle
-			var label3 = element.Q<Label>("Label3");
-			label3.text = bundleInfo.BundleName;
+			var label2 = element.Q<Label>("Label2");
+			label2.text = bundleInfo.BundleName;
 		}
 		private void AssetListView_onSelectionChange(IEnumerable<object> objs)
 		{
@@ -179,22 +228,41 @@ namespace YooAsset.Editor
 			}
 		}
 		private void TopBar1_clicked()
-		{		
+		{
+			if (_sortMode != ESortMode.AssetPath)
+			{
+				_sortMode = ESortMode.AssetPath;
+				_descendingSort = false;
+				RefreshView();
+			}
+			else
+			{
+				_descendingSort = !_descendingSort;
+				RefreshView();
+			}
 		}
 		private void TopBar2_clicked()
 		{
-		}
-		private void TopBar3_clicked()
-		{
+			if (_sortMode != ESortMode.BundleName)
+			{
+				_sortMode = ESortMode.BundleName;
+				_descendingSort = false;
+				RefreshView();
+			}
+			else
+			{
+				_descendingSort = !_descendingSort;
+				RefreshView();
+			}
 		}
 
 		// 依赖列表相关
 		private void FillDependListView(ReportAssetInfo assetInfo)
 		{
 			List<ReportBundleInfo> bundles = new List<ReportBundleInfo>();
-			var mainBundle = _buildReport.GetBundleInfo(assetInfo.MainBundle);
+			var mainBundle = _buildReport.GetBundleInfo(assetInfo.MainBundleName);
 			bundles.Add(mainBundle);
-			foreach(string dependBundleName in assetInfo.DependBundles)
+			foreach (string dependBundleName in assetInfo.DependBundles)
 			{
 				var dependBundle = _buildReport.GetBundleInfo(dependBundleName);
 				bundles.Add(dependBundle);
@@ -259,15 +327,6 @@ namespace YooAsset.Editor
 			// Hash
 			var label3 = element.Q<Label>("Label3");
 			label3.text = bundleInfo.Hash;
-		}
-
-		private string GetAssetFileSize(string assetPath)
-		{
-			string fullPath = EditorTools.GetProjectPath() + "/" + assetPath;
-			if (File.Exists(fullPath) == false)
-				return "unknown";
-			else
-				return (EditorTools.GetFileSize(fullPath) / 1024f).ToString("f1") + " KB";
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -36,5 +37,13 @@ namespace YooAsset.Editor
 		/// Flags
 		/// </summary>
 		public int Flags;
+
+		public string GetTagsString()
+		{
+			if (Tags != null)
+				return String.Join(";", Tags);
+			else
+				return string.Empty;
+		}
 	}
 }

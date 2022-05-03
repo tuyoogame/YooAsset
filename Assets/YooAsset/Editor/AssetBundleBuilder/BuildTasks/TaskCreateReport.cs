@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
 
 namespace YooAsset.Editor
 {
@@ -62,8 +63,11 @@ namespace YooAsset.Editor
 			{
 				var mainBundle = patchManifest.BundleList[patchAsset.BundleID];
 				ReportAssetInfo reportAssetInfo = new ReportAssetInfo();
+				reportAssetInfo.Address = patchAsset.Address;
 				reportAssetInfo.AssetPath = patchAsset.AssetPath;
-				reportAssetInfo.MainBundle = mainBundle.BundleName;
+				reportAssetInfo.AssetGUID = AssetDatabase.AssetPathToGUID(patchAsset.AssetPath);
+				reportAssetInfo.MainBundleName = mainBundle.BundleName;
+				reportAssetInfo.MainBundleSize = mainBundle.SizeBytes;
 				reportAssetInfo.DependBundles = GetDependBundles(patchManifest, patchAsset);
 				reportAssetInfo.DependAssets = GetDependAssets(buildMapContext, mainBundle.BundleName, patchAsset.AssetPath);
 				buildReport.AssetInfos.Add(reportAssetInfo);
