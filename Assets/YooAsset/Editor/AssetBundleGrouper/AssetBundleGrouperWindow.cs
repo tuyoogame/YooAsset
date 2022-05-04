@@ -402,7 +402,13 @@ namespace YooAsset.Editor
 
 			// Foldout
 			var foldout = element.Q<Foldout>("Foldout1");
-			RefreshFoldout(foldout, selectGrouper, collector);
+			foldout.RegisterValueChangedCallback(evt =>
+			{
+				if (evt.newValue)
+					RefreshFoldout(foldout, selectGrouper, collector);
+				else
+					foldout.Clear();
+			});
 
 			// Remove Button
 			var removeBtn = element.Q<Button>("Button1");
@@ -419,7 +425,10 @@ namespace YooAsset.Editor
 				collector.CollectPath = AssetDatabase.GetAssetPath(evt.newValue);
 				objectField1.value.name = collector.CollectPath;
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
-				RefreshFoldout(foldout, selectGrouper, collector);
+				if (foldout.value)
+				{
+					RefreshFoldout(foldout, selectGrouper, collector);
+				}
 			});
 
 			// Collector Type
@@ -429,7 +438,10 @@ namespace YooAsset.Editor
 			{
 				collector.CollectorType = StringUtility.NameToEnum<ECollectorType>(evt.newValue);
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
-				RefreshFoldout(foldout, selectGrouper, collector);
+				if (foldout.value)
+				{
+					RefreshFoldout(foldout, selectGrouper, collector);
+				}
 			});
 
 			// Address Rule
@@ -441,7 +453,10 @@ namespace YooAsset.Editor
 				{
 					collector.AddressRuleName = evt.newValue;
 					AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
-					RefreshFoldout(foldout, selectGrouper, collector);
+					if (foldout.value)
+					{
+						RefreshFoldout(foldout, selectGrouper, collector);
+					}
 				});
 			}
 
@@ -452,7 +467,10 @@ namespace YooAsset.Editor
 			{
 				collector.PackRuleName = evt.newValue;
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
-				RefreshFoldout(foldout, selectGrouper, collector);
+				if (foldout.value)
+				{
+					RefreshFoldout(foldout, selectGrouper, collector);
+				}
 			});
 
 			// Filter Rule
@@ -462,7 +480,10 @@ namespace YooAsset.Editor
 			{
 				collector.FilterRuleName = evt.newValue;
 				AssetBundleGrouperSettingData.ModifyCollector(selectGrouper, collector);
-				RefreshFoldout(foldout, selectGrouper, collector);
+				if (foldout.value)
+				{
+					RefreshFoldout(foldout, selectGrouper, collector);
+				}
 			});
 
 			// Tags
