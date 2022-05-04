@@ -33,8 +33,8 @@ namespace YooAsset.Editor
 				buildReport.Summary.EnableAddressable = buildParameters.Parameters.EnableAddressable;
 				buildReport.Summary.EnableAutoCollect = buildParameters.Parameters.EnableAutoCollect;
 				buildReport.Summary.AppendFileExtension = buildParameters.Parameters.AppendFileExtension;
-				buildReport.Summary.AutoCollectShaders = AssetBundleGrouperSettingData.Setting.AutoCollectShaders;
-				buildReport.Summary.ShadersBundleName = AssetBundleGrouperSettingData.Setting.ShadersBundleName;
+				buildReport.Summary.AutoCollectShaders = AssetBundleCollectorSettingData.Setting.AutoCollectShaders;
+				buildReport.Summary.ShadersBundleName = AssetBundleCollectorSettingData.Setting.ShadersBundleName;
 				buildReport.Summary.EncryptionServicesClassName = buildParameters.Parameters.EncryptionServices == null ?
 					"null" : buildParameters.Parameters.EncryptionServices.GetType().FullName;
 

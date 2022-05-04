@@ -5,13 +5,13 @@ namespace YooAsset.Editor
 	{
 		public string AssetPath;
 		public string CollectPath;
-		public string GrouperName;
+		public string GroupName;
 
-		public AddressRuleData(string assetPath, string collectPath, string grouperName)
+		public AddressRuleData(string assetPath, string collectPath, string groupName)
 		{
 			AssetPath = assetPath;
 			CollectPath = collectPath;
-			GrouperName = grouperName;
+			GroupName = groupName;
 		}
 	}
 

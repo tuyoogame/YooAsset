@@ -16,12 +16,12 @@ namespace YooAsset.Editor
 	/// <summary>
 	/// 以组名+文件名为定位地址
 	/// </summary>
-	public class AddressByGrouperAndFileName : IAddressRule
+	public class AddressByGroupAndFileName : IAddressRule
 	{
 		string IAddressRule.GetAssetAddress(AddressRuleData data)
 		{
 			string fileName = Path.GetFileNameWithoutExtension(data.AssetPath);
-			return $"{data.GrouperName}_{fileName}";
+			return $"{data.GroupName}_{fileName}";
 		}
 	}
 

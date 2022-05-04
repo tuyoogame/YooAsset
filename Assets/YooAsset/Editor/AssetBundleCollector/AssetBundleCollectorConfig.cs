@@ -8,14 +8,14 @@ using UnityEngine;
 
 namespace YooAsset.Editor
 {
-	public class AssetBundleGrouperConfig
+	public class AssetBundleCollectorConfig
 	{
 		public const string XmlShader = "Shader";
 		public const string XmlAutoCollectShader = "AutoCollectShader";
 		public const string XmlShaderBundleName = "ShaderBundleName";
-		public const string XmlGrouper = "Grouper";
-		public const string XmlGrouperName = "GrouperName";
-		public const string XmlGrouperDesc = "GrouperDesc";
+		public const string XmlGroup = "Group";
+		public const string XmlGroupName = "GroupName";
+		public const string XmlGroupDesc = "GroupDesc";
 		public const string XmlCollector = "Collector";
 		public const string XmlCollectPath = "CollectPath";
 		public const string XmlCollectorType = "CollectType";
@@ -57,26 +57,26 @@ namespace YooAsset.Editor
 			}
 
 			// 读取分组配置
-			List<AssetBundleGrouper> grouperTemper = new List<AssetBundleGrouper>();
-			var grouperNodeList = root.GetElementsByTagName(XmlGrouper);
-			foreach (var grouperNode in grouperNodeList)
+			List<AssetBundleCollectorGroup> groupTemper = new List<AssetBundleCollectorGroup>();
+			var groupNodeList = root.GetElementsByTagName(XmlGroup);
+			foreach (var groupNode in groupNodeList)
 			{
-				XmlElement grouperElement = grouperNode as XmlElement;
-				if (grouperElement.HasAttribute(XmlGrouperName) == false)
-					throw new Exception($"Not found attribute {XmlGrouperName} in {XmlGrouper}");
-				if (grouperElement.HasAttribute(XmlGrouperDesc) == false)
-					throw new Exception($"Not found attribute {XmlGrouperDesc} in {XmlGrouper}");
-				if (grouperElement.HasAttribute(XmlAssetTags) == false)
-					throw new Exception($"Not found attribute {XmlAssetTags} in {XmlGrouper}");
+				XmlElement groupElement = groupNode as XmlElement;
+				if (groupElement.HasAttribute(XmlGroupName) == false)
+					throw new Exception($"Not found attribute {XmlGroupName} in {XmlGroup}");
+				if (groupElement.HasAttribute(XmlGroupDesc) == false)
+					throw new Exception($"Not found attribute {XmlGroupDesc} in {XmlGroup}");
+				if (groupElement.HasAttribute(XmlAssetTags) == false)
+					throw new Exception($"Not found attribute {XmlAssetTags} in {XmlGroup}");
 
-				AssetBundleGrouper grouper = new AssetBundleGrouper();
-				grouper.GrouperName = grouperElement.GetAttribute(XmlGrouperName);
-				grouper.GrouperDesc = grouperElement.GetAttribute(XmlGrouperDesc);
-				grouper.AssetTags = grouperElement.GetAttribute(XmlAssetTags);
-				grouperTemper.Add(grouper);
+				AssetBundleCollectorGroup group = new AssetBundleCollectorGroup();
+				group.GroupName = groupElement.GetAttribute(XmlGroupName);
+				group.GroupDesc = groupElement.GetAttribute(XmlGroupDesc);
+				group.AssetTags = groupElement.GetAttribute(XmlAssetTags);
+				groupTemper.Add(group);
 
 				// 读取收集器配置
-				var collectorNodeList = grouperElement.GetElementsByTagName(XmlCollector);
+				var collectorNodeList = groupElement.GetElementsByTagName(XmlCollector);
 				foreach (var collectorNode in collectorNodeList)
 				{
 					XmlElement collectorElement = collectorNode as XmlElement;
@@ -100,16 +100,16 @@ namespace YooAsset.Editor
 					collector.PackRuleName = collectorElement.GetAttribute(XmlPackRule);
 					collector.FilterRuleName = collectorElement.GetAttribute(XmlFilterRule);
 					collector.AssetTags = collectorElement.GetAttribute(XmlAssetTags); ;
-					grouper.Collectors.Add(collector);
+					group.Collectors.Add(collector);
 				}
 			}
 
 			// 保存配置数据
-			AssetBundleGrouperSettingData.ClearAll();
-			AssetBundleGrouperSettingData.Setting.AutoCollectShaders = autoCollectShaders;
-			AssetBundleGrouperSettingData.Setting.ShadersBundleName = shaderBundleName;
-			AssetBundleGrouperSettingData.Setting.Groupers.AddRange(grouperTemper);
-			AssetBundleGrouperSettingData.SaveFile();
+			AssetBundleCollectorSettingData.ClearAll();
+			AssetBundleCollectorSettingData.Setting.AutoCollectShaders = autoCollectShaders;
+			AssetBundleCollectorSettingData.Setting.ShadersBundleName = shaderBundleName;
+			AssetBundleCollectorSettingData.Setting.Groups.AddRange(groupTemper);
+			AssetBundleCollectorSettingData.SaveFile();
 			Debug.Log($"导入配置完毕！");
 		}
 
@@ -132,20 +132,20 @@ namespace YooAsset.Editor
 
 			// 设置着色器配置
 			var shaderElement = xmlDoc.CreateElement(XmlShader);
-			shaderElement.SetAttribute(XmlAutoCollectShader, AssetBundleGrouperSettingData.Setting.AutoCollectShaders.ToString());
-			shaderElement.SetAttribute(XmlShaderBundleName, AssetBundleGrouperSettingData.Setting.ShadersBundleName);
+			shaderElement.SetAttribute(XmlAutoCollectShader, AssetBundleCollectorSettingData.Setting.AutoCollectShaders.ToString());
+			shaderElement.SetAttribute(XmlShaderBundleName, AssetBundleCollectorSettingData.Setting.ShadersBundleName);
 
 			// 设置分组配置
-			foreach (var grouper in AssetBundleGrouperSettingData.Setting.Groupers)
+			foreach (var group in AssetBundleCollectorSettingData.Setting.Groups)
 			{
-				var grouperElement = xmlDoc.CreateElement(XmlGrouper);
-				grouperElement.SetAttribute(XmlGrouperName, grouper.GrouperName);
-				grouperElement.SetAttribute(XmlGrouperDesc, grouper.GrouperDesc);
-				grouperElement.SetAttribute(XmlAssetTags, grouper.AssetTags);
-				root.AppendChild(grouperElement);
+				var groupElement = xmlDoc.CreateElement(XmlGroup);
+				groupElement.SetAttribute(XmlGroupName, group.GroupName);
+				groupElement.SetAttribute(XmlGroupDesc, group.GroupDesc);
+				groupElement.SetAttribute(XmlAssetTags, group.AssetTags);
+				root.AppendChild(groupElement);
 
 				// 设置收集器配置
-				foreach (var collector in grouper.Collectors)
+				foreach (var collector in group.Collectors)
 				{
 					var collectorElement = xmlDoc.CreateElement(XmlCollector);
 					collectorElement.SetAttribute(XmlCollectPath, collector.CollectPath);
@@ -154,7 +154,7 @@ namespace YooAsset.Editor
 					collectorElement.SetAttribute(XmlPackRule, collector.PackRuleName);
 					collectorElement.SetAttribute(XmlFilterRule, collector.FilterRuleName);
 					collectorElement.SetAttribute(XmlAssetTags, collector.AssetTags);
-					grouperElement.AppendChild(collectorElement);
+					groupElement.AppendChild(collectorElement);
 				}
 			}
 

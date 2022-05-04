@@ -16,10 +16,10 @@ namespace YooAsset.Editor
 			Dictionary<string, BuildAssetInfo> buildAssetDic = new Dictionary<string, BuildAssetInfo>(1000);
 
 			// 1. 检测配置合法性
-			AssetBundleGrouperSettingData.Setting.CheckConfigError();
+			AssetBundleCollectorSettingData.Setting.CheckConfigError();
 
 			// 2. 获取所有主动收集的资源
-			List<CollectAssetInfo> allCollectAssets = AssetBundleGrouperSettingData.Setting.GetAllCollectAssets();
+			List<CollectAssetInfo> allCollectAssets = AssetBundleCollectorSettingData.Setting.GetAllCollectAssets();
 
 			// 3. 剔除未被引用的依赖资源
 			List<CollectAssetInfo> removeDependList = new List<CollectAssetInfo>();

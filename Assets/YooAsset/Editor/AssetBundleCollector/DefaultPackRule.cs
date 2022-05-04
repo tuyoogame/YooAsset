@@ -78,11 +78,11 @@ namespace YooAsset.Editor
 	/// 以分组名称作为资源包名
 	/// 注意：收集的所有文件打进一个资源包
 	/// </summary>
-	public class PackGrouper : IPackRule
+	public class PackGroup : IPackRule
 	{
 		string IPackRule.GetBundleName(PackRuleData data)
 		{
-			return data.GrouperName;
+			return data.GroupName;
 		}
 	}
 

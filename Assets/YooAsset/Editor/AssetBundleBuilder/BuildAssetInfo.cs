@@ -147,11 +147,11 @@ namespace YooAsset.Editor
 				if (IsRawAsset)
 					throw new Exception("Should never get here !");
 
-				if (AssetBundleGrouperSettingData.Setting.AutoCollectShaders)
+				if (AssetBundleCollectorSettingData.Setting.AutoCollectShaders)
 				{
 					if (IsShaderAsset)
 					{
-						string shareBundleName = $"{AssetBundleGrouperSettingData.Setting.ShadersBundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+						string shareBundleName = $"{AssetBundleCollectorSettingData.Setting.ShadersBundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
 						_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
 						return;
 					}

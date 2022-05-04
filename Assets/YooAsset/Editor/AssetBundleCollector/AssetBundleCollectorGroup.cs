@@ -3,30 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	public class AssetBundleGrouperSetting : ScriptableObject
+	[Serializable]
+	public class AssetBundleCollectorGroup
 	{
 		/// <summary>
-		/// 是否启用可寻址资源定位
+		/// 分组名称
 		/// </summary>
-		public bool EnableAddressable = false;
+		public string GroupName = string.Empty;
 
 		/// <summary>
-		/// 自动收集着色器
+		/// 分组描述
 		/// </summary>
-		public bool AutoCollectShaders = true;
+		public string GroupDesc = string.Empty;
 
 		/// <summary>
-		/// 自动收集的着色器资源包名称
+		/// 资源分类标签
 		/// </summary>
-		public string ShadersBundleName = "myshaders";
+		public string AssetTags = string.Empty;
 
 		/// <summary>
-		/// 分组列表
+		/// 分组的收集器列表
 		/// </summary>
-		public List<AssetBundleGrouper> Groupers = new List<AssetBundleGrouper>();
+		public List<AssetBundleCollector> Collectors = new List<AssetBundleCollector>();
 
 
 		/// <summary>
@@ -34,9 +36,9 @@ namespace YooAsset.Editor
 		/// </summary>
 		public void CheckConfigError()
 		{
-			foreach (var grouper in Groupers)
+			foreach (var collector in Collectors)
 			{
-				grouper.CheckConfigError();
+				collector.CheckConfigError();
 			}
 		}
 
@@ -48,20 +50,20 @@ namespace YooAsset.Editor
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
 
 			// 收集打包资源
-			foreach (var grouper in Groupers)
+			foreach (var collector in Collectors)
 			{
-				var temper = grouper.GetAllCollectAssets();
+				var temper = collector.GetAllCollectAssets(this);
 				foreach (var assetInfo in temper)
 				{
 					if (result.ContainsKey(assetInfo.AssetPath) == false)
 						result.Add(assetInfo.AssetPath, assetInfo);
 					else
-						throw new Exception($"The collecting asset file is existed : {assetInfo.AssetPath} in grouper setting.");
+						throw new Exception($"The collecting asset file is existed : {assetInfo.AssetPath} in group : {GroupName}");
 				}
 			}
 
 			// 检测可寻址地址是否重复
-			if (EnableAddressable)
+			if (AssetBundleCollectorSettingData.Setting.EnableAddressable)
 			{
 				HashSet<string> adressTemper = new HashSet<string>();
 				foreach (var collectInfoPair in result)
@@ -72,7 +74,7 @@ namespace YooAsset.Editor
 						if (adressTemper.Contains(address) == false)
 							adressTemper.Add(address);
 						else
-							throw new Exception($"The address is existed : {address} in grouper setting.");
+							throw new Exception($"The address is existed : {address} in group : {GroupName}");
 					}
 				}
 			}

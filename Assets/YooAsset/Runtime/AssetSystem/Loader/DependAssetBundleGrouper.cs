@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	internal class DependAssetBundleGrouper
+	internal class DependAssetBundleGroup
 	{
 		/// <summary>
 		/// 依赖的资源包加载器列表
@@ -12,7 +12,7 @@ namespace YooAsset
 		private readonly List<AssetBundleLoaderBase> _dependBundles;
 
 
-		public DependAssetBundleGrouper(string assetPath)
+		public DependAssetBundleGroup(string assetPath)
 		{
 			_dependBundles = AssetSystem.CreateDependAssetBundleLoaders(assetPath);
 		}

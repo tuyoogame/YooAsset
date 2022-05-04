@@ -5,19 +5,19 @@ namespace YooAsset.Editor
 	{
 		public string AssetPath;		
 		public string CollectPath;
-		public string GrouperName;
+		public string GroupName;
 
 		public PackRuleData(string assetPath)
 		{
 			AssetPath = assetPath;
 			CollectPath = string.Empty;
-			GrouperName = string.Empty;
+			GroupName = string.Empty;
 		}
-		public PackRuleData(string assetPath, string collectPath, string grouperName)
+		public PackRuleData(string assetPath, string collectPath, string groupName)
 		{
 			AssetPath = assetPath;
 			CollectPath = collectPath;
-			GrouperName = grouperName;
+			GroupName = groupName;
 		}
 	}
 

@@ -19,7 +19,7 @@ namespace YooAsset.Editor
 			buildParameters.BuildMode = EBuildMode.FastRunBuild;
 			buildParameters.BuildVersion = AssetBundleBuilderSettingData.Setting.BuildVersion;
 			buildParameters.BuildinTags = AssetBundleBuilderSettingData.Setting.BuildTags;
-			buildParameters.EnableAddressable = AssetBundleGrouperSettingData.Setting.EnableAddressable;
+			buildParameters.EnableAddressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
 
 			AssetBundleBuilder builder = new AssetBundleBuilder();
 			bool buildResult = builder.Run(buildParameters);
