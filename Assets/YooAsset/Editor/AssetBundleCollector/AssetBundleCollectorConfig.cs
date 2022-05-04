@@ -10,7 +10,8 @@ namespace YooAsset.Editor
 {
 	public class AssetBundleCollectorConfig
 	{
-		public const string XmlShader = "Shader";
+		public const string XmlCommon = "Common";
+		public const string XmlEnableAddressable = "AutoAddressable";
 		public const string XmlAutoCollectShader = "AutoCollectShader";
 		public const string XmlShaderBundleName = "ShaderBundleName";
 		public const string XmlGroup = "Group";
@@ -41,19 +42,23 @@ namespace YooAsset.Editor
 			XmlElement root = xml.DocumentElement;
 
 			// 读取着色器配置
+			bool enableAddressable = false;
 			bool autoCollectShaders = false;
 			string shaderBundleName = string.Empty;
-			var shaderNodeList = root.GetElementsByTagName(XmlShader);
-			if (shaderNodeList.Count > 0)
+			var commonNodeList = root.GetElementsByTagName(XmlCommon);
+			if (commonNodeList.Count > 0)
 			{
-				XmlElement shaderElement = shaderNodeList[0] as XmlElement;
-				if (shaderElement.HasAttribute(XmlAutoCollectShader) == false)
-					throw new Exception($"Not found attribute {XmlAutoCollectShader} in {XmlShader}");
-				if (shaderElement.HasAttribute(XmlShaderBundleName) == false)
-					throw new Exception($"Not found attribute {XmlShaderBundleName} in {XmlShader}");
+				XmlElement commonElement = commonNodeList[0] as XmlElement;
+				if (commonElement.HasAttribute(XmlEnableAddressable) == false)
+					throw new Exception($"Not found attribute {XmlEnableAddressable} in {XmlCommon}");
+				if (commonElement.HasAttribute(XmlAutoCollectShader) == false)
+					throw new Exception($"Not found attribute {XmlAutoCollectShader} in {XmlCommon}");
+				if (commonElement.HasAttribute(XmlShaderBundleName) == false)
+					throw new Exception($"Not found attribute {XmlShaderBundleName} in {XmlCommon}");
 
-				autoCollectShaders = shaderElement.GetAttribute(XmlAutoCollectShader) == "True" ? true : false;
-				shaderBundleName = shaderElement.GetAttribute(XmlShaderBundleName);
+				enableAddressable = commonElement.GetAttribute(XmlEnableAddressable) == "True" ? true : false;
+				autoCollectShaders = commonElement.GetAttribute(XmlAutoCollectShader) == "True" ? true : false;
+				shaderBundleName = commonElement.GetAttribute(XmlShaderBundleName);
 			}
 
 			// 读取分组配置
@@ -106,6 +111,7 @@ namespace YooAsset.Editor
 
 			// 保存配置数据
 			AssetBundleCollectorSettingData.ClearAll();
+			AssetBundleCollectorSettingData.Setting.EnableAddressable = enableAddressable;
 			AssetBundleCollectorSettingData.Setting.AutoCollectShaders = autoCollectShaders;
 			AssetBundleCollectorSettingData.Setting.ShadersBundleName = shaderBundleName;
 			AssetBundleCollectorSettingData.Setting.Groups.AddRange(groupTemper);
@@ -131,9 +137,11 @@ namespace YooAsset.Editor
 			XmlElement root = xmlDoc.DocumentElement;
 
 			// 设置着色器配置
-			var shaderElement = xmlDoc.CreateElement(XmlShader);
-			shaderElement.SetAttribute(XmlAutoCollectShader, AssetBundleCollectorSettingData.Setting.AutoCollectShaders.ToString());
-			shaderElement.SetAttribute(XmlShaderBundleName, AssetBundleCollectorSettingData.Setting.ShadersBundleName);
+			var commonElement = xmlDoc.CreateElement(XmlCommon);
+			commonElement.SetAttribute(XmlEnableAddressable, AssetBundleCollectorSettingData.Setting.EnableAddressable.ToString());
+			commonElement.SetAttribute(XmlAutoCollectShader, AssetBundleCollectorSettingData.Setting.AutoCollectShaders.ToString());
+			commonElement.SetAttribute(XmlShaderBundleName, AssetBundleCollectorSettingData.Setting.ShadersBundleName);
+			root.AppendChild(commonElement);
 
 			// 设置分组配置
 			foreach (var group in AssetBundleCollectorSettingData.Setting.Groups)
