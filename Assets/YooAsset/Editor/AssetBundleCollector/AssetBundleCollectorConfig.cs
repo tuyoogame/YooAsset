@@ -10,6 +10,9 @@ namespace YooAsset.Editor
 {
 	public class AssetBundleCollectorConfig
 	{
+		public const string ConfigVersion = "1.0";
+
+		public const string XmlVersion = "Version";
 		public const string XmlCommon = "Common";
 		public const string XmlEnableAddressable = "AutoAddressable";
 		public const string XmlAutoCollectShader = "AutoCollectShader";
@@ -41,7 +44,14 @@ namespace YooAsset.Editor
 			xml.Load(filePath);
 			XmlElement root = xml.DocumentElement;
 
-			// 读取着色器配置
+			// 读取配置版本
+			string configVersion = root.GetAttribute(XmlVersion);
+			if(configVersion != ConfigVersion)
+			{
+				throw new Exception($"The config version is invalid : {configVersion}");
+			}
+
+			// 读取公共配置
 			bool enableAddressable = false;
 			bool autoCollectShaders = false;
 			string shaderBundleName = string.Empty;
@@ -136,7 +146,10 @@ namespace YooAsset.Editor
 			xmlDoc.LoadXml(sb.ToString());
 			XmlElement root = xmlDoc.DocumentElement;
 
-			// 设置着色器配置
+			// 设置配置版本
+			root.SetAttribute(XmlVersion, ConfigVersion);
+
+			// 设置公共配置
 			var commonElement = xmlDoc.CreateElement(XmlCommon);
 			commonElement.SetAttribute(XmlEnableAddressable, AssetBundleCollectorSettingData.Setting.EnableAddressable.ToString());
 			commonElement.SetAttribute(XmlAutoCollectShader, AssetBundleCollectorSettingData.Setting.AutoCollectShaders.ToString());
