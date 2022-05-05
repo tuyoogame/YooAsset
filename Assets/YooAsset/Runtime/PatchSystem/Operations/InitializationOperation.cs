@@ -104,7 +104,6 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = _appManifestLoader.Error;
-					throw new System.Exception($"FATAL : {_appManifestLoader.Error}");
 				}
 				else
 				{
@@ -178,7 +177,6 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = _appManifestLoader.Error;
-					throw new System.Exception($"FATAL : {_appManifestLoader.Error}");
 				}
 				else
 				{

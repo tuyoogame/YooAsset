@@ -36,7 +36,7 @@ namespace YooAsset
 		/// <summary>
 		/// 编辑器资源路径
 		/// </summary>
-		public string EditorAssetPath { private set; get; }
+		internal string EditorAssetPath { private set; get; }
 
 		/// <summary>
 		/// 文件哈希值

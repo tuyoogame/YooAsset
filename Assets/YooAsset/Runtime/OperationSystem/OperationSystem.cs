@@ -9,7 +9,7 @@ namespace YooAsset
 		private static readonly List<AsyncOperationBase> _operations = new List<AsyncOperationBase>(100);
 
 		// 计时器相关
-		private static Stopwatch _watch;	
+		private static Stopwatch _watch;
 		private static long _maxTimeSlice;
 		private static long _frameTime;
 
@@ -35,11 +35,12 @@ namespace YooAsset
 				if (_watch.ElapsedMilliseconds - _frameTime >= _maxTimeSlice)
 					return;
 
-				_operations[i].Update();
-				if (_operations[i].IsDone)
+				var operation = _operations[i];
+				operation.Update();
+				if (operation.IsDone)
 				{
-					_operations[i].Finish();
 					_operations.RemoveAt(i);
+					operation.Finish();
 				}
 			}
 		}
