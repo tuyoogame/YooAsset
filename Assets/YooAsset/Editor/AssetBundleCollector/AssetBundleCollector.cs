@@ -235,6 +235,10 @@ namespace YooAsset.Editor
 		}
 		private List<string> GetAllDependencies(string mainAssetPath)
 		{
+			// 注意：模拟构建模式下不需要收集依赖资源
+			if(AssetBundleCollectorSetting.BuildMode == EBuildMode.SimulateBuild)
+				return new List<string>();
+
 			List<string> result = new List<string>();
 			string[] depends = AssetDatabase.GetDependencies(mainAssetPath, true);
 			foreach (string assetPath in depends)

@@ -21,9 +21,9 @@ namespace YooAsset.Editor
 			var buildParametersContext = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 
-			// 快速构建模式下跳过引擎构建
+			// 模拟构建模式下跳过引擎构建
 			var buildMode = buildParametersContext.Parameters.BuildMode;
-			if (buildMode == EBuildMode.FastRunBuild)
+			if (buildMode == EBuildMode.SimulateBuild)
 				return;
 
 			BuildAssetBundleOptions opt = buildParametersContext.GetPipelineBuildOptions();

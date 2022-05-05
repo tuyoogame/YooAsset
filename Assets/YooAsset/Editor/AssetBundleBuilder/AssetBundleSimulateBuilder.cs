@@ -1,22 +1,21 @@
-﻿using System;
-using UnityEditor;
+﻿using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	public static class AssetBundleRuntimeBuilder
+	public static class AssetBundleSimulateBuilder
 	{
 		private static string _manifestFilePath = string.Empty;
 
 		/// <summary>
-		/// 快速模式构建
+		/// 模拟构建
 		/// </summary>
-		public static void FastBuild()
+		public static void SimulateBuild()
 		{
 			string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
 			BuildParameters buildParameters = new BuildParameters();
 			buildParameters.OutputRoot = defaultOutputRoot;
 			buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
-			buildParameters.BuildMode = EBuildMode.FastRunBuild;
+			buildParameters.BuildMode = EBuildMode.SimulateBuild;
 			buildParameters.BuildVersion = AssetBundleBuilderSettingData.Setting.BuildVersion;
 			buildParameters.BuildinTags = AssetBundleBuilderSettingData.Setting.BuildTags;
 			buildParameters.EnableAddressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
@@ -26,7 +25,7 @@ namespace YooAsset.Editor
 			if (buildResult)
 			{
 				string pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(buildParameters.OutputRoot, buildParameters.BuildTarget);
-				_manifestFilePath = $"{pipelineOutputDirectory}_{EBuildMode.FastRunBuild}/{YooAssetSettingsData.GetPatchManifestFileName(buildParameters.BuildVersion)}";
+				_manifestFilePath = $"{pipelineOutputDirectory}_{EBuildMode.SimulateBuild}/{YooAssetSettingsData.GetPatchManifestFileName(buildParameters.BuildVersion)}";
 			}
 			else
 			{
@@ -35,9 +34,9 @@ namespace YooAsset.Editor
 		}
 		
 		/// <summary>
-		/// 获取构建的补丁清单文件路径
+		/// 获取构建的补丁清单路径
 		/// </summary>
-		public static string GetPatchManifestFilePath()
+		public static string GetPatchManifestPath()
 		{
 			return _manifestFilePath;
 		}

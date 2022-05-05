@@ -17,13 +17,13 @@ namespace YooAsset.Editor
 		IncrementalBuild,
 
 		/// <summary>
-		/// 快速构建模式
-		/// </summary>
-		FastRunBuild,
-
-		/// <summary>
 		/// 演练构建模式
 		/// </summary>
 		DryRunBuild,
+
+		/// <summary>
+		/// 模拟构建模式
+		/// </summary>
+		SimulateBuild,
 	}
 }

@@ -3,19 +3,19 @@ using System.Reflection;
 
 namespace YooAsset
 {
-	internal static class EditorPlayModeHelper
+	internal static class EditorSimulateModeHelper
 	{
 		private static System.Type _classType;
 
-		public static string DryRunBuild()
+		public static string SimulateBuild()
 		{
-			_classType = Assembly.Load("YooAsset.Editor").GetType("YooAsset.Editor.AssetBundleRuntimeBuilder");
-			InvokePublicStaticMethod(_classType, "FastBuild");
+			_classType = Assembly.Load("YooAsset.Editor").GetType("YooAsset.Editor.AssetBundleSimulateBuilder");
+			InvokePublicStaticMethod(_classType, "SimulateBuild");
 			return GetPatchManifestFilePath();
 		}
 		private static string GetPatchManifestFilePath()
 		{
-			return (string)InvokePublicStaticMethod(_classType, "GetPatchManifestFilePath");
+			return (string)InvokePublicStaticMethod(_classType, "GetPatchManifestPath");
 		}
 		private static object InvokePublicStaticMethod(System.Type type, string method, params object[] parameters)
 		{
@@ -30,8 +30,8 @@ namespace YooAsset
 	}
 }
 #else
-	internal static class EditorPlayModeHelper
+	internal static class EditorSimulateModeHelper
 	{
-		public static string DryRunBuild() { throw new System.Exception("Only support in unity editor !"); }
+		public static string SimulateBuild() { throw new System.Exception("Only support in unity editor !"); }
 	}
 #endif

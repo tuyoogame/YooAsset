@@ -12,7 +12,8 @@ namespace YooAsset.Editor
 	{
 		void IBuildTask.Run(BuildContext context)
 		{
-			var buildMapContext = BuildMapCreater.CreateBuildMap();
+			var buildParametersContext = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
+			var buildMapContext = BuildMapCreater.CreateBuildMap(buildParametersContext.Parameters.BuildMode);
 			context.SetContextObject(buildMapContext);
 			BuildRunner.Log("构建内容准备完毕！");
 

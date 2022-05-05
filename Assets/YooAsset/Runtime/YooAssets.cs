@@ -14,17 +14,18 @@ namespace YooAsset
 		public enum EPlayMode
 		{
 			/// <summary>
-			/// 编辑器下模拟运行模式
+			/// 编辑器下的模拟模式
+			/// 注意：在初始化的时候自动构建真机运行环境。
 			/// </summary>
-			EditorPlayMode,
-
+			EditorSimulateMode,
+			
 			/// <summary>
-			/// 离线模式
+			/// 离线运行模式
 			/// </summary>
 			OfflinePlayMode,
 
 			/// <summary>
-			/// 网络模式
+			/// 网络运行模式
 			/// </summary>
 			HostPlayMode,
 		}
@@ -56,21 +57,21 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 编辑器下模拟运行模式参数
+		/// 编辑器下模拟运行模式的初始化参数
 		/// </summary>
-		public class EditorPlayModeParameters : CreateParameters
+		public class EditorSimulateModeParameters : CreateParameters
 		{
 		}
 
 		/// <summary>
-		/// 离线模式参数
+		/// 离线运行模式的初始化参数
 		/// </summary>
 		public class OfflinePlayModeParameters : CreateParameters
 		{
 		}
 
 		/// <summary>
-		/// 网络模式参数
+		/// 网络运行模式的初始化参数
 		/// </summary>
 		public class HostPlayModeParameters : CreateParameters
 		{
@@ -102,7 +103,7 @@ namespace YooAsset
 		private static EPlayMode _playMode;
 		private static IBundleServices _bundleServices;
 		private static ILocationServices _locationServices;
-		private static EditorPlayModeImpl _editorPlayModeImpl;
+		private static EditorSimulateModeImpl _editorSimulateModeImpl;
 		private static OfflinePlayModeImpl _offlinePlayModeImpl;
 		private static HostPlayModeImpl _hostPlayModeImpl;
 
@@ -151,8 +152,8 @@ namespace YooAsset
 			}
 
 			// 运行模式
-			if (parameters is EditorPlayModeParameters)
-				_playMode = EPlayMode.EditorPlayMode;
+			if (parameters is EditorSimulateModeParameters)
+				_playMode = EPlayMode.EditorSimulateMode;
 			else if (parameters is OfflinePlayModeParameters)
 				_playMode = EPlayMode.OfflinePlayMode;
 			else if (parameters is HostPlayModeParameters)
@@ -176,12 +177,12 @@ namespace YooAsset
 
 			// 初始化资源系统
 			InitializationOperation initializeOperation;
-			if (_playMode == EPlayMode.EditorPlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
-				_editorPlayModeImpl = new EditorPlayModeImpl();
-				_bundleServices = _editorPlayModeImpl;
+				_editorSimulateModeImpl = new EditorSimulateModeImpl();
+				_bundleServices = _editorSimulateModeImpl;
 				AssetSystem.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				initializeOperation = _editorPlayModeImpl.InitializeAsync();
+				initializeOperation = _editorSimulateModeImpl.InitializeAsync();
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
@@ -223,7 +224,7 @@ namespace YooAsset
 		public static UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorPlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdateStaticVersionOperation();
 				OperationSystem.ProcessOperaiton(operation);
@@ -255,7 +256,7 @@ namespace YooAsset
 		public static UpdateManifestOperation UpdateManifestAsync(int resourceVersion, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorPlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdateManifestOperation();
 				OperationSystem.ProcessOperaiton(operation);
@@ -285,11 +286,11 @@ namespace YooAsset
 		public static int GetResourceVersion()
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorPlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
-				if (_editorPlayModeImpl == null)
+				if (_editorSimulateModeImpl == null)
 					throw new Exception("YooAsset is not initialized.");
-				return _editorPlayModeImpl.GetResourceVersion();
+				return _editorSimulateModeImpl.GetResourceVersion();
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
@@ -574,7 +575,7 @@ namespace YooAsset
 			string bundleName = _bundleServices.GetBundleName(assetPath);
 			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(bundleName);
 
-			if (_playMode == EPlayMode.EditorPlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				RawFileOperation operation = new EditorPlayModeRawFileOperation(bundleInfo, copyPath);
 				OperationSystem.ProcessOperaiton(operation);
@@ -635,7 +636,7 @@ namespace YooAsset
 		public static PatchDownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorPlayMode || _playMode == EPlayMode.OfflinePlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
@@ -661,7 +662,7 @@ namespace YooAsset
 		public static PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorPlayMode || _playMode == EPlayMode.OfflinePlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
@@ -689,7 +690,7 @@ namespace YooAsset
 		public static PatchDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorPlayMode || _playMode == EPlayMode.OfflinePlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
@@ -723,7 +724,7 @@ namespace YooAsset
 		public static PatchDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorPlayMode || _playMode == EPlayMode.OfflinePlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
@@ -770,7 +771,7 @@ namespace YooAsset
 		public static PatchUnpackerOperation CreatePatchUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorPlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
 				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain);
@@ -804,7 +805,7 @@ namespace YooAsset
 		public static UpdatePackageOperation UpdatePackageAsync(int resourceVersion, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorPlayMode)
+			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdatePackageOperation();
 				OperationSystem.ProcessOperaiton(operation);
@@ -876,7 +877,11 @@ namespace YooAsset
 			// 轮询更新资源系统
 			AssetSystem.Update();
 		}
-		internal static string MappingToAssetPath(string location)
+
+		/// <summary>
+		/// 资源定位地址转换为资源完整路径
+		/// </summary>
+		public static string MappingToAssetPath(string location)
 		{
 			DebugCheckLocation(location);
 			return _bundleServices.MappingToAssetPath(location);

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	internal class EditorPlayModeImpl : IBundleServices
+	internal class EditorSimulateModeImpl : IBundleServices
 	{
 		internal PatchManifest AppPatchManifest;
 
@@ -13,7 +13,7 @@ namespace YooAsset
 		/// </summary>
 		public InitializationOperation InitializeAsync()
 		{
-			var operation = new EditorPlayModeInitializationOperation(this);
+			var operation = new EditorSimulateModeInitializationOperation(this);
 			OperationSystem.ProcessOperaiton(operation);
 			return operation;
 		}

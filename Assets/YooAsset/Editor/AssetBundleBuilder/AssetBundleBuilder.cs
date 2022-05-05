@@ -30,8 +30,8 @@ namespace YooAsset.Editor
 				PipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(parameters.OutputRoot, parameters.BuildTarget);
 				if (parameters.BuildMode == EBuildMode.DryRunBuild)
 					PipelineOutputDirectory += $"_{EBuildMode.DryRunBuild}";
-				else if(parameters.BuildMode == EBuildMode.FastRunBuild)
-					PipelineOutputDirectory += $"_{EBuildMode.FastRunBuild}";
+				else if(parameters.BuildMode == EBuildMode.SimulateBuild)
+					PipelineOutputDirectory += $"_{EBuildMode.SimulateBuild}";
 			}
 
 			/// <summary>
@@ -53,7 +53,7 @@ namespace YooAsset.Editor
 				BuildAssetBundleOptions opt = BuildAssetBundleOptions.None;
 				opt |= BuildAssetBundleOptions.StrictMode; //Do not allow the build to succeed if any errors are reporting during it.
 
-				if (Parameters.BuildMode == EBuildMode.FastRunBuild)
+				if (Parameters.BuildMode == EBuildMode.SimulateBuild)
 				{
 					throw new Exception("Should never get here !");
 				}
@@ -132,7 +132,7 @@ namespace YooAsset.Editor
 				new TaskCopyBuildinFiles(), //拷贝内置文件
 			};
 
-			if (buildParameters.BuildMode == EBuildMode.FastRunBuild)
+			if (buildParameters.BuildMode == EBuildMode.SimulateBuild)
 				BuildRunner.EnableLog = false;
 			else
 				BuildRunner.EnableLog = true;

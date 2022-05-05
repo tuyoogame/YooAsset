@@ -15,8 +15,8 @@ namespace YooAsset.Editor
 		{
 			var buildParametersContext = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
 			
-			// 快速构建模式下跳过验证
-			if (buildParametersContext.Parameters.BuildMode == EBuildMode.FastRunBuild)
+			// 模拟构建模式下跳过验证
+			if (buildParametersContext.Parameters.BuildMode == EBuildMode.SimulateBuild)
 				return;
 
 			// 验证构建结果

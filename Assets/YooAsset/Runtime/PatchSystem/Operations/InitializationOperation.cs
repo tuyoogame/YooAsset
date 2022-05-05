@@ -13,9 +13,9 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 编辑器下模拟运行的初始化操作
+	/// 编辑器下模拟模式的初始化操作
 	/// </summary>
-	internal sealed class EditorPlayModeInitializationOperation : InitializationOperation
+	internal sealed class EditorSimulateModeInitializationOperation : InitializationOperation
 	{
 		private enum ESteps
 		{
@@ -24,10 +24,10 @@ namespace YooAsset
 			Done,
 		}
 
-		private readonly EditorPlayModeImpl _impl;
+		private readonly EditorSimulateModeImpl _impl;
 		private ESteps _steps = ESteps.None;
 
-		internal EditorPlayModeInitializationOperation(EditorPlayModeImpl impl)
+		internal EditorSimulateModeInitializationOperation(EditorSimulateModeImpl impl)
 		{
 			_impl = impl;
 		}
@@ -39,7 +39,7 @@ namespace YooAsset
 		{
 			if (_steps == ESteps.Builder)
 			{
-				string manifestFilePath = EditorPlayModeHelper.DryRunBuild();
+				string manifestFilePath = EditorSimulateModeHelper.SimulateBuild();
 				if (string.IsNullOrEmpty(manifestFilePath))
 				{
 					_steps = ESteps.Done;
@@ -65,7 +65,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 离线模式的初始化操作
+	/// 离线运行模式的初始化操作
 	/// </summary>
 	internal sealed class OfflinePlayModeInitializationOperation : InitializationOperation
 	{
@@ -116,7 +116,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 网络模式的初始化操作
+	/// 网络运行模式的初始化操作
 	/// </summary>
 	internal sealed class HostPlayModeInitializationOperation : InitializationOperation
 	{
