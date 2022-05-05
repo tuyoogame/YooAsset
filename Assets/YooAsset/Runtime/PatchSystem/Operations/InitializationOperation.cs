@@ -44,7 +44,7 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = "Dry run build failed, see the detail info on the console window.";
+					Error = "Simulate build failed, see the detail info on the console window.";
 					return;
 				}
 				if (File.Exists(manifestFilePath) == false)
@@ -55,9 +55,10 @@ namespace YooAsset
 					return;
 				}
 
-				YooLogger.Log($"Load manifest file in editor play mode : {manifestFilePath}");
+				YooLogger.Log($"Load manifest file : {manifestFilePath}");
 				string jsonContent = FileUtility.ReadFile(manifestFilePath);
-				_impl.AppPatchManifest = PatchManifest.Deserialize(jsonContent);
+				var simulatePatchManifest = PatchManifest.Deserialize(jsonContent);
+				_impl.SetSimulatePatchManifest(simulatePatchManifest);
 				_steps = ESteps.Done;
 				Status = EOperationStatus.Succeed;
 			}
@@ -109,7 +110,7 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
-					_impl.AppPatchManifest = _appManifestLoader.Result;
+					_impl.SetAppPatchManifest(_appManifestLoader.Result);
 				}
 			}
 		}
@@ -182,8 +183,8 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
-					_impl.AppPatchManifest = _appManifestLoader.Result;
-					_impl.LocalPatchManifest = _appManifestLoader.Result;
+					_impl.SetAppPatchManifest(_appManifestLoader.Result);
+					_impl.SetLocalPatchManifest(_appManifestLoader.Result);
 				}
 			}
 		}

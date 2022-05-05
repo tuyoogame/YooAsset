@@ -6,13 +6,15 @@ namespace YooAsset
 {
 	internal class OfflinePlayModeImpl : IBundleServices
 	{
-		internal PatchManifest AppPatchManifest;
+		private PatchManifest _appPatchManifest;
+		private bool _locationToLower;
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync()
+		public InitializationOperation InitializeAsync(bool locationToLower)
 		{
+			_locationToLower = locationToLower;
 			var operation = new OfflinePlayModeInitializationOperation(this);
 			OperationSystem.ProcessOperaiton(operation);
 			return operation;
@@ -23,9 +25,9 @@ namespace YooAsset
 		/// </summary>
 		public int GetResourceVersion()
 		{
-			if (AppPatchManifest == null)
+			if (_appPatchManifest == null)
 				return 0;
-			return AppPatchManifest.ResourceVersion;
+			return _appPatchManifest.ResourceVersion;
 		}
 
 		/// <summary>
@@ -33,9 +35,16 @@ namespace YooAsset
 		/// </summary>
 		public PatchUnpackerOperation CreatePatchUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
 		{
-			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByTags(AppPatchManifest, tags);
+			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByTags(_appPatchManifest, tags);
 			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
 			return operation;
+		}
+
+		// 设置资源清单
+		internal void SetAppPatchManifest(PatchManifest patchManifest)
+		{
+			_appPatchManifest = patchManifest;
+			_appPatchManifest.InitAssetPathMapping(_locationToLower);
 		}
 
 		#region IBundleServices接口
@@ -44,7 +53,7 @@ namespace YooAsset
 			if (string.IsNullOrEmpty(bundleName))
 				return new BundleInfo(string.Empty);
 
-			if (AppPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
+			if (_appPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
 			{
 				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming);
 				return bundleInfo;
@@ -58,19 +67,19 @@ namespace YooAsset
 		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
-			return PatchHelper.GetAssetsInfoByTag(AppPatchManifest, tags);
+			return PatchHelper.GetAssetsInfoByTag(_appPatchManifest, tags);
 		}
 		string IBundleServices.MappingToAssetPath(string location)
 		{
-			return AppPatchManifest.MappingToAssetPath(location);
+			return _appPatchManifest.MappingToAssetPath(location);
 		}
 		string IBundleServices.GetBundleName(string assetPath)
 		{
-			return AppPatchManifest.GetBundleName(assetPath);
+			return _appPatchManifest.GetBundleName(assetPath);
 		}
 		string[] IBundleServices.GetAllDependencies(string assetPath)
 		{
-			return AppPatchManifest.GetAllDependencies(assetPath);
+			return _appPatchManifest.GetAllDependencies(assetPath);
 		}
 		#endregion
 	}

@@ -8,10 +8,11 @@ namespace YooAsset
 	internal class HostPlayModeImpl : IBundleServices
 	{
 		// 补丁清单
-		internal PatchManifest AppPatchManifest;
-		internal PatchManifest LocalPatchManifest;
+		internal PatchManifest AppPatchManifest { private set; get; }
+		internal PatchManifest LocalPatchManifest { private set; get; }
 
 		// 参数相关
+		internal bool LocationToLower { private set; get; }
 		internal bool ClearCacheWhenDirty { private set; get; }
 		private string _defaultHostServer;
 		private string _fallbackHostServer;
@@ -19,8 +20,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(bool clearCacheWhenDirty, string defaultHostServer, string fallbackHostServer)
+		public InitializationOperation InitializeAsync(bool locationToLower, bool clearCacheWhenDirty, string defaultHostServer, string fallbackHostServer)
 		{
+			LocationToLower = locationToLower;
 			ClearCacheWhenDirty = clearCacheWhenDirty;
 			_defaultHostServer = defaultHostServer;
 			_fallbackHostServer = fallbackHostServer;
@@ -272,6 +274,17 @@ namespace YooAsset
 			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.Hash);
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, remoteMainURL, remoteFallbackURL);
 			return bundleInfo;
+		}
+
+		// 设置资源清单
+		internal void SetAppPatchManifest(PatchManifest patchManifest)
+		{
+			AppPatchManifest = patchManifest;
+		}
+		internal void SetLocalPatchManifest(PatchManifest patchManifest)
+		{
+			LocalPatchManifest = patchManifest;
+			LocalPatchManifest.InitAssetPathMapping(LocationToLower);
 		}
 
 		#region IBundleServices接口

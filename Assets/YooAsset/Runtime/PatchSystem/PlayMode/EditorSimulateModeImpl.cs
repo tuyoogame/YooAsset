@@ -6,13 +6,15 @@ namespace YooAsset
 {
 	internal class EditorSimulateModeImpl : IBundleServices
 	{
-		internal PatchManifest AppPatchManifest;
+		private PatchManifest _simulatePatchManifest;
+		private bool _locationToLower;
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync()
+		public InitializationOperation InitializeAsync(bool locationToLower)
 		{
+			_locationToLower = locationToLower;
 			var operation = new EditorSimulateModeInitializationOperation(this);
 			OperationSystem.ProcessOperaiton(operation);
 			return operation;
@@ -23,9 +25,16 @@ namespace YooAsset
 		/// </summary>
 		public int GetResourceVersion()
 		{
-			if (AppPatchManifest == null)
+			if (_simulatePatchManifest == null)
 				return 0;
-			return AppPatchManifest.ResourceVersion;
+			return _simulatePatchManifest.ResourceVersion;
+		}
+
+		// 设置资源清单
+		internal void SetSimulatePatchManifest(PatchManifest patchManifest)
+		{
+			_simulatePatchManifest = patchManifest;
+			_simulatePatchManifest.InitAssetPathMapping(_locationToLower);
 		}
 
 		#region IBundleServices接口
@@ -34,9 +43,9 @@ namespace YooAsset
 			if (string.IsNullOrEmpty(bundleName))
 				return new BundleInfo(string.Empty);
 
-			if (AppPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
+			if (_simulatePatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
 			{
-				string mainAssetPath = AppPatchManifest.TryGetBundleMainAssetPath(bundleName);
+				string mainAssetPath = _simulatePatchManifest.TryGetBundleMainAssetPath(bundleName);
 				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromEditor, mainAssetPath);
 				return bundleInfo;
 			}
@@ -49,19 +58,19 @@ namespace YooAsset
 		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
-			return PatchHelper.GetAssetsInfoByTag(AppPatchManifest, tags);
+			return PatchHelper.GetAssetsInfoByTag(_simulatePatchManifest, tags);
 		}
 		string IBundleServices.MappingToAssetPath(string location)
 		{
-			return AppPatchManifest.MappingToAssetPath(location);
+			return _simulatePatchManifest.MappingToAssetPath(location);
 		}
 		string IBundleServices.GetBundleName(string assetPath)
 		{
-			return AppPatchManifest.GetBundleName(assetPath);
+			return _simulatePatchManifest.GetBundleName(assetPath);
 		}
 		string[] IBundleServices.GetAllDependencies(string assetPath)
 		{
-			return AppPatchManifest.GetAllDependencies(assetPath);
+			return _simulatePatchManifest.GetAllDependencies(assetPath);
 		}
 		#endregion
 	}

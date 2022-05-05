@@ -36,6 +36,11 @@ namespace YooAsset
 		public abstract class CreateParameters
 		{
 			/// <summary>
+			/// 资源定位地址为小写地址
+			/// </summary>
+			public bool LocationToLower = false;
+
+			/// <summary>
 			/// 资源定位服务接口
 			/// </summary>
 			public ILocationServices LocationServices = null;
@@ -123,7 +128,7 @@ namespace YooAsset
 
 #if !UNITY_EDITOR
 			if (parameters is EditorSimulateModeParameters)
-				throw new Exception($"Editor play mode only support unity editor.");
+				throw new Exception($"Editor simulate mode only support unity editor.");
 #endif
 
 			// 创建驱动器
@@ -182,14 +187,14 @@ namespace YooAsset
 				_editorSimulateModeImpl = new EditorSimulateModeImpl();
 				_bundleServices = _editorSimulateModeImpl;
 				AssetSystem.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				initializeOperation = _editorSimulateModeImpl.InitializeAsync();
+				initializeOperation = _editorSimulateModeImpl.InitializeAsync(parameters.LocationToLower);
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				_offlinePlayModeImpl = new OfflinePlayModeImpl();
 				_bundleServices = _offlinePlayModeImpl;
 				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				initializeOperation = _offlinePlayModeImpl.InitializeAsync();
+				initializeOperation = _offlinePlayModeImpl.InitializeAsync(parameters.LocationToLower);
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
@@ -198,6 +203,7 @@ namespace YooAsset
 				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = _hostPlayModeImpl.InitializeAsync(
+					hostPlayModeParameters.LocationToLower,
 					hostPlayModeParameters.ClearCacheWhenDirty,
 					hostPlayModeParameters.DefaultHostServer,
 					hostPlayModeParameters.FallbackHostServer);
@@ -881,7 +887,7 @@ namespace YooAsset
 		/// <summary>
 		/// 资源定位地址转换为资源完整路径
 		/// </summary>
-		public static string MappingToAssetPath(string location)
+		internal static string MappingToAssetPath(string location)
 		{
 			DebugCheckLocation(location);
 			return _bundleServices.MappingToAssetPath(location);

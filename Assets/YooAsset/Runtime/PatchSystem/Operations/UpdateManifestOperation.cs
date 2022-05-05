@@ -201,7 +201,8 @@ namespace YooAsset
 		{
 			try
 			{
-				_impl.LocalPatchManifest = PatchManifest.Deserialize(content);
+				var remotePatchManifest = PatchManifest.Deserialize(content);
+				_impl.SetLocalPatchManifest(remotePatchManifest);
 
 				YooLogger.Log("Save remote patch manifest file.");
 				string savePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.GetPatchManifestFileName(updateResourceVersion));
@@ -223,7 +224,8 @@ namespace YooAsset
 			YooLogger.Log("Load sandbox patch manifest file.");
 			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.GetPatchManifestFileName(updateResourceVersion));
 			string jsonData = File.ReadAllText(filePath);
-			_impl.LocalPatchManifest = PatchManifest.Deserialize(jsonData);
+			var sandboxPatchManifest = PatchManifest.Deserialize(jsonData);
+			_impl.SetLocalPatchManifest(sandboxPatchManifest);
 		}
 
 		/// <summary>
