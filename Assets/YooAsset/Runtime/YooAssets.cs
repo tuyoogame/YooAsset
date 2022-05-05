@@ -15,7 +15,7 @@ namespace YooAsset
 		{
 			/// <summary>
 			/// 编辑器下的模拟模式
-			/// 注意：在初始化的时候自动构建真机运行环境。
+			/// 注意：在初始化的时候自动构建真机模拟环境。
 			/// </summary>
 			EditorSimulateMode,
 			
@@ -122,7 +122,7 @@ namespace YooAsset
 				_locationServices = parameters.LocationServices;
 
 #if !UNITY_EDITOR
-			if (parameters is EditorPlayModeParameters)
+			if (parameters is EditorSimulateModeParameters)
 				throw new Exception($"Editor play mode only support unity editor.");
 #endif
 

@@ -139,8 +139,7 @@ namespace YooAsset.Editor
 					typeof(PackRawFile),
 				};
 
-				TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom<IPackRule>();
-				var customTypes = collection.ToList();
+				var customTypes = EditorTools.GetAssignableTypes(typeof(IPackRule));
 				types.AddRange(customTypes);
 				for (int i = 0; i < types.Count; i++)
 				{
@@ -165,8 +164,7 @@ namespace YooAsset.Editor
 					typeof(CollectSprite)
 				};
 
-				TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom<IFilterRule>();
-				var customTypes = collection.ToList();
+				var customTypes = EditorTools.GetAssignableTypes(typeof(IFilterRule));
 				types.AddRange(customTypes);
 				for (int i = 0; i < types.Count; i++)
 				{
@@ -190,8 +188,7 @@ namespace YooAsset.Editor
 					typeof(AddressByGroupAndFileName)
 				};
 
-				TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom<IAddressRule>();
-				var customTypes = collection.ToList();
+				var customTypes = EditorTools.GetAssignableTypes(typeof(IAddressRule));
 				types.AddRange(customTypes);
 				for (int i = 0; i < types.Count; i++)
 				{

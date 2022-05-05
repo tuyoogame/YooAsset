@@ -1,10 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEditor;
 
@@ -15,7 +15,57 @@ namespace YooAsset.Editor
 	/// </summary>
 	public static class EditorTools
 	{
+		static EditorTools()
+		{
+			InitAssembly();
+		}
+
 		#region Assembly
+#if UNITY_2019_4_OR_NEWER
+		private static void InitAssembly()
+		{
+		}
+
+		/// <summary>
+		/// 获取带继承关系的所有类的类型
+		/// </summary>
+		public static List<Type> GetAssignableTypes(System.Type parentType)
+		{
+			TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom(parentType);
+			return collection.ToList();
+		}
+#else
+		private static readonly List<Type> _cacheTypes = new List<Type>(10000);
+		private static void InitAssembly()
+		{
+			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			foreach (Assembly assembly in assemblies)
+			{
+				List<Type> types = assembly.GetTypes().ToList();
+				_cacheTypes.AddRange(types);
+			}
+		}
+
+		/// <summary>
+		/// 获取带继承关系的所有类的类型
+		/// </summary>
+		public static List<Type> GetAssignableTypes(System.Type parentType)
+		{
+			List<Type> result = new List<Type>();
+			for (int i = 0; i < _cacheTypes.Count; i++)
+			{
+				Type type = _cacheTypes[i];
+				if (parentType.IsAssignableFrom(type))
+				{
+					if (type.Name == parentType.Name)
+						continue;
+					result.Add(type);
+				}
+			}
+			return result;
+		}
+#endif
+
 		/// <summary>
 		/// 调用私有的静态方法
 		/// </summary>
@@ -190,7 +240,7 @@ namespace YooAsset.Editor
 		}
 		#endregion
 
-		#region 控制台
+		#region EditorConsole
 		private static MethodInfo _clearConsoleMethod;
 		private static MethodInfo ClearConsoleMethod
 		{
@@ -551,40 +601,6 @@ namespace YooAsset.Editor
 			}
 			return string.Empty;
 		}
-		#endregion
-
-		#region 字符串
-		/// <summary>
-		/// 是否含有中文
-		/// </summary>
-		public static bool IncludeChinese(string content)
-		{
-			foreach (var c in content)
-			{
-				if (c >= 0x4e00 && c <= 0x9fbb)
-					return true;
-			}
-			return false;
-		}
-
-		/// <summary>
-		/// 是否是数字
-		/// </summary>
-		public static bool IsNumber(string content)
-		{
-			if (string.IsNullOrEmpty(content))
-				return false;
-			string pattern = @"^\d*$";
-			return Regex.IsMatch(content, pattern);
-		}
-
-		/// <summary>
-		/// 首字母大写
-		/// </summary>
-		public static string Capitalize(string content)
-		{
-			return content.Substring(0, 1).ToUpper() + (content.Length > 1 ? content.Substring(1).ToLower() : "");
-		}
 
 		/// <summary>
 		/// 截取字符串
@@ -594,7 +610,7 @@ namespace YooAsset.Editor
 		/// <param name="key">关键字</param>
 		/// <param name="includeKey">分割的结果里是否包含关键字</param>
 		/// <param name="searchBegin">是否使用初始匹配的位置，否则使用末尾匹配的位置</param>
-		public static string Substring(string content, string key, bool includeKey, bool firstMatch = true)
+		private static string Substring(string content, string key, bool includeKey, bool firstMatch = true)
 		{
 			if (string.IsNullOrEmpty(key))
 				return content;
@@ -614,6 +630,7 @@ namespace YooAsset.Editor
 			else
 				return content.Substring(startIndex + key.Length);
 		}
+
 		#endregion
 	}
 }

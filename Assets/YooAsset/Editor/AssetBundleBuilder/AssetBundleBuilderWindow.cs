@@ -199,9 +199,7 @@ namespace YooAsset.Editor
 		}
 		private List<Type> GetEncryptionServicesClassTypes()
 		{
-			TypeCache.TypeCollection collection = TypeCache.GetTypesDerivedFrom<IEncryptionServices>();
-			List<Type> classTypes = collection.ToList();
-			return classTypes;
+			return EditorTools.GetAssignableTypes(typeof(IEncryptionServices));
 		}
 		private IEncryptionServices CreateEncryptionServicesInstance()
 		{
