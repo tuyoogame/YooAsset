@@ -89,9 +89,9 @@ namespace YooAsset.Editor
 			/// <summary>
 			/// 获取构建的耗时（单位：秒）
 			/// </summary>
-			public int GetBuildingSeconds()
+			public float GetBuildingSeconds()
 			{
-				int seconds = (int)(_buildWatch.ElapsedMilliseconds / 1000);
+				float seconds = _buildWatch.ElapsedMilliseconds / 1000f;
 				return seconds;
 			}
 			public void BeginWatch()
@@ -139,9 +139,9 @@ namespace YooAsset.Editor
 
 			bool succeed = BuildRunner.Run(pipeline, _buildContext);
 			if (succeed)
-				Debug.Log($"{buildParameters.BuildMode}模式构建成功！");
+				Debug.Log($"{buildParameters.BuildMode} pipeline build succeed !");
 			else
-				Debug.LogWarning($"{buildParameters.BuildMode}模式构建失败！");
+				Debug.LogWarning($"{buildParameters.BuildMode} pipeline build failed !");
 			return succeed;
 		}
 	}

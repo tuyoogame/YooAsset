@@ -45,14 +45,22 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 普通日志输出
+		/// 日志输出
 		/// </summary>
 		public static void Log(string info)
 		{
 			if (EnableLog)
 			{
 				UnityEngine.Debug.Log(info);
-			}	
+			}
+		}
+
+		/// <summary>
+		/// 日志输出
+		/// </summary>
+		public static void Info(string info)
+		{
+			UnityEngine.Debug.Log(info);
 		}
 	}
 }
