@@ -16,7 +16,7 @@ YooAssets.InitializeAsync(CreateParameters parameters);
 ````c#
 private IEnumerator InitializeYooAsset()
 {
-    var createParameters = new YooAssets.EditorPlayModeParameters();
+    var createParameters = new YooAssets.EditorSimulateModeParameters();
     createParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
     yield return YooAssets.InitializeAsync(createParameters);
 }
