@@ -70,7 +70,7 @@ namespace YooAsset
 					Status = SceneObject.IsValid() ? EStatus.Success : EStatus.Fail;
 					if (Status == EStatus.Fail)
 					{
-						LastError = $"The load scene is invalid : {AssetPath}";
+						LastError = $"The loaded scene is invalid : {AssetPath}";
 						YooLogger.Error(LastError);
 					}
 					InvokeCompletion();

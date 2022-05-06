@@ -56,9 +56,13 @@ namespace YooAsset
 				return bundleInfo;
 			}
 		}
+		AssetInfo[] IBundleServices.GetAssetInfos(string bundleName)
+		{
+			return PatchHelper.GetAssetsInfoByBundleName(_simulatePatchManifest, bundleName);
+		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
-			return PatchHelper.GetAssetsInfoByTag(_simulatePatchManifest, tags);
+			return PatchHelper.GetAssetsInfoByTags(_simulatePatchManifest, tags);
 		}
 		string IBundleServices.MappingToAssetPath(string location)
 		{

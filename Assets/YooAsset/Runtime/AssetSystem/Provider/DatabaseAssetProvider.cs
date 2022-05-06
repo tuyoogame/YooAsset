@@ -39,10 +39,8 @@ namespace YooAsset
 					InvokeCompletion();
 					return;
 				}
-				else
-				{
-					Status = EStatus.Loading;
-				}
+
+				Status = EStatus.Loading;
 
 				// 注意：模拟异步加载效果提前返回
 				if (IsWaitForAsyncComplete == false)
@@ -52,7 +50,10 @@ namespace YooAsset
 			// 1. 加载资源对象
 			if (Status == EStatus.Loading)
 			{
-				AssetObject = UnityEditor.AssetDatabase.LoadAssetAtPath(AssetPath, AssetType);
+				if (AssetType == null)
+					AssetObject = UnityEditor.AssetDatabase.LoadMainAssetAtPath(AssetPath);
+				else
+					AssetObject = UnityEditor.AssetDatabase.LoadAssetAtPath(AssetPath, AssetType);
 				Status = EStatus.Checking;
 			}
 

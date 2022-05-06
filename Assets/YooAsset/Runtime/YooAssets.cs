@@ -18,7 +18,7 @@ namespace YooAsset
 			/// 注意：在初始化的时候自动构建真机模拟环境。
 			/// </summary>
 			EditorSimulateMode,
-			
+
 			/// <summary>
 			/// 离线运行模式
 			/// </summary>
@@ -369,6 +369,17 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取资源信息列表
+		/// </summary>
+		/// <param name="tags">资源标签列表</param>
+		/// <returns></returns>
+		public static AssetInfo[] GetAssetInfos(string[] tags)
+		{
+			DebugCheckInitialize();
+			return _bundleServices.GetAssetInfos(tags);
+		}
+
+		/// <summary>
 		/// 获取调试信息
 		/// </summary>
 		internal static void GetDebugReport(DebugReport report)
@@ -436,6 +447,37 @@ namespace YooAsset
 		}
 
 
+		private static RawFileOperation GetRawFileInternal(string assetPath, string copyPath)
+		{
+			string bundleName = _bundleServices.GetBundleName(assetPath);
+			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(bundleName);
+
+			if (_playMode == EPlayMode.EditorSimulateMode)
+			{
+				RawFileOperation operation = new EditorPlayModeRawFileOperation(bundleInfo, copyPath);
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				RawFileOperation operation = new OfflinePlayModeRawFileOperation(bundleInfo, copyPath);
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.HostPlayMode)
+			{
+				RawFileOperation operation = new HostPlayModeRawFileOperation(bundleInfo, copyPath);
+				OperationSystem.ProcessOperaiton(operation);
+				return operation;
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
+		#endregion
+
+		#region 资源加载
 		/// <summary>
 		/// 同步加载资源对象
 		/// </summary>
@@ -468,41 +510,6 @@ namespace YooAsset
 			DebugCheckInitialize();
 			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
 			return LoadAssetInternal(assetPath, type, true);
-		}
-
-
-		/// <summary>
-		/// 同步加载子资源对象
-		/// </summary>
-		/// <param name="assetInfo">资源信息</param>
-		public static SubAssetsOperationHandle LoadSubAssetsSync(AssetInfo assetInfo)
-		{
-			DebugCheckInitialize();
-			return LoadSubAssetsInternal(assetInfo.AssetPath, assetInfo.AssetType, true);
-		}
-
-		/// <summary>
-		/// 同步加载子资源对象
-		/// </summary>
-		/// <typeparam name="TObject">资源类型</typeparam>
-		/// <param name="location">资源的定位地址</param>
-		public static SubAssetsOperationHandle LoadSubAssetsSync<TObject>(string location)
-		{
-			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadSubAssetsInternal(assetPath, typeof(TObject), true);
-		}
-
-		/// <summary>
-		/// 同步加载子资源对象
-		/// </summary>
-		/// <param name="location">资源的定位地址</param>
-		/// <param name="type">子对象类型</param>
-		public static SubAssetsOperationHandle LoadSubAssetsSync(string location, System.Type type)
-		{
-			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadSubAssetsInternal(assetPath, type, true);
 		}
 
 
@@ -541,6 +548,51 @@ namespace YooAsset
 		}
 
 
+		private static AssetOperationHandle LoadAssetInternal(string assetPath, System.Type assetType, bool waitForAsyncComplete)
+		{
+			var handle = AssetSystem.LoadAssetAsync(assetPath, assetType);
+			if (waitForAsyncComplete)
+				handle.WaitForAsyncComplete();
+			return handle;
+		}
+		#endregion
+
+		#region 资源加载
+		/// <summary>
+		/// 同步加载子资源对象
+		/// </summary>
+		/// <param name="assetInfo">资源信息</param>
+		public static SubAssetsOperationHandle LoadSubAssetsSync(AssetInfo assetInfo)
+		{
+			DebugCheckInitialize();
+			return LoadSubAssetsInternal(assetInfo.AssetPath, assetInfo.AssetType, true);
+		}
+
+		/// <summary>
+		/// 同步加载子资源对象
+		/// </summary>
+		/// <typeparam name="TObject">资源类型</typeparam>
+		/// <param name="location">资源的定位地址</param>
+		public static SubAssetsOperationHandle LoadSubAssetsSync<TObject>(string location)
+		{
+			DebugCheckInitialize();
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
+			return LoadSubAssetsInternal(assetPath, typeof(TObject), true);
+		}
+
+		/// <summary>
+		/// 同步加载子资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		/// <param name="type">子对象类型</param>
+		public static SubAssetsOperationHandle LoadSubAssetsSync(string location, System.Type type)
+		{
+			DebugCheckInitialize();
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
+			return LoadSubAssetsInternal(assetPath, type, true);
+		}
+
+
 		/// <summary>
 		/// 异步加载子资源对象
 		/// </summary>
@@ -576,44 +628,89 @@ namespace YooAsset
 		}
 
 
-		private static RawFileOperation GetRawFileInternal(string assetPath, string copyPath)
+		private static SubAssetsOperationHandle LoadSubAssetsInternal(string assetPath, System.Type assetType, bool waitForAsyncComplete)
 		{
-			string bundleName = _bundleServices.GetBundleName(assetPath);
-			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(bundleName);
-
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				RawFileOperation operation = new EditorPlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.ProcessOperaiton(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				RawFileOperation operation = new OfflinePlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.ProcessOperaiton(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				RawFileOperation operation = new HostPlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.ProcessOperaiton(operation);
-				return operation;
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
-		}
-		private static AssetOperationHandle LoadAssetInternal(string assetPath, System.Type assetType, bool waitForAsyncComplete)
-		{
-			var handle = AssetSystem.LoadAssetAsync(assetPath, assetType);
+			var handle = AssetSystem.LoadSubAssetsAsync(assetPath, assetType);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
 			return handle;
 		}
-		private static SubAssetsOperationHandle LoadSubAssetsInternal(string assetPath, System.Type assetType, bool waitForAsyncComplete)
+		#endregion
+
+		#region 资源加载
+		/// <summary>
+		/// 同步加载资源对象所属资源包里的所有资源
+		/// </summary>
+		/// <param name="assetInfo">资源信息</param>
+		public static AllAssetsOperationHandle LoadAllAssetsSync(AssetInfo assetInfo)
 		{
-			var handle = AssetSystem.LoadSubAssetsAsync(assetPath, assetType);
+			DebugCheckInitialize();
+			return LoadAllAssetsInternal(assetInfo.AssetPath, assetInfo.AssetType, true);
+		}
+
+		/// <summary>
+		/// 同步加载资源对象所属资源包里的所有资源
+		/// </summary>
+		/// <typeparam name="TObject">资源类型</typeparam>
+		/// <param name="location">资源的定位地址</param>
+		public static AllAssetsOperationHandle LoadAllAssetsSync<TObject>(string location)
+		{
+			DebugCheckInitialize();
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
+			return LoadAllAssetsInternal(assetPath, typeof(TObject), true);
+		}
+
+		/// <summary>
+		/// 同步加载资源对象所属资源包里的所有资源
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		/// <param name="type">资源类型</param>
+		public static AllAssetsOperationHandle LoadAllAssetsSync(string location, System.Type type)
+		{
+			DebugCheckInitialize();
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
+			return LoadAllAssetsInternal(assetPath, type, true);
+		}
+
+
+		/// <summary>
+		/// 异步加载资源对象所属资源包里的所有资源
+		/// </summary>
+		/// <param name="assetInfo">资源信息</param>
+		public static AllAssetsOperationHandle LoadAllAssetsAsync(AssetInfo assetInfo)
+		{
+			DebugCheckInitialize();
+			return LoadAllAssetsInternal(assetInfo.AssetPath, assetInfo.AssetType, false);
+		}
+
+		/// <summary>
+		/// 异步加载资源对象所属资源包里的所有资源
+		/// </summary>
+		/// <typeparam name="TObject">资源类型</typeparam>
+		/// <param name="location">资源的定位地址</param>
+		public static AllAssetsOperationHandle LoadAllAssetsAsync<TObject>(string location)
+		{
+			DebugCheckInitialize();
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
+			return LoadAllAssetsInternal(assetPath, typeof(TObject), false);
+		}
+
+		/// <summary>
+		/// 异步加载资源对象所属资源包里的所有资源
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		/// <param name="type">资源类型</param>
+		public static AllAssetsOperationHandle LoadAllAssetsAsync(string location, System.Type type)
+		{
+			DebugCheckInitialize();
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
+			return LoadAllAssetsInternal(assetPath, type, false);
+		}
+
+
+		private static AllAssetsOperationHandle LoadAllAssetsInternal(string assetPath, System.Type assetType, bool waitForAsyncComplete)
+		{
+			var handle = AssetSystem.LoadAllAssetsAsync(assetPath, assetType);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
 			return handle;
@@ -909,7 +1006,7 @@ namespace YooAsset
 		{
 			if (string.IsNullOrEmpty(location))
 			{
-				UnityEngine.Debug.LogError("location param is null or empty!");
+				YooLogger.Error("location param is null or empty!");
 			}
 			else
 			{
@@ -918,11 +1015,11 @@ namespace YooAsset
 				if (index != -1)
 				{
 					if (location.Length == index + 1)
-						UnityEngine.Debug.LogWarning($"Found blank character in location : \"{location}\"");
+						YooLogger.Warning($"Found blank character in location : \"{location}\"");
 				}
 
 				if (location.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
-					UnityEngine.Debug.LogWarning($"Found illegal character in location : \"{location}\"");
+					YooLogger.Warning($"Found illegal character in location : \"{location}\"");
 			}
 		}
 		#endregion

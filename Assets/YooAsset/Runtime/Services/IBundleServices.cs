@@ -11,6 +11,11 @@ namespace YooAsset
 		/// <summary>
 		/// 获取资源信息列表
 		/// </summary>
+		AssetInfo[] GetAssetInfos(string bundleName);
+
+		/// <summary>
+		/// 获取资源信息列表
+		/// </summary>
 		AssetInfo[] GetAssetInfos(string[] tags);
 
 		/// <summary>

@@ -173,7 +173,7 @@ namespace YooAsset
 		/// <summary>
 		/// 获取资源信息列表
 		/// </summary>
-		public static AssetInfo[] GetAssetsInfoByTag(PatchManifest patchManifest, string[] tags)
+		public static AssetInfo[] GetAssetsInfoByTags(PatchManifest patchManifest, string[] tags)
 		{
 			List<AssetInfo> result = new List<AssetInfo>(100);
 			foreach (var patchAsset in patchManifest.AssetList)
@@ -186,6 +186,21 @@ namespace YooAsset
 						result.Add(new AssetInfo(patchAsset.AssetPath));
 					}
 				}
+			}
+			return result.ToArray();
+		}
+
+		/// <summary>
+		/// 获取资源信息列表
+		/// </summary>
+		public static AssetInfo[] GetAssetsInfoByBundleName(PatchManifest patchManifest, string bundleName)
+		{
+			List<AssetInfo> result = new List<AssetInfo>(100);
+			foreach (var patchAsset in patchManifest.AssetList)
+			{
+				string tempName = patchManifest.GetBundleName(patchAsset.AssetPath);
+				if (tempName == bundleName)
+					result.Add(new AssetInfo(patchAsset.AssetPath));
 			}
 			return result.ToArray();
 		}

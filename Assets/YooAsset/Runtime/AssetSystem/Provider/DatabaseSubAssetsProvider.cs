@@ -39,10 +39,8 @@ namespace YooAsset
 					InvokeCompletion();
 					return;
 				}
-				else
-				{
-					Status = EStatus.Loading;
-				}
+
+				Status = EStatus.Loading;
 
 				// 注意：模拟异步加载效果提前返回
 				if (IsWaitForAsyncComplete == false)
@@ -62,7 +60,7 @@ namespace YooAsset
 					List<UnityEngine.Object> result = new List<Object>(findAssets.Length);
 					foreach (var findAsset in findAssets)
 					{
-						if (findAsset.GetType() == AssetType)
+						if (AssetType.IsAssignableFrom(findAsset.GetType()))
 							result.Add(findAsset);
 					}
 					AllAssetObjects = result.ToArray();

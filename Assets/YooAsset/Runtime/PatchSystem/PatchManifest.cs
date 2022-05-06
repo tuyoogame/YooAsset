@@ -210,7 +210,7 @@ namespace YooAsset
 			}
 			else
 			{
-				YooLogger.Warning($"Failed to mapping location to asset path  : {location}");
+				YooLogger.Error($"Failed to mapping location to asset path  : {location}");
 				return string.Empty;
 			}
 		}
