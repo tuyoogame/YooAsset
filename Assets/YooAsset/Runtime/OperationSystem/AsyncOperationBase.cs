@@ -18,7 +18,12 @@ namespace YooAsset
 		/// <summary>
 		/// 错误信息
 		/// </summary>
-		public string Error { get; protected set; } = string.Empty;
+		public string Error { get; protected set; }
+
+		/// <summary>
+		/// 处理进度
+		/// </summary>
+		public float Progress { get; protected set; }
 
 		/// <summary>
 		/// 是否已经完成
@@ -70,8 +75,8 @@ namespace YooAsset
 		internal abstract void Update();
 		internal void Finish()
 		{
+			Progress = 1f;
 			_callback?.Invoke(this);
-
 			if (_taskCompletionSource != null)
 				_taskCompletionSource.TrySetResult(null);
 		}

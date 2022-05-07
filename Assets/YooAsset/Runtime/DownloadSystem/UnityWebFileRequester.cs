@@ -61,6 +61,16 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 下载进度
+		/// </summary>
+		public float Progress()
+		{
+			if (_operationHandle == null)
+				return 0;
+			return _operationHandle.progress;
+		}
+
+		/// <summary>
 		/// 下载是否发生错误
 		/// </summary>
 		public bool HasError()

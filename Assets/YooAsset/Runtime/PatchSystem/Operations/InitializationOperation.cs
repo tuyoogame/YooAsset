@@ -108,6 +108,7 @@ namespace YooAsset
 			if (_steps == ESteps.Update)
 			{
 				_appManifestLoader.Update();
+				Progress = _appManifestLoader.Progress();
 				if (_appManifestLoader.IsDone() == false)
 					return;
 
@@ -181,6 +182,7 @@ namespace YooAsset
 			if (_steps == ESteps.Update)
 			{
 				_appManifestLoader.Update();
+				Progress = _appManifestLoader.Progress();
 				if (_appManifestLoader.IsDone() == false)
 					return;
 
@@ -241,6 +243,16 @@ namespace YooAsset
 				return true;
 			else
 				return false;
+		}
+
+		/// <summary>
+		/// 加载进度
+		/// </summary>
+		public float Progress()
+		{
+			if (_downloader2 == null)
+				return 0;
+			return _downloader2.Progress();
 		}
 
 		public void Update()

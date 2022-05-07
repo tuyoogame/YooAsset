@@ -28,7 +28,7 @@ namespace YooAsset
 
 
 		/// <summary>
-		/// 下载进度（0-100f）
+		/// 下载进度
 		/// </summary>
 		public float DownloadProgress
 		{

@@ -111,6 +111,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.CheckWebManifest)
 			{
+				Progress = _downloaderManifest.Progress();
 				if (_downloaderManifest.IsDone() == false)
 					return;
 

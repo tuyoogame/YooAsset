@@ -172,6 +172,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.UpdateVerifyingCache)
 			{
+				Progress = GetVerifyProgress();
 				if (UpdateVerifyingCache())
 				{
 					_steps = ESteps.Done;
@@ -258,6 +259,7 @@ namespace YooAsset
 		private readonly List<PatchBundle> _verifyingList = new List<PatchBundle>(100);
 		private readonly ThreadSyncContext _syncContext = new ThreadSyncContext();
 		private int _verifyMaxNum = 32;
+		private int _verifyTotalCount = 0;
 		private int _verifySuccessCount = 0;
 		private int _verifyFailCount = 0;
 
@@ -290,6 +292,7 @@ namespace YooAsset
 			ThreadPool.GetMaxThreads(out int workerThreads, out int ioThreads);
 			YooLogger.Log($"Work threads : {workerThreads}, IO threads : {ioThreads}");
 			_verifyMaxNum = Math.Min(workerThreads, ioThreads);
+			_verifyTotalCount = _waitingList.Count;
 		}
 		private bool UpdateVerifyingCache()
 		{
@@ -357,6 +360,12 @@ namespace YooAsset
 					File.Delete(info.FilePath);
 			}
 			_verifyingList.Remove(info.Bundle);
+		}
+		private float GetVerifyProgress()
+		{
+			if (_verifyTotalCount == 0)
+				return 1f;
+			return (float)(_verifySuccessCount + _verifyFailCount) / _verifyTotalCount;
 		}
 		#endregion
 	}

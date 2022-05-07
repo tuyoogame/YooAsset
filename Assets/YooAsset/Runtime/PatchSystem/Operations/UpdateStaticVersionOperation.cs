@@ -87,6 +87,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.CheckStaticVersion)
 			{
+				Progress = _downloader.Progress();
 				if (_downloader.IsDone() == false)
 					return;
 
@@ -105,7 +106,7 @@ namespace YooAsset
 						Status = EOperationStatus.Succeed;
 					}
 					else
-					{						
+					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
 						Error = $"URL : {_downloader.URL} Error : static version content is invalid.";

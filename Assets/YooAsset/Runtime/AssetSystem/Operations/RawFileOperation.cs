@@ -195,6 +195,7 @@ namespace YooAsset
 			// 3. 检测APK拷贝文件结果
 			if (_steps == ESteps.CheckDownloadFromApk)
 			{
+				Progress = _fileRequester.Progress();
 				if (_fileRequester.IsDone() == false)
 					return;
 
@@ -336,6 +337,7 @@ namespace YooAsset
 			// 3. 检测服务器下载结果
 			if (_steps == ESteps.CheckDownloadFromWeb)
 			{
+				Progress = _downloader.DownloadProgress;
 				if (_downloader.IsDone() == false)
 					return;
 
@@ -363,6 +365,7 @@ namespace YooAsset
 			// 5. 检测APK拷贝文件结果
 			if (_steps == ESteps.CheckDownloadFromApk)
 			{
+				Progress = _fileRequester.Progress();
 				if (_fileRequester.IsDone() == false)
 					return;
 

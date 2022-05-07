@@ -203,7 +203,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.CheckDownload)
 			{
-				_downloadProgress = _threadDownloader.DownloadProgress * 100f;
+				_downloadProgress = _threadDownloader.DownloadProgress;
 				_downloadedBytes = _threadDownloader.DownloadedBytes;
 				if (_threadDownloader.IsDone == false)
 					return;

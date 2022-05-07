@@ -53,7 +53,7 @@ namespace YooAsset
 			// 检测下载结果
 			if (_steps == ESteps.CheckDownload)
 			{
-				_downloadProgress = _webRequest.downloadProgress * 100f;
+				_downloadProgress = _webRequest.downloadProgress;
 				_downloadedBytes = _webRequest.downloadedBytes;
 				if (_operationHandle.isDone == false)
 				{

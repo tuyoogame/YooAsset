@@ -145,6 +145,7 @@ namespace YooAsset
 				{
 					_lastDownloadBytes = downloadBytes;
 					_lastDownloadCount = CurrentDownloadCount;
+					Progress = (float)_lastDownloadBytes / TotalDownloadBytes;
 					OnDownloadProgressCallback?.Invoke(TotalDownloadCount, _lastDownloadCount, TotalDownloadBytes, _lastDownloadBytes);
 				}
 

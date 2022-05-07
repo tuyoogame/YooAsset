@@ -11,7 +11,7 @@ namespace YooAsset
 			get
 			{
 				if (IsDone)
-					return 100f;
+					return 1f;
 				else
 					return 0;
 			}
