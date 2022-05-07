@@ -287,6 +287,15 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 开启一个异步操作
+		/// </summary>
+		/// <param name="operation">异步操作对象</param>
+		public static void ProcessOperaiton(GameAsyncOperation operation)
+		{
+			OperationSystem.ProcessOperaiton(operation);
+		}
+
+		/// <summary>
 		/// 获取资源版本号
 		/// </summary>
 		public static int GetResourceVersion()
