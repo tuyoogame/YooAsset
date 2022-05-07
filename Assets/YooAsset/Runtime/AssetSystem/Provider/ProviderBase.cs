@@ -140,8 +140,6 @@ namespace YooAsset
 				handle = new SceneOperationHandle(this);
 			else if (IsSubAssetsProvider())
 				handle = new SubAssetsOperationHandle(this);
-			else if (IsAllAssetsProvider())
-				handle = new AllAssetsOperationHandle(this);
 			else
 				handle = new AssetOperationHandle(this);
 
@@ -208,13 +206,6 @@ namespace YooAsset
 		public bool IsSubAssetsProvider()
 		{
 			if (this is BundledSubAssetsProvider || this is DatabaseSubAssetsProvider)
-				return true;
-			else
-				return false;
-		}
-		public bool IsAllAssetsProvider()
-		{
-			if (this is BundledAllAssetsProvider || this is DatabaseAllAssetsProvider)
 				return true;
 			else
 				return false;

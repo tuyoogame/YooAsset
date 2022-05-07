@@ -343,6 +343,18 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取调试信息
+		/// </summary>
+		internal static void GetDebugReport(DebugReport report)
+		{
+			if (report == null)
+				YooLogger.Error($"{nameof(DebugReport)} is null");
+
+			AssetSystem.GetDebugReport(report);
+		}
+
+		#region 资源信息
+		/// <summary>
 		/// 获取资源包信息
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
@@ -368,8 +380,17 @@ namespace YooAsset
 		/// <summary>
 		/// 获取资源信息列表
 		/// </summary>
+		/// <param name="bundleInfo">资源包信息</param>
+		public static AssetInfo[] GetAssetInfos(BundleInfo bundleInfo)
+		{
+			DebugCheckInitialize();
+			return _bundleServices.GetAssetInfos(bundleInfo.BundleName);
+		}
+
+		/// <summary>
+		/// 获取资源信息列表
+		/// </summary>
 		/// <param name="tag">资源标签</param>
-		/// <returns></returns>
 		public static AssetInfo[] GetAssetInfos(string tag)
 		{
 			DebugCheckInitialize();
@@ -381,23 +402,12 @@ namespace YooAsset
 		/// 获取资源信息列表
 		/// </summary>
 		/// <param name="tags">资源标签列表</param>
-		/// <returns></returns>
 		public static AssetInfo[] GetAssetInfos(string[] tags)
 		{
 			DebugCheckInitialize();
 			return _bundleServices.GetAssetInfos(tags);
 		}
-
-		/// <summary>
-		/// 获取调试信息
-		/// </summary>
-		internal static void GetDebugReport(DebugReport report)
-		{
-			if (report == null)
-				YooLogger.Error($"{nameof(DebugReport)} is null");
-
-			AssetSystem.GetDebugReport(report);
-		}
+		#endregion
 
 		#region 场景加载
 		/// <summary>
@@ -640,86 +650,6 @@ namespace YooAsset
 		private static SubAssetsOperationHandle LoadSubAssetsInternal(string assetPath, System.Type assetType, bool waitForAsyncComplete)
 		{
 			var handle = AssetSystem.LoadSubAssetsAsync(assetPath, assetType);
-			if (waitForAsyncComplete)
-				handle.WaitForAsyncComplete();
-			return handle;
-		}
-		#endregion
-
-		#region 资源加载
-		/// <summary>
-		/// 同步加载资源对象所属资源包里的所有资源
-		/// </summary>
-		/// <param name="assetInfo">资源信息</param>
-		public static AllAssetsOperationHandle LoadAllAssetsSync(AssetInfo assetInfo)
-		{
-			DebugCheckInitialize();
-			return LoadAllAssetsInternal(assetInfo.AssetPath, assetInfo.AssetType, true);
-		}
-
-		/// <summary>
-		/// 同步加载资源对象所属资源包里的所有资源
-		/// </summary>
-		/// <typeparam name="TObject">资源类型</typeparam>
-		/// <param name="location">资源的定位地址</param>
-		public static AllAssetsOperationHandle LoadAllAssetsSync<TObject>(string location)
-		{
-			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadAllAssetsInternal(assetPath, typeof(TObject), true);
-		}
-
-		/// <summary>
-		/// 同步加载资源对象所属资源包里的所有资源
-		/// </summary>
-		/// <param name="location">资源的定位地址</param>
-		/// <param name="type">资源类型</param>
-		public static AllAssetsOperationHandle LoadAllAssetsSync(string location, System.Type type)
-		{
-			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadAllAssetsInternal(assetPath, type, true);
-		}
-
-
-		/// <summary>
-		/// 异步加载资源对象所属资源包里的所有资源
-		/// </summary>
-		/// <param name="assetInfo">资源信息</param>
-		public static AllAssetsOperationHandle LoadAllAssetsAsync(AssetInfo assetInfo)
-		{
-			DebugCheckInitialize();
-			return LoadAllAssetsInternal(assetInfo.AssetPath, assetInfo.AssetType, false);
-		}
-
-		/// <summary>
-		/// 异步加载资源对象所属资源包里的所有资源
-		/// </summary>
-		/// <typeparam name="TObject">资源类型</typeparam>
-		/// <param name="location">资源的定位地址</param>
-		public static AllAssetsOperationHandle LoadAllAssetsAsync<TObject>(string location)
-		{
-			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadAllAssetsInternal(assetPath, typeof(TObject), false);
-		}
-
-		/// <summary>
-		/// 异步加载资源对象所属资源包里的所有资源
-		/// </summary>
-		/// <param name="location">资源的定位地址</param>
-		/// <param name="type">资源类型</param>
-		public static AllAssetsOperationHandle LoadAllAssetsAsync(string location, System.Type type)
-		{
-			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadAllAssetsInternal(assetPath, type, false);
-		}
-
-
-		private static AllAssetsOperationHandle LoadAllAssetsInternal(string assetPath, System.Type assetType, bool waitForAsyncComplete)
-		{
-			var handle = AssetSystem.LoadAllAssetsAsync(assetPath, assetType);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
 			return handle;

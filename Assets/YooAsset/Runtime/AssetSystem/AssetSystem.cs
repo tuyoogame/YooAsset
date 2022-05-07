@@ -196,24 +196,6 @@ namespace YooAsset
 			return provider.CreateHandle() as SubAssetsOperationHandle;
 		}
 
-		/// <summary>
-		/// 加载资源包里的所有资源对象
-		/// </summary>
-		public static AllAssetsOperationHandle LoadAllAssetsAsync(string assetPath, System.Type assetType)
-		{
-			ProviderBase provider = TryGetProvider(assetPath);
-			if (provider == null)
-			{
-				if (SimulationOnEditor)
-					provider = new DatabaseAllAssetsProvider(assetPath, assetType);
-				else
-					provider = new BundledAllAssetsProvider(assetPath, assetType);
-				provider.InitSpawnDebugInfo();
-				_providers.Add(provider);
-			}
-			return provider.CreateHandle() as AllAssetsOperationHandle;
-		}
-
 
 		internal static void UnloadSubScene(ProviderBase provider)
 		{
