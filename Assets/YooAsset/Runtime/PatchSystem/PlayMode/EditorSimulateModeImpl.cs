@@ -12,10 +12,10 @@ namespace YooAsset
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(bool locationToLower)
+		public InitializationOperation InitializeAsync(bool locationToLower, string simulatePatchManifestPath)
 		{
 			_locationToLower = locationToLower;
-			var operation = new EditorSimulateModeInitializationOperation(this);
+			var operation = new EditorSimulateModeInitializationOperation(this, simulatePatchManifestPath);
 			OperationSystem.ProcessOperaiton(operation);
 			return operation;
 		}

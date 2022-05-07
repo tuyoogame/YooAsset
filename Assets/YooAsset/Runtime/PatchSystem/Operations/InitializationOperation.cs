@@ -21,42 +21,53 @@ namespace YooAsset
 		{
 			None,
 			Builder,
+			Load,
 			Done,
 		}
 
 		private readonly EditorSimulateModeImpl _impl;
+		private string _simulatePatchManifestPath;
 		private ESteps _steps = ESteps.None;
 
-		internal EditorSimulateModeInitializationOperation(EditorSimulateModeImpl impl)
+		internal EditorSimulateModeInitializationOperation(EditorSimulateModeImpl impl, string simulatePatchManifestPath)
 		{
 			_impl = impl;
+			_simulatePatchManifestPath = simulatePatchManifestPath;
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.Builder;
+			if (string.IsNullOrEmpty(_simulatePatchManifestPath))
+				_steps = ESteps.Builder;
+			else
+				_steps = ESteps.Load;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.Builder)
 			{
-				string manifestFilePath = EditorSimulateModeHelper.SimulateBuild();
-				if (string.IsNullOrEmpty(manifestFilePath))
+				_simulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild();
+				if (string.IsNullOrEmpty(_simulatePatchManifestPath))
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = "Simulate build failed, see the detail info on the console window.";
 					return;
 				}
-				if (File.Exists(manifestFilePath) == false)
+				_steps = ESteps.Load;
+			}
+
+			if (_steps == ESteps.Load)
+			{
+				if (File.Exists(_simulatePatchManifestPath) == false)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = $"Manifest file not found : {manifestFilePath}";
+					Error = $"Manifest file not found : {_simulatePatchManifestPath}";
 					return;
 				}
 
-				YooLogger.Log($"Load manifest file : {manifestFilePath}");
-				string jsonContent = FileUtility.ReadFile(manifestFilePath);
+				YooLogger.Log($"Load manifest file : {_simulatePatchManifestPath}");
+				string jsonContent = FileUtility.ReadFile(_simulatePatchManifestPath);
 				var simulatePatchManifest = PatchManifest.Deserialize(jsonContent);
 				_impl.SetSimulatePatchManifest(simulatePatchManifest);
 				_steps = ESteps.Done;

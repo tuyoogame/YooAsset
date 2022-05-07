@@ -66,6 +66,11 @@ namespace YooAsset
 		/// </summary>
 		public class EditorSimulateModeParameters : CreateParameters
 		{
+			/// <summary>
+			/// 用于模拟运行的资源清单路径
+			/// 注意：如果路径为空，会自动重新构建补丁清单。
+			/// </summary>
+			public string SimulatePatchManifestPath;
 		}
 
 		/// <summary>
@@ -187,7 +192,10 @@ namespace YooAsset
 				_editorSimulateModeImpl = new EditorSimulateModeImpl();
 				_bundleServices = _editorSimulateModeImpl;
 				AssetSystem.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				initializeOperation = _editorSimulateModeImpl.InitializeAsync(parameters.LocationToLower);
+				var editorSimulateModeParameters = parameters as EditorSimulateModeParameters;
+				initializeOperation = _editorSimulateModeImpl.InitializeAsync(
+					editorSimulateModeParameters.LocationToLower,
+					editorSimulateModeParameters.SimulatePatchManifestPath);
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
