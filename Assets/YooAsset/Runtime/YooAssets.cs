@@ -36,7 +36,7 @@ namespace YooAsset
 		public abstract class CreateParameters
 		{
 			/// <summary>
-			/// 资源定位地址为小写地址
+			/// 资源定位地址大小写不敏感
 			/// </summary>
 			public bool LocationToLower = false;
 
