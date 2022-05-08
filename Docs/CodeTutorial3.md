@@ -1,13 +1,13 @@
 # 资源加载
 
-加载接口：
+加载方法：
 
-- YooAssets.LoadAssetSync() 同步加载资源对象接口
-- YooAssets.LoadSubAssetsSync() 同步加载子资源对象接口
-- YooAssets.LoadAssetAsync() 异步加载资源对象接口
-- YooAssets.LoadSubAssetsAsync() 异步加载子资源对象接口
-- YooAssets.LoadSceneAsync() 异步加载场景接口
-- YooAssets.LoadRawFileAsync() 异步读取原生文件接口
+- YooAssets.LoadAssetSync() 同步加载资源对象
+- YooAssets.LoadSubAssetsSync() 同步加载子资源对象
+- YooAssets.LoadAssetAsync() 异步加载资源对象
+- YooAssets.LoadSubAssetsAsync() 异步加载子资源对象
+- YooAssets.LoadSceneAsync() 异步加载场景
+- YooAssets.GetRawFileAsync() 异步获取原生文件
 
 统一约定：location为资源的定位地址，也是加载资源对象的唯一标识符。
 
@@ -135,14 +135,14 @@ IEnumerator Start()
 {
     string location = "wwise/init.bnk";
     string copyPath = $"{Application.persistentDataPath}/Audio/init.bnk";
-    RawFileOperation operation = YooAssets.LoadRawFileAsync(location, copyPath);
+    RawFileOperation operation = YooAssets.GetRawFileAsync(location, copyPath);
     yield return operation;
     byte[] fileData = operation.GetFileData();
     string fileText = operation.GetFileText();
 }
 ````
 
-**FairyGUI加载方案**
+**FairyGUI支持解决方案**
 
 注意：在FairyGUI的面板销毁的时候，将资源句柄列表释放，否则会造成资源泄漏。
 
@@ -153,7 +153,7 @@ private List<AssetOperationHandle> _handles = new List<AssetOperationHandle>(100
 // 加载方法
 private object LoadFunc(string name, string extension, System.Type type, out DestroyMethod method)
 {
-    method = DestroyMethod.None;
+    method = DestroyMethod.None; //注意：这里一定要设置为None
     string location = $"FairyRes/{name}{extension}";
     var handle = YooAssets.LoadAssetSync(location , type);
     _handles.Add(handle);
@@ -171,3 +171,6 @@ private void ReleaseHandles()
 }
 ````
 
+**UniTask支持解决方案**
+
+[解决方案](https://github.com/tuyoogame/YooAsset/blob/master/Assets/UniTask.YooAsset~/README.md)
