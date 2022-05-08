@@ -2,6 +2,66 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.0.8] - 2022-05-08
+
+### Fixed
+
+- 修复了资源收集器导出配置文件时没有导出公共设置。
+- 修复了不兼容Unity2018版本的错误。
+
+### Changed
+
+- AssetBundleGrouper窗口变更为AssetBundleCollector窗口。
+- **优化了编辑器下模拟运行的初始化速度**。
+- **优化了资源收集窗口打开时卡顿的问题**。
+- 资源收集XML配表支持版本兼容。
+- 资源报告查看窗口支持预览AssetBundle文件内容的功能。
+- 完善了对UniTask的支持。
+- YooAssets所有接口支持初始化容错检测。
+
+### Added
+
+- 异步操作类增加进度查询字段。
+
+  ```c#
+  class AsyncOperationBase
+  {
+      /// <summary>
+      /// 处理进度
+      /// </summary>
+      public float Progress { get; protected set; } 
+  }
+  ```
+
+- 增加开启异步操作的方法。
+
+  ```c#
+  /// <summary>
+  /// 开启一个异步操作
+  /// </summary>
+  /// <param name="operation">异步操作对象</param>
+  public static void ProcessOperaiton(GameAsyncOperation operation)
+  ```
+
+- 新增编辑器下模拟模式的初始化参数。
+
+  ````c#
+  /// <summary>
+  /// 用于模拟运行的资源清单路径
+  /// 注意：如果路径为空，会自动重新构建补丁清单。
+  /// </summary>
+  public string SimulatePatchManifestPath;
+  ````
+
+- 新增通用的初始化参数。
+
+  ```c#
+  /// <summary>
+  /// 资源定位地址大小写不敏感
+  /// </summary>
+  public bool LocationToLower = false;
+  ```
+
 ## [1.0.7] - 2022-05-04
 
 ### Fixed
