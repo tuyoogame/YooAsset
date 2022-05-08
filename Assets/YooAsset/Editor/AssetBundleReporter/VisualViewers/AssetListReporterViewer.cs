@@ -322,7 +322,7 @@ namespace YooAsset.Editor
 
 			// Size
 			var label2 = element.Q<Label>("Label2");
-			label2.text = (bundleInfo.SizeBytes / 1024f).ToString("f1") + " KB";
+			label2.text = EditorUtility.FormatBytes(bundleInfo.SizeBytes);
 
 			// Hash
 			var label3 = element.Q<Label>("Label3");

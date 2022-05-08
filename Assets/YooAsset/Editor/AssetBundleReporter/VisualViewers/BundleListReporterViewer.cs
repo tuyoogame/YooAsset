@@ -31,10 +31,10 @@ namespace YooAsset.Editor
 		private ListView _includeListView;
 
 		private BuildReport _buildReport;
+		private string _reportFilePath;
 		private string _searchKeyWord;
 		private ESortMode _sortMode = ESortMode.BundleName;
 		private bool _descendingSort = false;
-
 
 		/// <summary>
 		/// 初始化页面
@@ -93,9 +93,10 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 填充页面数据
 		/// </summary>
-		public void FillViewData(BuildReport buildReport, string searchKeyWord)
+		public void FillViewData( BuildReport buildReport, string reprotFilePath, string searchKeyWord)
 		{
 			_buildReport = buildReport;
+			_reportFilePath = reprotFilePath;
 			_searchKeyWord = searchKeyWord;
 			RefreshView();
 		}
@@ -139,7 +140,7 @@ namespace YooAsset.Editor
 			}
 			else if (_sortMode == ESortMode.BundleTags)
 			{
-				if(_descendingSort)
+				if (_descendingSort)
 					return result.OrderByDescending(a => a.GetTagsString()).ToList();
 				else
 					return result.OrderBy(a => a.GetTagsString()).ToList();
@@ -171,7 +172,7 @@ namespace YooAsset.Editor
 				else
 					_topBar2.text = "Size ↑";
 			}
-			else if(_sortMode == ESortMode.BundleTags)
+			else if (_sortMode == ESortMode.BundleTags)
 			{
 				if (_descendingSort)
 					_topBar4.text = "Tags ↓";
@@ -260,7 +261,7 @@ namespace YooAsset.Editor
 
 			// Size
 			var label2 = element.Q<Label>("Label2");
-			label2.text = (bundleInfo.SizeBytes / 1024f).ToString("f1") + " KB";
+			label2.text = EditorUtility.FormatBytes(bundleInfo.SizeBytes);
 
 			// Hash
 			var label3 = element.Q<Label>("Label3");
@@ -276,7 +277,21 @@ namespace YooAsset.Editor
 			{
 				ReportBundleInfo bundleInfo = item as ReportBundleInfo;
 				FillIncludeListView(bundleInfo);
+				ShowAssetBundleInspector(bundleInfo);
+				break;
 			}
+		}
+		private void ShowAssetBundleInspector(ReportBundleInfo bundleInfo)
+		{
+			if (bundleInfo.IsRawFile())
+				return;
+
+			string rootDirectory = Path.GetDirectoryName(_reportFilePath);
+			string filePath = $"{rootDirectory}/{bundleInfo.Hash}";
+			if (File.Exists(filePath))
+				Selection.activeObject = AssetBundleRecorder.GetAssetBundle(filePath);
+			else
+				Selection.activeObject = null;
 		}
 		private void TopBar1_clicked()
 		{
