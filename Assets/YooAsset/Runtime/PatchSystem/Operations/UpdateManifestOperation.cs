@@ -332,16 +332,8 @@ namespace YooAsset
 		}
 		private void VerifyInThread(object infoObj)
 		{
-			// 验证沙盒内的文件
 			ThreadInfo info = (ThreadInfo)infoObj;
-			try
-			{
-				info.Result = DownloadSystem.CheckContentIntegrity(info.FilePath, info.Bundle.SizeBytes, info.Bundle.CRC);
-			}
-			catch (Exception)
-			{
-				info.Result = false;
-			}
+			info.Result = DownloadSystem.CheckContentIntegrity(info.FilePath, info.Bundle.SizeBytes, info.Bundle.CRC);
 			_syncContext.Post(VerifyCallback, info);
 		}
 		private void VerifyCallback(object obj)

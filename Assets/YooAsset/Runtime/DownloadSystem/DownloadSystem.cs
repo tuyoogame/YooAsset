@@ -155,17 +155,24 @@ namespace YooAsset
 		}
 		public static bool CheckContentIntegrity(string filePath, long size, string crc)
 		{
-			if (File.Exists(filePath) == false)
-				return false;
+			try
+			{
+				if (File.Exists(filePath) == false)
+					return false;
 
-			// 先验证文件大小
-			long fileSize = FileUtility.GetFileSize(filePath);
-			if (fileSize != size)
-				return false;
+				// 先验证文件大小
+				long fileSize = FileUtility.GetFileSize(filePath);
+				if (fileSize != size)
+					return false;
 
-			// 再验证文件CRC
-			string fileCRC = HashUtility.FileCRC32(filePath);
-			return fileCRC == crc;
+				// 再验证文件CRC
+				string fileCRC = HashUtility.FileCRC32(filePath);
+				return fileCRC == crc;
+			}
+			catch(Exception)
+			{
+				return false;
+			}
 		}
 	}
 }
