@@ -53,6 +53,7 @@
 5. [资源部署](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetDeploy.md)
 5. [构建报告](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetReporter.md)
 5. [调试器](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetDebugger.md)
+5. [常见问题](https://github.com/tuyoogame/YooAsset/blob/master/Docs/FAQ.md)
 
 ## 代码教程
 1. [初始化](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial1.md)
@@ -61,7 +62,7 @@
 
 ## 视频教程
 
-[B站](https://space.bilibili.com/328590743/channel/seriesdetail?sid=2207858)
+[B站视频教程](https://space.bilibili.com/328590743/channel/seriesdetail?sid=2207858)
 
 ## 社区
 
