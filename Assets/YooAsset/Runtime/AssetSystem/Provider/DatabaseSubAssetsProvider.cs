@@ -74,7 +74,10 @@ namespace YooAsset
 				Status = AllAssetObjects == null ? EStatus.Fail : EStatus.Success;
 				if (Status == EStatus.Fail)
 				{
-					LastError = $"Failed to load sub assets : {nameof(AssetType)} in {AssetPath}";
+					if (AssetType == null)
+						LastError = $"Failed to load sub assets : {AssetPath} AssetType : null";
+					else
+						LastError = $"Failed to load sub assets : {AssetPath} AssetType : {AssetType}";
 					YooLogger.Error(LastError);
 				}
 				InvokeCompletion();

@@ -106,7 +106,10 @@ namespace YooAsset
 				Status = AllAssetObjects == null ? EStatus.Fail : EStatus.Success;
 				if (Status == EStatus.Fail)
 				{
-					LastError = $"Failed to load sub assets : {AssetName} from bundle : {OwnerBundle.BundleFileInfo.BundleName}";
+					if (AssetType == null)
+						LastError = $"Failed to load sub assets : {AssetName} AssetType : null AssetBundle : {OwnerBundle.BundleFileInfo.BundleName}";
+					else
+						LastError = $"Failed to load sub assets : {AssetName} AssetType : {AssetType} AssetBundle : {OwnerBundle.BundleFileInfo.BundleName}";
 					YooLogger.Error(LastError);
 				}
 				InvokeCompletion();
