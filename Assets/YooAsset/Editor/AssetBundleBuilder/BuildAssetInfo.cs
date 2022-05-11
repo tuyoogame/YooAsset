@@ -10,7 +10,8 @@ namespace YooAsset.Editor
 		private string _mainBundleName;
 		private string _shareBundleName;
 		private readonly HashSet<string> _referenceBundleNames = new HashSet<string>();
-
+		private bool _isAddAssetTags = false;
+		
 		/// <summary>
 		/// 收集器类型
 		/// </summary>
@@ -37,9 +38,14 @@ namespace YooAsset.Editor
 		public bool IsShaderAsset { private set; get; }
 
 		/// <summary>
-		/// 资源分类标签列表
+		/// 资源的分类标签
 		/// </summary>
 		public readonly List<string> AssetTags = new List<string>();
+
+		/// <summary>
+		/// 资源包的分类标签
+		/// </summary>
+		public readonly List<string> BundleTags = new List<string>();
 
 		/// <summary>
 		/// 依赖的所有资源
@@ -89,15 +95,35 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 添加资源分类标签
+		/// 添加资源的分类标签
+		/// 说明：原始定义的资源分类标签
 		/// </summary>
 		public void AddAssetTags(List<string> tags)
 		{
+			if (_isAddAssetTags)
+				throw new Exception("Should never get here !");
+			_isAddAssetTags = true;
+
 			foreach (var tag in tags)
 			{
 				if (AssetTags.Contains(tag) == false)
 				{
 					AssetTags.Add(tag);
+				}
+			}
+		}
+		
+		/// <summary>
+		/// 添加资源包的分类标签
+		/// 说明：传染算法统计到的分类标签
+		/// </summary>
+		public void AddBundleTags(List<string> tags)
+		{
+			foreach (var tag in tags)
+			{
+				if (BundleTags.Contains(tag) == false)
+				{
+					BundleTags.Add(tag);
 				}
 			}
 		}

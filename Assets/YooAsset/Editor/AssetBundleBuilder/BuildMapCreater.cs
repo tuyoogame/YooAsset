@@ -18,7 +18,7 @@ namespace YooAsset.Editor
 			// 1. 检测配置合法性
 			AssetBundleCollectorSettingData.Setting.CheckConfigError();
 
-			// 2. 获取所有主动收集的资源
+			// 2. 获取所有收集器收集的资源
 			List<CollectAssetInfo> allCollectAssets = AssetBundleCollectorSettingData.Setting.GetAllCollectAssets(buildMode);
 
 			// 3. 剔除未被引用的依赖资源
@@ -36,13 +36,15 @@ namespace YooAsset.Editor
 				allCollectAssets.Remove(removeValue);
 			}
 
-			// 4. 录入主动收集的资源
+			// 4. 录入所有收集器收集的资源
 			foreach (var collectAssetInfo in allCollectAssets)
 			{
 				if (buildAssetDic.ContainsKey(collectAssetInfo.AssetPath) == false)
 				{
-					var buildAssetInfo = new BuildAssetInfo(collectAssetInfo.CollectorType, collectAssetInfo.BundleName, collectAssetInfo.Address, collectAssetInfo.AssetPath, collectAssetInfo.IsRawAsset);
+					var buildAssetInfo = new BuildAssetInfo(collectAssetInfo.CollectorType, collectAssetInfo.BundleName,
+						collectAssetInfo.Address, collectAssetInfo.AssetPath, collectAssetInfo.IsRawAsset);
 					buildAssetInfo.AddAssetTags(collectAssetInfo.AssetTags);
+					buildAssetInfo.AddBundleTags(collectAssetInfo.AssetTags);
 					buildAssetDic.Add(collectAssetInfo.AssetPath, buildAssetInfo);
 				}
 				else
@@ -58,13 +60,13 @@ namespace YooAsset.Editor
 				{
 					if (buildAssetDic.ContainsKey(dependAssetPath))
 					{
-						buildAssetDic[dependAssetPath].AddAssetTags(collectAssetInfo.AssetTags);
+						buildAssetDic[dependAssetPath].AddBundleTags(collectAssetInfo.AssetTags);
 						buildAssetDic[dependAssetPath].AddReferenceBundleName(collectAssetInfo.BundleName);
 					}
 					else
 					{
 						var buildAssetInfo = new BuildAssetInfo(ECollectorType.None, dependAssetPath);
-						buildAssetInfo.AddAssetTags(collectAssetInfo.AssetTags);
+						buildAssetInfo.AddBundleTags(collectAssetInfo.AssetTags);
 						buildAssetInfo.AddReferenceBundleName(collectAssetInfo.BundleName);
 						buildAssetDic.Add(dependAssetPath, buildAssetInfo);
 					}
@@ -92,7 +94,7 @@ namespace YooAsset.Editor
 				pair.Value.CalculateFullBundleName();
 			}
 
-			// 8. 移除未参与构建的资源
+			// 8. 移除不参与构建的资源
 			List<BuildAssetInfo> removeBuildList = new List<BuildAssetInfo>();
 			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
 			{

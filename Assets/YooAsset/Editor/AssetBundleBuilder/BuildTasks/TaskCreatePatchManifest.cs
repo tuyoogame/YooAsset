@@ -70,7 +70,7 @@ namespace YooAsset.Editor
 				string hash = GetFileHash(filePath, standardBuild);
 				string crc32 = GetFileCRC(filePath, standardBuild);
 				long size = GetFileSize(filePath, standardBuild);
-				string[] tags = buildMapContext.GetAssetTags(bundleName);
+				string[] tags = buildMapContext.GetBundleTags(bundleName);
 				bool isEncrypted = encryptionContext.IsEncryptFile(bundleName);
 				bool isBuildin = IsBuildinBundle(tags, buildinTags);
 				bool isRawFile = bundleInfo.IsRawFile;
@@ -141,6 +141,7 @@ namespace YooAsset.Editor
 					else
 						patchAsset.Address = string.Empty;
 					patchAsset.AssetPath = assetInfo.AssetPath;
+					patchAsset.AssetTags = assetInfo.AssetTags.ToArray();
 					patchAsset.BundleID = GetAssetBundleID(assetInfo.GetBundleName(), patchManifest);
 					patchAsset.DependIDs = GetAssetBundleDependIDs(patchAsset.BundleID, assetInfo, patchManifest);
 					result.Add(patchAsset);

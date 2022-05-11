@@ -22,6 +22,11 @@ namespace YooAsset.Editor
 		/// 说明：Meta文件记录的GUID
 		/// </summary>
 		public string AssetGUID;
+
+		/// <summary>
+		/// 资源的分类标签
+		/// </summary>
+		public string[] AssetTags;
 		
 		/// <summary>
 		/// 所属资源包名称

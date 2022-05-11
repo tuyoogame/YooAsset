@@ -27,7 +27,7 @@ namespace YooAsset
 		public long SizeBytes;
 
 		/// <summary>
-		/// Tags
+		/// 资源包的分类标签
 		/// </summary>
 		public string[] Tags;
 

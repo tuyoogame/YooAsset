@@ -55,13 +55,13 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 获取AssetBundle内包含的标记列表
+		/// 获取资源包的分类标签列表
 		/// </summary>
-		public string[] GetAssetTags(string bundleName)
+		public string[] GetBundleTags(string bundleName)
 		{
 			if (TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))
 			{
-				return bundleInfo.GetAssetTags();
+				return bundleInfo.GetBundleTags();
 			}
 			throw new Exception($"Not found {nameof(BuildBundleInfo)} : {bundleName}");
 		}

@@ -75,6 +75,7 @@ namespace YooAsset.Editor
 				ReportAssetInfo reportAssetInfo = new ReportAssetInfo();
 				reportAssetInfo.Address = patchAsset.Address;
 				reportAssetInfo.AssetPath = patchAsset.AssetPath;
+				reportAssetInfo.AssetTags = patchAsset.AssetTags;
 				reportAssetInfo.AssetGUID = AssetDatabase.AssetPathToGUID(patchAsset.AssetPath);
 				reportAssetInfo.MainBundleName = mainBundle.BundleName;
 				reportAssetInfo.MainBundleSize = mainBundle.SizeBytes;

@@ -68,14 +68,14 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 获取资源标签列表
+		/// 获取资源包的分类标签列表
 		/// </summary>
-		public string[] GetAssetTags()
+		public string[] GetBundleTags()
 		{
 			List<string> result = new List<string>(BuildinAssets.Count);
 			foreach (var assetInfo in BuildinAssets)
 			{
-				foreach (var assetTag in assetInfo.AssetTags)
+				foreach (var assetTag in assetInfo.BundleTags)
 				{
 					if (result.Contains(assetTag) == false)
 						result.Add(assetTag);
