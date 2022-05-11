@@ -16,8 +16,7 @@ namespace YooAsset.Editor
 			buildParameters.OutputRoot = defaultOutputRoot;
 			buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
 			buildParameters.BuildMode = EBuildMode.SimulateBuild;
-			buildParameters.BuildVersion = AssetBundleBuilderSettingData.Setting.BuildVersion;
-			buildParameters.BuildinTags = AssetBundleBuilderSettingData.Setting.BuildTags;
+			buildParameters.BuildVersion = 999;
 			buildParameters.EnableAddressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
 
 			AssetBundleBuilder builder = new AssetBundleBuilder();
