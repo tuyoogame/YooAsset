@@ -192,7 +192,7 @@ namespace YooAsset
 		{
 			if (_steps == ESteps.None)
 			{
-				OperationSystem.ProcessOperaiton(this);
+				OperationSystem.StartOperaiton(this);
 			}
 		}
 	}

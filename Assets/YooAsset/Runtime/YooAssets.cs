@@ -149,19 +149,19 @@ namespace YooAsset
 				throw new Exception("YooAsset is initialized yet.");
 			}
 
+			// 检测参数范围
 			if (parameters.AssetLoadingMaxNumber < 1)
 			{
 				parameters.AssetLoadingMaxNumber = 1;
 				YooLogger.Warning($"{nameof(parameters.AssetLoadingMaxNumber)} minimum value is 1");
 			}
-
 			if (parameters.OperationSystemMaxTimeSlice < 30)
 			{
 				parameters.OperationSystemMaxTimeSlice = 30;
-				YooLogger.Warning($"{nameof(parameters.OperationSystemMaxTimeSlice)} minimum value is 33 milliseconds");
+				YooLogger.Warning($"{nameof(parameters.OperationSystemMaxTimeSlice)} minimum value is 30 milliseconds");
 			}
 
-			// 运行模式
+			// 鉴定运行模式
 			if (parameters is EditorSimulateModeParameters)
 				_playMode = EPlayMode.EditorSimulateMode;
 			else if (parameters is OfflinePlayModeParameters)
@@ -241,19 +241,17 @@ namespace YooAsset
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdateStaticVersionOperation();
-				OperationSystem.ProcessOperaiton(operation);
+				OperationSystem.StartOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				var operation = new OfflinePlayModeUpdateStaticVersionOperation();
-				OperationSystem.ProcessOperaiton(operation);
+				OperationSystem.StartOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				if (_hostPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
 				return _hostPlayModeImpl.UpdateStaticVersionAsync(timeout);
 			}
 			else
@@ -273,19 +271,17 @@ namespace YooAsset
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdateManifestOperation();
-				OperationSystem.ProcessOperaiton(operation);
+				OperationSystem.StartOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				var operation = new OfflinePlayModeUpdateManifestOperation();
-				OperationSystem.ProcessOperaiton(operation);
+				OperationSystem.StartOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				if (_hostPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
 				return _hostPlayModeImpl.UpdatePatchManifestAsync(resourceVersion, timeout);
 			}
 			else
@@ -298,9 +294,9 @@ namespace YooAsset
 		/// 开启一个异步操作
 		/// </summary>
 		/// <param name="operation">异步操作对象</param>
-		public static void ProcessOperaiton(GameAsyncOperation operation)
+		public static void StartOperaiton(GameAsyncOperation operation)
 		{
-			OperationSystem.ProcessOperaiton(operation);
+			OperationSystem.StartOperaiton(operation);
 		}
 
 		/// <summary>
@@ -311,20 +307,14 @@ namespace YooAsset
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
-				if (_editorSimulateModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
 				return _editorSimulateModeImpl.GetResourceVersion();
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				if (_offlinePlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
 				return _offlinePlayModeImpl.GetResourceVersion();
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				if (_hostPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
 				return _hostPlayModeImpl.GetResourceVersion();
 			}
 			else
@@ -338,8 +328,11 @@ namespace YooAsset
 		/// </summary>
 		public static void UnloadUnusedAssets()
 		{
-			AssetSystem.Update();
-			AssetSystem.UnloadUnusedAssets();
+			if (_isInitialize)
+			{
+				AssetSystem.Update();
+				AssetSystem.UnloadUnusedAssets();
+			}
 		}
 
 		/// <summary>
@@ -347,52 +340,30 @@ namespace YooAsset
 		/// </summary>
 		public static void ForceUnloadAllAssets()
 		{
-			AssetSystem.ForceUnloadAllAssets();
+			if (_isInitialize)
+			{
+				AssetSystem.ForceUnloadAllAssets();
+			}
 		}
 
-		/// <summary>
-		/// 获取调试信息
-		/// </summary>
-		internal static void GetDebugReport(DebugReport report)
-		{
-			if (report == null)
-				YooLogger.Error($"{nameof(DebugReport)} is null");
-
-			AssetSystem.GetDebugReport(report);
-		}
 
 		#region 资源信息
 		/// <summary>
-		/// 获取资源包信息
+		/// 是否需要从远端更新下载
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
-		public static BundleInfo GetBundleInfo(string location)
+		public static bool IsNeedDownloadFromRemote(string location)
 		{
 			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			string bundleName = _bundleServices.GetBundleName(assetPath);
-			return _bundleServices.GetBundleInfo(bundleName);
-		}
-
-		/// <summary>
-		/// 获取资源包信息
-		/// </summary>
-		/// <param name="assetInfo">资源信息</param>
-		public static BundleInfo GetBundleInfo(AssetInfo assetInfo)
-		{
-			DebugCheckInitialize();
-			string bundleName = _bundleServices.GetBundleName(assetInfo.AssetPath);
-			return _bundleServices.GetBundleInfo(bundleName);
-		}
-
-		/// <summary>
-		/// 获取资源信息列表
-		/// </summary>
-		/// <param name="bundleInfo">资源包信息</param>
-		public static AssetInfo[] GetAssetInfos(BundleInfo bundleInfo)
-		{
-			DebugCheckInitialize();
-			return _bundleServices.GetAssetInfos(bundleInfo.BundleName);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+			if (assetInfo.IsInvalid)
+				return false;
+			
+			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+			if (bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
+				return true;
+			else
+				return false;
 		}
 
 		/// <summary>
@@ -428,8 +399,8 @@ namespace YooAsset
 		public static SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool activateOnLoad = true, int priority = 100)
 		{
 			DebugCheckInitialize();
-			string scenePath = _locationServices.ConvertLocationToAssetPath(location);
-			var handle = AssetSystem.LoadSceneAsync(scenePath, sceneMode, activateOnLoad, priority);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+			var handle = AssetSystem.LoadSceneAsync(assetInfo, sceneMode, activateOnLoad, priority);
 			return handle;
 		}
 
@@ -443,8 +414,7 @@ namespace YooAsset
 		public static SceneOperationHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool activateOnLoad = true, int priority = 100)
 		{
 			DebugCheckInitialize();
-			string scenePath = assetInfo.AssetPath;
-			var handle = AssetSystem.LoadSceneAsync(scenePath, sceneMode, activateOnLoad, priority);
+			var handle = AssetSystem.LoadSceneAsync(assetInfo, sceneMode, activateOnLoad, priority);
 			return handle;
 		}
 		#endregion
@@ -458,8 +428,8 @@ namespace YooAsset
 		public static RawFileOperation GetRawFileAsync(string location, string copyPath = null)
 		{
 			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return GetRawFileInternal(assetPath, copyPath);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+			return GetRawFileInternal(assetInfo, copyPath);
 		}
 
 		/// <summary>
@@ -470,31 +440,36 @@ namespace YooAsset
 		public static RawFileOperation GetRawFileAsync(AssetInfo assetInfo, string copyPath = null)
 		{
 			DebugCheckInitialize();
-			return GetRawFileInternal(assetInfo.AssetPath, copyPath);
+			return GetRawFileInternal(assetInfo, copyPath);
 		}
 
 
-		private static RawFileOperation GetRawFileInternal(string assetPath, string copyPath)
+		private static RawFileOperation GetRawFileInternal(AssetInfo assetInfo, string copyPath)
 		{
-			string bundleName = _bundleServices.GetBundleName(assetPath);
-			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(bundleName);
+			if (assetInfo.IsInvalid)
+			{
+				RawFileOperation operation = new CompletedRawFileOperation(assetInfo.Error, copyPath);
+				OperationSystem.StartOperaiton(operation);
+				return operation;
+			}
 
+			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				RawFileOperation operation = new EditorPlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.ProcessOperaiton(operation);
+				OperationSystem.StartOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				RawFileOperation operation = new OfflinePlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.ProcessOperaiton(operation);
+				OperationSystem.StartOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
 				RawFileOperation operation = new HostPlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.ProcessOperaiton(operation);
+				OperationSystem.StartOperaiton(operation);
 				return operation;
 			}
 			else
@@ -512,7 +487,7 @@ namespace YooAsset
 		public static AssetOperationHandle LoadAssetSync(AssetInfo assetInfo)
 		{
 			DebugCheckInitialize();
-			return LoadAssetInternal(assetInfo.AssetPath, assetInfo.AssetType, true);
+			return LoadAssetInternal(assetInfo, true);
 		}
 
 		/// <summary>
@@ -523,8 +498,8 @@ namespace YooAsset
 		public static AssetOperationHandle LoadAssetSync<TObject>(string location) where TObject : class
 		{
 			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadAssetInternal(assetPath, typeof(TObject), true);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
+			return LoadAssetInternal(assetInfo, true);
 		}
 
 		/// <summary>
@@ -535,8 +510,8 @@ namespace YooAsset
 		public static AssetOperationHandle LoadAssetSync(string location, System.Type type)
 		{
 			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadAssetInternal(assetPath, type, true);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadAssetInternal(assetInfo, true);
 		}
 
 
@@ -547,7 +522,7 @@ namespace YooAsset
 		public static AssetOperationHandle LoadAssetAsync(AssetInfo assetInfo)
 		{
 			DebugCheckInitialize();
-			return LoadAssetInternal(assetInfo.AssetPath, assetInfo.AssetType, false);
+			return LoadAssetInternal(assetInfo, false);
 		}
 
 		/// <summary>
@@ -558,8 +533,8 @@ namespace YooAsset
 		public static AssetOperationHandle LoadAssetAsync<TObject>(string location)
 		{
 			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadAssetInternal(assetPath, typeof(TObject), false);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
+			return LoadAssetInternal(assetInfo, false);
 		}
 
 		/// <summary>
@@ -570,14 +545,14 @@ namespace YooAsset
 		public static AssetOperationHandle LoadAssetAsync(string location, System.Type type)
 		{
 			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadAssetInternal(assetPath, type, false);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadAssetInternal(assetInfo, false);
 		}
 
 
-		private static AssetOperationHandle LoadAssetInternal(string assetPath, System.Type assetType, bool waitForAsyncComplete)
+		private static AssetOperationHandle LoadAssetInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
 		{
-			var handle = AssetSystem.LoadAssetAsync(assetPath, assetType);
+			var handle = AssetSystem.LoadAssetAsync(assetInfo);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
 			return handle;
@@ -592,7 +567,7 @@ namespace YooAsset
 		public static SubAssetsOperationHandle LoadSubAssetsSync(AssetInfo assetInfo)
 		{
 			DebugCheckInitialize();
-			return LoadSubAssetsInternal(assetInfo.AssetPath, assetInfo.AssetType, true);
+			return LoadSubAssetsInternal(assetInfo, true);
 		}
 
 		/// <summary>
@@ -603,8 +578,8 @@ namespace YooAsset
 		public static SubAssetsOperationHandle LoadSubAssetsSync<TObject>(string location)
 		{
 			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadSubAssetsInternal(assetPath, typeof(TObject), true);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
+			return LoadSubAssetsInternal(assetInfo, true);
 		}
 
 		/// <summary>
@@ -615,8 +590,8 @@ namespace YooAsset
 		public static SubAssetsOperationHandle LoadSubAssetsSync(string location, System.Type type)
 		{
 			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadSubAssetsInternal(assetPath, type, true);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadSubAssetsInternal(assetInfo, true);
 		}
 
 
@@ -627,7 +602,7 @@ namespace YooAsset
 		public static SubAssetsOperationHandle LoadSubAssetsAsync(AssetInfo assetInfo)
 		{
 			DebugCheckInitialize();
-			return LoadSubAssetsInternal(assetInfo.AssetPath, assetInfo.AssetType, false);
+			return LoadSubAssetsInternal(assetInfo, false);
 		}
 
 		/// <summary>
@@ -638,8 +613,8 @@ namespace YooAsset
 		public static SubAssetsOperationHandle LoadSubAssetsAsync<TObject>(string location)
 		{
 			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadSubAssetsInternal(assetPath, typeof(TObject), false);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
+			return LoadSubAssetsInternal(assetInfo, false);
 		}
 
 		/// <summary>
@@ -650,14 +625,14 @@ namespace YooAsset
 		public static SubAssetsOperationHandle LoadSubAssetsAsync(string location, System.Type type)
 		{
 			DebugCheckInitialize();
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-			return LoadSubAssetsInternal(assetPath, type, false);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadSubAssetsInternal(assetInfo, false);
 		}
 
 
-		private static SubAssetsOperationHandle LoadSubAssetsInternal(string assetPath, System.Type assetType, bool waitForAsyncComplete)
+		private static SubAssetsOperationHandle LoadSubAssetsInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
 		{
-			var handle = AssetSystem.LoadSubAssetsAsync(assetPath, assetType);
+			var handle = AssetSystem.LoadSubAssetsAsync(assetInfo);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
 			return handle;
@@ -694,8 +669,6 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				if (_hostPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
 				return _hostPlayModeImpl.CreatePatchDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain);
 			}
 			else
@@ -720,8 +693,6 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				if (_hostPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
 				return _hostPlayModeImpl.CreatePatchDownloaderByAll(downloadingMaxNumber, failedTryAgain);
 			}
 			else
@@ -748,16 +719,13 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				if (_hostPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
-
-				List<string> assetPaths = new List<string>(locations.Length);
+				List<AssetInfo> assetInfos = new List<AssetInfo>(locations.Length);
 				foreach (var location in locations)
 				{
-					string assetPath = _locationServices.ConvertLocationToAssetPath(location);
-					assetPaths.Add(assetPath);
+					AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+					assetInfos.Add(assetInfo);
 				}
-				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetPaths, downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetInfos.ToArray(), downloadingMaxNumber, failedTryAgain);
 			}
 			else
 			{
@@ -782,15 +750,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				if (_hostPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
-
-				List<string> assetPaths = new List<string>(assetInfos.Length);
-				foreach (var assetInfo in assetInfos)
-				{
-					assetPaths.Add(assetInfo.AssetPath);
-				}
-				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetPaths, downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetInfos, downloadingMaxNumber, failedTryAgain);
 			}
 			else
 			{
@@ -829,15 +789,39 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				if (_offlinePlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
 				return _offlinePlayModeImpl.CreatePatchUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain);
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				if (_hostPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
 				return _hostPlayModeImpl.CreatePatchUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain);
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+		/// <summary>
+		/// 创建补丁解压器
+		/// </summary>
+		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
+		/// <param name="failedTryAgain">解压失败的重试次数</param>
+		public static PatchUnpackerOperation CreatePatchUnpacker(int unpackingMaxNumber, int failedTryAgain)
+		{
+			DebugCheckInitialize();
+			if (_playMode == EPlayMode.EditorSimulateMode)
+			{
+				List<BundleInfo> downloadList = new List<BundleInfo>();
+				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				return _offlinePlayModeImpl.CreatePatchUnpackerByAll(unpackingMaxNumber, failedTryAgain);
+			}
+			else if (_playMode == EPlayMode.HostPlayMode)
+			{
+				return _hostPlayModeImpl.CreatePatchUnpackerByAll(unpackingMaxNumber, failedTryAgain);
 			}
 			else
 			{
@@ -858,19 +842,17 @@ namespace YooAsset
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdatePackageOperation();
-				OperationSystem.ProcessOperaiton(operation);
+				OperationSystem.StartOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				var operation = new OfflinePlayModeUpdatePackageOperation();
-				OperationSystem.ProcessOperaiton(operation);
+				OperationSystem.StartOperaiton(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				if (_hostPlayModeImpl == null)
-					throw new Exception("YooAsset is not initialized.");
 				return _hostPlayModeImpl.UpdatePackageAsync(resourceVersion, timeout);
 			}
 			else
@@ -918,14 +900,25 @@ namespace YooAsset
 		#region 内部方法
 		internal static void InternalUpdate()
 		{
-			// 更新异步请求操作
+			// 更新异步操作系统
 			OperationSystem.Update();
 
 			// 更新下载管理系统
 			DownloadSystem.Update();
 
-			// 轮询更新资源系统
+			// 更新资源系统
 			AssetSystem.Update();
+		}
+
+		/// <summary>
+		/// 获取调试信息
+		/// </summary>
+		internal static void GetDebugReport(DebugReport report)
+		{
+			if (report == null)
+				YooLogger.Error($"{nameof(DebugReport)} is null");
+
+			AssetSystem.GetDebugReport(report);
 		}
 
 		/// <summary>
@@ -933,7 +926,6 @@ namespace YooAsset
 		/// </summary>
 		internal static string MappingToAssetPath(string location)
 		{
-			DebugCheckLocation(location);
 			return _bundleServices.MappingToAssetPath(location);
 		}
 		#endregion
@@ -951,11 +943,7 @@ namespace YooAsset
 		[Conditional("DEBUG")]
 		private static void DebugCheckLocation(string location)
 		{
-			if (string.IsNullOrEmpty(location))
-			{
-				YooLogger.Error("location param is null or empty!");
-			}
-			else
+			if (string.IsNullOrEmpty(location) == false)
 			{
 				// 检查路径末尾是否有空格
 				int index = location.LastIndexOf(" ");
@@ -967,6 +955,31 @@ namespace YooAsset
 
 				if (location.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
 					YooLogger.Warning($"Found illegal character in location : \"{location}\"");
+			}
+		}
+		#endregion
+
+		#region 私有方法
+		private static AssetInfo ConvertLocationToAssetInfo(string location, System.Type assetType)
+		{
+			DebugCheckLocation(location);
+			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
+			PatchAsset patchAsset = _bundleServices.TryGetPatchAsset(assetPath);
+			if (patchAsset != null)
+			{
+				AssetInfo assetInfo = new AssetInfo(patchAsset, assetType);
+				return assetInfo;
+			}
+			else
+			{
+				string error;
+				if (string.IsNullOrEmpty(location))
+					error = $"The location is null or empty !";
+				else
+					error = $"The location is invalid : {location}";
+				YooLogger.Error(error);
+				AssetInfo assetInfo = new AssetInfo(error);
+				return assetInfo;
 			}
 		}
 		#endregion

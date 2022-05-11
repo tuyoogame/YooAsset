@@ -17,7 +17,7 @@ namespace YooAsset
 		/// <summary>
 		/// 资源包文件信息
 		/// </summary>
-		public BundleInfo BundleFileInfo { private set; get; }
+		public BundleInfo MainBundleInfo { private set; get; }
 
 		/// <summary>
 		/// 引用计数
@@ -45,7 +45,7 @@ namespace YooAsset
 
 		public AssetBundleLoaderBase(BundleInfo bundleInfo)
 		{
-			BundleFileInfo = bundleInfo;
+			MainBundleInfo = bundleInfo;
 			RefCount = 0;
 			Status = EStatus.None;
 		}
@@ -91,9 +91,9 @@ namespace YooAsset
 			if (forceDestroy == false)
 			{
 				if (RefCount > 0)
-					throw new Exception($"Bundle file loader ref is not zero : {BundleFileInfo.BundleName}");
+					throw new Exception($"Bundle file loader ref is not zero : {MainBundleInfo.BundleName}");
 				if (IsDone() == false)
-					throw new Exception($"Bundle file loader is not done : {BundleFileInfo.BundleName}");
+					throw new Exception($"Bundle file loader is not done : {MainBundleInfo.BundleName}");
 			}
 
 			if (CacheBundle != null)

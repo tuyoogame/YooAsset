@@ -62,90 +62,6 @@ namespace YooAsset
 
 
 		/// <summary>
-		/// 获取内置资源标签列表
-		/// </summary>
-		public string[] GetBuildinTags()
-		{
-			return StringUtility.StringToStringList(BuildinTags, ';').ToArray();
-		}
-
-		/// <summary>
-		/// 获取资源依赖列表
-		/// </summary>
-		public string[] GetAllDependencies(string assetPath)
-		{
-			if (Assets.TryGetValue(assetPath, out PatchAsset patchAsset))
-			{
-				List<string> result = new List<string>(patchAsset.DependIDs.Length);
-				foreach (var dependID in patchAsset.DependIDs)
-				{
-					if (dependID >= 0 && dependID < BundleList.Count)
-					{
-						var dependPatchBundle = BundleList[dependID];
-						result.Add(dependPatchBundle.BundleName);
-					}
-					else
-					{
-						throw new Exception($"Invalid bundle id : {dependID} Asset path : {assetPath}");
-					}
-				}
-				return result.ToArray();
-			}
-			else
-			{
-				YooLogger.Warning($"Not found asset path in patch manifest : {assetPath}");
-				return new string[] { };
-			}
-		}
-
-		/// <summary>
-		/// 获取资源包名称
-		/// </summary>
-		public string GetBundleName(string assetPath)
-		{
-			if (Assets.TryGetValue(assetPath, out PatchAsset patchAsset))
-			{
-				int bundleID = patchAsset.BundleID;
-				if (bundleID >= 0 && bundleID < BundleList.Count)
-				{
-					var patchBundle = BundleList[bundleID];
-					return patchBundle.BundleName;
-				}
-				else
-				{
-					throw new Exception($"Invalid bundle id : {bundleID} Asset path : {assetPath}");
-				}
-			}
-			else
-			{
-				YooLogger.Warning($"Not found asset path in patch manifest : {assetPath}");
-				return string.Empty;
-			}
-		}
-
-		/// <summary>
-		/// 尝试获取资源包的主资源路径
-		/// </summary>
-		public string TryGetBundleMainAssetPath(string bundleName)
-		{
-			foreach (var patchAsset in AssetList)
-			{
-				int bundleID = patchAsset.BundleID;
-				if (bundleID >= 0 && bundleID < BundleList.Count)
-				{
-					var patchBundle = BundleList[bundleID];
-					if (patchBundle.BundleName == bundleName)
-						return patchAsset.AssetPath;
-				}
-				else
-				{
-					throw new Exception($"Invalid bundle id : {bundleID} Asset path : {patchAsset.AssetPath}");
-				}
-			}
-			return string.Empty;
-		}
-
-		/// <summary>
 		/// 初始化资源路径映射
 		/// </summary>
 		public void InitAssetPathMapping(bool locationToLower)
@@ -201,6 +117,12 @@ namespace YooAsset
 		/// </summary>
 		public string MappingToAssetPath(string location)
 		{
+			if(string.IsNullOrEmpty(location))
+			{
+				YooLogger.Error("Failed to mapping location to asset path, The location is null or empty.");
+				return string.Empty;
+			}
+
 			if (_locationToLower)
 				location = location.ToLower();
 
@@ -210,8 +132,62 @@ namespace YooAsset
 			}
 			else
 			{
-				YooLogger.Error($"Failed to mapping location to asset path  : {location}");
+				YooLogger.Warning($"Failed to mapping location to asset path : {location}");
 				return string.Empty;
+			}
+		}
+
+		/// <summary>
+		/// 获取资源包名称
+		/// 注意：传入的资源路径一定合法有效！
+		/// </summary>
+		public string GetBundleName(string assetPath)
+		{
+			if (Assets.TryGetValue(assetPath, out PatchAsset patchAsset))
+			{
+				int bundleID = patchAsset.BundleID;
+				if (bundleID >= 0 && bundleID < BundleList.Count)
+				{
+					var patchBundle = BundleList[bundleID];
+					return patchBundle.BundleName;
+				}
+				else
+				{
+					throw new Exception($"Invalid bundle id : {bundleID} Asset path : {assetPath}");
+				}
+			}
+			else
+			{
+				throw new Exception("Should never get here !");
+			}
+		}
+
+		/// <summary>
+		/// 获取资源依赖列表
+		/// 注意：传入的资源路径一定合法有效！
+		/// </summary>
+		public string[] GetAllDependencies(string assetPath)
+		{
+			if (Assets.TryGetValue(assetPath, out PatchAsset patchAsset))
+			{
+				List<string> result = new List<string>(patchAsset.DependIDs.Length);
+				foreach (var dependID in patchAsset.DependIDs)
+				{
+					if (dependID >= 0 && dependID < BundleList.Count)
+					{
+						var dependPatchBundle = BundleList[dependID];
+						result.Add(dependPatchBundle.BundleName);
+					}
+					else
+					{
+						throw new Exception($"Invalid bundle id : {dependID} Asset path : {assetPath}");
+					}
+				}
+				return result.ToArray();
+			}
+			else
+			{
+				throw new Exception("Should never get here !");
 			}
 		}
 

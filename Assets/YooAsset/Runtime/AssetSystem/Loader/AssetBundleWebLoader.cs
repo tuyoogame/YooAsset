@@ -37,28 +37,30 @@ namespace YooAsset
 
 			if (_steps == ESteps.None)
 			{
-				if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.None)
+				if (MainBundleInfo.IsInvalid)
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
-					LastError = $"Invalid load mode : {BundleFileInfo.BundleName}";
+					LastError = $"The bundle info is invalid : {MainBundleInfo.BundleName}";
 					YooLogger.Error(LastError);
+					return;
 				}
-				else if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
+
+				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
 					_steps = ESteps.LoadFile;
-					_webURL = BundleFileInfo.GetStreamingLoadPath();
+					_webURL = MainBundleInfo.GetStreamingLoadPath();
 				}
 				else
 				{
-					throw new System.NotImplementedException(BundleFileInfo.LoadMode.ToString());
+					throw new System.NotImplementedException(MainBundleInfo.LoadMode.ToString());
 				}
 			}
 
 			// 1. 从服务器或缓存中获取AssetBundle文件
 			if (_steps == ESteps.LoadFile)
 			{
-				string hash = StringUtility.RemoveExtension(BundleFileInfo.Hash);
+				string hash = StringUtility.RemoveExtension(MainBundleInfo.Hash);
 				_webRequest = UnityWebRequestAssetBundle.GetAssetBundle(_webURL, Hash128.Parse(hash));
 				_webRequest.SendWebRequest();
 				_steps = ESteps.CheckFile;
@@ -87,7 +89,7 @@ namespace YooAsset
 					{
 						_steps = ESteps.Done;
 						Status = EStatus.Failed;
-						LastError = $"AssetBundle file is invalid : {BundleFileInfo.BundleName}";
+						LastError = $"AssetBundle file is invalid : {MainBundleInfo.BundleName}";
 						YooLogger.Error(LastError);
 					}
 					else

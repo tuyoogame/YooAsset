@@ -15,7 +15,7 @@ namespace YooAsset
 		private static readonly Dictionary<string, DownloaderBase> _downloaderDic = new Dictionary<string, DownloaderBase>();
 		private static readonly List<string> _removeList = new List<string>(100);
 		private static readonly Dictionary<string, string> _cachedHashList = new Dictionary<string, string>(1000);
-		private static int _breakpointResumeFileSize;
+		private static int _breakpointResumeFileSize = int.MaxValue;
 
 		/// <summary>
 		/// 初始化

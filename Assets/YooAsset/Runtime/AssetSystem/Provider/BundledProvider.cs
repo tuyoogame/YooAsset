@@ -6,15 +6,17 @@ namespace YooAsset
     internal abstract class BundledProvider : ProviderBase
     {
 		protected AssetBundleLoaderBase OwnerBundle { private set; get; }
-		protected DependAssetBundleGroup DependBundles { private set; get; }
+		protected DependAssetBundleGroup DependBundleGroup { private set; get; }
 
-		public BundledProvider(string assetPath, System.Type assetType) : base(assetPath, assetType)
+		public BundledProvider(AssetInfo assetInfo) : base(assetInfo)
 		{
-			OwnerBundle = AssetSystem.CreateOwnerAssetBundleLoader(assetPath);
+			OwnerBundle = AssetSystem.CreateOwnerAssetBundleLoader(assetInfo);
 			OwnerBundle.Reference();
 			OwnerBundle.AddProvider(this);
-			DependBundles = new DependAssetBundleGroup(assetPath);
-			DependBundles.Reference();
+
+			var dependBundles = AssetSystem.CreateDependAssetBundleLoaders(assetInfo);
+			DependBundleGroup = new DependAssetBundleGroup(dependBundles);
+			DependBundleGroup.Reference();
 		}
 		public override void Destroy()
 		{
@@ -26,10 +28,10 @@ namespace YooAsset
 				OwnerBundle.Release();
 				OwnerBundle = null;
 			}
-			if (DependBundles != null)
+			if (DependBundleGroup != null)
 			{
-				DependBundles.Release();
-				DependBundles = null;
+				DependBundleGroup.Release();
+				DependBundleGroup = null;
 			}
 		}
 
@@ -39,12 +41,12 @@ namespace YooAsset
 		internal void GetBundleDebugInfos(List<DebugBundleInfo> output)
 		{
 			var bundleInfo = new DebugBundleInfo();
-			bundleInfo.BundleName = OwnerBundle.BundleFileInfo.BundleName;
+			bundleInfo.BundleName = OwnerBundle.MainBundleInfo.BundleName;
 			bundleInfo.RefCount = OwnerBundle.RefCount;
 			bundleInfo.Status = OwnerBundle.Status;
 			output.Add(bundleInfo);
 
-			DependBundles.GetBundleDebugInfos(output);
+			DependBundleGroup.GetBundleDebugInfos(output);
 		}
 	}
 }

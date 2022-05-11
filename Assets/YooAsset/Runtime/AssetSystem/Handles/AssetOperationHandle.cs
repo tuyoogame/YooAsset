@@ -135,7 +135,7 @@ namespace YooAsset
 		private InstantiateOperation InstantiateAsyncInternal(Vector3 position, Quaternion rotation, Transform parent, bool setPositionRotation)
 		{
 			InstantiateOperation operation = new InstantiateOperation(this, position, rotation, parent, setPositionRotation);
-			OperationSystem.ProcessOperaiton(operation);
+			OperationSystem.StartOperaiton(operation);
 			return operation;
 		}
 	}

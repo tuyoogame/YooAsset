@@ -39,31 +39,33 @@ namespace YooAsset
 
 			if (_steps == ESteps.None)
 			{
-				if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.None)
+				if(MainBundleInfo.IsInvalid)
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
-					LastError = $"Invalid load mode : {BundleFileInfo.BundleName}";
+					LastError = $"The bundle info is invalid : {MainBundleInfo.BundleName}";
 					YooLogger.Error(LastError);
+					return;
 				}
-				else if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
+
+				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
 					_steps = ESteps.Download;
-					_fileLoadPath = BundleFileInfo.GetCacheLoadPath();
+					_fileLoadPath = MainBundleInfo.GetCacheLoadPath();
 				}
-				else if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
+				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
 					_steps = ESteps.LoadFile;
-					_fileLoadPath = BundleFileInfo.GetStreamingLoadPath();
+					_fileLoadPath = MainBundleInfo.GetStreamingLoadPath();
 				}
-				else if (BundleFileInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
+				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
 					_steps = ESteps.LoadFile;
-					_fileLoadPath = BundleFileInfo.GetCacheLoadPath();
+					_fileLoadPath = MainBundleInfo.GetCacheLoadPath();
 				}
 				else
 				{
-					throw new System.NotImplementedException(BundleFileInfo.LoadMode.ToString());
+					throw new System.NotImplementedException(MainBundleInfo.LoadMode.ToString());
 				}
 			}
 
@@ -71,7 +73,7 @@ namespace YooAsset
 			if (_steps == ESteps.Download)
 			{
 				int failedTryAgain = int.MaxValue;
-				_downloader = DownloadSystem.BeginDownload(BundleFileInfo, failedTryAgain);
+				_downloader = DownloadSystem.BeginDownload(MainBundleInfo, failedTryAgain);
 				_steps = ESteps.CheckDownload;
 			}
 
@@ -109,12 +111,12 @@ namespace YooAsset
 #endif
 
 				// Load assetBundle file
-				if (BundleFileInfo.IsEncrypted)
+				if (MainBundleInfo.IsEncrypted)
 				{
 					if (AssetSystem.DecryptionServices == null)
-						throw new Exception($"{nameof(AssetBundleFileLoader)} need {nameof(IDecryptionServices)} : {BundleFileInfo.BundleName}");
+						throw new Exception($"{nameof(AssetBundleFileLoader)} need {nameof(IDecryptionServices)} : {MainBundleInfo.BundleName}");
 
-					ulong offset = AssetSystem.DecryptionServices.GetFileOffset(BundleFileInfo);
+					ulong offset = AssetSystem.DecryptionServices.GetFileOffset();
 					if (_isWaitForAsyncComplete)
 						CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath, 0, offset);
 					else
@@ -154,7 +156,7 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
-					LastError = $"Failed to load assetBundle : {BundleFileInfo.BundleName}";
+					LastError = $"Failed to load assetBundle : {MainBundleInfo.BundleName}";
 					YooLogger.Error(LastError);
 				}
 				else
@@ -183,7 +185,7 @@ namespace YooAsset
 					if (_isShowWaitForAsyncError == false)
 					{
 						_isShowWaitForAsyncError = true;
-						YooLogger.Error($"WaitForAsyncComplete failed ! BundleName : {BundleFileInfo.BundleName} States : {Status}");
+						YooLogger.Error($"WaitForAsyncComplete failed ! BundleName : {MainBundleInfo.BundleName} States : {Status}");
 					}
 					break;
 				}

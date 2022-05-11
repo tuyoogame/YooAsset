@@ -16,7 +16,7 @@ namespace YooAsset
 		{
 			_locationToLower = locationToLower;
 			var operation = new OfflinePlayModeInitializationOperation(this);
-			OperationSystem.ProcessOperaiton(operation);
+			OperationSystem.StartOperaiton(operation);
 			return operation;
 		}
 
@@ -39,6 +39,12 @@ namespace YooAsset
 			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
 			return operation;
 		}
+		public PatchUnpackerOperation CreatePatchUnpackerByAll(int fileUpackingMaxNumber, int failedTryAgain)
+		{
+			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByAll(_appPatchManifest);
+			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
+			return operation;
+		}
 
 		// 设置资源清单
 		internal void SetAppPatchManifest(PatchManifest patchManifest)
@@ -48,11 +54,8 @@ namespace YooAsset
 		}
 
 		#region IBundleServices接口
-		BundleInfo IBundleServices.GetBundleInfo(string bundleName)
+		private BundleInfo CreateBundleInfo(string bundleName)
 		{
-			if (string.IsNullOrEmpty(bundleName))
-				return new BundleInfo(string.Empty);
-
 			if (_appPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
 			{
 				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming);
@@ -60,30 +63,45 @@ namespace YooAsset
 			}
 			else
 			{
-				YooLogger.Warning($"Not found bundle in patch manifest : {bundleName}");
-				BundleInfo bundleInfo = new BundleInfo(bundleName);
-				return bundleInfo;
+				throw new Exception("Should never get here !");
 			}
 		}
-		AssetInfo[] IBundleServices.GetAssetInfos(string bundleName)
+		BundleInfo IBundleServices.GetBundleInfo(AssetInfo assetInfo)
 		{
-			return PatchHelper.GetAssetsInfoByBundleName(_appPatchManifest, bundleName);
+			if (assetInfo.IsInvalid)
+				throw new Exception("Should never get here !");
+
+			string bundleName = _appPatchManifest.GetBundleName(assetInfo.AssetPath);
+			return CreateBundleInfo(bundleName);
+		}
+		BundleInfo[] IBundleServices.GetAllDependBundleInfos(AssetInfo assetInfo)
+		{
+			if (assetInfo.IsInvalid)
+				throw new Exception("Should never get here !");
+
+			var depends = _appPatchManifest.GetAllDependencies(assetInfo.AssetPath);
+			List<BundleInfo> result = new List<BundleInfo>(depends.Length);
+			foreach (var bundleName in depends)
+			{
+				BundleInfo bundleInfo = CreateBundleInfo(bundleName);
+				result.Add(bundleInfo);
+			}
+			return result.ToArray();
 		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
 			return PatchHelper.GetAssetsInfoByTags(_appPatchManifest, tags);
 		}
+		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
+		{
+			if (_appPatchManifest.Assets.TryGetValue(assetPath, out PatchAsset patchAsset))
+				return patchAsset;
+			else
+				return null;
+		}
 		string IBundleServices.MappingToAssetPath(string location)
 		{
 			return _appPatchManifest.MappingToAssetPath(location);
-		}
-		string IBundleServices.GetBundleName(string assetPath)
-		{
-			return _appPatchManifest.GetBundleName(assetPath);
-		}
-		string[] IBundleServices.GetAllDependencies(string assetPath)
-		{
-			return _appPatchManifest.GetAllDependencies(assetPath);
 		}
 		#endregion
 	}

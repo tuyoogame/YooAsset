@@ -19,8 +19,7 @@ namespace YooAsset
 			}
 		}
 
-		public DatabaseSceneProvider(string scenePath, LoadSceneMode sceneMode, bool activateOnLoad, int priority)
-			: base(scenePath, null)
+		public DatabaseSceneProvider(AssetInfo assetInfo, LoadSceneMode sceneMode, bool activateOnLoad, int priority) : base(assetInfo)
 		{
 			SceneMode = sceneMode;
 			_activateOnLoad = activateOnLoad;
@@ -42,7 +41,7 @@ namespace YooAsset
 			{
 				LoadSceneParameters loadSceneParameters = new LoadSceneParameters();
 				loadSceneParameters.loadSceneMode = SceneMode;
-				_asyncOp = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(AssetPath, loadSceneParameters);
+				_asyncOp = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(MainAssetInfo.AssetPath, loadSceneParameters);
 				if (_asyncOp != null)
 				{
 					_asyncOp.allowSceneActivation = true;
@@ -52,7 +51,7 @@ namespace YooAsset
 				else
 				{
 					Status = EStatus.Fail;
-					LastError = $"Failed to load scene : {AssetPath}";
+					LastError = $"Failed to load scene : {MainAssetInfo.AssetPath}";
 					YooLogger.Error(LastError);
 					InvokeCompletion();
 				}
@@ -70,7 +69,7 @@ namespace YooAsset
 					Status = SceneObject.IsValid() ? EStatus.Success : EStatus.Fail;
 					if (Status == EStatus.Fail)
 					{
-						LastError = $"The loaded scene is invalid : {AssetPath}";
+						LastError = $"The loaded scene is invalid : {MainAssetInfo.AssetPath}";
 						YooLogger.Error(LastError);
 					}
 					InvokeCompletion();

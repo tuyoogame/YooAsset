@@ -17,8 +17,7 @@ namespace YooAsset
 			}
 		}
 
-		public DatabaseAssetProvider(string assetPath, System.Type assetType)
-			: base(assetPath, assetType)
+		public DatabaseAssetProvider(AssetInfo assetInfo) : base(assetInfo)
 		{
 		}
 		public override void Update()
@@ -30,11 +29,11 @@ namespace YooAsset
 			if (Status == EStatus.None)
 			{
 				// 检测资源文件是否存在
-				string guid = UnityEditor.AssetDatabase.AssetPathToGUID(AssetPath);
+				string guid = UnityEditor.AssetDatabase.AssetPathToGUID(MainAssetInfo.AssetPath);
 				if (string.IsNullOrEmpty(guid))
 				{
 					Status = EStatus.Fail;
-					LastError = $"Not found asset : {AssetPath}";
+					LastError = $"Not found asset : {MainAssetInfo.AssetPath}";
 					YooLogger.Error(LastError);
 					InvokeCompletion();
 					return;
@@ -50,10 +49,10 @@ namespace YooAsset
 			// 1. 加载资源对象
 			if (Status == EStatus.Loading)
 			{
-				if (AssetType == null)
-					AssetObject = UnityEditor.AssetDatabase.LoadMainAssetAtPath(AssetPath);
+				if (MainAssetInfo.AssetType == null)
+					AssetObject = UnityEditor.AssetDatabase.LoadMainAssetAtPath(MainAssetInfo.AssetPath);
 				else
-					AssetObject = UnityEditor.AssetDatabase.LoadAssetAtPath(AssetPath, AssetType);
+					AssetObject = UnityEditor.AssetDatabase.LoadAssetAtPath(MainAssetInfo.AssetPath, MainAssetInfo.AssetType);
 				Status = EStatus.Checking;
 			}
 
@@ -66,7 +65,7 @@ namespace YooAsset
 					{
 						AssetObject = null;
 						Status = EStatus.Fail;
-						LastError = $"The loaded asset object is not main asset : {AssetPath} AssetType : {AssetType}";
+						LastError = $"The loaded asset object is not main asset : {MainAssetInfo.AssetPath} AssetType : {MainAssetInfo.AssetType}";
 						YooLogger.Error(LastError);
 						InvokeCompletion();
 						return;
@@ -76,12 +75,12 @@ namespace YooAsset
 				Status = AssetObject == null ? EStatus.Fail : EStatus.Success;
 				if (Status == EStatus.Fail)
 				{
-					if (AssetType == null)
-						LastError = $"Failed to load asset object : {AssetPath} AssetType : null";
+					if (MainAssetInfo.AssetType == null)
+						LastError = $"Failed to load asset object : {MainAssetInfo.AssetPath} AssetType : null";
 					else
-						LastError = $"Failed to load asset object : {AssetPath} AssetType : {AssetType}";
+						LastError = $"Failed to load asset object : {MainAssetInfo.AssetPath} AssetType : {MainAssetInfo.AssetType}";
 					YooLogger.Error(LastError);
-				}		
+				}
 				InvokeCompletion();
 			}
 #endif

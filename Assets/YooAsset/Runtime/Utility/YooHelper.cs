@@ -151,6 +151,26 @@ namespace YooAsset
 
 			return ConvertToUnpackList(downloadList);
 		}
+		public static List<BundleInfo> GetUnpackListByAll(PatchManifest appPatchManifest)
+		{
+			// 注意：离线运行模式也依赖下面逻辑，所以判断沙盒内文件是否存在不能通过缓存系统去验证。
+			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
+			foreach (var patchBundle in appPatchManifest.BundleList)
+			{
+				// 如果已经在沙盒内
+				string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
+				if (System.IO.File.Exists(filePath))
+					continue;
+
+				// 如果不是内置资源
+				if (patchBundle.IsBuildin == false)
+					continue;
+
+				downloadList.Add(patchBundle);
+			}
+
+			return ConvertToUnpackList(downloadList);
+		}
 		private static List<BundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
 		{
 			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
@@ -178,29 +198,11 @@ namespace YooAsset
 			List<AssetInfo> result = new List<AssetInfo>(100);
 			foreach (var patchAsset in patchManifest.AssetList)
 			{
-				string bundleName = patchManifest.GetBundleName(patchAsset.AssetPath);
-				if(patchManifest.Bundles.TryGetValue(bundleName, out PatchBundle bundle))
+				if(patchAsset.HasTag(tags))
 				{
-					if(bundle.HasTag(tags))
-					{
-						result.Add(new AssetInfo(patchAsset.AssetPath));
-					}
+					AssetInfo assetInfo = new AssetInfo(patchAsset);
+					result.Add(assetInfo);
 				}
-			}
-			return result.ToArray();
-		}
-
-		/// <summary>
-		/// 获取资源信息列表
-		/// </summary>
-		public static AssetInfo[] GetAssetsInfoByBundleName(PatchManifest patchManifest, string bundleName)
-		{
-			List<AssetInfo> result = new List<AssetInfo>(100);
-			foreach (var patchAsset in patchManifest.AssetList)
-			{
-				string tempName = patchManifest.GetBundleName(patchAsset.AssetPath);
-				if (tempName == bundleName)
-					result.Add(new AssetInfo(patchAsset.AssetPath));
 			}
 			return result.ToArray();
 		}

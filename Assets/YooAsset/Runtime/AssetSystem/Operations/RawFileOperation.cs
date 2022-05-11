@@ -7,7 +7,7 @@ namespace YooAsset
 	/// </summary>
 	public abstract class RawFileOperation : AsyncOperationBase
 	{
-		protected readonly BundleInfo _bundleInfo;
+		internal readonly BundleInfo _bundleInfo;
 
 		/// <summary>
 		/// 原生文件的拷贝路径
@@ -46,6 +46,34 @@ namespace YooAsset
 			if (File.Exists(filePath) == false)
 				return string.Empty;
 			return File.ReadAllText(filePath, System.Text.Encoding.UTF8);
+		}
+	}
+
+	/// <summary>
+	/// 发生错误的原生文件操作
+	/// </summary>
+	internal sealed class CompletedRawFileOperation : RawFileOperation
+	{
+		private readonly string _error;
+		internal CompletedRawFileOperation(string error, string copyPath) : base(null, copyPath)
+		{
+			_error = error;
+		}
+		internal override void Start()
+		{
+			Status = EOperationStatus.Failed;
+			Error = _error;
+		}
+		internal override void Update()
+		{
+		}
+
+		/// <summary>
+		/// 原生文件的缓存路径
+		/// </summary>
+		public override string GetCachePath()
+		{
+			return string.Empty;
 		}
 	}
 

@@ -48,7 +48,7 @@ namespace YooAsset
 		/// <summary>
 		/// 开始处理异步操作类
 		/// </summary>
-		public static void ProcessOperaiton(AsyncOperationBase operationBase)
+		public static void StartOperaiton(AsyncOperationBase operationBase)
 		{
 			_operations.Add(operationBase);
 			operationBase.Start();

@@ -18,19 +18,9 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 资源路径
+		/// 资源信息
 		/// </summary>
-		public string AssetPath { private set; get; }
-
-		/// <summary>
-		/// 资源对象的名称
-		/// </summary>
-		public string AssetName { private set; get; }
-
-		/// <summary>
-		/// 资源对象的类型
-		/// </summary>
-		public System.Type AssetType { private set; get; }
+		public AssetInfo MainAssetInfo { private set; get; }
 
 		/// <summary>
 		/// 获取的资源对象
@@ -95,11 +85,9 @@ namespace YooAsset
 		private readonly List<OperationHandleBase> _handles = new List<OperationHandleBase>();
 
 
-		public ProviderBase(string assetPath, System.Type assetType)
+		public ProviderBase(AssetInfo assetInfo)
 		{
-			AssetPath = assetPath;
-			AssetName = System.IO.Path.GetFileName(assetPath);
-			AssetType = assetType;
+			MainAssetInfo = assetInfo;
 		}
 
 		/// <summary>
@@ -127,24 +115,37 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 是否为场景提供者
+		/// </summary>
+		public bool IsSceneProvider()
+		{
+			if (this is BundledSceneProvider || this is DatabaseSceneProvider)
+				return true;
+			else
+				return false;
+		}
+
+		/// <summary>
 		/// 创建操作句柄
 		/// </summary>
 		/// <returns></returns>
-		public OperationHandleBase CreateHandle()
+		public T CreateHandle<T>() where T : OperationHandleBase
 		{
 			// 引用计数增加
 			RefCount++;
 
 			OperationHandleBase handle;
-			if (IsSceneProvider())
+			if (typeof(T) == typeof(AssetOperationHandle))
+				handle = new AssetOperationHandle(this);
+			else if (typeof(T) == typeof(SceneOperationHandle))
 				handle = new SceneOperationHandle(this);
-			else if (IsSubAssetsProvider())
+			else if (typeof(T) == typeof(SubAssetsOperationHandle))
 				handle = new SubAssetsOperationHandle(this);
 			else
-				handle = new AssetOperationHandle(this);
+				throw new System.NotImplementedException();
 
 			_handles.Add(handle);
-			return handle;
+			return handle as T;
 		}
 
 		/// <summary>
@@ -175,7 +176,7 @@ namespace YooAsset
 			// 验证结果
 			if (IsDone == false)
 			{
-				YooLogger.Warning($"WaitForAsyncComplete failed to loading : {AssetPath}");
+				YooLogger.Warning($"WaitForAsyncComplete failed to loading : {MainAssetInfo.AssetPath}");
 			}
 		}
 
@@ -194,21 +195,6 @@ namespace YooAsset
 				}
 				return _taskCompletionSource.Task;
 			}
-		}
-
-		public bool IsSceneProvider()
-		{
-			if (this is BundledSceneProvider || this is DatabaseSceneProvider)
-				return true;
-			else
-				return false;
-		}
-		public bool IsSubAssetsProvider()
-		{
-			if (this is BundledSubAssetsProvider || this is DatabaseSubAssetsProvider)
-				return true;
-			else
-				return false;
 		}
 
 		#region 异步编程相关

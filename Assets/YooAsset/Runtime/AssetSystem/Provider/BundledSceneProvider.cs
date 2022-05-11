@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -22,11 +23,10 @@ namespace YooAsset
 			}
 		}
 
-		public BundledSceneProvider(string scenePath, LoadSceneMode sceneMode, bool activateOnLoad, int priority)
-			: base(scenePath, null)
+		public BundledSceneProvider(AssetInfo assetInfo, LoadSceneMode sceneMode, bool activateOnLoad, int priority) : base(assetInfo)
 		{
 			SceneMode = sceneMode;
-			_sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+			_sceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
 			_activateOnLoad = activateOnLoad;
 			_priority = priority;
 		}
@@ -43,15 +43,15 @@ namespace YooAsset
 			// 1. 检测资源包
 			if (Status == EStatus.CheckBundle)
 			{
-				if (DependBundles.IsDone() == false)
+				if (DependBundleGroup.IsDone() == false)
 					return;
 				if (OwnerBundle.IsDone() == false)
 					return;
 
-				if (DependBundles.IsSucceed() == false)
+				if (DependBundleGroup.IsSucceed() == false)
 				{
 					Status = EStatus.Fail;
-					LastError = DependBundles.GetLastError();
+					LastError = DependBundleGroup.GetLastError();
 					InvokeCompletion();
 					return;
 				}
@@ -98,7 +98,7 @@ namespace YooAsset
 					Status = SceneObject.IsValid() ? EStatus.Success : EStatus.Fail;
 					if(Status == EStatus.Fail)
 					{
-						LastError = $"The load scene is invalid : {AssetPath}";
+						LastError = $"The load scene is invalid : {MainAssetInfo.AssetPath}";
 						YooLogger.Error(LastError);
 					}
 					InvokeCompletion();

@@ -6,6 +6,6 @@ namespace YooAsset
 		/// <summary>
 		/// 获取加密文件的数据偏移量
 		/// </summary>
-		ulong GetFileOffset(BundleInfo bundleInfo);
+		ulong GetFileOffset();
 	}
 }
