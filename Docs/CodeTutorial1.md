@@ -77,7 +77,7 @@ private IEnumerator InitializeYooAsset()
 ````c#
 public class BundleDecryption : IDecryptionServices
 {
-    public ulong GetFileOffset(BundleInfo bundleInfo)
+    public ulong GetFileOffset()
     {
         return 32;
     }

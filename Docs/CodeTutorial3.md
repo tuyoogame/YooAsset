@@ -142,6 +142,21 @@ IEnumerator Start()
 }
 ````
 
+**获取资源信息列表**
+
+通过资源标签来获取资源信息列表。
+
+````c#
+private GetAssetInfosByTag(string tag)
+{
+    AssetInfo[] assetInfos = YooAssets.GetAssetInfos(tag);
+    foreach (var assetInfo in assetInfos)
+    {
+        Debug.Log(assetInfo.AssetPath);
+    }
+}
+````
+
 **FairyGUI支持解决方案**
 
 注意：在FairyGUI的面板销毁的时候，将资源句柄列表释放，否则会造成资源泄漏。
