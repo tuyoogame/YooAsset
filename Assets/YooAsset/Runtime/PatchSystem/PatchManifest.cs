@@ -73,7 +73,7 @@ namespace YooAsset
 			if (EnableAddressable)
 			{
 				if (locationToLower)
-					YooLogger.Warning("Addressable not support location to lower !");
+					YooLogger.Error("Addressable not support location to lower !");
 
 				foreach (var patchAsset in AssetList)
 				{

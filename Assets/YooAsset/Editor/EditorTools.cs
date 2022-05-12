@@ -566,7 +566,7 @@ namespace YooAsset.Editor
 		public static string AbsolutePathToAssetPath(string absolutePath)
 		{
 			string content = GetRegularPath(absolutePath);
-			return Substring(content, "Assets", true);
+			return Substring(content, "Assets/", true);
 		}
 
 		/// <summary>

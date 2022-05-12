@@ -12,18 +12,23 @@ namespace YooAsset
 		internal PatchManifest LocalPatchManifest { private set; get; }
 
 		// 参数相关
-		internal bool LocationToLower { private set; get; }
-		internal bool ClearCacheWhenDirty { private set; get; }
+		private bool _locationToLower;
+		private bool _clearCacheWhenDirty;
 		private string _defaultHostServer;
 		private string _fallbackHostServer;
+
+		public bool ClearCacheWhenDirty
+		{
+			get { return _clearCacheWhenDirty; }
+		}
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
 		public InitializationOperation InitializeAsync(bool locationToLower, bool clearCacheWhenDirty, string defaultHostServer, string fallbackHostServer)
 		{
-			LocationToLower = locationToLower;
-			ClearCacheWhenDirty = clearCacheWhenDirty;
+			_locationToLower = locationToLower;
+			_clearCacheWhenDirty = clearCacheWhenDirty;
 			_defaultHostServer = defaultHostServer;
 			_fallbackHostServer = fallbackHostServer;
 
@@ -293,7 +298,7 @@ namespace YooAsset
 		internal void SetLocalPatchManifest(PatchManifest patchManifest)
 		{
 			LocalPatchManifest = patchManifest;
-			LocalPatchManifest.InitAssetPathMapping(LocationToLower);
+			LocalPatchManifest.InitAssetPathMapping(_locationToLower);
 		}
 
 		#region IBundleServices接口

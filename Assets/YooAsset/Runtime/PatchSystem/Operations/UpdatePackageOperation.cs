@@ -81,7 +81,7 @@ namespace YooAsset
 		private readonly int _resourceVersion;
 		private readonly int _timeout;
 		private ESteps _steps = ESteps.None;
-		private UnityWebDataRequester _downloaderManifest;
+		private UnityWebDataRequester _downloader;
 		private PatchManifest _remotePatchManifest;
 
 		internal HostPlayModeUpdatePackageOperation(HostPlayModeImpl impl, int resourceVersion, int timeout)
@@ -104,28 +104,28 @@ namespace YooAsset
 			{
 				string webURL = GetPatchManifestRequestURL(YooAssetSettingsData.GetPatchManifestFileName(_resourceVersion));
 				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
-				_downloaderManifest = new UnityWebDataRequester();
-				_downloaderManifest.SendRequest(webURL, _timeout);
+				_downloader = new UnityWebDataRequester();
+				_downloader.SendRequest(webURL, _timeout);
 				_steps = ESteps.CheckWebManifest;
 			}
 
 			if (_steps == ESteps.CheckWebManifest)
 			{
-				Progress = _downloaderManifest.Progress();
-				if (_downloaderManifest.IsDone() == false)
+				Progress = _downloader.Progress();
+				if (_downloader.IsDone() == false)
 					return;
 
 				// Check error
-				if (_downloaderManifest.HasError())
+				if (_downloader.HasError())
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _downloaderManifest.GetError();
+					Error = _downloader.GetError();
 				}
 				else
 				{
 					// 解析补丁清单			
-					if (ParseRemotePatchManifest(_downloaderManifest.GetText()))
+					if (ParseRemotePatchManifest(_downloader.GetText()))
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;
@@ -134,10 +134,10 @@ namespace YooAsset
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
-						Error = $"URL : {_downloaderManifest.URL} Error : remote patch manifest content is invalid";
+						Error = $"URL : {_downloader.URL} Error : remote patch manifest content is invalid";
 					}
 				}
-				_downloaderManifest.Dispose();
+				_downloader.Dispose();
 			}
 		}
 
@@ -209,8 +209,8 @@ namespace YooAsset
 						continue;
 				}
 
-				// 注意：下载系统只会验证当前游戏版本的资源文件，对于其它游戏版本的差异文件不会在初始化的时候去做校验。
-				// 注意：通过比对文件大小做实时的文件校验方式！
+				// 注意：通过比对文件大小做快速的文件校验！
+				// 注意：在初始化的时候会去做最终校验！
 				string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
 				if (File.Exists(filePath))
 				{

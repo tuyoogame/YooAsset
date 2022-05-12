@@ -33,7 +33,7 @@ namespace YooAsset
 		/// <summary>
 		/// 初始化参数
 		/// </summary>
-		public abstract class CreateParameters
+		public abstract class InitializeParameters
 		{
 			/// <summary>
 			/// 资源定位地址大小写不敏感
@@ -64,7 +64,7 @@ namespace YooAsset
 		/// <summary>
 		/// 编辑器下模拟运行模式的初始化参数
 		/// </summary>
-		public class EditorSimulateModeParameters : CreateParameters
+		public class EditorSimulateModeParameters : InitializeParameters
 		{
 			/// <summary>
 			/// 用于模拟运行的资源清单路径
@@ -76,14 +76,14 @@ namespace YooAsset
 		/// <summary>
 		/// 离线运行模式的初始化参数
 		/// </summary>
-		public class OfflinePlayModeParameters : CreateParameters
+		public class OfflinePlayModeParameters : InitializeParameters
 		{
 		}
 
 		/// <summary>
 		/// 网络运行模式的初始化参数
 		/// </summary>
-		public class HostPlayModeParameters : CreateParameters
+		public class HostPlayModeParameters : InitializeParameters
 		{
 			/// <summary>
 			/// 当缓存池被污染的时候清理缓存池
@@ -121,7 +121,7 @@ namespace YooAsset
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public static InitializationOperation InitializeAsync(CreateParameters parameters)
+		public static InitializationOperation InitializeAsync(InitializeParameters parameters)
 		{
 			if (parameters == null)
 				throw new Exception($"YooAsset create parameters is null.");
@@ -357,8 +357,31 @@ namespace YooAsset
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
 			if (assetInfo.IsInvalid)
+			{
+				YooLogger.Warning(assetInfo.Error);
 				return false;
-			
+			}
+
+			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+			if (bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
+				return true;
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// 是否需要从远端更新下载
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		public static bool IsNeedDownloadFromRemote(AssetInfo assetInfo)
+		{
+			DebugCheckInitialize();
+			if (assetInfo.IsInvalid)
+			{
+				YooLogger.Warning(assetInfo.Error);
+				return false;
+			}
+
 			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
 			if (bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				return true;
@@ -448,6 +471,7 @@ namespace YooAsset
 		{
 			if (assetInfo.IsInvalid)
 			{
+				YooLogger.Warning(assetInfo.Error);
 				RawFileOperation operation = new CompletedRawFileOperation(assetInfo.Error, copyPath);
 				OperationSystem.StartOperaiton(operation);
 				return operation;
