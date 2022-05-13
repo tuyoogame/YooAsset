@@ -86,5 +86,25 @@ namespace YooAsset
 			YooLogger.Warning($"Not found sub asset object : {assetName}");
 			return null;
 		}
+		
+		
+		/// <summary>
+        /// 获取图集下所有的精灵对象集合
+        /// </summary>
+        /// <typeparam name="TObject">子资源对象类型</typeparam>
+        public TObject[] GetSubAssetObjects<TObject>() where TObject : UnityEngine.Object
+        {
+            List<TObject> ret = new List<TObject>();
+            if (IsValid == false)
+            {
+                return null;
+            }
+
+            foreach (var e in _provider.AllAssetObjects)
+            {
+                ret.Add(e as TObject);
+            }
+            return ret.ToArray();
+        }
 	}
 }
