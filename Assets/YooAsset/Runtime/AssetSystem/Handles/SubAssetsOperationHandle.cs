@@ -1,4 +1,5 @@
-﻿
+﻿using System.Collections.Generic;
+
 namespace YooAsset
 {
 	public sealed class SubAssetsOperationHandle : OperationHandleBase
@@ -77,34 +78,35 @@ namespace YooAsset
 			if (IsValid == false)
 				return null;
 
-			foreach (var asset in Provider.AllAssetObjects)
+			foreach (var assetObject in Provider.AllAssetObjects)
 			{
-				if (asset.name == assetName)
-					return asset as TObject;
+				if (assetObject.name == assetName)
+					return assetObject as TObject;
 			}
 
 			YooLogger.Warning($"Not found sub asset object : {assetName}");
 			return null;
 		}
-		
-		
-		/// <summary>
-        /// 获取图集下所有的精灵对象集合
-        /// </summary>
-        /// <typeparam name="TObject">子资源对象类型</typeparam>
-        public TObject[] GetSubAssetObjects<TObject>() where TObject : UnityEngine.Object
-        {
-            List<TObject> ret = new List<TObject>();
-            if (IsValid == false)
-            {
-                return null;
-            }
 
-            foreach (var e in _provider.AllAssetObjects)
-            {
-                ret.Add(e as TObject);
-            }
-            return ret.ToArray();
-        }
+		/// <summary>
+		/// 获取所有的子资源对象集合
+		/// </summary>
+		/// <typeparam name="TObject">子资源对象类型</typeparam>
+		public TObject[] GetSubAssetObjects<TObject>() where TObject : UnityEngine.Object
+		{
+			if (IsValid == false)
+				return null;
+
+			List<TObject> ret = new List<TObject>(Provider.AllAssetObjects.Length);
+			foreach (var assetObject in Provider.AllAssetObjects)
+			{
+				var retObject = assetObject as TObject;
+				if (retObject != null)
+					ret.Add(retObject);
+				else
+					YooLogger.Warning($"The type conversion failed : {assetObject.name}");
+			}
+			return ret.ToArray();
+		}
 	}
 }
