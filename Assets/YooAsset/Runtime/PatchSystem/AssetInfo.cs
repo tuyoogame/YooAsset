@@ -42,11 +42,6 @@ namespace YooAsset
 		internal string Error { private set; get; }
 
 		/// <summary>
-		/// 资源对象名称
-		/// </summary>
-		public string AssetName { private set; get; }
-
-		/// <summary>
 		/// 资源路径
 		/// </summary>
 		public string AssetPath { private set; get; }
@@ -69,7 +64,6 @@ namespace YooAsset
 			_patchAsset = patchAsset;
 			AssetType = assetType;
 			AssetPath = patchAsset.AssetPath;
-			AssetName = Path.GetFileName(patchAsset.AssetPath);
 			Error = string.Empty;
 		}
 		internal AssetInfo(PatchAsset patchAsset)
@@ -80,7 +74,6 @@ namespace YooAsset
 			_patchAsset = patchAsset;
 			AssetType = null;
 			AssetPath = patchAsset.AssetPath;
-			AssetName = Path.GetFileName(patchAsset.AssetPath);
 			Error = string.Empty;
 		}
 		internal AssetInfo(string error)
@@ -88,7 +81,6 @@ namespace YooAsset
 			_patchAsset = null;
 			AssetType = null;
 			AssetPath = string.Empty;
-			AssetName = string.Empty;
 			Error = error;
 		}
 	}

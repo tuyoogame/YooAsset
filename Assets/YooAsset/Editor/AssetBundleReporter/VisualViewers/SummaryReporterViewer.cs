@@ -71,7 +71,6 @@ namespace YooAsset.Editor
 			_items.Add(new ItemWrapper("内置资源标签", $"{buildReport.Summary.BuildinTags}"));
 
 			_items.Add(new ItemWrapper("启用可寻址资源定位", $"{buildReport.Summary.EnableAddressable}"));
-			_items.Add(new ItemWrapper("启用自动分包机制", $"{buildReport.Summary.EnableAutoCollect}"));
 			_items.Add(new ItemWrapper("追加文件扩展名", $"{buildReport.Summary.AppendFileExtension}"));
 			_items.Add(new ItemWrapper("自动收集着色器", $"{buildReport.Summary.AutoCollectShaders}"));
 			_items.Add(new ItemWrapper("着色器资源包名称", $"{buildReport.Summary.ShadersBundleName}"));
@@ -80,10 +79,8 @@ namespace YooAsset.Editor
 			_items.Add(new ItemWrapper(string.Empty, string.Empty));
 			_items.Add(new ItemWrapper("构建参数", string.Empty));
 			_items.Add(new ItemWrapper("CompressOption", $"{buildReport.Summary.CompressOption}"));
-			_items.Add(new ItemWrapper("AppendHash", $"{buildReport.Summary.AppendHash}"));
 			_items.Add(new ItemWrapper("DisableWriteTypeTree", $"{buildReport.Summary.DisableWriteTypeTree}"));
 			_items.Add(new ItemWrapper("IgnoreTypeTreeChanges", $"{buildReport.Summary.IgnoreTypeTreeChanges}"));
-			_items.Add(new ItemWrapper("DisableLoadAssetByFileName", $"{buildReport.Summary.DisableLoadAssetByFileName}"));
 
 			_items.Add(new ItemWrapper(string.Empty, string.Empty));
 			_items.Add(new ItemWrapper("构建结果", string.Empty));

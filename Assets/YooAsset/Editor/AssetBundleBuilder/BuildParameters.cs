@@ -47,12 +47,6 @@ namespace YooAsset.Editor
 		public bool EnableAddressable = false;
 
 		/// <summary>
-		/// 启用自动分包机制
-		/// 说明：自动分包机制可以实现资源零冗余
-		/// </summary>
-		public bool EnableAutoCollect = true;
-
-		/// <summary>
 		/// 追加文件扩展名
 		/// </summary>
 		public bool AppendFileExtension = false;
@@ -69,11 +63,6 @@ namespace YooAsset.Editor
 		public ECompressOption CompressOption = ECompressOption.Uncompressed;
 
 		/// <summary>
-		/// 文件名附加上哈希值
-		/// </summary>
-		public bool AppendHash = false;
-
-		/// <summary>
 		/// 禁止写入类型树结构（可以降低包体和内存并提高加载效率）
 		/// </summary>
 		public bool DisableWriteTypeTree = false;
@@ -82,11 +71,6 @@ namespace YooAsset.Editor
 		/// 忽略类型树变化
 		/// </summary>
 		public bool IgnoreTypeTreeChanges = true;
-
-		/// <summary>
-		/// 禁用名称查找资源（可以降内存并提高加载效率）
-		/// </summary>
-		public bool DisableLoadAssetByFileName = false;
 
 
 		/// <summary>

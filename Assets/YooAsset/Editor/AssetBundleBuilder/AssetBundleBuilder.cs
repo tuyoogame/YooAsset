@@ -30,7 +30,7 @@ namespace YooAsset.Editor
 				PipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(parameters.OutputRoot, parameters.BuildTarget);
 				if (parameters.BuildMode == EBuildMode.DryRunBuild)
 					PipelineOutputDirectory += $"_{EBuildMode.DryRunBuild}";
-				else if(parameters.BuildMode == EBuildMode.SimulateBuild)
+				else if (parameters.BuildMode == EBuildMode.SimulateBuild)
 					PipelineOutputDirectory += $"_{EBuildMode.SimulateBuild}";
 			}
 
@@ -54,9 +54,7 @@ namespace YooAsset.Editor
 				opt |= BuildAssetBundleOptions.StrictMode; //Do not allow the build to succeed if any errors are reporting during it.
 
 				if (Parameters.BuildMode == EBuildMode.SimulateBuild)
-				{
 					throw new Exception("Should never get here !");
-				}
 
 				if (Parameters.BuildMode == EBuildMode.DryRunBuild)
 				{
@@ -71,17 +69,13 @@ namespace YooAsset.Editor
 
 				if (Parameters.BuildMode == EBuildMode.ForceRebuild)
 					opt |= BuildAssetBundleOptions.ForceRebuildAssetBundle; //Force rebuild the asset bundles
-				if (Parameters.AppendHash)
-					opt |= BuildAssetBundleOptions.AppendHashToAssetBundleName; //Append the hash to the assetBundle name
 				if (Parameters.DisableWriteTypeTree)
 					opt |= BuildAssetBundleOptions.DisableWriteTypeTree; //Do not include type information within the asset bundle (don't write type tree).
 				if (Parameters.IgnoreTypeTreeChanges)
 					opt |= BuildAssetBundleOptions.IgnoreTypeTreeChanges; //Ignore the type tree changes when doing the incremental build check.
-				if (Parameters.DisableLoadAssetByFileName)
-				{
-					opt |= BuildAssetBundleOptions.DisableLoadAssetByFileName; //Disables Asset Bundle LoadAsset by file name.
-					opt |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension; //Disables Asset Bundle LoadAsset by file name with extension.
-				}
+
+				opt |= BuildAssetBundleOptions.DisableLoadAssetByFileName; //Disables Asset Bundle LoadAsset by file name.
+				opt |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension; //Disables Asset Bundle LoadAsset by file name with extension.			
 
 				return opt;
 			}

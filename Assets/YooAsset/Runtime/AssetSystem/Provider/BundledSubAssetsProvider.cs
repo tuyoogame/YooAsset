@@ -69,16 +69,16 @@ namespace YooAsset
 				if (IsWaitForAsyncComplete)
 				{
 					if (MainAssetInfo.AssetType == null)
-						AllAssetObjects = OwnerBundle.CacheBundle.LoadAssetWithSubAssets(MainAssetInfo.AssetName);
+						AllAssetObjects = OwnerBundle.CacheBundle.LoadAssetWithSubAssets(MainAssetInfo.AssetPath);
 					else
-						AllAssetObjects = OwnerBundle.CacheBundle.LoadAssetWithSubAssets(MainAssetInfo.AssetName, MainAssetInfo.AssetType);
+						AllAssetObjects = OwnerBundle.CacheBundle.LoadAssetWithSubAssets(MainAssetInfo.AssetPath, MainAssetInfo.AssetType);
 				}
 				else
 				{
 					if (MainAssetInfo.AssetType == null)
-						_cacheRequest = OwnerBundle.CacheBundle.LoadAssetWithSubAssetsAsync(MainAssetInfo.AssetName);
+						_cacheRequest = OwnerBundle.CacheBundle.LoadAssetWithSubAssetsAsync(MainAssetInfo.AssetPath);
 					else
-						_cacheRequest = OwnerBundle.CacheBundle.LoadAssetWithSubAssetsAsync(MainAssetInfo.AssetName, MainAssetInfo.AssetType);
+						_cacheRequest = OwnerBundle.CacheBundle.LoadAssetWithSubAssetsAsync(MainAssetInfo.AssetPath, MainAssetInfo.AssetType);
 				}
 				Status = EStatus.Checking;
 			}
@@ -106,9 +106,9 @@ namespace YooAsset
 				if (Status == EStatus.Fail)
 				{
 					if (MainAssetInfo.AssetType == null)
-						LastError = $"Failed to load sub assets : {MainAssetInfo.AssetName} AssetType : null AssetBundle : {OwnerBundle.MainBundleInfo.BundleName}";
+						LastError = $"Failed to load sub assets : {MainAssetInfo.AssetPath} AssetType : null AssetBundle : {OwnerBundle.MainBundleInfo.BundleName}";
 					else
-						LastError = $"Failed to load sub assets : {MainAssetInfo.AssetName} AssetType : {MainAssetInfo.AssetType} AssetBundle : {OwnerBundle.MainBundleInfo.BundleName}";
+						LastError = $"Failed to load sub assets : {MainAssetInfo.AssetPath} AssetType : {MainAssetInfo.AssetType} AssetBundle : {OwnerBundle.MainBundleInfo.BundleName}";
 					YooLogger.Error(LastError);
 				}
 				InvokeCompletion();

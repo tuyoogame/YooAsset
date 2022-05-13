@@ -41,7 +41,6 @@ namespace YooAsset.Editor
 				buildReport.Summary.BuildVersion = buildParameters.Parameters.BuildVersion;
 				buildReport.Summary.BuildinTags = buildParameters.Parameters.BuildinTags;
 				buildReport.Summary.EnableAddressable = buildParameters.Parameters.EnableAddressable;
-				buildReport.Summary.EnableAutoCollect = buildParameters.Parameters.EnableAutoCollect;
 				buildReport.Summary.AppendFileExtension = buildParameters.Parameters.AppendFileExtension;
 				buildReport.Summary.AutoCollectShaders = AssetBundleCollectorSettingData.Setting.AutoCollectShaders;
 				buildReport.Summary.ShadersBundleName = AssetBundleCollectorSettingData.Setting.ShadersBundleName;
@@ -50,10 +49,8 @@ namespace YooAsset.Editor
 
 				// 构建参数
 				buildReport.Summary.CompressOption = buildParameters.Parameters.CompressOption;
-				buildReport.Summary.AppendHash = buildParameters.Parameters.AppendHash;
 				buildReport.Summary.DisableWriteTypeTree = buildParameters.Parameters.DisableWriteTypeTree;
 				buildReport.Summary.IgnoreTypeTreeChanges = buildParameters.Parameters.IgnoreTypeTreeChanges;
-				buildReport.Summary.DisableLoadAssetByFileName = buildParameters.Parameters.DisableLoadAssetByFileName;
 
 				// 构建结果
 				buildReport.Summary.AssetFileTotalCount = buildMapContext.AssetFileCount;
