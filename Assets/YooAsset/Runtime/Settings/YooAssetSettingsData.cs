@@ -28,7 +28,7 @@ namespace YooAsset
 			}
 			else
 			{
-				YooLogger.Log("YooAsset use custom settings.");
+				YooLogger.Log("YooAsset use user settings.");
 			}
 		}
 

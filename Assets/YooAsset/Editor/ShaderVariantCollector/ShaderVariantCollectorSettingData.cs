@@ -25,22 +25,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		private static void LoadSettingData()
 		{
-			// 加载配置文件
-			string settingFilePath = $"{EditorTools.GetYooAssetSettingPath()}/{nameof(ShaderVariantCollectorSetting)}.asset";
-			_setting = AssetDatabase.LoadAssetAtPath<ShaderVariantCollectorSetting>(settingFilePath);
-			if (_setting == null)
-			{
-				Debug.LogWarning($"Create new {nameof(ShaderVariantCollectorSetting)}.asset : {settingFilePath}");
-				_setting = ScriptableObject.CreateInstance<ShaderVariantCollectorSetting>();
-				EditorTools.CreateFileDirectory(settingFilePath);
-				AssetDatabase.CreateAsset(Setting, settingFilePath);
-				AssetDatabase.SaveAssets();
-				AssetDatabase.Refresh();
-			}
-			else
-			{
-				Debug.Log($"Load {nameof(ShaderVariantCollectorSetting)}.asset ok");
-			}
+			_setting = YooAssetEditorSettingsHelper.LoadSettingData<ShaderVariantCollectorSetting>();
 		}
 
 		/// <summary>

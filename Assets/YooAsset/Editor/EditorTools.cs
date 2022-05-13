@@ -462,92 +462,12 @@ namespace YooAsset.Editor
 		#endregion
 
 		#region 路径
-		private static string YooAssetSourcePath;
-		private static string YooAssetSettingPath;
-
 		/// <summary>
 		/// 获取规范的路径
 		/// </summary>
 		public static string GetRegularPath(string path)
 		{
 			return path.Replace('\\', '/').Replace("\\", "/"); //替换为Linux路径格式
-		}
-
-		/// <summary>
-		/// 获取资源框架源码路径
-		/// </summary>
-		public static string GetYooAssetSourcePath()
-		{
-			if (string.IsNullOrEmpty(YooAssetSourcePath) == false)
-			{
-				if (Directory.Exists(YooAssetSourcePath))
-					return YooAssetSourcePath;
-			}
-
-			// 从Pakcages目录下搜索
-			string packagesPath = "Packages/com.tuyoogame.yooasset/README.md";
-			var obj = AssetDatabase.LoadAssetAtPath(packagesPath, typeof(TextAsset));
-			if (obj != null)
-			{
-				YooAssetSourcePath = "Packages/com.tuyoogame.yooasset/";
-				return YooAssetSourcePath;
-			}
-
-			// 从Assets目录下搜索
-			string[] allDirectorys = Directory.GetDirectories(Application.dataPath, "YooAsset", SearchOption.AllDirectories);
-			if (allDirectorys.Length == 0)
-			{
-				Debug.LogError("Not found YooAsset package !");
-				return string.Empty;
-			}
-
-			string targetDirectory = string.Empty;
-			foreach (var directory in allDirectorys)
-			{
-				string asmdefFilePath = $"{directory}/Editor/YooAsset.Editor.asmdef";
-				if (File.Exists(asmdefFilePath))
-				{
-					targetDirectory = directory;
-					break;
-				}
-			}
-			if (string.IsNullOrEmpty(targetDirectory))
-			{
-				Debug.LogError("Should never get here !");
-				return string.Empty;
-			}
-
-			YooAssetSourcePath = AbsolutePathToAssetPath(targetDirectory);
-			return YooAssetSourcePath;
-		}
-
-		/// <summary>
-		/// 获取资源框架配置路径
-		/// </summary>
-		public static string GetYooAssetSettingPath()
-		{
-			if (string.IsNullOrEmpty(YooAssetSettingPath) == false)
-			{
-				if (Directory.Exists(YooAssetSettingPath))
-					return YooAssetSettingPath;
-			}
-
-			// 从Assets目录下搜索
-			string[] allDirectorys = Directory.GetDirectories(Application.dataPath, "YooAssetSetting", SearchOption.AllDirectories);
-			if (allDirectorys.Length == 0)
-			{
-				YooAssetSettingPath = "Assets/YooAssetSetting";
-				return YooAssetSettingPath;
-			}
-
-			string targetDirectory = allDirectorys[0];
-			if (allDirectorys.Length != 1)
-			{
-				Debug.LogError("Found multiple YooAssetSetting folder !");
-			}
-
-			YooAssetSettingPath = AbsolutePathToAssetPath(targetDirectory);
-			return YooAssetSettingPath;
 		}
 
 		/// <summary>
@@ -630,7 +550,6 @@ namespace YooAsset.Editor
 			else
 				return content.Substring(startIndex + key.Length);
 		}
-
 		#endregion
 	}
 }

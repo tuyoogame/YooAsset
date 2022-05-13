@@ -37,8 +37,6 @@ namespace YooAsset.Editor
 			Undo.undoRedoPerformed -= RefreshWindow;
 			Undo.undoRedoPerformed += RefreshWindow;
 
-			VisualElement root = this.rootVisualElement;
-
 			_collectorTypeList = new List<string>()
 			{
 				$"{nameof(ECollectorType.MainAssetCollector)}",
@@ -49,19 +47,19 @@ namespace YooAsset.Editor
 			_packRuleList = AssetBundleCollectorSettingData.GetPackRuleNames();
 			_filterRuleList = AssetBundleCollectorSettingData.GetFilterRuleNames();
 
-			// 加载布局文件
-			string rootPath = EditorTools.GetYooAssetSourcePath();
-			string uxml = $"{rootPath}/Editor/AssetBundleCollector/{nameof(AssetBundleCollectorWindow)}.uxml";
-			var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
-			if (visualAsset == null)
-			{
-				Debug.LogError($"Not found {nameof(AssetBundleCollectorWindow)}.uxml : {uxml}");
-				return;
-			}
-			visualAsset.CloneTree(root);
-
 			try
 			{
+				VisualElement root = this.rootVisualElement;
+
+				// 加载布局文件
+				var visualAsset = YooAssetEditorSettingsData.Setting.AssetBundleCollectorUXML;
+				if (visualAsset == null)
+				{
+					Debug.LogError($"Not found {nameof(AssetBundleCollectorWindow)}.uxml in settings.");
+					return;
+				}
+				visualAsset.CloneTree(root);
+
 				// 导入导出按钮
 				var exportBtn = root.Q<Button>("ExportButton");
 				exportBtn.clicked += ExportBtn_clicked;

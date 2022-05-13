@@ -1,4 +1,5 @@
 ﻿#if UNITY_2019_4_OR_NEWER
+using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -37,8 +38,8 @@ namespace YooAsset.Editor
         }
 
         private ToolbarMenu _viewModeMenu;
-        private AssetListDebuggerViewer _assetListViewer;
-        private BundleListDebuggerViewer _bundleListViewer;
+        private DebuggerAssetListViewer _assetListViewer;
+        private DebuggerBundleListViewer _bundleListViewer;
         
         private EViewMode _viewMode;
         private readonly DebugReport _debugReport = new DebugReport();
@@ -47,45 +48,50 @@ namespace YooAsset.Editor
 
         public void CreateGUI()
         {
-            VisualElement root = rootVisualElement;
+			try
+			{
+                VisualElement root = rootVisualElement;
 
-            // 加载布局文件
-            string rootPath = EditorTools.GetYooAssetSourcePath();
-            string uxml = $"{rootPath}/Editor/AssetBundleDebugger/{nameof(AssetBundleDebuggerWindow)}.uxml";
-            var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
-            if (visualAsset == null)
-            {
-                Debug.LogError($"Not found {nameof(AssetBundleDebuggerWindow)}.uxml : {uxml}");
-                return;
+                // 加载布局文件
+                var visualAsset = YooAssetEditorSettingsData.Setting.AssetBundleDebuggerUXML;
+                if (visualAsset == null)
+                {
+                    Debug.LogError($"Not found {nameof(AssetBundleDebuggerWindow)}.uxml in settings.");
+                    return;
+                }
+                visualAsset.CloneTree(root);
+
+                // 采样按钮
+                var sampleBtn = root.Q<Button>("SampleButton");
+                sampleBtn.clicked += SampleBtn_onClick;
+
+                // 视口模式菜单
+                _viewModeMenu = root.Q<ToolbarMenu>("ViewModeMenu");
+                //_viewModeMenu.menu.AppendAction(EViewMode.MemoryView.ToString(), ViewModeMenuAction0, ViewModeMenuFun0);
+                _viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction1, ViewModeMenuFun1);
+                _viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction2, ViewModeMenuFun2);
+
+                // 搜索栏
+                var searchField = root.Q<ToolbarSearchField>("SearchField");
+                searchField.RegisterValueChangedCallback(OnSearchKeyWordChange);
+
+                // 加载视图
+                _assetListViewer = new DebuggerAssetListViewer();
+                _assetListViewer.InitViewer();
+
+                // 加载视图
+                _bundleListViewer = new DebuggerBundleListViewer();
+                _bundleListViewer.InitViewer();
+
+                // 显示视图
+                _viewMode = EViewMode.AssetView;
+                _viewModeMenu.text = EViewMode.AssetView.ToString();
+                _assetListViewer.AttachParent(root);
             }
-            visualAsset.CloneTree(root);
-
-            // 采样按钮
-			var sampleBtn = root.Q<Button>("SampleButton");
-            sampleBtn.clicked += SampleBtn_onClick;
-
-            // 视口模式菜单
-            _viewModeMenu = root.Q<ToolbarMenu>("ViewModeMenu");
-            //_viewModeMenu.menu.AppendAction(EViewMode.MemoryView.ToString(), ViewModeMenuAction0, ViewModeMenuFun0);
-            _viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction1, ViewModeMenuFun1);
-            _viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction2, ViewModeMenuFun2);
-
-            // 搜索栏
-            var searchField = root.Q<ToolbarSearchField>("SearchField");
-            searchField.RegisterValueChangedCallback(OnSearchKeyWordChange);
-
-            // 加载视图
-            _assetListViewer = new AssetListDebuggerViewer();
-            _assetListViewer.InitViewer();
-
-            // 加载视图
-            _bundleListViewer = new BundleListDebuggerViewer();
-            _bundleListViewer.InitViewer();
-
-            // 显示视图
-            _viewMode = EViewMode.AssetView;
-            _viewModeMenu.text = EViewMode.AssetView.ToString();
-            _assetListViewer.AttachParent(root);
+            catch(Exception e)
+			{
+                Debug.LogError(e.ToString());
+            }
         }
         private void SampleBtn_onClick()
         {

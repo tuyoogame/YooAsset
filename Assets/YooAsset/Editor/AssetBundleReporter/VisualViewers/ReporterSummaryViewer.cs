@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
-	internal class SummaryReporterViewer
+	internal class ReporterSummaryViewer
 	{
 		private class ItemWrapper
 		{
@@ -37,12 +37,10 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件
-			string rootPath = EditorTools.GetYooAssetSourcePath();
-			string uxml = $"{rootPath}/Editor/AssetBundleReporter/VisualViewers/{nameof(SummaryReporterViewer)}.uxml";
-			_visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
+			_visualAsset = YooAssetEditorSettingsData.Setting.ReporterSummaryViewerUXML;
 			if (_visualAsset == null)
 			{
-				Debug.LogError($"Not found {nameof(SummaryReporterViewer)}.uxml : {uxml}");
+				Debug.LogError($"Not found {nameof(ReporterSummaryViewer)}.uxml in settings.");
 				return;
 			}
 			_root = _visualAsset.CloneTree();

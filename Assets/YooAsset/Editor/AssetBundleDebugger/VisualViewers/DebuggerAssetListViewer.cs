@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
-	internal class AssetListDebuggerViewer
+	internal class DebuggerAssetListViewer
 	{
 		private VisualTreeAsset _visualAsset;
 		private TemplateContainer _root;
@@ -23,13 +23,11 @@ namespace YooAsset.Editor
 		/// </summary>
 		public void InitViewer()
 		{
-			// 加载布局文件
-			string rootPath = EditorTools.GetYooAssetSourcePath();
-			string uxml = $"{rootPath}/Editor/AssetBundleDebugger/VisualViewers/{nameof(AssetListDebuggerViewer)}.uxml";
-			_visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
+			// 加载布局文件		
+			_visualAsset = YooAssetEditorSettingsData.Setting.DebuggerAssetListViewerUXML;
 			if (_visualAsset == null)
 			{
-				Debug.LogError($"Not found {nameof(AssetListDebuggerViewer)}.uxml : {uxml}");
+				Debug.LogError($"Not found {nameof(DebuggerAssetListViewer)}.uxml in settings.");
 				return;
 			}
 			_root = _visualAsset.CloneTree();

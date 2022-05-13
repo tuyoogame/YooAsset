@@ -1,4 +1,5 @@
 #if UNITY_2019_4_OR_NEWER
+using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.UIElements;
@@ -37,9 +38,9 @@ namespace YooAsset.Editor
 		}
 
 		private ToolbarMenu _viewModeMenu;
-		private SummaryReporterViewer _summaryViewer;
-		private AssetListReporterViewer _assetListViewer;
-		private BundleListReporterViewer _bundleListViewer;
+		private ReporterSummaryViewer _summaryViewer;
+		private ReporterAssetListViewer _assetListViewer;
+		private ReporterBundleListViewer _bundleListViewer;
 
 		private EViewMode _viewMode;
 		private BuildReport _buildReport;
@@ -49,49 +50,54 @@ namespace YooAsset.Editor
 
 		public void CreateGUI()
 		{
-			VisualElement root = this.rootVisualElement;
-
-			// 加载布局文件
-			string rootPath = EditorTools.GetYooAssetSourcePath();
-			string uxml = $"{rootPath}/Editor/AssetBundleReporter/{nameof(AssetBundleReporterWindow)}.uxml";
-			var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
-			if (visualAsset == null)
+			try
 			{
-				Debug.LogError($"Not found {nameof(AssetBundleReporterWindow)}.uxml : {uxml}");
-				return;
+				VisualElement root = this.rootVisualElement;
+
+				// 加载布局文件
+				var visualAsset = YooAssetEditorSettingsData.Setting.AssetBundleReporterUXML;
+				if (visualAsset == null)
+				{
+					Debug.LogError($"Not found {nameof(AssetBundleReporterWindow)}.uxml in settings.");
+					return;
+				}
+				visualAsset.CloneTree(root);
+
+				// 导入按钮
+				var importBtn = root.Q<Button>("ImportButton");
+				importBtn.clicked += ImportBtn_onClick;
+
+				// 视图模式菜单
+				_viewModeMenu = root.Q<ToolbarMenu>("ViewModeMenu");
+				_viewModeMenu.menu.AppendAction(EViewMode.Summary.ToString(), ViewModeMenuAction0, ViewModeMenuFun0);
+				_viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction1, ViewModeMenuFun1);
+				_viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction2, ViewModeMenuFun2);
+
+				// 搜索栏
+				var searchField = root.Q<ToolbarSearchField>("SearchField");
+				searchField.RegisterValueChangedCallback(OnSearchKeyWordChange);
+
+				// 加载视图
+				_summaryViewer = new ReporterSummaryViewer();
+				_summaryViewer.InitViewer();
+
+				// 加载视图
+				_assetListViewer = new ReporterAssetListViewer();
+				_assetListViewer.InitViewer();
+
+				// 加载视图
+				_bundleListViewer = new ReporterBundleListViewer();
+				_bundleListViewer.InitViewer();
+
+				// 显示视图
+				_viewMode = EViewMode.Summary;
+				_viewModeMenu.text = EViewMode.Summary.ToString();
+				_summaryViewer.AttachParent(root);
 			}
-			visualAsset.CloneTree(root);
-
-			// 导入按钮
-			var importBtn = root.Q<Button>("ImportButton");
-			importBtn.clicked += ImportBtn_onClick;
-
-			// 视图模式菜单
-			_viewModeMenu = root.Q<ToolbarMenu>("ViewModeMenu");
-			_viewModeMenu.menu.AppendAction(EViewMode.Summary.ToString(), ViewModeMenuAction0, ViewModeMenuFun0);
-			_viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction1, ViewModeMenuFun1);
-			_viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction2, ViewModeMenuFun2);
-
-			// 搜索栏
-			var searchField = root.Q<ToolbarSearchField>("SearchField");
-			searchField.RegisterValueChangedCallback(OnSearchKeyWordChange);
-
-			// 加载视图
-			_summaryViewer = new SummaryReporterViewer();
-			_summaryViewer.InitViewer();
-
-			// 加载视图
-			_assetListViewer = new AssetListReporterViewer();
-			_assetListViewer.InitViewer();
-
-			// 加载视图
-			_bundleListViewer = new BundleListReporterViewer();
-			_bundleListViewer.InitViewer();
-
-			// 显示视图
-			_viewMode = EViewMode.Summary;
-			_viewModeMenu.text = EViewMode.Summary.ToString();
-			_summaryViewer.AttachParent(root);
+			catch (Exception e)
+			{
+				Debug.LogError(e.ToString());
+			}
 		}
 		public void OnDestroy()
 		{

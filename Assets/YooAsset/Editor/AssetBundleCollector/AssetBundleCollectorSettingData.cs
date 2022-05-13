@@ -105,22 +105,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		private static void LoadSettingData()
 		{
-			// 加载配置文件
-			string settingFilePath = $"{EditorTools.GetYooAssetSettingPath()}/{nameof(AssetBundleCollectorSetting)}.asset";
-			_setting = AssetDatabase.LoadAssetAtPath<AssetBundleCollectorSetting>(settingFilePath);
-			if (_setting == null)
-			{
-				Debug.LogWarning($"Create new {nameof(AssetBundleCollectorSetting)}.asset : {settingFilePath}");
-				_setting = ScriptableObject.CreateInstance<AssetBundleCollectorSetting>();
-				EditorTools.CreateFileDirectory(settingFilePath);
-				AssetDatabase.CreateAsset(Setting, settingFilePath);
-				AssetDatabase.SaveAssets();
-				AssetDatabase.Refresh();
-			}
-			else
-			{
-				Debug.Log($"Load {nameof(AssetBundleCollectorSetting)}.asset ok");
-			}
+			_setting = YooAssetEditorSettingsHelper.LoadSettingData<AssetBundleCollectorSetting>();
 
 			// IPackRule
 			{

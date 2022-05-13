@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
-	internal class BundleListReporterViewer
+	internal class ReporterBundleListViewer
 	{
 		private enum ESortMode
 		{
@@ -42,12 +42,10 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件
-			string rootPath = EditorTools.GetYooAssetSourcePath();
-			string uxml = $"{rootPath}/Editor/AssetBundleReporter/VisualViewers/{nameof(BundleListReporterViewer)}.uxml";
-			_visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
+			_visualAsset = YooAssetEditorSettingsData.Setting.ReporterBundleListViewerUXML;
 			if (_visualAsset == null)
 			{
-				Debug.LogError($"Not found {nameof(BundleListReporterViewer)}.uxml : {uxml}");
+				Debug.LogError($"Not found {nameof(ReporterBundleListViewer)}.uxml in settings.");
 				return;
 			}
 

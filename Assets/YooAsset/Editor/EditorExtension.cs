@@ -1,6 +1,7 @@
 ﻿
 namespace YooAsset.Editor
 {
+
 #if UNITY_2019
 	public static partial class UnityEngine_UIElements_ListView_Extension
 	{
@@ -20,4 +21,5 @@ namespace YooAsset.Editor
 		}
 	}
 #endif
+
 }

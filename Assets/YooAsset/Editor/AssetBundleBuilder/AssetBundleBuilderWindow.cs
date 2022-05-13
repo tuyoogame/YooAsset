@@ -32,21 +32,19 @@ namespace YooAsset.Editor
 
 		public void CreateGUI()
 		{
-			VisualElement root = this.rootVisualElement;
-
-			// 加载布局文件
-			string rootPath = EditorTools.GetYooAssetSourcePath();
-			string uxml = $"{rootPath}/Editor/AssetBundleBuilder/{nameof(AssetBundleBuilderWindow)}.uxml";
-			var visualAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxml);
-			if (visualAsset == null)
-			{
-				Debug.LogError($"Not found {nameof(AssetBundleBuilderWindow)}.uxml : {uxml}");
-				return;
-			}
-			visualAsset.CloneTree(root);
-
 			try
 			{
+				VisualElement root = this.rootVisualElement;
+
+				// 加载布局文件
+				var visualAsset = YooAssetEditorSettingsData.Setting.AssetBundleBuilderUXML;
+				if (visualAsset == null)
+				{
+					Debug.LogError($"Not found {nameof(AssetBundleBuilderWindow)}.uxml in settings.");
+					return;
+				}
+				visualAsset.CloneTree(root);
+
 				_buildTarget = EditorUserBuildSettings.activeBuildTarget;
 				_encryptionServicesClassTypes = GetEncryptionServicesClassTypes();
 				_encryptionServicesClassNames = _encryptionServicesClassTypes.Select(t => t.FullName).ToList();
