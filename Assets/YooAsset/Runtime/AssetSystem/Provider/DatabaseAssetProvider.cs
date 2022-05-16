@@ -59,19 +59,6 @@ namespace YooAsset
 			// 2. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
-				if (AssetObject != null)
-				{
-					if (UnityEditor.AssetDatabase.IsMainAsset(AssetObject) == false)
-					{
-						AssetObject = null;
-						Status = EStatus.Fail;
-						LastError = $"The loaded asset object is not main asset : {MainAssetInfo.AssetPath} AssetType : {MainAssetInfo.AssetType}";
-						YooLogger.Error(LastError);
-						InvokeCompletion();
-						return;
-					}
-				}
-
 				Status = AssetObject == null ? EStatus.Fail : EStatus.Success;
 				if (Status == EStatus.Fail)
 				{
