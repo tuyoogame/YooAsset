@@ -37,18 +37,18 @@ namespace YooAsset.Editor
 			Undo.undoRedoPerformed -= RefreshWindow;
 			Undo.undoRedoPerformed += RefreshWindow;
 
-			_collectorTypeList = new List<string>()
-			{
-				$"{nameof(ECollectorType.MainAssetCollector)}",
-				$"{nameof(ECollectorType.StaticAssetCollector)}",
-				$"{nameof(ECollectorType.DependAssetCollector)}"
-			};
-			_addressRuleList = AssetBundleCollectorSettingData.GetAddressRuleNames();
-			_packRuleList = AssetBundleCollectorSettingData.GetPackRuleNames();
-			_filterRuleList = AssetBundleCollectorSettingData.GetFilterRuleNames();
-
 			try
 			{
+				_collectorTypeList = new List<string>()
+				{
+					$"{nameof(ECollectorType.MainAssetCollector)}",
+					$"{nameof(ECollectorType.StaticAssetCollector)}",
+					$"{nameof(ECollectorType.DependAssetCollector)}"
+				};
+				_addressRuleList = AssetBundleCollectorSettingData.GetAddressRuleNames();
+				_packRuleList = AssetBundleCollectorSettingData.GetPackRuleNames();
+				_filterRuleList = AssetBundleCollectorSettingData.GetFilterRuleNames();
+
 				VisualElement root = this.rootVisualElement;
 
 				// 加载布局文件
