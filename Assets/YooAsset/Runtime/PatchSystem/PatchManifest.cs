@@ -23,7 +23,7 @@ namespace YooAsset
 		public int ResourceVersion;
 
 		/// <summary>
-		/// 内置资源的标记列表
+		/// 内置资源的标签列表（首包资源）
 		/// </summary>
 		public string BuildinTags;
 

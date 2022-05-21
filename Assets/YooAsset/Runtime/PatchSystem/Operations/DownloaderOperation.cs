@@ -28,6 +28,7 @@ namespace YooAsset
 
 		// 数据相关
 		private ESteps _steps = ESteps.None;
+		private bool _isPause = false;
 		private long _lastDownloadBytes = 0;
 		private int _lastDownloadCount = 0;
 
@@ -153,6 +154,9 @@ namespace YooAsset
 				// 注意：如果期间有下载失败的文件，暂停动态创建下载器
 				if (_downloadList.Count > 0 && _loadFailedList.Count == 0)
 				{
+					if (_isPause)
+						return;
+
 					if (_downloaders.Count < _downloadingMaxNumber)
 					{
 						int index = _downloadList.Count - 1;
@@ -194,6 +198,22 @@ namespace YooAsset
 			{
 				OperationSystem.StartOperaiton(this);
 			}
+		}
+
+		/// <summary>
+		/// 暂停下载
+		/// </summary>
+		public void PauseDownload()
+		{
+			_isPause = true;
+		}
+
+		/// <summary>
+		/// 恢复下载
+		/// </summary>
+		public void ResumeDownload()
+		{
+			_isPause = false;
 		}
 	}
 
