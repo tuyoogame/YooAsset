@@ -24,7 +24,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		private static void LoadSettingData()
 		{
-			_setting = YooAssetEditorSettingsHelper.LoadSettingData<AssetBundleBuilderSetting>();
+			_setting = EditorHelper.LoadSettingData<AssetBundleBuilderSetting>();
 		}
 
 		/// <summary>

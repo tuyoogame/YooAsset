@@ -24,12 +24,10 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件
-			_visualAsset = YooAssetEditorSettingsData.Setting.DebuggerBundleListViewerUXML;
+			_visualAsset = EditorHelper.LoadWindowUXML<DebuggerBundleListViewer>();
 			if (_visualAsset == null)
-			{
-				Debug.LogError($"Not found {nameof(DebuggerBundleListViewer)}.uxml in settings.");
 				return;
-			}
+			
 			_root = _visualAsset.CloneTree();
 			_root.style.flexGrow = 1f;
 
@@ -37,12 +35,12 @@ namespace YooAsset.Editor
 			_bundleListView = _root.Q<ListView>("TopListView");
 			_bundleListView.makeItem = MakeAssetListViewItem;
 			_bundleListView.bindItem = BindAssetListViewItem;
-
 #if UNITY_2020_1_OR_NEWER
 			_bundleListView.onSelectionChange += BundleListView_onSelectionChange;
 #else
 			_bundleListView.onSelectionChanged += BundleListView_onSelectionChange;
 #endif
+
 			// 使用列表
 			_usingListView = _root.Q<ListView>("BottomListView");
 			_usingListView.makeItem = MakeIncludeListViewItem;

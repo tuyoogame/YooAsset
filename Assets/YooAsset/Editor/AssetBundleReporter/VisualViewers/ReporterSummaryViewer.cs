@@ -37,12 +37,10 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件
-			_visualAsset = YooAssetEditorSettingsData.Setting.ReporterSummaryViewerUXML;
+			_visualAsset = EditorHelper.LoadWindowUXML<ReporterSummaryViewer>();
 			if (_visualAsset == null)
-			{
-				Debug.LogError($"Not found {nameof(ReporterSummaryViewer)}.uxml in settings.");
 				return;
-			}
+			
 			_root = _visualAsset.CloneTree();
 			_root.style.flexGrow = 1f;
 

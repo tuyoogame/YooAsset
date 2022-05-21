@@ -105,7 +105,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		private static void LoadSettingData()
 		{
-			_setting = YooAssetEditorSettingsHelper.LoadSettingData<AssetBundleCollectorSetting>();
+			_setting = EditorHelper.LoadSettingData<AssetBundleCollectorSetting>();
 
 			// IPackRule
 			{

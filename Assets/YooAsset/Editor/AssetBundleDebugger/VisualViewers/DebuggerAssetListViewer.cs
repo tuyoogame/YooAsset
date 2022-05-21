@@ -24,12 +24,10 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件		
-			_visualAsset = YooAssetEditorSettingsData.Setting.DebuggerAssetListViewerUXML;
+			_visualAsset = EditorHelper.LoadWindowUXML<DebuggerAssetListViewer>();
 			if (_visualAsset == null)
-			{
-				Debug.LogError($"Not found {nameof(DebuggerAssetListViewer)}.uxml in settings.");
 				return;
-			}
+			
 			_root = _visualAsset.CloneTree();
 			_root.style.flexGrow = 1f;
 

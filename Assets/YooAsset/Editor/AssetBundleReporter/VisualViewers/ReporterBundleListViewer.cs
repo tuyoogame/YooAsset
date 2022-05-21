@@ -42,56 +42,46 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件
-			_visualAsset = YooAssetEditorSettingsData.Setting.ReporterBundleListViewerUXML;
+			_visualAsset = EditorHelper.LoadWindowUXML<ReporterBundleListViewer>();
 			if (_visualAsset == null)
-			{
-				Debug.LogError($"Not found {nameof(ReporterBundleListViewer)}.uxml in settings.");
 				return;
-			}
 
-			try
-			{
-				_root = _visualAsset.CloneTree();
-				_root.style.flexGrow = 1f;
+			_root = _visualAsset.CloneTree();
+			_root.style.flexGrow = 1f;
 
-				// 顶部按钮栏
-				_topBar1 = _root.Q<ToolbarButton>("TopBar1");
-				_topBar2 = _root.Q<ToolbarButton>("TopBar2");
-				_topBar3 = _root.Q<ToolbarButton>("TopBar3");
-				_topBar4 = _root.Q<ToolbarButton>("TopBar4");
-				_topBar1.clicked += TopBar1_clicked;
-				_topBar2.clicked += TopBar2_clicked;
-				_topBar3.clicked += TopBar3_clicked;
-				_topBar4.clicked += TopBar4_clicked;
+			// 顶部按钮栏
+			_topBar1 = _root.Q<ToolbarButton>("TopBar1");
+			_topBar2 = _root.Q<ToolbarButton>("TopBar2");
+			_topBar3 = _root.Q<ToolbarButton>("TopBar3");
+			_topBar4 = _root.Q<ToolbarButton>("TopBar4");
+			_topBar1.clicked += TopBar1_clicked;
+			_topBar2.clicked += TopBar2_clicked;
+			_topBar3.clicked += TopBar3_clicked;
+			_topBar4.clicked += TopBar4_clicked;
 
-				// 底部按钮栏
-				_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
+			// 底部按钮栏
+			_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
 
-				// 资源包列表
-				_bundleListView = _root.Q<ListView>("TopListView");
-				_bundleListView.makeItem = MakeBundleListViewItem;
-				_bundleListView.bindItem = BindBundleListViewItem;
+			// 资源包列表
+			_bundleListView = _root.Q<ListView>("TopListView");
+			_bundleListView.makeItem = MakeBundleListViewItem;
+			_bundleListView.bindItem = BindBundleListViewItem;
 #if UNITY_2020_1_OR_NEWER
-				_bundleListView.onSelectionChange += BundleListView_onSelectionChange;
+			_bundleListView.onSelectionChange += BundleListView_onSelectionChange;
 #else
-				_bundleListView.onSelectionChanged += BundleListView_onSelectionChange;
+			_bundleListView.onSelectionChanged += BundleListView_onSelectionChange;
 #endif
 
-				// 包含列表
-				_includeListView = _root.Q<ListView>("BottomListView");
-				_includeListView.makeItem = MakeIncludeListViewItem;
-				_includeListView.bindItem = BindIncludeListViewItem;
-			}
-			catch (Exception e)
-			{
-				Debug.LogError(e.ToString());
-			}
+			// 包含列表
+			_includeListView = _root.Q<ListView>("BottomListView");
+			_includeListView.makeItem = MakeIncludeListViewItem;
+			_includeListView.bindItem = BindIncludeListViewItem;
 		}
 
 		/// <summary>
 		/// 填充页面数据
 		/// </summary>
-		public void FillViewData( BuildReport buildReport, string reprotFilePath, string searchKeyWord)
+		public void FillViewData(BuildReport buildReport, string reprotFilePath, string searchKeyWord)
 		{
 			_buildReport = buildReport;
 			_reportFilePath = reprotFilePath;

@@ -38,46 +38,36 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件
-			_visualAsset = YooAssetEditorSettingsData.Setting.ReporterAssetListViewerUXML;
+			_visualAsset = EditorHelper.LoadWindowUXML<ReporterAssetListViewer>();
 			if (_visualAsset == null)
-			{
-				Debug.LogError($"Not found {nameof(ReporterAssetListViewer)}.uxml in settings.");
 				return;
-			}
 
-			try
-			{
-				_root = _visualAsset.CloneTree();
-				_root.style.flexGrow = 1f;
+			_root = _visualAsset.CloneTree();
+			_root.style.flexGrow = 1f;
 
-				// 顶部按钮栏
-				_topBar1 = _root.Q<ToolbarButton>("TopBar1");
-				_topBar2 = _root.Q<ToolbarButton>("TopBar2");
-				_topBar1.clicked += TopBar1_clicked;
-				_topBar2.clicked += TopBar2_clicked;
+			// 顶部按钮栏
+			_topBar1 = _root.Q<ToolbarButton>("TopBar1");
+			_topBar2 = _root.Q<ToolbarButton>("TopBar2");
+			_topBar1.clicked += TopBar1_clicked;
+			_topBar2.clicked += TopBar2_clicked;
 
-				// 底部按钮栏
-				_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
+			// 底部按钮栏
+			_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
 
-				// 资源列表
-				_assetListView = _root.Q<ListView>("TopListView");
-				_assetListView.makeItem = MakeAssetListViewItem;
-				_assetListView.bindItem = BindAssetListViewItem;
+			// 资源列表
+			_assetListView = _root.Q<ListView>("TopListView");
+			_assetListView.makeItem = MakeAssetListViewItem;
+			_assetListView.bindItem = BindAssetListViewItem;
 #if UNITY_2020_1_OR_NEWER
-				_assetListView.onSelectionChange += AssetListView_onSelectionChange;
+			_assetListView.onSelectionChange += AssetListView_onSelectionChange;
 #else
-				_assetListView.onSelectionChanged += AssetListView_onSelectionChange;
+			_assetListView.onSelectionChanged += AssetListView_onSelectionChange;
 #endif
 
-				// 依赖列表
-				_dependListView = _root.Q<ListView>("BottomListView");
-				_dependListView.makeItem = MakeDependListViewItem;
-				_dependListView.bindItem = BindDependListViewItem;
-			}
-			catch (Exception e)
-			{
-				Debug.LogError(e.ToString());
-			}
+			// 依赖列表
+			_dependListView = _root.Q<ListView>("BottomListView");
+			_dependListView.makeItem = MakeDependListViewItem;
+			_dependListView.bindItem = BindDependListViewItem;
 		}
 
 		/// <summary>

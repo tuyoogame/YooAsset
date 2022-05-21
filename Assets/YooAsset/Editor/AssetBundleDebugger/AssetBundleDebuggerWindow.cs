@@ -53,12 +53,10 @@ namespace YooAsset.Editor
                 VisualElement root = rootVisualElement;
 
                 // 加载布局文件
-                var visualAsset = YooAssetEditorSettingsData.Setting.AssetBundleDebuggerUXML;
+                var visualAsset = EditorHelper.LoadWindowUXML<AssetBundleDebuggerWindow>();
                 if (visualAsset == null)
-                {
-                    Debug.LogError($"Not found {nameof(AssetBundleDebuggerWindow)}.uxml in settings.");
                     return;
-                }
+                
                 visualAsset.CloneTree(root);
 
                 // 采样按钮

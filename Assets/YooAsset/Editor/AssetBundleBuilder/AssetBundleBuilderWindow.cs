@@ -38,12 +38,10 @@ namespace YooAsset.Editor
 				VisualElement root = this.rootVisualElement;
 
 				// 加载布局文件
-				var visualAsset = YooAssetEditorSettingsData.Setting.AssetBundleBuilderUXML;
+				var visualAsset = EditorHelper.LoadWindowUXML<AssetBundleBuilderWindow>();
 				if (visualAsset == null)
-				{
-					Debug.LogError($"Not found {nameof(AssetBundleBuilderWindow)}.uxml in settings.");
 					return;
-				}
+				
 				visualAsset.CloneTree(root);
 
 				_buildTarget = EditorUserBuildSettings.activeBuildTarget;

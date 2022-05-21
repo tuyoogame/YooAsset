@@ -54,12 +54,10 @@ namespace YooAsset.Editor
 				VisualElement root = this.rootVisualElement;
 
 				// 加载布局文件
-				var visualAsset = YooAssetEditorSettingsData.Setting.AssetBundleCollectorUXML;
+				var visualAsset = EditorHelper.LoadWindowUXML<AssetBundleCollectorWindow>();
 				if (visualAsset == null)
-				{
-					Debug.LogError($"Not found {nameof(AssetBundleCollectorWindow)}.uxml in settings.");
 					return;
-				}
+				
 				visualAsset.CloneTree(root);
 
 				// 导入导出按钮
