@@ -54,6 +54,11 @@ namespace YooAsset.Editor
 		public bool AppendFileExtension;
 
 		/// <summary>
+		/// 拷贝内置资源文件
+		/// </summary>
+		public bool CopyBuildinTagFiles;
+
+		/// <summary>
 		/// 自动收集着色器
 		/// </summary>
 		public bool AutoCollectShaders;

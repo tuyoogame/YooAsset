@@ -58,9 +58,7 @@ namespace YooAsset.Editor
 		{
 			List<PatchBundle> result = new List<PatchBundle>(1000);
 
-			// 内置标记列表
 			List<string> buildinTags = buildParameters.Parameters.GetBuildinTags();
-
 			var buildMode = buildParameters.Parameters.BuildMode;
 			bool standardBuild = buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild;
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
@@ -90,7 +88,7 @@ namespace YooAsset.Editor
 		}
 		private bool IsBuildinBundle(string[] bundleTags, List<string> buildinTags)
 		{
-			// 注意：没有任何标记的Bundle文件默认为内置文件
+			// 注意：没有任何分类标签的Bundle文件默认为内置文件
 			if (bundleTags.Length == 0)
 				return true;
 

@@ -30,7 +30,7 @@ namespace YooAsset.Editor
 		public int BuildVersion;
 
 		/// <summary>
-		/// 内置资源的标记列表
+		/// 内置资源标签集合（首包资源标签）
 		/// 注意：分号为分隔符
 		/// </summary>
 		public string BuildinTags;
@@ -50,6 +50,11 @@ namespace YooAsset.Editor
 		/// 追加文件扩展名
 		/// </summary>
 		public bool AppendFileExtension = false;
+
+		/// <summary>
+		/// 拷贝内置资源文件（首包资源文件）
+		/// </summary>
+		public bool CopyBuildinTagFiles = false;
 
 
 		/// <summary>
@@ -74,7 +79,7 @@ namespace YooAsset.Editor
 
 
 		/// <summary>
-		/// 获取内置标记列表
+		/// 获取内置资源标签列表（首包资源标签）
 		/// </summary>
 		public List<string> GetBuildinTags()
 		{

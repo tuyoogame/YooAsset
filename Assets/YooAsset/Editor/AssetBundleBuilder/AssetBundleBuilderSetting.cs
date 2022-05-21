@@ -16,7 +16,7 @@ namespace YooAsset.Editor
 		public EBuildMode BuildMode = EBuildMode.ForceRebuild;
 
 		/// <summary>
-		/// 内置资源标签
+		/// 内置资源标签（首包资源标签）
 		/// </summary>
 		public string BuildTags = string.Empty;
 
@@ -34,5 +34,10 @@ namespace YooAsset.Editor
 		/// 附加后缀格式
 		/// </summary>
 		public bool AppendExtension = false;
+
+		/// <summary>
+		/// 拷贝内置资源文件（首包资源文件）
+		/// </summary>
+		public bool CopyBuildinTagFiles = true;
 	}
 }

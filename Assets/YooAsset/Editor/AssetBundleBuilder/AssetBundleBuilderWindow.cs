@@ -25,11 +25,12 @@ namespace YooAsset.Editor
 		private TextField _buildOutputField;
 		private IntegerField _buildVersionField;
 		private EnumField _buildModeField;
-		private TextField _buildTagsField;
+		private TextField _buildinTagsField;
 		private PopupField<string> _encryptionField;
 		private EnumField _compressionField;
 		private Toggle _appendExtensionToggle;
-
+		private Toggle _copyBuildinTagFilesToggle;
+		
 		public void CreateGUI()
 		{
 			try
@@ -76,11 +77,11 @@ namespace YooAsset.Editor
 				});
 
 				// 内置资源标签
-				_buildTagsField = root.Q<TextField>("BuildinTags");
-				_buildTagsField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.BuildTags);
-				_buildTagsField.RegisterValueChangedCallback(evt =>
+				_buildinTagsField = root.Q<TextField>("BuildinTags");
+				_buildinTagsField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.BuildTags);
+				_buildinTagsField.RegisterValueChangedCallback(evt =>
 				{
-					AssetBundleBuilderSettingData.Setting.BuildTags = _buildTagsField.value;
+					AssetBundleBuilderSettingData.Setting.BuildTags = _buildinTagsField.value;
 				});
 
 				// 加密方法
@@ -123,6 +124,14 @@ namespace YooAsset.Editor
 					AssetBundleBuilderSettingData.Setting.AppendExtension = _appendExtensionToggle.value;
 				});
 
+				// 拷贝首包文件
+				_copyBuildinTagFilesToggle = root.Q<Toggle>("CopyBuildinFiles");
+				_copyBuildinTagFilesToggle.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.CopyBuildinTagFiles);
+				_copyBuildinTagFilesToggle.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleBuilderSettingData.Setting.CopyBuildinTagFiles = _copyBuildinTagFilesToggle.value;
+				});
+
 				// 构建按钮
 				var buildButton = root.Q<Button>("Build");
 				buildButton.clicked += BuildButton_clicked; ;
@@ -141,11 +150,13 @@ namespace YooAsset.Editor
 
 		private void RefreshWindow()
 		{
-			bool enableElement = AssetBundleBuilderSettingData.Setting.BuildMode == EBuildMode.ForceRebuild;
-			_buildTagsField.SetEnabled(enableElement);
+			var buildMode = AssetBundleBuilderSettingData.Setting.BuildMode;
+			bool enableElement = buildMode == EBuildMode.ForceRebuild;
+			_buildinTagsField.SetEnabled(enableElement);
 			_encryptionField.SetEnabled(enableElement);
 			_compressionField.SetEnabled(enableElement);
 			_appendExtensionToggle.SetEnabled(enableElement);
+			_copyBuildinTagFilesToggle.SetEnabled(buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild);
 		}
 		private void BuildButton_clicked()
 		{
@@ -172,10 +183,11 @@ namespace YooAsset.Editor
 			buildParameters.BuildTarget = _buildTarget;
 			buildParameters.BuildMode = (EBuildMode)_buildModeField.value;
 			buildParameters.BuildVersion = _buildVersionField.value;
-			buildParameters.BuildinTags = _buildTagsField.value;
+			buildParameters.BuildinTags = _buildinTagsField.value;
 			buildParameters.VerifyBuildingResult = true;
 			buildParameters.EnableAddressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
 			buildParameters.AppendFileExtension = _appendExtensionToggle.value;
+			buildParameters.CopyBuildinTagFiles = _copyBuildinTagFilesToggle.value;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.CompressOption = (ECompressOption)_compressionField.value;
 
