@@ -31,6 +31,8 @@ namespace YooAsset.Editor
 		private TextField _groupDescTxt;
 		private TextField _groupAssetTagsTxt;
 		private VisualElement _groupContainer;
+		private string _lastModifyGroup = string.Empty;
+
 
 		public void CreateGUI()
 		{
@@ -164,6 +166,9 @@ namespace YooAsset.Editor
 		}
 		public void OnDestroy()
 		{
+			// 注意：清空所有撤销操作
+			Undo.ClearAll();
+
 			if (AssetBundleCollectorSettingData.IsDirty)
 				AssetBundleCollectorSettingData.SaveFile();
 		}
@@ -203,6 +208,16 @@ namespace YooAsset.Editor
 			_groupListView.ClearSelection();
 			_groupListView.itemsSource = AssetBundleCollectorSettingData.Setting.Groups;
 			_groupListView.Rebuild();
+
+			for (int index = 0; index < AssetBundleCollectorSettingData.Setting.Groups.Count; index++)
+			{
+				var group = AssetBundleCollectorSettingData.Setting.Groups[index];
+				if (group.GroupName == _lastModifyGroup)
+				{
+					_groupListView.selectedIndex = index;
+					break;
+				}
+			}
 		}
 		private VisualElement MakeGroupListViewItem()
 		{
@@ -236,7 +251,7 @@ namespace YooAsset.Editor
 		}
 		private void AddGroupBtn_clicked()
 		{
-			Undo.RecordObject(AssetBundleCollectorSettingData.Setting, "YooAsset AddGroup");
+			Undo.RecordObject(AssetBundleCollectorSettingData.Setting, "YooAsset.AssetBundleCollectorWindow AddGroup");
 			AssetBundleCollectorSettingData.CreateGroup("Default Group");
 			FillGroupViewData();
 		}
@@ -246,8 +261,7 @@ namespace YooAsset.Editor
 			if (selectGroup == null)
 				return;
 
-			Undo.RecordObject(AssetBundleCollectorSettingData.Setting, "YooAsset RemoveGroup");
-
+			Undo.RecordObject(AssetBundleCollectorSettingData.Setting, "YooAsset.AssetBundleCollectorWindow RemoveGroup");
 			AssetBundleCollectorSettingData.RemoveGroup(selectGroup);
 			FillGroupViewData();
 		}
@@ -262,6 +276,7 @@ namespace YooAsset.Editor
 				return;
 			}
 
+			_lastModifyGroup = selectGroup.GroupName;
 			_groupContainer.visible = true;
 			_groupNameTxt.SetValueWithoutNotify(selectGroup.GroupName);
 			_groupDescTxt.SetValueWithoutNotify(selectGroup.GroupDesc);
@@ -550,6 +565,7 @@ namespace YooAsset.Editor
 			if (selectGroup == null)
 				return;
 
+			Undo.RecordObject(AssetBundleCollectorSettingData.Setting, "YooAsset.AssetBundleCollectorWindow AddCollector");
 			AssetBundleCollectorSettingData.CreateCollector(selectGroup, string.Empty);
 			FillCollectorViewData();
 		}
@@ -560,6 +576,8 @@ namespace YooAsset.Editor
 				return;
 			if (selectCollector == null)
 				return;
+
+			Undo.RecordObject(AssetBundleCollectorSettingData.Setting, "YooAsset.AssetBundleCollectorWindow RemoveCollector");
 			AssetBundleCollectorSettingData.RemoveCollector(selectGroup, selectCollector);
 			FillCollectorViewData();
 		}
