@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
 	public class EditorHelper
 	{
+#if UNITY_2019_4_OR_NEWER
 		private readonly static Dictionary<System.Type, string> _uxmlDic = new Dictionary<System.Type, string>();
 
 		static EditorHelper()
@@ -33,7 +33,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 加载窗口的布局文件
 		/// </summary>
-		public static VisualTreeAsset LoadWindowUXML<TWindow>() where TWindow : class
+		public static UnityEngine.UIElements.VisualTreeAsset LoadWindowUXML<TWindow>() where TWindow : class
 		{
 			var windowType = typeof(TWindow);
 			if (_uxmlDic.TryGetValue(windowType, out string uxmlGUID))
@@ -41,7 +41,7 @@ namespace YooAsset.Editor
 				string assetPath = AssetDatabase.GUIDToAssetPath(uxmlGUID);
 				if (string.IsNullOrEmpty(assetPath))
 					throw new System.Exception($"Invalid YooAsset uxml guid : {uxmlGUID}");
-				var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(assetPath);
+				var visualTreeAsset = AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.VisualTreeAsset>(assetPath);
 				if (visualTreeAsset == null)
 					throw new System.Exception($"Failed to load {windowType}.uxml");
 				return visualTreeAsset;
@@ -51,6 +51,7 @@ namespace YooAsset.Editor
 				throw new System.Exception($"Invalid YooAsset window type : {windowType}");
 			}
 		}
+#endif
 
 		/// <summary>
 		/// 加载相关的配置文件
