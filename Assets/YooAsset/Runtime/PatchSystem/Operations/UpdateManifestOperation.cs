@@ -11,6 +11,10 @@ namespace YooAsset
 	/// </summary>
 	public abstract class UpdateManifestOperation : AsyncOperationBase
 	{
+		/// <summary>
+		/// 是否发现了新的补丁清单
+		/// </summary>
+		public bool FoundNewManifest { protected set; get; }
 	}
 
 	/// <summary>
@@ -114,11 +118,13 @@ namespace YooAsset
 					{
 						YooLogger.Log($"Patch manifest file hash is not change : {webManifestHash}");
 						LoadSandboxPatchManifest(_resourceVersion);
+						FoundNewManifest = false;
 						_steps = ESteps.InitVerifyingCache;
 					}
 					else
 					{
 						YooLogger.Log($"Patch manifest hash is change : {webManifestHash} -> {cachedManifestHash}");
+						FoundNewManifest = true;
 						_steps = ESteps.LoadWebManifest;
 					}
 				}
