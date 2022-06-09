@@ -73,7 +73,14 @@ namespace YooAsset.Editor
 			else
 			{
 				if (guids.Length != 1)
+				{
+					foreach (var guid in guids)
+					{
+						string path = AssetDatabase.GUIDToAssetPath(guid);
+						Debug.LogWarning($"Found multiple file : {path}");
+					}
 					throw new System.Exception($"Found multiple {settingType.Name} files !");
+				}
 
 				string filePath = AssetDatabase.GUIDToAssetPath(guids[0]);
 				var setting = AssetDatabase.LoadAssetAtPath<TSetting>(filePath);
