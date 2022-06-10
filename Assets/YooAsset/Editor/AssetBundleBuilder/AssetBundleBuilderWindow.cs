@@ -29,7 +29,6 @@ namespace YooAsset.Editor
 		private PopupField<string> _encryptionField;
 		private EnumField _compressionField;
 		private Toggle _appendExtensionToggle;
-		private Toggle _copyBuildinTagFilesToggle;
 		
 		public void CreateGUI()
 		{
@@ -122,14 +121,6 @@ namespace YooAsset.Editor
 					AssetBundleBuilderSettingData.Setting.AppendExtension = _appendExtensionToggle.value;
 				});
 
-				// 拷贝首包文件
-				_copyBuildinTagFilesToggle = root.Q<Toggle>("CopyBuildinFiles");
-				_copyBuildinTagFilesToggle.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.CopyBuildinTagFiles);
-				_copyBuildinTagFilesToggle.RegisterValueChangedCallback(evt =>
-				{
-					AssetBundleBuilderSettingData.Setting.CopyBuildinTagFiles = _copyBuildinTagFilesToggle.value;
-				});
-
 				// 构建按钮
 				var buildButton = root.Q<Button>("Build");
 				buildButton.clicked += BuildButton_clicked; ;
@@ -154,7 +145,6 @@ namespace YooAsset.Editor
 			_encryptionField.SetEnabled(enableElement);
 			_compressionField.SetEnabled(enableElement);
 			_appendExtensionToggle.SetEnabled(enableElement);
-			_copyBuildinTagFilesToggle.SetEnabled(buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild);
 		}
 		private void BuildButton_clicked()
 		{
@@ -175,17 +165,19 @@ namespace YooAsset.Editor
 		/// </summary>
 		private void ExecuteBuild()
 		{
+			var buildMode = (EBuildMode)_buildModeField.value;
+
 			string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
 			BuildParameters buildParameters = new BuildParameters();
 			buildParameters.OutputRoot = defaultOutputRoot;
 			buildParameters.BuildTarget = _buildTarget;
-			buildParameters.BuildMode = (EBuildMode)_buildModeField.value;
+			buildParameters.BuildMode = buildMode;
 			buildParameters.BuildVersion = _buildVersionField.value;
 			buildParameters.BuildinTags = _buildinTagsField.value;
 			buildParameters.VerifyBuildingResult = true;
 			buildParameters.EnableAddressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
 			buildParameters.AppendFileExtension = _appendExtensionToggle.value;
-			buildParameters.CopyBuildinTagFiles = _copyBuildinTagFilesToggle.value;
+			buildParameters.CopyBuildinTagFiles = buildMode == EBuildMode.ForceRebuild;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.CompressOption = (ECompressOption)_compressionField.value;
 

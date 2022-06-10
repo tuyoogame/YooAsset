@@ -52,7 +52,7 @@ namespace YooAsset.Editor
 		public bool AppendFileExtension = false;
 
 		/// <summary>
-		/// 拷贝内置资源文件（首包资源文件）
+		/// 拷贝内置资源文件到StreamingAssets目录（首包资源文件）
 		/// </summary>
 		public bool CopyBuildinTagFiles = false;
 
