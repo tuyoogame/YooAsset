@@ -104,7 +104,7 @@ namespace YooAsset
 				var bundleInfo = new DebugBundleInfo();
 				bundleInfo.BundleName = loader.MainBundleInfo.BundleName;
 				bundleInfo.RefCount = loader.RefCount;
-				bundleInfo.Status = loader.Status;
+				bundleInfo.Status = (int)loader.Status;
 				output.Add(bundleInfo);
 			}
 		}

@@ -185,7 +185,7 @@ namespace YooAsset
 					if (_isShowWaitForAsyncError == false)
 					{
 						_isShowWaitForAsyncError = true;
-						YooLogger.Error($"WaitForAsyncComplete failed ! BundleName : {MainBundleInfo.BundleName} States : {Status}");
+						YooLogger.Error($"WaitForAsyncComplete failed ! Try load bundle : {MainBundleInfo.BundleName} from remote with sync load method !");
 					}
 					break;
 				}

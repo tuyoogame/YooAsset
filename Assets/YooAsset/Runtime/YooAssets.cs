@@ -117,7 +117,6 @@ namespace YooAsset
 		private static OfflinePlayModeImpl _offlinePlayModeImpl;
 		private static HostPlayModeImpl _hostPlayModeImpl;
 
-
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
@@ -143,6 +142,10 @@ namespace YooAsset
 				UnityEngine.GameObject driverGo = new UnityEngine.GameObject("[YooAsset]");
 				driverGo.AddComponent<YooAssetDriver>();
 				UnityEngine.Object.DontDestroyOnLoad(driverGo);
+
+#if DEBUG
+				driverGo.AddComponent<RemoteDebuggerInRuntime>();
+#endif
 			}
 			else
 			{
@@ -932,17 +935,6 @@ namespace YooAsset
 
 			// 更新资源系统
 			AssetSystem.Update();
-		}
-
-		/// <summary>
-		/// 获取调试信息
-		/// </summary>
-		internal static void GetDebugReport(DebugReport report)
-		{
-			if (report == null)
-				YooLogger.Error($"{nameof(DebugReport)} is null");
-
-			AssetSystem.GetDebugReport(report);
 		}
 
 		/// <summary>

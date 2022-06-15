@@ -20,6 +20,7 @@ namespace YooAsset
 		private ESteps _steps = ESteps.None;
 		private float _tryTimer = 0;
 		private string _webURL;
+		private bool _isShowWaitForAsyncError = false;
 		private UnityWebRequest _webRequest;
 
 
@@ -118,7 +119,11 @@ namespace YooAsset
 		/// </summary>
 		public override void WaitForAsyncComplete()
 		{
-			throw new System.NotImplementedException($"WebGL platform not support {nameof(WaitForAsyncComplete)}");
+			if (_isShowWaitForAsyncError == false)
+			{
+				_isShowWaitForAsyncError = true;
+				YooLogger.Error($"WebGL platform not support {nameof(WaitForAsyncComplete)} ! Use the async load method instead of the sync load method !");
+			}
 		}
 	}
 }

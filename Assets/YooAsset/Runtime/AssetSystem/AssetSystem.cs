@@ -321,9 +321,10 @@ namespace YooAsset
 		}
 
 		#region 调试专属方法
-		internal static void GetDebugReport(DebugReport report)
+		internal static DebugReport GetDebugReport()
 		{
-			report.ClearAll();
+			DebugReport report = new DebugReport();
+			report.FrameCount = Time.frameCount;
 			report.BundleCount = _loaders.Count;
 			report.AssetCount = _providers.Count;
 
@@ -334,8 +335,8 @@ namespace YooAsset
 				providerInfo.SpawnScene = provider.SpawnScene;
 				providerInfo.SpawnTime = provider.SpawnTime;
 				providerInfo.RefCount = provider.RefCount;
-				providerInfo.Status = provider.Status;
-				providerInfo.BundleInfos.Clear();
+				providerInfo.Status = (int)provider.Status;
+				providerInfo.BundleInfos = new List<DebugBundleInfo>();
 				report.ProviderInfos.Add(providerInfo);
 
 				if (provider is BundledProvider)
@@ -347,6 +348,7 @@ namespace YooAsset
 
 			// 重新排序
 			report.ProviderInfos.Sort();
+			return report;
 		}
 		#endregion
 	}
