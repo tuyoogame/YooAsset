@@ -58,7 +58,9 @@ namespace YooAsset
 				downloader.Abort();
 			}
 			_downloaderDic.Clear();
-			YooLogger.Log("DownloadSystem destroy all !");
+			_removeList.Clear();
+			_cachedHashList.Clear();
+			_breakpointResumeFileSize = int.MaxValue;
 		}
 
 

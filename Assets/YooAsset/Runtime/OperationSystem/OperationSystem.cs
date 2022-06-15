@@ -46,6 +46,17 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 销毁异步操作系统
+		/// </summary>
+		public static void DestroyAll()
+		{
+			_operations.Clear();
+			_watch = null;
+			_maxTimeSlice = 0;
+			_frameTime = 0;
+		}
+
+		/// <summary>
 		/// 开始处理异步操作类
 		/// </summary>
 		public static void StartOperaiton(AsyncOperationBase operationBase)

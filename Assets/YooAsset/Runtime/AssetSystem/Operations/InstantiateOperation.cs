@@ -51,6 +51,9 @@ namespace YooAsset
 					return;
 				}
 
+				if (_handle.IsDone == false)
+					return;
+
 				if (_handle.AssetObject == null)
 				{
 					_steps = ESteps.Done;

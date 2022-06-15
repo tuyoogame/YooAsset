@@ -11,7 +11,7 @@ namespace YooAsset
 
 		void OnApplicationQuit()
 		{
-			DownloadSystem.DestroyAll();
+			YooAssets.InternalDestroy();
 		}
 	}
 }

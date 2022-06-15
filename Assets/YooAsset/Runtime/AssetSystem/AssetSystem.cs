@@ -64,6 +64,19 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 销毁
+		/// </summary>
+		public static void DestroyAll()
+		{
+			_loaders.Clear();
+			_providers.Clear();
+			_sceneHandles.Clear();
+
+			DecryptionServices = null;
+			BundleServices = null;
+		}
+
+		/// <summary>
 		/// 资源回收（卸载引用计数为零的资源）
 		/// </summary>
 		public static void UnloadUnusedAssets()

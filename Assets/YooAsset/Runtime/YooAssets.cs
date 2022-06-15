@@ -925,15 +925,27 @@ namespace YooAsset
 		#endregion
 
 		#region 内部方法
+		internal static void InternalDestroy()
+		{
+			_isInitialize = false;
+			_initializeError = string.Empty;
+			_initializeStatus = EOperationStatus.None;
+
+			_bundleServices = null;
+			_locationServices = null;
+			_editorSimulateModeImpl = null;
+			_offlinePlayModeImpl = null;
+			_hostPlayModeImpl = null;
+
+			OperationSystem.DestroyAll();
+			DownloadSystem.DestroyAll();
+			AssetSystem.DestroyAll();
+			YooLogger.Log("YooAssets destroy all !");
+		}
 		internal static void InternalUpdate()
 		{
-			// 更新异步操作系统
 			OperationSystem.Update();
-
-			// 更新下载管理系统
 			DownloadSystem.Update();
-
-			// 更新资源系统
 			AssetSystem.Update();
 		}
 
