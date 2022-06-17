@@ -28,6 +28,8 @@ namespace YooAsset.Editor
 	/// </summary>
 	public class PackDirectory : IPackRule
 	{
+		public static PackDirectory StaticPackRule = new PackDirectory();
+
 		string IPackRule.GetBundleName(PackRuleData data)
 		{
 			return Path.GetDirectoryName(data.AssetPath);
