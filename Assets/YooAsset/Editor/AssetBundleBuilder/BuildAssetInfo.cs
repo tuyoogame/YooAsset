@@ -9,9 +9,9 @@ namespace YooAsset.Editor
 	{
 		private string _mainBundleName;
 		private string _shareBundleName;
-		private readonly HashSet<string> _referenceBundleNames = new HashSet<string>();
 		private bool _isAddAssetTags = false;
-		
+		private readonly HashSet<string> _referenceBundleNames = new HashSet<string>();
+
 		/// <summary>
 		/// 收集器类型
 		/// </summary>
@@ -68,9 +68,9 @@ namespace YooAsset.Editor
 			else
 				IsShaderAsset = false;
 		}
-		public BuildAssetInfo(ECollectorType collectorType, string assetPath)
+		public BuildAssetInfo(string assetPath)
 		{
-			CollectorType = collectorType;
+			CollectorType = ECollectorType.None;
 			Address = string.Empty;
 			AssetPath = assetPath;
 			IsRawAsset = false;
@@ -185,11 +185,9 @@ namespace YooAsset.Editor
 
 				if (_referenceBundleNames.Count > 1)
 				{
-					var bundleNameList = _referenceBundleNames.ToList();
-					bundleNameList.Sort();
-					string combineName = string.Join("|", bundleNameList);
-					var combineNameHash = HashUtility.StringSHA1(combineName);
-					var shareBundleName = $"share_{combineNameHash}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+					IPackRule packRule = PackDirectory.StaticPackRule;
+					var bundleName = packRule.GetBundleName(new PackRuleData(AssetPath));
+					var shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
 					_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
 				}
 			}

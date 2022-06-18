@@ -65,7 +65,7 @@ namespace YooAsset.Editor
 					}
 					else
 					{
-						var buildAssetInfo = new BuildAssetInfo(ECollectorType.None, dependAssetPath);
+						var buildAssetInfo = new BuildAssetInfo(dependAssetPath);
 						buildAssetInfo.AddBundleTags(collectAssetInfo.AssetTags);
 						buildAssetInfo.AddReferenceBundleName(collectAssetInfo.BundleName);
 						buildAssetDic.Add(dependAssetPath, buildAssetInfo);
