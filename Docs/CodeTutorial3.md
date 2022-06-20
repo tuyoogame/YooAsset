@@ -175,6 +175,9 @@ private object LoadFunc(string name, string extension, System.Type type, out Des
     return handle.AssetObject;
 }
 
+// 执行FairyGUI的添加包函数
+UIPackage.AddPackage(name, LoadFunc);
+
 // 释放资源句柄列表
 private void ReleaseHandles()
 {
