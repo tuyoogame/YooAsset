@@ -25,12 +25,12 @@ namespace YooAsset
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(bool locationToLower, bool clearCacheWhenDirty, string defaultHostServer, string fallbackHostServer)
+		public InitializationOperation InitializeAsync(bool locationToLower, bool clearCacheWhenDirty, IRemoteHostServices hostServerServices)
 		{
 			_locationToLower = locationToLower;
 			_clearCacheWhenDirty = clearCacheWhenDirty;
-			_defaultHostServer = defaultHostServer;
-			_fallbackHostServer = fallbackHostServer;
+			_defaultHostServer = hostServerServices.GetDefaultHost();
+			_fallbackHostServer = hostServerServices.GetFallbackHost();
 
 			var operation = new HostPlayModeInitializationOperation(this);
 			OperationSystem.StartOperaiton(operation);

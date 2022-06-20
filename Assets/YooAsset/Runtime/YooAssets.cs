@@ -85,21 +85,14 @@ namespace YooAsset
 		/// </summary>
 		public class HostPlayModeParameters : InitializeParameters
 		{
-			/// <summary>
-			/// 当缓存池被污染的时候清理缓存池
-			/// </summary>
-			public bool ClearCacheWhenDirty;
-
-			/// <summary>
-			/// 默认的资源服务器下载地址
-			/// </summary>
-			public string DefaultHostServer;
-
-			/// <summary>
-			/// 备用的资源服务器下载地址
-			/// </summary>
-			public string FallbackHostServer;
-
+            /// <summary>
+            /// 资源更新获取URL服务接口
+            /// </summary>
+            public IRemoteHostServices HostAddressServices;
+            /// <summary>
+            /// 当缓存池被污染的时候清理缓存池
+            /// </summary>
+            public bool ClearCacheWhenDirty;
 			/// <summary>
 			/// 启用断点续传功能的文件大小
 			/// </summary>
@@ -215,9 +208,7 @@ namespace YooAsset
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = _hostPlayModeImpl.InitializeAsync(
 					hostPlayModeParameters.LocationToLower,
-					hostPlayModeParameters.ClearCacheWhenDirty,
-					hostPlayModeParameters.DefaultHostServer,
-					hostPlayModeParameters.FallbackHostServer);
+					hostPlayModeParameters.ClearCacheWhenDirty, hostPlayModeParameters.HostAddressServices);
 			}
 			else
 			{
@@ -234,11 +225,17 @@ namespace YooAsset
 			_initializeError = op.Error;
 		}
 
-		/// <summary>
-		/// 向网络端请求静态资源版本
-		/// </summary>
-		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public static UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
+        /// <summary>
+        /// 
+        /// </summary>
+        public static bool IsInitialized => _isInitialize;
+
+
+        /// <summary>
+        /// 向网络端请求静态资源版本
+        /// </summary>
+        /// <param name="timeout">超时时间（默认值：60秒）</param>
+        public static UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -557,7 +554,7 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
-		public static AssetOperationHandle LoadAssetAsync<TObject>(string location)
+		public static AssetOperationHandle LoadAssetAsync<TObject>(string location) where TObject : UnityEngine.Object
 		{
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
