@@ -27,27 +27,16 @@ namespace YooAsset
 #else
 		private void OnEnable()
 		{
-			PlayerConnection.instance.RegisterConnection(OnHandleConnectionEvent);
-			PlayerConnection.instance.RegisterDisconnection(OnHandleDisconnectionEvent);
 			PlayerConnection.instance.Register(RemoteDebuggerDefine.kMsgSendEditorToPlayer, OnHandleEditorMessage);
 		}
 		private void OnDisable()
 		{
 			PlayerConnection.instance.Unregister(RemoteDebuggerDefine.kMsgSendEditorToPlayer, OnHandleEditorMessage);
 		}
-
-		private void OnHandleConnectionEvent(int id)
-		{
-			YooLogger.Log($"Editor player connection : {id}");
-		}
-		private void OnHandleDisconnectionEvent(int id)
-		{
-			YooLogger.Log($"Editor player disconnection : {id}");
-		}
 		private void OnHandleEditorMessage(MessageEventArgs args)
 		{
 			var command = RemoteCommand.Deserialize(args.data);
-			YooLogger.Log($"On handle remote command : {command.CommandType} : {command.CommandParam}");
+			YooLogger.Log($"On handle remote command : {command.CommandType} Param : {command.CommandParam}");
 			if (command.CommandType == (int)ERemoteCommand.SampleOnce)
 			{
 				var debugReport = AssetSystem.GetDebugReport();

@@ -43,6 +43,7 @@ namespace YooAsset.Editor
 
 		private readonly Dictionary<int, RemotePlayerSession> _playerSessions = new Dictionary<int, RemotePlayerSession>();
 
+		private Label _playerName;
 		private ToolbarMenu _viewModeMenu;
 		private DebuggerAssetListViewer _assetListViewer;
 		private DebuggerBundleListViewer _bundleListViewer;
@@ -69,11 +70,15 @@ namespace YooAsset.Editor
 				var sampleBtn = root.Q<Button>("SampleButton");
 				sampleBtn.clicked += SampleBtn_onClick;
 
+				// 用户列表菜单
+				_playerName = root.Q<Label>("PlayerName");
+				_playerName.text = "Editor player";
+
 				// 视口模式菜单
 				_viewModeMenu = root.Q<ToolbarMenu>("ViewModeMenu");
-				//_viewModeMenu.menu.AppendAction(EViewMode.MemoryView.ToString(), ViewModeMenuAction0, ViewModeMenuFun0);
-				_viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction1, ViewModeMenuFun1);
-				_viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction2, ViewModeMenuFun2);
+				_viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction, ViewModeMenuFun, EViewMode.AssetView);
+				_viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction, ViewModeMenuFun, EViewMode.BundleView);
+				_viewModeMenu.text = EViewMode.AssetView.ToString();
 
 				// 搜索栏
 				var searchField = root.Q<ToolbarSearchField>("SearchField");
@@ -89,8 +94,14 @@ namespace YooAsset.Editor
 
 				// 显示视图
 				_viewMode = EViewMode.AssetView;
-				_viewModeMenu.text = EViewMode.AssetView.ToString();
 				_assetListViewer.AttachParent(root);
+
+				// 远程调试
+				EditorConnection.instance.Initialize();
+				EditorConnection.instance.RegisterConnection(OnHandleConnectionEvent);
+				EditorConnection.instance.RegisterDisconnection(OnHandleDisconnectionEvent);
+				EditorConnection.instance.Register(RemoteDebuggerDefine.kMsgSendPlayerToEditor, OnHandlePlayerMessage);
+				RemoteDebuggerInRuntime.EditorHandleDebugReportCallback = OnHandleDebugReport;
 			}
 			catch (Exception e)
 			{
@@ -99,28 +110,22 @@ namespace YooAsset.Editor
 		}
 		public void OnDestroy()
 		{
-		}
-
-		private void OnEnable()
-		{
-			EditorConnection.instance.Initialize();
-			EditorConnection.instance.RegisterConnection(OnHandleConnectionEvent);
-			EditorConnection.instance.RegisterDisconnection(OnHandleDisconnectionEvent);
-			EditorConnection.instance.Register(RemoteDebuggerDefine.kMsgSendPlayerToEditor, OnHandlePlayerMessage);
-			RemoteDebuggerInRuntime.EditorHandleDebugReportCallback = OnHandleDebugReport;
-		}
-		private void OnDisable()
-		{
+			// 远程调试
+			EditorConnection.instance.UnregisterConnection(OnHandleConnectionEvent);
+			EditorConnection.instance.UnregisterDisconnection(OnHandleDisconnectionEvent);
 			EditorConnection.instance.Unregister(RemoteDebuggerDefine.kMsgSendPlayerToEditor, OnHandlePlayerMessage);
 			_playerSessions.Clear();
 		}
+
 		private void OnHandleConnectionEvent(int playerId)
 		{
 			Debug.Log($"Game player connection : {playerId}");
+			_playerName.text = $"Connected player : {playerId}";
 		}
 		private void OnHandleDisconnectionEvent(int playerId)
 		{
 			Debug.Log($"Game player disconnection : {playerId}");
+			_playerName.text = $"Disconneced player : {playerId}";
 			RemovePlayerSession(playerId);
 		}
 		private void OnHandlePlayerMessage(MessageEventArgs args)
@@ -175,38 +180,22 @@ namespace YooAsset.Editor
 				_bundleListViewer.FillViewData(_debugReport, _searchKeyWord);
 			}
 		}
-		private void ViewModeMenuAction1(DropdownMenuAction action)
+		private void ViewModeMenuAction(DropdownMenuAction action)
 		{
-			if (_viewMode != EViewMode.AssetView)
+			var viewMode = (EViewMode)action.userData;
+			if (_viewMode != viewMode)
 			{
-				_viewMode = EViewMode.AssetView;
+				_viewMode = viewMode;
 				VisualElement root = this.rootVisualElement;
-				_viewModeMenu.text = EViewMode.AssetView.ToString();
+				_viewModeMenu.text = viewMode.ToString();
 				_assetListViewer.AttachParent(root);
 				_bundleListViewer.DetachParent();
 			}
 		}
-		private void ViewModeMenuAction2(DropdownMenuAction action)
+		private DropdownMenuAction.Status ViewModeMenuFun(DropdownMenuAction action)
 		{
-			if (_viewMode != EViewMode.BundleView)
-			{
-				_viewMode = EViewMode.BundleView;
-				VisualElement root = this.rootVisualElement;
-				_viewModeMenu.text = EViewMode.BundleView.ToString();
-				_assetListViewer.DetachParent();
-				_bundleListViewer.AttachParent(root);
-			}
-		}
-		private DropdownMenuAction.Status ViewModeMenuFun1(DropdownMenuAction action)
-		{
-			if (_viewMode == EViewMode.AssetView)
-				return DropdownMenuAction.Status.Checked;
-			else
-				return DropdownMenuAction.Status.Normal;
-		}
-		private DropdownMenuAction.Status ViewModeMenuFun2(DropdownMenuAction action)
-		{
-			if (_viewMode == EViewMode.BundleView)
+			var viewMode = (EViewMode)action.userData;
+			if (_viewMode == viewMode)
 				return DropdownMenuAction.Status.Checked;
 			else
 				return DropdownMenuAction.Status.Normal;
