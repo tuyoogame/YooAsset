@@ -1,5 +1,4 @@
-﻿using System.IO;
-
+﻿
 namespace YooAsset
 {
 	public class AssetInfo
@@ -42,10 +41,15 @@ namespace YooAsset
 		internal string Error { private set; get; }
 
 		/// <summary>
+		/// 可寻址地址
+		/// </summary>
+		public string Address { private set; get; }
+
+		/// <summary>
 		/// 资源路径
 		/// </summary>
 		public string AssetPath { private set; get; }
-
+		
 		/// <summary>
 		/// 资源类型
 		/// </summary>
@@ -63,6 +67,7 @@ namespace YooAsset
 
 			_patchAsset = patchAsset;
 			AssetType = assetType;
+			Address = patchAsset.Address;
 			AssetPath = patchAsset.AssetPath;
 			Error = string.Empty;
 		}
@@ -73,6 +78,7 @@ namespace YooAsset
 
 			_patchAsset = patchAsset;
 			AssetType = null;
+			Address = patchAsset.Address;
 			AssetPath = patchAsset.AssetPath;
 			Error = string.Empty;
 		}
@@ -80,6 +86,7 @@ namespace YooAsset
 		{
 			_patchAsset = null;
 			AssetType = null;
+			Address = string.Empty;
 			AssetPath = string.Empty;
 			Error = error;
 		}
