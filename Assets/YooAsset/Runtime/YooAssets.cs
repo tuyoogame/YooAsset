@@ -117,6 +117,15 @@ namespace YooAsset
 		private static OfflinePlayModeImpl _offlinePlayModeImpl;
 		private static HostPlayModeImpl _hostPlayModeImpl;
 
+
+		/// <summary>
+		/// 是否已经初始化
+		/// </summary>
+		public static bool IsInitialized
+		{
+			get { return _isInitialize; }
+		}
+
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
@@ -522,7 +531,7 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
-		public static AssetOperationHandle LoadAssetSync<TObject>(string location) where TObject : class
+		public static AssetOperationHandle LoadAssetSync<TObject>(string location) where TObject : UnityEngine.Object
 		{
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
@@ -557,7 +566,7 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
-		public static AssetOperationHandle LoadAssetAsync<TObject>(string location)
+		public static AssetOperationHandle LoadAssetAsync<TObject>(string location) where TObject : UnityEngine.Object
 		{
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
@@ -602,7 +611,7 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
-		public static SubAssetsOperationHandle LoadSubAssetsSync<TObject>(string location)
+		public static SubAssetsOperationHandle LoadSubAssetsSync<TObject>(string location) where TObject : UnityEngine.Object
 		{
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
@@ -637,7 +646,7 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
-		public static SubAssetsOperationHandle LoadSubAssetsAsync<TObject>(string location)
+		public static SubAssetsOperationHandle LoadSubAssetsAsync<TObject>(string location) where TObject : UnityEngine.Object
 		{
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
