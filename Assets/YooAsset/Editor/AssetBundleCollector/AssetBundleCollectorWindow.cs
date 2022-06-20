@@ -71,6 +71,7 @@ namespace YooAsset.Editor
 				_enableAddressableToogle.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleCollectorSettingData.ModifyAddressable(evt.newValue);
+					RefreshWindow();
 				});
 				_autoCollectShaderToogle = root.Q<Toggle>("AutoCollectShader");
 				_autoCollectShaderToogle.RegisterValueChangedCallback(evt =>
