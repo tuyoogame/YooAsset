@@ -81,7 +81,8 @@ namespace YooAsset
 				if (hasError == false)
 				{
 					// 注意：如果文件验证失败需要删除文件
-					if (DownloadSystem.CheckContentIntegrity(_bundleInfo) == false)
+					
+					if (DownloadSystem.CheckContentIntegrity(_bundleInfo.GetCacheLoadPath(), _bundleInfo.SizeBytes, _bundleInfo.CRC) == false)
 					{
 						hasError = true;
 						_lastError = $"Verification failed";

@@ -104,6 +104,11 @@ namespace YooAsset
 			/// 启用断点续传功能的文件大小
 			/// </summary>
 			public int BreakpointResumeFileSize = int.MaxValue;
+
+			/// <summary>
+			/// 下载文件校验等级
+			/// </summary>
+			public EVerifyLevel VerifyLevel = EVerifyLevel.High;
 		}
 
 
@@ -193,7 +198,7 @@ namespace YooAsset
 				throw new Exception($"{EPlayMode.HostPlayMode} not supports WebGL platform !");
 #else
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
-				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize);
+				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize, hostPlayModeParameters.VerifyLevel);
 #endif
 			}
 

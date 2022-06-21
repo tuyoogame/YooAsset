@@ -16,13 +16,16 @@ namespace YooAsset
 		private static readonly List<string> _removeList = new List<string>(100);
 		private static readonly Dictionary<string, string> _cachedHashList = new Dictionary<string, string>(1000);
 		private static int _breakpointResumeFileSize = int.MaxValue;
+		private static EVerifyLevel _verifyLevel = EVerifyLevel.High;
+
 
 		/// <summary>
 		/// 初始化
 		/// </summary>
-		public static void Initialize(int breakpointResumeFileSize)
+		public static void Initialize(int breakpointResumeFileSize, EVerifyLevel verifyLevel)
 		{
 			_breakpointResumeFileSize = breakpointResumeFileSize;
+			_verifyLevel = verifyLevel;
 		}
 
 		/// <summary>
@@ -145,17 +148,18 @@ namespace YooAsset
 			}
 		}
 
-		// 验证文件完整性
-		public static bool CheckContentIntegrity(BundleInfo bundleInfo)
-		{
-			return CheckContentIntegrity(bundleInfo.GetCacheLoadPath(), bundleInfo.SizeBytes, bundleInfo.CRC);
-		}
-		public static bool CheckContentIntegrity(PatchBundle patchBundle)
-		{
-			string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
-			return CheckContentIntegrity(filePath, patchBundle.SizeBytes, patchBundle.CRC);
-		}
+		/// <summary>
+		/// 验证文件完整性
+		/// </summary>
 		public static bool CheckContentIntegrity(string filePath, long size, string crc)
+		{
+			return CheckContentIntegrity(_verifyLevel, filePath, size, crc);
+		}
+
+		/// <summary>
+		/// 验证文件完整性
+		/// </summary>
+		public static bool CheckContentIntegrity(EVerifyLevel verifyLevel, string filePath, long size, string crc)
 		{
 			try
 			{
@@ -168,10 +172,17 @@ namespace YooAsset
 					return false;
 
 				// 再验证文件CRC
-				string fileCRC = HashUtility.FileCRC32(filePath);
-				return fileCRC == crc;
+				if (verifyLevel == EVerifyLevel.High)
+				{
+					string fileCRC = HashUtility.FileCRC32(filePath);
+					return fileCRC == crc;
+				}
+				else
+				{
+					return true;
+				}
 			}
-			catch(Exception)
+			catch (Exception)
 			{
 				return false;
 			}

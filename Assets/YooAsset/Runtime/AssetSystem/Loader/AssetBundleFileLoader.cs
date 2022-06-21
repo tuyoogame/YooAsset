@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,7 +40,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.None)
 			{
-				if(MainBundleInfo.IsInvalid)
+				if (MainBundleInfo.IsInvalid)
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
@@ -158,6 +159,21 @@ namespace YooAsset
 					Status = EStatus.Failed;
 					LastError = $"Failed to load assetBundle : {MainBundleInfo.BundleName}";
 					YooLogger.Error(LastError);
+
+					// 注意：当缓存文件的校验等级为Low的时候，并不能保证缓存文件的完整性。
+					// 在AssetBundle文件加载失败的情况下，我们需要重新验证文件的完整性！
+					if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
+					{
+						string cacheLoadPath = MainBundleInfo.GetCacheLoadPath();
+						if (DownloadSystem.CheckContentIntegrity(EVerifyLevel.High, cacheLoadPath, MainBundleInfo.SizeBytes, MainBundleInfo.CRC) == false)
+						{
+							if (File.Exists(cacheLoadPath))
+							{
+								YooLogger.Error($"Delete the invalid cache file : {cacheLoadPath}");
+								File.Delete(cacheLoadPath);
+							}
+						}
+					}
 				}
 				else
 				{
