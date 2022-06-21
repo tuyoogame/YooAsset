@@ -426,6 +426,17 @@ namespace YooAsset
 			DebugCheckInitialize();
 			return _bundleServices.GetAssetInfos(tags);
 		}
+
+		/// <summary>
+		/// 获取资源路径
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		/// <returns>如果location地址无效，则返回空字符串</returns>
+		public static string GetAssetPath(string location)
+		{
+			DebugCheckInitialize();
+			return _locationServices.ConvertLocationToAssetPath(location);
+		}
 		#endregion
 
 		#region 场景加载
