@@ -203,7 +203,10 @@ namespace YooAsset
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-					_steps = ESteps.DownloadFromApk;
+					if (DownloadSystem.ContainsVerifyFile(_bundleInfo.Hash))
+						_steps = ESteps.CheckAndCopyFile;
+					else
+						_steps = ESteps.DownloadFromApk;
 				}
 				else
 				{
@@ -235,7 +238,17 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.CheckAndCopyFile;
+					if (DownloadSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.SizeBytes, _bundleInfo.CRC))
+					{
+						DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.BundleName);
+						_steps = ESteps.CheckAndCopyFile;
+					}
+					else
+					{
+						_steps = ESteps.Done;
+						Status = EOperationStatus.Failed;
+						Error = "File content verify failed !";
+					}
 				}
 				_fileRequester.Dispose();
 			}
@@ -342,7 +355,10 @@ namespace YooAsset
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-					_steps = ESteps.DownloadFromApk;
+					if (DownloadSystem.ContainsVerifyFile(_bundleInfo.Hash))
+						_steps = ESteps.CheckAndCopyFile;
+					else
+						_steps = ESteps.DownloadFromApk;
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
@@ -405,7 +421,17 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.CheckAndCopyFile;
+					if (DownloadSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.SizeBytes, _bundleInfo.CRC))
+					{
+						DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.BundleName);
+						_steps = ESteps.CheckAndCopyFile;
+					}
+					else
+					{
+						_steps = ESteps.Done;
+						Status = EOperationStatus.Failed;
+						Error = "File content verify failed !";
+					}
 				}
 				_fileRequester.Dispose();
 			}
