@@ -17,14 +17,15 @@ namespace YooAsset
 
 		public delegate void OnDownloadOver(bool isSucceed);
 		public delegate void OnDownloadProgress(int totalDownloadCount, int currentDownloadCount, long totalDownloadBytes, long currentDownloadBytes);
-		public delegate void OnDownloadFileFailed(string fileName);
-
+		public delegate void OnDownloadError(string fileName, string error);
+		public delegate void OnStartDownloadFile(string fileName, long sizeBytes);
+		
 		private readonly int _downloadingMaxNumber;
 		private readonly int _failedTryAgain;
 		private readonly List<BundleInfo> _downloadList;
-		private readonly List<BundleInfo> _loadFailedList = new List<BundleInfo>();
-		private readonly List<DownloaderBase> _downloaders = new List<DownloaderBase>();
+		private readonly List<DownloaderBase> _downloaders = new List<DownloaderBase>(MAX_LOADER_COUNT);
 		private readonly List<DownloaderBase> _removeList = new List<DownloaderBase>(MAX_LOADER_COUNT);
+		private readonly List<DownloaderBase> _failedList = new List<DownloaderBase>(MAX_LOADER_COUNT);
 
 		// 数据相关
 		private ESteps _steps = ESteps.None;
@@ -59,15 +60,20 @@ namespace YooAsset
 		public OnDownloadOver OnDownloadOverCallback { set; get; }
 
 		/// <summary>
-		/// 当下载进度变化
+		/// 当下载进度发生变化
 		/// </summary>
 		public OnDownloadProgress OnDownloadProgressCallback { set; get; }
 
 		/// <summary>
-		/// 当文件下载失败
+		/// 当某个文件下载失败
 		/// </summary>
-		public OnDownloadFileFailed OnDownloadFileFailedCallback { set; get; }
+		public OnDownloadError OnDownloadErrorCallback { set; get; }
 
+		/// <summary>
+		/// 当开始下载某个文件
+		/// </summary>
+		public OnStartDownloadFile OnStartDownloadFileCallback { set; get; }
+		
 
 		internal DownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain)
 		{
@@ -125,7 +131,7 @@ namespace YooAsset
 					if (downloader.HasError())
 					{
 						_removeList.Add(downloader);
-						_loadFailedList.Add(bundleInfo);
+						_failedList.Add(downloader);
 						continue;
 					}
 
@@ -152,7 +158,7 @@ namespace YooAsset
 
 				// 动态创建新的下载器到最大数量限制
 				// 注意：如果期间有下载失败的文件，暂停动态创建下载器
-				if (_downloadList.Count > 0 && _loadFailedList.Count == 0)
+				if (_downloadList.Count > 0 && _failedList.Count == 0)
 				{
 					if (_isPause)
 						return;
@@ -160,22 +166,25 @@ namespace YooAsset
 					if (_downloaders.Count < _downloadingMaxNumber)
 					{
 						int index = _downloadList.Count - 1;
-						var operation = DownloadSystem.BeginDownload(_downloadList[index], _failedTryAgain);
+						var bundleInfo = _downloadList[index];
+						var operation = DownloadSystem.BeginDownload(bundleInfo, _failedTryAgain);
 						_downloaders.Add(operation);
 						_downloadList.RemoveAt(index);
+						OnStartDownloadFileCallback?.Invoke(bundleInfo.BundleName, bundleInfo.SizeBytes);
 					}
 				}
 
 				// 下载结算
 				if (_downloaders.Count == 0)
 				{
-					if (_loadFailedList.Count > 0)
+					if (_failedList.Count > 0)
 					{
-						string fileName = _loadFailedList[0].BundleName;
+						var failedDownloader = _failedList[0];
+						string fileName = failedDownloader.GetBundleInfo().BundleName;
 						Error = $"Failed to download file : {fileName}";
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
-						OnDownloadFileFailedCallback?.Invoke(fileName);
+						OnDownloadErrorCallback?.Invoke(fileName, failedDownloader.GetLastError());
 						OnDownloadOverCallback?.Invoke(false);
 					}
 					else
