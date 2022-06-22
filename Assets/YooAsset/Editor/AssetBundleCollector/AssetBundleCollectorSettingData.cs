@@ -113,24 +113,11 @@ namespace YooAsset.Editor
 				_cachePackRuleTypes.Clear();
 				_cachePackRuleInstance.Clear();
 
-				// 获取所有类型
-				List<Type> types = new List<Type>(100)
-				{
-					typeof(PackSeparately),
-					typeof(PackDirectory),
-					typeof(PackTopDirectory),
-					typeof(PackCollector),
-					typeof(PackGroup),
-					typeof(PackRawFile),
-				};
+				var types = TypeCache.GetTypesDerivedFrom<IPackRule>();
 
-				var customTypes = EditorTools.GetAssignableTypes(typeof(IPackRule));
-				types.AddRange(customTypes);
-				for (int i = 0; i < types.Count; i++)
+				foreach(var type in types)
 				{
-					Type type = types[i];
-					if (_cachePackRuleTypes.ContainsKey(type.Name) == false)
-						_cachePackRuleTypes.Add(type.Name, type);
+					_cachePackRuleTypes.TryAdd(type.Name, type);
 				}
 			}
 
@@ -140,22 +127,11 @@ namespace YooAsset.Editor
 				_cacheFilterRuleTypes.Clear();
 				_cacheFilterRuleInstance.Clear();
 
-				// 获取所有类型
-				List<Type> types = new List<Type>(100)
+				var types = TypeCache.GetTypesDerivedFrom<IFilterRule>();
+				
+				foreach(var type in types)
 				{
-					typeof(CollectAll),
-					typeof(CollectScene),
-					typeof(CollectPrefab),
-					typeof(CollectSprite)
-				};
-
-				var customTypes = EditorTools.GetAssignableTypes(typeof(IFilterRule));
-				types.AddRange(customTypes);
-				for (int i = 0; i < types.Count; i++)
-				{
-					Type type = types[i];
-					if (_cacheFilterRuleTypes.ContainsKey(type.Name) == false)
-						_cacheFilterRuleTypes.Add(type.Name, type);
+					_cacheFilterRuleTypes.TryAdd(type.Name, type);
 				}
 			}
 
@@ -165,21 +141,11 @@ namespace YooAsset.Editor
 				_cacheAddressRuleTypes.Clear();
 				_cacheAddressRuleInstance.Clear();
 
-				// 获取所有类型
-				List<Type> types = new List<Type>(100)
+				var types = TypeCache.GetTypesDerivedFrom<IAddressRule>();
+				
+				foreach(var type in types)
 				{
-					typeof(AddressByFileName),
-					typeof(AddressByCollectorAndFileName),
-					typeof(AddressByGroupAndFileName)
-				};
-
-				var customTypes = EditorTools.GetAssignableTypes(typeof(IAddressRule));
-				types.AddRange(customTypes);
-				for (int i = 0; i < types.Count; i++)
-				{
-					Type type = types[i];
-					if (_cacheAddressRuleTypes.ContainsKey(type.Name) == false)
-						_cacheAddressRuleTypes.Add(type.Name, type);
+					_cacheAddressRuleTypes.TryAdd(type.Name, type);
 				}
 			}
 		}
