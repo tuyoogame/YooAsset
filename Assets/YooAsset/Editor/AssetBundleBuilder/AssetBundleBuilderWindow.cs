@@ -182,7 +182,12 @@ namespace YooAsset.Editor
 			buildParameters.CompressOption = (ECompressOption)_compressionField.value;
 
 			AssetBundleBuilder builder = new AssetBundleBuilder();
-			builder.Run(buildParameters);
+			bool succeed = builder.Run(buildParameters);
+
+			if (succeed)
+			{
+				EditorUtility.RevealInFinder($"{buildParameters.OutputRoot}/{buildParameters.BuildTarget}/{buildParameters.BuildVersion}");
+			}			
 		}
 
 		// 加密类相关
