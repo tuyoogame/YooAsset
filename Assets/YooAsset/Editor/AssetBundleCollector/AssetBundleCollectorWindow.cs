@@ -524,7 +524,7 @@ namespace YooAsset.Editor
 
 				try
 				{
-					collectAssetInfos = collector.GetAllCollectAssets(group);
+					collectAssetInfos = collector.GetAllCollectAssets(EBuildMode.DryRunBuild, group);
 				}
 				catch (System.Exception e)
 				{

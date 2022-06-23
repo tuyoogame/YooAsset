@@ -8,8 +8,6 @@ namespace YooAsset.Editor
 {
 	public class AssetBundleCollectorSetting : ScriptableObject
 	{
-		public static EBuildMode BuildMode;
-
 		/// <summary>
 		/// 是否启用可寻址资源定位
 		/// </summary>
@@ -47,14 +45,12 @@ namespace YooAsset.Editor
 		/// </summary>
 		public List<CollectAssetInfo> GetAllCollectAssets(EBuildMode buildMode)
 		{
-			BuildMode = buildMode;
-
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
 
 			// 收集打包资源
 			foreach (var group in Groups)
 			{
-				var temper = group.GetAllCollectAssets();
+				var temper = group.GetAllCollectAssets(buildMode);
 				foreach (var assetInfo in temper)
 				{
 					if (result.ContainsKey(assetInfo.AssetPath) == false)

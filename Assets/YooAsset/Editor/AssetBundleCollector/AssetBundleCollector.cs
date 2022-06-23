@@ -87,10 +87,10 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取打包收集的资源文件
 		/// </summary>
-		public List<CollectAssetInfo> GetAllCollectAssets(AssetBundleCollectorGroup group)
+		public List<CollectAssetInfo> GetAllCollectAssets(EBuildMode buildMode, AssetBundleCollectorGroup group)
 		{
 			// 注意：模拟构建模式下只收集主资源
-			if (AssetBundleCollectorSetting.BuildMode == EBuildMode.SimulateBuild)
+			if (buildMode == EBuildMode.SimulateBuild)
 			{
 				if (CollectorType != ECollectorType.MainAssetCollector)
 					return new List<CollectAssetInfo>();
@@ -117,7 +117,7 @@ namespace YooAsset.Editor
 					{
 						if (result.ContainsKey(assetPath) == false)
 						{
-							var collectAssetInfo = CreateCollectAssetInfo(group, assetPath, isRawAsset);
+							var collectAssetInfo = CreateCollectAssetInfo(buildMode, group, assetPath, isRawAsset);
 							result.Add(assetPath, collectAssetInfo);
 						}
 						else
@@ -132,7 +132,7 @@ namespace YooAsset.Editor
 				string assetPath = CollectPath;
 				if (IsValidateAsset(assetPath) && IsCollectAsset(assetPath))
 				{
-					var collectAssetInfo = CreateCollectAssetInfo(group, assetPath, isRawAsset);
+					var collectAssetInfo = CreateCollectAssetInfo(buildMode, group, assetPath, isRawAsset);
 					result.Add(assetPath, collectAssetInfo);
 				}
 				else
@@ -162,13 +162,19 @@ namespace YooAsset.Editor
 			return result.Values.ToList();
 		}
 
-		private CollectAssetInfo CreateCollectAssetInfo(AssetBundleCollectorGroup group, string assetPath, bool isRawAsset)
+		private CollectAssetInfo CreateCollectAssetInfo(EBuildMode buildMode, AssetBundleCollectorGroup group, string assetPath, bool isRawAsset)
 		{
 			string address = GetAddress(group, assetPath);
 			string bundleName = GetBundleName(group, assetPath);
 			List<string> assetTags = GetAssetTags(group);
 			CollectAssetInfo collectAssetInfo = new CollectAssetInfo(CollectorType, bundleName, address, assetPath, assetTags, isRawAsset);
-			collectAssetInfo.DependAssets = GetAllDependencies(assetPath);
+
+			// 注意：模拟构建模式下不需要收集依赖资源
+			if (buildMode == EBuildMode.SimulateBuild)
+				collectAssetInfo.DependAssets = new List<string>();
+			else
+				collectAssetInfo.DependAssets = GetAllDependencies(assetPath);
+
 			return collectAssetInfo;
 		}
 		private bool IsValidateAsset(string assetPath)
@@ -242,10 +248,6 @@ namespace YooAsset.Editor
 		}
 		private List<string> GetAllDependencies(string mainAssetPath)
 		{
-			// 注意：模拟构建模式下不需要收集依赖资源
-			if(AssetBundleCollectorSetting.BuildMode == EBuildMode.SimulateBuild)
-				return new List<string>();
-
 			List<string> result = new List<string>();
 			string[] depends = AssetDatabase.GetDependencies(mainAssetPath, true);
 			foreach (string assetPath in depends)

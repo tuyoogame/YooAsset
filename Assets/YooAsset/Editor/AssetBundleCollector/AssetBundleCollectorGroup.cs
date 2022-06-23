@@ -45,14 +45,14 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取打包收集的资源文件
 		/// </summary>
-		public List<CollectAssetInfo> GetAllCollectAssets()
+		public List<CollectAssetInfo> GetAllCollectAssets(EBuildMode buildMode)
 		{
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
 
 			// 收集打包资源
 			foreach (var collector in Collectors)
 			{
-				var temper = collector.GetAllCollectAssets(this);
+				var temper = collector.GetAllCollectAssets(buildMode, this);
 				foreach (var assetInfo in temper)
 				{
 					if (result.ContainsKey(assetInfo.AssetPath) == false)
