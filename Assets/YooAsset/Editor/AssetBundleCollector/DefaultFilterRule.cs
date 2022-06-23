@@ -47,7 +47,7 @@ namespace YooAsset.Editor
 			var mainAssetType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath);
 			if(mainAssetType == typeof(Texture2D))
 			{
-				var texImporter = TextureImporter.GetAtPath(data.AssetPath) as TextureImporter;
+				var texImporter = AssetImporter.GetAtPath(data.AssetPath) as TextureImporter;
 				if (texImporter != null && texImporter.textureType == TextureImporterType.Sprite)
 					return true;
 				else
