@@ -41,6 +41,12 @@ namespace YooAsset
 			public bool LocationToLower = false;
 
 			/// <summary>
+			/// 自动释放游戏对象所属资源句柄
+			/// 说明：通过资源句柄实例化的游戏对象在销毁之后，会自动释放所属资源句柄。
+			/// </summary>
+			public bool AutoReleaseGameObjectHandle = false;
+
+			/// <summary>
 			/// 资源定位服务接口
 			/// </summary>
 			public ILocationServices LocationServices = null;
@@ -208,7 +214,7 @@ namespace YooAsset
 			{
 				_editorSimulateModeImpl = new EditorSimulateModeImpl();
 				_bundleServices = _editorSimulateModeImpl;
-				AssetSystem.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+				AssetSystem.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.AutoReleaseGameObjectHandle, parameters.DecryptionServices, _bundleServices);
 				var editorSimulateModeParameters = parameters as EditorSimulateModeParameters;
 				initializeOperation = _editorSimulateModeImpl.InitializeAsync(
 					editorSimulateModeParameters.LocationToLower,
@@ -218,14 +224,14 @@ namespace YooAsset
 			{
 				_offlinePlayModeImpl = new OfflinePlayModeImpl();
 				_bundleServices = _offlinePlayModeImpl;
-				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.AutoReleaseGameObjectHandle, parameters.DecryptionServices, _bundleServices);
 				initializeOperation = _offlinePlayModeImpl.InitializeAsync(parameters.LocationToLower);
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
 				_hostPlayModeImpl = new HostPlayModeImpl();
 				_bundleServices = _hostPlayModeImpl;
-				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.AutoReleaseGameObjectHandle, parameters.DecryptionServices, _bundleServices);
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = _hostPlayModeImpl.InitializeAsync(
 					hostPlayModeParameters.LocationToLower,

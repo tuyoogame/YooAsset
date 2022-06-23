@@ -94,6 +94,20 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 句柄是否有效
+		/// </summary>
+		public bool IsValidNoWarning
+		{
+			get
+			{
+				if (Provider != null && Provider.IsDestroyed == false)
+					return true;
+				else
+					return false;
+			}
+		}
+
+		/// <summary>
 		/// 释放句柄
 		/// </summary>
 		internal void ReleaseInternal()

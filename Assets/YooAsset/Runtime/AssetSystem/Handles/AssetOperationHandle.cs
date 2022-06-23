@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace YooAsset
 {
@@ -117,26 +118,72 @@ namespace YooAsset
 			if (Provider.AssetObject == null)
 				return null;
 
+			GameObject result;
 			if (setPositionRotation)
 			{
 				if (parent == null)
-					return UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, position, rotation);
+					result = UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, position, rotation);
 				else
-					return UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, position, rotation, parent);
+					result = UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, position, rotation, parent);
 			}
 			else
 			{
 				if (parent == null)
-					return UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject);
+					result = UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject);
 				else
-					return UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, parent);
+					result = UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, parent);
 			}
+
+			if (AssetSystem.AutoReleaseGameObjectHandle)
+			{
+				AddTrackGameObject(result);
+			}
+			return result;
 		}
 		private InstantiateOperation InstantiateAsyncInternal(Vector3 position, Quaternion rotation, Transform parent, bool setPositionRotation)
 		{
 			InstantiateOperation operation = new InstantiateOperation(this, position, rotation, parent, setPositionRotation);
 			OperationSystem.StartOperaiton(operation);
+
+			if (AssetSystem.AutoReleaseGameObjectHandle)
+			{
+				operation.Completed += InstantiateOperationCompleted;
+			}
 			return operation;
 		}
+
+		#region 资源对象句柄相关
+		private readonly HashSet<GameObject> _trackGameObjects = new HashSet<GameObject>();
+		private void InstantiateOperationCompleted(AsyncOperationBase obj)
+		{
+			if (obj.Status == EOperationStatus.Succeed)
+			{
+				var op = obj as InstantiateOperation;
+				AddTrackGameObject(op.Result);
+			}
+		}
+		private void AddTrackGameObject(GameObject go)
+		{
+			if (go != null)
+			{
+				_trackGameObjects.Add(go);
+				AssetSystem.AddAutoReleaseGameObjectHandle(this);
+			}
+		}
+		internal void CheckAutoReleaseHandle()
+		{
+			if (IsValidNoWarning == false)
+				return;
+			if (_trackGameObjects.Count == 0)
+				return;
+
+			foreach (var go in _trackGameObjects)
+			{
+				if (go != null)
+					return;
+			}
+			ReleaseInternal();
+		}
+		#endregion
 	}
 }
