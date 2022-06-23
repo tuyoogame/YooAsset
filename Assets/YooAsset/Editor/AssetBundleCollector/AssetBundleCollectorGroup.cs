@@ -26,6 +26,11 @@ namespace YooAsset.Editor
 		public string AssetTags = string.Empty;
 
 		/// <summary>
+		/// 分组激活规则
+		/// </summary>
+		public string ActiveRuleName = nameof(EnableGroup);
+
+		/// <summary>
 		/// 分组的收集器列表
 		/// </summary>
 		public List<AssetBundleCollector> Collectors = new List<AssetBundleCollector>();
@@ -36,6 +41,9 @@ namespace YooAsset.Editor
 		/// </summary>
 		public void CheckConfigError()
 		{
+			if (AssetBundleCollectorSettingData.HasActiveRuleName(ActiveRuleName) == false)
+				throw new Exception($"Invalid {nameof(IActiveRule)} class type : {ActiveRuleName} in group : {GroupName}");
+
 			foreach (var collector in Collectors)
 			{
 				collector.CheckConfigError();
@@ -48,6 +56,13 @@ namespace YooAsset.Editor
 		public List<CollectAssetInfo> GetAllCollectAssets(EBuildMode buildMode)
 		{
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
+
+			// 检测分组是否激活
+			IActiveRule activeRule = AssetBundleCollectorSettingData.GetActiveRuleInstance(ActiveRuleName);
+			if (activeRule.IsActiveGroup() == false)
+			{
+				return new List<CollectAssetInfo>();
+			}
 
 			// 收集打包资源
 			foreach (var collector in Collectors)

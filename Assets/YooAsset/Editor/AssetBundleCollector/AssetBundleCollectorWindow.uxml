@@ -18,6 +18,7 @@
                 <ui:TextField picking-mode="Ignore" label="Shader Bundle Name" name="ShaderBundleName" style="flex-grow: 1; -unity-text-align: middle-left;" />
             </ui:VisualElement>
             <ui:VisualElement name="GroupContainer" style="flex-grow: 1; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">
+                <ui:VisualElement name="ActiveRuleContainer" style="height: 20px;" />
                 <ui:TextField picking-mode="Ignore" label="Group Name" name="GroupName" />
                 <ui:TextField picking-mode="Ignore" label="Group Desc" name="GroupDesc" />
                 <ui:TextField picking-mode="Ignore" label="Group Asset Tags" name="GroupAssetTags" />

@@ -9,6 +9,9 @@ namespace YooAsset.Editor
 {
 	public class AssetBundleCollectorSettingData
 	{
+		private static readonly Dictionary<string, System.Type> _cacheActiveRuleTypes = new Dictionary<string, Type>();
+		private static readonly Dictionary<string, IActiveRule> _cacheActiveRuleInstance = new Dictionary<string, IActiveRule>();
+
 		private static readonly Dictionary<string, System.Type> _cacheAddressRuleTypes = new Dictionary<string, System.Type>();
 		private static readonly Dictionary<string, IAddressRule> _cacheAddressRuleInstance = new Dictionary<string, IAddressRule>();
 
@@ -35,6 +38,18 @@ namespace YooAsset.Editor
 			}
 		}
 
+		public static List<string> GetActiveRuleNames()
+		{
+			if (_setting == null)
+				LoadSettingData();
+
+			List<string> names = new List<string>();
+			foreach (var pair in _cacheActiveRuleTypes)
+			{
+				names.Add(pair.Key);
+			}
+			return names;
+		}
 		public static List<string> GetAddressRuleNames()
 		{
 			if (_setting == null)
@@ -70,6 +85,15 @@ namespace YooAsset.Editor
 				names.Add(pair.Key);
 			}
 			return names;
+		}
+		public static bool HasActiveRuleName(string ruleName)
+		{
+			foreach (var pair in _cacheActiveRuleTypes)
+			{
+				if (pair.Key == ruleName)
+					return true;
+			}
+			return false;
 		}
 		public static bool HasAddressRuleName(string ruleName)
 		{
@@ -182,6 +206,29 @@ namespace YooAsset.Editor
 						_cacheAddressRuleTypes.Add(type.Name, type);
 				}
 			}
+
+			// IActiveRule
+			{
+				// 清空缓存集合
+				_cacheActiveRuleTypes.Clear();
+				_cacheActiveRuleInstance.Clear();
+
+				// 获取所有类型
+				List<Type> types = new List<Type>(100)
+				{
+					typeof(EnableGroup),
+					typeof(DisableGroup),
+				};
+
+				var customTypes = EditorTools.GetAssignableTypes(typeof(IActiveRule));
+				types.AddRange(customTypes);
+				for (int i = 0; i < types.Count; i++)
+				{
+					Type type = types[i];
+					if (_cacheActiveRuleTypes.ContainsKey(type.Name) == false)
+						_cacheActiveRuleTypes.Add(type.Name, type);
+				}
+			}
 		}
 
 		/// <summary>
@@ -210,6 +257,23 @@ namespace YooAsset.Editor
 		}
 
 		// 实例类相关
+		public static IActiveRule GetActiveRuleInstance(string ruleName)
+		{
+			if (_cacheActiveRuleInstance.TryGetValue(ruleName, out IActiveRule instance))
+				return instance;
+
+			// 如果不存在创建类的实例
+			if (_cacheActiveRuleTypes.TryGetValue(ruleName, out Type type))
+			{
+				instance = (IActiveRule)Activator.CreateInstance(type);
+				_cacheActiveRuleInstance.Add(ruleName, instance);
+				return instance;
+			}
+			else
+			{
+				throw new Exception($"{nameof(IActiveRule)}类型无效：{ruleName}");
+			}
+		}
 		public static IAddressRule GetAddressRuleInstance(string ruleName)
 		{
 			if (_cacheAddressRuleInstance.TryGetValue(ruleName, out IAddressRule instance))

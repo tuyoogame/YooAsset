@@ -19,11 +19,13 @@ namespace YooAsset.Editor
 		}
 
 		private List<string> _collectorTypeList;
+		private List<string> _activeRuleList;
 		private List<string> _addressRuleList;
 		private List<string> _packRuleList;
 		private List<string> _filterRuleList;
 		private ListView _groupListView;
 		private ScrollView _collectorScrollView;
+		private PopupField<string> _activeRulePopupField;
 		private Toggle _enableAddressableToogle;
 		private Toggle _autoCollectShaderToogle;
 		private TextField _shaderBundleNameTxt;
@@ -47,6 +49,7 @@ namespace YooAsset.Editor
 					$"{nameof(ECollectorType.StaticAssetCollector)}",
 					$"{nameof(ECollectorType.DependAssetCollector)}"
 				};
+				_activeRuleList = AssetBundleCollectorSettingData.GetActiveRuleNames();
 				_addressRuleList = AssetBundleCollectorSettingData.GetAddressRuleNames();
 				_packRuleList = AssetBundleCollectorSettingData.GetPackRuleNames();
 				_filterRuleList = AssetBundleCollectorSettingData.GetFilterRuleNames();
@@ -57,7 +60,7 @@ namespace YooAsset.Editor
 				var visualAsset = EditorHelper.LoadWindowUXML<AssetBundleCollectorWindow>();
 				if (visualAsset == null)
 					return;
-				
+
 				visualAsset.CloneTree(root);
 
 				// 导入导出按钮
@@ -155,6 +158,25 @@ namespace YooAsset.Editor
 					addBtn.clicked += AddCollectorBtn_clicked;
 				}
 
+				// 分组激活规则
+				var activeRuleContainer = root.Q("ActiveRuleContainer");
+				{
+					_activeRulePopupField = new PopupField<string>("Active Rule", _activeRuleList, 0);
+					_activeRulePopupField.name = "ActiveRuleMaskField";
+					_activeRulePopupField.style.unityTextAlign = TextAnchor.MiddleLeft;
+					activeRuleContainer.Add(_activeRulePopupField);
+					_activeRulePopupField.RegisterValueChangedCallback(evt =>
+					{
+						var selectGroup = _groupListView.selectedItem as AssetBundleCollectorGroup;
+						if (selectGroup != null)
+						{
+							selectGroup.ActiveRuleName = evt.newValue;
+							AssetBundleCollectorSettingData.ModifyGroup(selectGroup);
+							FillGroupViewData();
+						}
+					});
+				}
+
 				// 刷新窗体
 				RefreshWindow();
 			}
@@ -243,6 +265,11 @@ namespace YooAsset.Editor
 				textField1.text = group.GroupName;
 			else
 				textField1.text = $"{group.GroupName} ({group.GroupDesc})";
+
+			// 激活状态
+			IActiveRule activeRule = AssetBundleCollectorSettingData.GetActiveRuleInstance(group.ActiveRuleName);
+			bool isActive = activeRule.IsActiveGroup();
+			textField1.SetEnabled(isActive);
 		}
 		private void GroupListView_onSelectionChange(IEnumerable<object> objs)
 		{
@@ -277,6 +304,7 @@ namespace YooAsset.Editor
 
 			_lastModifyGroup = selectGroup.GroupName;
 			_groupContainer.visible = true;
+			_activeRulePopupField.SetValueWithoutNotify(selectGroup.ActiveRuleName);
 			_groupNameTxt.SetValueWithoutNotify(selectGroup.GroupName);
 			_groupDescTxt.SetValueWithoutNotify(selectGroup.GroupDesc);
 			_groupAssetTagsTxt.SetValueWithoutNotify(selectGroup.AssetTags);

@@ -29,7 +29,7 @@ namespace YooAsset.Editor
 		private PopupField<string> _encryptionField;
 		private EnumField _compressionField;
 		private Toggle _appendExtensionToggle;
-		
+
 		public void CreateGUI()
 		{
 			try
@@ -40,7 +40,7 @@ namespace YooAsset.Editor
 				var visualAsset = EditorHelper.LoadWindowUXML<AssetBundleBuilderWindow>();
 				if (visualAsset == null)
 					return;
-				
+
 				visualAsset.CloneTree(root);
 
 				_buildTarget = EditorUserBuildSettings.activeBuildTarget;
@@ -107,7 +107,7 @@ namespace YooAsset.Editor
 				_compressionField = root.Q<EnumField>("Compression");
 				_compressionField.Init(AssetBundleBuilderSettingData.Setting.CompressOption);
 				_compressionField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.CompressOption);
-				_compressionField.style.width = 300;	
+				_compressionField.style.width = 300;
 				_compressionField.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleBuilderSettingData.Setting.CompressOption = (ECompressOption)_compressionField.value;
@@ -183,11 +183,10 @@ namespace YooAsset.Editor
 
 			AssetBundleBuilder builder = new AssetBundleBuilder();
 			bool succeed = builder.Run(buildParameters);
-
 			if (succeed)
 			{
 				EditorUtility.RevealInFinder($"{buildParameters.OutputRoot}/{buildParameters.BuildTarget}/{buildParameters.BuildVersion}");
-			}			
+			}
 		}
 
 		// 加密类相关
