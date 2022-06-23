@@ -44,10 +44,19 @@ namespace YooAsset.Editor
 	{
 		public bool IsCollectAsset(FilterRuleData data)
 		{
-			if (AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath) == typeof(Sprite))
-				return true;
+			var mainAssetType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath);
+			if(mainAssetType == typeof(Texture2D))
+			{
+				var texImporter = TextureImporter.GetAtPath(data.AssetPath) as TextureImporter;
+				if (texImporter != null && texImporter.textureType == TextureImporterType.Sprite)
+					return true;
+				else
+					return false;
+			}
 			else
+			{
 				return false;
+			}
 		}
 	}
 }
