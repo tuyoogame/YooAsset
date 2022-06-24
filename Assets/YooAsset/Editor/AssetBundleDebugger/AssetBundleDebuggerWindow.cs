@@ -188,8 +188,21 @@ namespace YooAsset.Editor
 				_viewMode = viewMode;
 				VisualElement root = this.rootVisualElement;
 				_viewModeMenu.text = viewMode.ToString();
-				_assetListViewer.AttachParent(root);
-				_bundleListViewer.DetachParent();
+
+				if (viewMode == EViewMode.AssetView)
+				{
+					_assetListViewer.AttachParent(root);
+					_bundleListViewer.DetachParent();
+				}
+				else if (viewMode == EViewMode.BundleView)
+				{
+					_assetListViewer.DetachParent();
+					_bundleListViewer.AttachParent(root);
+				}
+				else
+				{
+					throw new NotImplementedException(viewMode.ToString());
+				}
 			}
 		}
 		private DropdownMenuAction.Status ViewModeMenuFun(DropdownMenuAction action)
