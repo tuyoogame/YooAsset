@@ -46,6 +46,18 @@ namespace YooAsset.Editor
 			_usingListView.makeItem = MakeIncludeListViewItem;
 			_usingListView.bindItem = BindIncludeListViewItem;
 		}
+		
+		/// <summary>
+		/// 清空页面
+		/// </summary>
+		public void ClearView()
+		{
+			_debugReport = null;
+			_bundleListView.Clear();
+			_bundleListView.ClearSelection();
+			_bundleListView.itemsSource.Clear();
+			_bundleListView.Rebuild();
+		}
 
 		/// <summary>
 		/// 填充页面数据

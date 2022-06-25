@@ -48,6 +48,18 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
+		/// 清空页面
+		/// </summary>
+		public void ClearView()
+		{
+			_debugReport = null;
+			_assetListView.Clear();
+			_assetListView.ClearSelection();
+			_assetListView.itemsSource.Clear();
+			_assetListView.Rebuild();
+		}
+
+		/// <summary>
 		/// 填充页面数据
 		/// </summary>
 		public void FillViewData(DebugReport debugReport, string searchKeyWord)

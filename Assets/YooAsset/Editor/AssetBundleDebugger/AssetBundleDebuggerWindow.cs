@@ -45,12 +45,15 @@ namespace YooAsset.Editor
 
 		private Label _playerName;
 		private ToolbarMenu _viewModeMenu;
+		private SliderInt _frameSlider;
 		private DebuggerAssetListViewer _assetListViewer;
 		private DebuggerBundleListViewer _bundleListViewer;
 
 		private EViewMode _viewMode;
-		private DebugReport _debugReport;
 		private string _searchKeyWord;
+		private DebugReport _currentReport;
+		private RemotePlayerSession _currentPlayerSession;
+		private int _rangeIndex = 0;
 
 
 		public void CreateGUI()
@@ -76,13 +79,35 @@ namespace YooAsset.Editor
 
 				// 视口模式菜单
 				_viewModeMenu = root.Q<ToolbarMenu>("ViewModeMenu");
-				_viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction, ViewModeMenuFun, EViewMode.AssetView);
-				_viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction, ViewModeMenuFun, EViewMode.BundleView);
+				_viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), OnViewModeMenuChange, OnViewModeMenuStatusUpdate, EViewMode.AssetView);
+				_viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), OnViewModeMenuChange, OnViewModeMenuStatusUpdate, EViewMode.BundleView);
 				_viewModeMenu.text = EViewMode.AssetView.ToString();
 
 				// 搜索栏
 				var searchField = root.Q<ToolbarSearchField>("SearchField");
 				searchField.RegisterValueChangedCallback(OnSearchKeyWordChange);
+
+				// 帧数相关
+				{
+					_frameSlider = root.Q<SliderInt>("FrameSlider");
+					_frameSlider.label = "Frame:";
+					_frameSlider.highValue = 0;
+					_frameSlider.lowValue = 0;
+					_frameSlider.value = 0;
+					_frameSlider.RegisterValueChangedCallback(evt =>
+					{
+						OnFrameSliderChange(evt.newValue);
+					});
+
+					var frameLast = root.Q<ToolbarButton>("FrameLast");
+					frameLast.clicked += OnFrameLast_clicked;
+
+					var frameNext = root.Q<ToolbarButton>("FrameNext");
+					frameNext.clicked += OnFrameNext_clicked;
+
+					var frameClear = root.Q<ToolbarButton>("FrameClear");
+					frameClear.clicked += OnFrameClear_clicked;
+				}
 
 				// 加载视图
 				_assetListViewer = new DebuggerAssetListViewer();
@@ -126,7 +151,6 @@ namespace YooAsset.Editor
 		{
 			Debug.Log($"Game player disconnection : {playerId}");
 			_playerName.text = $"Disconneced player : {playerId}";
-			RemovePlayerSession(playerId);
 		}
 		private void OnHandlePlayerMessage(MessageEventArgs args)
 		{
@@ -135,13 +159,53 @@ namespace YooAsset.Editor
 		}
 		private void OnHandleDebugReport(int playerId, DebugReport debugReport)
 		{
-			var playerSession = GetOrCreatePlayerSession(playerId);
-			playerSession.AddDebugReport(debugReport);
-
-			_debugReport = debugReport;
-			_assetListViewer.FillViewData(debugReport, _searchKeyWord);
-			_bundleListViewer.FillViewData(debugReport, _searchKeyWord);
+			Debug.Log($"Handle player {playerId} debug report !");
+			_currentPlayerSession = GetOrCreatePlayerSession(playerId);
+			_currentPlayerSession.AddDebugReport(debugReport);
+			_frameSlider.highValue = _currentPlayerSession.MaxRangeValue;
+			_frameSlider.value = _currentPlayerSession.MaxRangeValue;
+			UpdateFrameView(_currentPlayerSession);
 		}
+		private void OnFrameSliderChange(int sliderValue)
+		{
+			if (_currentPlayerSession != null)
+			{
+				_rangeIndex = _currentPlayerSession.ClampRangeIndex(sliderValue); ;
+				UpdateFrameView(_currentPlayerSession, _rangeIndex);
+			}
+		}
+		private void OnFrameLast_clicked()
+		{
+			if (_currentPlayerSession != null)
+			{
+				_rangeIndex = _currentPlayerSession.ClampRangeIndex(_rangeIndex - 1);
+				_frameSlider.value = _rangeIndex;
+				UpdateFrameView(_currentPlayerSession, _rangeIndex);
+			}
+		}
+		private void OnFrameNext_clicked()
+		{
+			if (_currentPlayerSession != null)
+			{
+				_rangeIndex = _currentPlayerSession.ClampRangeIndex(_rangeIndex + 1);
+				_frameSlider.value = _rangeIndex;
+				UpdateFrameView(_currentPlayerSession, _rangeIndex);
+			}
+		}
+		private void OnFrameClear_clicked()
+		{
+			if (_currentPlayerSession != null)
+			{
+				_frameSlider.label = $"Frame:";
+				_frameSlider.value = 0;
+				_frameSlider.lowValue = 0;
+				_frameSlider.highValue = 0;
+				_currentPlayerSession.ClearDebugReport();
+				_assetListViewer.ClearView();
+				_bundleListViewer.ClearView();
+			}
+		}
+
 		private RemotePlayerSession GetOrCreatePlayerSession(int playerId)
 		{
 			if (_playerSessions.TryGetValue(playerId, out RemotePlayerSession session))
@@ -155,10 +219,26 @@ namespace YooAsset.Editor
 				return newSession;
 			}
 		}
-		private void RemovePlayerSession(int playerId)
+		private void UpdateFrameView(RemotePlayerSession playerSession)
 		{
-			if (_playerSessions.ContainsKey(playerId))
-				_playerSessions.Remove(playerId);
+			if (playerSession != null)
+			{
+				UpdateFrameView(playerSession, playerSession.MaxRangeValue);
+			}
+		}
+		private void UpdateFrameView(RemotePlayerSession playerSession, int rangeIndex)
+		{
+			if (playerSession == null)
+				return;
+
+			var debugReport = playerSession.GetDebugReport(rangeIndex);
+			if (debugReport != null)
+			{
+				_currentReport = debugReport;
+				_frameSlider.label = $"Frame: {debugReport.FrameCount}";
+				_assetListViewer.FillViewData(debugReport, _searchKeyWord);
+				_bundleListViewer.FillViewData(debugReport, _searchKeyWord);
+			}
 		}
 
 		private void SampleBtn_onClick()
@@ -174,13 +254,13 @@ namespace YooAsset.Editor
 		private void OnSearchKeyWordChange(ChangeEvent<string> e)
 		{
 			_searchKeyWord = e.newValue;
-			if (_debugReport != null)
+			if (_currentReport != null)
 			{
-				_assetListViewer.FillViewData(_debugReport, _searchKeyWord);
-				_bundleListViewer.FillViewData(_debugReport, _searchKeyWord);
+				_assetListViewer.FillViewData(_currentReport, _searchKeyWord);
+				_bundleListViewer.FillViewData(_currentReport, _searchKeyWord);
 			}
 		}
-		private void ViewModeMenuAction(DropdownMenuAction action)
+		private void OnViewModeMenuChange(DropdownMenuAction action)
 		{
 			var viewMode = (EViewMode)action.userData;
 			if (_viewMode != viewMode)
@@ -205,7 +285,7 @@ namespace YooAsset.Editor
 				}
 			}
 		}
-		private DropdownMenuAction.Status ViewModeMenuFun(DropdownMenuAction action)
+		private DropdownMenuAction.Status OnViewModeMenuStatusUpdate(DropdownMenuAction action)
 		{
 			var viewMode = (EViewMode)action.userData;
 			if (_viewMode == viewMode)
