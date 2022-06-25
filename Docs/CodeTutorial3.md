@@ -3,17 +3,21 @@
 加载方法：
 
 - YooAssets.LoadAssetSync() 同步加载资源对象
-- YooAssets.LoadSubAssetsSync() 同步加载子资源对象
 - YooAssets.LoadAssetAsync() 异步加载资源对象
+- YooAssets.LoadSubAssetsSync() 同步加载子资源对象
 - YooAssets.LoadSubAssetsAsync() 异步加载子资源对象
 - YooAssets.LoadSceneAsync() 异步加载场景
 - YooAssets.GetRawFileAsync() 异步获取原生文件
 
-统一约定：location为资源的定位地址，也是加载资源对象的唯一标识符。
+**统一约定**
 
-DefaultLocationServices 默认资源定位服务，location代表的是资源对象的相对路径。
+location为资源的定位地址，也是加载资源对象的唯一标识符。
 
-AddressLocationServices 可寻址资源定位服务，location代表的是资源对象可寻址地址。
+- DefaultLocationServices 默认资源定位服务，location代表的是资源对象的相对路径。
+
+
+- AddressLocationServices 可寻址资源定位服务，location代表的是资源对象可寻址地址。
+
 
 **注意**：以下范例执行环境是在DefaultLocationServices下。
 

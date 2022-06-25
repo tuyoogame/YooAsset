@@ -24,6 +24,25 @@
 
 #### 资源分组
 
+- Active Rule
+
+  激活规则，规则可以自定义扩展。下面是内置规则：
+
+  - EnableGroup 启用分组。
+
+  - DisableGroup 禁用分组。
+
+  ````c#
+  //自定义扩展范例
+  public class DisableGroup : IActiveRule
+  {
+    public bool IsActiveGroup()
+    {
+      return false;
+    }
+  }
+  ````
+
 - Grouper Name
 
   分组名称
@@ -63,6 +82,7 @@
   - AddressByCollectorAndFileName 以收集器名+文件名为定位地址。
 
   ````c#
+  //自定义扩展范例
   public class AddressByFileName : IAddressRule
   {
     string IAddressRule.GetAssetAddress(AddressRuleData data)

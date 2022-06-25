@@ -59,6 +59,8 @@ private IEnumerator InitializeYooAsset()
 
 - FallbackHostServer : 备用的资源服务器IP地址。
 
+- VerifyLevel : 下载文件校验等级
+
 ````c#
 private IEnumerator InitializeYooAsset()
 {
@@ -68,6 +70,7 @@ private IEnumerator InitializeYooAsset()
     createParameters.ClearCacheWhenDirty = false;
     createParameters.DefaultHostServer = "http://127.0.0.1/CDN1/Android";
     createParameters.FallbackHostServer = "http://127.0.0.1/CDN2/Android";
+    createParameters.VerifyLevel = EVerifyLevel.High;
     yield return YooAssets.InitializeAsync(createParameters);
 }
 ````

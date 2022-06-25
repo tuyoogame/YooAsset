@@ -48,7 +48,7 @@
 ## 入门教程
 1. [快速开始](https://github.com/tuyoogame/YooAsset/blob/master/Docs/QuickStart.md)
 2. [全局配置](https://github.com/tuyoogame/YooAsset/blob/master/Docs/Settings.md)
-3. [资源配置](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetGrouper.md)
+3. [资源配置](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetCollector.md)
 4. [资源打包](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBuilder.md)
 5. [资源部署](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetDeploy.md)
 5. [构建报告](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetReporter.md)

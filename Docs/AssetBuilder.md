@@ -114,7 +114,8 @@ private static void BuildInternal(BuildTarget buildTarget)
     buildParameters.BuildinTags = "buildin";
     buildParameters.VerifyBuildingResult = true;
     buildParameters.EnableAddressable = false;
-    buildParameters.AppendFileExtension = false;   
+    buildParameters.AppendFileExtension = false;
+    buildParameters.CopyBuildinTagFiles = true;
     buildParameters.EncryptionServices = new GameEncryption();
     buildParameters.CompressOption = ECompressOption.LZ4;
 
