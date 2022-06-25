@@ -10,12 +10,10 @@ namespace YooAsset
 	{
 		private static readonly List<AssetBundleLoaderBase> _loaders = new List<AssetBundleLoaderBase>(1000);
 		private static readonly List<ProviderBase> _providers = new List<ProviderBase>(1000);
-		private static readonly HashSet<AssetOperationHandle> _trackGameObjectHandles = new HashSet<AssetOperationHandle>();
 		private static readonly Dictionary<string, SceneOperationHandle> _sceneHandles = new Dictionary<string, SceneOperationHandle>(100);
+		
 		private static bool _simulationOnEditor;
 		private static int _loadingMaxNumber;
-
-		public static bool AutoReleaseGameObjectHandle { private set; get; }
 		public static IDecryptionServices DecryptionServices { private set; get; }
 		public static IBundleServices BundleServices { private set; get; }
 
@@ -24,11 +22,10 @@ namespace YooAsset
 		/// 初始化
 		/// 注意：在使用AssetSystem之前需要初始化
 		/// </summary>
-		public static void Initialize(bool simulationOnEditor, int loadingMaxNumber, bool autoReleaseGameObjectHandle, IDecryptionServices decryptionServices, IBundleServices bundleServices)
+		public static void Initialize(bool simulationOnEditor, int loadingMaxNumber, IDecryptionServices decryptionServices, IBundleServices bundleServices)
 		{
 			_simulationOnEditor = simulationOnEditor;
 			_loadingMaxNumber = loadingMaxNumber;
-			AutoReleaseGameObjectHandle = autoReleaseGameObjectHandle;
 			DecryptionServices = decryptionServices;
 			BundleServices = bundleServices;
 		}
@@ -84,11 +81,6 @@ namespace YooAsset
 		/// </summary>
 		public static void UnloadUnusedAssets()
 		{
-			if (AutoReleaseGameObjectHandle)
-			{
-				CheckAutoReleaseGameObjectHandle();
-			}
-
 			if (_simulationOnEditor)
 			{
 				for (int i = _providers.Count - 1; i >= 0; i--)
@@ -227,29 +219,6 @@ namespace YooAsset
 				_providers.Add(provider);
 			}
 			return provider.CreateHandle<SubAssetsOperationHandle>();
-		}
-
-		/// <summary>
-		/// 添加自动释放的游戏对象句柄
-		/// </summary>
-		public static void AddAutoReleaseGameObjectHandle(AssetOperationHandle handle)
-		{
-			if (_trackGameObjectHandles.Contains(handle) == false)
-				_trackGameObjectHandles.Add(handle);
-		}
-		private static void CheckAutoReleaseGameObjectHandle()
-		{
-			List<AssetOperationHandle> removeList = new List<AssetOperationHandle>();
-			foreach (var trackHandle in _trackGameObjectHandles)
-			{
-				trackHandle.CheckAutoReleaseHandle();
-				if (trackHandle.IsValidNoWarning == false)
-					removeList.Add(trackHandle);
-			}
-			foreach (var removeHandle in removeList)
-			{
-				_trackGameObjectHandles.Remove(removeHandle);
-			}
 		}
 
 		internal static void UnloadSubScene(ProviderBase provider)
