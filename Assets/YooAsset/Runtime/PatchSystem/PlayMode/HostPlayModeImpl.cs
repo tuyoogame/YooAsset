@@ -249,15 +249,59 @@ namespace YooAsset
 		/// </summary>
 		public PatchUnpackerOperation CreatePatchUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
 		{
-			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByTags(AppPatchManifest, tags);
+			List<BundleInfo> unpcakList = GetUnpackListByTags(tags);
 			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
 			return operation;
 		}
+		private List<BundleInfo> GetUnpackListByTags(string[] tags)
+		{
+			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
+			foreach (var patchBundle in AppPatchManifest.BundleList)
+			{
+				// 如果不是内置资源
+				if (patchBundle.IsBuildin == false)
+					continue;
+
+				// 忽略缓存文件
+				if (DownloadSystem.ContainsVerifyFile(patchBundle.Hash))
+					continue;
+
+				// 查询DLC资源
+				if (patchBundle.HasTag(tags))
+				{
+					downloadList.Add(patchBundle);
+				}
+			}
+
+			return ConvertToUnpackList(downloadList);
+		}
+
+		/// <summary>
+		/// 创建解压器
+		/// </summary>
 		public PatchUnpackerOperation CreatePatchUnpackerByAll(int fileUpackingMaxNumber, int failedTryAgain)
 		{
-			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByAll(AppPatchManifest);
+			List<BundleInfo> unpcakList = GetUnpackListByAll();
 			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
 			return operation;
+		}
+		private List<BundleInfo> GetUnpackListByAll()
+		{
+			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
+			foreach (var patchBundle in AppPatchManifest.BundleList)
+			{
+				// 如果不是内置资源
+				if (patchBundle.IsBuildin == false)
+					continue;
+
+				// 忽略缓存文件
+				if (DownloadSystem.ContainsVerifyFile(patchBundle.Hash))
+					continue;
+
+				downloadList.Add(patchBundle);
+			}
+
+			return ConvertToUnpackList(downloadList);
 		}
 
 		// WEB相关
@@ -287,6 +331,26 @@ namespace YooAsset
 			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.Hash);
 			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.Hash);
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, remoteMainURL, remoteFallbackURL);
+			return bundleInfo;
+		}
+
+		// 解压相关
+		public List<BundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
+		{
+			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
+			foreach (var patchBundle in unpackList)
+			{
+				var bundleInfo = ConvertToUnpackInfo(patchBundle);
+				result.Add(bundleInfo);
+			}
+			return result;
+		}
+		public BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
+		{
+			// 注意：我们把流加载路径指定为远端下载地址
+			string streamingPath = PathHelper.MakeStreamingLoadPath(patchBundle.Hash);
+			streamingPath = PathHelper.ConvertToWWWPath(streamingPath);
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, streamingPath, streamingPath);
 			return bundleInfo;
 		}
 

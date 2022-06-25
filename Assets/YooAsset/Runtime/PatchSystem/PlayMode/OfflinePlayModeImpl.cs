@@ -30,22 +30,6 @@ namespace YooAsset
 			return _appPatchManifest.ResourceVersion;
 		}
 
-		/// <summary>
-		/// 创建解压器
-		/// </summary>
-		public PatchUnpackerOperation CreatePatchUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
-		{
-			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByTags(_appPatchManifest, tags);
-			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
-			return operation;
-		}
-		public PatchUnpackerOperation CreatePatchUnpackerByAll(int fileUpackingMaxNumber, int failedTryAgain)
-		{
-			List<BundleInfo> unpcakList = PatchHelper.GetUnpackListByAll(_appPatchManifest);
-			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
-			return operation;
-		}
-
 		// 设置资源清单
 		internal void SetAppPatchManifest(PatchManifest patchManifest)
 		{

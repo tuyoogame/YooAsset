@@ -92,11 +92,6 @@ namespace YooAsset
 		public class HostPlayModeParameters : InitializeParameters
 		{
 			/// <summary>
-			/// 当缓存池被污染的时候清理缓存池
-			/// </summary>
-			public bool ClearCacheWhenDirty;
-
-			/// <summary>
 			/// 默认的资源服务器下载地址
 			/// </summary>
 			public string DefaultHostServer;
@@ -105,6 +100,11 @@ namespace YooAsset
 			/// 备用的资源服务器下载地址
 			/// </summary>
 			public string FallbackHostServer;
+
+			/// <summary>
+			/// 当缓存池被污染的时候清理缓存池
+			/// </summary>
+			public bool ClearCacheWhenDirty = false;
 
 			/// <summary>
 			/// 启用断点续传功能的文件大小
@@ -847,7 +847,9 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				return _offlinePlayModeImpl.CreatePatchUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain);
+				List<BundleInfo> downloadList = new List<BundleInfo>();
+				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain);
+				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
@@ -875,7 +877,9 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				return _offlinePlayModeImpl.CreatePatchUnpackerByAll(unpackingMaxNumber, failedTryAgain);
+				List<BundleInfo> downloadList = new List<BundleInfo>();
+				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain);
+				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
