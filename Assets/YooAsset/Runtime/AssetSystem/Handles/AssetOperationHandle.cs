@@ -57,6 +57,10 @@ namespace YooAsset
         /// <returns></returns>
         public AssetOperationHandle GetAssetObjet<TAsset>(out TAsset asset) where TAsset : UnityEngine.Object
         {
+            if(Status != EOperationStatus.Succeed)
+            {
+                YooLogger.Warning($"The {Provider.MainAssetInfo.AssetPath}[{Provider.MainAssetInfo.AssetType}] is not success.Error[{Provider.LastError}]");
+            }
             asset = AssetObject as TAsset;
             return this;
         }
