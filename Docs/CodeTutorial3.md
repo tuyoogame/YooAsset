@@ -1,6 +1,6 @@
 # 资源加载
 
-加载方法：
+**加载方法**
 
 - YooAssets.LoadAssetSync() 同步加载资源对象
 - YooAssets.LoadAssetAsync() 异步加载资源对象
@@ -11,13 +11,32 @@
 
 **统一约定**
 
-location为资源的定位地址，也是加载资源对象的唯一标识符。
+**Location**为资源的定位地址，也是加载资源对象的唯一标识符。
 
 - DefaultLocationServices 默认资源定位服务，location代表的是资源对象的相对路径。
 
+```c#
+// 以工程内的音频文件为例："Assets/GameRes/Audio/bgMusic.mp3" 
+// 设定资源路径的根目录为："Assets/GameRes"，后续加载的资源定位地址填写相对路径："Audio/bgMusic"
+var createParameters = new YooAssets.EditorSimulateModeParameters();
+createParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
+yield return YooAssets.InitializeAsync(createParameters);
+......
+YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic");
+```
 
 - AddressLocationServices 可寻址资源定位服务，location代表的是资源对象可寻址地址。
 
+````c#
+// 以工程内的音频文件为例："Assets/GameRes/Audio/bgMusic.mp3" 
+// 需要在资源配置界面启用可寻址功能（Enable Addressable）。
+// 配置界面的可寻址规则为AddressByFileName，那么资源定位地址填写文件名称："bgMusic"
+var createParameters = new YooAssets.EditorSimulateModeParameters();
+createParameters.LocationServices = new AddressLocationServices();
+yield return YooAssets.InitializeAsync(createParameters);
+......
+YooAssets.LoadAssetAsync<AudioClip>("bgMusic");
+````
 
 **注意**：以下范例执行环境是在DefaultLocationServices下。
 
