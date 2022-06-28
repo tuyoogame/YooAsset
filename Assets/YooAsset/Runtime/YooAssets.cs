@@ -308,6 +308,36 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 弱联网情况下加载补丁清单
+		/// 注意：当指定版本内容验证失败后会返回失败。
+		/// </summary>
+		/// <param name="resourceVersion">指定的资源版本</param>
+		public static UpdateManifestOperation WeaklyUpdateManifestAsync(int resourceVersion)
+		{
+			DebugCheckInitialize();
+			if (_playMode == EPlayMode.EditorSimulateMode)
+			{
+				var operation = new EditorPlayModeUpdateManifestOperation();
+				OperationSystem.StartOperaiton(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				var operation = new OfflinePlayModeUpdateManifestOperation();
+				OperationSystem.StartOperaiton(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.HostPlayMode)
+			{
+				return _hostPlayModeImpl.WeaklyUpdatePatchManifestAsync(resourceVersion);
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+		/// <summary>
 		/// 开启一个异步操作
 		/// </summary>
 		/// <param name="operation">异步操作对象</param>

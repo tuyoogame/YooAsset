@@ -56,6 +56,16 @@ namespace YooAsset
 			OperationSystem.StartOperaiton(operation);
 			return operation;
 		}
+		
+		/// <summary>
+		/// 异步更新补丁清单（弱联网）
+		/// </summary>
+		public UpdateManifestOperation WeaklyUpdatePatchManifestAsync(int resourceVersion)
+		{
+			var operation = new HostPlayModeWeaklyUpdateManifestOperation(this, resourceVersion);
+			OperationSystem.StartOperaiton(operation);
+			return operation;
+		}
 
 		/// <summary>
 		/// 异步更新资源包裹
