@@ -14,6 +14,15 @@ namespace YooAsset
 		}
 		internal abstract void InvokeCallback();
 
+
+		/// <summary>
+		/// 获取资源信息
+		/// </summary>
+		public AssetInfo GetAssetInfo()
+		{
+			return _assetInfo;
+		}
+
 		/// <summary>
 		/// 当前状态
 		/// </summary>
