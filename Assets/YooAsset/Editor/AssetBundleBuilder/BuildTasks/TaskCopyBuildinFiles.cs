@@ -12,7 +12,7 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			// 注意：我们只有在强制重建的时候才会拷贝
-			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
+			var buildParameters = context.GetContextObject<BuildParametersContext>();
 			if (buildParameters.Parameters.CopyBuildinTagFiles)
 			{
 				// 清空流目录

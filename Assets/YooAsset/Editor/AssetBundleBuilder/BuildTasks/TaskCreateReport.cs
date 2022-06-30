@@ -10,7 +10,7 @@ namespace YooAsset.Editor
 	{
 		void IBuildTask.Run(BuildContext context)
 		{
-			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
+			var buildParameters = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 			buildParameters.StopWatch();
 
@@ -26,7 +26,7 @@ namespace YooAsset.Editor
 			}
 		}
 
-		private void CreateReportFile(AssetBundleBuilder.BuildParametersContext buildParameters, BuildMapContext buildMapContext)
+		private void CreateReportFile(BuildParametersContext buildParameters, BuildMapContext buildMapContext)
 		{
 			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory, buildParameters.Parameters.BuildVersion);
 			BuildReport buildReport = new BuildReport();		

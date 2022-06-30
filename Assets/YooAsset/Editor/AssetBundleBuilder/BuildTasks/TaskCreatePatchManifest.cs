@@ -10,17 +10,17 @@ namespace YooAsset.Editor
 	{
 		void IBuildTask.Run(BuildContext context)
 		{
-			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
-			var encryptionContext = context.GetContextObject<TaskEncryption.EncryptionContext>();
+			var buildParameters = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
+			var encryptionContext = context.GetContextObject<TaskEncryption.EncryptionContext>();	
 			CreatePatchManifestFile(buildParameters, buildMapContext, encryptionContext);
 		}
 
 		/// <summary>
 		/// 创建补丁清单文件到输出目录
 		/// </summary>
-		private void CreatePatchManifestFile(AssetBundleBuilder.BuildParametersContext buildParameters,
-			BuildMapContext buildMapContext, TaskEncryption.EncryptionContext encryptionContext)
+		private void CreatePatchManifestFile(BuildParametersContext buildParameters, BuildMapContext buildMapContext,
+			TaskEncryption.EncryptionContext encryptionContext)
 		{
 			int resourceVersion = buildParameters.Parameters.BuildVersion;
 
@@ -53,8 +53,8 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取资源包列表
 		/// </summary>
-		private List<PatchBundle> GetAllPatchBundle(AssetBundleBuilder.BuildParametersContext buildParameters,
-			BuildMapContext buildMapContext, TaskEncryption.EncryptionContext encryptionContext)
+		private List<PatchBundle> GetAllPatchBundle(BuildParametersContext buildParameters, BuildMapContext buildMapContext,
+			TaskEncryption.EncryptionContext encryptionContext)
 		{
 			List<PatchBundle> result = new List<PatchBundle>(1000);
 
@@ -124,8 +124,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取资源列表
 		/// </summary>
-		private List<PatchAsset> GetAllPatchAsset(AssetBundleBuilder.BuildParametersContext buildParameters,
-			BuildMapContext buildMapContext, PatchManifest patchManifest)
+		private List<PatchAsset> GetAllPatchAsset(BuildParametersContext buildParameters, BuildMapContext buildMapContext, PatchManifest patchManifest)
 		{
 			List<PatchAsset> result = new List<PatchAsset>(1000);
 			foreach (var bundleInfo in buildMapContext.BundleInfos)

@@ -18,7 +18,7 @@ namespace YooAsset.Editor
 
 		void IBuildTask.Run(BuildContext context)
 		{
-			var buildParametersContext = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
+			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 
 			// 模拟构建模式下跳过引擎构建
@@ -46,7 +46,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 拷贝原生文件
 		/// </summary>
-		private void CopyRawBundle(BuildMapContext buildMapContext, AssetBundleBuilder.BuildParametersContext buildParametersContext)
+		private void CopyRawBundle(BuildMapContext buildMapContext, BuildParametersContext buildParametersContext)
 		{
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{

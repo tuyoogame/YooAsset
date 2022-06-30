@@ -13,7 +13,7 @@ namespace YooAsset.Editor
 	{
 		void IBuildTask.Run(BuildContext context)
 		{
-			var buildParametersContext = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
+			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
 			
 			// 模拟构建模式下跳过验证
 			if (buildParametersContext.Parameters.BuildMode == EBuildMode.SimulateBuild)
@@ -32,7 +32,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		private void VerifyingBuildingResult(BuildContext context, AssetBundleManifest unityManifest)
 		{
-			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
+			var buildParameters = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 			string[] buildedBundles = unityManifest.GetAllAssetBundles();
 

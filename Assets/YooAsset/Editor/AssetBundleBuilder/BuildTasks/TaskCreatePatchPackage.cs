@@ -8,7 +8,7 @@ namespace YooAsset.Editor
 	{
 		void IBuildTask.Run(BuildContext context)
 		{
-			var buildParameters = context.GetContextObject<AssetBundleBuilder.BuildParametersContext>();
+			var buildParameters = context.GetContextObject<BuildParametersContext>();
 			var buildMode = buildParameters.Parameters.BuildMode;
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
@@ -19,7 +19,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 拷贝补丁文件到补丁包目录
 		/// </summary>
-		private void CopyPatchFiles(AssetBundleBuilder.BuildParametersContext buildParameters)
+		private void CopyPatchFiles(BuildParametersContext buildParameters)
 		{
 			int resourceVersion = buildParameters.Parameters.BuildVersion;
 			string packageDirectory = buildParameters.GetPackageDirectory();
