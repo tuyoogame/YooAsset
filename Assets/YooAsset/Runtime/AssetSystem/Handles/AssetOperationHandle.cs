@@ -49,21 +49,45 @@ namespace YooAsset
 				return Provider.AssetObject;
 			}
 		}
-
+        /// <summary>
+        /// 获取资源对象
+        /// </summary>
+        /// <typeparam name="TAsset"></typeparam>
+        /// <param name="asset"></param>
+        /// <returns></returns>
+        public AssetOperationHandle GetAssetObjet<TAsset>(out TAsset asset) where TAsset : UnityEngine.Object
+        {
+            if(Status != EOperationStatus.Succeed)
+            {
+                YooLogger.Warning($"The {Provider.MainAssetInfo.AssetPath}[{Provider.MainAssetInfo.AssetType}] is not success.Error[{Provider.LastError}]");
+            }
+            asset = AssetObject as TAsset;
+            return this;
+        }
 		/// <summary>
 		/// 等待异步执行完毕
 		/// </summary>
-		public void WaitForAsyncComplete()
+		public AssetOperationHandle WaitForAsyncOperationComplete()
 		{
 			if (IsValid == false)
-				return;
+				return this;
 			Provider.WaitForAsyncComplete();
+            return this;
 		}
+        /// <summary>
+        /// 等待异步执行完毕
+        /// </summary>
+        public void WaitForAsyncComplete()
+        {
+            if(IsValid == false)
+                return;
+            Provider.WaitForAsyncComplete();
+        }
 
-		/// <summary>
-		/// 释放资源句柄
-		/// </summary>
-		public void Release()
+        /// <summary>
+        /// 释放资源句柄
+        /// </summary>
+        public void Release()
 		{
 			this.ReleaseInternal();
 		}
@@ -109,8 +133,6 @@ namespace YooAsset
 		{
 			return InstantiateAsyncInternal(position, rotation, parent, true);
 		}
-
-
 		private GameObject InstantiateSyncInternal(Vector3 position, Quaternion rotation, Transform parent, bool setPositionRotation)
 		{
 			if (IsValid == false)
