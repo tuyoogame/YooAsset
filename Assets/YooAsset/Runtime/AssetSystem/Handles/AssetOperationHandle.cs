@@ -49,45 +49,32 @@ namespace YooAsset
 				return Provider.AssetObject;
 			}
 		}
-        /// <summary>
-        /// 获取资源对象
-        /// </summary>
-        /// <typeparam name="TAsset"></typeparam>
-        /// <param name="asset"></param>
-        /// <returns></returns>
-        public AssetOperationHandle GetAssetObjet<TAsset>(out TAsset asset) where TAsset : UnityEngine.Object
-        {
-            if(Status != EOperationStatus.Succeed)
-            {
-                YooLogger.Warning($"The {Provider.MainAssetInfo.AssetPath}[{Provider.MainAssetInfo.AssetType}] is not success.Error[{Provider.LastError}]");
-            }
-            asset = AssetObject as TAsset;
-            return this;
-        }
+
+		/// <summary>
+		/// 获取资源对象
+		/// </summary>
+		/// <typeparam name="TAsset">资源类型</typeparam>
+		public TAsset GetAssetObjet<TAsset>() where TAsset : UnityEngine.Object
+		{
+			if (IsValid == false)
+				return null;
+			return Provider.AssetObject as TAsset;
+		}
+
 		/// <summary>
 		/// 等待异步执行完毕
 		/// </summary>
-		public AssetOperationHandle WaitForAsyncOperationComplete()
+		public void WaitForAsyncComplete()
 		{
 			if (IsValid == false)
-				return this;
+				return;
 			Provider.WaitForAsyncComplete();
-            return this;
 		}
-        /// <summary>
-        /// 等待异步执行完毕
-        /// </summary>
-        public void WaitForAsyncComplete()
-        {
-            if(IsValid == false)
-                return;
-            Provider.WaitForAsyncComplete();
-        }
 
-        /// <summary>
-        /// 释放资源句柄
-        /// </summary>
-        public void Release()
+		/// <summary>
+		/// 释放资源句柄
+		/// </summary>
+		public void Release()
 		{
 			this.ReleaseInternal();
 		}
@@ -133,6 +120,8 @@ namespace YooAsset
 		{
 			return InstantiateAsyncInternal(position, rotation, parent, true);
 		}
+
+
 		private GameObject InstantiateSyncInternal(Vector3 position, Quaternion rotation, Transform parent, bool setPositionRotation)
 		{
 			if (IsValid == false)
