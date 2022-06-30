@@ -4,7 +4,7 @@
 
 ````C#
 // 资源系统初始化方法，根据不同的模式，我们传递不同的创建参数类
-YooAssets.InitializeAsync(CreateParameters parameters);
+YooAssets.InitializeAsync(InitializeParameters parameters);
 ````
 
 **编辑器模拟模式**
@@ -16,9 +16,9 @@ YooAssets.InitializeAsync(CreateParameters parameters);
 ````c#
 private IEnumerator InitializeYooAsset()
 {
-    var createParameters = new YooAssets.EditorSimulateModeParameters();
-    createParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
-    yield return YooAssets.InitializeAsync(createParameters);
+    var initParameters = new YooAssets.EditorSimulateModeParameters();
+    initParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
+    yield return YooAssets.InitializeAsync(initParameters);
 }
 ````
 
@@ -31,9 +31,9 @@ private IEnumerator InitializeYooAsset()
 ````c#
 private IEnumerator InitializeYooAsset()
 {
-    var createParameters = new YooAssets.OfflinePlayModeParameters();
-    createParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
-    yield return YooAssets.InitializeAsync(createParameters);
+    var initParameters = new YooAssets.OfflinePlayModeParameters();
+    initParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
+    yield return YooAssets.InitializeAsync(initParameters);
 }
 ````
 
@@ -64,14 +64,14 @@ private IEnumerator InitializeYooAsset()
 ````c#
 private IEnumerator InitializeYooAsset()
 {
-    var createParameters = new YooAssets.HostPlayModeParameters();
-    createParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
-    createParameters.DecryptionServices = null;
-    createParameters.ClearCacheWhenDirty = false;
-    createParameters.DefaultHostServer = "http://127.0.0.1/CDN1/Android";
-    createParameters.FallbackHostServer = "http://127.0.0.1/CDN2/Android";
-    createParameters.VerifyLevel = EVerifyLevel.High;
-    yield return YooAssets.InitializeAsync(createParameters);
+    var initParameters = new YooAssets.HostPlayModeParameters();
+    initParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
+    initParameters.DecryptionServices = null;
+    initParameters.ClearCacheWhenDirty = false;
+    initParameters.DefaultHostServer = "http://127.0.0.1/CDN1/Android";
+    initParameters.FallbackHostServer = "http://127.0.0.1/CDN2/Android";
+    initParameters.VerifyLevel = EVerifyLevel.High;
+    yield return YooAssets.InitializeAsync(initParameters);
 }
 ````
 
