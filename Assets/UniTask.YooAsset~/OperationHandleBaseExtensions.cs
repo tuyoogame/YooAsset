@@ -1,6 +1,12 @@
+#if UNITY_2020_1_OR_NEWER && ! UNITY_2021
+#define UNITY_2020_BUG
+#endif
+
 using System;
+using System.Runtime.CompilerServices;
 using YooAsset;
 using static Cysharp.Threading.Tasks.Internal.Error;
+
 
 namespace Cysharp.Threading.Tasks
 {
@@ -71,11 +77,29 @@ namespace Cysharp.Threading.Tasks
                 result.completed = false;
                 TaskTracker.TrackActiveTask(result, 3);
 
-                if(progress is not null)
+                if(progress != null)
                 {
                     PlayerLoopHelper.AddAction(timing, result);
                 }
 
+                // BUG 在 Unity 2020.3.36 版本测试中, IL2Cpp 会报 如下错误
+                // BUG ArgumentException: Incompatible Delegate Types. First is System.Action`1[[YooAsset.AssetOperationHandle, YooAsset, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] second is System.Action`1[[YooAsset.OperationHandleBase, YooAsset, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]
+                // BUG 也可能报的是 Action '1' Action '1' 的 InvalidCastException
+                // BUG 此处不得不这么修改, 如果后续 Unity 修复了这个问题, 可以恢复之前的写法 
+#if UNITY_2020_BUG
+                switch(handle)
+                {
+                    case AssetOperationHandle asset_handle:
+                        asset_handle.Completed += result.AssetContinuation;
+                        break;
+                    case SceneOperationHandle scene_handle:
+                        scene_handle.Completed += result.SceneContinuation;
+                        break;
+                    case SubAssetsOperationHandle sub_asset_handle:
+                        sub_asset_handle.Completed += result.SubContinuation;
+                        break;
+                }
+#else
                 switch(handle)
                 {
                     case AssetOperationHandle asset_handle:
@@ -88,10 +112,49 @@ namespace Cysharp.Threading.Tasks
                         sub_asset_handle.Completed += result.continuationAction;
                         break;
                 }
-
+#endif
                 token = result.core.Version;
 
                 return result;
+            }
+#if UNITY_2020_BUG
+            private void AssetContinuation(AssetOperationHandle handle)
+            {
+                handle.Completed -= AssetContinuation;
+                BaseContinuation();
+            }
+
+            private void SceneContinuation(SceneOperationHandle handle)
+            {
+                handle.Completed -= SceneContinuation;
+                BaseContinuation();
+            }
+
+            private void SubContinuation(SubAssetsOperationHandle handle)
+            {
+                handle.Completed -= SubContinuation;
+                BaseContinuation();
+            }
+#endif
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private void BaseContinuation()
+            {
+                if(completed)
+                {
+                    TryReturn();
+                }
+                else
+                {
+                    completed = true;
+                    if(handle.Status == EOperationStatus.Failed)
+                    {
+                        core.TrySetException(new Exception(handle.LastError));
+                    }
+                    else
+                    {
+                        core.TrySetResult(AsyncUnit.Default);
+                    }
+                }
             }
 
             private void Continuation(OperationHandleBase _)
@@ -109,22 +172,7 @@ namespace Cysharp.Threading.Tasks
                         break;
                 }
 
-                if(completed)
-                {
-                    TryReturn();
-                }
-                else
-                {
-                    completed = true;
-                    if(handle.Status == EOperationStatus.Failed)
-                    {
-                        core.TrySetException(new Exception(handle.LastError));
-                    }
-                    else
-                    {
-                        core.TrySetResult(AsyncUnit.Default);
-                    }
-                }
+                BaseContinuation();
             }
 
             bool TryReturn()
