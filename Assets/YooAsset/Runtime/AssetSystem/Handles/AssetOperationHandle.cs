@@ -54,7 +54,7 @@ namespace YooAsset
 		/// 获取资源对象
 		/// </summary>
 		/// <typeparam name="TAsset">资源类型</typeparam>
-		public TAsset GetAssetObjet<TAsset>() where TAsset : UnityEngine.Object
+		public TAsset GetAssetObject<TAsset>() where TAsset : UnityEngine.Object
 		{
 			if (IsValid == false)
 				return null;
