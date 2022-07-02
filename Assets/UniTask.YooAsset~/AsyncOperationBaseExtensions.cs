@@ -71,7 +71,7 @@ namespace Cysharp.Threading.Tasks
                 result.completed = false;
                 TaskTracker.TrackActiveTask(result, 3);
 
-                if(progress is not null)
+                if(progress != null)
                 {
                     PlayerLoopHelper.AddAction(timing, result);
                 }
