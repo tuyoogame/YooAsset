@@ -119,11 +119,6 @@ namespace YooAsset
 			}
 		}
 
-		/// <summary>
-		/// 错误信息
-		/// </summary>
-		public string Error { private set; get; }
-
 
 		private BundleInfo()
 		{
@@ -136,7 +131,6 @@ namespace YooAsset
 			RemoteMainURL = mainURL;
 			RemoteFallbackURL = fallbackURL;
 			EditorAssetPath = string.Empty;
-			Error = string.Empty;
 		}
 		public BundleInfo(PatchBundle patchBundle, ELoadMode loadMode, string editorAssetPath)
 		{
@@ -146,7 +140,6 @@ namespace YooAsset
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
 			EditorAssetPath = editorAssetPath;
-			Error = string.Empty;
 		}
 		public BundleInfo(PatchBundle patchBundle, ELoadMode loadMode)
 		{
@@ -156,17 +149,6 @@ namespace YooAsset
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
 			EditorAssetPath = string.Empty;
-			Error = string.Empty;
-		}
-		public BundleInfo(string error)
-		{
-			_patchBundle = null;
-			LoadMode = ELoadMode.None;
-			BundleName = string.Empty;
-			RemoteMainURL = string.Empty;
-			RemoteFallbackURL = string.Empty;
-			EditorAssetPath = string.Empty;
-			Error = error;
 		}
 
 		/// <summary>

@@ -536,6 +536,15 @@ namespace YooAsset
 			}
 
 			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+			if (bundleInfo.IsRawFile == false)
+			{
+				string error = $"Cannot load asset bundle file using {nameof(GetRawFileAsync)} interfaces !";
+				YooLogger.Warning(error);
+				RawFileOperation operation = new CompletedRawFileOperation(error, copyPath);
+				OperationSystem.StartOperaiton(operation);
+				return operation;
+			}
+
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				RawFileOperation operation = new EditorPlayModeRawFileOperation(bundleInfo, copyPath);
