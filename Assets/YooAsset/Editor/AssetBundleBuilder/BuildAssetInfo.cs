@@ -185,10 +185,13 @@ namespace YooAsset.Editor
 
 				if (_referenceBundleNames.Count > 1)
 				{
-					IPackRule packRule = PackDirectory.StaticPackRule;
-					var bundleName = packRule.GetBundleName(new PackRuleData(AssetPath));
-					var shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-					_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
+					if (!AssetPath.Contains("/Editor/") && !AssetPath.Contains("/Gizmos/"))
+					{
+						IPackRule packRule = PackDirectory.StaticPackRule;
+						var bundleName = packRule.GetBundleName(new PackRuleData(AssetPath));
+						var shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+						_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
+					}
 				}
 			}
 			else
