@@ -42,13 +42,13 @@ namespace YooAsset
 		/// 资源包集合（提供BundleName获取PatchBundle）
 		/// </summary>
 		[NonSerialized]
-		public readonly Dictionary<string, PatchBundle> Bundles = new Dictionary<string, PatchBundle>();
+		public readonly Dictionary<string, PatchBundle> BundleDic = new Dictionary<string, PatchBundle>();
 
 		/// <summary>
 		/// 资源映射集合（提供AssetPath获取PatchAsset）
 		/// </summary>
 		[NonSerialized]
-		public readonly Dictionary<string, PatchAsset> Assets = new Dictionary<string, PatchAsset>();
+		public readonly Dictionary<string, PatchAsset> AssetDic = new Dictionary<string, PatchAsset>();
 
 		/// <summary>
 		/// 资源路径映射集合
@@ -117,7 +117,7 @@ namespace YooAsset
 		/// </summary>
 		public string MappingToAssetPath(string location)
 		{
-			if(string.IsNullOrEmpty(location))
+			if (string.IsNullOrEmpty(location))
 			{
 				YooLogger.Error("Failed to mapping location to asset path, The location is null or empty.");
 				return string.Empty;
@@ -138,18 +138,18 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取资源包名称
+		/// 获取主资源包
 		/// 注意：传入的资源路径一定合法有效！
 		/// </summary>
-		public string GetBundleName(string assetPath)
+		public PatchBundle GetMainPatchBundle(string assetPath)
 		{
-			if (Assets.TryGetValue(assetPath, out PatchAsset patchAsset))
+			if (AssetDic.TryGetValue(assetPath, out PatchAsset patchAsset))
 			{
 				int bundleID = patchAsset.BundleID;
 				if (bundleID >= 0 && bundleID < BundleList.Count)
 				{
 					var patchBundle = BundleList[bundleID];
-					return patchBundle.BundleName;
+					return patchBundle;
 				}
 				else
 				{
@@ -166,17 +166,17 @@ namespace YooAsset
 		/// 获取资源依赖列表
 		/// 注意：传入的资源路径一定合法有效！
 		/// </summary>
-		public string[] GetAllDependencies(string assetPath)
+		public PatchBundle[] GetAllDependencies(string assetPath)
 		{
-			if (Assets.TryGetValue(assetPath, out PatchAsset patchAsset))
+			if (AssetDic.TryGetValue(assetPath, out PatchAsset patchAsset))
 			{
-				List<string> result = new List<string>(patchAsset.DependIDs.Length);
+				List<PatchBundle> result = new List<PatchBundle>(patchAsset.DependIDs.Length);
 				foreach (var dependID in patchAsset.DependIDs)
 				{
 					if (dependID >= 0 && dependID < BundleList.Count)
 					{
 						var dependPatchBundle = BundleList[dependID];
-						result.Add(dependPatchBundle.BundleName);
+						result.Add(dependPatchBundle);
 					}
 					else
 					{
@@ -189,6 +189,22 @@ namespace YooAsset
 			{
 				throw new Exception("Should never get here !");
 			}
+		}
+
+		/// <summary>
+		/// 尝试获取补丁资源
+		/// </summary>
+		public bool TryGetPatchAsset(string assetPath, out PatchAsset result)
+		{
+			return AssetDic.TryGetValue(assetPath, out result);
+		}
+
+		/// <summary>
+		/// 尝试获取补丁资源包
+		/// </summary>
+		public bool TryGetPatchBundle(string bundleName, out PatchBundle result)
+		{
+			return BundleDic.TryGetValue(bundleName, out result);
 		}
 
 
@@ -212,7 +228,7 @@ namespace YooAsset
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				patchBundle.ParseFlagsValue();
-				patchManifest.Bundles.Add(patchBundle.BundleName, patchBundle);
+				patchManifest.BundleDic.Add(patchBundle.BundleName, patchBundle);
 			}
 
 			// AssetList
@@ -220,10 +236,10 @@ namespace YooAsset
 			{
 				// 注意：我们不允许原始路径存在重名
 				string assetPath = patchAsset.AssetPath;
-				if (patchManifest.Assets.ContainsKey(assetPath))
+				if (patchManifest.AssetDic.ContainsKey(assetPath))
 					throw new Exception($"AssetPath have existed : {assetPath}");
 				else
-					patchManifest.Assets.Add(assetPath, patchAsset);
+					patchManifest.AssetDic.Add(assetPath, patchAsset);
 			}
 
 			return patchManifest;

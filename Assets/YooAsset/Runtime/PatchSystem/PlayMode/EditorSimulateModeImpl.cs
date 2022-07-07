@@ -40,19 +40,13 @@ namespace YooAsset
 		#region IBundleServices接口
 		BundleInfo IBundleServices.GetBundleInfo(AssetInfo assetInfo)
 		{
-			if(assetInfo.IsInvalid)
+			if (assetInfo.IsInvalid)
 				throw new Exception("Should never get here !");
 
-			string bundleName = _simulatePatchManifest.GetBundleName(assetInfo.AssetPath);
-			if (_simulatePatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
-			{
-				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromEditor, assetInfo.AssetPath);
-				return bundleInfo;
-			}
-			else
-			{
-				throw new Exception("Should never get here !");
-			}
+			// 注意：如果补丁清单里未找到资源包会抛出异常！
+			var patchBundle = _simulatePatchManifest.GetMainPatchBundle(assetInfo.AssetPath);
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromEditor, assetInfo.AssetPath);
+			return bundleInfo;
 		}
 		BundleInfo[] IBundleServices.GetAllDependBundleInfos(AssetInfo assetInfo)
 		{
@@ -64,7 +58,7 @@ namespace YooAsset
 		}
 		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
 		{
-			if (_simulatePatchManifest.Assets.TryGetValue(assetPath, out PatchAsset patchAsset))
+			if (_simulatePatchManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
 				return patchAsset;
 			else
 				return null;

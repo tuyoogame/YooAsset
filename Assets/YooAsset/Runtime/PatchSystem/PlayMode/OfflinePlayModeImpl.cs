@@ -38,36 +38,34 @@ namespace YooAsset
 		}
 
 		#region IBundleServices接口
-		private BundleInfo CreateBundleInfo(string bundleName)
+		private BundleInfo CreateBundleInfo(PatchBundle patchBundle)
 		{
-			if (_appPatchManifest.Bundles.TryGetValue(bundleName, out PatchBundle patchBundle))
-			{
-				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming);
-				return bundleInfo;
-			}
-			else
-			{
+			if (patchBundle == null)
 				throw new Exception("Should never get here !");
-			}
+
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming);
+			return bundleInfo;
 		}
 		BundleInfo IBundleServices.GetBundleInfo(AssetInfo assetInfo)
 		{
 			if (assetInfo.IsInvalid)
 				throw new Exception("Should never get here !");
 
-			string bundleName = _appPatchManifest.GetBundleName(assetInfo.AssetPath);
-			return CreateBundleInfo(bundleName);
+			// 注意：如果补丁清单里未找到资源包会抛出异常！
+			var patchBundle = _appPatchManifest.GetMainPatchBundle(assetInfo.AssetPath);
+			return CreateBundleInfo(patchBundle);
 		}
 		BundleInfo[] IBundleServices.GetAllDependBundleInfos(AssetInfo assetInfo)
 		{
 			if (assetInfo.IsInvalid)
 				throw new Exception("Should never get here !");
 
+			// 注意：如果补丁清单里未找到资源包会抛出异常！
 			var depends = _appPatchManifest.GetAllDependencies(assetInfo.AssetPath);
 			List<BundleInfo> result = new List<BundleInfo>(depends.Length);
-			foreach (var bundleName in depends)
+			foreach (var patchBundle in depends)
 			{
-				BundleInfo bundleInfo = CreateBundleInfo(bundleName);
+				BundleInfo bundleInfo = CreateBundleInfo(patchBundle);
 				result.Add(bundleInfo);
 			}
 			return result.ToArray();
@@ -78,7 +76,7 @@ namespace YooAsset
 		}
 		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
 		{
-			if (_appPatchManifest.Assets.TryGetValue(assetPath, out PatchAsset patchAsset))
+			if (_appPatchManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
 				return patchAsset;
 			else
 				return null;
