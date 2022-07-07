@@ -2,6 +2,56 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.1.1] - 2022-07-07
+
+### Fixed
+
+- 修复了AssetBundleDebugger窗口，View下拉页签切换无效的问题。
+- 修复了在Unity2020.3版本下UniTask在真机上的一个IL2CPP相关的错误。
+
+### Changed
+
+- 优化了AssetBundleDebugger窗口，增加了帧数显示以及回放功能。
+- 优化了AssetBundleBuilder的代码结构。
+- 增强了YooAssets.GetRawFileAsync()方法的容错。
+
+### Added
+
+- 新增了OperationHandleBase.GetAssetInfo()方法。
+
+  ````c#
+  /// <summary>
+  /// 获取资源信息
+  /// </summary>
+  public AssetInfo GetAssetInfo();
+  ````
+
+- 新增了AssetOperationHandle.GetAssetObjet<TAsset>()方法。
+
+  ````c#
+  /// <summary>
+  /// 获取资源对象
+  /// </summary>
+  /// <typeparam name="TAsset">资源类型</typeparam>
+  public TAsset GetAssetObjet<TAsset>()；
+  ````
+
+- 新增了弱联网情况下加载补丁清单方法。
+
+  ````c#
+  /// <summary>
+  /// 弱联网情况下加载补丁清单
+  /// 注意：当指定版本内容验证失败后会返回失败。
+  /// </summary>
+  /// <param name="resourceVersion">指定的资源版本</param>
+  public static UpdateManifestOperation WeaklyUpdateManifestAsync(int resourceVersion)；
+  ````
+
+### Removed
+
+- 离线运行模式（OfflinePlayMode）下移除了资内置资源解压相关逻辑。
+- 移除了初始化参数：AutoReleaseGameObjectHandle及相关代码逻辑。
+
 ## [1.1.0] - 2022-06-23
 
 ### Fixed
