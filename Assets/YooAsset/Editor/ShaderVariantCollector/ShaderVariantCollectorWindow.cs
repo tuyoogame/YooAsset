@@ -34,6 +34,8 @@ namespace YooAsset.Editor
 			EditorGUILayout.Space();
 			if (GUILayout.Button("搜集变种", GUILayout.MaxWidth(80)))
 			{
+				// 先删除再保存，否则ShaderVariantCollection内容将无法及时刷新
+				AssetDatabase.DeleteAsset(ShaderVariantCollectorSettingData.Setting.SavePath);
 				ShaderVariantCollector.Run(ShaderVariantCollectorSettingData.Setting.SavePath);
 			}
 
