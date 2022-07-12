@@ -112,7 +112,7 @@ namespace YooAsset.Editor
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// 添加资源包的分类标签
 		/// 说明：传染算法统计到的分类标签
@@ -185,13 +185,10 @@ namespace YooAsset.Editor
 
 				if (_referenceBundleNames.Count > 1)
 				{
-					if (!AssetPath.Contains("/Editor/") && !AssetPath.Contains("/Gizmos/"))
-					{
-						IPackRule packRule = PackDirectory.StaticPackRule;
-						var bundleName = packRule.GetBundleName(new PackRuleData(AssetPath));
-						var shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-						_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
-					}
+					IPackRule packRule = PackDirectory.StaticPackRule;
+					var bundleName = packRule.GetBundleName(new PackRuleData(AssetPath));
+					var shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+					_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
 				}
 			}
 			else

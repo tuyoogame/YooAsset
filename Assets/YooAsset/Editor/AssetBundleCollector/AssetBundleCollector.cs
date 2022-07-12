@@ -180,7 +180,15 @@ namespace YooAsset.Editor
 		private bool IsValidateAsset(string assetPath)
 		{
 			if (assetPath.StartsWith("Assets/") == false && assetPath.StartsWith("Packages/") == false)
+			{
+				UnityEngine.Debug.LogError($"Invalid asset path : {assetPath}");
 				return false;
+			}
+			if (assetPath.Contains("/Gizmos/"))
+			{
+				UnityEngine.Debug.LogWarning($"Cannot pack gizmos asset : {assetPath}");
+				return false;
+			}
 
 			if (AssetDatabase.IsValidFolder(assetPath))
 				return false;
