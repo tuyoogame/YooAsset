@@ -117,7 +117,11 @@ namespace YooAsset
 					if (AssetSystem.DecryptionServices == null)
 						throw new Exception($"{nameof(AssetBundleFileLoader)} need {nameof(IDecryptionServices)} : {MainBundleInfo.BundleName}");
 
-					ulong offset = AssetSystem.DecryptionServices.GetFileOffset();
+					DecryptionFileInfo fileInfo = new DecryptionFileInfo();
+					fileInfo.BundleName = MainBundleInfo.BundleName;
+					fileInfo.BundleHash = MainBundleInfo.Hash;
+					fileInfo.BundleCRC = MainBundleInfo.CRC;
+					ulong offset = AssetSystem.DecryptionServices.GetFileOffset(fileInfo);
 					if (_isWaitForAsyncComplete)
 						CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath, 0, offset);
 					else
