@@ -7,6 +7,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 
 namespace YooAsset.Editor
 {
@@ -262,6 +263,20 @@ namespace YooAsset.Editor
 		public static void ClearUnityConsole()
 		{
 			ClearConsoleMethod.Invoke(new object(), null);
+		}
+		#endregion
+
+		#region SceneUtility
+		public static bool HasDirtyScenes()
+		{
+			var sceneCount = EditorSceneManager.sceneCount;
+			for (var i = 0; i < sceneCount; ++i)
+			{
+				var scene = EditorSceneManager.GetSceneAt(i);
+				if (scene.isDirty)
+					return true;
+			}
+			return false;
 		}
 		#endregion
 

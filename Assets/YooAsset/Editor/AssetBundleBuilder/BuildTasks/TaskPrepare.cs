@@ -26,6 +26,17 @@ namespace YooAsset.Editor
 			if (string.IsNullOrEmpty(buildParameters.PipelineOutputDirectory))
 				throw new Exception("输出目录不能为空");
 
+			// 检测当前是否正在构建资源包
+			if (BuildPipeline.isBuildingPlayer)
+				throw new Exception("当前正在构建资源包，请结束后再试");
+
+			// 检测是否有未保存场景
+			if (EditorTools.HasDirtyScenes())
+				throw new Exception("检测到未保存的场景文件");
+
+			// 保存改动的资源
+			AssetDatabase.SaveAssets();
+
 			// 增量更新时候的必要检测
 			var buildMode = buildParameters.Parameters.BuildMode;
 			if (buildMode == EBuildMode.IncrementalBuild)
