@@ -13,5 +13,10 @@
         "url": "https://github.com/tuyoogame/YooAsset.git"
     },
     "relatedPackages": {},
-    "dependencies": {}
+    "dependencies": {
+        "com.unity.scriptablebuildpipeline": "1.20.2",
+        "com.unity.modules.assetbundle": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.modules.unitywebrequestassetbundle": "1.0.0"
+    }
 }
