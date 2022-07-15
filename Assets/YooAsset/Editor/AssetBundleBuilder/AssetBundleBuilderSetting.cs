@@ -11,6 +11,11 @@ namespace YooAsset.Editor
 		public int BuildVersion = 0;
 
 		/// <summary>
+		/// 构建管线
+		/// </summary>
+		public EBuildPipeline BuildPipeline = EBuildPipeline.BuiltInBuildPipeline;
+
+		/// <summary>
 		/// 构建模式
 		/// </summary>
 		public EBuildMode BuildMode = EBuildMode.ForceRebuild;

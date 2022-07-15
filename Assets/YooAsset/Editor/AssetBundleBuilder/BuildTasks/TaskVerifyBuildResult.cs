@@ -37,53 +37,21 @@ namespace YooAsset.Editor
 			string[] buildedBundles = unityManifest.GetAllAssetBundles();
 
 			// 1. 过滤掉原生Bundle
-			List<BuildBundleInfo> expectBundles = new List<BuildBundleInfo>(buildedBundles.Length);
-			foreach(var bundleInfo in buildMapContext.BundleInfos)
-			{
-				if (bundleInfo.IsRawFile == false)
-					expectBundles.Add(bundleInfo);
-			}
+			string[] expectBundles = buildMapContext.BundleInfos.Where(t => t.IsRawFile == false).Select(t => t.BundleName).ToArray();
 
-			// 2. 验证数量		
-			if (buildedBundles.Length != expectBundles.Count)
+			// 2. 验证Bundle
+			List<string> intersectBundleList = buildedBundles.Except(expectBundles).ToList();
+			if (intersectBundleList.Count > 0)
 			{
-				Debug.LogWarning($"构建过程中可能存在无效的资源，导致和预期构建的Bundle数量不一致！");
-			}
-
-			// 3. 正向验证Bundle
-			foreach (var bundleName in buildedBundles)
-			{
-				if (buildMapContext.IsContainsBundle(bundleName) == false)
+				foreach (var intersectBundle in intersectBundleList)
 				{
-					throw new Exception($"Should never get here !");
+					Debug.LogWarning($"差异资源包: {intersectBundle}");
 				}
+				throw new System.Exception("存在差异资源包！请查看警告信息！");
 			}
 
-			// 4. 反向验证Bundle
+			// 3. 验证Asset
 			bool isPass = true;
-			foreach (var expectBundle in expectBundles)
-			{
-				bool isMatch = false;
-				foreach (var buildedBundle in buildedBundles)
-				{
-					if (buildedBundle == expectBundle.BundleName)
-					{
-						isMatch = true;
-						break;
-					}
-				}
-				if (isMatch == false)
-				{
-					isPass = false;
-					Debug.LogWarning($"没有找到预期构建的Bundle文件 : {expectBundle.BundleName}");
-				}
-			}
-			if(isPass == false)
-			{
-				throw new Exception("构建结果验证没有通过，请参考警告日志！");
-			}
-
-			// 5. 验证Asset
 			var buildMode = buildParameters.Parameters.BuildMode;
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
@@ -137,7 +105,6 @@ namespace YooAsset.Editor
 				}
 			}
 
-			// 卸载所有加载的Bundle
 			BuildRunner.Log("构建结果验证成功！");
 		}
 

@@ -54,18 +54,38 @@ namespace YooAsset.Editor
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
-			// 拷贝UnityManifest序列化文件
+			if (buildParameters.Parameters.BuildPipeline == EBuildPipeline.ScriptBuildPipeline)
 			{
-				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.UnityManifestFileName}";
-				string destPath = $"{packageDirectory}/{YooAssetSettingsData.Setting.UnityManifestFileName}";
-				EditorTools.CopyFile(sourcePath, destPath, true);
-			}
+				// 拷贝构建日志
+				{
+					string sourcePath = $"{buildParameters.PipelineOutputDirectory}/buildlogtep.json";
+					string destPath = $"{packageDirectory}/buildlogtep.json";
+					EditorTools.CopyFile(sourcePath, destPath, true);
+				}
 
-			// 拷贝UnityManifest文本文件
+				// 拷贝代码防裁剪配置
+				if (buildParameters.Parameters.SBPParameters.WriteLinkXML)
+				{
+					string sourcePath = $"{buildParameters.PipelineOutputDirectory}/link.xml";
+					string destPath = $"{packageDirectory}/link.xml";
+					EditorTools.CopyFile(sourcePath, destPath, true);
+				}
+			}
+			else
 			{
-				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.UnityManifestFileName}.manifest";
-				string destPath = $"{packageDirectory}/{YooAssetSettingsData.Setting.UnityManifestFileName}.manifest";
-				EditorTools.CopyFile(sourcePath, destPath, true);
+				// 拷贝UnityManifest序列化文件
+				{
+					string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.UnityManifestFileName}";
+					string destPath = $"{packageDirectory}/{YooAssetSettingsData.Setting.UnityManifestFileName}";
+					EditorTools.CopyFile(sourcePath, destPath, true);
+				}
+
+				// 拷贝UnityManifest文本文件
+				{
+					string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.UnityManifestFileName}.manifest";
+					string destPath = $"{packageDirectory}/{YooAssetSettingsData.Setting.UnityManifestFileName}.manifest";
+					EditorTools.CopyFile(sourcePath, destPath, true);
+				}
 			}
 
 			// 拷贝所有补丁文件

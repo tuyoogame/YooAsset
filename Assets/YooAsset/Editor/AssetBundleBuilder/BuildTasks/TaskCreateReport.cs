@@ -29,14 +29,20 @@ namespace YooAsset.Editor
 		private void CreateReportFile(BuildParametersContext buildParameters, BuildMapContext buildMapContext)
 		{
 			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory, buildParameters.Parameters.BuildVersion);
-			BuildReport buildReport = new BuildReport();		
+			BuildReport buildReport = new BuildReport();
 
 			// 概述信息
 			{
+#if UNITY_2019_4_OR_NEWER
+				UnityEditor.PackageManager.PackageInfo packageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(BuildReport).Assembly);
+				if (packageInfo != null)
+					buildReport.Summary.YooVersion = packageInfo.version;
+#endif
 				buildReport.Summary.UnityVersion = UnityEngine.Application.unityVersion;
-				buildReport.Summary.BuildTime = DateTime.Now.ToString();
+				buildReport.Summary.BuildDate = DateTime.Now.ToString();
 				buildReport.Summary.BuildSeconds = (int)buildParameters.GetBuildingSeconds();
 				buildReport.Summary.BuildTarget = buildParameters.Parameters.BuildTarget;
+				buildReport.Summary.BuildPipeline = buildParameters.Parameters.BuildPipeline;
 				buildReport.Summary.BuildMode = buildParameters.Parameters.BuildMode;
 				buildReport.Summary.BuildVersion = buildParameters.Parameters.BuildVersion;
 				buildReport.Summary.BuildinTags = buildParameters.Parameters.BuildinTags;

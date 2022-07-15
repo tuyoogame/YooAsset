@@ -9,6 +9,11 @@ namespace YooAsset.Editor
 	public class ReportSummary
 	{
 		/// <summary>
+		/// YooAsset版本
+		/// </summary>
+		public string YooVersion;
+
+		/// <summary>
 		/// 引擎版本
 		/// </summary>
 		public string UnityVersion;
@@ -16,7 +21,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 构建时间
 		/// </summary>
-		public string BuildTime;
+		public string BuildDate;
 		
 		/// <summary>
 		/// 构建耗时（单位：秒）
@@ -27,6 +32,11 @@ namespace YooAsset.Editor
 		/// 构建平台
 		/// </summary>
 		public BuildTarget BuildTarget;
+
+		/// <summary>
+		/// 构建管线
+		/// </summary>
+		public EBuildPipeline BuildPipeline;
 
 		/// <summary>
 		/// 构建模式

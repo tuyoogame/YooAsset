@@ -58,10 +58,13 @@ namespace YooAsset.Editor
 			_buildReport = buildReport;
 			
 			_items.Clear();
+
+			_items.Add(new ItemWrapper("YooAsset版本", buildReport.Summary.YooVersion));
 			_items.Add(new ItemWrapper("引擎版本", buildReport.Summary.UnityVersion));
-			_items.Add(new ItemWrapper("构建时间", buildReport.Summary.BuildTime));
+			_items.Add(new ItemWrapper("构建时间", buildReport.Summary.BuildDate));
 			_items.Add(new ItemWrapper("构建耗时", $"{buildReport.Summary.BuildSeconds}秒"));
 			_items.Add(new ItemWrapper("构建平台", $"{buildReport.Summary.BuildTarget}"));
+			_items.Add(new ItemWrapper("构建管线", $"{buildReport.Summary.BuildPipeline}"));
 			_items.Add(new ItemWrapper("构建模式", $"{buildReport.Summary.BuildMode}"));
 			_items.Add(new ItemWrapper("构建版本", $"{buildReport.Summary.BuildVersion}"));
 			_items.Add(new ItemWrapper("内置资源标签", $"{buildReport.Summary.BuildinTags}"));

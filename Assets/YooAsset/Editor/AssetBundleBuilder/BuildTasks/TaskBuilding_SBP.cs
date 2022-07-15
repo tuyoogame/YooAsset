@@ -5,14 +5,17 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+using UnityEditor.Build.Pipeline;
+using UnityEditor.Build.Pipeline.Interfaces;
+
 namespace YooAsset.Editor
 {
 	[TaskAttribute("资源构建内容打包")]
-	public class TaskBuilding : IBuildTask
+	public class TaskBuilding_SBP : IBuildTask
 	{
-		public class UnityManifestContext : IContextObject
+		public class SBPBuildResultContext : IContextObject
 		{
-			public AssetBundleManifest UnityManifest;
+			public IBundleBuildResults Results;
 		}
 
 		void IBuildTask.Run(BuildContext context)
@@ -25,15 +28,30 @@ namespace YooAsset.Editor
 			if (buildMode == EBuildMode.SimulateBuild)
 				return;
 
-			BuildAssetBundleOptions opt = buildParametersContext.GetPipelineBuildOptions();
-			AssetBundleManifest unityManifest = BuildPipeline.BuildAssetBundles(buildParametersContext.PipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), opt, buildParametersContext.Parameters.BuildTarget);
-			if (unityManifest == null)
-				throw new Exception("构建过程中发生错误！");
+			// 构建内容
+			var buildContent = new BundleBuildContent(buildMapContext.GetPipelineBuilds());
+
+			// 开始构建
+			IBundleBuildResults buildResults;
+			var buildParameters = buildParametersContext.GetSBPBuildParameters();
+			var taskList = DefaultBuildTasks.Create(DefaultBuildTasks.Preset.AssetBundleBuiltInShaderExtraction);
+			ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out buildResults, taskList);
+			if (exitCode < 0)
+			{
+				throw new Exception($"构建过程中发生错误 : {exitCode}");
+			}
 
 			BuildRunner.Log("Unity引擎打包成功！");
-			UnityManifestContext unityManifestContext = new UnityManifestContext();
-			unityManifestContext.UnityManifest = unityManifest;
-			context.SetContextObject(unityManifestContext);
+			SBPBuildResultContext buildResultContext = new SBPBuildResultContext();
+			buildResultContext.Results = buildResults;
+			context.SetContextObject(buildResultContext);
+
+			// 添加Unity内置资源包信息
+			if (buildResults.BundleInfos.Keys.Any(t => t == YooAssetSettings.UnityBuiltInShadersBundleName))
+			{
+				BuildBundleInfo builtInBundleInfo = new BuildBundleInfo(YooAssetSettings.UnityBuiltInShadersBundleName);
+				buildMapContext.BundleInfos.Add(builtInBundleInfo);
+			}
 
 			// 拷贝原生文件
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)

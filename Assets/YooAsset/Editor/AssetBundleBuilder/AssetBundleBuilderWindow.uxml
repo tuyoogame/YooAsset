@@ -3,6 +3,7 @@
     <ui:VisualElement name="BuildContainer">
         <ui:TextField picking-mode="Ignore" label="Build Output" name="BuildOutput" />
         <uie:IntegerField label="Build Version" value="0" name="BuildVersion" />
+        <uie:EnumField label="Build Pipeline" name="BuildPipeline" />
         <uie:EnumField label="Build Mode" name="BuildMode" />
         <ui:VisualElement name="EncryptionContainer" style="height: 24px;" />
         <uie:EnumField label="Compression" value="Center" name="Compression" />

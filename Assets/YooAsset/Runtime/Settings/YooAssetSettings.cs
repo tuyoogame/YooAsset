@@ -25,6 +25,7 @@ namespace YooAsset
 		/// </summary>
 		public string UnityManifestFileName = "UnityManifest";
 
+
 		/// <summary>
 		/// 构建输出的报告文件
 		/// </summary>
@@ -34,5 +35,10 @@ namespace YooAsset
 		/// 静态版本文件
 		/// </summary>
 		public const string VersionFileName = "StaticVersion.bytes";
+
+		/// <summary>
+		/// Unity内置着色器资源包名称
+		/// </summary>
+		public const string UnityBuiltInShadersBundleName = "UnityBuiltInShaders.bundle";
 	}
 }
