@@ -2,6 +2,23 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.2.0] - 2022-07-18
+
+### Fixed
+
+- 修复了ShaderVariantCollection刷新不及时问题。
+
+### Changed
+
+- 资源收集忽略了Gizmos资源文件。
+- 解密服务接口增加解密文件信息参数。
+- 资源收集窗体增加配置保存按钮。
+- 资源构建窗体增加配置保存按钮。
+
+### Added
+
+- 资源构建模块增加了可编程构建管线(SBP)的支持，开发者可以在内置构建管线和可编程构建管线之间自由选择，零修改成本。
+
 ## [1.1.1] - 2022-07-07
 
 ### Fixed
