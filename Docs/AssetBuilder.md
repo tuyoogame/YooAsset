@@ -12,6 +12,14 @@
 
   构建版本号，也是资源版本号，版本号必须大于零。
 
+- **Build Pipeline**
+
+  构建管线
+
+  (1) BuiltinBuildPipeline: 传统的内置构建管线。
+
+  (2) ScriptableBuildPipeline: 可编程构建管线。
+
 - **Build Mode**
 
   构建模式
