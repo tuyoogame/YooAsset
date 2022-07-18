@@ -13,7 +13,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 构建管线
 		/// </summary>
-		public EBuildPipeline BuildPipeline = EBuildPipeline.BuiltInBuildPipeline;
+		public EBuildPipeline BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;
 
 		/// <summary>
 		/// 构建模式

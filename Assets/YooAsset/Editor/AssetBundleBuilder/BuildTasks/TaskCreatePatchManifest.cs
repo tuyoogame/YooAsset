@@ -35,7 +35,7 @@ namespace YooAsset.Editor
 			patchManifest.AssetList = GetAllPatchAsset(buildParameters, buildMapContext, patchManifest);
 
 			// 更新Unity内置资源包的引用关系
-			if (buildParameters.Parameters.BuildPipeline == EBuildPipeline.ScriptBuildPipeline)
+			if (buildParameters.Parameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
 				var buildResultContext = context.GetContextObject<TaskBuilding_SBP.SBPBuildResultContext>();
 				UpdateBuiltInBundleReference(patchManifest, buildResultContext.Results);

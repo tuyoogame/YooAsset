@@ -192,7 +192,7 @@ namespace YooAsset.Editor
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.CompressOption = AssetBundleBuilderSettingData.Setting.CompressOption;
 
-			if (AssetBundleBuilderSettingData.Setting.BuildPipeline == EBuildPipeline.ScriptBuildPipeline)
+			if (AssetBundleBuilderSettingData.Setting.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
 				buildParameters.SBPParameters = new BuildParameters.SBPBuildParameters();
 				buildParameters.SBPParameters.WriteLinkXML = true;

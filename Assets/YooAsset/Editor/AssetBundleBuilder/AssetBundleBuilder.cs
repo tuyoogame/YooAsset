@@ -23,7 +23,7 @@ namespace YooAsset.Editor
 			{
 				throw new Exception($"{nameof(buildParameters)} is null !");
 			}
-			if (buildParameters.BuildPipeline == EBuildPipeline.ScriptBuildPipeline)
+			if (buildParameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
 				if (buildParameters.SBPParameters == null)
 					throw new Exception($"{nameof(BuildParameters.SBPParameters)} is null !");
@@ -41,7 +41,7 @@ namespace YooAsset.Editor
 
 			// 创建构建节点
 			List<IBuildTask> pipeline;
-			if (buildParameters.BuildPipeline == EBuildPipeline.BuiltInBuildPipeline)
+			if (buildParameters.BuildPipeline == EBuildPipeline.BuiltinBuildPipeline)
 			{
 				pipeline = new List<IBuildTask>
 				{
@@ -56,7 +56,7 @@ namespace YooAsset.Editor
 					new TaskCopyBuildinFiles(), //拷贝内置文件
 				};
 			}
-			else if (buildParameters.BuildPipeline == EBuildPipeline.ScriptBuildPipeline)
+			else if (buildParameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
 				pipeline = new List<IBuildTask>
 				{

@@ -9,11 +9,11 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 传统内置构建管线
 		/// </summary>
-		BuiltInBuildPipeline,
+		BuiltinBuildPipeline,
 		
 		/// <summary>
 		/// 可编程构建管线
 		/// </summary>
-		ScriptBuildPipeline,
+		ScriptableBuildPipeline,
 	}
 }

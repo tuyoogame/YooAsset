@@ -54,7 +54,7 @@ namespace YooAsset.Editor
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
-			if (buildParameters.Parameters.BuildPipeline == EBuildPipeline.ScriptBuildPipeline)
+			if (buildParameters.Parameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
 				// 拷贝构建日志
 				{
