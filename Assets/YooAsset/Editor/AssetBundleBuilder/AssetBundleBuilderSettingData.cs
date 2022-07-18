@@ -20,6 +20,11 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
+		/// 配置数据是否被修改
+		/// </summary>
+		public static bool IsDirty { set; get; } = false;
+
+		/// <summary>
 		/// 加载配置文件
 		/// </summary>
 		private static void LoadSettingData()
@@ -34,6 +39,7 @@ namespace YooAsset.Editor
 		{
 			if (Setting != null)
 			{
+				IsDirty = false;
 				EditorUtility.SetDirty(Setting);
 				AssetDatabase.SaveAssets();
 				Debug.Log($"{nameof(AssetBundleBuilderSetting)}.asset is saved!");
