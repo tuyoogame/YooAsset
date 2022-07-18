@@ -85,6 +85,7 @@ namespace YooAsset.Editor
 			_items.Add(new ItemWrapper(string.Empty, string.Empty));
 			_items.Add(new ItemWrapper("构建结果", string.Empty));
 			_items.Add(new ItemWrapper("构建文件总数", $"{buildReport.Summary.AssetFileTotalCount}"));
+			_items.Add(new ItemWrapper("主资源总数", $"{buildReport.Summary.MainAssetTotalCount}"));
 			_items.Add(new ItemWrapper("资源包总数", $"{buildReport.Summary.AllBundleTotalCount}"));
 			_items.Add(new ItemWrapper("资源包总大小", ConvertSize(buildReport.Summary.AllBundleTotalSize)));
 			_items.Add(new ItemWrapper("内置资源包总数", $"{buildReport.Summary.BuildinBundleTotalCount}"));

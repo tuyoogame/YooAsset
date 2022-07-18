@@ -90,6 +90,7 @@ namespace YooAsset.Editor
 
 		// 构建结果
 		public int AssetFileTotalCount;
+		public int MainAssetTotalCount;
 		public int AllBundleTotalCount;
 		public long AllBundleTotalSize;
 		public int BuildinBundleTotalCount;

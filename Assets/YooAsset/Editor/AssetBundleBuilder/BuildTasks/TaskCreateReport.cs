@@ -61,6 +61,7 @@ namespace YooAsset.Editor
 
 				// 构建结果
 				buildReport.Summary.AssetFileTotalCount = buildMapContext.AssetFileCount;
+				buildReport.Summary.MainAssetTotalCount = GetMainAssetCount(patchManifest);
 				buildReport.Summary.AllBundleTotalCount = GetAllBundleCount(patchManifest);
 				buildReport.Summary.AllBundleTotalSize = GetAllBundleSize(patchManifest);
 				buildReport.Summary.BuildinBundleTotalCount = GetBuildinBundleCount(patchManifest);
@@ -159,6 +160,10 @@ namespace YooAsset.Editor
 			return result;
 		}
 
+		private int GetMainAssetCount(PatchManifest patchManifest)
+		{
+			return patchManifest.AssetList.Count;
+		}
 		private int GetAllBundleCount(PatchManifest patchManifest)
 		{
 			return patchManifest.BundleList.Count;
