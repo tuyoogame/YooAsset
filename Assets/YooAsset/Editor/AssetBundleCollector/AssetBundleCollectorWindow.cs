@@ -18,6 +18,7 @@ namespace YooAsset.Editor
 			window.minSize = new Vector2(800, 600);
 		}
 
+		private Button _saveButton;
 		private List<string> _collectorTypeList;
 		private List<string> _activeRuleList;
 		private List<string> _addressRuleList;
@@ -68,6 +69,10 @@ namespace YooAsset.Editor
 				exportBtn.clicked += ExportBtn_clicked;
 				var importBtn = root.Q<Button>("ImportButton");
 				importBtn.clicked += ImportBtn_clicked;
+
+				// 配置保存按钮
+				_saveButton = root.Q<Button>("SaveButton");
+				_saveButton.clicked += SaveBtn_clicked;
 
 				// 公共设置相关
 				_enableAddressableToogle = root.Q<Toggle>("EnableAddressable");
@@ -193,6 +198,22 @@ namespace YooAsset.Editor
 			if (AssetBundleCollectorSettingData.IsDirty)
 				AssetBundleCollectorSettingData.SaveFile();
 		}
+		public void Update()
+		{
+			if (_saveButton != null)
+			{
+				if (AssetBundleCollectorSettingData.IsDirty)
+				{
+					if (_saveButton.enabledSelf == false)
+						_saveButton.SetEnabled(true);
+				}
+				else
+				{
+					if (_saveButton.enabledSelf)
+						_saveButton.SetEnabled(false);
+				}
+			}
+		}
 
 		private void RefreshWindow()
 		{
@@ -220,6 +241,10 @@ namespace YooAsset.Editor
 				AssetBundleCollectorConfig.ImportXmlConfig(resultPath);
 				RefreshWindow();
 			}
+		}
+		private void SaveBtn_clicked()
+		{
+			AssetBundleCollectorSettingData.SaveFile();
 		}
 
 		// 分组列表相关
