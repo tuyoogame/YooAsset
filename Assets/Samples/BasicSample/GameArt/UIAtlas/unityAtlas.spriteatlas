@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: unityAtlas
+  serializedVersion: 2
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 29f27e4abf667c04b88a3996d8cdadfc, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 145b173105dad2d44a8c243a25f27147, type: 3}
+  - {fileID: 21300000, guid: e7478af3e19f2754186cf50b9fcc82aa, type: 3}
+  - {fileID: 21300000, guid: 9a4febb4946416146b75846aeffdee1a, type: 3}
+  - {fileID: 21300000, guid: 5cfcf3596b4cccc4f93e702d4336b816, type: 3}
+  - {fileID: 21300000, guid: 3ef466bedc075214ab47aa3289123438, type: 3}
+  - {fileID: 21300000, guid: 04285c1f1c3943b4c81187f40a31622d, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Icon_Arrows_128
+  - Icon_Shield_128
+  - Icon_Leafs_128
+  - Icon_Sword_128
+  - Icon_Fireball_128
+  - Icon_Deathkiss_128
+  m_RenderDataMap: {}
+  m_Tag: unityAtlas
+  m_IsVariant: 0
+  m_IsPlaceholder: 0

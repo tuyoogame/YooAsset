@@ -1,0 +1,19 @@
+{
+    "name": "YooAsset.EditorExtension",
+    "rootNamespace": "",
+    "references": [
+        "YooAsset",
+        "YooAsset.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
