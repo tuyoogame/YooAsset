@@ -190,13 +190,21 @@ namespace YooAsset.Editor
 				return false;
 			}
 
+			// 忽略文件夹
 			if (AssetDatabase.IsValidFolder(assetPath))
 				return false;
 
-			// 注意：忽略编辑器下的类型资源
+			// 忽略编辑器下的类型资源
 			Type type = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
 			if (type == typeof(LightingDataAsset))
 				return false;
+
+			// 忽略Unity无法识别的无效文件
+			if (type == typeof(UnityEditor.DefaultAsset))
+			{
+				UnityEngine.Debug.LogWarning($"Cannot pack default asset : {assetPath}");
+				return false;
+			}
 
 			string ext = System.IO.Path.GetExtension(assetPath);
 			if (ext == "" || ext == ".dll" || ext == ".cs" || ext == ".js" || ext == ".boo" || ext == ".meta" || ext == ".cginc")
