@@ -64,38 +64,14 @@ namespace YooAsset.Editor
 					if (expectBuildinAssetPaths.Length != allBuildinAssetPaths.Length)
 					{
 						Debug.LogWarning($"构建的Bundle文件内的资源对象数量和预期不匹配 : {buildedBundle}");
+						var intersectAssetList = expectBuildinAssetPaths.Except(allBuildinAssetPaths).ToList();
+						foreach (var intersectAssset in intersectAssetList)
+						{
+							Debug.LogWarning($"构建失败的资源对象路径为 : {intersectAssset}");
+						}
 						isPass = false;
 						continue;
 					}
-
-					foreach (var buildinAssetPath in allBuildinAssetPaths)
-					{
-						var guid = AssetDatabase.AssetPathToGUID(buildinAssetPath);
-						if (string.IsNullOrEmpty(guid))
-						{
-							Debug.LogWarning($"无效的资源路径，请检查路径是否带有特殊符号或中文：{buildinAssetPath}");
-							isPass = false;
-							continue;
-						}
-
-						bool isMatch = false;
-						foreach (var exceptBuildAssetPath in expectBuildinAssetPaths)
-						{
-							var guidExcept = AssetDatabase.AssetPathToGUID(exceptBuildAssetPath);
-							if (guid == guidExcept)
-							{
-								isMatch = true;
-								break;
-							}
-						}
-						if (isMatch == false)
-						{
-							Debug.LogWarning($"在构建的Bundle文件里发现了没有匹配的资源对象：{buildinAssetPath}");
-							isPass = false;
-							continue;
-						}
-					}
-
 					EditorTools.DisplayProgressBar("验证构建结果", ++progressValue, buildedBundles.Length);
 				}
 				EditorTools.ClearProgressBar();

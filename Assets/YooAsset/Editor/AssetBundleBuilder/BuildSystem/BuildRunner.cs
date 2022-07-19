@@ -28,7 +28,7 @@ namespace YooAsset.Editor
 				try
 				{
 					var taskAttribute = task.GetType().GetCustomAttribute<TaskAttribute>();
-					Log($"---------------------------------------->{taskAttribute.Desc}");
+					Log($"---------------------------------------->{taskAttribute.Desc}<---------------------------------------");
 					task.Run(context);
 				}
 				catch (Exception e)
