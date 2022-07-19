@@ -73,8 +73,6 @@ QQ群：**963240451**
 [代码贡献](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeStyle.md)
 
 ## 友情链接
-
-[huatuo](https://github.com/focus-creative-games/huatuo)：华佗是一个特性完整、零成本、高性能、低内存的近乎完美的c#热更新方案。
-
-[YooAssetEx](https://gitee.com/liu_zhongxiu/yoo-asset-ex/tree/master)： YooAsset Odin扩展工具，用于支持Unity2017和Unity2018版本。
+[ET Framework](https://github.com/wqaetly/ET/tree/et7_fgui_yooasset_luban_huatuo): ET 7.0 + FGUI + luban + huatuo + YooAsset + NKGMoba + UniTask，并提供常用的编辑器工具。  
+[YooAssetEx](https://gitee.com/liu_zhongxiu/yoo-asset-ex/tree/master): YooAsset Odin扩展工具，用于支持Unity2017和Unity2018版本。
 
