@@ -104,6 +104,8 @@ public class GameEncryption : IEncryptionServices
 
 如果需要自动化构建，可以参考如下代码范例：
 
+使用内置构建管线来构建资源包。
+
 ````c#
 private static void BuildInternal(BuildTarget buildTarget)
 {
@@ -114,9 +116,10 @@ private static void BuildInternal(BuildTarget buildTarget)
 
     // 构建参数
     string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
-    AssetBundleBuilder.BuildParameters buildParameters = new AssetBundleBuilder.BuildParameters();
+    BuildParameters buildParameters = new BuildParameters();
     buildParameters.OutputRoot = defaultOutputRoot;
     buildParameters.BuildTarget = buildTarget;
+    buildParameters.BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;
     buildParameters.BuildMode = EBuildMode.ForceRebuild;
     buildParameters.BuildVersion = buildVersion;
     buildParameters.BuildinTags = "buildin";
@@ -126,10 +129,11 @@ private static void BuildInternal(BuildTarget buildTarget)
     buildParameters.CopyBuildinTagFiles = true;
     buildParameters.EncryptionServices = new GameEncryption();
     buildParameters.CompressOption = ECompressOption.LZ4;
-
+    
     // 执行构建
     AssetBundleBuilder builder = new AssetBundleBuilder();
-    builder.Run(buildParameters);
+    bool succeed = builder.Run(buildParameters);
+    Debug.Log($"构建结果:{succeed}");
 }
 
 // 从构建命令里获取参数

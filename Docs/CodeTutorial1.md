@@ -68,8 +68,8 @@ private IEnumerator InitializeYooAsset()
     initParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
     initParameters.DecryptionServices = null;
     initParameters.ClearCacheWhenDirty = false;
-    initParameters.DefaultHostServer = "http://127.0.0.1/CDN1/Android";
-    initParameters.FallbackHostServer = "http://127.0.0.1/CDN2/Android";
+    initParameters.DefaultHostServer = "http://127.0.0.1/CDN1/Android/v1.0";
+    initParameters.FallbackHostServer = "http://127.0.0.1/CDN2/Android/v1.0";
     initParameters.VerifyLevel = EVerifyLevel.High;
     yield return YooAssets.InitializeAsync(initParameters);
 }
@@ -80,7 +80,7 @@ private IEnumerator InitializeYooAsset()
 ````c#
 public class BundleDecryption : IDecryptionServices
 {
-    public ulong GetFileOffset()
+    public ulong GetFileOffset(DecryptionFileInfo fileInfo)
     {
         return 32;
     }
