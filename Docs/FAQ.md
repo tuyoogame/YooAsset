@@ -13,12 +13,6 @@ windows平台添加命令: **-force-gles**
 3. 删除Library/ScriptAssemblies文件夹。
 4. 重新打开游戏工程，然后点击某个脚本重新编译。
 
-#### 问题：无效的资源路径，请检查路径是否带有特殊符号或中文：Assets/xxx/xxx/xxx
+#### 问题：UnityEditor.Build.Pipeline引用丢失问题
 
-如果检查报错的文件路径内无特殊符合和中文字符，也可能是文件路径过长且文件名称带空格，在打包生成的manifest文件里文件路径被截断导致验证失败。
-
-例如：Assets/My Game Res/JMO Assets/Cartoon FX Remaster/CFXR Assets/Shaders/CFXR Particle Glow.shader
-
-解决方案1：缩短文件路径长度。
-
-解决方案2：移除文件名称里的空格。
+YooAsset依赖于ScriptBuildPipeline（SBP），在PackageManager里找到SBP插件安装就可以了。
