@@ -19,9 +19,9 @@ namespace YooAsset
 		}
 		public override void Update()
 		{
-			if (IsDone)
-				return;
-
+		}
+		public void SetCompleted()
+		{
 			if (Status == EStatus.None)
 			{
 				Status = EStatus.Fail;
