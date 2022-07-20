@@ -130,14 +130,14 @@ namespace YooAsset
 			if (IsDone() == false)
 				return;
 
-			// 注意：必须等待所有Provider可以销毁的时候，才可以释放Bundle文件。
+			// 条件1：必须等待所有Provider可以销毁
 			foreach (var provider in _providers)
 			{
 				if (provider.CanDestroy() == false)
 					return;
 			}
 
-			// 除了自己没有其它引用
+			// 条件2：除了自己没有其它引用
 			if (RefCount > _providers.Count)
 				return;
 

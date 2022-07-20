@@ -11,7 +11,8 @@ namespace YooAsset
 		private static readonly List<AssetBundleLoaderBase> _loaders = new List<AssetBundleLoaderBase>(1000);
 		private static readonly List<ProviderBase> _providers = new List<ProviderBase>(1000);
 		private static readonly Dictionary<string, SceneOperationHandle> _sceneHandles = new Dictionary<string, SceneOperationHandle>(100);
-		
+		private static long _sceneCreateCount = 0;
+
 		private static bool _simulationOnEditor;
 		private static int _loadingMaxNumber;
 		public static IDecryptionServices DecryptionServices { private set; get; }
@@ -144,24 +145,20 @@ namespace YooAsset
 				return completedProvider.CreateHandle<SceneOperationHandle>();
 			}
 
-			// 注意：场景句柄永远保持唯一
-			string providerGUID = assetInfo.ProviderGUID;
-			if (_sceneHandles.ContainsKey(providerGUID))
-				return _sceneHandles[providerGUID];
-
 			// 如果加载的是主场景，则卸载所有缓存的场景
 			if (sceneMode == LoadSceneMode.Single)
 			{
 				UnloadAllScene();
 			}
 
-			ProviderBase provider = TryGetProvider(providerGUID);
-			if (provider == null)
+			// 注意：同一个场景的ProviderGUID每次加载都会变化
+			string providerGUID = $"{assetInfo.GUID}-{++_sceneCreateCount}";
+			ProviderBase provider;
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseSceneProvider(assetInfo, sceneMode, activateOnLoad, priority);
+					provider = new DatabaseSceneProvider(providerGUID, assetInfo, sceneMode, activateOnLoad, priority);
 				else
-					provider = new BundledSceneProvider(assetInfo, sceneMode, activateOnLoad, priority);
+					provider = new BundledSceneProvider(providerGUID, assetInfo, sceneMode, activateOnLoad, priority);
 				provider.InitSpawnDebugInfo();
 				_providers.Add(provider);
 			}
@@ -183,13 +180,14 @@ namespace YooAsset
 				return completedProvider.CreateHandle<AssetOperationHandle>();
 			}
 
-			ProviderBase provider = TryGetProvider(assetInfo.ProviderGUID);
+			string providerGUID = assetInfo.GUID;
+			ProviderBase provider = TryGetProvider(providerGUID);
 			if (provider == null)
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseAssetProvider(assetInfo);
+					provider = new DatabaseAssetProvider(providerGUID, assetInfo);
 				else
-					provider = new BundledAssetProvider(assetInfo);
+					provider = new BundledAssetProvider(providerGUID, assetInfo);
 				provider.InitSpawnDebugInfo();
 				_providers.Add(provider);
 			}
@@ -208,13 +206,14 @@ namespace YooAsset
 				return completedProvider.CreateHandle<SubAssetsOperationHandle>();
 			}
 
-			ProviderBase provider = TryGetProvider(assetInfo.ProviderGUID);
+			string providerGUID = assetInfo.GUID;
+			ProviderBase provider = TryGetProvider(providerGUID);
 			if (provider == null)
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseSubAssetsProvider(assetInfo);
+					provider = new DatabaseSubAssetsProvider(providerGUID, assetInfo);
 				else
-					provider = new BundledSubAssetsProvider(assetInfo);
+					provider = new BundledSubAssetsProvider(providerGUID, assetInfo);
 				provider.InitSpawnDebugInfo();
 				_providers.Add(provider);
 			}
@@ -223,7 +222,7 @@ namespace YooAsset
 
 		internal static void UnloadSubScene(ProviderBase provider)
 		{
-			string providerGUID = provider.MainAssetInfo.ProviderGUID;
+			string providerGUID = provider.ProviderGUID;
 			if (_sceneHandles.ContainsKey(providerGUID) == false)
 				throw new Exception("Should never get here !");
 
@@ -233,12 +232,6 @@ namespace YooAsset
 
 			// 卸载未被使用的资源（包括场景）
 			AssetSystem.UnloadUnusedAssets();
-
-			// 检验子场景是否销毁
-			if (provider.IsDestroyed == false)
-			{
-				throw new Exception("Should never get here !");
-			}
 		}
 		internal static void UnloadAllScene()
 		{
@@ -251,16 +244,6 @@ namespace YooAsset
 
 			// 卸载未被使用的资源（包括场景）
 			AssetSystem.UnloadUnusedAssets();
-
-			// 检验所有场景是否销毁
-			foreach (var provider in _providers)
-			{
-				if (provider.IsSceneProvider())
-				{
-					if (provider.IsDestroyed == false)
-						throw new Exception("Should never get here !");
-				}
-			}
 		}
 
 		internal static AssetBundleLoaderBase CreateOwnerAssetBundleLoader(AssetInfo assetInfo)
@@ -324,7 +307,7 @@ namespace YooAsset
 			for (int i = 0; i < _providers.Count; i++)
 			{
 				ProviderBase temp = _providers[i];
-				if (temp.MainAssetInfo.ProviderGUID.Equals(providerGUID))
+				if (temp.ProviderGUID.Equals(providerGUID))
 				{
 					provider = temp;
 					break;

@@ -19,7 +19,7 @@ namespace YooAsset
 			}
 		}
 
-		public DatabaseSceneProvider(AssetInfo assetInfo, LoadSceneMode sceneMode, bool activateOnLoad, int priority) : base(assetInfo)
+		public DatabaseSceneProvider(string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool activateOnLoad, int priority) : base(providerGUID, assetInfo)
 		{
 			SceneMode = sceneMode;
 			_activateOnLoad = activateOnLoad;
