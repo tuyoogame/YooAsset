@@ -42,23 +42,23 @@ namespace YooAsset.Editor
 			if (buildMode == EBuildMode.IncrementalBuild)
 			{
 				// 检测历史版本是否存在
-				if (AssetBundleBuilderHelper.HasAnyPackageVersion(buildParameters.Parameters.BuildTarget, buildParameters.Parameters.OutputRoot) == false)
-					throw new Exception("没有发现任何历史版本，请尝试强制重建");
+				if (AssetBundleBuilderHelper.HasAnyPackageVersion(buildParameters.Parameters.BuildTarget, buildParameters.Parameters.OutputRoot))
+				{
+					// 检测构建版本是否合法
+					int maxPackageVersion = AssetBundleBuilderHelper.GetMaxPackageVersion(buildParameters.Parameters.BuildTarget, buildParameters.Parameters.OutputRoot);
+					if (buildParameters.Parameters.BuildVersion <= maxPackageVersion)
+						throw new Exception("构建版本不能小于历史版本");
 
-				// 检测构建版本是否合法
-				int maxPackageVersion = AssetBundleBuilderHelper.GetMaxPackageVersion(buildParameters.Parameters.BuildTarget, buildParameters.Parameters.OutputRoot);
-				if (buildParameters.Parameters.BuildVersion <= maxPackageVersion)
-					throw new Exception("构建版本不能小于历史版本");
+					// 检测补丁包是否已经存在
+					string packageDirectory = buildParameters.GetPackageDirectory();
+					if (Directory.Exists(packageDirectory))
+						throw new Exception($"补丁包已经存在：{packageDirectory}");
 
-				// 检测补丁包是否已经存在
-				string packageDirectory = buildParameters.GetPackageDirectory();
-				if (Directory.Exists(packageDirectory))
-					throw new Exception($"补丁包已经存在：{packageDirectory}");
-
-				// 检测内置资源分类标签是否一致
-				var oldPatchManifest = AssetBundleBuilderHelper.GetOldPatchManifest(buildParameters.PipelineOutputDirectory);
-				if (buildParameters.Parameters.BuildinTags != oldPatchManifest.BuildinTags)
-					throw new Exception($"增量更新时内置资源标签必须一致：{buildParameters.Parameters.BuildinTags} != {oldPatchManifest.BuildinTags}");
+					// 检测内置资源分类标签是否一致
+					var oldPatchManifest = AssetBundleBuilderHelper.GetOldPatchManifest(buildParameters.PipelineOutputDirectory);
+					if (buildParameters.Parameters.BuildinTags != oldPatchManifest.BuildinTags)
+						throw new Exception($"增量更新时内置资源标签必须一致：{buildParameters.Parameters.BuildinTags} != {oldPatchManifest.BuildinTags}");
+				}
 			}
 
 			// 如果是强制重建
