@@ -18,6 +18,16 @@ namespace YooAsset.Editor
 			/// 生成代码防裁剪配置
 			/// </summary>
 			public bool WriteLinkXML = true;
+
+			/// <summary>
+			/// 缓存服务器地址
+			/// </summary>
+			public string CacheServerHost;
+
+			/// <summary>
+			/// 缓存服务器端口
+			/// </summary>
+			public int CacheServerPort;
 		}
 
 		/// <summary>

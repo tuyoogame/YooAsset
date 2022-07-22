@@ -100,11 +100,19 @@ namespace YooAsset.Editor
 			else
 				throw new System.NotImplementedException(Parameters.CompressOption.ToString());
 
-			if (Parameters.BuildMode == EBuildMode.ForceRebuild)
-				buildParams.UseCache = false;
 			if (Parameters.DisableWriteTypeTree)
 				buildParams.ContentBuildFlags |= UnityEditor.Build.Content.ContentBuildFlags.DisableWriteTypeTree;
 
+			if(Parameters.BuildMode == EBuildMode.ForceRebuild)
+			{
+				buildParams.UseCache = false;
+			}
+			else
+			{
+				buildParams.UseCache = true;
+				buildParams.CacheServerHost = Parameters.SBPParameters.CacheServerHost;
+				buildParams.CacheServerPort = Parameters.SBPParameters.CacheServerPort;
+			}
 			buildParams.WriteLinkXML = Parameters.SBPParameters.WriteLinkXML;
 
 			return buildParams;
