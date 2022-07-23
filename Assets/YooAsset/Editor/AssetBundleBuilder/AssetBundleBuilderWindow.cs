@@ -30,7 +30,7 @@ namespace YooAsset.Editor
 		private TextField _buildinTagsField;
 		private PopupField<string> _encryptionField;
 		private EnumField _compressionField;
-		private Toggle _appendExtensionToggle;
+		private EnumField _outputNameStyleField;
 
 		public void CreateGUI()
 		{
@@ -76,7 +76,7 @@ namespace YooAsset.Editor
 				_buildPipelineField = root.Q<EnumField>("BuildPipeline");
 				_buildPipelineField.Init(AssetBundleBuilderSettingData.Setting.BuildPipeline);
 				_buildPipelineField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.BuildPipeline);
-				_buildPipelineField.style.width = 300;
+				_buildPipelineField.style.width = 350;
 				_buildPipelineField.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleBuilderSettingData.IsDirty = true;
@@ -88,7 +88,7 @@ namespace YooAsset.Editor
 				_buildModeField = root.Q<EnumField>("BuildMode");
 				_buildModeField.Init(AssetBundleBuilderSettingData.Setting.BuildMode);
 				_buildModeField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.BuildMode);
-				_buildModeField.style.width = 300;
+				_buildModeField.style.width = 350;
 				_buildModeField.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleBuilderSettingData.IsDirty = true;
@@ -112,7 +112,7 @@ namespace YooAsset.Editor
 					int defaultIndex = GetEncryptionDefaultIndex(AssetBundleBuilderSettingData.Setting.EncyptionClassName);
 					_encryptionField = new PopupField<string>(_encryptionServicesClassNames, defaultIndex);
 					_encryptionField.label = "Encryption";
-					_encryptionField.style.width = 300;
+					_encryptionField.style.width = 350;
 					_encryptionField.RegisterValueChangedCallback(evt =>
 					{
 						AssetBundleBuilderSettingData.IsDirty = true;
@@ -124,7 +124,7 @@ namespace YooAsset.Editor
 				{
 					_encryptionField = new PopupField<string>();
 					_encryptionField.label = "Encryption";
-					_encryptionField.style.width = 300;
+					_encryptionField.style.width = 350;
 					encryptionContainer.Add(_encryptionField);
 				}
 
@@ -132,20 +132,22 @@ namespace YooAsset.Editor
 				_compressionField = root.Q<EnumField>("Compression");
 				_compressionField.Init(AssetBundleBuilderSettingData.Setting.CompressOption);
 				_compressionField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.CompressOption);
-				_compressionField.style.width = 300;
+				_compressionField.style.width = 350;
 				_compressionField.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleBuilderSettingData.IsDirty = true;
 					AssetBundleBuilderSettingData.Setting.CompressOption = (ECompressOption)_compressionField.value;
 				});
 
-				// 附加后缀格式
-				_appendExtensionToggle = root.Q<Toggle>("AppendExtension");
-				_appendExtensionToggle.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.AppendExtension);
-				_appendExtensionToggle.RegisterValueChangedCallback(evt =>
+				// 输出文件名称样式
+				_outputNameStyleField = root.Q<EnumField>("OutputNameStyle");
+				_outputNameStyleField.Init(AssetBundleBuilderSettingData.Setting.OutputNameStyle);
+				_outputNameStyleField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.OutputNameStyle);
+				_outputNameStyleField.style.width = 350;
+				_outputNameStyleField.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleBuilderSettingData.IsDirty = true;
-					AssetBundleBuilderSettingData.Setting.AppendExtension = _appendExtensionToggle.value;
+					AssetBundleBuilderSettingData.Setting.OutputNameStyle = (EOutputNameStyle)_outputNameStyleField.value;
 				});
 
 				// 构建按钮
@@ -188,7 +190,7 @@ namespace YooAsset.Editor
 			_buildinTagsField.SetEnabled(enableElement);
 			_encryptionField.SetEnabled(enableElement);
 			_compressionField.SetEnabled(enableElement);
-			_appendExtensionToggle.SetEnabled(enableElement);
+			_outputNameStyleField.SetEnabled(enableElement);
 		}
 		private void SaveBtn_clicked()
 		{
@@ -223,10 +225,10 @@ namespace YooAsset.Editor
 			buildParameters.BuildinTags = AssetBundleBuilderSettingData.Setting.BuildTags;
 			buildParameters.VerifyBuildingResult = true;
 			buildParameters.EnableAddressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
-			buildParameters.AppendFileExtension = AssetBundleBuilderSettingData.Setting.AppendExtension;
 			buildParameters.CopyBuildinTagFiles = AssetBundleBuilderSettingData.Setting.BuildMode == EBuildMode.ForceRebuild;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.CompressOption = AssetBundleBuilderSettingData.Setting.CompressOption;
+			buildParameters.OutputNameStyle = AssetBundleBuilderSettingData.Setting.OutputNameStyle;
 
 			if (AssetBundleBuilderSettingData.Setting.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{

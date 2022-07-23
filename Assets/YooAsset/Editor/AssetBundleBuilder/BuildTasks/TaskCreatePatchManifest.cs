@@ -69,6 +69,7 @@ namespace YooAsset.Editor
 
 			List<string> buildinTags = buildParameters.Parameters.GetBuildinTags();
 			var buildMode = buildParameters.Parameters.BuildMode;
+			var outputNameStype = buildParameters.Parameters.OutputNameStyle;
 			bool standardBuild = buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild;
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
@@ -82,13 +83,8 @@ namespace YooAsset.Editor
 				bool isBuildin = IsBuildinBundle(tags, buildinTags);
 				bool isRawFile = bundleInfo.IsRawFile;
 
-				// 附加文件扩展名
-				if (buildParameters.Parameters.AppendFileExtension)
-				{
-					hash += bundleInfo.GetAppendExtension();
-				}
-
-				PatchBundle patchBundle = new PatchBundle(bundleName, hash, crc32, size, tags);
+				string fileName = GetFileOutputName(outputNameStype, hash, bundleInfo);
+				PatchBundle patchBundle = new PatchBundle(bundleName, fileName, crc32, size, tags);
 				patchBundle.SetFlagsValue(isEncrypted, isBuildin, isRawFile);
 				result.Add(patchBundle);
 			}
@@ -107,6 +103,37 @@ namespace YooAsset.Editor
 					return true;
 			}
 			return false;
+		}
+		private string GetFileOutputName(EOutputNameStyle outputNameStyle, string hash, BuildBundleInfo bundleInfo)
+		{
+			string fileName;
+			var bundleName = bundleInfo.BundleName;
+			if (outputNameStyle == EOutputNameStyle.HashName)
+			{
+				fileName = hash;
+			}
+			else if (outputNameStyle == EOutputNameStyle.HashName_Extension)
+			{
+				string tempFileExtension = bundleInfo.GetAppendExtension();
+				fileName = $"{hash}{tempFileExtension}";
+			}
+			else if (outputNameStyle == EOutputNameStyle.BundleName_HashName)
+			{
+				string tempFileExtension = bundleInfo.GetAppendExtension();
+				string tempBundleName = bundleName.Replace('/', '_').Replace(tempFileExtension, "");
+				fileName = $"{tempBundleName}_{hash}";
+			}
+			else if (outputNameStyle == EOutputNameStyle.BundleName_HashName_Extension)
+			{
+				string tempFileExtension = bundleInfo.GetAppendExtension();
+				string tempBundleName = bundleName.Replace('/', '_').Replace(tempFileExtension, "");
+				fileName = $"{tempBundleName}_{hash}{tempFileExtension}";
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+			return fileName;
 		}
 		private string GetFileHash(string filePath, bool standardBuild)
 		{

@@ -77,12 +77,7 @@ namespace YooAsset.Editor
 		/// 启用可寻址资源定位
 		/// </summary>
 		public bool EnableAddressable = false;
-
-		/// <summary>
-		/// 追加文件扩展名
-		/// </summary>
-		public bool AppendFileExtension = false;
-
+		
 		/// <summary>
 		/// 拷贝内置资源文件到StreamingAssets目录（首包资源文件）
 		/// </summary>
@@ -93,6 +88,11 @@ namespace YooAsset.Editor
 		/// 加密类
 		/// </summary>
 		public IEncryptionServices EncryptionServices = null;
+
+		/// <summary>
+		/// 补丁文件名称的样式
+		/// </summary>
+		public EOutputNameStyle OutputNameStyle = EOutputNameStyle.HashName;
 
 		/// <summary>
 		/// 压缩选项

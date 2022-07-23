@@ -31,13 +31,13 @@ namespace YooAsset.Editor
 		public ECompressOption CompressOption = ECompressOption.LZ4;
 
 		/// <summary>
+		/// 输出文件名称样式
+		/// </summary>
+		public EOutputNameStyle OutputNameStyle = EOutputNameStyle.HashName;
+
+		/// <summary>
 		/// 加密类名称
 		/// </summary>
 		public string EncyptionClassName = string.Empty;
-
-		/// <summary>
-		/// 附加后缀格式
-		/// </summary>
-		public bool AppendExtension = false;
 	}
 }

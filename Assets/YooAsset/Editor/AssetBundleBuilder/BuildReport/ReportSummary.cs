@@ -59,11 +59,6 @@ namespace YooAsset.Editor
 		public bool EnableAddressable;
 
 		/// <summary>
-		/// 追加文件扩展名
-		/// </summary>
-		public bool AppendFileExtension;
-
-		/// <summary>
 		/// 拷贝内置资源文件
 		/// </summary>
 		public bool CopyBuildinTagFiles;
@@ -84,6 +79,7 @@ namespace YooAsset.Editor
 		public string EncryptionServicesClassName;
 
 		// 构建参数
+		public EOutputNameStyle OutputNameStyle;
 		public ECompressOption CompressOption;
 		public bool DisableWriteTypeTree;
 		public bool IgnoreTypeTreeChanges;
