@@ -88,7 +88,7 @@ namespace YooAsset
 
 			// 创建新的下载器	
 			{
-				YooLogger.Log($"Beginning to download file : {bundleInfo.BundleName} URL : {bundleInfo.RemoteMainURL}");
+				YooLogger.Log($"Beginning to download file : {bundleInfo.FileName} URL : {bundleInfo.RemoteMainURL}");
 				FileUtility.CreateFileDirectory(bundleInfo.GetCacheLoadPath());
 				DownloaderBase newDownloader;
 				if (bundleInfo.SizeBytes >= _breakpointResumeFileSize)
@@ -117,16 +117,16 @@ namespace YooAsset
 		{
 			if (_cachedHashList.ContainsKey(hash))
 			{
-				string filePath = SandboxHelper.MakeCacheFilePath(hash);
+				string fileName = _cachedHashList[hash];
+				string filePath = SandboxHelper.MakeCacheFilePath(fileName);
 				if (File.Exists(filePath))
 				{
 					return true;
 				}
 				else
 				{
-					string bundleName = _cachedHashList[hash];
 					_cachedHashList.Remove(hash);
-					YooLogger.Error($"Cache file is missing : {bundleName} Hash : {hash}");
+					YooLogger.Error($"Cache file is missing : {fileName}");
 					return false;
 				}
 			}
@@ -139,12 +139,12 @@ namespace YooAsset
 		/// <summary>
 		/// 缓存验证过的文件
 		/// </summary>
-		public static void CacheVerifyFile(string hash, string bundleName)
+		public static void CacheVerifyFile(string hash, string fileName)
 		{
 			if (_cachedHashList.ContainsKey(hash) == false)
 			{
-				YooLogger.Log($"Cache verify file : {bundleName} Hash : {hash}");
-				_cachedHashList.Add(hash, bundleName);
+				YooLogger.Log($"Cache verify file : {fileName}");
+				_cachedHashList.Add(hash, fileName);
 			}
 		}
 

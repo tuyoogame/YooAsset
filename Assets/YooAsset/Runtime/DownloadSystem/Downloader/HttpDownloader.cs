@@ -21,7 +21,7 @@ namespace YooAsset
 			private bool _running = true;
 			private string _url;
 			private string _savePath;
-			private string _fileHash;
+			private string _fileName;
 			private string _fileCRC;
 			private long _fileSize;
 			private int _timeout;
@@ -50,11 +50,11 @@ namespace YooAsset
 			/// <summary>
 			/// 开始下载
 			/// </summary>
-			public void Run(string url, string savePath, string fileHash, string fileCRC, long fileSize, int timeout)
+			public void Run(string url, string savePath, string fileName, string fileCRC, long fileSize, int timeout)
 			{
 				_url = url;
 				_savePath = savePath;
-				_fileHash = fileHash;
+				_fileName = fileName;
 				_fileCRC = fileCRC;
 				_fileSize = fileSize;
 				_timeout = timeout;
@@ -159,14 +159,14 @@ namespace YooAsset
 						bool verfiyResult = DownloadSystem.CheckContentIntegrity(_savePath, _fileSize, _fileCRC);
 						if (verfiyResult == false)
 						{
-							Error = $"Verify download content failed : {_fileHash}";
+							Error = $"Verify download content failed : {_fileName}";
 							if (File.Exists(_savePath))
 								File.Delete(_savePath);
 						}
 					}
 					else
 					{
-						Error = $"Download content is incomplete : {_fileHash}";
+						Error = $"Download content is incomplete : {_fileName}";
 					}
 
 					IsDone = true;
@@ -197,7 +197,7 @@ namespace YooAsset
 
 				_requestURL = GetRequestURL();
 				_threadDownloader = new ThreadDownloader();
-				_threadDownloader.Run(_requestURL, _bundleInfo.GetCacheLoadPath(), _bundleInfo.Hash, _bundleInfo.CRC, _bundleInfo.SizeBytes, _timeout);
+				_threadDownloader.Run(_requestURL, _bundleInfo.GetCacheLoadPath(), _bundleInfo.FileName, _bundleInfo.CRC, _bundleInfo.SizeBytes, _timeout);
 				_steps = ESteps.CheckDownload;
 			}
 
@@ -226,7 +226,7 @@ namespace YooAsset
 				}
 				else
 				{
-					DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.BundleName);
+					DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.FileName);
 					_steps = ESteps.Succeed;
 				}
 			}

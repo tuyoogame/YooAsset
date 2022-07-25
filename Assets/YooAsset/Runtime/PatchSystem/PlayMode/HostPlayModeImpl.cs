@@ -102,7 +102,7 @@ namespace YooAsset
 				bool used = false;
 				foreach (var patchBundle in LocalPatchManifest.BundleList)
 				{
-					if (fileInfo.Name == patchBundle.Hash)
+					if (fileInfo.Name == patchBundle.FileName)
 					{
 						used = true;
 						break;
@@ -333,9 +333,8 @@ namespace YooAsset
 		}
 		public BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
 		{
-			// 注意：资源版本号只用于确定下载路径
-			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.Hash);
-			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.Hash);
+			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.FileName);
+			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.FileName);
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, remoteMainURL, remoteFallbackURL);
 			return bundleInfo;
 		}
@@ -354,7 +353,7 @@ namespace YooAsset
 		public BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
 		{
 			// 注意：我们把流加载路径指定为远端下载地址
-			string streamingPath = PathHelper.MakeStreamingLoadPath(patchBundle.Hash);
+			string streamingPath = PathHelper.MakeStreamingLoadPath(patchBundle.FileName);
 			streamingPath = PathHelper.ConvertToWWWPath(streamingPath);
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, streamingPath, streamingPath);
 			return bundleInfo;

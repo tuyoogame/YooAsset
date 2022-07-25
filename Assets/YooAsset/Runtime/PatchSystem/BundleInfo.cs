@@ -24,6 +24,11 @@ namespace YooAsset
 		public string BundleName { private set; get; }
 
 		/// <summary>
+		/// 文件名称
+		/// </summary>
+		public string FileName { private set; get; }
+
+		/// <summary>
 		/// 远端下载地址
 		/// </summary>
 		public string RemoteMainURL { private set; get; }
@@ -51,7 +56,7 @@ namespace YooAsset
 					return _patchBundle.Hash;
 			}
 		}
-
+		
 		/// <summary>
 		/// 校验的CRC
 		/// </summary>
@@ -128,6 +133,7 @@ namespace YooAsset
 			_patchBundle = patchBundle;
 			LoadMode = loadMode;
 			BundleName = patchBundle.BundleName;
+			FileName = patchBundle.FileName;
 			RemoteMainURL = mainURL;
 			RemoteFallbackURL = fallbackURL;
 			EditorAssetPath = string.Empty;
@@ -137,6 +143,7 @@ namespace YooAsset
 			_patchBundle = patchBundle;
 			LoadMode = loadMode;
 			BundleName = patchBundle.BundleName;
+			FileName = patchBundle.FileName;
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
 			EditorAssetPath = editorAssetPath;
@@ -146,6 +153,7 @@ namespace YooAsset
 			_patchBundle = patchBundle;
 			LoadMode = loadMode;
 			BundleName = patchBundle.BundleName;
+			FileName = patchBundle.FileName;
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
 			EditorAssetPath = string.Empty;
@@ -160,7 +168,7 @@ namespace YooAsset
 				return string.Empty;
 
 			if (string.IsNullOrEmpty(_streamingPath))
-				_streamingPath = PathHelper.MakeStreamingLoadPath(_patchBundle.Hash);
+				_streamingPath = PathHelper.MakeStreamingLoadPath(_patchBundle.FileName);
 			return _streamingPath;
 		}
 
@@ -173,7 +181,7 @@ namespace YooAsset
 				return string.Empty;
 
 			if (string.IsNullOrEmpty(_cachePath))
-				_cachePath = SandboxHelper.MakeCacheFilePath(_patchBundle.Hash);
+				_cachePath = SandboxHelper.MakeCacheFilePath(_patchBundle.FileName);
 			return _cachePath;
 		}
 

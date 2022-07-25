@@ -61,8 +61,7 @@ namespace YooAsset
 			// 1. 从服务器或缓存中获取AssetBundle文件
 			if (_steps == ESteps.LoadFile)
 			{
-				string hash = StringUtility.RemoveExtension(MainBundleInfo.Hash);
-				_webRequest = UnityWebRequestAssetBundle.GetAssetBundle(_webURL, Hash128.Parse(hash));
+				_webRequest = UnityWebRequestAssetBundle.GetAssetBundle(_webURL, Hash128.Parse(MainBundleInfo.Hash));
 				_webRequest.SendWebRequest();
 				_steps = ESteps.CheckFile;
 			}

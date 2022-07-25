@@ -211,7 +211,7 @@ namespace YooAsset
 
 				// 注意：通过比对文件大小做快速的文件校验！
 				// 注意：在初始化的时候会去做最终校验！
-				string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
+				string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
 				if (File.Exists(filePath))
 				{
 					long fileSize = FileUtility.GetFileSize(filePath);

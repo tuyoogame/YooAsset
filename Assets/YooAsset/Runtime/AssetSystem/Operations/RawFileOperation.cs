@@ -240,7 +240,7 @@ namespace YooAsset
 				{
 					if (DownloadSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.SizeBytes, _bundleInfo.CRC))
 					{
-						DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.BundleName);
+						DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.FileName);
 						_steps = ESteps.CheckAndCopyFile;
 					}
 					else
@@ -423,7 +423,7 @@ namespace YooAsset
 				{
 					if (DownloadSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.SizeBytes, _bundleInfo.CRC))
 					{
-						DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.BundleName);
+						DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.FileName);
 						_steps = ESteps.CheckAndCopyFile;
 					}
 					else

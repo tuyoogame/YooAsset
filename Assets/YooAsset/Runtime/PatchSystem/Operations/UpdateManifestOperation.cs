@@ -391,7 +391,7 @@ namespace YooAsset
 				// 注意：在弱联网模式下，我们需要验证指定资源版本的所有资源完整性
 				if (weaklyUpdate)
 				{
-					string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
+					string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
 					if (File.Exists(filePath))
 						_waitingList.Add(patchBundle);
 					else
@@ -399,7 +399,7 @@ namespace YooAsset
 				}
 				else
 				{
-					string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
+					string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
 					if (File.Exists(filePath))
 						_waitingList.Add(patchBundle);
 				}
@@ -451,7 +451,7 @@ namespace YooAsset
 
 		private bool RunThread(PatchBundle patchBundle)
 		{
-			string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.Hash);
+			string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
 			ThreadInfo info = new ThreadInfo(filePath, patchBundle);
 			return ThreadPool.QueueUserWorkItem(new WaitCallback(VerifyInThread), info);
 		}
@@ -467,7 +467,7 @@ namespace YooAsset
 			if (info.Result)
 			{
 				VerifySuccessCount++;
-				DownloadSystem.CacheVerifyFile(info.Bundle.Hash, info.Bundle.BundleName);
+				DownloadSystem.CacheVerifyFile(info.Bundle.Hash, info.Bundle.FileName);
 			}
 			else
 			{

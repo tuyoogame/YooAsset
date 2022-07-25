@@ -80,8 +80,7 @@ namespace YooAsset
 				// 检查文件完整性
 				if (hasError == false)
 				{
-					// 注意：如果文件验证失败需要删除文件
-					
+					// 注意：如果文件验证失败需要删除文件				
 					if (DownloadSystem.CheckContentIntegrity(_bundleInfo.GetCacheLoadPath(), _bundleInfo.SizeBytes, _bundleInfo.CRC) == false)
 					{
 						hasError = true;
@@ -92,7 +91,7 @@ namespace YooAsset
 				if (hasError == false)
 				{
 					_steps = ESteps.Succeed;
-					DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.BundleName);
+					DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.FileName);
 				}
 				else
 				{
