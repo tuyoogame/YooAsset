@@ -40,9 +40,17 @@
 
   资源包的压缩方式。
 
-- **Append Extension**
+- **Output Name Style**
 
-  构建的资源包文件名是否包含后缀格式。
+  输出的资源包文件名称样式
+
+  (1) HashName：哈希值
+
+  (2) HashName_Extension：哈希值+后缀名
+
+  (3) BundleName_HashName：资源包名+哈希值
+
+  (4) BundleName_HashName_Extension：资源包名+哈希值+后缀名
 
 - **Buildin Tags**
 

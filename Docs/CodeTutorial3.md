@@ -214,4 +214,4 @@ private void ReleaseHandles()
 
 **UniTask支持解决方案**
 
-[解决方案](https://github.com/tuyoogame/YooAsset/blob/master/Assets/Samples~/UniTaskSample/README.md)
+[解决方案](https://github.com/tuyoogame/YooAsset/blob/master/Assets/YooAsset/Samples~/UniTaskSample/README.md)

@@ -21,13 +21,15 @@ YooAsset依赖于ScriptBuildPipeline（SBP），在PackageManager里找到SBP插
 
 YooAsset分俩部分，编辑器代码和运行时代码。因为工具界面是使用UIElements编写的，所以在Unity2019以前的版本是使用不了界面化工具。但是这并没有影响我们使用YooAsset，以下提供一种解决方案。
 
+请先通过Package Manager安装Scriptable Build Pipeline插件。
+
 1. 资源包收集工具替代方案
 
 ````C#
 // 推荐直接手动编辑资源收集配置文件，在Sample工程里可以找到AssetBundleCollectorConfig.xml的文件，我们直接拿过来做模板。
 // 然后通过以下代码来导入配置文件，成功之后AssetBundleCollectorSetting.asset文件会被刷新，就可以运行游戏了。
 // 注意：每次修改完XML文件，都需要导入配置文件。
-AssetBundleCollectorConfig.ImportXmlConfig("C://Demo//Assets//AssetsAssetBundleCollectorConfig.xml");
+AssetBundleCollectorConfig.ImportXmlConfig("C://Demo//Assets//AssetBundleCollectorConfig.xml");
 ````
 
 2. 资源包构建工具替代方案
