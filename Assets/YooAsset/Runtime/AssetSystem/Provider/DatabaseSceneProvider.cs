@@ -46,6 +46,7 @@ namespace YooAsset
 				{
 					_asyncOp.allowSceneActivation = true;
 					_asyncOp.priority = _priority;
+					SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
 					Status = EStatus.Checking;
 				}
 				else
@@ -61,8 +62,7 @@ namespace YooAsset
 			if (Status == EStatus.Checking)
 			{
 				if (_asyncOp.isDone)
-				{
-					SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
+				{				
 					if (SceneObject.IsValid() && _activateOnLoad)
 						SceneManager.SetActiveScene(SceneObject);
 

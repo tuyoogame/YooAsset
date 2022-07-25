@@ -70,11 +70,13 @@ namespace YooAsset
 			// 2. 加载场景
 			if (Status == EStatus.Loading)
 			{
-				_asyncOp = SceneManager.LoadSceneAsync(_sceneName, SceneMode);
+				// 注意：如果场景不存在则返回NULL
+				_asyncOp = SceneManager.LoadSceneAsync(MainAssetInfo.AssetPath, SceneMode);
 				if (_asyncOp != null)
 				{
 					_asyncOp.allowSceneActivation = true;
 					_asyncOp.priority = _priority;
+					SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
 					Status = EStatus.Checking;
 				}
 				else
@@ -91,7 +93,6 @@ namespace YooAsset
 			{
 				if (_asyncOp.isDone)
 				{
-					SceneObject = SceneManager.GetSceneByName(_sceneName);
 					if (SceneObject.IsValid() && _activateOnLoad)
 						SceneManager.SetActiveScene(SceneObject);
 
