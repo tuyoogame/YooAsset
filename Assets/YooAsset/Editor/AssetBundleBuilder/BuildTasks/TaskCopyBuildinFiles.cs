@@ -35,7 +35,7 @@ namespace YooAsset.Editor
 					continue;
 
 				string sourcePath = $"{pipelineOutputDirectory}/{patchBundle.BundleName}";
-				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{patchBundle.Hash}";
+				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{patchBundle.FileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 

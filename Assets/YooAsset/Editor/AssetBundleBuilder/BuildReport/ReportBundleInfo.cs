@@ -29,6 +29,11 @@ namespace YooAsset.Editor
 		public string BundleName;
 
 		/// <summary>
+		/// 文件名称
+		/// </summary>
+		public string FileName;
+
+		/// <summary>
 		/// 哈希值
 		/// </summary>
 		public string Hash;

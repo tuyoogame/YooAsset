@@ -275,7 +275,7 @@ namespace YooAsset.Editor
 				return;
 
 			string rootDirectory = Path.GetDirectoryName(_reportFilePath);
-			string filePath = $"{rootDirectory}/{bundleInfo.Hash}";
+			string filePath = $"{rootDirectory}/{bundleInfo.FileName}";
 			if (File.Exists(filePath))
 				Selection.activeObject = AssetBundleRecorder.GetAssetBundle(filePath);
 			else

@@ -95,7 +95,7 @@ namespace YooAsset.Editor
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{patchBundle.BundleName}";
-				string destPath = $"{packageDirectory}/{patchBundle.Hash}";
+				string destPath = $"{packageDirectory}/{patchBundle.FileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 				EditorTools.DisplayProgressBar("拷贝补丁文件", ++progressValue, patchFileTotalCount);
 			}
