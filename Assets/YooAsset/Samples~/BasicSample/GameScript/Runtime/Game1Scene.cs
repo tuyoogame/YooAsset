@@ -142,7 +142,7 @@ public class Game1Scene : MonoBehaviour
 				go.transform.localScale = Vector3.one * 50;	
 #endif
 				_npcIndex++;
-				if (_npcIndex > 3)
+				if (_npcIndex > 1)
 					_npcIndex = 0;
 			});
 		}

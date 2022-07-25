@@ -21,36 +21,18 @@ MonoBehaviour:
     AssetTags: level
     ActiveRuleName: EnableGroup
     Collectors:
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Entity/Level1/footman_Blue.prefab
+    - CollectPath: Assets/Samples/BasicSample/GameRes/Entity/Level1
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackSeparately
       FilterRuleName: CollectPrefab
       AssetTags: level1
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Entity/Level2/footman_Green.prefab
+    - CollectPath: Assets/Samples/BasicSample/GameRes/Entity/Level2
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackSeparately
       FilterRuleName: CollectPrefab
       AssetTags: level2
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Entity/Level3
-      CollectorType: 0
-      AddressRuleName: AddressByFileName
-      PackRuleName: PackDirectory
-      FilterRuleName: CollectPrefab
-      AssetTags: level3
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Entity/Cube
-      CollectorType: 0
-      AddressRuleName: AddressByFileName
-      PackRuleName: PackSeparately
-      FilterRuleName: CollectPrefab
-      AssetTags: cube
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Entity/Sphere
-      CollectorType: 0
-      AddressRuleName: AddressByFileName
-      PackRuleName: PackDirectory
-      FilterRuleName: CollectAll
-      AssetTags: sphere
   - GroupName: Buildin
     GroupDesc: "\u5185\u7F6E\u8D44\u6E90"
     AssetTags: buildin
@@ -74,8 +56,8 @@ MonoBehaviour:
       PackRuleName: PackDirectory
       FilterRuleName: CollectAll
       AssetTags: 
-  - GroupName: Other
-    GroupDesc: "\u5176\u5B83\u8D44\u6E90"
+  - GroupName: Panel
+    GroupDesc: "\u9762\u677F\u8D44\u6E90"
     AssetTags: other
     ActiveRuleName: EnableGroup
     Collectors:
@@ -112,12 +94,6 @@ MonoBehaviour:
       CollectorType: 1
       AddressRuleName: AddressByFileName
       PackRuleName: PackShaderVariants
-      FilterRuleName: CollectAll
-      AssetTags: 
-    - CollectPath: Assets/Samples/BasicSample/GameArt/Entity/Gometry
-      CollectorType: 2
-      AddressRuleName: AddressByFileName
-      PackRuleName: PackDirectory
       FilterRuleName: CollectAll
       AssetTags: 
     - CollectPath: Assets/Samples/BasicSample/GameArt/UIFont

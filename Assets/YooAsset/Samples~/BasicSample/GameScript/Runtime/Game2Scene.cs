@@ -10,7 +10,7 @@ public class Game2Scene : MonoBehaviour
 {
 	public GameObject CanvasRoot;
 	private readonly List<AssetOperationHandle> _cachedAssetOperationHandles = new List<AssetOperationHandle>(1000);
-	private SceneOperationHandle _subSceneHandle = null;
+	private readonly List<SceneOperationHandle> _subSceneHandles = new List<SceneOperationHandle>(100);
 
 	void Start()
 	{
@@ -71,7 +71,8 @@ public class Game2Scene : MonoBehaviour
 			var btn = CanvasRoot.transform.Find("subSceneLoadBtn").GetComponent<Button>();
 			btn.onClick.AddListener(() =>
 			{
-				_subSceneHandle = YooAssets.LoadSceneAsync("Scene/SubScene", UnityEngine.SceneManagement.LoadSceneMode.Additive);
+				var subSceneHandle = YooAssets.LoadSceneAsync("Scene/SubScene", UnityEngine.SceneManagement.LoadSceneMode.Additive);
+				_subSceneHandles.Add(subSceneHandle);
 			});
 		}
 
@@ -80,11 +81,11 @@ public class Game2Scene : MonoBehaviour
 			var btn = CanvasRoot.transform.Find("subSceneUnloadBtn").GetComponent<Button>();
 			btn.onClick.AddListener(() =>
 			{
-				if(_subSceneHandle != null)
+				foreach(var subSceneHandle in _subSceneHandles)
 				{
-					_subSceneHandle.UnloadAsync();
-					_subSceneHandle = null;
-				}				
+					subSceneHandle.UnloadAsync();
+				}
+				_subSceneHandles.Clear();
 			});
 		}
 	}
