@@ -13,14 +13,19 @@ namespace YooAsset
 	internal class PatchManifest
 	{
 		/// <summary>
+		/// 资源版本号
+		/// </summary>
+		public int ResourceVersion;
+
+		/// <summary>
 		/// 启用可寻址资源定位
 		/// </summary>
 		public bool EnableAddressable;
 
 		/// <summary>
-		/// 资源版本号
+		/// 文件名称样式
 		/// </summary>
-		public int ResourceVersion;
+		public int OutputNameStyle;
 
 		/// <summary>
 		/// 内置资源的标签列表（首包资源）
@@ -228,6 +233,7 @@ namespace YooAsset
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				patchBundle.ParseFlagsValue();
+				patchBundle.ParseFileName(patchManifest.OutputNameStyle);
 				patchManifest.BundleDic.Add(patchBundle.BundleName, patchBundle);
 			}
 

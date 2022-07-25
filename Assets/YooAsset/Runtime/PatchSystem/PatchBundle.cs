@@ -27,11 +27,6 @@ namespace YooAsset
 		public long SizeBytes;
 
 		/// <summary>
-		/// 名字样式
-		/// </summary>
-		public byte NameStyle;
-
-		/// <summary>
 		/// 资源包的分类标签
 		/// </summary>
 		public string[] Tags;
@@ -60,52 +55,15 @@ namespace YooAsset
 		/// <summary>
 		/// 文件名称
 		/// </summary>	
-		public string FileName
-		{
-			get
-			{
-				if (_fileName != null)
-					return _fileName;
-
-				if (NameStyle == 1)
-				{
-					_fileName = Hash;
-				}
-				else if (NameStyle == 2)
-				{
-					string tempFileExtension = System.IO.Path.GetExtension(BundleName);
-					_fileName = $"{Hash}{tempFileExtension}";
-				}
-				else if (NameStyle == 3)
-				{
-					string tempFileExtension = System.IO.Path.GetExtension(BundleName);
-					string tempBundleName = BundleName.Replace('/', '_').Replace(tempFileExtension, "");
-					_fileName = $"{tempBundleName}_{Hash}";
-				}
-				else if (NameStyle == 4)
-				{
-					string tempFileExtension = System.IO.Path.GetExtension(BundleName);
-					string tempBundleName = BundleName.Replace('/', '_').Replace(tempFileExtension, "");
-					_fileName = $"{tempBundleName}_{Hash}{tempFileExtension}";
-				}
-				else
-				{
-					throw new NotImplementedException();
-				}
-
-				return _fileName;
-			}
-		}
-		private string _fileName = null;
+		public string FileName { private set; get; }
 
 
-		public PatchBundle(string bundleName, string hash, string crc, long sizeBytes, byte nameStyle, string[] tags)
+		public PatchBundle(string bundleName, string hash, string crc, long sizeBytes, string[] tags)
 		{
 			BundleName = bundleName;
 			Hash = hash;
 			CRC = crc;
 			SizeBytes = sizeBytes;
-			NameStyle = nameStyle;
 			Tags = tags;
 		}
 
@@ -134,6 +92,38 @@ namespace YooAsset
 			IsEncrypted = value.Test(0);
 			IsBuildin = value.Test(1);
 			IsRawFile = value.Test(2);
+		}
+
+		/// <summary>
+		/// 解析文件名称
+		/// </summary>
+		public void ParseFileName(int nameStype)
+		{
+			if (nameStype == 1)
+			{
+				FileName = Hash;
+			}
+			else if (nameStype == 2)
+			{
+				string tempFileExtension = System.IO.Path.GetExtension(BundleName);
+				FileName = $"{Hash}{tempFileExtension}";
+			}
+			else if (nameStype == 3)
+			{
+				string tempFileExtension = System.IO.Path.GetExtension(BundleName);
+				string tempBundleName = BundleName.Replace('/', '_').Replace(tempFileExtension, "");
+				FileName = $"{tempBundleName}_{Hash}";
+			}
+			else if (nameStype == 4)
+			{
+				string tempFileExtension = System.IO.Path.GetExtension(BundleName);
+				string tempBundleName = BundleName.Replace('/', '_').Replace(tempFileExtension, "");
+				FileName = $"{tempBundleName}_{Hash}{tempFileExtension}";
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
 		}
 
 		/// <summary>

@@ -28,8 +28,9 @@ namespace YooAsset.Editor
 
 			// 创建新补丁清单
 			PatchManifest patchManifest = new PatchManifest();
-			patchManifest.EnableAddressable = buildParameters.Parameters.EnableAddressable;
 			patchManifest.ResourceVersion = buildParameters.Parameters.BuildVersion;
+			patchManifest.EnableAddressable = buildParameters.Parameters.EnableAddressable;
+			patchManifest.OutputNameStyle = (int)buildParameters.Parameters.OutputNameStyle;
 			patchManifest.BuildinTags = buildParameters.Parameters.BuildinTags;
 			patchManifest.BundleList = GetAllPatchBundle(buildParameters, buildMapContext, encryptionContext);
 			patchManifest.AssetList = GetAllPatchAsset(buildParameters, buildMapContext, patchManifest);
@@ -69,7 +70,6 @@ namespace YooAsset.Editor
 
 			List<string> buildinTags = buildParameters.Parameters.GetBuildinTags();
 			var buildMode = buildParameters.Parameters.BuildMode;
-			var outputNameStype = buildParameters.Parameters.OutputNameStyle;
 			bool standardBuild = buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild;
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
@@ -83,7 +83,7 @@ namespace YooAsset.Editor
 				bool isBuildin = IsBuildinBundle(tags, buildinTags);
 				bool isRawFile = bundleInfo.IsRawFile;
 
-				PatchBundle patchBundle = new PatchBundle(bundleName, hash, crc32, size, (byte)outputNameStype, tags);
+				PatchBundle patchBundle = new PatchBundle(bundleName, hash, crc32, size, tags);
 				patchBundle.SetFlagsValue(isEncrypted, isBuildin, isRawFile);
 				result.Add(patchBundle);
 			}
