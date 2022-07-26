@@ -213,12 +213,12 @@ namespace YooAsset.Editor
 		public static void FocusUnitySceneWindow()
 		{
 			EditorWindow.FocusWindowIfItsOpen<SceneView>();
+		} 
+		public static void CloseUnityGameWindow() 
+		{ 
+			System.Type T = Assembly.Load("UnityEditor").GetType("UnityEditor.GameView"); 
+			EditorWindow.GetWindow(T, false, "GameView", true).Close(); 
 		}
-        public static void CloseUnityGameWindow()
-        {
-            System.Type T = Assembly.Load("UnityEditor").GetType("UnityEditor.GameView");
-            EditorWindow.GetWindow(T, false, "GameView", true).Close();
-        }
 		public static void FocusUnityGameWindow()
 		{
 			System.Type T = Assembly.Load("UnityEditor").GetType("UnityEditor.GameView");
