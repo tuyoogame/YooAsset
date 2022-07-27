@@ -16,7 +16,7 @@ namespace YooAsset.Editor
 		private static string _saveFilePath;
 		private static bool _isStarted = false;
 		private static readonly Stopwatch _elapsedTime = new Stopwatch();
-		public static Action OnCompletedCallback;
+		private static Action _completedCallback;
 
 		private static void EditorUpdate()
 		{
@@ -25,53 +25,37 @@ namespace YooAsset.Editor
 			{
 				_isStarted = false;
 				_elapsedTime.Stop();
-								
 				EditorApplication.update -= EditorUpdate;
-				
+
 				// 保存结果
 				SaveCurrentShaderVariantCollection();
 
 				// 创建说明文件
 				CreateReadme();
-				
-				Debug.Log($"搜集SVC完毕");
 
-				OnCompletedCallback?.Invoke();
+				Debug.Log($"搜集SVC完毕！");
+				_completedCallback?.Invoke();
 			}
-		}
-		
-		private static void CreateReadme()
-		{
-			AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-
-			ShaderVariantCollection svc = AssetDatabase.LoadAssetAtPath<ShaderVariantCollection>(_saveFilePath);
-			if(svc != null)
-			{
-				var wrapper = ShaderVariantCollectionHelper.Extract(svc);
-				string jsonContents = JsonUtility.ToJson(wrapper, true);
-				string savePath = _saveFilePath.Replace(".shadervariants", ".json");
-				File.WriteAllText(savePath, jsonContents);
-			}
-
-			AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 		}
 
 		/// <summary>
 		/// 开始收集
 		/// </summary>
-		public static void Run(string saveFilePath)
+		public static void Run(string saveFilePath, Action completedCallback)
 		{
 			if (_isStarted)
 				return;
-			
-			EditorApplication.update += EditorUpdate;
 
 			if (Path.HasExtension(saveFilePath) == false)
 				saveFilePath = $"{saveFilePath}.shadervariants";
 			if (Path.GetExtension(saveFilePath) != ".shadervariants")
 				throw new System.Exception("Shader variant file extension is invalid.");
+
+			// 注意：先删除再保存，否则ShaderVariantCollection内容将无法及时刷新
+			AssetDatabase.DeleteAsset(ShaderVariantCollectorSettingData.Setting.SavePath);		
 			EditorTools.CreateFileDirectory(saveFilePath);
 			_saveFilePath = saveFilePath;
+			_completedCallback = completedCallback;
 
 			// 聚焦到游戏窗口
 			EditorTools.FocusUnityGameWindow();
@@ -86,6 +70,7 @@ namespace YooAsset.Editor
 			var materials = GetAllMaterials();
 			CollectVariants(materials);
 
+			EditorApplication.update += EditorUpdate;
 			_isStarted = true;
 			_elapsedTime.Reset();
 			_elapsedTime.Start();
@@ -153,7 +138,7 @@ namespace YooAsset.Editor
 		private static void CollectVariants(List<Material> materials)
 		{
 			Camera camera = Camera.main;
-			if(camera == null)
+			if (camera == null)
 				throw new System.Exception("Not found main camera.");
 
 			// 设置主相机
@@ -197,6 +182,21 @@ namespace YooAsset.Editor
 			go.name = $"Sphere_{index}|{material.name}";
 		}
 
+		private static void CreateReadme()
+		{
+			AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+
+			ShaderVariantCollection svc = AssetDatabase.LoadAssetAtPath<ShaderVariantCollection>(_saveFilePath);
+			if (svc != null)
+			{
+				var wrapper = ShaderVariantCollectionHelper.Extract(svc);
+				string jsonContents = JsonUtility.ToJson(wrapper, true);
+				string savePath = _saveFilePath.Replace(".shadervariants", ".json");
+				File.WriteAllText(savePath, jsonContents);
+			}
+
+			AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+		}
 		private static void ClearCurrentShaderVariantCollection()
 		{
 			EditorTools.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "ClearCurrentShaderVariantCollection");
