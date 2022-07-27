@@ -10,7 +10,7 @@
 public static void CollectSVC()
 {
     string savePath = ShaderVariantCollectorSettingData.Setting.SavePath;  
-    ShaderVariantCollector.OnCompletedCallback = () =>
+    System.Action completedCallback = () =>
     {
         ShaderVariantCollection collection =
             AssetDatabase.LoadAssetAtPath<ShaderVariantCollection>(savePath);
@@ -27,7 +27,7 @@ public static void CollectSVC()
         EditorTools.CloseUnityGameWindow();
         EditorApplication.Exit(0);
     };
-    ShaderVariantCollector.Run(savePath);
+    ShaderVariantCollector.Run(savePath, completedCallback);
 }
 ```
 

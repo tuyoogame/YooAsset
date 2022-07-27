@@ -53,6 +53,7 @@
 5. [资源部署](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBundleDeployer.md)
 5. [构建报告](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBundleReporter.md)
 5. [调试器](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBundleDebugger.md)
+5. [着色器](https://github.com/tuyoogame/YooAsset/blob/master/Docs/ShaderVariantCollector.md)
 5. [常见问题](https://github.com/tuyoogame/YooAsset/blob/master/Docs/FAQ.md)
 
 ## 代码教程
