@@ -191,7 +191,7 @@ namespace YooAsset.Editor
 			{
 				var wrapper = ShaderVariantCollectionHelper.Extract(svc);
 				string jsonContents = JsonUtility.ToJson(wrapper, true);
-				string savePath = _saveFilePath.Replace(".shadervariants", ".json");
+				string savePath = _saveFilePath.Replace(".shadervariants", "_Readme.json");
 				File.WriteAllText(savePath, jsonContents);
 			}
 
