@@ -30,7 +30,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public static string MakePipelineOutputDirectory(string outputRoot, BuildTarget buildTarget)
 		{
-			return $"{outputRoot}/{buildTarget}/{YooAssetSettingsData.Setting.OutputFolderName}";
+			return $"{outputRoot}/{buildTarget}/{YooAssetSettings.OutputFolderName}";
 		}
 
 		/// <summary>

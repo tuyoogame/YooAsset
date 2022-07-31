@@ -75,15 +75,15 @@ namespace YooAsset.Editor
 			{
 				// 拷贝UnityManifest序列化文件
 				{
-					string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.OutputFolderName}";
-					string destPath = $"{packageDirectory}/{YooAssetSettingsData.Setting.OutputFolderName}";
+					string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettings.OutputFolderName}";
+					string destPath = $"{packageDirectory}/{YooAssetSettings.OutputFolderName}";
 					EditorTools.CopyFile(sourcePath, destPath, true);
 				}
 
 				// 拷贝UnityManifest文本文件
 				{
-					string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.Setting.OutputFolderName}.manifest";
-					string destPath = $"{packageDirectory}/{YooAssetSettingsData.Setting.OutputFolderName}.manifest";
+					string sourcePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettings.OutputFolderName}.manifest";
+					string destPath = $"{packageDirectory}/{YooAssetSettings.OutputFolderName}.manifest";
 					EditorTools.CopyFile(sourcePath, destPath, true);
 				}
 			}
