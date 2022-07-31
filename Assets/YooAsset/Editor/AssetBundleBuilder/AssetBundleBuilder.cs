@@ -13,7 +13,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 开始构建
 		/// </summary>
-		public bool Run(BuildParameters buildParameters)
+		public BuildResult Run(BuildParameters buildParameters)
 		{
 			// 清空旧数据
 			_buildContext.ClearAllContext();
@@ -77,12 +77,18 @@ namespace YooAsset.Editor
 			}
 
 			// 执行构建流程
-			bool succeed = BuildRunner.Run(pipeline, _buildContext);
-			if (succeed)
+			var buildResult = BuildRunner.Run(pipeline, _buildContext);
+			if (buildResult.Success)
+			{
 				Debug.Log($"{buildParameters.BuildMode} pipeline build succeed !");
+			}
 			else
+			{
 				Debug.LogWarning($"{buildParameters.BuildMode} pipeline build failed !");
-			return succeed;
+				Debug.LogError($"Build task failed : {buildResult.FailedTask}");
+				Debug.LogError($"Build task error : {buildResult.FailedInfo}");
+			}
+			return buildResult;
 		}
 	}
 }

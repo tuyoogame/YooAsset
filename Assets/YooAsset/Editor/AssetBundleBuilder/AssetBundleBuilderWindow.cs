@@ -237,8 +237,8 @@ namespace YooAsset.Editor
 			}
 			
 			var builder = new AssetBundleBuilder();
-			bool succeed = builder.Run(buildParameters);
-			if (succeed)
+			var buildResult = builder.Run(buildParameters);
+			if (buildResult.Success)
 			{
 				EditorUtility.RevealInFinder($"{buildParameters.OutputRoot}/{buildParameters.BuildTarget}/{buildParameters.BuildVersion}");
 			}

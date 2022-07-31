@@ -14,14 +14,15 @@ namespace YooAsset.Editor
 		/// 执行构建流程
 		/// </summary>
 		/// <returns>如果成功返回TRUE，否则返回FALSE</returns>
-		public static bool Run(List<IBuildTask> pipeline, BuildContext context)
+		public static BuildResult Run(List<IBuildTask> pipeline, BuildContext context)
 		{
 			if (pipeline == null)
 				throw new ArgumentNullException("pipeline");
 			if (context == null)
 				throw new ArgumentNullException("context");
 
-			bool succeed = true;
+			BuildResult buildResult = new BuildResult();
+			buildResult.Success = true;
 			for (int i = 0; i < pipeline.Count; i++)
 			{
 				IBuildTask task = pipeline[i];
@@ -33,15 +34,15 @@ namespace YooAsset.Editor
 				}
 				catch (Exception e)
 				{
-					Debug.LogError($"Build task {task.GetType().Name} failed !");
-					Debug.LogError($"Build error : {e}");
-					succeed = false;
+					buildResult.FailedTask = task.GetType().Name;
+					buildResult.FailedInfo = e.ToString();
+					buildResult.Success = false;
 					break;
 				}
 			}
 
 			// 返回运行结果
-			return succeed;
+			return buildResult;
 		}
 
 		/// <summary>

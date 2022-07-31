@@ -20,8 +20,8 @@ namespace YooAsset.Editor
 			buildParameters.EnableAddressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
 
 			AssetBundleBuilder builder = new AssetBundleBuilder();
-			bool buildResult = builder.Run(buildParameters);
-			if (buildResult)
+			var buildResult = builder.Run(buildParameters);
+			if (buildResult.Success)
 			{
 				string pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(buildParameters.OutputRoot, buildParameters.BuildTarget);
 				_manifestFilePath = $"{pipelineOutputDirectory}_{EBuildMode.SimulateBuild}/{YooAssetSettingsData.GetPatchManifestFileName(buildParameters.BuildVersion)}";
