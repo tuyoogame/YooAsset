@@ -20,11 +20,11 @@ namespace YooAsset
 		/// </summary>
 		public string PatchManifestFileName = "PatchManifest";
 
-		/// <summary>
-		/// 构建输出的Unity清单文件名称
-		/// </summary>
-		public string UnityManifestFileName = "UnityManifest";
 
+		/// <summary>
+		/// 构建输出文件夹名称
+		/// </summary>
+		public const string OutputFolderName = "OutputCache";
 
 		/// <summary>
 		/// 构建输出的报告文件
