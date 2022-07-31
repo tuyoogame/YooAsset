@@ -2,6 +2,44 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.2.2] - 2022-07-31
+
+### Fixed
+
+- 修复了加载多个相同的子场景而无法全部卸载的问题。
+
+### Changed
+
+- ShaderVariantCollecor支持在CI上调用运行。
+
+- 资源补丁清单增加文件版本校验功能。
+
+- AssetBundleBuilder现在构建结果可以查询构建失败信息。
+
+- AssetBundleBuilder现在资源包文件名称样式提供选择功能。
+
+  ````c#
+  class BuildParameters
+  {
+      /// <summary>
+      /// 补丁文件名称的样式
+      /// </summary>
+      public EOutputNameStyle OutputNameStyle;
+  }
+  ````
+
+### Added
+
+- 增加获取资源信息新方法。
+
+  ````c#
+  /// <summary>
+  /// 获取资源信息
+  /// </summary>
+  /// <param name="location">资源的定位地址</param>
+  public static AssetInfo GetAssetInfo(string location);
+  ````
+
 ## [1.2.1] - 2022-07-23
 
 ### Fixed
