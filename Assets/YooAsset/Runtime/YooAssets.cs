@@ -455,6 +455,17 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取资源信息
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		public static AssetInfo GetAssetInfo(string location)
+		{
+			DebugCheckInitialize();
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+			return assetInfo;
+		}
+
+		/// <summary>
 		/// 获取资源路径
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
