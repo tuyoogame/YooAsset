@@ -13,6 +13,11 @@ namespace YooAsset
 	internal class PatchManifest
 	{
 		/// <summary>
+		/// 文件版本
+		/// </summary>
+		public string FileVersion;
+
+		/// <summary>
 		/// 资源版本号
 		/// </summary>
 		public int ResourceVersion;
@@ -228,6 +233,10 @@ namespace YooAsset
 		public static PatchManifest Deserialize(string jsonData)
 		{
 			PatchManifest patchManifest = JsonUtility.FromJson<PatchManifest>(jsonData);
+
+			// 检测文件版本
+			if (patchManifest.FileVersion != YooAssetSettings.PatchManifestFileVersion)
+				throw new Exception($"The manifest file version are not compatible : {patchManifest.FileVersion} != {YooAssetSettings.PatchManifestFileVersion}");
 
 			// BundleList
 			foreach (var patchBundle in patchManifest.BundleList)

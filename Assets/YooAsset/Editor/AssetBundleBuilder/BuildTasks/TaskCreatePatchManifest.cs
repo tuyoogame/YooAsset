@@ -28,6 +28,7 @@ namespace YooAsset.Editor
 
 			// 创建新补丁清单
 			PatchManifest patchManifest = new PatchManifest();
+			patchManifest.FileVersion = YooAssetSettings.PatchManifestFileVersion;
 			patchManifest.ResourceVersion = buildParameters.Parameters.BuildVersion;
 			patchManifest.EnableAddressable = buildParameters.Parameters.EnableAddressable;
 			patchManifest.OutputNameStyle = (int)buildParameters.Parameters.OutputNameStyle;

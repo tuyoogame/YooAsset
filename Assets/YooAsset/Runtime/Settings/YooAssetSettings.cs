@@ -16,10 +16,15 @@ namespace YooAsset
 		public string RawFileVariant = "rawfile";
 
 		/// <summary>
-		/// 构建输出的补丁清单文件名称
+		/// 补丁清单文件名称
 		/// </summary>
 		public string PatchManifestFileName = "PatchManifest";
 
+
+		/// <summary>
+		/// 补丁清单文件版本
+		/// </summary>
+		public const string PatchManifestFileVersion = "1.2.2";
 
 		/// <summary>
 		/// 构建输出文件夹名称
