@@ -21,36 +21,36 @@ MonoBehaviour:
     AssetTags: level
     ActiveRuleName: EnableGroup
     Collectors:
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Entity/Level1
+    - CollectPath: Assets/Samples/Basic Sample/GameRes/Entity/Level1
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackSeparately
       FilterRuleName: CollectPrefab
       AssetTags: level1
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Entity/Level2
+    - CollectPath: Assets/Samples/Basic Sample/GameRes/Entity/Level2
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackSeparately
       FilterRuleName: CollectPrefab
       AssetTags: level2
   - GroupName: Buildin
-    GroupDesc: "\u5185\u7F6E\u8D44\u6E90"
+    GroupDesc: "\u9996\u5305\u8D44\u6E90"
     AssetTags: buildin
     ActiveRuleName: EnableGroup
     Collectors:
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Scene
+    - CollectPath: Assets/Samples/Basic Sample/GameRes/Scene
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackSeparately
       FilterRuleName: CollectScene
       AssetTags: 
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Config
+    - CollectPath: Assets/Samples/Basic Sample/GameRes/Config
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackRawFile
       FilterRuleName: CollectAll
       AssetTags: 
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Music
+    - CollectPath: Assets/Samples/Basic Sample/GameRes/Music
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackDirectory
@@ -58,28 +58,28 @@ MonoBehaviour:
       AssetTags: 
   - GroupName: Panel
     GroupDesc: "\u9762\u677F\u8D44\u6E90"
-    AssetTags: other
+    AssetTags: panel
     ActiveRuleName: EnableGroup
     Collectors:
-    - CollectPath: Assets/Samples/BasicSample/GameRes/Texture
+    - CollectPath: Assets/Samples/Basic Sample/GameRes/Texture
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackCollector
       FilterRuleName: CollectAll
       AssetTags: 
-    - CollectPath: Assets/Samples/BasicSample/GameRes/TpAtlas
+    - CollectPath: Assets/Samples/Basic Sample/GameRes/TpAtlas
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackDirectory
       FilterRuleName: CollectAll
       AssetTags: 
-    - CollectPath: Assets/Samples/BasicSample/GameRes/UIPanel
+    - CollectPath: Assets/Samples/Basic Sample/GameRes/UIPanel
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackDirectory
       FilterRuleName: CollectAll
       AssetTags: 
-    - CollectPath: Assets/Samples/BasicSample/GameRes/UISprite
+    - CollectPath: Assets/Samples/Basic Sample/GameRes/UISprite
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackDirectory
@@ -90,13 +90,13 @@ MonoBehaviour:
     AssetTags: 
     ActiveRuleName: EnableGroup
     Collectors:
-    - CollectPath: Assets/Samples/BasicSample/GameArt/ShaderVariants
+    - CollectPath: Assets/Samples/Basic Sample/GameArt/ShaderVariants
       CollectorType: 1
       AddressRuleName: AddressByFileName
       PackRuleName: PackShaderVariants
       FilterRuleName: CollectAll
       AssetTags: 
-    - CollectPath: Assets/Samples/BasicSample/GameArt/UIFont
+    - CollectPath: Assets/Samples/Basic Sample/GameArt/UIFont
       CollectorType: 2
       AddressRuleName: AddressByFileName
       PackRuleName: PackDirectory

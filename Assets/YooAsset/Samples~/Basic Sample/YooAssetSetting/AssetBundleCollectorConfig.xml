@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root Version="1.0">
+  <Common AutoAddressable="False" AutoCollectShader="True" ShaderBundleName="myshaders" />
+  <Group GroupName="Level" GroupDesc="关卡资源" AssetTags="level">
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Entity/Level1" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectPrefab" AssetTags="level1" />
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Entity/Level2" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectPrefab" AssetTags="level2" />
+  </Group>
+  <Group GroupName="Buildin" GroupDesc="首包资源" AssetTags="buildin">
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Scene" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectScene" AssetTags="" />
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Config" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackRawFile" FilterRule="CollectAll" AssetTags="" />
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Music" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+  </Group>
+  <Group GroupName="Panel" GroupDesc="面板资源" AssetTags="panel">
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Texture" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackCollector" FilterRule="CollectAll" AssetTags="" />
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/TpAtlas" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/UIPanel" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/UISprite" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+  </Group>
+  <Group GroupName="Art" GroupDesc="美术资源" AssetTags="">
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameArt/ShaderVariants" CollectType="StaticAssetCollector" AddressRule="AddressByFileName" PackRule="PackShaderVariants" FilterRule="CollectAll" AssetTags="" />
+    <Collector CollectPath="Assets/Samples/Basic Sample/GameArt/UIFont" CollectType="DependAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+  </Group>
+</root>
