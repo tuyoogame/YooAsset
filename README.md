@@ -60,6 +60,7 @@
 1. [初始化](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial1.md)
 2. [资源更新](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial2.md)
 3. [资源加载](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial3.md)
+3. [解决方案](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial4.md)
 
 ## 视频教程
 
