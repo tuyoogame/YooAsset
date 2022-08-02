@@ -140,8 +140,9 @@ private static void BuildInternal(BuildTarget buildTarget)
     
     // 执行构建
     AssetBundleBuilder builder = new AssetBundleBuilder();
-    bool succeed = builder.Run(buildParameters);
-    Debug.Log($"构建结果:{succeed}");
+    var buildResult = builder.Run(buildParameters);
+    if (buildResult.Success)
+        Debug.Log($"构建成功!");
 }
 
 // 从构建命令里获取参数
