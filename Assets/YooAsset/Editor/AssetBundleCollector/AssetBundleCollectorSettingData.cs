@@ -394,5 +394,14 @@ namespace YooAsset.Editor
 				IsDirty = true;
 			}
 		}
+
+		/// <summary>
+		/// 获取所有的资源标签
+		/// </summary>
+		public static string GetAllTags()
+		{
+			var allTgas = Setting.GetAllTags();
+			return string.Join(";", allTgas);
+		}
 	}
 }

@@ -41,6 +41,34 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
+		/// 获取所有的资源标签
+		/// </summary>
+		public List<string> GetAllTags()
+		{
+			HashSet<string> result = new HashSet<string>();
+			foreach (var group in Groups)
+			{
+				List<string> groupTags = StringUtility.StringToStringList(group.AssetTags, ';');
+				foreach (var tag in groupTags)
+				{
+					if (result.Contains(tag) == false)
+						result.Add(tag);
+				}
+
+				foreach (var collector in group.Collectors)
+				{
+					List<string> collectorTags = StringUtility.StringToStringList(collector.AssetTags, ';');
+					foreach (var tag in collectorTags)
+					{
+						if (result.Contains(tag) == false)
+							result.Add(tag);
+					}
+				}
+			}
+			return result.ToList();
+		}
+
+		/// <summary>
 		/// 获取打包收集的资源文件
 		/// </summary>
 		public List<CollectAssetInfo> GetAllCollectAssets(EBuildMode buildMode)
