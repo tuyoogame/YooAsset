@@ -400,8 +400,8 @@ namespace YooAsset.Editor
 		/// </summary>
 		public static string GetAllTags()
 		{
-			var allTgas = Setting.GetAllTags();
-			return string.Join(";", allTgas);
+			var allTags = Setting.GetAllTags();
+			return string.Join(";", allTags);
 		}
 	}
 }
