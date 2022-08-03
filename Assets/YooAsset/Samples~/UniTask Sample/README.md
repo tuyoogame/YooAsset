@@ -8,13 +8,16 @@
 ## 代码示例
 
 ```csharp
-var handle = YooAssets.LoadAssetAsync<GameObject>("Assets/Res/Prefabs/TestImg.prefab");
+public async UniTask Example(IProgress<float> progress = null, PlayerLoopTiming timing = PlayerLoopTiming.Update)
+{
+    var handle = YooAssets.LoadAssetAsync<GameObject>("Assets/Res/Prefabs/  TestImg.prefab");
 
-await handle.ToUniTask();
+    await handle.ToUniTask(progress, timing);
 
-var obj = handle.AssetObject as GameObject;
-var go  = Instantiate(obj, transform);
+    var obj = handle.AssetObject as GameObject;
+    var go  = Instantiate(obj, transform);
 
-go.transform.localPosition = Vector3.zero;
-go.transform.localScale    = Vector3.one;
+    go.transform.localPosition = Vector3.zero;
+    go.transform.localScale    = Vector3.one;
+}
 ```
