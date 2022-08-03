@@ -129,7 +129,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 网络运行模式的初始化操作
+	/// 联机运行模式的初始化操作
 	/// </summary>
 	internal sealed class HostPlayModeInitializationOperation : InitializationOperation
 	{

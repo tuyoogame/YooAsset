@@ -64,7 +64,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 网络模式的更新资源包裹操作
+	/// 联机模式的更新资源包裹操作
 	/// </summary>
 	internal sealed class HostPlayModeUpdatePackageOperation : UpdatePackageOperation
 	{

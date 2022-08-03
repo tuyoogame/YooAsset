@@ -46,7 +46,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 网络模式的更新清单操作
+	/// 联机模式的更新清单操作
 	/// </summary>
 	internal sealed class HostPlayModeUpdateManifestOperation : UpdateManifestOperation
 	{
@@ -252,7 +252,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 网络模式的更新清单操作（弱联网）
+	/// 联机模式的更新清单操作（弱联网）
 	/// </summary>
 	internal sealed class HostPlayModeWeaklyUpdateManifestOperation : UpdateManifestOperation
 	{

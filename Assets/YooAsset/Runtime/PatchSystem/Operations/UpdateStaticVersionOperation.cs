@@ -43,7 +43,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 网络模式的更新静态版本操作
+	/// 联机模式的更新静态版本操作
 	/// </summary>
 	internal sealed class HostPlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
 	{

@@ -308,7 +308,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 网络模式的原生文件操作
+	/// 联机模式的原生文件操作
 	/// </summary>
 	internal sealed class HostPlayModeRawFileOperation : RawFileOperation
 	{

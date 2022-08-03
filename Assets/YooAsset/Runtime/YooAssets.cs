@@ -25,7 +25,7 @@ namespace YooAsset
 			OfflinePlayMode,
 
 			/// <summary>
-			/// 网络运行模式
+			/// 联机运行模式
 			/// </summary>
 			HostPlayMode,
 		}
@@ -81,7 +81,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 网络运行模式的初始化参数
+		/// 联机运行模式的初始化参数
 		/// </summary>
 		public class HostPlayModeParameters : InitializeParameters
 		{
