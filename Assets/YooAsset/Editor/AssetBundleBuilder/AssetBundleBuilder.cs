@@ -80,6 +80,7 @@ namespace YooAsset.Editor
 			var buildResult = BuildRunner.Run(pipeline, _buildContext);
 			if (buildResult.Success)
 			{
+				buildResult.OutputPackageDirectory = buildParametersContext.GetPackageDirectory();
 				Debug.Log($"{buildParameters.BuildMode} pipeline build succeed !");
 			}
 			else

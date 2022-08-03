@@ -20,5 +20,10 @@ namespace YooAsset.Editor
         /// 构建失败的信息
         /// </summary>
         public string FailedInfo;
+
+        /// <summary>
+        /// 输出的补丁包目录
+        /// </summary>
+        public string OutputPackageDirectory;
     }
 }
