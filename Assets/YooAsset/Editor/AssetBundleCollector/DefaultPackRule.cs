@@ -113,4 +113,15 @@ namespace YooAsset.Editor
 			return StringUtility.RemoveExtension(data.AssetPath);
 		}
 	}
+
+	/// <summary>
+	/// 着色器变种收集文件
+	/// </summary>
+	public class PackShaderVariants : IPackRule
+	{
+		public string GetBundleName(PackRuleData data)
+		{
+			return YooAssetSettings.UnityShadersBundleName;
+		}
+	}
 }

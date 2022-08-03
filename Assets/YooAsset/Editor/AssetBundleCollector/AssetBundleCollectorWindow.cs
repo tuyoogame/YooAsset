@@ -28,8 +28,6 @@ namespace YooAsset.Editor
 		private ScrollView _collectorScrollView;
 		private PopupField<string> _activeRulePopupField;
 		private Toggle _enableAddressableToogle;
-		private Toggle _autoCollectShaderToogle;
-		private TextField _shaderBundleNameTxt;
 		private TextField _groupNameTxt;
 		private TextField _groupDescTxt;
 		private TextField _groupAssetTagsTxt;
@@ -80,17 +78,6 @@ namespace YooAsset.Editor
 				{
 					AssetBundleCollectorSettingData.ModifyAddressable(evt.newValue);
 					RefreshWindow();
-				});
-				_autoCollectShaderToogle = root.Q<Toggle>("AutoCollectShader");
-				_autoCollectShaderToogle.RegisterValueChangedCallback(evt =>
-				{
-					AssetBundleCollectorSettingData.ModifyShader(evt.newValue, _shaderBundleNameTxt.value);
-					_shaderBundleNameTxt.SetEnabled(evt.newValue);
-				});
-				_shaderBundleNameTxt = root.Q<TextField>("ShaderBundleName");
-				_shaderBundleNameTxt.RegisterValueChangedCallback(evt =>
-				{
-					AssetBundleCollectorSettingData.ModifyShader(_autoCollectShaderToogle.value, evt.newValue);
 				});
 
 				// 分组列表相关
@@ -218,9 +205,6 @@ namespace YooAsset.Editor
 		private void RefreshWindow()
 		{
 			_enableAddressableToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.EnableAddressable);
-			_autoCollectShaderToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.AutoCollectShaders);
-			_shaderBundleNameTxt.SetEnabled(AssetBundleCollectorSettingData.Setting.AutoCollectShaders);
-			_shaderBundleNameTxt.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShadersBundleName);
 			_groupContainer.visible = false;
 
 			FillGroupViewData();

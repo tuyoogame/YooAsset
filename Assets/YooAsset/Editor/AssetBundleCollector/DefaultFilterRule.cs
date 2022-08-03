@@ -59,4 +59,15 @@ namespace YooAsset.Editor
 			}
 		}
 	}
+
+	/// <summary>
+	/// 只收集着色器变种收集文件
+	/// </summary>
+	public class CollectShaderVariants : IFilterRule
+	{
+		public bool IsCollectAsset(FilterRuleData data)
+		{
+			return Path.GetExtension(data.AssetPath) == ".shadervariants";
+		}
+	}
 }

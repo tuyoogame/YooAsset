@@ -250,8 +250,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public static void ClearAll()
 		{
-			Setting.AutoCollectShaders = false;
-			Setting.ShadersBundleName = string.Empty;
+			Setting.EnableAddressable = false;
 			Setting.Groups.Clear();
 			SaveFile();
 		}
@@ -330,14 +329,6 @@ namespace YooAsset.Editor
 		public static void ModifyAddressable(bool enableAddressable)
 		{
 			Setting.EnableAddressable = enableAddressable;
-			IsDirty = true;
-		}
-
-		// 着色器编辑相关
-		public static void ModifyShader(bool isCollectAllShaders, string shadersBundleName)
-		{
-			Setting.AutoCollectShaders = isCollectAllShaders;
-			Setting.ShadersBundleName = shadersBundleName;
 			IsDirty = true;
 		}
 

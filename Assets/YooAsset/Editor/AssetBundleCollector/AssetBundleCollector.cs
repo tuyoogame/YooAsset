@@ -214,13 +214,9 @@ namespace YooAsset.Editor
 		}
 		private bool IsCollectAsset(string assetPath)
 		{
-			// 如果收集全路径着色器
-			if (AssetBundleCollectorSettingData.Setting.AutoCollectShaders)
-			{
-				Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-				if (assetType == typeof(UnityEngine.Shader))
-					return true;
-			}
+			Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+			if (assetType == typeof(UnityEngine.Shader))
+				return true;
 
 			// 根据规则设置过滤资源文件
 			IFilterRule filterRuleInstance = AssetBundleCollectorSettingData.GetFilterRuleInstance(FilterRuleName);
@@ -237,23 +233,16 @@ namespace YooAsset.Editor
 		}
 		private string GetBundleName(AssetBundleCollectorGroup group, string assetPath)
 		{
-			// 如果自动收集所有的着色器
-			if (AssetBundleCollectorSettingData.Setting.AutoCollectShaders)
+			System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+			if (assetType == typeof(UnityEngine.Shader))
 			{
-				System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-				if (assetType == typeof(UnityEngine.Shader))
-				{
-					string bundleName = AssetBundleCollectorSettingData.Setting.ShadersBundleName;
-					return EditorTools.GetRegularPath(bundleName).ToLower();
-				}
+				return EditorTools.GetRegularPath(YooAssetSettings.UnityShadersBundleName).ToLower();
 			}
 
 			// 根据规则设置获取资源包名称
-			{
-				IPackRule packRuleInstance = AssetBundleCollectorSettingData.GetPackRuleInstance(PackRuleName);
-				string bundleName = packRuleInstance.GetBundleName(new PackRuleData(assetPath, CollectPath, group.GroupName));
-				return EditorTools.GetRegularPath(bundleName).ToLower();
-			}
+			IPackRule packRuleInstance = AssetBundleCollectorSettingData.GetPackRuleInstance(PackRuleName);
+			string bundleName = packRuleInstance.GetBundleName(new PackRuleData(assetPath, CollectPath, group.GroupName));
+			return EditorTools.GetRegularPath(bundleName).ToLower();
 		}
 		private List<string> GetAssetTags(AssetBundleCollectorGroup group)
 		{

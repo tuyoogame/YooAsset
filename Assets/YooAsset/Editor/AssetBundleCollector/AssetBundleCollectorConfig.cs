@@ -15,8 +15,6 @@ namespace YooAsset.Editor
 		public const string XmlVersion = "Version";
 		public const string XmlCommon = "Common";
 		public const string XmlEnableAddressable = "AutoAddressable";
-		public const string XmlAutoCollectShader = "AutoCollectShader";
-		public const string XmlShaderBundleName = "ShaderBundleName";
 		public const string XmlGroup = "Group";
 		public const string XmlGroupName = "GroupName";
 		public const string XmlGroupDesc = "GroupDesc";
@@ -53,22 +51,13 @@ namespace YooAsset.Editor
 
 			// 读取公共配置
 			bool enableAddressable = false;
-			bool autoCollectShaders = false;
-			string shaderBundleName = string.Empty;
 			var commonNodeList = root.GetElementsByTagName(XmlCommon);
 			if (commonNodeList.Count > 0)
 			{
 				XmlElement commonElement = commonNodeList[0] as XmlElement;
 				if (commonElement.HasAttribute(XmlEnableAddressable) == false)
 					throw new Exception($"Not found attribute {XmlEnableAddressable} in {XmlCommon}");
-				if (commonElement.HasAttribute(XmlAutoCollectShader) == false)
-					throw new Exception($"Not found attribute {XmlAutoCollectShader} in {XmlCommon}");
-				if (commonElement.HasAttribute(XmlShaderBundleName) == false)
-					throw new Exception($"Not found attribute {XmlShaderBundleName} in {XmlCommon}");
-
 				enableAddressable = commonElement.GetAttribute(XmlEnableAddressable) == "True" ? true : false;
-				autoCollectShaders = commonElement.GetAttribute(XmlAutoCollectShader) == "True" ? true : false;
-				shaderBundleName = commonElement.GetAttribute(XmlShaderBundleName);
 			}
 
 			// 读取分组配置
@@ -122,8 +111,6 @@ namespace YooAsset.Editor
 			// 保存配置数据
 			AssetBundleCollectorSettingData.ClearAll();
 			AssetBundleCollectorSettingData.Setting.EnableAddressable = enableAddressable;
-			AssetBundleCollectorSettingData.Setting.AutoCollectShaders = autoCollectShaders;
-			AssetBundleCollectorSettingData.Setting.ShadersBundleName = shaderBundleName;
 			AssetBundleCollectorSettingData.Setting.Groups.AddRange(groupTemper);
 			AssetBundleCollectorSettingData.SaveFile();
 			Debug.Log($"导入配置完毕！");
@@ -152,8 +139,6 @@ namespace YooAsset.Editor
 			// 设置公共配置
 			var commonElement = xmlDoc.CreateElement(XmlCommon);
 			commonElement.SetAttribute(XmlEnableAddressable, AssetBundleCollectorSettingData.Setting.EnableAddressable.ToString());
-			commonElement.SetAttribute(XmlAutoCollectShader, AssetBundleCollectorSettingData.Setting.AutoCollectShaders.ToString());
-			commonElement.SetAttribute(XmlShaderBundleName, AssetBundleCollectorSettingData.Setting.ShadersBundleName);
 			root.AppendChild(commonElement);
 
 			// 设置分组配置
