@@ -122,9 +122,9 @@ namespace YooAsset.Editor
 			else if (_sortMode == ESortMode.BundleSize)
 			{
 				if (_descendingSort)
-					return result.OrderByDescending(a => a.SizeBytes).ToList();
+					return result.OrderByDescending(a => a.FileSize).ToList();
 				else
-					return result.OrderBy(a => a.SizeBytes).ToList();
+					return result.OrderBy(a => a.FileSize).ToList();
 			}
 			else if (_sortMode == ESortMode.BundleTags)
 			{
@@ -249,11 +249,11 @@ namespace YooAsset.Editor
 
 			// Size
 			var label2 = element.Q<Label>("Label2");
-			label2.text = EditorUtility.FormatBytes(bundleInfo.SizeBytes);
+			label2.text = EditorUtility.FormatBytes(bundleInfo.FileSize);
 
 			// Hash
 			var label3 = element.Q<Label>("Label3");
-			label3.text = bundleInfo.Hash;
+			label3.text = bundleInfo.FileHash;
 
 			// Tags
 			var label5 = element.Q<Label>("Label5");

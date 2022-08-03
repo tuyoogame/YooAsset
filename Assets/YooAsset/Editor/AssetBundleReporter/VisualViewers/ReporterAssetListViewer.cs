@@ -310,11 +310,11 @@ namespace YooAsset.Editor
 
 			// Size
 			var label2 = element.Q<Label>("Label2");
-			label2.text = EditorUtility.FormatBytes(bundleInfo.SizeBytes);
+			label2.text = EditorUtility.FormatBytes(bundleInfo.FileSize);
 
 			// Hash
 			var label3 = element.Q<Label>("Label3");
-			label3.text = bundleInfo.Hash;
+			label3.text = bundleInfo.FileHash;
 		}
 	}
 }
