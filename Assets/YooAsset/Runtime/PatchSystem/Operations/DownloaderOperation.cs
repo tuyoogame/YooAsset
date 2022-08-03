@@ -86,7 +86,7 @@ namespace YooAsset
 				TotalDownloadCount = downloadList.Count;
 				foreach (var patchBundle in downloadList)
 				{
-					TotalDownloadBytes += patchBundle.SizeBytes;
+					TotalDownloadBytes += patchBundle.FileSize;
 				}
 			}
 		}
@@ -138,7 +138,7 @@ namespace YooAsset
 					// 下载成功
 					_removeList.Add(downloader);
 					CurrentDownloadCount++;
-					CurrentDownloadBytes += bundleInfo.SizeBytes;
+					CurrentDownloadBytes += bundleInfo.FileSize;
 				}
 
 				// 移除已经完成的下载器（无论成功或失败）
@@ -170,7 +170,7 @@ namespace YooAsset
 						var operation = DownloadSystem.BeginDownload(bundleInfo, _failedTryAgain);
 						_downloaders.Add(operation);
 						_downloadList.RemoveAt(index);
-						OnStartDownloadFileCallback?.Invoke(bundleInfo.BundleName, bundleInfo.SizeBytes);
+						OnStartDownloadFileCallback?.Invoke(bundleInfo.BundleName, bundleInfo.FileSize);
 					}
 				}
 

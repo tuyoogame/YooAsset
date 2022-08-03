@@ -197,7 +197,7 @@ namespace YooAsset
 
 				_requestURL = GetRequestURL();
 				_threadDownloader = new ThreadDownloader();
-				_threadDownloader.Run(_requestURL, _bundleInfo.GetCacheLoadPath(), _bundleInfo.FileName, _bundleInfo.CRC, _bundleInfo.SizeBytes, _timeout);
+				_threadDownloader.Run(_requestURL, _bundleInfo.GetCacheLoadPath(), _bundleInfo.FileName, _bundleInfo.FileCRC, _bundleInfo.FileSize, _timeout);
 				_steps = ESteps.CheckDownload;
 			}
 
@@ -226,7 +226,7 @@ namespace YooAsset
 				}
 				else
 				{
-					DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.FileName);
+					DownloadSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
 					_steps = ESteps.Succeed;
 				}
 			}

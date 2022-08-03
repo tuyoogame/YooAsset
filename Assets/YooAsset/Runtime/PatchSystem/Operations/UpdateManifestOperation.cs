@@ -377,14 +377,14 @@ namespace YooAsset
 			foreach (var patchBundle in localPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (DownloadSystem.ContainsVerifyFile(patchBundle.Hash))
+				if (DownloadSystem.ContainsVerifyFile(patchBundle.FileHash))
 					continue;
 
 				// 忽略APP资源
 				// 注意：如果是APP资源并且哈希值相同，则不需要下载
 				if (appPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
 				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.Hash == patchBundle.Hash)
+					if (appPatchBundle.IsBuildin && appPatchBundle.FileHash == patchBundle.FileHash)
 						continue;
 				}
 
@@ -458,7 +458,7 @@ namespace YooAsset
 		private void VerifyInThread(object infoObj)
 		{
 			ThreadInfo info = (ThreadInfo)infoObj;
-			info.Result = DownloadSystem.CheckContentIntegrity(info.FilePath, info.Bundle.SizeBytes, info.Bundle.CRC);
+			info.Result = DownloadSystem.CheckContentIntegrity(info.FilePath, info.Bundle.FileSize, info.Bundle.FileCRC);
 			_syncContext.Post(VerifyCallback, info);
 		}
 		private void VerifyCallback(object obj)
@@ -467,7 +467,7 @@ namespace YooAsset
 			if (info.Result)
 			{
 				VerifySuccessCount++;
-				DownloadSystem.CacheVerifyFile(info.Bundle.Hash, info.Bundle.FileName);
+				DownloadSystem.CacheVerifyFile(info.Bundle.FileHash, info.Bundle.FileName);
 			}
 			else
 			{

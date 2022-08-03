@@ -198,14 +198,14 @@ namespace YooAsset
 			foreach (var patchBundle in _remotePatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (DownloadSystem.ContainsVerifyFile(patchBundle.Hash))
+				if (DownloadSystem.ContainsVerifyFile(patchBundle.FileHash))
 					continue;
 
 				// 忽略APP资源
 				// 注意：如果是APP资源并且哈希值相同，则不需要下载
 				if (_impl.AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
 				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.Hash == patchBundle.Hash)
+					if (appPatchBundle.IsBuildin && appPatchBundle.FileHash == patchBundle.FileHash)
 						continue;
 				}
 
@@ -215,7 +215,7 @@ namespace YooAsset
 				if (File.Exists(filePath))
 				{
 					long fileSize = FileUtility.GetFileSize(filePath);
-					if (fileSize == patchBundle.SizeBytes)
+					if (fileSize == patchBundle.FileSize)
 						continue;
 				}
 

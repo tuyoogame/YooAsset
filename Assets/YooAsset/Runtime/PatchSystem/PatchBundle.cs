@@ -12,19 +12,24 @@ namespace YooAsset
 		public string BundleName;
 
 		/// <summary>
+		/// 内容哈希值
+		/// </summary>
+		public string ContentHash;
+
+		/// <summary>
 		/// 文件哈希值
 		/// </summary>
-		public string Hash;
+		public string FileHash;
 
 		/// <summary>
 		/// 文件校验码
 		/// </summary>
-		public string CRC;
+		public string FileCRC;
 
 		/// <summary>
 		/// 文件大小（字节数）
 		/// </summary>
-		public long SizeBytes;
+		public long FileSize;
 
 		/// <summary>
 		/// 资源包的分类标签
@@ -58,12 +63,13 @@ namespace YooAsset
 		public string FileName { private set; get; }
 
 
-		public PatchBundle(string bundleName, string hash, string crc, long sizeBytes, string[] tags)
+		public PatchBundle(string bundleName, string contentHash, string fileHash, string fileCRC, long fileSize, string[] tags)
 		{
 			BundleName = bundleName;
-			Hash = hash;
-			CRC = crc;
-			SizeBytes = sizeBytes;
+			ContentHash = contentHash;
+			FileHash = fileHash;
+			FileCRC = fileCRC;
+			FileSize = fileSize;
 			Tags = tags;
 		}
 
@@ -101,24 +107,24 @@ namespace YooAsset
 		{
 			if (nameStype == 1)
 			{
-				FileName = Hash;
+				FileName = FileHash;
 			}
 			else if (nameStype == 2)
 			{
 				string tempFileExtension = System.IO.Path.GetExtension(BundleName);
-				FileName = $"{Hash}{tempFileExtension}";
+				FileName = $"{FileHash}{tempFileExtension}";
 			}
 			else if (nameStype == 3)
 			{
 				string tempFileExtension = System.IO.Path.GetExtension(BundleName);
 				string tempBundleName = BundleName.Replace('/', '_').Replace(tempFileExtension, "");
-				FileName = $"{tempBundleName}_{Hash}";
+				FileName = $"{tempBundleName}_{FileHash}";
 			}
 			else if (nameStype == 4)
 			{
 				string tempFileExtension = System.IO.Path.GetExtension(BundleName);
 				string tempBundleName = BundleName.Replace('/', '_').Replace(tempFileExtension, "");
-				FileName = $"{tempBundleName}_{Hash}{tempFileExtension}";
+				FileName = $"{tempBundleName}_{FileHash}{tempFileExtension}";
 			}
 			else
 			{

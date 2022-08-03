@@ -119,8 +119,8 @@ namespace YooAsset
 
 					DecryptionFileInfo fileInfo = new DecryptionFileInfo();
 					fileInfo.BundleName = MainBundleInfo.BundleName;
-					fileInfo.BundleHash = MainBundleInfo.Hash;
-					fileInfo.BundleCRC = MainBundleInfo.CRC;
+					fileInfo.FileHash = MainBundleInfo.FileHash;
+					fileInfo.FileCRC = MainBundleInfo.FileCRC;
 					ulong offset = AssetSystem.DecryptionServices.GetFileOffset(fileInfo);
 					if (_isWaitForAsyncComplete)
 						CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath, 0, offset);
@@ -169,7 +169,7 @@ namespace YooAsset
 					if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 					{
 						string cacheLoadPath = MainBundleInfo.GetCacheLoadPath();
-						if (DownloadSystem.CheckContentIntegrity(EVerifyLevel.High, cacheLoadPath, MainBundleInfo.SizeBytes, MainBundleInfo.CRC) == false)
+						if (DownloadSystem.CheckContentIntegrity(EVerifyLevel.High, cacheLoadPath, MainBundleInfo.FileSize, MainBundleInfo.FileCRC) == false)
 						{
 							if (File.Exists(cacheLoadPath))
 							{

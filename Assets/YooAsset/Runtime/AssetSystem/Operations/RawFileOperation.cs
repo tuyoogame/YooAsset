@@ -203,7 +203,7 @@ namespace YooAsset
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-					if (DownloadSystem.ContainsVerifyFile(_bundleInfo.Hash))
+					if (DownloadSystem.ContainsVerifyFile(_bundleInfo.FileHash))
 						_steps = ESteps.CheckAndCopyFile;
 					else
 						_steps = ESteps.DownloadFromApk;
@@ -238,9 +238,9 @@ namespace YooAsset
 				}
 				else
 				{
-					if (DownloadSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.SizeBytes, _bundleInfo.CRC))
+					if (DownloadSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.FileSize, _bundleInfo.FileCRC))
 					{
-						DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.FileName);
+						DownloadSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
 						_steps = ESteps.CheckAndCopyFile;
 					}
 					else
@@ -267,7 +267,7 @@ namespace YooAsset
 				// 如果原生文件已经存在，则验证其完整性
 				if (File.Exists(CopyPath))
 				{
-					bool result = DownloadSystem.CheckContentIntegrity(CopyPath, _bundleInfo.SizeBytes, _bundleInfo.CRC);
+					bool result = DownloadSystem.CheckContentIntegrity(CopyPath, _bundleInfo.FileSize, _bundleInfo.FileCRC);
 					if (result)
 					{
 						_steps = ESteps.Done;
@@ -355,7 +355,7 @@ namespace YooAsset
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-					if (DownloadSystem.ContainsVerifyFile(_bundleInfo.Hash))
+					if (DownloadSystem.ContainsVerifyFile(_bundleInfo.FileHash))
 						_steps = ESteps.CheckAndCopyFile;
 					else
 						_steps = ESteps.DownloadFromApk;
@@ -421,9 +421,9 @@ namespace YooAsset
 				}
 				else
 				{
-					if (DownloadSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.SizeBytes, _bundleInfo.CRC))
+					if (DownloadSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.FileSize, _bundleInfo.FileCRC))
 					{
-						DownloadSystem.CacheVerifyFile(_bundleInfo.Hash, _bundleInfo.FileName);
+						DownloadSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
 						_steps = ESteps.CheckAndCopyFile;
 					}
 					else
@@ -450,7 +450,7 @@ namespace YooAsset
 				// 如果原生文件已经存在，则验证其完整性
 				if (File.Exists(CopyPath))
 				{
-					bool result = DownloadSystem.CheckContentIntegrity(CopyPath, _bundleInfo.SizeBytes, _bundleInfo.CRC);
+					bool result = DownloadSystem.CheckContentIntegrity(CopyPath, _bundleInfo.FileSize, _bundleInfo.FileCRC);
 					if (result)
 					{
 						_steps = ESteps.Done;

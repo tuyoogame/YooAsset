@@ -6,7 +6,7 @@ namespace YooAsset
 		public TempDownloader(BundleInfo bundleInfo) : base(bundleInfo)
 		{
 			_downloadProgress = 1f;
-			_downloadedBytes = (ulong)bundleInfo.SizeBytes;
+			_downloadedBytes = (ulong)bundleInfo.FileSize;
 			_steps = ESteps.Succeed;
 		}
 

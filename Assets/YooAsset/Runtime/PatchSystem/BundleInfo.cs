@@ -46,42 +46,42 @@ namespace YooAsset
 		/// <summary>
 		/// 文件哈希值
 		/// </summary>
-		public string Hash
+		public string FileHash
 		{
 			get
 			{
 				if (_patchBundle == null)
 					return string.Empty;
 				else
-					return _patchBundle.Hash;
+					return _patchBundle.FileHash;
 			}
 		}
 		
 		/// <summary>
 		/// 校验的CRC
 		/// </summary>
-		public string CRC
+		public string FileCRC
 		{
 			get
 			{
 				if (_patchBundle == null)
 					return string.Empty;
 				else
-					return _patchBundle.CRC;
+					return _patchBundle.FileCRC;
 			}
 		}
 
 		/// <summary>
 		/// 文件大小
 		/// </summary>
-		public long SizeBytes
+		public long FileSize
 		{
 			get
 			{
 				if (_patchBundle == null)
 					return 0;
 				else
-					return _patchBundle.SizeBytes;
+					return _patchBundle.FileSize;
 			}
 		}
 
