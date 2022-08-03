@@ -23,7 +23,7 @@ namespace YooAsset.Editor
 			// 验证构建结果
 			if (buildParametersContext.Parameters.VerifyBuildingResult)
 			{
-				var buildResultContext = context.GetContextObject<TaskBuilding_SBP.SBPBuildResultContext>();
+				var buildResultContext = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
 				VerifyingBuildingResult(context, buildResultContext.Results);
 			}
 		}

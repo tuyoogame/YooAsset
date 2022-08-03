@@ -12,7 +12,7 @@ namespace YooAsset.Editor
 	[TaskAttribute("资源构建内容打包")]
 	public class TaskBuilding_SBP : IBuildTask
 	{
-		public class SBPBuildResultContext : IContextObject
+		public class BuildResultContext : IContextObject
 		{
 			public IBundleBuildResults Results;
 		}
@@ -42,14 +42,14 @@ namespace YooAsset.Editor
 			}
 
 			BuildRunner.Log("Unity引擎打包成功！");
-			SBPBuildResultContext buildResultContext = new SBPBuildResultContext();
+			BuildResultContext buildResultContext = new BuildResultContext();
 			buildResultContext.Results = buildResults;
 			context.SetContextObject(buildResultContext);
 
-			// 拷贝原生文件
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
 				CopyRawBundle(buildMapContext, buildParametersContext);
+				UpdateBuildBundleInfo(buildMapContext, buildParametersContext, buildResultContext);
 			}
 		}
 
@@ -68,6 +68,32 @@ namespace YooAsset.Editor
 						if (buildAsset.IsRawAsset)
 							EditorTools.CopyFile(buildAsset.AssetPath, dest, true);
 					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// 更新构建结果
+		/// </summary>
+		private void UpdateBuildBundleInfo(BuildMapContext buildMapContext, BuildParametersContext buildParametersContext, BuildResultContext buildResult)
+		{
+			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			{
+				string filePath = $"{buildParametersContext.PipelineOutputDirectory}/{bundleInfo.BundleName}";
+				bundleInfo.FileHash = HashUtility.FileMD5(filePath);
+				bundleInfo.FileCRC = HashUtility.FileCRC32(filePath);
+				bundleInfo.FileSize = FileUtility.GetFileSize(filePath);
+				if (bundleInfo.IsRawFile)
+				{
+					bundleInfo.ContentHash = bundleInfo.FileHash;
+				}
+				else
+				{
+					// 注意：当资源包的依赖列表发生变化的时候，ContentHash也会发生变化！
+					if (buildResult.Results.BundleInfos.TryGetValue(bundleInfo.BundleName, out var value))
+						bundleInfo.ContentHash = value.Hash.ToString();
+					else
+						throw new Exception($"Not found bundle in build result : {bundleInfo.BundleName}");
 				}
 			}
 		}

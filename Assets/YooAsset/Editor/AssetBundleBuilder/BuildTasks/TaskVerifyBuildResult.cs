@@ -22,8 +22,8 @@ namespace YooAsset.Editor
 			// 验证构建结果
 			if (buildParametersContext.Parameters.VerifyBuildingResult)
 			{
-				var unityManifestContext = context.GetContextObject<TaskBuilding.UnityManifestContext>();
-				VerifyingBuildingResult(context, unityManifestContext.UnityManifest);
+				var buildResultContext = context.GetContextObject<TaskBuilding.BuildResultContext>();
+				VerifyingBuildingResult(context, buildResultContext.UnityManifest);
 			}
 		}
 

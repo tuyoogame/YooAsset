@@ -35,6 +35,26 @@ namespace YooAsset.Editor
 			}
 		}
 
+		/// <summary>
+		/// 构建内容哈希值
+		/// </summary>
+		public string ContentHash { set; get; } = "00000000000000000000000000000000"; //32位
+
+		/// <summary>
+		/// 文件哈希值
+		/// </summary>
+		public string FileHash { set; get; } = "00000000000000000000000000000000"; //32位
+
+		/// <summary>
+		/// 文件CRC32
+		/// </summary>
+		public string FileCRC { set; get; } = "00000000"; //8位
+
+		/// <summary>
+		/// 文件大小
+		/// </summary>
+		public long FileSize { set; get; } = 0;
+
 
 		public BuildBundleInfo(string bundleName)
 		{

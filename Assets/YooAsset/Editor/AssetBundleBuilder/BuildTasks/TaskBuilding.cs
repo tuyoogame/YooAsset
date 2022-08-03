@@ -10,7 +10,7 @@ namespace YooAsset.Editor
 	[TaskAttribute("资源构建内容打包")]
 	public class TaskBuilding : IBuildTask
 	{
-		public class UnityManifestContext : IContextObject
+		public class BuildResultContext : IContextObject
 		{
 			public AssetBundleManifest UnityManifest;
 		}
@@ -26,19 +26,19 @@ namespace YooAsset.Editor
 				return;
 
 			BuildAssetBundleOptions opt = buildParametersContext.GetPipelineBuildOptions();
-			AssetBundleManifest unityManifest = BuildPipeline.BuildAssetBundles(buildParametersContext.PipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), opt, buildParametersContext.Parameters.BuildTarget);
-			if (unityManifest == null)
+			AssetBundleManifest buildResults = BuildPipeline.BuildAssetBundles(buildParametersContext.PipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), opt, buildParametersContext.Parameters.BuildTarget);
+			if (buildResults == null)
 				throw new Exception("构建过程中发生错误！");
 
 			BuildRunner.Log("Unity引擎打包成功！");
-			UnityManifestContext unityManifestContext = new UnityManifestContext();
-			unityManifestContext.UnityManifest = unityManifest;
-			context.SetContextObject(unityManifestContext);
+			BuildResultContext buildResultContext = new BuildResultContext();
+			buildResultContext.UnityManifest = buildResults;
+			context.SetContextObject(buildResultContext);
 
-			// 拷贝原生文件
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
 				CopyRawBundle(buildMapContext, buildParametersContext);
+				UpdateBuildBundleInfo(buildMapContext, buildParametersContext, buildResultContext);
 			}
 		}
 
@@ -57,6 +57,32 @@ namespace YooAsset.Editor
 						if (buildAsset.IsRawAsset)
 							EditorTools.CopyFile(buildAsset.AssetPath, dest, true);
 					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// 更新构建结果
+		/// </summary>
+		private void UpdateBuildBundleInfo(BuildMapContext buildMapContext, BuildParametersContext buildParametersContext, BuildResultContext buildResult)
+		{
+			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			{
+				string filePath = $"{buildParametersContext.PipelineOutputDirectory}/{bundleInfo.BundleName}";
+				bundleInfo.FileHash = HashUtility.FileMD5(filePath);
+				bundleInfo.FileCRC = HashUtility.FileCRC32(filePath);
+				bundleInfo.FileSize = FileUtility.GetFileSize(filePath);
+				if (bundleInfo.IsRawFile)
+				{
+					bundleInfo.ContentHash = bundleInfo.FileHash;
+				}
+				else
+				{
+					var hash = buildResult.UnityManifest.GetAssetBundleHash(bundleInfo.BundleName);
+					if (hash.isValid)
+						bundleInfo.ContentHash = hash.ToString();
+					else
+						throw new Exception($"Not found bundle in build result : {bundleInfo.BundleName}");
 				}
 			}
 		}

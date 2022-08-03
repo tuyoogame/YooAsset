@@ -34,19 +34,24 @@ namespace YooAsset.Editor
 		public string FileName;
 
 		/// <summary>
-		/// 哈希值
+		/// 内容哈希值
 		/// </summary>
-		public string Hash;
+		public string ContentHash;
+
+		/// <summary>
+		/// 文件哈希值
+		/// </summary>
+		public string FileHash;
 
 		/// <summary>
 		/// 文件校验码
 		/// </summary>
-		public string CRC;
+		public string FileCRC;
 
 		/// <summary>
 		/// 文件大小（字节数）
 		/// </summary>
-		public long SizeBytes;
+		public long FileSize;
 
 		/// <summary>
 		/// Tags

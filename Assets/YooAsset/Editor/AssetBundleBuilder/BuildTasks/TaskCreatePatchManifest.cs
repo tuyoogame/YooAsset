@@ -22,8 +22,6 @@ namespace YooAsset.Editor
 		private void CreatePatchManifestFile(BuildContext context)
 		{
 			var buildParameters = context.GetContextObject<BuildParametersContext>();
-			var buildMapContext = context.GetContextObject<BuildMapContext>();
-			var encryptionContext = context.GetContextObject<TaskEncryption.EncryptionContext>();
 			int resourceVersion = buildParameters.Parameters.BuildVersion;
 
 			// 创建新补丁清单
@@ -33,13 +31,13 @@ namespace YooAsset.Editor
 			patchManifest.EnableAddressable = buildParameters.Parameters.EnableAddressable;
 			patchManifest.OutputNameStyle = (int)buildParameters.Parameters.OutputNameStyle;
 			patchManifest.BuildinTags = buildParameters.Parameters.BuildinTags;
-			patchManifest.BundleList = GetAllPatchBundle(buildParameters, buildMapContext, encryptionContext);
-			patchManifest.AssetList = GetAllPatchAsset(buildParameters, buildMapContext, patchManifest);
+			patchManifest.BundleList = GetAllPatchBundle(context);
+			patchManifest.AssetList = GetAllPatchAsset(context, patchManifest);
 
 			// 更新Unity内置资源包的引用关系
 			if (buildParameters.Parameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
-				var buildResultContext = context.GetContextObject<TaskBuilding_SBP.SBPBuildResultContext>();
+				var buildResultContext = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
 				UpdateBuiltInBundleReference(patchManifest, buildResultContext.Results);
 			}
 
@@ -64,27 +62,28 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取资源包列表
 		/// </summary>
-		private List<PatchBundle> GetAllPatchBundle(BuildParametersContext buildParameters, BuildMapContext buildMapContext,
-			TaskEncryption.EncryptionContext encryptionContext)
+		private List<PatchBundle> GetAllPatchBundle(BuildContext context)
 		{
+			var buildParameters = context.GetContextObject<BuildParametersContext>();
+			var buildMapContext = context.GetContextObject<BuildMapContext>();
+			var encryptionContext = context.GetContextObject<TaskEncryption.EncryptionContext>();
+
 			List<PatchBundle> result = new List<PatchBundle>(1000);
 
 			List<string> buildinTags = buildParameters.Parameters.GetBuildinTags();
-			var buildMode = buildParameters.Parameters.BuildMode;
-			bool standardBuild = buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild;
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				var bundleName = bundleInfo.BundleName;
-				string filePath = $"{buildParameters.PipelineOutputDirectory}/{bundleName}";
-				string hash = GetFileHash(filePath, standardBuild);
-				string crc32 = GetFileCRC(filePath, standardBuild);
-				long size = GetFileSize(filePath, standardBuild);
+				string contentHash = bundleInfo.ContentHash;
+				string fileHash = bundleInfo.FileHash;
+				string fileCRC = bundleInfo.FileCRC;
+				long fileSize = bundleInfo.FileSize;
 				string[] tags = buildMapContext.GetBundleTags(bundleName);
 				bool isEncrypted = encryptionContext.IsEncryptFile(bundleName);
 				bool isBuildin = IsBuildinBundle(tags, buildinTags);
 				bool isRawFile = bundleInfo.IsRawFile;
 
-				PatchBundle patchBundle = new PatchBundle(bundleName, hash, crc32, size, tags);
+				PatchBundle patchBundle = new PatchBundle(bundleName, contentHash, fileHash, fileCRC, fileSize, tags);
 				patchBundle.SetFlagsValue(isEncrypted, isBuildin, isRawFile);
 				result.Add(patchBundle);
 			}
@@ -104,33 +103,15 @@ namespace YooAsset.Editor
 			}
 			return false;
 		}
-		private string GetFileHash(string filePath, bool standardBuild)
-		{
-			if (standardBuild)
-				return HashUtility.FileMD5(filePath);
-			else
-				return "00000000000000000000000000000000"; //32位
-		}
-		private string GetFileCRC(string filePath, bool standardBuild)
-		{
-			if (standardBuild)
-				return HashUtility.FileCRC32(filePath);
-			else
-				return "00000000"; //8位
-		}
-		private long GetFileSize(string filePath, bool standardBuild)
-		{
-			if (standardBuild)
-				return FileUtility.GetFileSize(filePath);
-			else
-				return 0;
-		}
 
 		/// <summary>
 		/// 获取资源列表
 		/// </summary>
-		private List<PatchAsset> GetAllPatchAsset(BuildParametersContext buildParameters, BuildMapContext buildMapContext, PatchManifest patchManifest)
+		private List<PatchAsset> GetAllPatchAsset(BuildContext context, PatchManifest patchManifest)
 		{
+			var buildParameters = context.GetContextObject<BuildParametersContext>();
+			var buildMapContext = context.GetContextObject<BuildMapContext>();
+
 			List<PatchAsset> result = new List<PatchAsset>(1000);
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
@@ -206,7 +187,7 @@ namespace YooAsset.Editor
 				if (conflictAssetPathList.Count > 0)
 				{
 					List<int> newDependIDs = new List<int>(patchAsset.DependIDs);
-					if(newDependIDs.Contains(shaderBundleId) == false)
+					if (newDependIDs.Contains(shaderBundleId) == false)
 						newDependIDs.Add(shaderBundleId);
 					patchAsset.DependIDs = newDependIDs.ToArray();
 				}
