@@ -55,5 +55,13 @@ namespace YooAsset
 		{
 			return $"{Setting.PatchManifestFileName}_{resourceVersion}.hash";
 		}
+
+		/// <summary>
+		/// 获取着色器资源包全名称（包含后缀名）
+		/// </summary>
+		public static string GetUnityShadersBundleFullName()
+		{
+			return $"{YooAssetSettings.UnityShadersBundleName}.{Setting.AssetBundleFileVariant}";
+		}
 	}
 }
