@@ -183,24 +183,31 @@ namespace YooAsset.Editor
 		/// </summary>
 		private void UpdateBuiltInBundleReference(PatchManifest patchManifest, IBundleBuildResults buildResults)
 		{
-			// 获取所有依赖内置资源包的资源包列表
-			List<string> builtInBundleReferenceList = new List<string>();
+			// 获取所有依赖着色器资源包的资源包列表
+			string shadersBunldeName = YooAssetSettingsData.GetUnityShadersBundleFullName();
+			List<string> shaderBundleReferenceList = new List<string>();
 			foreach (var valuePair in buildResults.BundleInfos)
 			{
-				if (valuePair.Value.Dependencies.Any(t => t == YooAssetSettings.UnityBuiltInShadersBundleName))
-					builtInBundleReferenceList.Add(valuePair.Key);
+				if (valuePair.Value.Dependencies.Any(t => t == shadersBunldeName))
+					shaderBundleReferenceList.Add(valuePair.Key);
 			}
 
+			// 获取着色器资源包索引
+			Predicate<PatchBundle> predicate = new Predicate<PatchBundle>(s => s.BundleName == shadersBunldeName);
+			int shaderBundleId = patchManifest.BundleList.FindIndex(predicate);
+			if (shaderBundleId == -1)
+				throw new Exception("没有发现着色器资源包！");
+
 			// 检测依赖交集并更新依赖ID
-			int builtInBundleId = patchManifest.BundleList.Count - 1;
 			foreach (var patchAsset in patchManifest.AssetList)
 			{
 				List<string> dependBundles = GetPatchAssetAllDependBundles(patchManifest, patchAsset);
-				List<string> conflictAssetPathList = dependBundles.Intersect(builtInBundleReferenceList).ToList();
+				List<string> conflictAssetPathList = dependBundles.Intersect(shaderBundleReferenceList).ToList();
 				if (conflictAssetPathList.Count > 0)
 				{
 					List<int> newDependIDs = new List<int>(patchAsset.DependIDs);
-					newDependIDs.Add(builtInBundleId);
+					if(newDependIDs.Contains(shaderBundleId) == false)
+						newDependIDs.Add(shaderBundleId);
 					patchAsset.DependIDs = newDependIDs.ToArray();
 				}
 			}

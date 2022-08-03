@@ -64,16 +64,6 @@ namespace YooAsset.Editor
 		public bool CopyBuildinTagFiles;
 
 		/// <summary>
-		/// 自动收集着色器
-		/// </summary>
-		public bool AutoCollectShaders;
-
-		/// <summary>
-		/// 自动收集的着色器资源包名称
-		/// </summary>
-		public string ShadersBundleName;
-
-		/// <summary>
 		/// 加密服务类名称
 		/// </summary>
 		public string EncryptionServicesClassName;

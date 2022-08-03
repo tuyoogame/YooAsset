@@ -48,8 +48,6 @@ namespace YooAsset.Editor
 				buildReport.Summary.BuildinTags = buildParameters.Parameters.BuildinTags;
 				buildReport.Summary.EnableAddressable = buildParameters.Parameters.EnableAddressable;
 				buildReport.Summary.CopyBuildinTagFiles = buildParameters.Parameters.CopyBuildinTagFiles;
-				buildReport.Summary.AutoCollectShaders = AssetBundleCollectorSettingData.Setting.AutoCollectShaders;
-				buildReport.Summary.ShadersBundleName = AssetBundleCollectorSettingData.Setting.ShadersBundleName;
 				buildReport.Summary.EncryptionServicesClassName = buildParameters.Parameters.EncryptionServices == null ?
 					"null" : buildParameters.Parameters.EncryptionServices.GetType().FullName;
 

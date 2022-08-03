@@ -35,21 +35,29 @@ namespace YooAsset.Editor
 		{
 			var buildParameters = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
-
-			// 1. 移除特定Bundle
 			List<string> buildedBundles = buildResults.BundleInfos.Keys.ToList();
-			buildedBundles.Remove(YooAssetSettings.UnityBuiltInShadersBundleName);
 
-			// 2. 过滤掉原生Bundle
+			// 1. 过滤掉原生Bundle
 			List<string> expectBundles = buildMapContext.BundleInfos.Where(t => t.IsRawFile == false).Select(t => t.BundleName).ToList();
 
-			// 3. 验证Bundle
-			List<string> intersectBundleList = buildedBundles.Except(expectBundles).ToList();
-			if (intersectBundleList.Count > 0)
+			// 2. 验证Bundle
+			List<string> exceptBundleList1 = buildedBundles.Except(expectBundles).ToList();
+			if (exceptBundleList1.Count > 0)
 			{
-				foreach (var intersectBundle in intersectBundleList)
+				foreach (var exceptBundle in exceptBundleList1)
 				{
-					Debug.LogWarning($"差异资源包: {intersectBundle}");
+					Debug.LogWarning($"差异资源包: {exceptBundle}");
+				}
+				throw new System.Exception("存在差异资源包！请查看警告信息！");
+			}
+
+			// 3. 验证Bundle
+			List<string> exceptBundleList2 = expectBundles.Except(buildedBundles).ToList();
+			if (exceptBundleList2.Count > 0)
+			{
+				foreach (var exceptBundle in exceptBundleList2)
+				{
+					Debug.LogWarning($"差异资源包: {exceptBundle}");
 				}
 				throw new System.Exception("存在差异资源包！请查看警告信息！");
 			}

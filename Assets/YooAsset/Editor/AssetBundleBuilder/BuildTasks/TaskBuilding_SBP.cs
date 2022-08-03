@@ -2,11 +2,10 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
 
 using UnityEditor.Build.Pipeline;
 using UnityEditor.Build.Pipeline.Interfaces;
+using UnityEditor.Build.Pipeline.Tasks;
 
 namespace YooAsset.Editor
 {
@@ -34,7 +33,8 @@ namespace YooAsset.Editor
 			// 开始构建
 			IBundleBuildResults buildResults;
 			var buildParameters = buildParametersContext.GetSBPBuildParameters();
-			var taskList = DefaultBuildTasks.Create(DefaultBuildTasks.Preset.AssetBundleBuiltInShaderExtraction);
+			var shadersBunldeName = YooAssetSettingsData.GetUnityShadersBundleFullName();
+			var taskList = SBPBuildTasks.Create(shadersBunldeName);
 			ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out buildResults, taskList);
 			if (exitCode < 0)
 			{
@@ -45,13 +45,6 @@ namespace YooAsset.Editor
 			SBPBuildResultContext buildResultContext = new SBPBuildResultContext();
 			buildResultContext.Results = buildResults;
 			context.SetContextObject(buildResultContext);
-
-			// 添加Unity内置资源包信息
-			if (buildResults.BundleInfos.Keys.Any(t => t == YooAssetSettings.UnityBuiltInShadersBundleName))
-			{
-				BuildBundleInfo builtInBundleInfo = new BuildBundleInfo(YooAssetSettings.UnityBuiltInShadersBundleName);
-				buildMapContext.BundleInfos.Add(builtInBundleInfo);
-			}
 
 			// 拷贝原生文件
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
