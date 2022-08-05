@@ -84,8 +84,8 @@ namespace YooAsset.Editor
 				foreach (var patchBundle in patchManifest.BundleList)
 				{
 					fileCount++;
-					string sourcePath = $"{outputDirectory}/{patchBundle.Hash}";
-					string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{patchBundle.Hash}";
+					string sourcePath = $"{outputDirectory}/{patchBundle.FileName}";
+					string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{patchBundle.FileName}";
 					EditorTools.CopyFile(sourcePath, destPath, true);
 				}
 			}
@@ -97,8 +97,8 @@ namespace YooAsset.Editor
 						continue;
 
 					fileCount++;
-					string sourcePath = $"{outputDirectory}/{patchBundle.Hash}";
-					string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{patchBundle.Hash}";
+					string sourcePath = $"{outputDirectory}/{patchBundle.FileName}";
+					string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{patchBundle.FileName}";
 					EditorTools.CopyFile(sourcePath, destPath, true);
 				}
 			}
