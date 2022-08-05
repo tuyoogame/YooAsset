@@ -25,8 +25,8 @@ namespace YooAsset.Editor
 			EditorGUILayout.Space();
 			ShaderVariantCollectorSettingData.Setting.SavePath = EditorGUILayout.TextField("收集文件保存路径", ShaderVariantCollectorSettingData.Setting.SavePath);
 
-			int currentShaderCount = ShaderVariantCollector.GetCurrentShaderVariantCollectionShaderCount();
-			int currentVariantCount = ShaderVariantCollector.GetCurrentShaderVariantCollectionVariantCount();
+			int currentShaderCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionShaderCount();
+			int currentVariantCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionVariantCount();
 			EditorGUILayout.LabelField($"CurrentShaderCount : {currentShaderCount}");
 			EditorGUILayout.LabelField($"CurrentVariantCount : {currentVariantCount}");
 

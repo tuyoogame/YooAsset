@@ -28,7 +28,7 @@ namespace YooAsset.Editor
 				EditorApplication.update -= EditorUpdate;
 
 				// 保存结果
-				SaveCurrentShaderVariantCollection();
+				ShaderVariantCollectionHelper.SaveCurrentShaderVariantCollection(_saveFilePath);
 
 				// 创建说明文件
 				CreateReadme();
@@ -61,7 +61,7 @@ namespace YooAsset.Editor
 			EditorTools.FocusUnityGameWindow();
 
 			// 清空旧数据
-			ClearCurrentShaderVariantCollection();
+			ShaderVariantCollectionHelper.ClearCurrentShaderVariantCollection();
 
 			// 创建临时测试场景
 			CreateTemperScene();
@@ -181,7 +181,6 @@ namespace YooAsset.Editor
 			go.transform.position = position;
 			go.name = $"Sphere_{index}|{material.name}";
 		}
-
 		private static void CreateReadme()
 		{
 			AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
@@ -189,29 +188,13 @@ namespace YooAsset.Editor
 			ShaderVariantCollection svc = AssetDatabase.LoadAssetAtPath<ShaderVariantCollection>(_saveFilePath);
 			if (svc != null)
 			{
-				var wrapper = ShaderVariantCollectionHelper.Extract(svc);
+				var wrapper = ShaderVariantCollectionReadme.Extract(svc);
 				string jsonContents = JsonUtility.ToJson(wrapper, true);
-				string savePath = _saveFilePath.Replace(".shadervariants", "_Readme.json");
+				string savePath = _saveFilePath.Replace(".shadervariants", "Manifest.json");
 				File.WriteAllText(savePath, jsonContents);
 			}
 
 			AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-		}
-		private static void ClearCurrentShaderVariantCollection()
-		{
-			EditorTools.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "ClearCurrentShaderVariantCollection");
-		}
-		private static void SaveCurrentShaderVariantCollection()
-		{
-			EditorTools.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "SaveCurrentShaderVariantCollection", _saveFilePath);
-		}
-		public static int GetCurrentShaderVariantCollectionShaderCount()
-		{
-			return (int)EditorTools.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "GetCurrentShaderVariantCollectionShaderCount");
-		}
-		public static int GetCurrentShaderVariantCollectionVariantCount()
-		{
-			return (int)EditorTools.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "GetCurrentShaderVariantCollectionVariantCount");
 		}
 	}
 }
