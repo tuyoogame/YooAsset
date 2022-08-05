@@ -100,10 +100,17 @@ namespace YooAsset
 			/// </summary>
 			public bool ClearCacheWhenDirty = false;
 
+#if UNITY_WEBGL
+			/// <summary>
+			/// WEBGL模式不支持多线程下载
+			/// </summary>
+			internal int BreakpointResumeFileSize = int.MaxValue;
+#else
 			/// <summary>
 			/// 启用断点续传功能的文件大小
 			/// </summary>
 			public int BreakpointResumeFileSize = int.MaxValue;
+#endif
 
 			/// <summary>
 			/// 下载文件校验等级
@@ -194,12 +201,8 @@ namespace YooAsset
 			// 初始化下载系统
 			if (_playMode == EPlayMode.HostPlayMode)
 			{
-#if UNITY_WEBGL
-				throw new Exception($"{EPlayMode.HostPlayMode} not supports WebGL platform !");
-#else
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
 				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize, hostPlayModeParameters.VerifyLevel);
-#endif
 			}
 
 			// 初始化资源系统

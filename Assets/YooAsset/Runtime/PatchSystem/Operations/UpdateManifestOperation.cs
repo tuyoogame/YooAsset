@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
 namespace YooAsset
 {
@@ -69,7 +68,7 @@ namespace YooAsset
 		private ESteps _steps = ESteps.None;
 		private UnityWebDataRequester _downloader1;
 		private UnityWebDataRequester _downloader2;
-		private VerifyManager _verifyManager = new VerifyManager();
+		private PatchCacheVerifier _patchCacheVerifier;
 		private float _verifyTime;
 
 		internal HostPlayModeUpdateManifestOperation(HostPlayModeImpl impl, int resourceVersion, int timeout)
@@ -77,6 +76,12 @@ namespace YooAsset
 			_impl = impl;
 			_resourceVersion = resourceVersion;
 			_timeout = timeout;
+
+#if UNITY_WEBGL
+			_patchCacheVerifier = new PatchCacheVerifierWithoutThread();
+#else
+			_patchCacheVerifier = new PatchCacheVerifierWithThread();
+#endif
 		}
 		internal override void Start()
 		{
@@ -172,20 +177,20 @@ namespace YooAsset
 
 			if (_steps == ESteps.InitVerifyingCache)
 			{
-				_verifyManager.InitVerifyingCache(_impl.AppPatchManifest, _impl.LocalPatchManifest, false);
+				_patchCacheVerifier.InitVerifier(_impl.AppPatchManifest, _impl.LocalPatchManifest, false);
 				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
 				_steps = ESteps.UpdateVerifyingCache;
 			}
 
 			if (_steps == ESteps.UpdateVerifyingCache)
 			{
-				Progress = _verifyManager.GetVerifyProgress();
-				if (_verifyManager.UpdateVerifyingCache())
+				Progress = _patchCacheVerifier.GetVerifierProgress();
+				if (_patchCacheVerifier.UpdateVerifier())
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
 					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
-					YooLogger.Log($"Verify result : Success {_verifyManager.VerifySuccessCount}, Fail {_verifyManager.VerifyFailCount}, Elapsed time {costTime} seconds");
+					YooLogger.Log($"Verify result : Success {_patchCacheVerifier.VerifySuccessCount}, Fail {_patchCacheVerifier.VerifyFailCount}, Elapsed time {costTime} seconds");
 				}
 			}
 		}
@@ -268,13 +273,19 @@ namespace YooAsset
 		private readonly HostPlayModeImpl _impl;
 		private readonly int _resourceVersion;
 		private ESteps _steps = ESteps.None;
-		private VerifyManager _verifyManager = new VerifyManager();
+		private PatchCacheVerifier _patchCacheVerifier;
 		private float _verifyTime;
 
 		internal HostPlayModeWeaklyUpdateManifestOperation(HostPlayModeImpl impl, int resourceVersion)
 		{
 			_impl = impl;
 			_resourceVersion = resourceVersion;
+
+#if UNITY_WEBGL
+			_patchCacheVerifier = new PatchCacheVerifierWithoutThread();
+#else
+			_patchCacheVerifier = new PatchCacheVerifierWithThread();
+#endif
 		}
 		internal override void Start()
 		{
@@ -293,7 +304,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.InitVerifyingCache)
 			{
-				if (_verifyManager.InitVerifyingCache(_impl.AppPatchManifest, _impl.LocalPatchManifest, true))
+				if (_patchCacheVerifier.InitVerifier(_impl.AppPatchManifest, _impl.LocalPatchManifest, true))
 				{
 					_verifyTime = UnityEngine.Time.realtimeSinceStartup;
 					_steps = ESteps.UpdateVerifyingCache;
@@ -308,12 +319,12 @@ namespace YooAsset
 
 			if (_steps == ESteps.UpdateVerifyingCache)
 			{
-				Progress = _verifyManager.GetVerifyProgress();
-				if (_verifyManager.UpdateVerifyingCache())
+				Progress = _patchCacheVerifier.GetVerifierProgress();
+				if (_patchCacheVerifier.UpdateVerifier())
 				{
 					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
-					YooLogger.Log($"Verify result : Success {_verifyManager.VerifySuccessCount}, Fail {_verifyManager.VerifyFailCount}, Elapsed time {costTime} seconds");
-					if (_verifyManager.VerifyFailCount > 0)
+					YooLogger.Log($"Verify result : Success {_patchCacheVerifier.VerifySuccessCount}, Fail {_patchCacheVerifier.VerifyFailCount}, Elapsed time {costTime} seconds");
+					if (_patchCacheVerifier.VerifyFailCount > 0)
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
@@ -342,145 +353,6 @@ namespace YooAsset
 				var sandboxPatchManifest = PatchManifest.Deserialize(jsonData);
 				_impl.SetLocalPatchManifest(sandboxPatchManifest);
 			}
-		}
-	}
-
-	/// <summary>
-	/// 本地缓存文件验证管理器
-	/// </summary>
-	internal class VerifyManager
-	{
-		private class ThreadInfo
-		{
-			public bool Result = false;
-			public string FilePath { private set; get; }
-			public PatchBundle Bundle { private set; get; }
-			public ThreadInfo(string filePath, PatchBundle bundle)
-			{
-				FilePath = filePath;
-				Bundle = bundle;
-			}
-		}
-
-		private readonly List<PatchBundle> _waitingList = new List<PatchBundle>(1000);
-		private readonly List<PatchBundle> _verifyingList = new List<PatchBundle>(100);
-		private readonly ThreadSyncContext _syncContext = new ThreadSyncContext();
-		private int _verifyMaxNum = 32;
-		private int _verifyTotalCount = 0;
-
-		public int VerifySuccessCount { private set; get; } = 0;
-		public int VerifyFailCount { private set; get; } = 0;
-
-		public bool InitVerifyingCache(PatchManifest appPatchManifest, PatchManifest localPatchManifest, bool weaklyUpdate)
-		{
-			// 遍历所有文件然后验证并缓存合法文件
-			foreach (var patchBundle in localPatchManifest.BundleList)
-			{
-				// 忽略缓存文件
-				if (DownloadSystem.ContainsVerifyFile(patchBundle.FileHash))
-					continue;
-
-				// 忽略APP资源
-				// 注意：如果是APP资源并且哈希值相同，则不需要下载
-				if (appPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
-				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.FileHash == patchBundle.FileHash)
-						continue;
-				}
-
-				// 注意：在弱联网模式下，我们需要验证指定资源版本的所有资源完整性
-				if (weaklyUpdate)
-				{
-					string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
-					if (File.Exists(filePath))
-						_waitingList.Add(patchBundle);
-					else
-						return false;
-				}
-				else
-				{
-					string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
-					if (File.Exists(filePath))
-						_waitingList.Add(patchBundle);
-				}
-			}
-
-			// 设置同时验证的最大数
-			ThreadPool.GetMaxThreads(out int workerThreads, out int ioThreads);
-			YooLogger.Log($"Work threads : {workerThreads}, IO threads : {ioThreads}");
-			_verifyMaxNum = Math.Min(workerThreads, ioThreads);
-			_verifyTotalCount = _waitingList.Count;
-			return true;
-		}
-		public bool UpdateVerifyingCache()
-		{
-			_syncContext.Update();
-
-			if (_waitingList.Count == 0 && _verifyingList.Count == 0)
-				return true;
-
-			if (_verifyingList.Count >= _verifyMaxNum)
-				return false;
-
-			for (int i = _waitingList.Count - 1; i >= 0; i--)
-			{
-				if (_verifyingList.Count >= _verifyMaxNum)
-					break;
-
-				var patchBundle = _waitingList[i];
-				if (RunThread(patchBundle))
-				{
-					_waitingList.RemoveAt(i);
-					_verifyingList.Add(patchBundle);
-				}
-				else
-				{
-					YooLogger.Warning("The thread pool is failed queued.");
-					break;
-				}
-			}
-
-			return false;
-		}
-		public float GetVerifyProgress()
-		{
-			if (_verifyTotalCount == 0)
-				return 1f;
-			return (float)(VerifySuccessCount + VerifyFailCount) / _verifyTotalCount;
-		}
-
-		private bool RunThread(PatchBundle patchBundle)
-		{
-			string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
-			ThreadInfo info = new ThreadInfo(filePath, patchBundle);
-			return ThreadPool.QueueUserWorkItem(new WaitCallback(VerifyInThread), info);
-		}
-		private void VerifyInThread(object infoObj)
-		{
-			ThreadInfo info = (ThreadInfo)infoObj;
-			info.Result = DownloadSystem.CheckContentIntegrity(info.FilePath, info.Bundle.FileSize, info.Bundle.FileCRC);
-			_syncContext.Post(VerifyCallback, info);
-		}
-		private void VerifyCallback(object obj)
-		{
-			ThreadInfo info = (ThreadInfo)obj;
-			if (info.Result)
-			{
-				VerifySuccessCount++;
-				DownloadSystem.CacheVerifyFile(info.Bundle.FileHash, info.Bundle.FileName);
-			}
-			else
-			{
-				VerifyFailCount++;
-
-				// NOTE：不期望删除断点续传的资源文件
-				/*
-				YooLogger.Warning($"Failed to verify file : {info.FilePath}");
-				if (File.Exists(info.FilePath))
-					File.Delete(info.FilePath);
-				*/
-			}
-			_verifyingList.Remove(info.Bundle);
 		}
 	}
 }
