@@ -102,7 +102,7 @@ namespace YooAsset
 			{
 				string error = $"{nameof(SceneOperationHandle)} is invalid.";
 				var operation = new UnloadSceneOperation(error);
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 
@@ -112,7 +112,7 @@ namespace YooAsset
 				string error = $"Cannot unload main scene. Use {nameof(YooAssets.LoadSceneAsync)} method to change the main scene !";
 				YooLogger.Error(error);
 				var operation = new UnloadSceneOperation(error);
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 
@@ -121,7 +121,7 @@ namespace YooAsset
 			AssetSystem.UnloadSubScene(Provider);
 			{
 				var operation = new UnloadSceneOperation(sceneObject);
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 		}

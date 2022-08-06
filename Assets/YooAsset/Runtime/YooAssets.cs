@@ -261,13 +261,13 @@ namespace YooAsset
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdateStaticVersionOperation();
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				var operation = new OfflinePlayModeUpdateStaticVersionOperation();
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
@@ -291,13 +291,13 @@ namespace YooAsset
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdateManifestOperation();
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				var operation = new OfflinePlayModeUpdateManifestOperation();
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
@@ -321,13 +321,13 @@ namespace YooAsset
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdateManifestOperation();
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				var operation = new OfflinePlayModeUpdateManifestOperation();
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
@@ -344,9 +344,9 @@ namespace YooAsset
 		/// 开启一个异步操作
 		/// </summary>
 		/// <param name="operation">异步操作对象</param>
-		public static void StartOperaiton(GameAsyncOperation operation)
+		public static void StartOperation(GameAsyncOperation operation)
 		{
-			OperationSystem.StartOperaiton(operation);
+			OperationSystem.StartOperation(operation);
 		}
 
 		/// <summary>
@@ -512,7 +512,7 @@ namespace YooAsset
 			if (assetInfo.IsInvalid)
 			{
 				RawFileOperation operation = new CompletedRawFileOperation(assetInfo.Error, copyPath);
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 
@@ -522,26 +522,26 @@ namespace YooAsset
 				string error = $"Cannot load asset bundle file using {nameof(GetRawFileAsync)} interfaces !";
 				YooLogger.Warning(error);
 				RawFileOperation operation = new CompletedRawFileOperation(error, copyPath);
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				RawFileOperation operation = new EditorPlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				RawFileOperation operation = new OfflinePlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
 				RawFileOperation operation = new HostPlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else
@@ -959,13 +959,13 @@ namespace YooAsset
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdatePackageOperation();
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				var operation = new OfflinePlayModeUpdatePackageOperation();
-				OperationSystem.StartOperaiton(operation);
+				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)

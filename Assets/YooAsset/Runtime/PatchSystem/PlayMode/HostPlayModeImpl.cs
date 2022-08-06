@@ -33,7 +33,7 @@ namespace YooAsset
 			_fallbackHostServer = fallbackHostServer;
 
 			var operation = new HostPlayModeInitializationOperation(this);
-			OperationSystem.StartOperaiton(operation);
+			OperationSystem.StartOperation(operation);
 			return operation;
 		}
 
@@ -43,7 +43,7 @@ namespace YooAsset
 		public UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout)
 		{
 			var operation = new HostPlayModeUpdateStaticVersionOperation(this, timeout);
-			OperationSystem.StartOperaiton(operation);
+			OperationSystem.StartOperation(operation);
 			return operation;
 		}
 
@@ -53,7 +53,7 @@ namespace YooAsset
 		public UpdateManifestOperation UpdatePatchManifestAsync(int resourceVersion, int timeout)
 		{
 			var operation = new HostPlayModeUpdateManifestOperation(this, resourceVersion, timeout);
-			OperationSystem.StartOperaiton(operation);
+			OperationSystem.StartOperation(operation);
 			return operation;
 		}
 
@@ -63,7 +63,7 @@ namespace YooAsset
 		public UpdateManifestOperation WeaklyUpdatePatchManifestAsync(int resourceVersion)
 		{
 			var operation = new HostPlayModeWeaklyUpdateManifestOperation(this, resourceVersion);
-			OperationSystem.StartOperaiton(operation);
+			OperationSystem.StartOperation(operation);
 			return operation;
 		}
 
@@ -73,7 +73,7 @@ namespace YooAsset
 		public UpdatePackageOperation UpdatePackageAsync(int resourceVersion, int timeout)
 		{
 			var operation = new HostPlayModeUpdatePackageOperation(this, resourceVersion, timeout);
-			OperationSystem.StartOperaiton(operation);
+			OperationSystem.StartOperation(operation);
 			return operation;
 		}
 
@@ -138,7 +138,7 @@ namespace YooAsset
 				// 注意：如果是APP资源并且哈希值相同，则不需要下载
 				if (AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
 				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.FileHash == patchBundle.FileHash)
+					if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
 						continue;
 				}
 
@@ -170,7 +170,7 @@ namespace YooAsset
 				// 注意：如果是APP资源并且哈希值相同，则不需要下载
 				if (AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
 				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.FileHash == patchBundle.FileHash)
+					if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
 						continue;
 				}
 
@@ -240,7 +240,7 @@ namespace YooAsset
 				// 注意：如果是APP资源并且哈希值相同，则不需要下载
 				if (AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
 				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.FileHash == patchBundle.FileHash)
+					if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
 						continue;
 				}
 
@@ -386,7 +386,7 @@ namespace YooAsset
 			// 查询APP资源
 			if (AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
 			{
-				if (appPatchBundle.IsBuildin && appPatchBundle.FileHash == patchBundle.FileHash)
+				if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
 				{
 					BundleInfo bundleInfo = new BundleInfo(appPatchBundle, BundleInfo.ELoadMode.LoadFromStreaming);
 					return bundleInfo;

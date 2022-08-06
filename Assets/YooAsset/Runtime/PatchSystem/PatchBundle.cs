@@ -160,5 +160,16 @@ namespace YooAsset
 			else
 				return false;
 		}
+
+		/// <summary>
+		/// 检测资源包文件内容是否相同
+		/// </summary>
+		public bool Equals(PatchBundle otherBundle)
+		{
+			if (FileHash == otherBundle.FileHash)
+				return true;
+			
+			return false;
+		}
 	}
 }

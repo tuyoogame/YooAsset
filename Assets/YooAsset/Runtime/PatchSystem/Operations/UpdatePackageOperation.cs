@@ -205,7 +205,7 @@ namespace YooAsset
 				// 注意：如果是APP资源并且哈希值相同，则不需要下载
 				if (_impl.AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
 				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.FileHash == patchBundle.FileHash)
+					if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
 						continue;
 				}
 
