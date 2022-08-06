@@ -81,7 +81,7 @@ namespace YooAsset
 				if (hasError == false)
 				{
 					// 注意：如果文件验证失败需要删除文件				
-					if (DownloadSystem.CheckContentIntegrity(_bundleInfo.GetCacheLoadPath(), _bundleInfo.FileSize, _bundleInfo.FileCRC) == false)
+					if (CacheSystem.CheckContentIntegrity(_bundleInfo.GetCacheLoadPath(), _bundleInfo.FileSize, _bundleInfo.FileCRC) == false)
 					{
 						hasError = true;
 						_lastError = $"Verification failed";
@@ -91,7 +91,7 @@ namespace YooAsset
 				if (hasError == false)
 				{
 					_steps = ESteps.Succeed;
-					DownloadSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
+					CacheSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
 				}
 				else
 				{

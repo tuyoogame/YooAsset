@@ -12,7 +12,7 @@ namespace YooAsset
 			LoadFromEditor,
 		}
 
-		private readonly PatchBundle _patchBundle;
+		public readonly PatchBundle LoadBundle;
 		public readonly ELoadMode LoadMode;
 
 		private string _streamingPath;
@@ -50,10 +50,10 @@ namespace YooAsset
 		{
 			get
 			{
-				if (_patchBundle == null)
+				if (LoadBundle == null)
 					return string.Empty;
 				else
-					return _patchBundle.FileHash;
+					return LoadBundle.FileHash;
 			}
 		}
 		
@@ -64,10 +64,10 @@ namespace YooAsset
 		{
 			get
 			{
-				if (_patchBundle == null)
+				if (LoadBundle == null)
 					return string.Empty;
 				else
-					return _patchBundle.FileCRC;
+					return LoadBundle.FileCRC;
 			}
 		}
 
@@ -78,10 +78,10 @@ namespace YooAsset
 		{
 			get
 			{
-				if (_patchBundle == null)
+				if (LoadBundle == null)
 					return 0;
 				else
-					return _patchBundle.FileSize;
+					return LoadBundle.FileSize;
 			}
 		}
 
@@ -92,10 +92,10 @@ namespace YooAsset
 		{
 			get
 			{
-				if (_patchBundle == null)
+				if (LoadBundle == null)
 					return false;
 				else
-					return _patchBundle.IsEncrypted;
+					return LoadBundle.IsEncrypted;
 			}
 		}
 
@@ -106,10 +106,10 @@ namespace YooAsset
 		{
 			get
 			{
-				if (_patchBundle == null)
+				if (LoadBundle == null)
 					return false;
 				else
-					return _patchBundle.IsRawFile;
+					return LoadBundle.IsRawFile;
 			}
 		}
 
@@ -120,7 +120,7 @@ namespace YooAsset
 		{
 			get
 			{
-				return _patchBundle == null;
+				return LoadBundle == null;
 			}
 		}
 
@@ -130,7 +130,7 @@ namespace YooAsset
 		}
 		public BundleInfo(PatchBundle patchBundle, ELoadMode loadMode, string mainURL, string fallbackURL)
 		{
-			_patchBundle = patchBundle;
+			LoadBundle = patchBundle;
 			LoadMode = loadMode;
 			BundleName = patchBundle.BundleName;
 			FileName = patchBundle.FileName;
@@ -140,7 +140,7 @@ namespace YooAsset
 		}
 		public BundleInfo(PatchBundle patchBundle, ELoadMode loadMode, string editorAssetPath)
 		{
-			_patchBundle = patchBundle;
+			LoadBundle = patchBundle;
 			LoadMode = loadMode;
 			BundleName = patchBundle.BundleName;
 			FileName = patchBundle.FileName;
@@ -150,7 +150,7 @@ namespace YooAsset
 		}
 		public BundleInfo(PatchBundle patchBundle, ELoadMode loadMode)
 		{
-			_patchBundle = patchBundle;
+			LoadBundle = patchBundle;
 			LoadMode = loadMode;
 			BundleName = patchBundle.BundleName;
 			FileName = patchBundle.FileName;
@@ -164,11 +164,11 @@ namespace YooAsset
 		/// </summary>
 		public string GetStreamingLoadPath()
 		{
-			if (_patchBundle == null)
+			if (LoadBundle == null)
 				return string.Empty;
 
 			if (string.IsNullOrEmpty(_streamingPath))
-				_streamingPath = PathHelper.MakeStreamingLoadPath(_patchBundle.FileName);
+				_streamingPath = PathHelper.MakeStreamingLoadPath(LoadBundle.FileName);
 			return _streamingPath;
 		}
 
@@ -177,11 +177,11 @@ namespace YooAsset
 		/// </summary>
 		public string GetCacheLoadPath()
 		{
-			if (_patchBundle == null)
+			if (LoadBundle == null)
 				return string.Empty;
 
 			if (string.IsNullOrEmpty(_cachePath))
-				_cachePath = SandboxHelper.MakeCacheFilePath(_patchBundle.FileName);
+				_cachePath = SandboxHelper.MakeCacheFilePath(LoadBundle.FileName);
 			return _cachePath;
 		}
 

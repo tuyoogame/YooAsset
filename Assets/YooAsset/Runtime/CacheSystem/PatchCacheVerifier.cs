@@ -48,7 +48,7 @@ namespace YooAsset
 			foreach (var patchBundle in localPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (DownloadSystem.ContainsVerifyFile(patchBundle.FileHash))
+				if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
 					continue;
 
 				// 忽略APP资源
@@ -131,7 +131,7 @@ namespace YooAsset
 		private void VerifyInThread(object infoObj)
 		{
 			ThreadInfo info = (ThreadInfo)infoObj;
-			info.Result = DownloadSystem.CheckContentIntegrity(info.FilePath, info.Bundle.FileSize, info.Bundle.FileCRC);
+			info.Result = CacheSystem.CheckContentIntegrity(info.FilePath, info.Bundle.FileSize, info.Bundle.FileCRC);
 			_syncContext.Post(VerifyCallback, info);
 		}
 		private void VerifyCallback(object obj)
@@ -140,7 +140,7 @@ namespace YooAsset
 			if (info.Result)
 			{
 				VerifySuccessCount++;
-				DownloadSystem.CacheVerifyFile(info.Bundle.FileHash, info.Bundle.FileName);
+				CacheSystem.CacheVerifyFile(info.Bundle.FileHash, info.Bundle.FileName);
 			}
 			else
 			{
@@ -173,7 +173,7 @@ namespace YooAsset
 			foreach (var patchBundle in localPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (DownloadSystem.ContainsVerifyFile(patchBundle.FileHash))
+				if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
 					continue;
 
 				// 忽略APP资源
@@ -235,11 +235,11 @@ namespace YooAsset
 		private void VerifyFile(PatchBundle patchBundle)
 		{
 			string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
-			bool result = DownloadSystem.CheckContentIntegrity(filePath, patchBundle.FileSize, patchBundle.FileCRC);
+			bool result = CacheSystem.CheckContentIntegrity(filePath, patchBundle.FileSize, patchBundle.FileCRC);
 			if (result)
 			{
 				VerifySuccessCount++;
-				DownloadSystem.CacheVerifyFile(patchBundle.FileHash, patchBundle.FileName);
+				CacheSystem.CacheVerifyFile(patchBundle.FileHash, patchBundle.FileName);
 			}
 			else
 			{

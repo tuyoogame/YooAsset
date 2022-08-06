@@ -202,7 +202,8 @@ namespace YooAsset
 			if (_playMode == EPlayMode.HostPlayMode)
 			{
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
-				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize, hostPlayModeParameters.VerifyLevel);
+				CacheSystem.Initialize(hostPlayModeParameters.VerifyLevel);
+				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize);		
 			}
 
 			// 初始化资源系统
@@ -1029,6 +1030,7 @@ namespace YooAsset
 
 			OperationSystem.DestroyAll();
 			DownloadSystem.DestroyAll();
+			CacheSystem.DestroyAll();
 			AssetSystem.DestroyAll();
 			YooLogger.Log("YooAssets destroy all !");
 		}

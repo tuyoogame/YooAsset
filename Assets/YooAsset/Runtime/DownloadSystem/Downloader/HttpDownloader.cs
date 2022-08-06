@@ -156,7 +156,7 @@ namespace YooAsset
 					// 验证下载文件完整性
 					if (DownloadedBytes == (ulong)_fileSize)
 					{
-						bool verfiyResult = DownloadSystem.CheckContentIntegrity(_savePath, _fileSize, _fileCRC);
+						bool verfiyResult = CacheSystem.CheckContentIntegrity(_savePath, _fileSize, _fileCRC);
 						if (verfiyResult == false)
 						{
 							Error = $"Verify download content failed : {_fileName}";
@@ -226,7 +226,7 @@ namespace YooAsset
 				}
 				else
 				{
-					DownloadSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
+					CacheSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
 					_steps = ESteps.Succeed;
 				}
 			}
