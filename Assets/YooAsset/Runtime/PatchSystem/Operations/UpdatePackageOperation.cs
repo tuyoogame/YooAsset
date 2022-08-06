@@ -198,7 +198,7 @@ namespace YooAsset
 			foreach (var patchBundle in _remotePatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
+				if (CacheSystem.ContainsVerifyFile(patchBundle))
 					continue;
 
 				// 忽略APP资源

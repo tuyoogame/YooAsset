@@ -91,7 +91,7 @@ namespace YooAsset
 				if (hasError == false)
 				{
 					_steps = ESteps.Succeed;
-					CacheSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
+					CacheSystem.CacheVerifyFile(_bundleInfo.LoadBundle);
 				}
 				else
 				{

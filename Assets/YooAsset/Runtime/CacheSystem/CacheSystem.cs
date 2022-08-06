@@ -15,7 +15,6 @@ namespace YooAsset
 		{
 			_verifyLevel = verifyLevel;
 		}
-
 		public static void DestroyAll()
 		{
 			_cacheBundles.Clear();
@@ -49,14 +48,13 @@ namespace YooAsset
 		}
 
 
-
-
 		/// <summary>
 		/// 查询是否为验证文件
 		/// 注意：被收录的文件完整性是绝对有效的
 		/// </summary>
-		public static bool ContainsVerifyFile(string fileHash)
+		public static bool ContainsVerifyFile(PatchBundle patchBundle)
 		{
+			string fileHash = patchBundle.FileHash;
 			if (_cachedHashList.ContainsKey(fileHash))
 			{
 				string fileName = _cachedHashList[fileHash];
@@ -81,8 +79,10 @@ namespace YooAsset
 		/// <summary>
 		/// 缓存验证过的文件
 		/// </summary>
-		public static void CacheVerifyFile(string fileHash, string fileName)
+		public static void CacheVerifyFile(PatchBundle patchBundle)
 		{
+			string fileHash = patchBundle.FileHash;
+			string fileName = patchBundle.FileName;
 			if (_cachedHashList.ContainsKey(fileHash) == false)
 			{
 				YooLogger.Log($"Cache verify file : {fileName}");

@@ -76,7 +76,7 @@ namespace YooAsset
 			}
 
 			// 如果资源已经缓存
-			if (CacheSystem.ContainsVerifyFile(bundleInfo.FileHash))
+			if (CacheSystem.ContainsVerifyFile(bundleInfo.LoadBundle))
 			{
 				var tempDownloader = new TempDownloader(bundleInfo);
 				return tempDownloader;

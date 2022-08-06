@@ -203,7 +203,7 @@ namespace YooAsset
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-					if (CacheSystem.ContainsVerifyFile(_bundleInfo.FileHash))
+					if (CacheSystem.ContainsVerifyFile(_bundleInfo.LoadBundle))
 						_steps = ESteps.CheckAndCopyFile;
 					else
 						_steps = ESteps.DownloadFromApk;
@@ -240,7 +240,7 @@ namespace YooAsset
 				{
 					if (CacheSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.FileSize, _bundleInfo.FileCRC))
 					{
-						CacheSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
+						CacheSystem.CacheVerifyFile(_bundleInfo.LoadBundle);
 						_steps = ESteps.CheckAndCopyFile;
 					}
 					else
@@ -355,7 +355,7 @@ namespace YooAsset
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-					if (CacheSystem.ContainsVerifyFile(_bundleInfo.FileHash))
+					if (CacheSystem.ContainsVerifyFile(_bundleInfo.LoadBundle))
 						_steps = ESteps.CheckAndCopyFile;
 					else
 						_steps = ESteps.DownloadFromApk;
@@ -423,7 +423,7 @@ namespace YooAsset
 				{
 					if (CacheSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.FileSize, _bundleInfo.FileCRC))
 					{
-						CacheSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
+						CacheSystem.CacheVerifyFile(_bundleInfo.LoadBundle);
 						_steps = ESteps.CheckAndCopyFile;
 					}
 					else

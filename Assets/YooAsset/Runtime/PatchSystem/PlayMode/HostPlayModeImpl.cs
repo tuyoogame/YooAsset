@@ -131,7 +131,7 @@ namespace YooAsset
 			foreach (var patchBundle in LocalPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
+				if (CacheSystem.ContainsVerifyFile(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -163,7 +163,7 @@ namespace YooAsset
 			foreach (var patchBundle in LocalPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
+				if (CacheSystem.ContainsVerifyFile(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -233,7 +233,7 @@ namespace YooAsset
 			foreach (var patchBundle in checkList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
+				if (CacheSystem.ContainsVerifyFile(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -269,7 +269,7 @@ namespace YooAsset
 					continue;
 
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
+				if (CacheSystem.ContainsVerifyFile(patchBundle))
 					continue;
 
 				// 查询DLC资源
@@ -301,7 +301,7 @@ namespace YooAsset
 					continue;
 
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
+				if (CacheSystem.ContainsVerifyFile(patchBundle))
 					continue;
 
 				downloadList.Add(patchBundle);
@@ -377,7 +377,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 查询沙盒资源
-			if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
+			if (CacheSystem.ContainsVerifyFile(patchBundle))
 			{
 				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromCache);
 				return bundleInfo;

@@ -48,7 +48,7 @@ namespace YooAsset
 			foreach (var patchBundle in localPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
+				if (CacheSystem.ContainsVerifyFile(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -140,7 +140,7 @@ namespace YooAsset
 			if (info.Result)
 			{
 				VerifySuccessCount++;
-				CacheSystem.CacheVerifyFile(info.Bundle.FileHash, info.Bundle.FileName);
+				CacheSystem.CacheVerifyFile(info.Bundle);
 			}
 			else
 			{
@@ -173,7 +173,7 @@ namespace YooAsset
 			foreach (var patchBundle in localPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle.FileHash))
+				if (CacheSystem.ContainsVerifyFile(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -239,7 +239,7 @@ namespace YooAsset
 			if (result)
 			{
 				VerifySuccessCount++;
-				CacheSystem.CacheVerifyFile(patchBundle.FileHash, patchBundle.FileName);
+				CacheSystem.CacheVerifyFile(patchBundle);
 			}
 			else
 			{

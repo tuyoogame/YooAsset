@@ -226,7 +226,7 @@ namespace YooAsset
 				}
 				else
 				{
-					CacheSystem.CacheVerifyFile(_bundleInfo.FileHash, _bundleInfo.FileName);
+					CacheSystem.CacheVerifyFile(_bundleInfo.LoadBundle);
 					_steps = ESteps.Succeed;
 				}
 			}
