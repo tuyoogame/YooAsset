@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace YooAsset
 {
-	public static class YooAssets
+	public static partial class YooAssets
 	{
 		/// <summary>
 		/// 运行模式
