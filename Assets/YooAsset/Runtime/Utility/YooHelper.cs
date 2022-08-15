@@ -109,14 +109,6 @@ namespace YooAsset
 		{
 			return PathHelper.MakePersistentLoadPath(CacheFolderName);
 		}
-
-		/// <summary>
-		/// 获取缓存文件的存储路径
-		/// </summary>
-		public static string MakeCacheFilePath(string fileName)
-		{
-			return PathHelper.MakePersistentLoadPath($"{CacheFolderName}/{fileName}");
-		}
 	}
 
 	/// <summary>
@@ -139,6 +131,27 @@ namespace YooAsset
 				}
 			}
 			return result.ToArray();
+		}
+
+		/// <summary>
+		/// 资源解压相关
+		/// </summary>
+		public static List<BundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
+		{
+			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
+			foreach (var patchBundle in unpackList)
+			{
+				var bundleInfo = ConvertToUnpackInfo(patchBundle);
+				result.Add(bundleInfo);
+			}
+			return result;
+		}
+		public static BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
+		{
+			// 注意：我们把流加载路径指定为远端下载地址
+			string streamingPath = PathHelper.ConvertToWWWPath(patchBundle.StreamingFilePath);
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming, streamingPath, streamingPath);
+			return bundleInfo;
 		}
 	}
 }

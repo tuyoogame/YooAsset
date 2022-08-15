@@ -38,19 +38,10 @@ namespace YooAsset
 
 			if (_steps == ESteps.None)
 			{
-				if (MainBundleInfo.IsInvalid)
-				{
-					_steps = ESteps.Done;
-					Status = EStatus.Failed;
-					LastError = $"The bundle info is invalid : {MainBundleInfo.BundleName}";
-					YooLogger.Error(LastError);
-					return;
-				}
-
 				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
 					_steps = ESteps.LoadFile;
-					_webURL = MainBundleInfo.GetStreamingLoadPath();
+					_webURL = MainBundleInfo.Bundle.StreamingFilePath;
 				}
 				else
 				{
@@ -61,7 +52,7 @@ namespace YooAsset
 			// 1. 从服务器或缓存中获取AssetBundle文件
 			if (_steps == ESteps.LoadFile)
 			{
-				_webRequest = UnityWebRequestAssetBundle.GetAssetBundle(_webURL, Hash128.Parse(MainBundleInfo.FileHash));
+				_webRequest = UnityWebRequestAssetBundle.GetAssetBundle(_webURL, Hash128.Parse(MainBundleInfo.Bundle.FileHash));
 				_webRequest.SendWebRequest();
 				_steps = ESteps.CheckFile;
 			}
@@ -89,7 +80,7 @@ namespace YooAsset
 					{
 						_steps = ESteps.Done;
 						Status = EStatus.Failed;
-						LastError = $"AssetBundle file is invalid : {MainBundleInfo.BundleName}";
+						LastError = $"AssetBundle file is invalid : {MainBundleInfo.Bundle.BundleName}";
 						YooLogger.Error(LastError);
 					}
 					else

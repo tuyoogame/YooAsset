@@ -273,7 +273,7 @@ namespace YooAsset
 		private static AssetBundleLoaderBase CreateAssetBundleLoaderInternal(BundleInfo bundleInfo)
 		{
 			// 如果加载器已经存在
-			AssetBundleLoaderBase loader = TryGetAssetBundleLoader(bundleInfo.BundleName);
+			AssetBundleLoaderBase loader = TryGetAssetBundleLoader(bundleInfo.Bundle.BundleName);
 			if (loader != null)
 				return loader;
 
@@ -293,7 +293,7 @@ namespace YooAsset
 			for (int i = 0; i < _loaders.Count; i++)
 			{
 				AssetBundleLoaderBase temp = _loaders[i];
-				if (temp.MainBundleInfo.BundleName.Equals(bundleName))
+				if (temp.MainBundleInfo.Bundle.BundleName.Equals(bundleName))
 				{
 					loader = temp;
 					break;

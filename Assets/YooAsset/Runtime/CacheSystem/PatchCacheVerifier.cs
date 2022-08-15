@@ -48,7 +48,7 @@ namespace YooAsset
 			foreach (var patchBundle in localPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle))
+				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -62,7 +62,7 @@ namespace YooAsset
 				// 注意：在弱联网模式下，我们需要验证指定资源版本的所有资源完整性
 				if (weaklyUpdate)
 				{
-					string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
+					string filePath = patchBundle.CachedFilePath;
 					if (File.Exists(filePath))
 						_waitingList.Add(patchBundle);
 					else
@@ -70,7 +70,7 @@ namespace YooAsset
 				}
 				else
 				{
-					string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
+					string filePath = patchBundle.CachedFilePath;
 					if (File.Exists(filePath))
 						_waitingList.Add(patchBundle);
 				}
@@ -124,14 +124,14 @@ namespace YooAsset
 
 		private bool VerifyFile(PatchBundle patchBundle)
 		{
-			string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
+			string filePath = patchBundle.CachedFilePath;
 			ThreadInfo info = new ThreadInfo(filePath, patchBundle);
 			return ThreadPool.QueueUserWorkItem(new WaitCallback(VerifyInThread), info);
 		}
 		private void VerifyInThread(object infoObj)
 		{
 			ThreadInfo info = (ThreadInfo)infoObj;
-			info.Result = CacheSystem.CheckContentIntegrity(info.FilePath, info.Bundle.FileSize, info.Bundle.FileCRC);
+			info.Result = CacheSystem.VerifyBundle(info.Bundle, CacheSystem.InitVerifyLevel);
 			_syncContext.Post(VerifyCallback, info);
 		}
 		private void VerifyCallback(object obj)
@@ -140,17 +140,17 @@ namespace YooAsset
 			if (info.Result)
 			{
 				VerifySuccessCount++;
-				CacheSystem.CacheVerifyFile(info.Bundle);
+				CacheSystem.CacheBundle(info.Bundle);
 			}
 			else
 			{
 				VerifyFailCount++;
+				YooLogger.Warning($"Failed to verify file : {info.Bundle.CachedFilePath}");
 
 				// NOTE：不期望删除断点续传的资源文件
 				/*
-				YooLogger.Warning($"Failed to verify file : {info.FilePath}");
-				if (File.Exists(info.FilePath))
-					File.Delete(info.FilePath);
+				if (File.Exists(patchBundle.CachedBundleFilePath))
+					File.Delete(patchBundle.CachedBundleFilePath);
 				*/
 			}
 			_verifyingList.Remove(info.Bundle);
@@ -173,7 +173,7 @@ namespace YooAsset
 			foreach (var patchBundle in localPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle))
+				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -187,7 +187,7 @@ namespace YooAsset
 				// 注意：在弱联网模式下，我们需要验证指定资源版本的所有资源完整性
 				if (weaklyUpdate)
 				{
-					string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
+					string filePath = patchBundle.CachedFilePath;
 					if (File.Exists(filePath))
 						_waitingList.Add(patchBundle);
 					else
@@ -195,7 +195,7 @@ namespace YooAsset
 				}
 				else
 				{
-					string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
+					string filePath = patchBundle.CachedFilePath;
 					if (File.Exists(filePath))
 						_waitingList.Add(patchBundle);
 				}
@@ -234,22 +234,19 @@ namespace YooAsset
 
 		private void VerifyFile(PatchBundle patchBundle)
 		{
-			string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
-			bool result = CacheSystem.CheckContentIntegrity(filePath, patchBundle.FileSize, patchBundle.FileCRC);
-			if (result)
+			if (CacheSystem.VerifyAndCacheBundle(patchBundle, CacheSystem.InitVerifyLevel))
 			{
 				VerifySuccessCount++;
-				CacheSystem.CacheVerifyFile(patchBundle);
 			}
 			else
 			{
 				VerifyFailCount++;
+				YooLogger.Warning($"Failed to verify file : {patchBundle.CachedFilePath}");
 
 				// NOTE：不期望删除断点续传的资源文件
-				/*
-				YooLogger.Warning($"Failed to verify file : {info.FilePath}");
-				if (File.Exists(info.FilePath))
-					File.Delete(info.FilePath);
+				/*			
+				if (File.Exists(patchBundle.CachedBundleFilePath))
+					File.Delete(patchBundle.CachedBundleFilePath);
 				*/
 			}
 		}

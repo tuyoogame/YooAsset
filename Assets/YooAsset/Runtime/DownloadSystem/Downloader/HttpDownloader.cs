@@ -21,8 +21,6 @@ namespace YooAsset
 			private bool _running = true;
 			private string _url;
 			private string _savePath;
-			private string _fileName;
-			private string _fileCRC;
 			private long _fileSize;
 			private int _timeout;
 
@@ -50,12 +48,10 @@ namespace YooAsset
 			/// <summary>
 			/// 开始下载
 			/// </summary>
-			public void Run(string url, string savePath, string fileName, string fileCRC, long fileSize, int timeout)
+			public void Run(string url, string savePath, long fileSize, int timeout)
 			{
 				_url = url;
 				_savePath = savePath;
-				_fileName = fileName;
-				_fileCRC = fileCRC;
 				_fileSize = fileSize;
 				_timeout = timeout;
 
@@ -153,22 +149,6 @@ namespace YooAsset
 						fileStream.Close();
 					}
 
-					// 验证下载文件完整性
-					if (DownloadedBytes == (ulong)_fileSize)
-					{
-						bool verfiyResult = CacheSystem.CheckContentIntegrity(_savePath, _fileSize, _fileCRC);
-						if (verfiyResult == false)
-						{
-							Error = $"Verify download content failed : {_fileName}";
-							if (File.Exists(_savePath))
-								File.Delete(_savePath);
-						}
-					}
-					else
-					{
-						Error = $"Download content is incomplete : {_fileName}";
-					}
-
 					IsDone = true;
 				}
 			}
@@ -188,6 +168,20 @@ namespace YooAsset
 			if (IsDone())
 				return;
 
+			// 检测本地文件
+			if (_steps == ESteps.CheckLocalFile)
+			{
+				if (CacheSystem.VerifyAndCacheBundle(_bundleInfo.Bundle, EVerifyLevel.High))
+				{
+					_steps = ESteps.Succeed;
+				}
+				else
+				{
+					_steps = ESteps.CreateDownload;
+				}
+			}
+
+			// 创建下载器
 			if (_steps == ESteps.CreateDownload)
 			{
 				// 重置变量
@@ -197,10 +191,11 @@ namespace YooAsset
 
 				_requestURL = GetRequestURL();
 				_threadDownloader = new ThreadDownloader();
-				_threadDownloader.Run(_requestURL, _bundleInfo.GetCacheLoadPath(), _bundleInfo.FileName, _bundleInfo.FileCRC, _bundleInfo.FileSize, _timeout);
+				_threadDownloader.Run(_requestURL, _bundleInfo.Bundle.CachedFilePath, _bundleInfo.Bundle.FileSize, _timeout);
 				_steps = ESteps.CheckDownload;
 			}
 
+			// 检测下载结果
 			if (_steps == ESteps.CheckDownload)
 			{
 				_downloadProgress = _threadDownloader.DownloadProgress;
@@ -208,10 +203,35 @@ namespace YooAsset
 				if (_threadDownloader.IsDone == false)
 					return;
 
+				bool hasError = false;
+
+				// 检查下载错误
 				if (_threadDownloader.HasError())
 				{
+					hasError = true;
 					_lastError = _threadDownloader.Error;
+				}
 
+				// 检查文件完整性
+				if (hasError == false)
+				{
+					if (CacheSystem.VerifyAndCacheBundle(_bundleInfo.Bundle, EVerifyLevel.High) == false)
+					{
+						hasError = true;
+						_lastError = $"Verify bundle content failed : {_bundleInfo.Bundle.FileName}";
+					}
+					else
+					{
+						// 验证失败后删除文件
+						string cacheFilePath = _bundleInfo.Bundle.CachedFilePath;
+						if (File.Exists(cacheFilePath))
+							File.Delete(cacheFilePath);
+					}
+				}
+
+				// 如果下载失败
+				if (hasError)
+				{
 					// 失败后重新尝试
 					if (_failedTryAgain > 0)
 					{
@@ -226,7 +246,7 @@ namespace YooAsset
 				}
 				else
 				{
-					CacheSystem.CacheVerifyFile(_bundleInfo.LoadBundle);
+					_lastError = string.Empty;
 					_steps = ESteps.Succeed;
 				}
 			}

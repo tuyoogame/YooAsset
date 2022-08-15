@@ -102,7 +102,7 @@ namespace YooAsset
 			foreach (var loader in _dependBundles)
 			{
 				var bundleInfo = new DebugBundleInfo();
-				bundleInfo.BundleName = loader.MainBundleInfo.BundleName;
+				bundleInfo.BundleName = loader.MainBundleInfo.Bundle.BundleName;
 				bundleInfo.RefCount = loader.RefCount;
 				bundleInfo.Status = (int)loader.Status;
 				output.Add(bundleInfo);

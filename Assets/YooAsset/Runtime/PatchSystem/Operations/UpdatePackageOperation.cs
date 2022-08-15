@@ -198,7 +198,7 @@ namespace YooAsset
 			foreach (var patchBundle in _remotePatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle))
+				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -206,16 +206,6 @@ namespace YooAsset
 				if (_impl.AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
 				{
 					if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
-						continue;
-				}
-
-				// 注意：通过比对文件大小做快速的文件校验！
-				// 注意：在初始化的时候会去做最终校验！
-				string filePath = SandboxHelper.MakeCacheFilePath(patchBundle.FileName);
-				if (File.Exists(filePath))
-				{
-					long fileSize = FileUtility.GetFileSize(filePath);
-					if (fileSize == patchBundle.FileSize)
 						continue;
 				}
 

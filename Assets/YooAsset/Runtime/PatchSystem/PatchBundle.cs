@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.IO;
 
 namespace YooAsset
 {
@@ -10,11 +11,6 @@ namespace YooAsset
 		/// 资源包名称
 		/// </summary>
 		public string BundleName;
-
-		/// <summary>
-		/// 内容哈希值
-		/// </summary>
-		public string ContentHash;
 
 		/// <summary>
 		/// 文件哈希值
@@ -62,11 +58,43 @@ namespace YooAsset
 		/// </summary>	
 		public string FileName { private set; get; }
 
+		/// <summary>
+		/// 缓存文件路径
+		/// </summary>
+		private string _cachedFilePath;
+		public string CachedFilePath
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(_cachedFilePath) == false)
+					return _cachedFilePath;
 
-		public PatchBundle(string bundleName, string contentHash, string fileHash, string fileCRC, long fileSize, string[] tags)
+				string cacheRoot = SandboxHelper.GetCacheFolderPath();			
+				_cachedFilePath = $"{cacheRoot}/{FileName}";
+				return _cachedFilePath;
+			}
+		}
+
+		/// <summary>
+		/// 内置文件路径
+		/// </summary>
+		private string _streamingFilePath;
+		public string StreamingFilePath
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(_streamingFilePath) == false)
+					return _streamingFilePath;
+
+				_streamingFilePath = PathHelper.MakeStreamingLoadPath(FileName);
+				return _streamingFilePath;
+			}
+		}
+
+
+		public PatchBundle(string bundleName, string fileHash, string fileCRC, long fileSize, string[] tags)
 		{
 			BundleName = bundleName;
-			ContentHash = contentHash;
 			FileHash = fileHash;
 			FileCRC = fileCRC;
 			FileSize = fileSize;

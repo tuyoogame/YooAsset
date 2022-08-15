@@ -91,9 +91,9 @@ namespace YooAsset
 			if (forceDestroy == false)
 			{
 				if (RefCount > 0)
-					throw new Exception($"Bundle file loader ref is not zero : {MainBundleInfo.BundleName}");
+					throw new Exception($"Bundle file loader ref is not zero : {MainBundleInfo.Bundle.BundleName}");
 				if (IsDone() == false)
-					throw new Exception($"Bundle file loader is not done : {MainBundleInfo.BundleName}");
+					throw new Exception($"Bundle file loader is not done : {MainBundleInfo.Bundle.BundleName}");
 			}
 
 			if (CacheBundle != null)

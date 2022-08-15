@@ -131,7 +131,7 @@ namespace YooAsset
 			foreach (var patchBundle in LocalPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle))
+				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -163,7 +163,7 @@ namespace YooAsset
 			foreach (var patchBundle in LocalPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle))
+				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -233,7 +233,7 @@ namespace YooAsset
 			foreach (var patchBundle in checkList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle))
+				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -269,7 +269,7 @@ namespace YooAsset
 					continue;
 
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle))
+				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				// 查询DLC资源
@@ -279,7 +279,7 @@ namespace YooAsset
 				}
 			}
 
-			return ConvertToUnpackList(downloadList);
+			return PatchHelper.ConvertToUnpackList(downloadList);
 		}
 
 		/// <summary>
@@ -301,13 +301,13 @@ namespace YooAsset
 					continue;
 
 				// 忽略缓存文件
-				if (CacheSystem.ContainsVerifyFile(patchBundle))
+				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				downloadList.Add(patchBundle);
 			}
 
-			return ConvertToUnpackList(downloadList);
+			return PatchHelper.ConvertToUnpackList(downloadList);
 		}
 
 		// WEB相关
@@ -339,26 +339,6 @@ namespace YooAsset
 			return bundleInfo;
 		}
 
-		// 解压相关
-		public List<BundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
-		{
-			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
-			foreach (var patchBundle in unpackList)
-			{
-				var bundleInfo = ConvertToUnpackInfo(patchBundle);
-				result.Add(bundleInfo);
-			}
-			return result;
-		}
-		public BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
-		{
-			// 注意：我们把流加载路径指定为远端下载地址
-			string streamingPath = PathHelper.MakeStreamingLoadPath(patchBundle.FileName);
-			streamingPath = PathHelper.ConvertToWWWPath(streamingPath);
-			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, streamingPath, streamingPath);
-			return bundleInfo;
-		}
-
 		// 设置资源清单
 		internal void SetAppPatchManifest(PatchManifest patchManifest)
 		{
@@ -377,7 +357,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 查询沙盒资源
-			if (CacheSystem.ContainsVerifyFile(patchBundle))
+			if (CacheSystem.IsCached(patchBundle))
 			{
 				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromCache);
 				return bundleInfo;

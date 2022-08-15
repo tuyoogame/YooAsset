@@ -40,29 +40,20 @@ namespace YooAsset
 
 			if (_steps == ESteps.None)
 			{
-				if (MainBundleInfo.IsInvalid)
-				{
-					_steps = ESteps.Done;
-					Status = EStatus.Failed;
-					LastError = $"The bundle info is invalid : {MainBundleInfo.BundleName}";
-					YooLogger.Error(LastError);
-					return;
-				}
-
 				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
 					_steps = ESteps.Download;
-					_fileLoadPath = MainBundleInfo.GetCacheLoadPath();
+					_fileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
 					_steps = ESteps.LoadFile;
-					_fileLoadPath = MainBundleInfo.GetStreamingLoadPath();
+					_fileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
 					_steps = ESteps.LoadFile;
-					_fileLoadPath = MainBundleInfo.GetCacheLoadPath();
+					_fileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
 				}
 				else
 				{
@@ -112,15 +103,14 @@ namespace YooAsset
 #endif
 
 				// Load assetBundle file
-				if (MainBundleInfo.IsEncrypted)
+				if (MainBundleInfo.Bundle.IsEncrypted)
 				{
 					if (AssetSystem.DecryptionServices == null)
-						throw new Exception($"{nameof(AssetBundleFileLoader)} need {nameof(IDecryptionServices)} : {MainBundleInfo.BundleName}");
+						throw new Exception($"{nameof(AssetBundleFileLoader)} need {nameof(IDecryptionServices)} : {MainBundleInfo.Bundle.BundleName}");
 
 					DecryptionFileInfo fileInfo = new DecryptionFileInfo();
-					fileInfo.BundleName = MainBundleInfo.BundleName;
-					fileInfo.FileHash = MainBundleInfo.FileHash;
-					fileInfo.FileCRC = MainBundleInfo.FileCRC;
+					fileInfo.BundleName = MainBundleInfo.Bundle.BundleName;
+					fileInfo.FileHash = MainBundleInfo.Bundle.FileHash;
 					ulong offset = AssetSystem.DecryptionServices.GetFileOffset(fileInfo);
 					if (_isWaitForAsyncComplete)
 						CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath, 0, offset);
@@ -161,15 +151,15 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
-					LastError = $"Failed to load assetBundle : {MainBundleInfo.BundleName}";
+					LastError = $"Failed to load assetBundle : {MainBundleInfo.Bundle.BundleName}";
 					YooLogger.Error(LastError);
 
 					// 注意：当缓存文件的校验等级为Low的时候，并不能保证缓存文件的完整性。
 					// 在AssetBundle文件加载失败的情况下，我们需要重新验证文件的完整性！
 					if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 					{
-						string cacheLoadPath = MainBundleInfo.GetCacheLoadPath();
-						if (CacheSystem.CheckContentIntegrity(EVerifyLevel.High, cacheLoadPath, MainBundleInfo.FileSize, MainBundleInfo.FileCRC) == false)
+						string cacheLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+						if (CacheSystem.VerifyBundle(MainBundleInfo.Bundle, EVerifyLevel.High) == false)
 						{
 							if (File.Exists(cacheLoadPath))
 							{
@@ -205,7 +195,7 @@ namespace YooAsset
 					if (_isShowWaitForAsyncError == false)
 					{
 						_isShowWaitForAsyncError = true;
-						YooLogger.Error($"WaitForAsyncComplete failed ! Try load bundle : {MainBundleInfo.BundleName} from remote with sync load method !");
+						YooLogger.Error($"WaitForAsyncComplete failed ! Try load bundle : {MainBundleInfo.Bundle.BundleName} from remote with sync load method !");
 					}
 					break;
 				}

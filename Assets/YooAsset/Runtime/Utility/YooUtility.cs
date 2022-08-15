@@ -127,7 +127,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 创建文件
+		/// 创建文件（如果已经存在则删除旧文件）
 		/// </summary>
 		public static void CreateFile(string filePath, string content)
 		{

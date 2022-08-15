@@ -205,6 +205,11 @@ namespace YooAsset
 				CacheSystem.Initialize(hostPlayModeParameters.VerifyLevel);
 				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize);		
 			}
+			else
+			{
+				CacheSystem.Initialize(EVerifyLevel.Low);
+				DownloadSystem.Initialize(int.MaxValue);
+			}
 
 			// 初始化资源系统
 			InitializationOperation initializeOperation;
@@ -518,7 +523,7 @@ namespace YooAsset
 			}
 
 			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
-			if (bundleInfo.IsRawFile == false)
+			if (bundleInfo.Bundle.IsRawFile == false)
 			{
 				string error = $"Cannot load asset bundle file using {nameof(GetRawFileAsync)} interfaces !";
 				YooLogger.Warning(error);

@@ -171,14 +171,14 @@ namespace YooAsset
 		{
 			None,
 			Prepare,
-			DownloadFromApk,
-			CheckDownloadFromApk,
+			DownloadBuildinFile,
+			CheckDownload,
 			CheckAndCopyFile,
 			Done,
 		}
 
 		private ESteps _steps = ESteps.None;
-		private UnityWebFileRequester _fileRequester;
+		private DownloaderBase _downloader;
 
 		public OfflinePlayModeRawFileOperation(BundleInfo bundleInfo, string copyPath) : base(bundleInfo, copyPath)
 		{
@@ -199,14 +199,15 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = $"Bundle info is invalid : {_bundleInfo.BundleName}";
+					Error = $"Bundle info is invalid : {_bundleInfo.Bundle.BundleName}";
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-					if (CacheSystem.ContainsVerifyFile(_bundleInfo.LoadBundle))
-						_steps = ESteps.CheckAndCopyFile;
-					else
-						_steps = ESteps.DownloadFromApk;
+					_steps = ESteps.DownloadBuildinFile;
+				}
+				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
+				{
+					_steps = ESteps.CheckAndCopyFile;
 				}
 				else
 				{
@@ -214,43 +215,32 @@ namespace YooAsset
 				}
 			}
 
-			// 2. 从APK拷贝文件
-			if (_steps == ESteps.DownloadFromApk)
+			// 2. 下载文件
+			if (_steps == ESteps.DownloadBuildinFile)
 			{
-				string downloadURL = PathHelper.ConvertToWWWPath(_bundleInfo.GetStreamingLoadPath());
-				_fileRequester = new UnityWebFileRequester();
-				_fileRequester.SendRequest(downloadURL, GetCachePath());
-				_steps = ESteps.CheckDownloadFromApk;
+				int failedTryAgain = int.MaxValue;
+				var bundleInfo = PatchHelper.ConvertToUnpackInfo(_bundleInfo.Bundle);
+				_downloader = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
+				_steps = ESteps.CheckDownload;
 			}
 
-			// 3. 检测APK拷贝文件结果
-			if (_steps == ESteps.CheckDownloadFromApk)
+			// 3. 检测下载结果
+			if (_steps == ESteps.CheckDownload)
 			{
-				Progress = _fileRequester.Progress();
-				if (_fileRequester.IsDone() == false)
+				Progress = _downloader.DownloadProgress;
+				if (_downloader.IsDone() == false)
 					return;
 
-				if (_fileRequester.HasError())
+				if (_downloader.HasError())
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _fileRequester.GetError();
+					Error = _downloader.GetLastError();
 				}
 				else
 				{
-					if (CacheSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.FileSize, _bundleInfo.FileCRC))
-					{
-						CacheSystem.CacheVerifyFile(_bundleInfo.LoadBundle);
-						_steps = ESteps.CheckAndCopyFile;
-					}
-					else
-					{
-						_steps = ESteps.Done;
-						Status = EOperationStatus.Failed;
-						Error = "File content verify failed !";
-					}
+					_steps = ESteps.CheckAndCopyFile;
 				}
-				_fileRequester.Dispose();
 			}
 
 			// 4. 检测并拷贝原生文件
@@ -267,7 +257,7 @@ namespace YooAsset
 				// 如果原生文件已经存在，则验证其完整性
 				if (File.Exists(CopyPath))
 				{
-					bool result = CacheSystem.CheckContentIntegrity(CopyPath, _bundleInfo.FileSize, _bundleInfo.FileCRC);
+					bool result = CacheSystem.VerifyContentInternal(CopyPath, _bundleInfo.Bundle.FileSize, _bundleInfo.Bundle.FileCRC, EVerifyLevel.High);
 					if (result)
 					{
 						_steps = ESteps.Done;
@@ -303,7 +293,7 @@ namespace YooAsset
 		{
 			if (_bundleInfo == null)
 				return string.Empty;
-			return _bundleInfo.GetCacheLoadPath();
+			return _bundleInfo.Bundle.CachedFilePath;
 		}
 	}
 
@@ -316,17 +306,15 @@ namespace YooAsset
 		{
 			None,
 			Prepare,
-			DownloadFromWeb,
-			CheckDownloadFromWeb,
-			DownloadFromApk,
-			CheckDownloadFromApk,
+			DownloadWebFile,
+			DownloadBuildinFile,
+			CheckDownload,
 			CheckAndCopyFile,
 			Done,
 		}
 
 		private ESteps _steps = ESteps.None;
 		private DownloaderBase _downloader;
-		private UnityWebFileRequester _fileRequester;
 
 		internal HostPlayModeRawFileOperation(BundleInfo bundleInfo, string copyPath) : base(bundleInfo, copyPath)
 		{
@@ -347,18 +335,15 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = $"Bundle info is invalid : {_bundleInfo.BundleName}";
+					Error = $"Bundle info is invalid : {_bundleInfo.Bundle.BundleName}";
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
-					_steps = ESteps.DownloadFromWeb;
+					_steps = ESteps.DownloadWebFile;
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-					if (CacheSystem.ContainsVerifyFile(_bundleInfo.LoadBundle))
-						_steps = ESteps.CheckAndCopyFile;
-					else
-						_steps = ESteps.DownloadFromApk;
+					_steps = ESteps.DownloadBuildinFile;
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
@@ -370,16 +355,25 @@ namespace YooAsset
 				}
 			}
 
-			// 2. 从服务器下载
-			if (_steps == ESteps.DownloadFromWeb)
+			// 2. 下载远端文件
+			if (_steps == ESteps.DownloadWebFile)
 			{
 				int failedTryAgain = int.MaxValue;
 				_downloader = DownloadSystem.BeginDownload(_bundleInfo, failedTryAgain);
-				_steps = ESteps.CheckDownloadFromWeb;
+				_steps = ESteps.CheckDownload;
 			}
 
-			// 3. 检测服务器下载结果
-			if (_steps == ESteps.CheckDownloadFromWeb)
+			// 3. 下载内置文件
+			if (_steps == ESteps.DownloadBuildinFile)
+			{
+				int failedTryAgain = int.MaxValue;
+				var bundleInfo = PatchHelper.ConvertToUnpackInfo(_bundleInfo.Bundle);
+				_downloader = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
+				_steps = ESteps.CheckDownload;
+			}
+
+			// 4. 检测下载结果
+			if (_steps == ESteps.CheckDownload)
 			{
 				Progress = _downloader.DownloadProgress;
 				if (_downloader.IsDone() == false)
@@ -397,46 +391,7 @@ namespace YooAsset
 				}
 			}
 
-			// 4. 从APK拷贝文件
-			if (_steps == ESteps.DownloadFromApk)
-			{
-				string downloadURL = PathHelper.ConvertToWWWPath(_bundleInfo.GetStreamingLoadPath());
-				_fileRequester = new UnityWebFileRequester();
-				_fileRequester.SendRequest(downloadURL, GetCachePath());
-				_steps = ESteps.CheckDownloadFromApk;
-			}
-
-			// 5. 检测APK拷贝文件结果
-			if (_steps == ESteps.CheckDownloadFromApk)
-			{
-				Progress = _fileRequester.Progress();
-				if (_fileRequester.IsDone() == false)
-					return;
-
-				if (_fileRequester.HasError())
-				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = _fileRequester.GetError();
-				}
-				else
-				{
-					if (CacheSystem.CheckContentIntegrity(GetCachePath(), _bundleInfo.FileSize, _bundleInfo.FileCRC))
-					{
-						CacheSystem.CacheVerifyFile(_bundleInfo.LoadBundle);
-						_steps = ESteps.CheckAndCopyFile;
-					}
-					else
-					{
-						_steps = ESteps.Done;
-						Status = EOperationStatus.Failed;
-						Error = "File content verify failed !";
-					}
-				}
-				_fileRequester.Dispose();
-			}
-
-			// 6. 检测并拷贝原生文件
+			// 5. 检测并拷贝原生文件
 			if (_steps == ESteps.CheckAndCopyFile)
 			{
 				// 如果不需要保存文件
@@ -450,7 +405,7 @@ namespace YooAsset
 				// 如果原生文件已经存在，则验证其完整性
 				if (File.Exists(CopyPath))
 				{
-					bool result = CacheSystem.CheckContentIntegrity(CopyPath, _bundleInfo.FileSize, _bundleInfo.FileCRC);
+					bool result = CacheSystem.VerifyContentInternal(CopyPath, _bundleInfo.Bundle.FileSize, _bundleInfo.Bundle.FileCRC, EVerifyLevel.High);
 					if (result)
 					{
 						_steps = ESteps.Done;
@@ -486,7 +441,7 @@ namespace YooAsset
 		{
 			if (_bundleInfo == null)
 				return string.Empty;
-			return _bundleInfo.GetCacheLoadPath();
+			return _bundleInfo.Bundle.CachedFilePath;
 		}
 	}
 }

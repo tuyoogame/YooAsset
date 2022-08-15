@@ -29,6 +29,19 @@ namespace YooAsset
 			if (IsDone())
 				return;
 
+			// 检测本地文件
+			if (_steps == ESteps.CheckLocalFile)
+			{
+				if (CacheSystem.VerifyAndCacheBundle(_bundleInfo.Bundle, EVerifyLevel.High))
+				{
+					_steps = ESteps.Succeed;
+				}
+				else
+				{
+					_steps = ESteps.CreateDownload;
+				}
+			}
+
 			// 创建下载器
 			if (_steps == ESteps.CreateDownload)
 			{
@@ -42,7 +55,7 @@ namespace YooAsset
 
 				_requestURL = GetRequestURL();
 				_webRequest = new UnityWebRequest(_requestURL, UnityWebRequest.kHttpVerbGET);
-				DownloadHandlerFile handler = new DownloadHandlerFile(_bundleInfo.GetCacheLoadPath());
+				DownloadHandlerFile handler = new DownloadHandlerFile(_bundleInfo.Bundle.CachedFilePath);
 				handler.removeFileOnAbort = true;
 				_webRequest.downloadHandler = handler;
 				_webRequest.disposeDownloadHandlerOnDispose = true;
@@ -61,8 +74,9 @@ namespace YooAsset
 					return;
 				}
 
-				// 检查网络错误
 				bool hasError = false;
+
+				// 检查网络错误
 #if UNITY_2020_3_OR_NEWER
 				if (_webRequest.result != UnityWebRequest.Result.Success)
 				{
@@ -80,22 +94,18 @@ namespace YooAsset
 				// 检查文件完整性
 				if (hasError == false)
 				{
-					// 注意：如果文件验证失败需要删除文件				
-					if (CacheSystem.CheckContentIntegrity(_bundleInfo.GetCacheLoadPath(), _bundleInfo.FileSize, _bundleInfo.FileCRC) == false)
+					if (CacheSystem.VerifyAndCacheBundle(_bundleInfo.Bundle, EVerifyLevel.High) == false)
 					{
 						hasError = true;
-						_lastError = $"Verification failed";
+						_lastError = $"Verify bundle content failed : {_bundleInfo.Bundle.FileName}";
 					}
 				}
 
-				if (hasError == false)
+				// 如果下载失败
+				if (hasError)
 				{
-					_steps = ESteps.Succeed;
-					CacheSystem.CacheVerifyFile(_bundleInfo.LoadBundle);
-				}
-				else
-				{
-					string cacheFilePath = _bundleInfo.GetCacheLoadPath();
+					// 下载失败后删除文件
+					string cacheFilePath = _bundleInfo.Bundle.CachedFilePath;
 					if (File.Exists(cacheFilePath))
 						File.Delete(cacheFilePath);
 
@@ -110,6 +120,11 @@ namespace YooAsset
 						ReportError();
 						_steps = ESteps.Failed;
 					}
+				}
+				else
+				{
+					_lastError = string.Empty;
+					_steps = ESteps.Succeed;
 				}
 
 				// 释放下载器
