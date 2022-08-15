@@ -94,7 +94,6 @@ namespace YooAsset.Editor
 				ReportBundleInfo reportBundleInfo = new ReportBundleInfo();
 				reportBundleInfo.BundleName = patchBundle.BundleName;
 				reportBundleInfo.FileName = patchBundle.FileName;
-				reportBundleInfo.ContentHash = patchBundle.ContentHash;
 				reportBundleInfo.FileHash = patchBundle.FileHash;
 				reportBundleInfo.FileCRC = patchBundle.FileCRC;
 				reportBundleInfo.FileSize = patchBundle.FileSize;

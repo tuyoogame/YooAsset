@@ -74,7 +74,6 @@ namespace YooAsset.Editor
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				var bundleName = bundleInfo.BundleName;
-				string contentHash = bundleInfo.ContentHash;
 				string fileHash = bundleInfo.FileHash;
 				string fileCRC = bundleInfo.FileCRC;
 				long fileSize = bundleInfo.FileSize;
@@ -83,7 +82,7 @@ namespace YooAsset.Editor
 				bool isBuildin = IsBuildinBundle(tags, buildinTags);
 				bool isRawFile = bundleInfo.IsRawFile;
 
-				PatchBundle patchBundle = new PatchBundle(bundleName, contentHash, fileHash, fileCRC, fileSize, tags);
+				PatchBundle patchBundle = new PatchBundle(bundleName, fileHash, fileCRC, fileSize, tags);
 				patchBundle.SetFlagsValue(isEncrypted, isBuildin, isRawFile);
 				result.Add(patchBundle);
 			}

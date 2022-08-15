@@ -34,11 +34,6 @@ namespace YooAsset.Editor
 		public string FileName;
 
 		/// <summary>
-		/// 内容哈希值
-		/// </summary>
-		public string ContentHash;
-
-		/// <summary>
 		/// 文件哈希值
 		/// </summary>
 		public string FileHash;
