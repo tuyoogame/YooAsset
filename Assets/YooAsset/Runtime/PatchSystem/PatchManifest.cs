@@ -84,43 +84,45 @@ namespace YooAsset
 			{
 				if (locationToLower)
 					YooLogger.Error("Addressable not support location to lower !");
-
-				foreach (var patchAsset in AssetList)
-				{
-					string location = patchAsset.Address;
-					if (AssetPathMapping.ContainsKey(location))
-						throw new Exception($"Address have existed : {location}");
-					else
-						AssetPathMapping.Add(location, patchAsset.AssetPath);
-				}
 			}
 			else
 			{
 				_locationToLower = locationToLower;
-				foreach (var patchAsset in AssetList)
-				{
-					string location = patchAsset.AssetPath;
-					if (locationToLower)
-						location = location.ToLower();
-
-					// 添加原生路径的映射
-					if (AssetPathMapping.ContainsKey(location))
-						throw new Exception($"AssetPath have existed : {location}");
-					else
-						AssetPathMapping.Add(location, patchAsset.AssetPath);
-
-					// 添加无后缀名路径的映射
-					if (Path.HasExtension(location))
-					{
-						string locationWithoutExtension = StringUtility.RemoveExtension(location);
-						if (AssetPathMapping.ContainsKey(locationWithoutExtension))
-							YooLogger.Warning($"AssetPath have existed : {locationWithoutExtension}");
-						else
-							AssetPathMapping.Add(locationWithoutExtension, patchAsset.AssetPath);
-					}
-				}
 			}
-		}
+
+            foreach(var patchAsset in AssetList)
+            {
+                string location = patchAsset.AssetPath;
+                if(locationToLower)
+                    location = location.ToLower();
+                // 添加原生路径的映射
+                if(AssetPathMapping.ContainsKey(location))
+                    throw new Exception($"AssetPath have existed : {location}");
+                else
+                    AssetPathMapping.Add(location, patchAsset.AssetPath);
+
+                // 添加无后缀名路径的映射
+                if(Path.HasExtension(location))
+                {
+                    string locationWithoutExtension = StringUtility.RemoveExtension(location);
+                    if(AssetPathMapping.ContainsKey(locationWithoutExtension))
+                        YooLogger.Warning($"AssetPath have existed : {locationWithoutExtension}");
+                    else
+                        AssetPathMapping.Add(locationWithoutExtension, patchAsset.AssetPath);
+                }
+                // 可寻址路径映射
+                if(EnableAddressable)
+                {
+                    // 可寻址路径
+                    location = patchAsset.Address;
+                    if(AssetPathMapping.ContainsKey(location))
+                        throw new Exception($"Address have existed : {location}");
+                    else
+                        AssetPathMapping.Add(location, patchAsset.AssetPath);
+                }
+            }
+
+        }
 
 		/// <summary>
 		/// 映射为资源路径
