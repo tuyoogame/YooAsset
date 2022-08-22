@@ -74,7 +74,7 @@ namespace YooAsset.Editor
 					if (result.ContainsKey(assetInfo.AssetPath) == false)
 						result.Add(assetInfo.AssetPath, assetInfo);
 					else
-						throw new Exception($"The collecting asset file is existed : {assetInfo.AssetPath} in group setting.");
+						throw new Exception($"The collecting asset file is existed : {assetInfo.AssetPath}");
 				}
 			}
 
@@ -90,7 +90,7 @@ namespace YooAsset.Editor
 						if (adressTemper.Contains(address) == false)
 							adressTemper.Add(address);
 						else
-							throw new Exception($"The address is existed : {address} in group setting.");
+							throw new Exception($"The address is existed : {address}");
 					}
 				}
 			}
