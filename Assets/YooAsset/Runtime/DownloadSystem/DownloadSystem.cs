@@ -86,11 +86,8 @@ namespace YooAsset
 			{
 				YooLogger.Log($"Beginning to download file : {bundleInfo.Bundle.FileName} URL : {bundleInfo.RemoteMainURL}");
 				FileUtility.CreateFileDirectory(bundleInfo.Bundle.CachedFilePath);
-				DownloaderBase newDownloader;
-				if (bundleInfo.Bundle.FileSize >= _breakpointResumeFileSize)
-					newDownloader = new HttpDownloader(bundleInfo);
-				else
-					newDownloader = new FileDownloader(bundleInfo);
+				bool breakDownload = bundleInfo.Bundle.FileSize >= _breakpointResumeFileSize;
+				DownloaderBase newDownloader = new FileDownloader(bundleInfo, breakDownload);
 				newDownloader.SendRequest(failedTryAgain, timeout);
 				_downloaderDic.Add(bundleInfo.Bundle.CachedFilePath, newDownloader);
 				return newDownloader;

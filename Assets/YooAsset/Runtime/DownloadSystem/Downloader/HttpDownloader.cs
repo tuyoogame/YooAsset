@@ -219,9 +219,7 @@ namespace YooAsset
 					{
 						hasError = true;
 						_lastError = $"Verify bundle content failed : {_bundleInfo.Bundle.FileName}";
-					}
-					else
-					{
+
 						// 验证失败后删除文件
 						string cacheFilePath = _bundleInfo.Bundle.CachedFilePath;
 						if (File.Exists(cacheFilePath))
