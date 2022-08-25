@@ -12,7 +12,8 @@
 
 #### 导入流程注意事项
 
+![image](./Image/Samples-img2.png)
+
 1. Basic Sample在导入完成后，需要移动目录。
-   ![image](./Image/Samples-img2.png)
 2. 移除Basic Sample文件夹名称里的空格。
 3. 找到Boot.scene场景启动游戏。
