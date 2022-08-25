@@ -66,9 +66,11 @@
 3. [资源加载](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial3.md)
 3. [解决方案](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial4.md)
 
-## 视频教程
+## 其它教程
 
-[B站视频教程](https://space.bilibili.com/328590743/channel/seriesdetail?sid=2207858)
+[视频教程](https://space.bilibili.com/328590743/channel/seriesdetail?sid=2207858)
+
+[示例教程](./Docs/Samples.md)
 
 ## 社区
 
