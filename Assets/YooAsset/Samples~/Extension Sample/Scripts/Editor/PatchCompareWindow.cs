@@ -73,7 +73,7 @@ namespace YooAsset.Editor
 				{
 					foreach (var bundle in _changeList)
 					{
-						EditorGUILayout.LabelField($"{bundle.BundleName} | {(bundle.SizeBytes / 1024)}K");
+						EditorGUILayout.LabelField($"{bundle.BundleName} | {(bundle.FileSize / 1024)}K");
 					}
 				}
 				EditorGUILayout.EndScrollView();
@@ -117,7 +117,7 @@ namespace YooAsset.Editor
 			{
 				if (patchManifest1.TryGetPatchBundle(patchBundle2.BundleName, out PatchBundle patchBundle1))
 				{
-					if (patchBundle2.Hash != patchBundle1.Hash)
+					if (patchBundle2.FileHash != patchBundle1.FileHash)
 					{
 						changeList.Add(patchBundle2);
 					}
