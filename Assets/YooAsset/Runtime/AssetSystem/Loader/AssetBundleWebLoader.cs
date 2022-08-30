@@ -38,7 +38,17 @@ namespace YooAsset
 
 			if (_steps == ESteps.None)
 			{
-				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
+				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
+				{
+					_steps = ESteps.LoadFile;
+					_webURL = MainBundleInfo.RemoteMainURL;
+				}
+				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
+				{
+					_steps = ESteps.LoadFile;
+					_webURL = MainBundleInfo.Bundle.CachedFilePath;
+				}
+				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
 					_steps = ESteps.LoadFile;
 					_webURL = MainBundleInfo.Bundle.StreamingFilePath;
