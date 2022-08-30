@@ -171,12 +171,19 @@ namespace YooAsset
 			// 检测本地文件
 			if (_steps == ESteps.CheckLocalFile)
 			{
-				if (CacheSystem.VerifyAndCacheBundle(_bundleInfo.Bundle, EVerifyLevel.High))
+				var verifyResult = CacheSystem.VerifyAndCacheBundle(_bundleInfo.Bundle, EVerifyLevel.High);
+				if (verifyResult == EVerifyResult.Succeed)
 				{
 					_steps = ESteps.Succeed;
 				}
 				else
 				{
+					if (verifyResult == EVerifyResult.FileOverflow)
+					{
+						string cacheFilePath = _bundleInfo.Bundle.CachedFilePath;
+						if (File.Exists(cacheFilePath))
+							File.Delete(cacheFilePath);
+					}
 					_steps = ESteps.CreateDownload;
 				}
 			}
@@ -215,7 +222,8 @@ namespace YooAsset
 				// 检查文件完整性
 				if (hasError == false)
 				{
-					if (CacheSystem.VerifyAndCacheBundle(_bundleInfo.Bundle, EVerifyLevel.High) == false)
+					var verifyResult = CacheSystem.VerifyAndCacheBundle(_bundleInfo.Bundle, EVerifyLevel.High);
+					if (verifyResult != EVerifyResult.Succeed)
 					{
 						hasError = true;
 						_lastError = $"Verify bundle content failed : {_bundleInfo.Bundle.FileName}";

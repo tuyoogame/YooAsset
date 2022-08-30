@@ -257,8 +257,8 @@ namespace YooAsset
 				// 如果原生文件已经存在，则验证其完整性
 				if (File.Exists(CopyPath))
 				{
-					bool result = CacheSystem.VerifyContentInternal(CopyPath, _bundleInfo.Bundle.FileSize, _bundleInfo.Bundle.FileCRC, EVerifyLevel.High);
-					if (result)
+					var verifyResult = CacheSystem.VerifyContentInternal(CopyPath, _bundleInfo.Bundle.FileSize, _bundleInfo.Bundle.FileCRC, EVerifyLevel.High);
+					if (verifyResult == EVerifyResult.Succeed)
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;
@@ -405,8 +405,8 @@ namespace YooAsset
 				// 如果原生文件已经存在，则验证其完整性
 				if (File.Exists(CopyPath))
 				{
-					bool result = CacheSystem.VerifyContentInternal(CopyPath, _bundleInfo.Bundle.FileSize, _bundleInfo.Bundle.FileCRC, EVerifyLevel.High);
-					if (result)
+					var verifyResult = CacheSystem.VerifyContentInternal(CopyPath, _bundleInfo.Bundle.FileSize, _bundleInfo.Bundle.FileCRC, EVerifyLevel.High);
+					if (verifyResult == EVerifyResult.Succeed)
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;

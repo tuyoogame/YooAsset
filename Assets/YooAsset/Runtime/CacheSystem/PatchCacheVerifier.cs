@@ -26,7 +26,7 @@ namespace YooAsset
 	{
 		private class ThreadInfo
 		{
-			public bool Result = false;
+			public EVerifyResult Result;
 			public string FilePath { private set; get; }
 			public PatchBundle Bundle { private set; get; }
 			public ThreadInfo(string filePath, PatchBundle bundle)
@@ -137,7 +137,7 @@ namespace YooAsset
 		private void VerifyCallback(object obj)
 		{
 			ThreadInfo info = (ThreadInfo)obj;
-			if (info.Result)
+			if (info.Result == EVerifyResult.Succeed)
 			{
 				VerifySuccessCount++;
 				CacheSystem.CacheBundle(info.Bundle);
@@ -234,7 +234,8 @@ namespace YooAsset
 
 		private void VerifyFile(PatchBundle patchBundle)
 		{
-			if (CacheSystem.VerifyAndCacheBundle(patchBundle, CacheSystem.InitVerifyLevel))
+			var verifyResult = CacheSystem.VerifyAndCacheBundle(patchBundle, CacheSystem.InitVerifyLevel);
+			if (verifyResult == EVerifyResult.Succeed)
 			{
 				VerifySuccessCount++;
 			}

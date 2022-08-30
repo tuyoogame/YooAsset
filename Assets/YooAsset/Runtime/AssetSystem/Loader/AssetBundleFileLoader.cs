@@ -159,7 +159,7 @@ namespace YooAsset
 					if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 					{
 						string cacheLoadPath = MainBundleInfo.Bundle.CachedFilePath;
-						if (CacheSystem.VerifyBundle(MainBundleInfo.Bundle, EVerifyLevel.High) == false)
+						if (CacheSystem.VerifyBundle(MainBundleInfo.Bundle, EVerifyLevel.High) != EVerifyResult.Succeed)
 						{
 							if (File.Exists(cacheLoadPath))
 							{

@@ -68,7 +68,7 @@ namespace YooAsset
 		/// <summary>
 		/// 验证补丁包文件
 		/// </summary>
-		public static bool VerifyBundle(PatchBundle patchBundle, EVerifyLevel verifyLevel)
+		public static EVerifyResult VerifyBundle(PatchBundle patchBundle, EVerifyLevel verifyLevel)
 		{
 			return VerifyContentInternal(patchBundle.CachedFilePath, patchBundle.FileSize, patchBundle.FileCRC, verifyLevel);
 		}
@@ -76,48 +76,48 @@ namespace YooAsset
 		/// <summary>
 		/// 验证并缓存补丁包文件
 		/// </summary>
-		public static bool VerifyAndCacheBundle(PatchBundle patchBundle, EVerifyLevel verifyLevel)
+		public static EVerifyResult VerifyAndCacheBundle(PatchBundle patchBundle, EVerifyLevel verifyLevel)
 		{
-			if (VerifyContentInternal(patchBundle.CachedFilePath, patchBundle.FileSize, patchBundle.FileCRC, verifyLevel))
-			{
+			var verifyResult = VerifyContentInternal(patchBundle.CachedFilePath, patchBundle.FileSize, patchBundle.FileCRC, verifyLevel);
+			if (verifyResult == EVerifyResult.Succeed)
 				CacheBundle(patchBundle);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return verifyResult;
 		}
 
 		/// <summary>
 		/// 验证文件完整性
 		/// </summary>
-		public static bool VerifyContentInternal(string filePath, long fileSize, string fileCRC, EVerifyLevel verifyLevel)
+		public static EVerifyResult VerifyContentInternal(string filePath, long fileSize, string fileCRC, EVerifyLevel verifyLevel)
 		{
 			try
 			{
 				if (File.Exists(filePath) == false)
-					return false;
+					return EVerifyResult.FileNotExisted;
 
 				// 先验证文件大小
 				long size = FileUtility.GetFileSize(filePath);
-				if (size != fileSize)
-					return false;
+				if (size < fileSize)
+					return EVerifyResult.FileNotComplete;
+				else if (size > fileSize)
+					return EVerifyResult.FileOverflow;
 
 				// 再验证文件CRC
 				if (verifyLevel == EVerifyLevel.High)
 				{
 					string crc = HashUtility.FileCRC32(filePath);
-					return crc == fileCRC;
+					if (crc == fileCRC)
+						return EVerifyResult.Succeed;
+					else
+						return EVerifyResult.FileCrcError;
 				}
 				else
 				{
-					return true;
+					return EVerifyResult.Succeed;
 				}
 			}
 			catch (Exception)
 			{
-				return false;
+				return EVerifyResult.Exception;
 			}
 		}
 	}
