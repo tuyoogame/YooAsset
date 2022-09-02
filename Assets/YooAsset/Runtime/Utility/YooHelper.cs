@@ -57,7 +57,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取网络资源加载路径
+		/// 获取WWW加载本地资源的路径
 		/// </summary>
 		public static string ConvertToWWWPath(string path)
 		{
