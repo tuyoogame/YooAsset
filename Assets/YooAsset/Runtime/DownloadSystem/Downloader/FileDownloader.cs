@@ -9,8 +9,9 @@ namespace YooAsset
 {
 	internal sealed class FileDownloader : DownloaderBase
 	{
-		private UnityWebRequest _webRequest;
-		private bool _breakResume;
+		private readonly bool _breakResume;
+		private UnityWebRequest _webRequest = null;
+		private DownloadHandlerFileRange _downloadHandle = null;
 
 		// 重置变量
 		private bool _isAbort = false;
@@ -40,7 +41,7 @@ namespace YooAsset
 				}
 				else
 				{
-					if(verifyResult == EVerifyResult.FileOverflow)
+					if (verifyResult == EVerifyResult.FileOverflow)
 					{
 						string cacheFilePath = _bundleInfo.Bundle.CachedFilePath;
 						if (File.Exists(cacheFilePath))
@@ -75,8 +76,15 @@ namespace YooAsset
 
 					_requestURL = GetRequestURL();
 					_webRequest = UnityWebRequest.Get(_requestURL);
-					DownloadHandlerFile handler = new DownloadHandlerFile(fileSavePath, true);
+
+#if UNITY_2019_4_OR_NEWER
+					var handler = new DownloadHandlerFile(fileSavePath, true);
 					handler.removeFileOnAbort = false;
+#else
+					var handler = new DownloadHandlerFileRange(fileSavePath, _bundleInfo.Bundle.FileSize, _webRequest);
+					_downloadHandle = handler;
+#endif
+
 					_webRequest.downloadHandler = handler;
 					_webRequest.disposeDownloadHandlerOnDispose = true;
 					if (fileLength > 0)
@@ -218,6 +226,12 @@ namespace YooAsset
 		}
 		private void DisposeWebRequest()
 		{
+			if(_downloadHandle != null)
+			{
+				_downloadHandle.Cleanup();
+				_downloadHandle = null;
+			}
+
 			if (_webRequest != null)
 			{
 				_webRequest.Dispose();
