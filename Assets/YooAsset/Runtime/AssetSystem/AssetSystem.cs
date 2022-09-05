@@ -141,7 +141,7 @@ namespace YooAsset
 			if (assetInfo.IsInvalid)
 			{
 				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
-				completedProvider.SetCompleted();
+				completedProvider.SetCompleted(assetInfo.Error);
 				return completedProvider.CreateHandle<SceneOperationHandle>();
 			}
 
@@ -176,7 +176,7 @@ namespace YooAsset
 			if (assetInfo.IsInvalid)
 			{
 				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
-				completedProvider.SetCompleted();
+				completedProvider.SetCompleted(assetInfo.Error);
 				return completedProvider.CreateHandle<AssetOperationHandle>();
 			}
 
@@ -202,7 +202,7 @@ namespace YooAsset
 			if (assetInfo.IsInvalid)
 			{
 				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
-				completedProvider.SetCompleted();
+				completedProvider.SetCompleted(assetInfo.Error);
 				return completedProvider.CreateHandle<SubAssetsOperationHandle>();
 			}
 

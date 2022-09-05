@@ -522,15 +522,17 @@ namespace YooAsset
 				return operation;
 			}
 
+#if UNITY_EDITOR
 			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
 			if (bundleInfo.Bundle.IsRawFile == false)
 			{
-				string error = $"Cannot load asset bundle file using {nameof(GetRawFileAsync)} interfaces !";
-				YooLogger.Warning(error);
+				string error = $"Cannot load asset bundle file using {nameof(GetRawFileAsync)} method !";
+				YooLogger.Error(error);
 				RawFileOperation operation = new CompletedRawFileOperation(error, copyPath);
 				OperationSystem.StartOperation(operation);
 				return operation;
 			}
+#endif
 
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
@@ -667,6 +669,18 @@ namespace YooAsset
 
 		private static AssetOperationHandle LoadAssetInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
 		{
+#if UNITY_EDITOR
+			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+			if (bundleInfo.Bundle.IsRawFile)
+			{
+				string error = $"Cannot load raw file using LoadAsset method !";
+				YooLogger.Error(error);
+				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+				completedProvider.SetCompleted(error);
+				return completedProvider.CreateHandle<AssetOperationHandle>();
+			}
+#endif
+
 			var handle = AssetSystem.LoadAssetAsync(assetInfo);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
@@ -751,6 +765,18 @@ namespace YooAsset
 
 		private static SubAssetsOperationHandle LoadSubAssetsInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
 		{
+#if UNITY_EDITOR
+			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+			if (bundleInfo.Bundle.IsRawFile)
+			{
+				string error = $"Cannot load raw file using LoadSubAssets method !";
+				YooLogger.Error(error);
+				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+				completedProvider.SetCompleted(error);
+				return completedProvider.CreateHandle<SubAssetsOperationHandle>();
+			}
+#endif
+
 			var handle = AssetSystem.LoadSubAssetsAsync(assetInfo);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
