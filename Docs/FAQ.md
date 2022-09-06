@@ -38,7 +38,7 @@ AssetBundleCollectorConfig.ImportXmlConfig("C://Demo//Assets//AssetBundleCollect
 // 资源包构建可以直接参考教程文档，在文档的最下面有Jenkins支持介绍。
 ````
 
-资源构建教程：https://github.com/tuyoogame/YooAsset/blob/main/Docs/AssetBuilder.md
+资源构建教程：https://github.com/tuyoogame/YooAsset/blob/main/Docs/AssetBundleBuilder.md
 
 3. 资源包报告工具替代方案
 
