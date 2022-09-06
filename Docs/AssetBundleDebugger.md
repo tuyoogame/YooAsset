@@ -12,9 +12,9 @@
 
 ### 资源对象列表视图
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetDebugger-img1.png)
+![image](./Image/AssetDebugger-img1.png)
 
 ### 资源包列表视图
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetDebugger-img2.png)
+![image](./Image/AssetDebugger-img2.png)
 

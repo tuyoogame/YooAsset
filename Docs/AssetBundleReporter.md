@@ -6,16 +6,16 @@
 
 ### 概览视图
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img1.png)
+![image](./Image/AssetReporter-img1.png)
 
 ### 资源对象列表视图
 
 可以查看资源对象列表以及每个资源对象所依赖的资源包。
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img2.png)
+![image](./Image/AssetReporter-img2.png)
 
 ### 资源包列表视图
 
 可以查看资源包列表以及每个资源包所包含的资源对象。
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetReporter-img3.png)
+![image](./Image/AssetReporter-img3.png)

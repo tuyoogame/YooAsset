@@ -1,6 +1,6 @@
 # 资源构建
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetBuilder-img1.png)
+![image](./Image/AssetBuilder-img1.png)
 
 ### 界面介绍
 
@@ -100,13 +100,13 @@ public class GameEncryption : IEncryptionServices
 
 资源包文件都是以文件的哈希值命名。
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetBuilder-img4.png)
+![image](./Image/AssetBuilder-img4.png)
 
 ### 补丁清单
 
 补丁清单是一个Json格式的文本文件，里面包含了所有资源包的信息，例如：名称，大小，CRC等。
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetBuilder-img2.png)
+![image](./Image/AssetBuilder-img2.png)
 
 ### Jenkins支持
 

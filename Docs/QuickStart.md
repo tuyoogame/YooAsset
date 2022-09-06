@@ -13,11 +13,11 @@
    Scope(s): com.tuyoogame.yooasset
    ````
 
-   ![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/QuickStart-img1.jpg)
+   ![image](./Image/QuickStart-img1.jpg)
 
    打开管理界面 **Edit/Windows/Package Manager**
 
-   ![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/QuickStart-img2.jpg)
+   ![image](./Image/QuickStart-img2.jpg)
 
 2. **通过Packages清单安装**
 

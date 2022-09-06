@@ -1,6 +1,6 @@
 # 全局配置
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/Settings-img1.jpg)
+![image](./Image/Settings-img1.jpg)
 
 通过右键创建配置文件（Project窗体内右键 -> Create -> YooAsset -> Create Setting）
 

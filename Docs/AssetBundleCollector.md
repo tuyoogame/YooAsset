@@ -1,6 +1,6 @@
 # 资源收集
 
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/AssetGrouper-img1.png)
+![image](./Image/AssetGrouper-img1.png)
 
 左侧为分组列表，右侧为该分组的配置界面。
 

@@ -1,4 +1,4 @@
-![image](https://github.com/tuyoogame/YooAsset/raw/main/Docs/Image/LOGO.png)
+![image](./Docs/Image/LOGO.png)
 
 # YooAsset
 
@@ -50,21 +50,21 @@
   支持传统的内置构建管线，也支持可编程构建管线（SBP）。
 
 ## 入门教程
-1. [快速开始](https://github.com/tuyoogame/YooAsset/blob/master/Docs/QuickStart.md)
-2. [全局配置](https://github.com/tuyoogame/YooAsset/blob/master/Docs/GlobalSettings.md)
-3. [资源配置](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBundleCollector.md)
-4. [资源打包](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBundleBuilder.md)
-5. [资源部署](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBundleDeployer.md)
-5. [构建报告](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBundleReporter.md)
-5. [调试器](https://github.com/tuyoogame/YooAsset/blob/master/Docs/AssetBundleDebugger.md)
-5. [着色器](https://github.com/tuyoogame/YooAsset/blob/master/Docs/ShaderVariantCollector.md)
-5. [常见问题](https://github.com/tuyoogame/YooAsset/blob/master/Docs/FAQ.md)
+1. [快速开始](.Docs/QuickStart.md)
+2. [全局配置](./Docs/GlobalSettings.md)
+3. [资源配置](./Docs/AssetBundleCollector.md)
+4. [资源打包](./Docs/AssetBundleBuilder.md)
+5. [资源部署](./Docs/AssetBundleDeployer.md)
+5. [构建报告](./Docs/AssetBundleReporter.md)
+5. [调试器](./Docs/AssetBundleDebugger.md)
+5. [着色器](./Docs/ShaderVariantCollector.md)
+5. [常见问题](./Docs/FAQ.md)
 
 ## 代码教程
-1. [初始化](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial1.md)
-2. [资源更新](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial2.md)
-3. [资源加载](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial3.md)
-3. [解决方案](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeTutorial4.md)
+1. [初始化](./Docs/CodeTutorial1.md)
+2. [资源更新](./Docs/CodeTutorial2.md)
+3. [资源加载](./Docs/CodeTutorial3.md)
+3. [解决方案](./Docs/CodeTutorial4.md)
 
 ## 其它教程
 
@@ -76,9 +76,9 @@
 
 QQ群：**963240451**
 
-[致谢名单](https://github.com/tuyoogame/YooAsset/blob/master/Docs/Contributor.md)👯
+[致谢名单](./Docs/Contributor.md)👯
 
-[代码贡献](https://github.com/tuyoogame/YooAsset/blob/master/Docs/CodeStyle.md)
+[代码贡献](./Docs/CodeStyle.md)
 
 ## 友情链接
 [ET Framework](https://github.com/wqaetly/ET/tree/et7_fgui_yooasset_luban_huatuo): ET 7.0 + FGUI + luban + huatuo + YooAsset + NKGMoba + UniTask，并提供常用的编辑器工具。  
