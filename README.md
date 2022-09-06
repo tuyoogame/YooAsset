@@ -50,7 +50,7 @@
   支持传统的内置构建管线，也支持可编程构建管线（SBP）。
 
 ## 入门教程
-1. [快速开始](.Docs/QuickStart.md)
+1. [快速开始](./Docs/QuickStart.md)
 2. [全局配置](./Docs/GlobalSettings.md)
 3. [资源配置](./Docs/AssetBundleCollector.md)
 4. [资源打包](./Docs/AssetBundleBuilder.md)
