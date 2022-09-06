@@ -522,8 +522,9 @@ namespace YooAsset
 				return operation;
 			}
 
-#if UNITY_EDITOR
 			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+
+#if UNITY_EDITOR
 			if (bundleInfo.Bundle.IsRawFile == false)
 			{
 				string error = $"Cannot load asset bundle file using {nameof(GetRawFileAsync)} method !";
