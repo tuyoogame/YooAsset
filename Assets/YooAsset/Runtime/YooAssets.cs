@@ -203,7 +203,7 @@ namespace YooAsset
 			{
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
 				CacheSystem.Initialize(hostPlayModeParameters.VerifyLevel);
-				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize);		
+				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize);
 			}
 			else
 			{
@@ -1040,10 +1040,31 @@ namespace YooAsset
 		/// <summary>
 		/// 清空未被使用的缓存文件
 		/// </summary>
-		public static void ClearUnusedCacheFiles()
+		public static ClearUnusedCacheFilesOperation ClearUnusedCacheFiles()
 		{
-			if (_playMode == EPlayMode.HostPlayMode)
-				_hostPlayModeImpl.ClearUnusedCacheFiles();
+			DebugCheckInitialize();
+			if (_playMode == EPlayMode.EditorSimulateMode)
+			{
+				var operation = new EditorPlayModeClearUnusedCacheFilesOperation();
+				OperationSystem.StartOperation(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				var operation = new OfflinePlayModeClearUnusedCacheFilesOperation();
+				OperationSystem.StartOperation(operation);
+				return operation;
+			}
+			else if (_playMode == EPlayMode.HostPlayMode)
+			{
+				var operation = new HostPlayModeClearUnusedCacheFilesOperation(_hostPlayModeImpl);
+				OperationSystem.StartOperation(operation);
+				return operation;
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
 		}
 		#endregion
 
