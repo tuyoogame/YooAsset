@@ -346,6 +346,15 @@ namespace YooAsset
 			report.ProviderInfos.Sort();
 			return report;
 		}
+		internal static List<BundleInfo> GetLoadedBundleInfos()
+		{
+			List<BundleInfo> result = new List<BundleInfo>(100);
+			foreach (var bundleLoader in _loaders)
+			{
+				result.Add(bundleLoader.MainBundleInfo);
+			}
+			return result;
+		}
 		#endregion
 	}
 }

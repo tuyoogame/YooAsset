@@ -294,6 +294,7 @@ namespace YooAsset
 		public static UpdateManifestOperation UpdateManifestAsync(int resourceVersion, int timeout = 60)
 		{
 			DebugCheckInitialize();
+			DebugCheckUpdateManifest();
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				var operation = new EditorPlayModeUpdateManifestOperation();
@@ -1128,6 +1129,16 @@ namespace YooAsset
 
 				if (location.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
 					YooLogger.Warning($"Found illegal character in location : \"{location}\"");
+			}
+		}
+
+		[Conditional("DEBUG")]
+		private static void DebugCheckUpdateManifest()
+		{
+			var loadedBundleInfos = AssetSystem.GetLoadedBundleInfos();
+			if(loadedBundleInfos.Count > 0)
+			{
+				YooLogger.Warning($"Found loaded bundle before update manifest ! Recommended to call the  {nameof(ForceUnloadAllAssets)} method to release loaded bundle !");
 			}
 		}
 		#endregion
