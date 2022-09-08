@@ -208,11 +208,20 @@ namespace YooAsset.Editor
 			}
 			*/
 
-			string ext = System.IO.Path.GetExtension(assetPath);
-			if (ext == "" || ext == ".dll" || ext == ".cs" || ext == ".js" || ext == ".boo" || ext == ".meta" || ext == ".cginc")
+			string fileExtension = System.IO.Path.GetExtension(assetPath);
+			if (IsIgnoreFile(fileExtension))
 				return false;
 
 			return true;
+		}
+		private bool IsIgnoreFile(string fileExtension)
+		{
+			foreach (var extension in YooAssetSettings.IgnoreFileExtensions)
+			{
+				if (extension == fileExtension)
+					return true;
+			}
+			return false;
 		}
 		private bool IsCollectAsset(string assetPath)
 		{

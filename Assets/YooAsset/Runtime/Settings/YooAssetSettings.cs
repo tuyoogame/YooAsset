@@ -45,5 +45,10 @@ namespace YooAsset
 		/// Unity着色器资源包名称
 		/// </summary>
 		public const string UnityShadersBundleName = "unityshaders";
+
+		/// <summary>
+		/// 忽略的文件类型
+		/// </summary>
+		public static readonly string[] IgnoreFileExtensions = { "", ".so", ".dll", ".cs", ".js", ".boo", ".meta", ".cginc" };
 	}
 }
