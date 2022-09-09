@@ -8,6 +8,7 @@ using System.Threading;
 
 namespace YooAsset
 {
+	/*
 	internal sealed class HttpDownloader : DownloaderBase
 	{
 		/// <summary>
@@ -283,4 +284,5 @@ namespace YooAsset
 			}
 		}
 	}
+	*/
 }
