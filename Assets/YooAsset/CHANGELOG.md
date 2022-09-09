@@ -2,6 +2,33 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.2.3] - 2022-09-09
+
+### Fixed
+
+- 修复了资源收集器无法识别.bank音频文件格式。
+
+### Changed
+
+- **HostPlayMode正式支持WebGL平台。**
+- AssetBundleCollector里的着色器收集选项已经移除，现在必定收集。
+- AssetBundleCollector修改了默认的打包规则类。
+- AssetBundleBuilder现在构建结果增加补丁包目录。
+- 更新了UniTask的Sample。
+- 优化了缓存系统的代码结构。
+- 使用了新的断点续传下载器。
+
+### Added
+
+- 增加清理缓存资源的异步操作类。
+
+````c#
+/// <summary>
+/// 清空未被使用的缓存文件
+/// </summary>
+public static ClearUnusedCacheFilesOperation ClearUnusedCacheFiles();
+````
+
 ## [1.2.2] - 2022-07-31
 
 ### Fixed
