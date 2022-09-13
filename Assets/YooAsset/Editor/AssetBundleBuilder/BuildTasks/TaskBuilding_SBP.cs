@@ -79,13 +79,10 @@ namespace YooAsset.Editor
 		{
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
-				string filePath = $"{buildParametersContext.PipelineOutputDirectory}/{bundleInfo.BundleName}";
-				bundleInfo.FileHash = HashUtility.FileMD5(filePath);
-				bundleInfo.FileCRC = HashUtility.FileCRC32(filePath);
-				bundleInfo.FileSize = FileUtility.GetFileSize(filePath);
 				if (bundleInfo.IsRawFile)
 				{
-					bundleInfo.ContentHash = bundleInfo.FileHash;
+					string filePath = $"{buildParametersContext.PipelineOutputDirectory}/{bundleInfo.BundleName}";
+					bundleInfo.ContentHash = HashUtility.FileMD5(filePath);
 				}
 				else
 				{
