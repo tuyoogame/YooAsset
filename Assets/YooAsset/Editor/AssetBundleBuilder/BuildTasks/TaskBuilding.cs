@@ -30,6 +30,13 @@ namespace YooAsset.Editor
 			if (buildResults == null)
 				throw new Exception("构建过程中发生错误！");
 
+			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
+			{
+				string unityOutputManifestFilePath = $"{buildParametersContext.PipelineOutputDirectory}/{YooAssetSettings.OutputFolderName}";
+				if(System.IO.File.Exists(unityOutputManifestFilePath) == false)
+					throw new Exception("构建过程中发生严重错误！请查阅上下文日志！");
+			}
+
 			BuildRunner.Log("Unity引擎打包成功！");
 			BuildResultContext buildResultContext = new BuildResultContext();
 			buildResultContext.UnityManifest = buildResults;
