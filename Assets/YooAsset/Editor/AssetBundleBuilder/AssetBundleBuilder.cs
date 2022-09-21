@@ -20,13 +20,19 @@ namespace YooAsset.Editor
 
 			// 检测构建参数是否为空
 			if (buildParameters == null)
-			{
 				throw new Exception($"{nameof(buildParameters)} is null !");
-			}
+
+			// 检测可编程构建管线参数
 			if (buildParameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
 				if (buildParameters.SBPParameters == null)
 					throw new Exception($"{nameof(BuildParameters.SBPParameters)} is null !");
+
+				if (buildParameters.BuildMode == EBuildMode.DryRunBuild)
+					throw new Exception($"{nameof(EBuildPipeline.ScriptableBuildPipeline)} not support {nameof(EBuildMode.DryRunBuild)} build mode !");
+
+				if (buildParameters.BuildMode == EBuildMode.ForceRebuild)
+					throw new Exception($"{nameof(EBuildPipeline.ScriptableBuildPipeline)} not support {nameof(EBuildMode.ForceRebuild)} build mode !");
 			}
 
 			// 构建参数

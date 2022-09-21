@@ -85,9 +85,6 @@ namespace YooAsset.Editor
 			if (Parameters.BuildMode == EBuildMode.SimulateBuild)
 				throw new Exception("Should never get here !");
 
-			if (Parameters.BuildMode == EBuildMode.DryRunBuild)
-				throw new Exception($"SBP not support {nameof(EBuildMode.DryRunBuild)} build mode !");
-
 			var targetGroup = BuildPipeline.GetBuildTargetGroup(Parameters.BuildTarget);
 			var buildParams = new UnityEditor.Build.Pipeline.BundleBuildParameters(Parameters.BuildTarget, targetGroup, PipelineOutputDirectory);
 
@@ -103,16 +100,9 @@ namespace YooAsset.Editor
 			if (Parameters.DisableWriteTypeTree)
 				buildParams.ContentBuildFlags |= UnityEditor.Build.Content.ContentBuildFlags.DisableWriteTypeTree;
 
-			if(Parameters.BuildMode == EBuildMode.ForceRebuild)
-			{
-				buildParams.UseCache = false;
-			}
-			else
-			{
-				buildParams.UseCache = true;
-				buildParams.CacheServerHost = Parameters.SBPParameters.CacheServerHost;
-				buildParams.CacheServerPort = Parameters.SBPParameters.CacheServerPort;
-			}
+			buildParams.UseCache = true;
+			buildParams.CacheServerHost = Parameters.SBPParameters.CacheServerHost;
+			buildParams.CacheServerPort = Parameters.SBPParameters.CacheServerPort;
 			buildParams.WriteLinkXML = Parameters.SBPParameters.WriteLinkXML;
 
 			return buildParams;
