@@ -184,11 +184,6 @@ namespace YooAsset.Editor
 				UnityEngine.Debug.LogError($"Invalid asset path : {assetPath}");
 				return false;
 			}
-			if (assetPath.Contains("/Gizmos/"))
-			{
-				UnityEngine.Debug.LogWarning($"Cannot pack gizmos asset : {assetPath}");
-				return false;
-			}
 
 			// 忽略文件夹
 			if (AssetDatabase.IsValidFolder(assetPath))
