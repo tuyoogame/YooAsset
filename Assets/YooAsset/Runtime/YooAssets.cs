@@ -1072,21 +1072,24 @@ namespace YooAsset
 		#region 内部方法
 		internal static void InternalDestroy()
 		{
-			_isInitialize = false;
-			_initializeError = string.Empty;
-			_initializeStatus = EOperationStatus.None;
+			if (_isInitialize)
+			{
+				_isInitialize = false;
+				_initializeError = string.Empty;
+				_initializeStatus = EOperationStatus.None;
 
-			_bundleServices = null;
-			_locationServices = null;
-			_editorSimulateModeImpl = null;
-			_offlinePlayModeImpl = null;
-			_hostPlayModeImpl = null;
+				_bundleServices = null;
+				_locationServices = null;
+				_editorSimulateModeImpl = null;
+				_offlinePlayModeImpl = null;
+				_hostPlayModeImpl = null;
 
-			OperationSystem.DestroyAll();
-			DownloadSystem.DestroyAll();
-			CacheSystem.DestroyAll();
-			AssetSystem.DestroyAll();
-			YooLogger.Log("YooAssets destroy all !");
+				OperationSystem.DestroyAll();
+				DownloadSystem.DestroyAll();
+				CacheSystem.DestroyAll();
+				AssetSystem.DestroyAll();
+				YooLogger.Log("YooAssets destroy all !");
+			}
 		}
 		internal static void InternalUpdate()
 		{
@@ -1136,7 +1139,7 @@ namespace YooAsset
 		private static void DebugCheckUpdateManifest()
 		{
 			var loadedBundleInfos = AssetSystem.GetLoadedBundleInfos();
-			if(loadedBundleInfos.Count > 0)
+			if (loadedBundleInfos.Count > 0)
 			{
 				YooLogger.Warning($"Found loaded bundle before update manifest ! Recommended to call the  {nameof(ForceUnloadAllAssets)} method to release loaded bundle !");
 			}
