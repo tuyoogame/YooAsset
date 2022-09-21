@@ -37,8 +37,11 @@ namespace YooAsset.Editor
 			// 更新Unity内置资源包的引用关系
 			if (buildParameters.Parameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
-				var buildResultContext = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
-				UpdateBuiltInBundleReference(patchManifest, buildResultContext.Results);
+				if(buildParameters.Parameters.BuildMode == EBuildMode.IncrementalBuild)
+				{
+					var buildResultContext = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
+					UpdateBuiltInBundleReference(patchManifest, buildResultContext.Results);
+				}
 			}
 
 			// 创建补丁清单文件
