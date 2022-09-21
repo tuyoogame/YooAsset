@@ -19,11 +19,9 @@ namespace YooAsset.Editor
 			{
 				CreateReportFile(buildParameters, buildMapContext);
 			}
-			else
-			{
-				float buildSeconds = buildParameters.GetBuildingSeconds();
-				BuildRunner.Info($"Build time consuming {buildSeconds} seconds.");
-			}
+
+			float buildSeconds = buildParameters.GetBuildingSeconds();
+			BuildRunner.Info($"Build time consuming {buildSeconds} seconds.");
 		}
 
 		private void CreateReportFile(BuildParametersContext buildParameters, BuildMapContext buildMapContext)
