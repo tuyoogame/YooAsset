@@ -6,7 +6,7 @@ using UnityEngine.U2D;
 using UnityEngine.UI;
 using YooAsset;
 
-public class Game2Scene : MonoBehaviour
+public class GameScene2 : MonoBehaviour
 {
 	public GameObject CanvasRoot;
 	private readonly List<AssetOperationHandle> _cachedAssetOperationHandles = new List<AssetOperationHandle>(1000);
@@ -41,7 +41,7 @@ public class Game2Scene : MonoBehaviour
 #if UNITY_WEBGL
 		{
 			var rawImage = CanvasRoot.transform.Find("background").GetComponent<RawImage>();
-			AssetOperationHandle handle = YooAssets.LoadAssetAsync<Texture>("bg");
+			AssetOperationHandle handle = YooAssets.LoadAssetAsync<Texture>("tex_bg");
 			_cachedAssetOperationHandles.Add(handle);
 			handle.Completed += (AssetOperationHandle obj) =>
 			{
@@ -51,7 +51,7 @@ public class Game2Scene : MonoBehaviour
 #else
 		{
 			var rawImage = CanvasRoot.transform.Find("background").GetComponent<RawImage>();
-			AssetOperationHandle handle = YooAssets.LoadAssetSync<Texture>("bg");
+			AssetOperationHandle handle = YooAssets.LoadAssetSync<Texture>("tex_bg");
 			_cachedAssetOperationHandles.Add(handle);
 			rawImage.texture = handle.AssetObject as Texture;
 		}
@@ -62,7 +62,7 @@ public class Game2Scene : MonoBehaviour
 			var btn = CanvasRoot.transform.Find("load_scene").GetComponent<Button>();
 			btn.onClick.AddListener(() =>
 			{
-				YooAssets.LoadSceneAsync("Game1");
+				YooAssets.LoadSceneAsync("GameScene1");
 			});
 		}
 
@@ -98,7 +98,7 @@ public class Game2Scene : MonoBehaviour
 		// 加载背景音乐
 		{
 			var audioSource = CanvasRoot.transform.Find("music").GetComponent<AudioSource>();
-			AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("town");
+			AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("music_town");
 			_cachedAssetOperationHandles.Add(handle);
 			yield return handle;
 			audioSource.clip = handle.AssetObject as AudioClip;
