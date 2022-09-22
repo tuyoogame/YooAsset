@@ -19,14 +19,14 @@ MonoBehaviour:
     AssetTags: level
     ActiveRuleName: EnableGroup
     Collectors:
-    - CollectPath: Assets/Samples/Basic Sample/GameRes/Entity/Level1
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameRes/Entity/Level1
       CollectorGUID: 724066efe61192e43a0d7e59166b36a4
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackSeparately
       FilterRuleName: CollectPrefab
       AssetTags: level1
-    - CollectPath: Assets/Samples/Basic Sample/GameRes/Entity/Level2
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameRes/Entity/Level2
       CollectorGUID: 8045c1986f0ae964f8b1ea29e3522388
       CollectorType: 0
       AddressRuleName: AddressByFileName
@@ -38,21 +38,21 @@ MonoBehaviour:
     AssetTags: buildin
     ActiveRuleName: EnableGroup
     Collectors:
-    - CollectPath: Assets/Samples/Basic Sample/GameRes/Scene
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameRes/Scene
       CollectorGUID: f75e7d64104fb1a48b849b72b84ade4c
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackSeparately
       FilterRuleName: CollectScene
       AssetTags: 
-    - CollectPath: Assets/Samples/Basic Sample/GameRes/Config
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameRes/Config
       CollectorGUID: 44774abdee2b91b45b42f9dadf8c17a4
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackRawFile
       FilterRuleName: CollectAll
       AssetTags: 
-    - CollectPath: Assets/Samples/Basic Sample/GameRes/Music
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameRes/Music
       CollectorGUID: e05b02ee4d90ae84a99871ce75288ea2
       CollectorType: 0
       AddressRuleName: AddressByFileName
@@ -64,28 +64,28 @@ MonoBehaviour:
     AssetTags: panel
     ActiveRuleName: EnableGroup
     Collectors:
-    - CollectPath: Assets/Samples/Basic Sample/GameRes/Texture
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameRes/Texture
       CollectorGUID: 69b046f60ca75f647b2963e0113fd779
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackCollector
       FilterRuleName: CollectAll
       AssetTags: 
-    - CollectPath: Assets/Samples/Basic Sample/GameRes/TpAtlas
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameRes/TpAtlas
       CollectorGUID: 06e38aac2570d2b4a97c6a90223e5344
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackDirectory
       FilterRuleName: CollectAll
       AssetTags: 
-    - CollectPath: Assets/Samples/Basic Sample/GameRes/UIPanel
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameRes/UIPanel
       CollectorGUID: 926d3203fcefdb947881a7491496e039
       CollectorType: 0
       AddressRuleName: AddressByFileName
       PackRuleName: PackDirectory
       FilterRuleName: CollectAll
       AssetTags: 
-    - CollectPath: Assets/Samples/Basic Sample/GameRes/UISprite
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameRes/UISprite
       CollectorGUID: 29f27e4abf667c04b88a3996d8cdadfc
       CollectorType: 0
       AddressRuleName: AddressByFileName
@@ -97,14 +97,14 @@ MonoBehaviour:
     AssetTags: 
     ActiveRuleName: EnableGroup
     Collectors:
-    - CollectPath: Assets/Samples/Basic Sample/GameArt/ShaderVariants
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameArt/ShaderVariants
       CollectorGUID: 00781758c26692e40a9634ddeac838be
       CollectorType: 1
       AddressRuleName: AddressByFileName
       PackRuleName: PackShaderVariants
       FilterRuleName: CollectAll
       AssetTags: 
-    - CollectPath: Assets/Samples/Basic Sample/GameArt/UIFont
+    - CollectPath: Assets/YooAsset/Samples/Basic Sample/GameArt/UIFont
       CollectorGUID: 464727a15e4a7dc4d895346374432399
       CollectorType: 2
       AddressRuleName: AddressByFileName
