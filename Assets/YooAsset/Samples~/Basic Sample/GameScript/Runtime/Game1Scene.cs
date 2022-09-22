@@ -72,7 +72,7 @@ public class Game1Scene : MonoBehaviour
 #if UNITY_WEBGL
 		{
 			var rawImage = CanvasRoot.transform.Find("background").GetComponent<RawImage>();
-			AssetOperationHandle handle = YooAssets.LoadAssetAsync<Texture>("Texture/bg");
+			AssetOperationHandle handle = YooAssets.LoadAssetAsync<Texture>("bg");
 			_cachedAssetOperationHandles.Add(handle);
 			handle.Completed += (AssetOperationHandle obj) =>
 			{
@@ -82,7 +82,7 @@ public class Game1Scene : MonoBehaviour
 #else
 		{
 			var rawImage = CanvasRoot.transform.Find("background").GetComponent<RawImage>();
-			AssetOperationHandle handle = YooAssets.LoadAssetSync<Texture>("Texture/bg");
+			AssetOperationHandle handle = YooAssets.LoadAssetSync<Texture>("bg");
 			_cachedAssetOperationHandles.Add(handle);
 			rawImage.texture = handle.AssetObject as Texture;
 		}
@@ -92,7 +92,7 @@ public class Game1Scene : MonoBehaviour
 #if UNITY_WEBGL
 		{
 			var logoImage = CanvasRoot.transform.Find("title/logo").GetComponent<Image>();
-			AssetOperationHandle handle = YooAssets.LoadAssetAsync<Sprite>("Texture/logo.png");
+			AssetOperationHandle handle = YooAssets.LoadAssetAsync<Sprite>("logo");
 			_cachedAssetOperationHandles.Add(handle);
 			handle.Completed += (AssetOperationHandle obj) =>
 			{
@@ -102,7 +102,7 @@ public class Game1Scene : MonoBehaviour
 #else
 		{
 			var logoImage = CanvasRoot.transform.Find("title/logo").GetComponent<Image>();
-			AssetOperationHandle handle = YooAssets.LoadAssetSync<Sprite>("Texture/logo.png");
+			AssetOperationHandle handle = YooAssets.LoadAssetSync<Sprite>("logo");
 			_cachedAssetOperationHandles.Add(handle);
 			logoImage.sprite = handle.AssetObject as Sprite;
 		}
@@ -112,10 +112,10 @@ public class Game1Scene : MonoBehaviour
 		{
 			string[] entityAssetNames =
 			{
-				"Level1/footman_Blue",
-				"Level2/footman_Green",
-				"Level3/footman_Red",
-				"Level3/footman_Yellow"
+				"footman_Blue",
+				"footman_Green",
+				"footman_Red",
+				"footman_Yellow"
 			};
 
 			var btn = CanvasRoot.transform.Find("load_npc/btn").GetComponent<Button>();
@@ -123,7 +123,7 @@ public class Game1Scene : MonoBehaviour
 			{
 #if UNITY_WEBGL
 				var icon = CanvasRoot.transform.Find("load_npc/icon").GetComponent<Image>();
-				AssetOperationHandle handle = YooAssets.LoadAssetAsync<GameObject>($"Entity/{entityAssetNames[_npcIndex]}");
+				AssetOperationHandle handle = YooAssets.LoadAssetAsync<GameObject>($"{entityAssetNames[_npcIndex]}");
 				_cachedAssetOperationHandles.Add(handle);
 				handle.Completed += (AssetOperationHandle op) =>
 				{
@@ -134,7 +134,7 @@ public class Game1Scene : MonoBehaviour
 				};
 #else
 				var icon = CanvasRoot.transform.Find("load_npc/icon").GetComponent<Image>();		
-				AssetOperationHandle handle = YooAssets.LoadAssetSync<GameObject>($"Entity/{entityAssetNames[_npcIndex]}");
+				AssetOperationHandle handle = YooAssets.LoadAssetSync<GameObject>($"{entityAssetNames[_npcIndex]}");
 				_cachedAssetOperationHandles.Add(handle);
 				GameObject go = handle.InstantiateSync(icon.transform);
 				go.transform.localPosition = new Vector3(0, -50, -100);
@@ -152,7 +152,7 @@ public class Game1Scene : MonoBehaviour
 			var btn = CanvasRoot.transform.Find("load_unity_atlas/btn").GetComponent<Button>();
 			btn.onClick.AddListener(() =>
 			{
-				AssetOperationHandle handle = YooAssets.LoadAssetAsync<Sprite>("UISprite/Icon_Leafs_128");
+				AssetOperationHandle handle = YooAssets.LoadAssetAsync<Sprite>("Icon_Leafs_128");
 				_cachedAssetOperationHandles.Add(handle);
 				handle.Completed += OnUnityAtlas_Completed;
 			});
@@ -163,7 +163,7 @@ public class Game1Scene : MonoBehaviour
 			var btn = CanvasRoot.transform.Find("load_tp_atlas/btn").GetComponent<Button>();
 			btn.onClick.AddListener(() =>
 			{
-				SubAssetsOperationHandle handle = YooAssets.LoadSubAssetsAsync<Sprite>("TpAtlas/tpAtlas");
+				SubAssetsOperationHandle handle = YooAssets.LoadSubAssetsAsync<Sprite>("tpAtlas");
 				_cachedSubAssetsOperationHandles.Add(handle);
 				handle.Completed += OnTpAtlasAsset_Completed;
 			});
@@ -175,7 +175,7 @@ public class Game1Scene : MonoBehaviour
 			btn.onClick.AddListener(() =>
 			{
 				string savePath = $"{YooAssets.GetSandboxRoot()}/config1.txt";
-				RawFileOperation operation = YooAssets.GetRawFileAsync("Config/config1.txt", savePath);
+				RawFileOperation operation = YooAssets.GetRawFileAsync("config1", savePath);
 				operation.Completed += OnRawFile_Completed;
 			});
 		}
@@ -185,7 +185,7 @@ public class Game1Scene : MonoBehaviour
 			var btn = CanvasRoot.transform.Find("load_scene").GetComponent<Button>();
 			btn.onClick.AddListener(() =>
 			{
-				YooAssets.LoadSceneAsync("Scene/Game2.unity");
+				YooAssets.LoadSceneAsync("Game2");
 			});
 		}
 	}
@@ -215,7 +215,7 @@ public class Game1Scene : MonoBehaviour
 		// 加载背景音乐
 		{
 			var audioSource = CanvasRoot.transform.Find("music").GetComponent<AudioSource>();
-			AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Music/town");
+			AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("town");
 			_cachedAssetOperationHandles.Add(handle);
 			await handle.Task;
 			audioSource.clip = handle.AssetObject as AudioClip;

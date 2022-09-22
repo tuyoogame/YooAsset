@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: AssetBundleBuilderSetting
   m_EditorClassIdentifier: 
   BuildVersion: 100
-  BuildPipeline: 1
+  BuildPipeline: 0
   BuildMode: 0
   BuildTags: buildin;
   CompressOption: 2
+  OutputNameStyle: 1
   EncyptionClassName: EncryptionNone
-  AppendExtension: 0

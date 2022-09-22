@@ -40,7 +40,7 @@ public class BootScene : MonoBehaviour
 		if (PlayMode == YooAssets.EPlayMode.EditorSimulateMode)
 		{
 			var createParameters = new YooAssets.EditorSimulateModeParameters();
-			createParameters.LocationServices = new DefaultLocationServices("Assets/Samples/BasicSample/GameRes");
+			createParameters.LocationServices = new AddressLocationServices();
 			//createParameters.SimulatePatchManifestPath = GetPatchManifestPath();
 			yield return YooAssets.InitializeAsync(createParameters);
 		}
@@ -49,7 +49,7 @@ public class BootScene : MonoBehaviour
 		if (PlayMode == YooAssets.EPlayMode.OfflinePlayMode)
 		{
 			var createParameters = new YooAssets.OfflinePlayModeParameters();
-			createParameters.LocationServices = new DefaultLocationServices("Assets/Samples/BasicSample/GameRes");
+			createParameters.LocationServices = new AddressLocationServices();
 			yield return YooAssets.InitializeAsync(createParameters);
 		}
 
@@ -57,7 +57,7 @@ public class BootScene : MonoBehaviour
 		if (PlayMode == YooAssets.EPlayMode.HostPlayMode)
 		{
 			var createParameters = new YooAssets.HostPlayModeParameters();
-			createParameters.LocationServices = new DefaultLocationServices("Assets/Samples/BasicSample/GameRes");
+			createParameters.LocationServices = new AddressLocationServices();
 			createParameters.DecryptionServices = null;
 			createParameters.ClearCacheWhenDirty = false;
 			createParameters.DefaultHostServer = GetHostServerURL();

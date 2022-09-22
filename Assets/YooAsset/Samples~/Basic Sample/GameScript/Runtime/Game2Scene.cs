@@ -41,7 +41,7 @@ public class Game2Scene : MonoBehaviour
 #if UNITY_WEBGL
 		{
 			var rawImage = CanvasRoot.transform.Find("background").GetComponent<RawImage>();
-			AssetOperationHandle handle = YooAssets.LoadAssetAsync<Texture>("Texture/bg");
+			AssetOperationHandle handle = YooAssets.LoadAssetAsync<Texture>("bg");
 			_cachedAssetOperationHandles.Add(handle);
 			handle.Completed += (AssetOperationHandle obj) =>
 			{
@@ -51,7 +51,7 @@ public class Game2Scene : MonoBehaviour
 #else
 		{
 			var rawImage = CanvasRoot.transform.Find("background").GetComponent<RawImage>();
-			AssetOperationHandle handle = YooAssets.LoadAssetSync<Texture>("Texture/bg");
+			AssetOperationHandle handle = YooAssets.LoadAssetSync<Texture>("bg");
 			_cachedAssetOperationHandles.Add(handle);
 			rawImage.texture = handle.AssetObject as Texture;
 		}
@@ -62,7 +62,7 @@ public class Game2Scene : MonoBehaviour
 			var btn = CanvasRoot.transform.Find("load_scene").GetComponent<Button>();
 			btn.onClick.AddListener(() =>
 			{
-				YooAssets.LoadSceneAsync("Scene/Game1");
+				YooAssets.LoadSceneAsync("Game1");
 			});
 		}
 
@@ -71,7 +71,7 @@ public class Game2Scene : MonoBehaviour
 			var btn = CanvasRoot.transform.Find("subSceneLoadBtn").GetComponent<Button>();
 			btn.onClick.AddListener(() =>
 			{
-				var subSceneHandle = YooAssets.LoadSceneAsync("Scene/SubScene", UnityEngine.SceneManagement.LoadSceneMode.Additive);
+				var subSceneHandle = YooAssets.LoadSceneAsync("SubScene", UnityEngine.SceneManagement.LoadSceneMode.Additive);
 				_subSceneHandles.Add(subSceneHandle);
 			});
 		}
@@ -98,7 +98,7 @@ public class Game2Scene : MonoBehaviour
 		// 加载背景音乐
 		{
 			var audioSource = CanvasRoot.transform.Find("music").GetComponent<AudioSource>();
-			AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Music/town");
+			AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("town");
 			_cachedAssetOperationHandles.Add(handle);
 			yield return handle;
 			audioSource.clip = handle.AssetObject as AudioClip;
