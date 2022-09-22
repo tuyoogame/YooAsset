@@ -2,6 +2,19 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.2.4] - 2022-09-22
+
+### Fixed
+
+- 修复了加密文件下载验证失败的问题。
+- 修复了可编程构建管线下模拟构建模式报错的问题。
+
+### Changed
+
+- 可编程构建管线强制使用增量构建模式。
+- 移除了对Gizmos资源的打包限制。
+- AssetBundleCollector窗口增加配置表修复功能。
+
 ## [1.2.3] - 2022-09-09
 
 ### Fixed
