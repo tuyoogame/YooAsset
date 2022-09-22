@@ -62,6 +62,10 @@ namespace YooAsset.Editor
 
 				visualAsset.CloneTree(root);
 
+				// 配置修复按钮
+				var fixBtn = root.Q<Button>("FixButton");
+				fixBtn.clicked += FixBtn_clicked;
+
 				// 导入导出按钮
 				var exportBtn = root.Q<Button>("ExportButton");
 				exportBtn.clicked += ExportBtn_clicked;
@@ -208,6 +212,10 @@ namespace YooAsset.Editor
 			_groupContainer.visible = false;
 
 			FillGroupViewData();
+		}
+		private void FixBtn_clicked()
+		{
+			AssetBundleCollectorSettingData.FixFile();
 		}
 		private void ExportBtn_clicked()
 		{
@@ -472,6 +480,7 @@ namespace YooAsset.Editor
 			objectField1.RegisterValueChangedCallback(evt =>
 			{
 				collector.CollectPath = AssetDatabase.GetAssetPath(evt.newValue);
+				collector.CollectorGUID = AssetDatabase.AssetPathToGUID(collector.CollectPath);
 				objectField1.value.name = collector.CollectPath;
 				AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
 				if (foldout.value)
@@ -602,7 +611,7 @@ namespace YooAsset.Editor
 				return;
 
 			Undo.RecordObject(AssetBundleCollectorSettingData.Setting, "YooAsset.AssetBundleCollectorWindow AddCollector");
-			AssetBundleCollectorSettingData.CreateCollector(selectGroup, string.Empty);
+			AssetBundleCollectorSettingData.CreateCollector(selectGroup);
 			FillCollectorViewData();
 		}
 		private void RemoveCollectorBtn_clicked(AssetBundleCollector selectCollector)

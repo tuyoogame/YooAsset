@@ -31,6 +31,26 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
+		/// 修复配置错误
+		/// </summary>
+		public bool FixConfigError()
+		{
+			bool result = false;
+			foreach (var group in Groups)
+			{
+				foreach (var collector in group.Collectors)
+				{
+					bool isFixed = collector.FixConfigError();
+					if (isFixed)
+					{
+						result = true;
+					}
+				}
+			}
+			return result;
+		}
+
+		/// <summary>
 		/// 获取所有的资源标签
 		/// </summary>
 		public List<string> GetAllTags()

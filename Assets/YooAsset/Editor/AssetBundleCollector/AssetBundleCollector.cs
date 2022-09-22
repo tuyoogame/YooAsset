@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEngine;
 
 namespace YooAsset.Editor
 {
@@ -13,6 +14,11 @@ namespace YooAsset.Editor
 		/// 注意：支持文件夹或单个资源文件
 		/// </summary>
 		public string CollectPath = string.Empty;
+
+		/// <summary>
+		/// 收集器的GUID
+		/// </summary>
+		public string CollectorGUID = string.Empty;
 
 		/// <summary>
 		/// 收集器类型
@@ -68,7 +74,8 @@ namespace YooAsset.Editor
 		/// </summary>
 		public void CheckConfigError()
 		{
-			if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(CollectPath) == null)
+			string assetGUID = AssetDatabase.AssetPathToGUID(CollectPath);
+			if (string.IsNullOrEmpty(assetGUID))
 				throw new Exception($"Invalid collect path : {CollectPath}");
 
 			if (CollectorType == ECollectorType.None)
@@ -82,6 +89,44 @@ namespace YooAsset.Editor
 
 			if (AssetBundleCollectorSettingData.HasAddressRuleName(AddressRuleName) == false)
 				throw new Exception($"Invalid {nameof(IAddressRule)} class type : {AddressRuleName} in collector : {CollectPath}");
+		}
+
+		/// <summary>
+		/// 修复配置错误
+		/// </summary>
+		public bool FixConfigError()
+		{
+			bool isFixed = false;
+
+			if (string.IsNullOrEmpty(CollectorGUID) == false)
+			{
+				string convertAssetPath = AssetDatabase.GUIDToAssetPath(CollectorGUID);
+				if (string.IsNullOrEmpty(convertAssetPath))
+				{
+					Debug.LogWarning($"Collector GUID {CollectorGUID} is invalid and has been auto removed !");
+					CollectorGUID = string.Empty;
+					isFixed = true;
+				}
+				else
+				{
+					if (CollectPath != convertAssetPath)
+					{
+						CollectPath = convertAssetPath;
+						isFixed = true;
+						Debug.LogWarning($"Fix collect path : {CollectPath} -> {convertAssetPath}");
+					}
+				}
+			}
+
+			/*
+			string convertGUID = AssetDatabase.AssetPathToGUID(CollectPath);
+			if(string.IsNullOrEmpty(convertGUID) == false)
+			{
+				CollectorGUID = convertGUID;
+			}
+			*/
+
+			return isFixed;
 		}
 
 		/// <summary>

@@ -3,6 +3,7 @@
         <ui:Button text="Save" display-tooltip-when-elided="true" name="SaveButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
         <ui:Button text="导出" display-tooltip-when-elided="true" name="ExportButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
         <ui:Button text="导入" display-tooltip-when-elided="true" name="ImportButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
+        <ui:Button text="修复" display-tooltip-when-elided="true" name="FixButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
     </uie:Toolbar>
     <ui:VisualElement name="ContentContainer" style="flex-grow: 1; flex-direction: row;">
         <ui:VisualElement name="LeftContainer" style="width: 200px; flex-grow: 0; background-color: rgb(67, 67, 67); border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">

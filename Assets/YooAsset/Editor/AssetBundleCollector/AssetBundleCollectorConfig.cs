@@ -20,12 +20,13 @@ namespace YooAsset.Editor
 		public const string XmlGroupDesc = "GroupDesc";
 		public const string XmlCollector = "Collector";
 		public const string XmlCollectPath = "CollectPath";
+		public const string XmlCollectorGUID = "CollectGUID";
 		public const string XmlCollectorType = "CollectType";
 		public const string XmlAddressRule = "AddressRule";
 		public const string XmlPackRule = "PackRule";
 		public const string XmlFilterRule = "FilterRule";
 		public const string XmlAssetTags = "AssetTags";
-		
+
 		/// <summary>
 		/// 导入XML配置表
 		/// </summary>
@@ -44,7 +45,7 @@ namespace YooAsset.Editor
 
 			// 读取配置版本
 			string configVersion = root.GetAttribute(XmlVersion);
-			if(configVersion != ConfigVersion)
+			if (configVersion != ConfigVersion)
 			{
 				throw new Exception($"The config version is invalid : {configVersion}");
 			}
@@ -97,13 +98,18 @@ namespace YooAsset.Editor
 					if (collectorElement.HasAttribute(XmlAssetTags) == false)
 						throw new Exception($"Not found attribute {XmlAssetTags} in {XmlCollector}");
 
+					string collectorGUID = string.Empty;
+					if (collectorElement.HasAttribute(XmlCollectorGUID))
+						collectorGUID = collectorElement.GetAttribute(XmlCollectorGUID);
+
 					AssetBundleCollector collector = new AssetBundleCollector();
 					collector.CollectPath = collectorElement.GetAttribute(XmlCollectPath);
+					collector.CollectorGUID = collectorGUID;
 					collector.CollectorType = StringUtility.NameToEnum<ECollectorType>(collectorElement.GetAttribute(XmlCollectorType));
 					collector.AddressRuleName = collectorElement.GetAttribute(XmlAddressRule);
 					collector.PackRuleName = collectorElement.GetAttribute(XmlPackRule);
 					collector.FilterRuleName = collectorElement.GetAttribute(XmlFilterRule);
-					collector.AssetTags = collectorElement.GetAttribute(XmlAssetTags); ;
+					collector.AssetTags = collectorElement.GetAttribute(XmlAssetTags);
 					group.Collectors.Add(collector);
 				}
 			}
@@ -155,6 +161,7 @@ namespace YooAsset.Editor
 				{
 					var collectorElement = xmlDoc.CreateElement(XmlCollector);
 					collectorElement.SetAttribute(XmlCollectPath, collector.CollectPath);
+					collectorElement.SetAttribute(XmlCollectorGUID, collector.CollectorGUID);
 					collectorElement.SetAttribute(XmlCollectorType, collector.CollectorType.ToString());
 					collectorElement.SetAttribute(XmlAddressRule, collector.AddressRuleName);
 					collectorElement.SetAttribute(XmlPackRule, collector.PackRuleName);
