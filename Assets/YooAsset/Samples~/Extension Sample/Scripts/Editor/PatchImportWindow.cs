@@ -66,13 +66,9 @@ namespace YooAsset.Editor
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 			{
-				string sourcePath = $"{outputDirectory}/{manifestFileName}.hash";
-				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{manifestFileName}.hash";
-				EditorTools.CopyFile(sourcePath, destPath, true);
-			}
-			{
-				string sourcePath = $"{outputDirectory}/{YooAssetSettings.VersionFileName}";
-				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{YooAssetSettings.VersionFileName}";
+				string fileName = YooAssetSettingsData.GetStaticVersionFileName(patchManifest.PackageName);
+				string sourcePath = $"{outputDirectory}/{fileName}";
+				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 

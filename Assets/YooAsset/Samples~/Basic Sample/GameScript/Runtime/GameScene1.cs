@@ -45,9 +45,6 @@ public class GameScene1 : MonoBehaviour
 
 	void InitWindow()
 	{
-		var resVersion = CanvasRoot.transform.Find("res_version/label").GetComponent<Text>();
-		resVersion.text = $"资源版本 : {YooAssets.GetResourceVersion()}";
-
 		var playMode = CanvasRoot.transform.Find("play_mode/label").GetComponent<Text>();
 		if (BootScene.GamePlayMode == YooAssets.EPlayMode.EditorSimulateMode)
 			playMode.text = "编辑器下模拟模式";

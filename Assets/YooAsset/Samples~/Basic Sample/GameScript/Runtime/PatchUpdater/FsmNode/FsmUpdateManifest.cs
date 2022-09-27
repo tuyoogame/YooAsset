@@ -24,7 +24,7 @@ public class FsmUpdateManifest : IFsmNode
 		yield return new WaitForSecondsRealtime(0.5f);
 
 		// 更新补丁清单
-		var operation = YooAssets.UpdateManifestAsync(PatchUpdater.ResourceVersion, 30);
+		var operation = YooAssets.UpdateManifestAsync("DefaultPackage", PatchUpdater.PackageCRC, 30);
 		yield return operation;
 
 		if(operation.Status == EOperationStatus.Succeed)

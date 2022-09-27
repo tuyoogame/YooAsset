@@ -16,7 +16,7 @@ public static class PatchUpdater
 	/// <summary>
 	/// 资源版本
 	/// </summary>
-	public static int ResourceVersion { set; get; }
+	public static string PackageCRC { set; get; }
 
 	/// <summary>
 	/// 开启初始化流程
