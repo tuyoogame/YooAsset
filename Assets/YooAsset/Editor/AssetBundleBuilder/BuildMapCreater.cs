@@ -10,7 +10,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 执行资源构建上下文
 		/// </summary>
-		public static BuildMapContext CreateBuildMap(EBuildMode buildMode)
+		public static BuildMapContext CreateBuildMap(EBuildMode buildMode, string packageName)
 		{
 			BuildMapContext context = new BuildMapContext();
 			Dictionary<string, BuildAssetInfo> buildAssetDic = new Dictionary<string, BuildAssetInfo>(1000);
@@ -19,7 +19,7 @@ namespace YooAsset.Editor
 			AssetBundleCollectorSettingData.Setting.CheckConfigError();
 
 			// 2. 获取所有收集器收集的资源
-			List<CollectAssetInfo> allCollectAssets = AssetBundleCollectorSettingData.Setting.GetAllCollectAssets(buildMode);
+			List<CollectAssetInfo> allCollectAssets = AssetBundleCollectorSettingData.Setting.GetPackageAssets(buildMode, packageName);
 
 			// 3. 剔除未被引用的依赖资源
 			List<CollectAssetInfo> removeDependList = new List<CollectAssetInfo>();

@@ -21,6 +21,11 @@ namespace YooAsset.Editor
 		public EBuildMode BuildMode = EBuildMode.ForceRebuild;
 
 		/// <summary>
+		/// 构建的包裹名称
+		/// </summary>
+		public string BuildPackage = string.Empty;
+
+		/// <summary>
 		/// 内置资源标签（首包资源标签）
 		/// </summary>
 		public string BuildTags = string.Empty;

@@ -13,7 +13,7 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
-			var buildMapContext = BuildMapCreater.CreateBuildMap(buildParametersContext.Parameters.BuildMode);
+			var buildMapContext = BuildMapCreater.CreateBuildMap(buildParametersContext.Parameters.BuildMode, buildParametersContext.Parameters.BuildPackage);
 			context.SetContextObject(buildMapContext);
 			BuildRunner.Log("构建内容准备完毕！");
 
