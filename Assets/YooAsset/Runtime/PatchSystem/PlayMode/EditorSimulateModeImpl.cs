@@ -20,16 +20,6 @@ namespace YooAsset
 			return operation;
 		}
 
-		/// <summary>
-		/// 获取资源版本号
-		/// </summary>
-		public int GetResourceVersion()
-		{
-			if (_simulatePatchManifest == null)
-				return 0;
-			return _simulatePatchManifest.ResourceVersion;
-		}
-
 		// 设置资源清单
 		internal void SetSimulatePatchManifest(PatchManifest patchManifest)
 		{

@@ -18,11 +18,6 @@ namespace YooAsset
 		public string FileVersion;
 
 		/// <summary>
-		/// 资源版本号
-		/// </summary>
-		public int ResourceVersion;
-
-		/// <summary>
 		/// 启用可寻址资源定位
 		/// </summary>
 		public bool EnableAddressable;
@@ -31,6 +26,11 @@ namespace YooAsset
 		/// 文件名称样式
 		/// </summary>
 		public int OutputNameStyle;
+
+		/// <summary>
+		/// 资源包裹名称
+		/// </summary>
+		public string PackageName;
 
 		/// <summary>
 		/// 内置资源的标签列表（首包资源）

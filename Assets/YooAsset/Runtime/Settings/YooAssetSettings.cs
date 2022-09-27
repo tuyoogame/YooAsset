@@ -24,7 +24,7 @@ namespace YooAsset
 		/// <summary>
 		/// 补丁清单文件版本
 		/// </summary>
-		public const string PatchManifestFileVersion = "1.2.2";
+		public const string PatchManifestFileVersion = "1.3.0";
 
 		/// <summary>
 		/// 构建输出文件夹名称
@@ -39,7 +39,7 @@ namespace YooAsset
 		/// <summary>
 		/// 静态版本文件
 		/// </summary>
-		public const string VersionFileName = "StaticVersion.bytes";
+		public const string VersionFileName = "StaticVersion";
 
 		/// <summary>
 		/// Unity着色器资源包名称

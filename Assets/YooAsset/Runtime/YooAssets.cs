@@ -41,6 +41,11 @@ namespace YooAsset
 			public bool LocationToLower = false;
 
 			/// <summary>
+			/// 内置的资源包裹名称
+			/// </summary>
+			public string BuildinPackageName = string.Empty;
+
+			/// <summary>
 			/// 资源定位服务接口
 			/// </summary>
 			public ILocationServices LocationServices = null;
@@ -146,15 +151,18 @@ namespace YooAsset
 			if (parameters == null)
 				throw new Exception($"YooAsset create parameters is null.");
 
+			if (string.IsNullOrEmpty(parameters.BuildinPackageName))
+				throw new Exception($"{nameof(parameters.BuildinPackageName)} is empty.");
+
 			if (parameters.LocationServices == null)
 				throw new Exception($"{nameof(IBundleServices)} is null.");
-			else
-				_locationServices = parameters.LocationServices;
 
 #if !UNITY_EDITOR
 			if (parameters is EditorSimulateModeParameters)
 				throw new Exception($"Editor simulate mode only support unity editor.");
 #endif
+
+			_locationServices = parameters.LocationServices;
 
 			// 创建驱动器
 			if (_isInitialize == false)
@@ -228,7 +236,7 @@ namespace YooAsset
 				_offlinePlayModeImpl = new OfflinePlayModeImpl();
 				_bundleServices = _offlinePlayModeImpl;
 				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				initializeOperation = _offlinePlayModeImpl.InitializeAsync(parameters.LocationToLower);
+				initializeOperation = _offlinePlayModeImpl.InitializeAsync(parameters.LocationToLower, parameters.BuildinPackageName);
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
@@ -238,7 +246,7 @@ namespace YooAsset
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = _hostPlayModeImpl.InitializeAsync(
 					hostPlayModeParameters.LocationToLower,
-					hostPlayModeParameters.ClearCacheWhenDirty,
+					hostPlayModeParameters.BuildinPackageName,
 					hostPlayModeParameters.DefaultHostServer,
 					hostPlayModeParameters.FallbackHostServer);
 			}
@@ -260,8 +268,9 @@ namespace YooAsset
 		/// <summary>
 		/// 向网络端请求静态资源版本
 		/// </summary>
+		/// <param name="packageName">更新的资源包裹名称</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public static UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
+		public static UpdateStaticVersionOperation UpdateStaticVersionAsync(string packageName, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -278,7 +287,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdateStaticVersionAsync(timeout);
+				return _hostPlayModeImpl.UpdateStaticVersionAsync(packageName, timeout);
 			}
 			else
 			{
@@ -289,9 +298,10 @@ namespace YooAsset
 		/// <summary>
 		/// 向网络端请求并更新补丁清单
 		/// </summary>
-		/// <param name="resourceVersion">更新的资源版本</param>
+		/// <param name="packageName">更新的资源包裹名称</param>
+		/// <param name="packageCRC">更新的资源包裹版本</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public static UpdateManifestOperation UpdateManifestAsync(int resourceVersion, int timeout = 60)
+		public static UpdateManifestOperation UpdateManifestAsync(string packageName, string packageCRC, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			DebugCheckUpdateManifest();
@@ -309,7 +319,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdatePatchManifestAsync(resourceVersion, timeout);
+				return _hostPlayModeImpl.UpdatePatchManifestAsync(packageName, packageCRC, timeout);
 			}
 			else
 			{
@@ -321,8 +331,9 @@ namespace YooAsset
 		/// 弱联网情况下加载补丁清单
 		/// 注意：当指定版本内容验证失败后会返回失败。
 		/// </summary>
-		/// <param name="resourceVersion">指定的资源版本</param>
-		public static UpdateManifestOperation WeaklyUpdateManifestAsync(int resourceVersion)
+		/// <param name="packageName">指定的资源包裹名称</param>
+		/// <param name="packageCRC">指定的资源包裹版本</param>
+		public static UpdateManifestOperation WeaklyUpdateManifestAsync(string packageName, string packageCRC)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -339,7 +350,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.WeaklyUpdatePatchManifestAsync(resourceVersion);
+				return _hostPlayModeImpl.WeaklyUpdatePatchManifestAsync(packageName, packageCRC);
 			}
 			else
 			{
@@ -354,30 +365,6 @@ namespace YooAsset
 		public static void StartOperation(GameAsyncOperation operation)
 		{
 			OperationSystem.StartOperation(operation);
-		}
-
-		/// <summary>
-		/// 获取资源版本号
-		/// </summary>
-		public static int GetResourceVersion()
-		{
-			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				return _editorSimulateModeImpl.GetResourceVersion();
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				return _offlinePlayModeImpl.GetResourceVersion();
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.GetResourceVersion();
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
 		}
 
 		/// <summary>
@@ -985,9 +972,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建资源包裹下载器，用于下载更新指定资源版本所有的资源包文件
 		/// </summary>
-		/// <param name="resourceVersion">指定更新的资源版本</param>
+		/// <param name="packageName">指定更新的资源包裹名称</param>
+		/// <param name="packageCRC">指定更新的资源包裹版本</param>
 		/// <param name="timeout">超时时间</param>
-		public static UpdatePackageOperation UpdatePackageAsync(int resourceVersion, int timeout = 60)
+		public static UpdatePackageOperation UpdatePackageAsync(string packageName, string packageCRC, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -1004,7 +992,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdatePackageAsync(resourceVersion, timeout);
+				return _hostPlayModeImpl.UpdatePackageAsync(packageName, packageCRC, timeout);
 			}
 			else
 			{

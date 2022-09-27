@@ -35,25 +35,33 @@ namespace YooAsset
 		/// <summary>
 		/// 获取构建报告文件名
 		/// </summary>
-		public static string GetReportFileName(int resourceVersion)
+		public static string GetReportFileName(string packageName, string packageCRC)
 		{
-			return $"{YooAssetSettings.ReportFileName}_{resourceVersion}.json";
+			return $"{YooAssetSettings.ReportFileName}_{packageName}_{packageCRC}.json";
 		}
 
 		/// <summary>
 		/// 获取补丁清单文件完整名称
 		/// </summary>
-		public static string GetPatchManifestFileName(int resourceVersion)
+		public static string GetPatchManifestFileName(string packageName, string packageCRC)
 		{
-			return $"{Setting.PatchManifestFileName}_{resourceVersion}.bytes";
+			return $"{Setting.PatchManifestFileName}_{packageName}_{packageCRC}.bytes";
 		}
 
 		/// <summary>
-		/// 获取补丁清单哈希文件完整名称
+		/// 获取补丁清单文件临时名称
 		/// </summary>
-		public static string GetPatchManifestHashFileName(int resourceVersion)
+		public static string GetPatchManifestTempFileName(string packageName)
 		{
-			return $"{Setting.PatchManifestFileName}_{resourceVersion}.hash";
+			return $"{Setting.PatchManifestFileName}_{packageName}.temp";
+		}
+
+		/// <summary>
+		/// 获取静态版本文件名称
+		/// </summary>
+		public static string GetStaticVersionFileName(string packageName)
+		{
+			return $"{YooAssetSettings.VersionFileName}_{packageName}.bytes";
 		}
 
 		/// <summary>

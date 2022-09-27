@@ -13,26 +13,19 @@ namespace YooAsset
 
 		// 参数相关
 		private bool _locationToLower;
-		private bool _clearCacheWhenDirty;
 		private string _defaultHostServer;
 		private string _fallbackHostServer;
-
-		public bool ClearCacheWhenDirty
-		{
-			get { return _clearCacheWhenDirty; }
-		}
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(bool locationToLower, bool clearCacheWhenDirty, string defaultHostServer, string fallbackHostServer)
+		public InitializationOperation InitializeAsync(bool locationToLower, string buildinPackageName, string defaultHostServer, string fallbackHostServer)
 		{
 			_locationToLower = locationToLower;
-			_clearCacheWhenDirty = clearCacheWhenDirty;
 			_defaultHostServer = defaultHostServer;
 			_fallbackHostServer = fallbackHostServer;
 
-			var operation = new HostPlayModeInitializationOperation(this);
+			var operation = new HostPlayModeInitializationOperation(this, buildinPackageName);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -40,9 +33,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新资源版本号
 		/// </summary>
-		public UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout)
+		public UpdateStaticVersionOperation UpdateStaticVersionAsync(string packageName, int timeout)
 		{
-			var operation = new HostPlayModeUpdateStaticVersionOperation(this, timeout);
+			var operation = new HostPlayModeUpdateStaticVersionOperation(this, packageName, timeout);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -50,9 +43,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新补丁清单
 		/// </summary>
-		public UpdateManifestOperation UpdatePatchManifestAsync(int resourceVersion, int timeout)
+		public UpdateManifestOperation UpdatePatchManifestAsync(string packageName, string packageCRC, int timeout)
 		{
-			var operation = new HostPlayModeUpdateManifestOperation(this, resourceVersion, timeout);
+			var operation = new HostPlayModeUpdateManifestOperation(this, packageName, packageCRC, timeout);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -60,9 +53,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新补丁清单（弱联网）
 		/// </summary>
-		public UpdateManifestOperation WeaklyUpdatePatchManifestAsync(int resourceVersion)
+		public UpdateManifestOperation WeaklyUpdatePatchManifestAsync(string packageName, string packageCRC)
 		{
-			var operation = new HostPlayModeWeaklyUpdateManifestOperation(this, resourceVersion);
+			var operation = new HostPlayModeWeaklyUpdateManifestOperation(this, packageName, packageCRC);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -70,21 +63,11 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新资源包裹
 		/// </summary>
-		public UpdatePackageOperation UpdatePackageAsync(int resourceVersion, int timeout)
+		public UpdatePackageOperation UpdatePackageAsync(string packageName, string packageCRC, int timeout)
 		{
-			var operation = new HostPlayModeUpdatePackageOperation(this, resourceVersion, timeout);
+			var operation = new HostPlayModeUpdatePackageOperation(this, packageName, packageCRC, timeout);
 			OperationSystem.StartOperation(operation);
 			return operation;
-		}
-
-		/// <summary>
-		/// 获取资源版本号
-		/// </summary>
-		public int GetResourceVersion()
-		{
-			if (LocalPatchManifest == null)
-				return 0;
-			return LocalPatchManifest.ResourceVersion;
 		}
 
 		/// <summary>

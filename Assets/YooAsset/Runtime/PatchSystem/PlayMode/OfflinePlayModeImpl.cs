@@ -12,22 +12,12 @@ namespace YooAsset
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(bool locationToLower)
+		public InitializationOperation InitializeAsync(bool locationToLower, string buildinPackageName)
 		{
 			_locationToLower = locationToLower;
-			var operation = new OfflinePlayModeInitializationOperation(this);
+			var operation = new OfflinePlayModeInitializationOperation(this, buildinPackageName);
 			OperationSystem.StartOperation(operation);
 			return operation;
-		}
-
-		/// <summary>
-		/// 获取资源版本号
-		/// </summary>
-		public int GetResourceVersion()
-		{
-			if (_appPatchManifest == null)
-				return 0;
-			return _appPatchManifest.ResourceVersion;
 		}
 
 		// 设置资源清单
