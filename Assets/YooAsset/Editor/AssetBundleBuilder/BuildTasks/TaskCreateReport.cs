@@ -24,9 +24,12 @@ namespace YooAsset.Editor
 			BuildRunner.Info($"Build time consuming {buildSeconds} seconds.");
 		}
 
-		private void CreateReportFile(BuildParametersContext buildParameters, BuildMapContext buildMapContext)
+		private void CreateReportFile(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext)
 		{
-			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(buildParameters.PipelineOutputDirectory, buildParameters.Parameters.BuildVersion);
+			var buildParameters = buildParametersContext.Parameters;
+
+			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
+			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(pipelineOutputDirectory, buildParameters.BuildPackage, buildParametersContext.OutputPackageCRC);
 			BuildReport buildReport = new BuildReport();
 
 			// 概述信息
@@ -38,22 +41,22 @@ namespace YooAsset.Editor
 #endif
 				buildReport.Summary.UnityVersion = UnityEngine.Application.unityVersion;
 				buildReport.Summary.BuildDate = DateTime.Now.ToString();
-				buildReport.Summary.BuildSeconds = (int)buildParameters.GetBuildingSeconds();
-				buildReport.Summary.BuildTarget = buildParameters.Parameters.BuildTarget;
-				buildReport.Summary.BuildPipeline = buildParameters.Parameters.BuildPipeline;
-				buildReport.Summary.BuildMode = buildParameters.Parameters.BuildMode;
-				buildReport.Summary.BuildVersion = buildParameters.Parameters.BuildVersion;
-				buildReport.Summary.BuildinTags = buildParameters.Parameters.BuildinTags;
-				buildReport.Summary.EnableAddressable = buildParameters.Parameters.EnableAddressable;
-				buildReport.Summary.CopyBuildinTagFiles = buildParameters.Parameters.CopyBuildinTagFiles;
-				buildReport.Summary.EncryptionServicesClassName = buildParameters.Parameters.EncryptionServices == null ?
-					"null" : buildParameters.Parameters.EncryptionServices.GetType().FullName;
+				buildReport.Summary.BuildSeconds = (int)buildParametersContext.GetBuildingSeconds();
+				buildReport.Summary.BuildTarget = buildParameters.BuildTarget;
+				buildReport.Summary.BuildPipeline = buildParameters.BuildPipeline;
+				buildReport.Summary.BuildMode = buildParameters.BuildMode;
+				buildReport.Summary.BuildPackage = buildParameters.BuildPackage;
+				buildReport.Summary.BuildinTags = buildParameters.BuildinTags;
+				buildReport.Summary.EnableAddressable = buildParameters.EnableAddressable;
+				buildReport.Summary.CopyBuildinTagFiles = buildParameters.CopyBuildinTagFiles;
+				buildReport.Summary.EncryptionServicesClassName = buildParameters.EncryptionServices == null ?
+					"null" : buildParameters.EncryptionServices.GetType().FullName;
 
 				// 构建参数
-				buildReport.Summary.OutputNameStyle = buildParameters.Parameters.OutputNameStyle;
-				buildReport.Summary.CompressOption = buildParameters.Parameters.CompressOption;
-				buildReport.Summary.DisableWriteTypeTree = buildParameters.Parameters.DisableWriteTypeTree;
-				buildReport.Summary.IgnoreTypeTreeChanges = buildParameters.Parameters.IgnoreTypeTreeChanges;
+				buildReport.Summary.OutputNameStyle = buildParameters.OutputNameStyle;
+				buildReport.Summary.CompressOption = buildParameters.CompressOption;
+				buildReport.Summary.DisableWriteTypeTree = buildParameters.DisableWriteTypeTree;
+				buildReport.Summary.IgnoreTypeTreeChanges = buildParameters.IgnoreTypeTreeChanges;
 
 				// 构建结果
 				buildReport.Summary.AssetFileTotalCount = buildMapContext.AssetFileCount;
@@ -101,7 +104,8 @@ namespace YooAsset.Editor
 			}
 
 			// 删除旧文件
-			string filePath = $"{buildParameters.PipelineOutputDirectory}/{YooAssetSettingsData.GetReportFileName(buildParameters.Parameters.BuildVersion)}";
+			string fileName = YooAssetSettingsData.GetReportFileName(buildParameters.BuildPackage, buildParametersContext.OutputPackageCRC);
+			string filePath = $"{pipelineOutputDirectory}/{fileName}";
 			if (File.Exists(filePath))
 				File.Delete(filePath);
 

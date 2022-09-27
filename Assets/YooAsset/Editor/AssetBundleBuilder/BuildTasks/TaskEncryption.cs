@@ -45,9 +45,9 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 加密文件
 		/// </summary>
-		private List<string> EncryptFiles(BuildParametersContext buildParameters, BuildMapContext buildMapContext)
+		private List<string> EncryptFiles(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext)
 		{
-			var encryptionServices = buildParameters.Parameters.EncryptionServices;
+			var encryptionServices = buildParametersContext.Parameters.EncryptionServices;
 
 			// 加密资源列表
 			List<string> encryptList = new List<string>();
@@ -57,6 +57,7 @@ namespace YooAsset.Editor
 				return encryptList;
 
 			int progressValue = 0;
+			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				if (encryptionServices.Check(bundleInfo.BundleName))
@@ -70,7 +71,7 @@ namespace YooAsset.Editor
 					encryptList.Add(bundleInfo.BundleName);
 
 					// 注意：通过判断文件合法性，规避重复加密一个文件
-					string filePath = $"{buildParameters.PipelineOutputDirectory}/{bundleInfo.BundleName}";
+					string filePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
 					byte[] fileData = File.ReadAllBytes(filePath);
 					if (EditorTools.CheckBundleFileValid(fileData))
 					{

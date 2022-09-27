@@ -6,11 +6,6 @@ namespace YooAsset.Editor
 	public class AssetBundleBuilderSetting : ScriptableObject
 	{
 		/// <summary>
-		/// 构建版本号
-		/// </summary>
-		public int BuildVersion = 0;
-
-		/// <summary>
 		/// 构建管线
 		/// </summary>
 		public EBuildPipeline BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;

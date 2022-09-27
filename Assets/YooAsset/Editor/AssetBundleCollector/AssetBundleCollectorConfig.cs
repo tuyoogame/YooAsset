@@ -240,7 +240,7 @@ namespace YooAsset.Editor
 
 				// 添加包裹元素
 				var packageElement = xmlDoc.CreateElement(XmlPackage);
-				packageElement.SetAttribute(XmlPackageName, "Default Package");
+				packageElement.SetAttribute(XmlPackageName, "DefaultPackage");
 				packageElement.SetAttribute(XmlPackageDesc, string.Empty);
 				root.AppendChild(packageElement);
 

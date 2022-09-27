@@ -62,11 +62,6 @@ namespace YooAsset.Editor
 		public string BuildPackage;
 
 		/// <summary>
-		/// 构建的版本（资源版本号）
-		/// </summary>
-		public int BuildVersion;
-
-		/// <summary>
 		/// 内置资源标签集合（首包资源标签）
 		/// 注意：分号为分隔符
 		/// </summary>

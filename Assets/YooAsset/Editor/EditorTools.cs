@@ -353,6 +353,9 @@ namespace YooAsset.Editor
 		/// </summary>
 		public static void FileMoveTo(string filePath, string destPath)
 		{
+			if (File.Exists(destPath))
+				File.Delete(destPath);
+
 			FileInfo fileInfo = new FileInfo(filePath);
 			fileInfo.MoveTo(destPath);
 		}

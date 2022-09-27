@@ -25,5 +25,10 @@ namespace YooAsset.Editor
         /// 输出的补丁包目录
         /// </summary>
         public string OutputPackageDirectory;
+
+        /// <summary>
+        /// 输出的包裹清单哈希值
+        /// </summary>
+        public string OutputPackageCRC;
     }
 }

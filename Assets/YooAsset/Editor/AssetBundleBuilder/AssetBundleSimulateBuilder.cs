@@ -16,7 +16,6 @@ namespace YooAsset.Editor
 			buildParameters.OutputRoot = defaultOutputRoot;
 			buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
 			buildParameters.BuildMode = EBuildMode.SimulateBuild;
-			buildParameters.BuildVersion = 999;
 			buildParameters.BuildPackage = AssetBundleBuilderSettingData.Setting.BuildPackage;
 			buildParameters.EnableAddressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
 
@@ -24,8 +23,9 @@ namespace YooAsset.Editor
 			var buildResult = builder.Run(buildParameters);
 			if (buildResult.Success)
 			{
-				string pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(buildParameters.OutputRoot, buildParameters.BuildTarget);
-				_manifestFilePath = $"{pipelineOutputDirectory}_{EBuildMode.SimulateBuild}/{YooAssetSettingsData.GetPatchManifestFileName(buildParameters.BuildVersion)}";
+				string pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(buildParameters.OutputRoot, buildParameters.BuildPackage, buildParameters.BuildTarget, buildParameters.BuildMode);
+				string manifestFileName = YooAssetSettingsData.GetPatchManifestFileName(buildParameters.BuildPackage, buildResult.OutputPackageCRC);
+				_manifestFilePath = $"{pipelineOutputDirectory}/{manifestFileName}";
 			}
 			else
 			{

@@ -25,7 +25,6 @@ namespace YooAsset.Editor
 
 		private Button _saveButton;
 		private TextField _buildOutputField;
-		private IntegerField _buildVersionField;
 		private EnumField _buildPipelineField;
 		private EnumField _buildModeField;
 		private TextField _buildinTagsField;
@@ -63,19 +62,9 @@ namespace YooAsset.Editor
 
 				// 输出目录
 				string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
-				string pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(defaultOutputRoot, _buildTarget);
 				_buildOutputField = root.Q<TextField>("BuildOutput");
-				_buildOutputField.SetValueWithoutNotify(pipelineOutputDirectory);
+				_buildOutputField.SetValueWithoutNotify(defaultOutputRoot);
 				_buildOutputField.SetEnabled(false);
-
-				// 构建版本
-				_buildVersionField = root.Q<IntegerField>("BuildVersion");
-				_buildVersionField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.BuildVersion);
-				_buildVersionField.RegisterValueChangedCallback(evt =>
-				{
-					AssetBundleBuilderSettingData.IsDirty = true;
-					AssetBundleBuilderSettingData.Setting.BuildVersion = _buildVersionField.value;
-				});
 
 				// 构建管线
 				_buildPipelineField = root.Q<EnumField>("BuildPipeline");
@@ -249,7 +238,6 @@ namespace YooAsset.Editor
 			buildParameters.BuildTarget = _buildTarget;
 			buildParameters.BuildPipeline = AssetBundleBuilderSettingData.Setting.BuildPipeline;
 			buildParameters.BuildMode = AssetBundleBuilderSettingData.Setting.BuildMode;
-			buildParameters.BuildVersion = AssetBundleBuilderSettingData.Setting.BuildVersion;
 			buildParameters.BuildPackage = AssetBundleBuilderSettingData.Setting.BuildPackage;
 			buildParameters.BuildinTags = AssetBundleBuilderSettingData.Setting.BuildTags;
 			buildParameters.VerifyBuildingResult = true;
@@ -269,7 +257,7 @@ namespace YooAsset.Editor
 			var buildResult = builder.Run(buildParameters);
 			if (buildResult.Success)
 			{
-				EditorUtility.RevealInFinder($"{buildParameters.OutputRoot}/{buildParameters.BuildTarget}/{buildParameters.BuildVersion}");
+				EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
 			}
 		}
 

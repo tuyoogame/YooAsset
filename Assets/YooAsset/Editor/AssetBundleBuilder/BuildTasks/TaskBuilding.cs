@@ -25,14 +25,15 @@ namespace YooAsset.Editor
 			if (buildMode == EBuildMode.SimulateBuild)
 				return;
 
-			BuildAssetBundleOptions opt = buildParametersContext.GetPipelineBuildOptions();
-			AssetBundleManifest buildResults = BuildPipeline.BuildAssetBundles(buildParametersContext.PipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), opt, buildParametersContext.Parameters.BuildTarget);
+			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
+			BuildAssetBundleOptions buildOptions = buildParametersContext.GetPipelineBuildOptions();
+			AssetBundleManifest buildResults = BuildPipeline.BuildAssetBundles(pipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), buildOptions, buildParametersContext.Parameters.BuildTarget);
 			if (buildResults == null)
 				throw new Exception("构建过程中发生错误！");
 
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
-				string unityOutputManifestFilePath = $"{buildParametersContext.PipelineOutputDirectory}/{YooAssetSettings.OutputFolderName}";
+				string unityOutputManifestFilePath = $"{buildParametersContext.GetPipelineOutputDirectory()}/{YooAssetSettings.OutputFolderName}";
 				if(System.IO.File.Exists(unityOutputManifestFilePath) == false)
 					throw new Exception("构建过程中发生严重错误！请查阅上下文日志！");
 			}
@@ -54,11 +55,12 @@ namespace YooAsset.Editor
 		/// </summary>
 		private void CopyRawBundle(BuildMapContext buildMapContext, BuildParametersContext buildParametersContext)
 		{
+			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				if (bundleInfo.IsRawFile)
 				{
-					string dest = $"{buildParametersContext.PipelineOutputDirectory}/{bundleInfo.BundleName}";
+					string dest = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
 					foreach (var buildAsset in bundleInfo.BuildinAssets)
 					{
 						if (buildAsset.IsRawAsset)
@@ -73,11 +75,12 @@ namespace YooAsset.Editor
 		/// </summary>
 		private void UpdateBuildBundleInfo(BuildMapContext buildMapContext, BuildParametersContext buildParametersContext, BuildResultContext buildResult)
 		{
+			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				if (bundleInfo.IsRawFile)
 				{
-					string filePath = $"{buildParametersContext.PipelineOutputDirectory}/{bundleInfo.BundleName}";
+					string filePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
 					bundleInfo.ContentHash = HashUtility.FileMD5(filePath);
 				}
 				else

@@ -374,7 +374,7 @@ namespace YooAsset.Editor
 		private void AddPackageBtn_clicked()
 		{
 			Undo.RecordObject(AssetBundleCollectorSettingData.Setting, "YooAsset.AssetBundleCollectorWindow AddPackage");
-			AssetBundleCollectorSettingData.CreatePackage("Default Package");
+			AssetBundleCollectorSettingData.CreatePackage("DefaultPackage");
 			FillPackageViewData();
 		}
 		private void RemovePackageBtn_clicked()

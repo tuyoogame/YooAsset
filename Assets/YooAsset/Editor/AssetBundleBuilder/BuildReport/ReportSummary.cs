@@ -44,9 +44,9 @@ namespace YooAsset.Editor
 		public EBuildMode BuildMode;
 
 		/// <summary>
-		/// 构建版本
+		/// 构建包裹
 		/// </summary>
-		public int BuildVersion;
+		public string BuildPackage;
 
 		/// <summary>
 		/// 内置资源标签
