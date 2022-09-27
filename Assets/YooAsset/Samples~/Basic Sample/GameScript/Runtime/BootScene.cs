@@ -41,6 +41,7 @@ public class BootScene : MonoBehaviour
 		{
 			var createParameters = new YooAssets.EditorSimulateModeParameters();
 			createParameters.LocationServices = new AddressLocationServices();
+			createParameters.BuildinPackageName = "DefaultPackage";
 			//createParameters.SimulatePatchManifestPath = GetPatchManifestPath();
 			yield return YooAssets.InitializeAsync(createParameters);
 		}
@@ -50,6 +51,7 @@ public class BootScene : MonoBehaviour
 		{
 			var createParameters = new YooAssets.OfflinePlayModeParameters();
 			createParameters.LocationServices = new AddressLocationServices();
+			createParameters.BuildinPackageName = "DefaultPackage";
 			yield return YooAssets.InitializeAsync(createParameters);
 		}
 
@@ -58,6 +60,7 @@ public class BootScene : MonoBehaviour
 		{
 			var createParameters = new YooAssets.HostPlayModeParameters();
 			createParameters.LocationServices = new AddressLocationServices();
+			createParameters.BuildinPackageName = "DefaultPackage";
 			createParameters.DecryptionServices = null;
 			createParameters.ClearCacheWhenDirty = false;
 			createParameters.DefaultHostServer = GetHostServerURL();

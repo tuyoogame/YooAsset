@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09788b4733bab2d4792fdd5d28e7653c, type: 3}
   m_Name: AssetBundleBuilderSetting
   m_EditorClassIdentifier: 
-  BuildVersion: 100
   BuildPipeline: 0
-  BuildMode: 0
+  BuildMode: 1
+  BuildPackage: DefaultPackage
   BuildTags: buildin;
   CompressOption: 2
   OutputNameStyle: 1
