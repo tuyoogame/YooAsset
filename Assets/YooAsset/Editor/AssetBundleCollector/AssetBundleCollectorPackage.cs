@@ -8,32 +8,22 @@ using UnityEditor;
 namespace YooAsset.Editor
 {
 	[Serializable]
-	public class AssetBundleCollectorGroup
+	public class AssetBundleCollectorPackage
 	{
 		/// <summary>
-		/// 分组名称
+		/// 包裹名称
 		/// </summary>
-		public string GroupName = string.Empty;
+		public string PackageName = string.Empty;
 
 		/// <summary>
-		/// 分组描述
+		/// 包裹描述
 		/// </summary>
-		public string GroupDesc = string.Empty;
+		public string PackageDesc = string.Empty;
 
 		/// <summary>
-		/// 资源分类标签
+		/// 分组列表
 		/// </summary>
-		public string AssetTags = string.Empty;
-
-		/// <summary>
-		/// 分组激活规则
-		/// </summary>
-		public string ActiveRuleName = nameof(EnableGroup);
-
-		/// <summary>
-		/// 分组的收集器列表
-		/// </summary>
-		public List<AssetBundleCollector> Collectors = new List<AssetBundleCollector>();
+		public List<AssetBundleCollectorGroup> Groups = new List<AssetBundleCollectorGroup>();
 
 
 		/// <summary>
@@ -41,12 +31,9 @@ namespace YooAsset.Editor
 		/// </summary>
 		public void CheckConfigError()
 		{
-			if (AssetBundleCollectorSettingData.HasActiveRuleName(ActiveRuleName) == false)
-				throw new Exception($"Invalid {nameof(IActiveRule)} class type : {ActiveRuleName} in group : {GroupName}");
-
-			foreach (var collector in Collectors)
+			foreach (var group in Groups)
 			{
-				collector.CheckConfigError();
+				group.CheckConfigError();
 			}
 		}
 
@@ -56,9 +43,9 @@ namespace YooAsset.Editor
 		public bool FixConfigError()
 		{
 			bool isFixed = false;
-			foreach (var collector in Collectors)
+			foreach (var group in Groups)
 			{
-				if (collector.FixConfigError())
+				if (group.FixConfigError())
 				{
 					isFixed = true;
 				}
@@ -73,23 +60,16 @@ namespace YooAsset.Editor
 		{
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
 
-			// 检测分组是否激活
-			IActiveRule activeRule = AssetBundleCollectorSettingData.GetActiveRuleInstance(ActiveRuleName);
-			if (activeRule.IsActiveGroup() == false)
-			{
-				return new List<CollectAssetInfo>();
-			}
-
 			// 收集打包资源
-			foreach (var collector in Collectors)
+			foreach (var group in Groups)
 			{
-				var temper = collector.GetAllCollectAssets(buildMode, enableAddressable, this);
+				var temper = group.GetAllCollectAssets(buildMode, enableAddressable);
 				foreach (var assetInfo in temper)
 				{
 					if (result.ContainsKey(assetInfo.AssetPath) == false)
 						result.Add(assetInfo.AssetPath, assetInfo);
 					else
-						throw new Exception($"The collecting asset file is existed : {assetInfo.AssetPath} in group : {GroupName}");
+						throw new Exception($"The collecting asset file is existed : {assetInfo.AssetPath}");
 				}
 			}
 
@@ -105,13 +85,41 @@ namespace YooAsset.Editor
 						if (adressTemper.Contains(address) == false)
 							adressTemper.Add(address);
 						else
-							throw new Exception($"The address is existed : {address} in group : {GroupName}");
+							throw new Exception($"The address is existed : {address}");
 					}
 				}
 			}
 
 			// 返回列表
 			return result.Values.ToList();
+		}
+
+		/// <summary>
+		/// 获取所有的资源标签
+		/// </summary>
+		public List<string> GetAllTags()
+		{
+			HashSet<string> result = new HashSet<string>();
+			foreach (var group in Groups)
+			{
+				List<string> groupTags = StringUtility.StringToStringList(group.AssetTags, ';');
+				foreach (var tag in groupTags)
+				{
+					if (result.Contains(tag) == false)
+						result.Add(tag);
+				}
+
+				foreach (var collector in group.Collectors)
+				{
+					List<string> collectorTags = StringUtility.StringToStringList(collector.AssetTags, ';');
+					foreach (var tag in collectorTags)
+					{
+						if (result.Contains(tag) == false)
+							result.Add(tag);
+					}
+				}
+			}
+			return result.ToList();
 		}
 	}
 }

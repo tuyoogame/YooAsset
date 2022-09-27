@@ -132,7 +132,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取打包收集的资源文件
 		/// </summary>
-		public List<CollectAssetInfo> GetAllCollectAssets(EBuildMode buildMode, AssetBundleCollectorGroup group)
+		public List<CollectAssetInfo> GetAllCollectAssets(EBuildMode buildMode, bool enableAddressable, AssetBundleCollectorGroup group)
 		{
 			// 注意：模拟构建模式下只收集主资源
 			if (buildMode == EBuildMode.SimulateBuild)
@@ -187,7 +187,7 @@ namespace YooAsset.Editor
 			}
 
 			// 检测可寻址地址是否重复
-			if (AssetBundleCollectorSettingData.Setting.EnableAddressable)
+			if (enableAddressable)
 			{
 				HashSet<string> adressTemper = new HashSet<string>();
 				foreach (var collectInfoPair in result)

@@ -87,7 +87,7 @@ namespace YooAsset.Editor
 			List<string> allAssets = new List<string>(1000);
 
 			// 获取所有打包的资源
-			List<CollectAssetInfo> allCollectInfos = AssetBundleCollectorSettingData.Setting.GetAllCollectAssets(EBuildMode.DryRunBuild);
+			List<CollectAssetInfo> allCollectInfos = AssetBundleCollectorSettingData.Setting.GetAllPackageAssets(EBuildMode.DryRunBuild);
 			List<string> collectAssets = allCollectInfos.Select(t => t.AssetPath).ToList();
 			foreach (var assetPath in collectAssets)
 			{

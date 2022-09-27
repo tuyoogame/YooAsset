@@ -9,24 +9,38 @@ namespace YooAsset.Editor
 	public class AssetBundleCollectorSetting : ScriptableObject
 	{
 		/// <summary>
+		/// 是否显示包裹视图
+		/// </summary>
+		public bool ShowPackageView = false;
+
+		/// <summary>
 		/// 是否启用可寻址资源定位
 		/// </summary>
 		public bool EnableAddressable = false;
 
 		/// <summary>
-		/// 分组列表
+		/// 包裹列表
 		/// </summary>
-		public List<AssetBundleCollectorGroup> Groups = new List<AssetBundleCollectorGroup>();
+		public List<AssetBundleCollectorPackage> Packages = new List<AssetBundleCollectorPackage>();
 
+
+		/// <summary>
+		/// 清空所有数据
+		/// </summary>
+		public void ClearAll()
+		{
+			EnableAddressable = false;
+			Packages.Clear();
+		}
 
 		/// <summary>
 		/// 检测配置错误
 		/// </summary>
 		public void CheckConfigError()
 		{
-			foreach (var group in Groups)
+			foreach (var package in Packages)
 			{
-				group.CheckConfigError();
+				package.CheckConfigError();
 			}
 		}
 
@@ -35,88 +49,64 @@ namespace YooAsset.Editor
 		/// </summary>
 		public bool FixConfigError()
 		{
-			bool result = false;
-			foreach (var group in Groups)
+			bool isFixed = false;
+			foreach (var package in Packages)
 			{
-				foreach (var collector in group.Collectors)
+				if (package.FixConfigError())
 				{
-					bool isFixed = collector.FixConfigError();
-					if (isFixed)
-					{
-						result = true;
-					}
+					isFixed = true;
 				}
 			}
-			return result;
+			return isFixed;
 		}
 
 		/// <summary>
 		/// 获取所有的资源标签
 		/// </summary>
-		public List<string> GetAllTags()
+		public List<string> GetPackageAllTags(string packageName)
 		{
-			HashSet<string> result = new HashSet<string>();
-			foreach (var group in Groups)
+			foreach (var package in Packages)
 			{
-				List<string> groupTags = StringUtility.StringToStringList(group.AssetTags, ';');
-				foreach (var tag in groupTags)
+				if (package.PackageName == packageName)
 				{
-					if (result.Contains(tag) == false)
-						result.Add(tag);
-				}
-
-				foreach (var collector in group.Collectors)
-				{
-					List<string> collectorTags = StringUtility.StringToStringList(collector.AssetTags, ';');
-					foreach (var tag in collectorTags)
-					{
-						if (result.Contains(tag) == false)
-							result.Add(tag);
-					}
+					return package.GetAllTags();
 				}
 			}
-			return result.ToList();
+
+			Debug.LogWarning($"Not found package : {packageName}");
+			return new List<string>();
+		}
+		
+		/// <summary>
+		/// 获取包裹收集的资源文件
+		/// </summary>
+		public List<CollectAssetInfo> GetPackageAssets(EBuildMode buildMode, string packageName)
+		{
+			if (string.IsNullOrEmpty(packageName))
+				throw new Exception("Build Package name is null or mepty !");
+
+			foreach (var package in Packages)
+			{
+				if (package.PackageName == packageName)
+				{
+					return package.GetAllCollectAssets(buildMode, EnableAddressable);
+				}
+			}
+			throw new Exception($"Not found collector pacakge : {packageName}");
 		}
 
 		/// <summary>
-		/// 获取打包收集的资源文件
+		/// 获取所有包裹收集的资源文件
 		/// </summary>
-		public List<CollectAssetInfo> GetAllCollectAssets(EBuildMode buildMode)
+		public List<CollectAssetInfo> GetAllPackageAssets(EBuildMode buildMode)
 		{
-			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
-
-			// 收集打包资源
-			foreach (var group in Groups)
+			List<CollectAssetInfo> result = new List<CollectAssetInfo>(1000);
+			foreach (var package in Packages)
 			{
-				var temper = group.GetAllCollectAssets(buildMode);
-				foreach (var assetInfo in temper)
-				{
-					if (result.ContainsKey(assetInfo.AssetPath) == false)
-						result.Add(assetInfo.AssetPath, assetInfo);
-					else
-						throw new Exception($"The collecting asset file is existed : {assetInfo.AssetPath}");
-				}
+				var temper = package.GetAllCollectAssets(buildMode, EnableAddressable);
+				result.AddRange(temper);
 			}
-
-			// 检测可寻址地址是否重复
-			if (EnableAddressable)
-			{
-				HashSet<string> adressTemper = new HashSet<string>();
-				foreach (var collectInfoPair in result)
-				{
-					if (collectInfoPair.Value.CollectorType == ECollectorType.MainAssetCollector)
-					{
-						string address = collectInfoPair.Value.Address;
-						if (adressTemper.Contains(address) == false)
-							adressTemper.Add(address);
-						else
-							throw new Exception($"The address is existed : {address}");
-					}
-				}
-			}
-
-			// 返回列表
-			return result.Values.ToList();
+			return result;
 		}
 	}
 }

@@ -256,14 +256,13 @@ namespace YooAsset.Editor
 				IsDirty = true;
 			}
 		}
-		
+
 		/// <summary>
 		/// 清空所有数据
 		/// </summary>
 		public static void ClearAll()
 		{
-			Setting.EnableAddressable = false;
-			Setting.Groups.Clear();
+			Setting.ClearAll();
 			SaveFile();
 		}
 
@@ -337,24 +336,56 @@ namespace YooAsset.Editor
 			}
 		}
 
-		// 可寻址编辑相关
+		// 公共参数编辑相关
+		public static void ModifyPackageView(bool showPackageView)
+		{
+			Setting.ShowPackageView = showPackageView;
+			IsDirty = true;
+		}
 		public static void ModifyAddressable(bool enableAddressable)
 		{
 			Setting.EnableAddressable = enableAddressable;
 			IsDirty = true;
 		}
 
+		// 资源包裹编辑相关
+		public static void CreatePackage(string packageName)
+		{
+			AssetBundleCollectorPackage package = new AssetBundleCollectorPackage();
+			package.PackageName = packageName;
+			Setting.Packages.Add(package);
+			IsDirty = true;
+		}
+		public static void RemovePackage(AssetBundleCollectorPackage package)
+		{
+			if (Setting.Packages.Remove(package))
+			{
+				IsDirty = true;
+			}
+			else
+			{
+				Debug.LogWarning($"Failed remove package : {package.PackageName}");
+			}
+		}
+		public static void ModifyPackage(AssetBundleCollectorPackage package)
+		{
+			if (package != null)
+			{
+				IsDirty = true;
+			}
+		}
+
 		// 资源分组编辑相关
-		public static void CreateGroup(string groupName)
+		public static void CreateGroup(AssetBundleCollectorPackage package, string groupName)
 		{
 			AssetBundleCollectorGroup group = new AssetBundleCollectorGroup();
 			group.GroupName = groupName;
-			Setting.Groups.Add(group);
+			package.Groups.Add(group);
 			IsDirty = true;
 		}
-		public static void RemoveGroup(AssetBundleCollectorGroup group)
+		public static void RemoveGroup(AssetBundleCollectorPackage package, AssetBundleCollectorGroup group)
 		{
-			if (Setting.Groups.Remove(group))
+			if (package.Groups.Remove(group))
 			{
 				IsDirty = true;
 			}
@@ -363,18 +394,17 @@ namespace YooAsset.Editor
 				Debug.LogWarning($"Failed remove group : {group.GroupName}");
 			}
 		}
-		public static void ModifyGroup(AssetBundleCollectorGroup group)
+		public static void ModifyGroup(AssetBundleCollectorPackage package, AssetBundleCollectorGroup group)
 		{
-			if (group != null)
+			if (package != null && group != null)
 			{
 				IsDirty = true;
 			}
 		}
 
 		// 资源收集器编辑相关
-		public static void CreateCollector(AssetBundleCollectorGroup group)
+		public static void CreateCollector(AssetBundleCollectorGroup group, AssetBundleCollector collector)
 		{
-			AssetBundleCollector collector = new AssetBundleCollector();
 			group.Collectors.Add(collector);
 			IsDirty = true;
 		}
@@ -400,9 +430,9 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取所有的资源标签
 		/// </summary>
-		public static string GetAllTags()
+		public static string GetPackageAllTags(string packageName)
 		{
-			var allTags = Setting.GetAllTags();
+			var allTags = Setting.GetPackageAllTags(packageName);
 			return string.Join(";", allTags);
 		}
 	}
