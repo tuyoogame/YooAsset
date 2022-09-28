@@ -27,7 +27,6 @@ namespace YooAsset.Editor
 		private TextField _buildOutputField;
 		private EnumField _buildPipelineField;
 		private EnumField _buildModeField;
-		private TextField _buildinTagsField;
 		private PopupField<string> _buildPackageField;
 		private PopupField<string> _encryptionField;
 		private EnumField _compressionField;
@@ -88,15 +87,6 @@ namespace YooAsset.Editor
 					AssetBundleBuilderSettingData.IsDirty = true;
 					AssetBundleBuilderSettingData.Setting.BuildMode = (EBuildMode)_buildModeField.value;
 					RefreshWindow();
-				});
-
-				// 内置资源标签
-				_buildinTagsField = root.Q<TextField>("BuildinTags");
-				_buildinTagsField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.BuildTags);
-				_buildinTagsField.RegisterValueChangedCallback(evt =>
-				{
-					AssetBundleBuilderSettingData.IsDirty = true;
-					AssetBundleBuilderSettingData.Setting.BuildTags = _buildinTagsField.value;
 				});
 
 				// 构建包裹
@@ -204,7 +194,6 @@ namespace YooAsset.Editor
 		{
 			var buildMode = AssetBundleBuilderSettingData.Setting.BuildMode;
 			bool enableElement = buildMode == EBuildMode.ForceRebuild;
-			_buildinTagsField.SetEnabled(enableElement);
 			_encryptionField.SetEnabled(enableElement);
 			_compressionField.SetEnabled(enableElement);
 			_outputNameStyleField.SetEnabled(enableElement);
@@ -239,10 +228,8 @@ namespace YooAsset.Editor
 			buildParameters.BuildPipeline = AssetBundleBuilderSettingData.Setting.BuildPipeline;
 			buildParameters.BuildMode = AssetBundleBuilderSettingData.Setting.BuildMode;
 			buildParameters.BuildPackage = AssetBundleBuilderSettingData.Setting.BuildPackage;
-			buildParameters.BuildinTags = AssetBundleBuilderSettingData.Setting.BuildTags;
 			buildParameters.VerifyBuildingResult = true;
 			buildParameters.EnableAddressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
-			buildParameters.CopyBuildinTagFiles = AssetBundleBuilderSettingData.Setting.BuildMode == EBuildMode.ForceRebuild;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.CompressOption = AssetBundleBuilderSettingData.Setting.CompressOption;
 			buildParameters.OutputNameStyle = AssetBundleBuilderSettingData.Setting.OutputNameStyle;

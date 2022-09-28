@@ -49,19 +49,9 @@ namespace YooAsset.Editor
 		public string BuildPackage;
 
 		/// <summary>
-		/// 内置资源标签
-		/// </summary>
-		public string BuildinTags;
-
-		/// <summary>
 		/// 启用可寻址资源定位
 		/// </summary>
 		public bool EnableAddressable;
-
-		/// <summary>
-		/// 拷贝内置资源文件
-		/// </summary>
-		public bool CopyBuildinTagFiles;
 
 		/// <summary>
 		/// 加密服务类名称
@@ -79,8 +69,6 @@ namespace YooAsset.Editor
 		public int MainAssetTotalCount;
 		public int AllBundleTotalCount;
 		public long AllBundleTotalSize;
-		public int BuildinBundleTotalCount;
-		public long BuildinBundleTotalSize;
 		public int EncryptedBundleTotalCount;
 		public long EncryptedBundleTotalSize;
 		public int RawBundleTotalCount;

@@ -61,12 +61,6 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string BuildPackage;
 
-		/// <summary>
-		/// 内置资源标签集合（首包资源标签）
-		/// 注意：分号为分隔符
-		/// </summary>
-		public string BuildinTags;
-
 
 		/// <summary>
 		/// 验证构建结果
@@ -77,12 +71,6 @@ namespace YooAsset.Editor
 		/// 启用可寻址资源定位
 		/// </summary>
 		public bool EnableAddressable = false;
-		
-		/// <summary>
-		/// 拷贝内置资源文件到StreamingAssets目录（首包资源文件）
-		/// </summary>
-		public bool CopyBuildinTagFiles = false;
-
 
 		/// <summary>
 		/// 加密类
@@ -108,14 +96,5 @@ namespace YooAsset.Editor
 		/// 忽略类型树变化
 		/// </summary>
 		public bool IgnoreTypeTreeChanges = true;
-
-
-		/// <summary>
-		/// 获取内置资源标签列表（首包资源标签）
-		/// </summary>
-		public List<string> GetBuildinTags()
-		{
-			return StringUtility.StringToStringList(BuildinTags, ';');
-		}
 	}
 }

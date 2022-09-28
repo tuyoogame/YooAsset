@@ -46,9 +46,7 @@ namespace YooAsset.Editor
 				buildReport.Summary.BuildPipeline = buildParameters.BuildPipeline;
 				buildReport.Summary.BuildMode = buildParameters.BuildMode;
 				buildReport.Summary.BuildPackage = buildParameters.BuildPackage;
-				buildReport.Summary.BuildinTags = buildParameters.BuildinTags;
 				buildReport.Summary.EnableAddressable = buildParameters.EnableAddressable;
-				buildReport.Summary.CopyBuildinTagFiles = buildParameters.CopyBuildinTagFiles;
 				buildReport.Summary.EncryptionServicesClassName = buildParameters.EncryptionServices == null ?
 					"null" : buildParameters.EncryptionServices.GetType().FullName;
 
@@ -63,8 +61,6 @@ namespace YooAsset.Editor
 				buildReport.Summary.MainAssetTotalCount = GetMainAssetCount(patchManifest);
 				buildReport.Summary.AllBundleTotalCount = GetAllBundleCount(patchManifest);
 				buildReport.Summary.AllBundleTotalSize = GetAllBundleSize(patchManifest);
-				buildReport.Summary.BuildinBundleTotalCount = GetBuildinBundleCount(patchManifest);
-				buildReport.Summary.BuildinBundleTotalSize = GetBuildinBundleSize(patchManifest);
 				buildReport.Summary.EncryptedBundleTotalCount = GetEncryptedBundleCount(patchManifest);
 				buildReport.Summary.EncryptedBundleTotalSize = GetEncryptedBundleSize(patchManifest);
 				buildReport.Summary.RawBundleTotalCount = GetRawBundleCount(patchManifest);
@@ -175,26 +171,6 @@ namespace YooAsset.Editor
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				fileBytes += patchBundle.FileSize;
-			}
-			return fileBytes;
-		}
-		private int GetBuildinBundleCount(PatchManifest patchManifest)
-		{
-			int fileCount = 0;
-			foreach (var patchBundle in patchManifest.BundleList)
-			{
-				if (patchBundle.IsBuildin)
-					fileCount++;
-			}
-			return fileCount;
-		}
-		private long GetBuildinBundleSize(PatchManifest patchManifest)
-		{
-			long fileBytes = 0;
-			foreach (var patchBundle in patchManifest.BundleList)
-			{
-				if (patchBundle.IsBuildin)
-					fileBytes += patchBundle.FileSize;
 			}
 			return fileBytes;
 		}

@@ -31,7 +31,6 @@ namespace YooAsset.Editor
 			patchManifest.EnableAddressable = buildParameters.EnableAddressable;
 			patchManifest.OutputNameStyle = (int)buildParameters.OutputNameStyle;
 			patchManifest.PackageName = buildParameters.BuildPackage;
-			patchManifest.BuildinTags = buildParameters.BuildinTags;
 			patchManifest.BundleList = GetAllPatchBundle(context);
 			patchManifest.AssetList = GetAllPatchAsset(context, patchManifest);
 
@@ -76,8 +75,6 @@ namespace YooAsset.Editor
 			var encryptionContext = context.GetContextObject<TaskEncryption.EncryptionContext>();
 
 			List<PatchBundle> result = new List<PatchBundle>(1000);
-
-			List<string> buildinTags = buildParameters.Parameters.GetBuildinTags();
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
 				var bundleName = bundleInfo.BundleName;
@@ -86,28 +83,13 @@ namespace YooAsset.Editor
 				long fileSize = GetBundleFileSize(bundleInfo, buildParameters);
 				string[] tags = buildMapContext.GetBundleTags(bundleName);
 				bool isEncrypted = encryptionContext.IsEncryptFile(bundleName);
-				bool isBuildin = IsBuildinBundle(tags, buildinTags);
 				bool isRawFile = bundleInfo.IsRawFile;
 
 				PatchBundle patchBundle = new PatchBundle(bundleName, fileHash, fileCRC, fileSize, tags);
-				patchBundle.SetFlagsValue(isEncrypted, isBuildin, isRawFile);
+				patchBundle.SetFlagsValue(isRawFile, isEncrypted);
 				result.Add(patchBundle);
 			}
-
 			return result;
-		}
-		private bool IsBuildinBundle(string[] bundleTags, List<string> buildinTags)
-		{
-			// 注意：没有任何分类标签的Bundle文件默认为内置文件
-			if (bundleTags.Length == 0)
-				return true;
-
-			foreach (var tag in bundleTags)
-			{
-				if (buildinTags.Contains(tag))
-					return true;
-			}
-			return false;
 		}
 		private string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
 		{

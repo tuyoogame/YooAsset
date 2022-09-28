@@ -21,11 +21,6 @@ namespace YooAsset.Editor
 		public string BuildPackage = string.Empty;
 
 		/// <summary>
-		/// 内置资源标签（首包资源标签）
-		/// </summary>
-		public string BuildTags = string.Empty;
-
-		/// <summary>
 		/// 压缩方式
 		/// </summary>
 		public ECompressOption CompressOption = ECompressOption.LZ4;
