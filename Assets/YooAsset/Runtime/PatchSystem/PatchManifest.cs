@@ -33,11 +33,6 @@ namespace YooAsset
 		public string PackageName;
 
 		/// <summary>
-		/// 内置资源的标签列表（首包资源）
-		/// </summary>
-		public string BuildinTags;
-
-		/// <summary>
 		/// 资源列表（主动收集的资源列表）
 		/// </summary>
 		public List<PatchAsset> AssetList = new List<PatchAsset>();

@@ -41,11 +41,6 @@ namespace YooAsset
 			public bool LocationToLower = false;
 
 			/// <summary>
-			/// 内置的资源包裹名称
-			/// </summary>
-			public string BuildinPackageName = string.Empty;
-
-			/// <summary>
 			/// 资源定位服务接口
 			/// </summary>
 			public ILocationServices LocationServices = null;
@@ -83,6 +78,10 @@ namespace YooAsset
 		/// </summary>
 		public class OfflinePlayModeParameters : InitializeParameters
 		{
+			/// <summary>
+			/// 内置的资源包裹名称
+			/// </summary>
+			public string BuildinPackageName = string.Empty;
 		}
 
 		/// <summary>
@@ -100,11 +99,6 @@ namespace YooAsset
 			/// </summary>
 			public string FallbackHostServer;
 
-			/// <summary>
-			/// 当缓存池被污染的时候清理缓存池
-			/// </summary>
-			public bool ClearCacheWhenDirty = false;
-
 #if UNITY_WEBGL
 			/// <summary>
 			/// WEBGL模式不支持多线程下载
@@ -121,6 +115,11 @@ namespace YooAsset
 			/// 下载文件校验等级
 			/// </summary>
 			public EVerifyLevel VerifyLevel = EVerifyLevel.High;
+
+			/// <summary>
+			/// 查询服务类
+			/// </summary>
+			public IQueryServices QueryServices = null;
 		}
 
 
@@ -151,35 +150,44 @@ namespace YooAsset
 			if (parameters == null)
 				throw new Exception($"YooAsset create parameters is null.");
 
-			if (string.IsNullOrEmpty(parameters.BuildinPackageName))
-				throw new Exception($"{nameof(parameters.BuildinPackageName)} is empty.");
-
-			if (parameters.LocationServices == null)
-				throw new Exception($"{nameof(IBundleServices)} is null.");
-
 #if !UNITY_EDITOR
 			if (parameters is EditorSimulateModeParameters)
 				throw new Exception($"Editor simulate mode only support unity editor.");
 #endif
 
-			_locationServices = parameters.LocationServices;
-
-			// 创建驱动器
-			if (_isInitialize == false)
-			{
-				_isInitialize = true;
-				UnityEngine.GameObject driverGo = new UnityEngine.GameObject("[YooAsset]");
-				driverGo.AddComponent<YooAssetDriver>();
-				UnityEngine.Object.DontDestroyOnLoad(driverGo);
-
-#if DEBUG
-				driverGo.AddComponent<RemoteDebuggerInRuntime>();
-#endif
-			}
+			// 鉴定运行模式
+			if (parameters is EditorSimulateModeParameters)
+				_playMode = EPlayMode.EditorSimulateMode;
+			else if (parameters is OfflinePlayModeParameters)
+				_playMode = EPlayMode.OfflinePlayMode;
+			else if (parameters is HostPlayModeParameters)
+				_playMode = EPlayMode.HostPlayMode;
 			else
+				throw new NotImplementedException();
+
+			if (parameters.LocationServices == null)
+				throw new Exception($"{nameof(IBundleServices)} is null.");
+
+			if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				var playModeParameters = parameters as OfflinePlayModeParameters;
+				if (string.IsNullOrEmpty(playModeParameters.BuildinPackageName))
+					throw new Exception($"{nameof(playModeParameters.BuildinPackageName)} is empty.");
+			}
+
+			if (_playMode == EPlayMode.HostPlayMode)
+			{
+				var playModeParameters = parameters as HostPlayModeParameters;
+				if (playModeParameters.QueryServices == null)
+					throw new Exception($"{nameof(IQueryServices)} is null.");
+			}
+
+			if (_isInitialize)
 			{
 				throw new Exception("YooAsset is initialized yet.");
 			}
+
+			_locationServices = parameters.LocationServices;
 
 			// 检测参数范围
 			if (parameters.AssetLoadingMaxNumber < 1)
@@ -193,17 +201,20 @@ namespace YooAsset
 				YooLogger.Warning($"{nameof(parameters.OperationSystemMaxTimeSlice)} minimum value is 30 milliseconds");
 			}
 
-			// 鉴定运行模式
-			if (parameters is EditorSimulateModeParameters)
-				_playMode = EPlayMode.EditorSimulateMode;
-			else if (parameters is OfflinePlayModeParameters)
-				_playMode = EPlayMode.OfflinePlayMode;
-			else if (parameters is HostPlayModeParameters)
-				_playMode = EPlayMode.HostPlayMode;
-			else
-				throw new NotImplementedException();
+			// 创建驱动器
+			if (_isInitialize == false)
+			{
+				_isInitialize = true;
+				UnityEngine.GameObject driverGo = new UnityEngine.GameObject("[YooAsset]");
+				driverGo.AddComponent<YooAssetDriver>();
+				UnityEngine.Object.DontDestroyOnLoad(driverGo);
 
-			// 初始化异步操作系统
+#if DEBUG
+				driverGo.AddComponent<RemoteDebuggerInRuntime>();
+#endif
+			}
+
+			// 初始化异步系统
 			OperationSystem.Initialize(parameters.OperationSystemMaxTimeSlice);
 
 			// 初始化下载系统
@@ -226,29 +237,32 @@ namespace YooAsset
 				_editorSimulateModeImpl = new EditorSimulateModeImpl();
 				_bundleServices = _editorSimulateModeImpl;
 				AssetSystem.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				var editorSimulateModeParameters = parameters as EditorSimulateModeParameters;
+				var simulateModeParameters = parameters as EditorSimulateModeParameters;
 				initializeOperation = _editorSimulateModeImpl.InitializeAsync(
-					editorSimulateModeParameters.LocationToLower,
-					editorSimulateModeParameters.SimulatePatchManifestPath);
+					simulateModeParameters.LocationToLower,
+					simulateModeParameters.SimulatePatchManifestPath);
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				_offlinePlayModeImpl = new OfflinePlayModeImpl();
 				_bundleServices = _offlinePlayModeImpl;
 				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				initializeOperation = _offlinePlayModeImpl.InitializeAsync(parameters.LocationToLower, parameters.BuildinPackageName);
+				var playModeParameters = parameters as OfflinePlayModeParameters;
+				initializeOperation = _offlinePlayModeImpl.InitializeAsync(
+					playModeParameters.LocationToLower,
+					playModeParameters.BuildinPackageName);
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
 				_hostPlayModeImpl = new HostPlayModeImpl();
 				_bundleServices = _hostPlayModeImpl;
 				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				var hostPlayModeParameters = parameters as HostPlayModeParameters;
+				var playModeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = _hostPlayModeImpl.InitializeAsync(
-					hostPlayModeParameters.LocationToLower,
-					hostPlayModeParameters.BuildinPackageName,
-					hostPlayModeParameters.DefaultHostServer,
-					hostPlayModeParameters.FallbackHostServer);
+					playModeParameters.LocationToLower,
+					playModeParameters.DefaultHostServer,
+					playModeParameters.FallbackHostServer,
+					playModeParameters.QueryServices);
 			}
 			else
 			{

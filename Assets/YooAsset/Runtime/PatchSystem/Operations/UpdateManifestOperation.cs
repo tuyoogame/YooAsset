@@ -154,7 +154,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.InitVerifyingCache)
 			{
-				_patchCacheVerifier.InitVerifier(_impl.AppPatchManifest, _impl.LocalPatchManifest, false);
+				_patchCacheVerifier.InitVerifier(_impl, false);
 				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
 				_steps = ESteps.UpdateVerifyingCache;
 			}
@@ -286,7 +286,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.InitVerifyingCache)
 			{
-				if (_patchCacheVerifier.InitVerifier(_impl.AppPatchManifest, _impl.LocalPatchManifest, true))
+				if (_patchCacheVerifier.InitVerifier(_impl, true))
 				{
 					_verifyTime = UnityEngine.Time.realtimeSinceStartup;
 					_steps = ESteps.UpdateVerifyingCache;

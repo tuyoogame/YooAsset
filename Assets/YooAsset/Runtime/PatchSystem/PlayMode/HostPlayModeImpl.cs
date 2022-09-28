@@ -8,24 +8,25 @@ namespace YooAsset
 	internal class HostPlayModeImpl : IBundleServices
 	{
 		// 补丁清单
-		internal PatchManifest AppPatchManifest { private set; get; }
 		internal PatchManifest LocalPatchManifest { private set; get; }
 
 		// 参数相关
 		private bool _locationToLower;
 		private string _defaultHostServer;
 		private string _fallbackHostServer;
+		private IQueryServices _queryServices;
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(bool locationToLower, string buildinPackageName, string defaultHostServer, string fallbackHostServer)
+		public InitializationOperation InitializeAsync(bool locationToLower, string defaultHostServer, string fallbackHostServer, IQueryServices queryServices)
 		{
 			_locationToLower = locationToLower;
 			_defaultHostServer = defaultHostServer;
 			_fallbackHostServer = fallbackHostServer;
+			_queryServices = queryServices;
 
-			var operation = new HostPlayModeInitializationOperation(this, buildinPackageName);
+			var operation = new HostPlayModeInitializationOperation();
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -118,12 +119,8 @@ namespace YooAsset
 					continue;
 
 				// 忽略APP资源
-				// 注意：如果是APP资源并且哈希值相同，则不需要下载
-				if (AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
-				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
-						continue;
-				}
+				if (IsBuildinPatchBundle(patchBundle))
+					continue;
 
 				downloadList.Add(patchBundle);
 			}
@@ -150,17 +147,11 @@ namespace YooAsset
 					continue;
 
 				// 忽略APP资源
-				// 注意：如果是APP资源并且哈希值相同，则不需要下载
-				if (AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
-				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
-						continue;
-				}
+				if (IsBuildinPatchBundle(patchBundle))
+					continue;
 
-				// 如果是纯内置资源，则统一下载
-				// 注意：可能是新增的或者变化的内置资源
-				// 注意：可能是由热更资源转换的内置资源
-				if (patchBundle.IsPureBuildin())
+				// 如果未带任何标记，则统一下载
+				if (patchBundle.HasAnyTags() == false)
 				{
 					downloadList.Add(patchBundle);
 				}
@@ -220,12 +211,8 @@ namespace YooAsset
 					continue;
 
 				// 忽略APP资源
-				// 注意：如果是APP资源并且哈希值相同，则不需要下载
-				if (AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
-				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
-						continue;
-				}
+				if (IsBuildinPatchBundle(patchBundle))
+					continue;
 
 				downloadList.Add(patchBundle);
 			}
@@ -245,20 +232,19 @@ namespace YooAsset
 		private List<BundleInfo> GetUnpackListByTags(string[] tags)
 		{
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
-			foreach (var patchBundle in AppPatchManifest.BundleList)
+			foreach (var patchBundle in LocalPatchManifest.BundleList)
 			{
-				// 如果不是内置资源
-				if (patchBundle.IsBuildin == false)
-					continue;
-
 				// 忽略缓存文件
 				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				// 查询DLC资源
-				if (patchBundle.HasTag(tags))
+				if (IsBuildinPatchBundle(patchBundle))
 				{
-					downloadList.Add(patchBundle);
+					if (patchBundle.HasTag(tags))
+					{
+						downloadList.Add(patchBundle);
+					}
 				}
 			}
 
@@ -277,17 +263,16 @@ namespace YooAsset
 		private List<BundleInfo> GetUnpackListByAll()
 		{
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
-			foreach (var patchBundle in AppPatchManifest.BundleList)
+			foreach (var patchBundle in LocalPatchManifest.BundleList)
 			{
-				// 如果不是内置资源
-				if (patchBundle.IsBuildin == false)
-					continue;
-
 				// 忽略缓存文件
 				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
-				downloadList.Add(patchBundle);
+				if (IsBuildinPatchBundle(patchBundle))
+				{
+					downloadList.Add(patchBundle);
+				}
 			}
 
 			return PatchHelper.ConvertToUnpackList(downloadList);
@@ -322,15 +307,14 @@ namespace YooAsset
 			return bundleInfo;
 		}
 
-		// 设置资源清单
-		internal void SetAppPatchManifest(PatchManifest patchManifest)
-		{
-			AppPatchManifest = patchManifest;
-		}
 		internal void SetLocalPatchManifest(PatchManifest patchManifest)
 		{
 			LocalPatchManifest = patchManifest;
 			LocalPatchManifest.InitAssetPathMapping(_locationToLower);
+		}
+		internal bool IsBuildinPatchBundle(PatchBundle patchBundle)
+		{
+			return _queryServices.QueryStreamingAssets(patchBundle.FileName);
 		}
 
 		#region IBundleServices接口
@@ -347,13 +331,10 @@ namespace YooAsset
 			}
 
 			// 查询APP资源
-			if (AppPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
+			if (IsBuildinPatchBundle(patchBundle))
 			{
-				if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
-				{
-					BundleInfo bundleInfo = new BundleInfo(appPatchBundle, BundleInfo.ELoadMode.LoadFromStreaming);
-					return bundleInfo;
-				}
+				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming);
+				return bundleInfo;
 			}
 
 			// 从服务端下载

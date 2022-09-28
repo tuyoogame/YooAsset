@@ -39,19 +39,14 @@ namespace YooAsset
 
 
 		/// <summary>
-		/// 是否为加密文件
-		/// </summary>
-		public bool IsEncrypted { private set; get; }
-
-		/// <summary>
-		/// 是否为内置文件
-		/// </summary>
-		public bool IsBuildin { private set; get; }
-
-		/// <summary>
 		/// 是否为原生文件
 		/// </summary>
 		public bool IsRawFile { private set; get; }
+
+		/// <summary>
+		/// 是否为加密文件
+		/// </summary>
+		public bool IsEncrypted { private set; get; }
 
 		/// <summary>
 		/// 文件名称
@@ -69,7 +64,7 @@ namespace YooAsset
 				if (string.IsNullOrEmpty(_cachedFilePath) == false)
 					return _cachedFilePath;
 
-				string cacheRoot = SandboxHelper.GetCacheFolderPath();			
+				string cacheRoot = SandboxHelper.GetCacheFolderPath();
 				_cachedFilePath = $"{cacheRoot}/{FileName}";
 				return _cachedFilePath;
 			}
@@ -104,16 +99,14 @@ namespace YooAsset
 		/// <summary>
 		/// 设置Flags
 		/// </summary>
-		public void SetFlagsValue(bool isEncrypted, bool isBuildin, bool isRawFile)
+		public void SetFlagsValue(bool isRawFile, bool isEncrypted)
 		{
-			IsEncrypted = isEncrypted;
-			IsBuildin = isBuildin;
 			IsRawFile = isRawFile;
+			IsEncrypted = isEncrypted;
 
 			BitMask32 mask = new BitMask32(0);
-			if (isEncrypted) mask.Open(0);
-			if (isBuildin) mask.Open(1);
-			if (isRawFile) mask.Open(2);
+			if (isRawFile) mask.Open(0);
+			if (isEncrypted) mask.Open(1);
 			Flags = mask;
 		}
 
@@ -123,9 +116,8 @@ namespace YooAsset
 		public void ParseFlagsValue()
 		{
 			BitMask32 value = Flags;
-			IsEncrypted = value.Test(0);
-			IsBuildin = value.Test(1);
-			IsRawFile = value.Test(2);
+			IsRawFile = value.Test(0);
+			IsEncrypted = value.Test(1);
 		}
 
 		/// <summary>
@@ -179,11 +171,11 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 是否为纯内置资源（不带任何Tag的资源）
+		/// 是否包含任意Tags
 		/// </summary>
-		public bool IsPureBuildin()
+		public bool HasAnyTags()
 		{
-			if (Tags == null || Tags.Length == 0)
+			if (Tags != null && Tags.Length > 0)
 				return true;
 			else
 				return false;
@@ -196,7 +188,7 @@ namespace YooAsset
 		{
 			if (FileHash == otherBundle.FileHash)
 				return true;
-			
+
 			return false;
 		}
 	}

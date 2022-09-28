@@ -11,7 +11,7 @@ namespace YooAsset
 	/// </summary>
 	internal abstract class PatchCacheVerifier
 	{
-		public abstract bool InitVerifier(PatchManifest appPatchManifest, PatchManifest localPatchManifest, bool weaklyUpdate);
+		public abstract bool InitVerifier(HostPlayModeImpl impl, bool weaklyUpdate);
 		public abstract bool UpdateVerifier();
 		public abstract float GetVerifierProgress();
 
@@ -42,22 +42,18 @@ namespace YooAsset
 		private int _verifyMaxNum;
 		private int _verifyTotalCount;
 
-		public override bool InitVerifier(PatchManifest appPatchManifest, PatchManifest localPatchManifest, bool weaklyUpdate)
+		public override bool InitVerifier(HostPlayModeImpl impl, bool weaklyUpdate)
 		{
 			// 遍历所有文件然后验证并缓存合法文件
-			foreach (var patchBundle in localPatchManifest.BundleList)
+			foreach (var patchBundle in impl.LocalPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
 				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				// 忽略APP资源
-				// 注意：如果是APP资源并且哈希值相同，则不需要下载
-				if (appPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
-				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
-						continue;
-				}
+				if (impl.IsBuildinPatchBundle(patchBundle))
+					continue;
 
 				// 注意：在弱联网模式下，我们需要验证指定资源版本的所有资源完整性
 				if (weaklyUpdate)
@@ -167,22 +163,18 @@ namespace YooAsset
 		private int _verifyMaxNum;
 		private int _verifyTotalCount;
 
-		public override bool InitVerifier(PatchManifest appPatchManifest, PatchManifest localPatchManifest, bool weaklyUpdate)
+		public override bool InitVerifier(HostPlayModeImpl impl, bool weaklyUpdate)
 		{
 			// 遍历所有文件然后验证并缓存合法文件
-			foreach (var patchBundle in localPatchManifest.BundleList)
+			foreach (var patchBundle in impl.LocalPatchManifest.BundleList)
 			{
 				// 忽略缓存文件
 				if (CacheSystem.IsCached(patchBundle))
 					continue;
 
 				// 忽略APP资源
-				// 注意：如果是APP资源并且哈希值相同，则不需要下载
-				if (appPatchManifest.TryGetPatchBundle(patchBundle.BundleName, out PatchBundle appPatchBundle))
-				{
-					if (appPatchBundle.IsBuildin && appPatchBundle.Equals(patchBundle))
-						continue;
-				}
+				if (impl.IsBuildinPatchBundle(patchBundle))
+					continue;
 
 				// 注意：在弱联网模式下，我们需要验证指定资源版本的所有资源完整性
 				if (weaklyUpdate)

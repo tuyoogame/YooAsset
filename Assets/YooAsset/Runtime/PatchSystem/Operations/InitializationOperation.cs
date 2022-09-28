@@ -134,75 +134,15 @@ namespace YooAsset
 	/// </summary>
 	internal sealed class HostPlayModeInitializationOperation : InitializationOperation
 	{
-		private enum ESteps
+		internal HostPlayModeInitializationOperation()
 		{
-			None,
-			LoadManifest,
-			CopyManifest,
-			Done,
-		}
-
-		private readonly HostPlayModeImpl _impl;
-		private readonly string _buildinPackageName;
-		private AppManifestLoader _appManifestLoader;
-		private AppManifestCopyer _appManifestCopyer;
-		private ESteps _steps = ESteps.None;
-
-		internal HostPlayModeInitializationOperation(HostPlayModeImpl impl, string buildinPackageName)
-		{
-			_impl = impl;
-			_buildinPackageName = buildinPackageName;
-			_appManifestLoader = new AppManifestLoader(buildinPackageName);
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.LoadManifest;
+			Status = EOperationStatus.Succeed;
 		}
 		internal override void Update()
 		{
-			if (_steps == ESteps.None || _steps == ESteps.Done)
-				return;
-
-			if (_steps == ESteps.LoadManifest)
-			{
-				_appManifestLoader.Update();
-				Progress = _appManifestLoader.Progress();
-				if (_appManifestLoader.IsDone() == false)
-					return;
-
-				if (_appManifestLoader.Result == null)
-				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = _appManifestLoader.Error;
-				}
-				else
-				{
-					_impl.SetAppPatchManifest(_appManifestLoader.Result);
-					_impl.SetLocalPatchManifest(_appManifestLoader.Result);
-					_appManifestCopyer = new AppManifestCopyer(_buildinPackageName, _appManifestLoader.BuildinPackageCRC);
-					_steps = ESteps.CopyManifest;
-				}
-			}
-
-			if (_steps == ESteps.CopyManifest)
-			{
-				_appManifestCopyer.Update();
-				if (_appManifestCopyer.IsDone() == false)
-					return;
-
-				if (_appManifestCopyer.Result == false)
-				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = _appManifestCopyer.Error;
-				}
-				else
-				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Succeed;
-				}
-			}
 		}
 	}
 
