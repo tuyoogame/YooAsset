@@ -259,7 +259,7 @@ namespace YooAsset.Editor
 		{
 			_dependListView.Clear();
 			_dependListView.ClearSelection();
-			_dependListView.itemsSource = providerInfo.BundleInfos;
+			_dependListView.itemsSource = providerInfo.DependBundleInfos;
 			_dependListView.Rebuild();
 		}
 	}

@@ -75,7 +75,7 @@ namespace YooAsset.Editor
 			Dictionary<string, DebugBundleInfo> result = new Dictionary<string, DebugBundleInfo>(debugReport.ProviderInfos.Count);
 			foreach (var providerInfo in debugReport.ProviderInfos)
 			{
-				foreach (var bundleInfo in providerInfo.BundleInfos)
+				foreach (var bundleInfo in providerInfo.DependBundleInfos)
 				{
 					if (string.IsNullOrEmpty(searchKeyWord) == false)
 					{
@@ -264,7 +264,7 @@ namespace YooAsset.Editor
 			List<DebugProviderInfo> source = new List<DebugProviderInfo>();
 			foreach (var providerInfo in _debugReport.ProviderInfos)
 			{
-				foreach (var bundleInfo in providerInfo.BundleInfos)
+				foreach (var bundleInfo in providerInfo.DependBundleInfos)
 				{
 					if (bundleInfo.BundleName == bundleName)
 					{
