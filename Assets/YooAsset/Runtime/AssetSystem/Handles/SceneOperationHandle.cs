@@ -118,7 +118,7 @@ namespace YooAsset
 
 			// 卸载子场景
 			Scene sceneObject = SceneObject;
-			AssetSystem.UnloadSubScene(Provider);
+			Provider.Impl.UnloadSubScene(Provider);
 			{
 				var operation = new UnloadSceneOperation(sceneObject);
 				OperationSystem.StartOperation(operation);

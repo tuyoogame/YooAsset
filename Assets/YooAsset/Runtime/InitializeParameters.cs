@@ -3,12 +3,35 @@
 namespace YooAsset
 {
 	/// <summary>
+	/// 运行模式
+	/// </summary>
+	public enum EPlayMode
+	{
+		/// <summary>
+		/// 编辑器下的模拟模式
+		/// 注意：在初始化的时候自动构建真机模拟环境。
+		/// </summary>
+		EditorSimulateMode,
+
+		/// <summary>
+		/// 离线运行模式
+		/// </summary>
+		OfflinePlayMode,
+
+		/// <summary>
+		/// 联机运行模式
+		/// </summary>
+		HostPlayMode,
+	}
+
+	/// <summary>
 	/// 初始化参数
 	/// </summary>
 	public abstract class InitializeParameters
 	{
 		/// <summary>
 		/// 资源定位地址大小写不敏感
+		/// 注意：默认值为False
 		/// </summary>
 		public bool LocationToLower = false;
 
@@ -24,13 +47,9 @@ namespace YooAsset
 
 		/// <summary>
 		/// 资源加载的最大数量
+		/// 注意：默认值为MaxValue
 		/// </summary>
 		public int AssetLoadingMaxNumber = int.MaxValue;
-
-		/// <summary>
-		/// 异步操作系统每帧允许运行的最大时间切片（单位：毫秒）
-		/// </summary>
-		public long OperationSystemMaxTimeSlice = long.MaxValue;
 	}
 
 	/// <summary>
@@ -42,7 +61,7 @@ namespace YooAsset
 		/// 用于模拟运行的资源清单路径
 		/// 注意：如果路径为空，会自动重新构建补丁清单。
 		/// </summary>
-		public string SimulatePatchManifestPath;
+		public string SimulatePatchManifestPath = string.Empty;
 	}
 
 	/// <summary>
@@ -50,10 +69,6 @@ namespace YooAsset
 	/// </summary>
 	public class OfflinePlayModeParameters : InitializeParameters
 	{
-		/// <summary>
-		/// 内置的资源包裹名称
-		/// </summary>
-		public string BuildinPackageName = string.Empty;
 	}
 
 	/// <summary>
@@ -64,29 +79,12 @@ namespace YooAsset
 		/// <summary>
 		/// 默认的资源服务器下载地址
 		/// </summary>
-		public string DefaultHostServer;
+		public string DefaultHostServer = string.Empty;
 
 		/// <summary>
 		/// 备用的资源服务器下载地址
 		/// </summary>
-		public string FallbackHostServer;
-
-#if UNITY_WEBGL
-			/// <summary>
-			/// WEBGL模式不支持多线程下载
-			/// </summary>
-			internal int BreakpointResumeFileSize = int.MaxValue;
-#else
-		/// <summary>
-		/// 启用断点续传功能的文件大小
-		/// </summary>
-		public int BreakpointResumeFileSize = int.MaxValue;
-#endif
-
-		/// <summary>
-		/// 下载文件校验等级
-		/// </summary>
-		public EVerifyLevel VerifyLevel = EVerifyLevel.High;
+		public string FallbackHostServer = string.Empty;
 
 		/// <summary>
 		/// 查询服务类

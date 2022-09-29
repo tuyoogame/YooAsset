@@ -20,7 +20,7 @@ namespace YooAsset
 		{
 			if(UnityEditor.EditorApplication.isPlaying)
 			{
-				var report = AssetSystem.GetDebugReport();
+				var report = YooAssets.GetDebugReport();
 				EditorHandleDebugReportCallback?.Invoke(0, report);
 			}
 		}
@@ -39,7 +39,7 @@ namespace YooAsset
 			YooLogger.Log($"On handle remote command : {command.CommandType} Param : {command.CommandParam}");
 			if (command.CommandType == (int)ERemoteCommand.SampleOnce)
 			{
-				var debugReport = AssetSystem.GetDebugReport();
+				var debugReport = YooAssets.GetDebugReport();
 				var data = DebugReport.Serialize(debugReport);
 				PlayerConnection.instance.Send(RemoteDebuggerDefine.kMsgSendPlayerToEditor, data);
 			}

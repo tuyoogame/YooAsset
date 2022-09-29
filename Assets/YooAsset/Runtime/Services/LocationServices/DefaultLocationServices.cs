@@ -11,16 +11,16 @@ namespace YooAsset
 				_resourceRoot = PathHelper.GetRegularPath(resourceRoot);
 		}
 
-		string ILocationServices.ConvertLocationToAssetPath(string location)
+		string ILocationServices.ConvertLocationToAssetPath(YooAssetPackage package, string location)
 		{
 			if (string.IsNullOrEmpty(_resourceRoot))
 			{
-				return YooAssets.MappingToAssetPath(location);
+				return package.MappingToAssetPath(location);
 			}
 			else
 			{
 				string tempLocation = $"{_resourceRoot}/{location}";
-				return YooAssets.MappingToAssetPath(tempLocation);
+				return package.MappingToAssetPath(tempLocation);
 			}
 		}
 	}

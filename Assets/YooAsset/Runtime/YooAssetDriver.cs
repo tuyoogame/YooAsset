@@ -6,17 +6,17 @@ namespace YooAsset
 	{
 		void Update()
 		{
-			YooAssets.InternalUpdate();
+			YooAssets.Update();
 		}
 
 		void OnDestroy()
 		{
-			YooAssets.InternalDestroy();
+			YooAssets.Destroy();
 		}
 
 		void OnApplicationQuit()
 		{
-			YooAssets.InternalDestroy();
+			YooAssets.Destroy();
 		}
 	}
 }

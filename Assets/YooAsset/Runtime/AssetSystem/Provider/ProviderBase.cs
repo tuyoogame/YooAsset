@@ -23,6 +23,11 @@ namespace YooAsset
 		public string ProviderGUID { private set; get; }
 
 		/// <summary>
+		/// 所属资源系统
+		/// </summary>
+		public AssetSystemImpl Impl { private set; get; }
+
+		/// <summary>
 		/// 资源信息
 		/// </summary>
 		public AssetInfo MainAssetInfo { private set; get; }
@@ -90,8 +95,9 @@ namespace YooAsset
 		private readonly List<OperationHandleBase> _handles = new List<OperationHandleBase>();
 
 
-		public ProviderBase(string providerGUID, AssetInfo assetInfo)
+		public ProviderBase(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo)
 		{
+			Impl = impl;
 			ProviderGUID = providerGUID;
 			MainAssetInfo = assetInfo;
 		}

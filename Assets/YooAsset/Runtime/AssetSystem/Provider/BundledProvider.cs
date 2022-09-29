@@ -8,13 +8,13 @@ namespace YooAsset
 		protected AssetBundleLoaderBase OwnerBundle { private set; get; }
 		protected DependAssetBundleGroup DependBundleGroup { private set; get; }
 
-		public BundledProvider(string providerGUID, AssetInfo assetInfo) : base(providerGUID, assetInfo)
+		public BundledProvider(AssetSystemImpl impl, string providerGUID,  AssetInfo assetInfo) : base(impl, providerGUID, assetInfo)
 		{
-			OwnerBundle = AssetSystem.CreateOwnerAssetBundleLoader(assetInfo);
+			OwnerBundle = impl.CreateOwnerAssetBundleLoader(assetInfo);
 			OwnerBundle.Reference();
 			OwnerBundle.AddProvider(this);
 
-			var dependBundles = AssetSystem.CreateDependAssetBundleLoaders(assetInfo);
+			var dependBundles = impl.CreateDependAssetBundleLoaders(assetInfo);
 			DependBundleGroup = new DependAssetBundleGroup(dependBundles);
 			DependBundleGroup.Reference();
 		}

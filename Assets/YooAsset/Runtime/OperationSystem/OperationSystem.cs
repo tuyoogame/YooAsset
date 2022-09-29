@@ -10,8 +10,12 @@ namespace YooAsset
 
 		// 计时器相关
 		private static Stopwatch _watch;
-		private static long _maxTimeSlice;
 		private static long _frameTime;
+
+		/// <summary>
+		/// 异步操作的最小时间片段
+		/// </summary>
+		public static long MaxTimeSlice { set; get; } = long.MaxValue;
 
 		/// <summary>
 		/// 处理器是否繁忙
@@ -20,7 +24,7 @@ namespace YooAsset
 		{
 			get
 			{
-				return _watch.ElapsedMilliseconds - _frameTime >= _maxTimeSlice;
+				return _watch.ElapsedMilliseconds - _frameTime >= MaxTimeSlice;
 			}
 		}
 
@@ -28,9 +32,8 @@ namespace YooAsset
 		/// <summary>
 		/// 初始化异步操作系统
 		/// </summary>
-		public static void Initialize(long maxTimeSlice)
+		public static void Initialize()
 		{
-			_maxTimeSlice = maxTimeSlice;
 			_watch = Stopwatch.StartNew();
 		}
 
@@ -63,8 +66,8 @@ namespace YooAsset
 		{
 			_operations.Clear();
 			_watch = null;
-			_maxTimeSlice = 0;
 			_frameTime = 0;
+			MaxTimeSlice = long.MaxValue;
 		}
 
 		/// <summary>

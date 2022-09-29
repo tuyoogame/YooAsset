@@ -20,17 +20,6 @@ namespace YooAsset
 		public int FrameCount;
 
 		/// <summary>
-		/// 资源包总数
-		/// </summary>
-		public int BundleCount;
-
-		/// <summary>
-		/// 资源对象总数
-		/// </summary>
-		public int AssetCount;
-
-
-		/// <summary>
 		/// 序列化
 		/// </summary>
         public static byte[] Serialize(DebugReport debugReport)

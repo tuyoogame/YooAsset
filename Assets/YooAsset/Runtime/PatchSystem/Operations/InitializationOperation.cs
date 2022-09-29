@@ -20,7 +20,6 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			Builder,
 			Load,
 			Done,
 		}
@@ -36,26 +35,10 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			if (string.IsNullOrEmpty(_simulatePatchManifestPath))
-				_steps = ESteps.Builder;
-			else
-				_steps = ESteps.Load;
+			_steps = ESteps.Load;
 		}
 		internal override void Update()
 		{
-			if (_steps == ESteps.Builder)
-			{
-				_simulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild();
-				if (string.IsNullOrEmpty(_simulatePatchManifestPath))
-				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = "Simulate build failed, see the detail info on the console window.";
-					return;
-				}
-				_steps = ESteps.Load;
-			}
-
 			if (_steps == ESteps.Load)
 			{
 				if (File.Exists(_simulatePatchManifestPath) == false)

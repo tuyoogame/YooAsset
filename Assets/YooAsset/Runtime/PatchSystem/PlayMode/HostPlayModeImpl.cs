@@ -72,35 +72,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取未被使用的缓存文件路径集合
-		/// </summary>
-		public List<string> ClearUnusedCacheFilePaths()
-		{
-			string cacheFolderPath = SandboxHelper.GetCacheFolderPath();
-			if (Directory.Exists(cacheFolderPath) == false)
-				return new List<string>();
-
-			DirectoryInfo directoryInfo = new DirectoryInfo(cacheFolderPath);
-			FileInfo[] fileInfos = directoryInfo.GetFiles();
-			List<string> result = new List<string>(fileInfos.Length);
-			foreach (FileInfo fileInfo in fileInfos)
-			{
-				bool used = false;
-				foreach (var patchBundle in LocalPatchManifest.BundleList)
-				{
-					if (fileInfo.Name == patchBundle.FileName)
-					{
-						used = true;
-						break;
-					}
-				}
-				if (used == false)
-					result.Add(fileInfo.FullName);
-			}
-			return result;
-		}
-
-		/// <summary>
 		/// 创建下载器
 		/// </summary>
 		public PatchDownloaderOperation CreatePatchDownloaderByAll(int fileLoadingMaxNumber, int failedTryAgain)
@@ -378,6 +349,10 @@ namespace YooAsset
 		string IBundleServices.MappingToAssetPath(string location)
 		{
 			return LocalPatchManifest.MappingToAssetPath(location);
+		}
+		string IBundleServices.GetPackageName()
+		{
+			return LocalPatchManifest.PackageName;
 		}
 		#endregion
 	}

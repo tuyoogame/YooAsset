@@ -14,16 +14,11 @@ namespace YooAsset
 	{
 		private static readonly Dictionary<string, DownloaderBase> _downloaderDic = new Dictionary<string, DownloaderBase>();
 		private static readonly List<string> _removeList = new List<string>(100);
-		private static int _breakpointResumeFileSize = int.MaxValue;
-
 
 		/// <summary>
-		/// 初始化
+		/// 启用断点续传的文件大小
 		/// </summary>
-		public static void Initialize(int breakpointResumeFileSize)
-		{
-			_breakpointResumeFileSize = breakpointResumeFileSize;
-		}
+		public static int BreakpointResumeFileSize { set; get; } = int.MaxValue;
 
 		/// <summary>
 		/// 更新所有下载器
@@ -59,7 +54,7 @@ namespace YooAsset
 			}
 			_downloaderDic.Clear();
 			_removeList.Clear();
-			_breakpointResumeFileSize = int.MaxValue;
+			BreakpointResumeFileSize = int.MaxValue;
 		}
 
 
@@ -86,7 +81,7 @@ namespace YooAsset
 			{
 				YooLogger.Log($"Beginning to download file : {bundleInfo.Bundle.FileName} URL : {bundleInfo.RemoteMainURL}");
 				FileUtility.CreateFileDirectory(bundleInfo.Bundle.CachedFilePath);
-				bool breakDownload = bundleInfo.Bundle.FileSize >= _breakpointResumeFileSize;
+				bool breakDownload = bundleInfo.Bundle.FileSize >= BreakpointResumeFileSize;
 				DownloaderBase newDownloader = new FileDownloader(bundleInfo, breakDownload);
 				newDownloader.SendRequest(failedTryAgain, timeout);
 				_downloaderDic.Add(bundleInfo.Bundle.CachedFilePath, newDownloader);

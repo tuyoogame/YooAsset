@@ -8,6 +8,11 @@ namespace YooAsset
 	internal class DebugProviderInfo : IComparer<DebugProviderInfo>, IComparable<DebugProviderInfo>
 	{
 		/// <summary>
+		/// 所属的资源包裹
+		/// </summary>
+		public string PackageName;
+
+		/// <summary>
 		/// 资源对象路径
 		/// </summary>
 		public string AssetPath;
@@ -35,7 +40,7 @@ namespace YooAsset
 		/// <summary>
 		/// 依赖的资源包列表
 		/// </summary>
-		public List<DebugBundleInfo> BundleInfos;
+		public List<DebugBundleInfo> DependBundleInfos;
 
 		public int CompareTo(DebugProviderInfo other)
 		{

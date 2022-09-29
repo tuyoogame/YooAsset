@@ -13,13 +13,13 @@ namespace YooAsset
 		/// <summary>
 		/// 初始化时的验证级别
 		/// </summary>
-		public static EVerifyLevel InitVerifyLevel { private set; get; }
+		public static EVerifyLevel InitVerifyLevel { set; get; } = EVerifyLevel.Low;
 
-		public static void Initialize(EVerifyLevel initVerifyLevel)
-		{
-			InitVerifyLevel = initVerifyLevel;
-		}
-		public static void DestroyAll()
+
+		/// <summary>
+		/// 清空所有数据
+		/// </summary>
+		public static void ClearAll()
 		{
 			_cachedDic.Clear();
 		}

@@ -6,40 +6,23 @@ using UnityEngine.SceneManagement;
 
 namespace YooAsset
 {
-	public class YooAssetComponent 
+	public class YooAssetPackage
 	{
-		/// <summary>
-		/// 运行模式
-		/// </summary>
-		public enum EPlayMode
-		{
-			/// <summary>
-			/// 编辑器下的模拟模式
-			/// 注意：在初始化的时候自动构建真机模拟环境。
-			/// </summary>
-			EditorSimulateMode,
-
-			/// <summary>
-			/// 离线运行模式
-			/// </summary>
-			OfflinePlayMode,
-
-			/// <summary>
-			/// 联机运行模式
-			/// </summary>
-			HostPlayMode,
-		}
-
 		private bool _isInitialize = false;
 		private string _initializeError = string.Empty;
 		private EOperationStatus _initializeStatus = EOperationStatus.None;
 		private EPlayMode _playMode;
 		private IBundleServices _bundleServices;
 		private ILocationServices _locationServices;
+		private AssetSystemImpl _assetSystemImpl;
 		private EditorSimulateModeImpl _editorSimulateModeImpl;
 		private OfflinePlayModeImpl _offlinePlayModeImpl;
 		private HostPlayModeImpl _hostPlayModeImpl;
 
+		/// <summary>
+		/// 包裹名
+		/// </summary>
+		public string PackageName { private set; get; }
 
 		/// <summary>
 		/// 是否已经初始化
@@ -49,18 +32,140 @@ namespace YooAsset
 			get { return _isInitialize; }
 		}
 
+
+		/// <summary>
+		/// 拒绝外部实例化
+		/// </summary>
+		internal YooAssetPackage()
+		{
+		}
+		internal YooAssetPackage(string packageName)
+		{
+			PackageName = packageName;
+		}
+
+		/// <summary>
+		/// 更新资源包裹
+		/// </summary>
+		internal void UpdatePackage()
+		{
+			if (_assetSystemImpl != null)
+				_assetSystemImpl.Update();
+		}
+
+		/// <summary>
+		/// 销毁资源包裹
+		/// </summary>
+		internal void DestroyPackage()
+		{
+			if (_isInitialize)
+			{
+				_isInitialize = false;
+				_initializeError = string.Empty;
+				_initializeStatus = EOperationStatus.None;
+
+				_bundleServices = null;
+				_locationServices = null;
+				_editorSimulateModeImpl = null;
+				_offlinePlayModeImpl = null;
+				_hostPlayModeImpl = null;
+
+				if (_assetSystemImpl != null)
+				{
+					_assetSystemImpl.DestroyAll();
+					_assetSystemImpl = null;
+				}
+
+				YooLogger.Log("YooAssets destroy all !");
+			}
+		}
+
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
 		public InitializationOperation InitializeAsync(InitializeParameters parameters)
 		{
+			// 检测初始化参数合法性
+			CheckInitializeParameters(parameters);
+
+			// 初始化资源系统
+			InitializationOperation initializeOperation;
+			_locationServices = parameters.LocationServices;
+			_assetSystemImpl = new AssetSystemImpl();
+			if (_playMode == EPlayMode.EditorSimulateMode)
+			{
+				_editorSimulateModeImpl = new EditorSimulateModeImpl();
+				_bundleServices = _editorSimulateModeImpl;
+				_assetSystemImpl.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+				var initializeParameters = parameters as EditorSimulateModeParameters;
+				initializeOperation = _editorSimulateModeImpl.InitializeAsync(
+					initializeParameters.LocationToLower,
+					initializeParameters.SimulatePatchManifestPath);
+			}
+			else if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				_offlinePlayModeImpl = new OfflinePlayModeImpl();
+				_bundleServices = _offlinePlayModeImpl;
+				_assetSystemImpl.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+				var initializeParameters = parameters as OfflinePlayModeParameters;
+				initializeOperation = _offlinePlayModeImpl.InitializeAsync(
+					initializeParameters.LocationToLower,
+					PackageName);
+			}
+			else if (_playMode == EPlayMode.HostPlayMode)
+			{
+				_hostPlayModeImpl = new HostPlayModeImpl();
+				_bundleServices = _hostPlayModeImpl;
+				_assetSystemImpl.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+				var initializeParameters = parameters as HostPlayModeParameters;
+				initializeOperation = _hostPlayModeImpl.InitializeAsync(
+					initializeParameters.LocationToLower,
+					initializeParameters.DefaultHostServer,
+					initializeParameters.FallbackHostServer,
+					initializeParameters.QueryServices);
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+
+			// 监听初始化结果
+			initializeOperation.Completed += InitializeOperation_Completed;
+			return initializeOperation;
+		}
+		private void CheckInitializeParameters(InitializeParameters parameters)
+		{
+			if (_isInitialize)
+				throw new Exception($"{nameof(YooAssetPackage)} is initialized yet.");
+
 			if (parameters == null)
-				throw new Exception($"YooAsset create parameters is null.");
+				throw new Exception($"{nameof(YooAssetPackage)} create parameters is null.");
 
 #if !UNITY_EDITOR
 			if (parameters is EditorSimulateModeParameters)
 				throw new Exception($"Editor simulate mode only support unity editor.");
 #endif
+
+			if (parameters.LocationServices == null)
+				throw new Exception($"{nameof(ILocationServices)} is null.");
+
+			if(parameters is EditorSimulateModeParameters)
+			{
+				var editorSimulateModeParameters = parameters as EditorSimulateModeParameters;
+				if (string.IsNullOrEmpty(editorSimulateModeParameters.SimulatePatchManifestPath))
+					throw new Exception($"${editorSimulateModeParameters.SimulatePatchManifestPath} is null or empty.");
+			}
+
+			if (parameters is HostPlayModeParameters)
+			{
+				var hostPlayModeParameters = parameters as HostPlayModeParameters;
+				if (string.IsNullOrEmpty(hostPlayModeParameters.DefaultHostServer))
+					throw new Exception($"${hostPlayModeParameters.DefaultHostServer} is null or empty.");
+				if (string.IsNullOrEmpty(hostPlayModeParameters.FallbackHostServer))
+					throw new Exception($"${hostPlayModeParameters.FallbackHostServer} is null or empty.");
+				if (hostPlayModeParameters.QueryServices == null)
+					throw new Exception($"{nameof(IQueryServices)} is null.");
+			}
 
 			// 鉴定运行模式
 			if (parameters is EditorSimulateModeParameters)
@@ -72,113 +177,12 @@ namespace YooAsset
 			else
 				throw new NotImplementedException();
 
-			if (parameters.LocationServices == null)
-				throw new Exception($"{nameof(IBundleServices)} is null.");
-
-			if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				var playModeParameters = parameters as OfflinePlayModeParameters;
-				if (string.IsNullOrEmpty(playModeParameters.BuildinPackageName))
-					throw new Exception($"{nameof(playModeParameters.BuildinPackageName)} is empty.");
-			}
-
-			if (_playMode == EPlayMode.HostPlayMode)
-			{
-				var playModeParameters = parameters as HostPlayModeParameters;
-				if (playModeParameters.QueryServices == null)
-					throw new Exception($"{nameof(IQueryServices)} is null.");
-			}
-
-			if (_isInitialize)
-			{
-				throw new Exception("YooAsset is initialized yet.");
-			}
-
-			_locationServices = parameters.LocationServices;
-
 			// 检测参数范围
 			if (parameters.AssetLoadingMaxNumber < 1)
 			{
 				parameters.AssetLoadingMaxNumber = 1;
 				YooLogger.Warning($"{nameof(parameters.AssetLoadingMaxNumber)} minimum value is 1");
 			}
-			if (parameters.OperationSystemMaxTimeSlice < 30)
-			{
-				parameters.OperationSystemMaxTimeSlice = 30;
-				YooLogger.Warning($"{nameof(parameters.OperationSystemMaxTimeSlice)} minimum value is 30 milliseconds");
-			}
-
-			// 创建驱动器
-			if (_isInitialize == false)
-			{
-				_isInitialize = true;
-				UnityEngine.GameObject driverGo = new UnityEngine.GameObject("[YooAsset]");
-				driverGo.AddComponent<YooAssetDriver>();
-				UnityEngine.Object.DontDestroyOnLoad(driverGo);
-
-#if DEBUG
-				driverGo.AddComponent<RemoteDebuggerInRuntime>();
-#endif
-			}
-
-			// 初始化异步系统
-			OperationSystem.Initialize(parameters.OperationSystemMaxTimeSlice);
-
-			// 初始化下载系统
-			if (_playMode == EPlayMode.HostPlayMode)
-			{
-				var hostPlayModeParameters = parameters as HostPlayModeParameters;
-				CacheSystem.Initialize(hostPlayModeParameters.VerifyLevel);
-				DownloadSystem.Initialize(hostPlayModeParameters.BreakpointResumeFileSize);
-			}
-			else
-			{
-				CacheSystem.Initialize(EVerifyLevel.Low);
-				DownloadSystem.Initialize(int.MaxValue);
-			}
-
-			// 初始化资源系统
-			InitializationOperation initializeOperation;
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				_editorSimulateModeImpl = new EditorSimulateModeImpl();
-				_bundleServices = _editorSimulateModeImpl;
-				AssetSystem.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				var simulateModeParameters = parameters as EditorSimulateModeParameters;
-				initializeOperation = _editorSimulateModeImpl.InitializeAsync(
-					simulateModeParameters.LocationToLower,
-					simulateModeParameters.SimulatePatchManifestPath);
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				_offlinePlayModeImpl = new OfflinePlayModeImpl();
-				_bundleServices = _offlinePlayModeImpl;
-				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				var playModeParameters = parameters as OfflinePlayModeParameters;
-				initializeOperation = _offlinePlayModeImpl.InitializeAsync(
-					playModeParameters.LocationToLower,
-					playModeParameters.BuildinPackageName);
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				_hostPlayModeImpl = new HostPlayModeImpl();
-				_bundleServices = _hostPlayModeImpl;
-				AssetSystem.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
-				var playModeParameters = parameters as HostPlayModeParameters;
-				initializeOperation = _hostPlayModeImpl.InitializeAsync(
-					playModeParameters.LocationToLower,
-					playModeParameters.DefaultHostServer,
-					playModeParameters.FallbackHostServer,
-					playModeParameters.QueryServices);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
-
-			// 监听初始化结果
-			initializeOperation.Completed += InitializeOperation_Completed;
-			return initializeOperation;
 		}
 		private void InitializeOperation_Completed(AsyncOperationBase op)
 		{
@@ -189,9 +193,8 @@ namespace YooAsset
 		/// <summary>
 		/// 向网络端请求静态资源版本
 		/// </summary>
-		/// <param name="packageName">更新的资源包裹名称</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdateStaticVersionOperation UpdateStaticVersionAsync(string packageName, int timeout = 60)
+		public UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -208,7 +211,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdateStaticVersionAsync(packageName, timeout);
+				return _hostPlayModeImpl.UpdateStaticVersionAsync(PackageName, timeout);
 			}
 			else
 			{
@@ -219,10 +222,9 @@ namespace YooAsset
 		/// <summary>
 		/// 向网络端请求并更新补丁清单
 		/// </summary>
-		/// <param name="packageName">更新的资源包裹名称</param>
 		/// <param name="packageCRC">更新的资源包裹版本</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdateManifestOperation UpdateManifestAsync(string packageName, string packageCRC, int timeout = 60)
+		public UpdateManifestOperation UpdateManifestAsync(string packageCRC, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			DebugCheckUpdateManifest();
@@ -240,7 +242,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdatePatchManifestAsync(packageName, packageCRC, timeout);
+				return _hostPlayModeImpl.UpdatePatchManifestAsync(PackageName, packageCRC, timeout);
 			}
 			else
 			{
@@ -252,9 +254,8 @@ namespace YooAsset
 		/// 弱联网情况下加载补丁清单
 		/// 注意：当指定版本内容验证失败后会返回失败。
 		/// </summary>
-		/// <param name="packageName">指定的资源包裹名称</param>
 		/// <param name="packageCRC">指定的资源包裹版本</param>
-		public UpdateManifestOperation WeaklyUpdateManifestAsync(string packageName, string packageCRC)
+		public UpdateManifestOperation WeaklyUpdateManifestAsync(string packageCRC)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -271,21 +272,12 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.WeaklyUpdatePatchManifestAsync(packageName, packageCRC);
+				return _hostPlayModeImpl.WeaklyUpdatePatchManifestAsync(PackageName, packageCRC);
 			}
 			else
 			{
 				throw new NotImplementedException();
 			}
-		}
-
-		/// <summary>
-		/// 开启一个异步操作
-		/// </summary>
-		/// <param name="operation">异步操作对象</param>
-		public void StartOperation(GameAsyncOperation operation)
-		{
-			OperationSystem.StartOperation(operation);
 		}
 
 		/// <summary>
@@ -295,8 +287,8 @@ namespace YooAsset
 		{
 			if (_isInitialize)
 			{
-				AssetSystem.Update();
-				AssetSystem.UnloadUnusedAssets();
+				_assetSystemImpl.Update();
+				_assetSystemImpl.UnloadUnusedAssets();
 			}
 		}
 
@@ -307,7 +299,7 @@ namespace YooAsset
 		{
 			if (_isInitialize)
 			{
-				AssetSystem.ForceUnloadAllAssets();
+				_assetSystemImpl.ForceUnloadAllAssets();
 			}
 		}
 
@@ -391,7 +383,7 @@ namespace YooAsset
 		public string GetAssetPath(string location)
 		{
 			DebugCheckInitialize();
-			return _locationServices.ConvertLocationToAssetPath(location);
+			return _locationServices.ConvertLocationToAssetPath(this, location);
 		}
 		#endregion
 
@@ -481,7 +473,7 @@ namespace YooAsset
 		{
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-			var handle = AssetSystem.LoadSceneAsync(assetInfo, sceneMode, activateOnLoad, priority);
+			var handle = _assetSystemImpl.LoadSceneAsync(assetInfo, sceneMode, activateOnLoad, priority);
 			return handle;
 		}
 
@@ -497,7 +489,7 @@ namespace YooAsset
 			DebugCheckInitialize();
 			if (assetInfo.IsInvalid)
 				YooLogger.Warning(assetInfo.Error);
-			var handle = AssetSystem.LoadSceneAsync(assetInfo, sceneMode, activateOnLoad, priority);
+			var handle = _assetSystemImpl.LoadSceneAsync(assetInfo, sceneMode, activateOnLoad, priority);
 			return handle;
 		}
 		#endregion
@@ -591,7 +583,7 @@ namespace YooAsset
 			}
 #endif
 
-			var handle = AssetSystem.LoadAssetAsync(assetInfo);
+			var handle = _assetSystemImpl.LoadAssetAsync(assetInfo);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
 			return handle;
@@ -687,7 +679,7 @@ namespace YooAsset
 			}
 #endif
 
-			var handle = AssetSystem.LoadSubAssetsAsync(assetInfo);
+			var handle = _assetSystemImpl.LoadSubAssetsAsync(assetInfo);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
 			return handle;
@@ -893,10 +885,9 @@ namespace YooAsset
 		/// <summary>
 		/// 创建资源包裹下载器，用于下载更新指定资源版本所有的资源包文件
 		/// </summary>
-		/// <param name="packageName">指定更新的资源包裹名称</param>
 		/// <param name="packageCRC">指定更新的资源包裹版本</param>
 		/// <param name="timeout">超时时间</param>
-		public UpdatePackageOperation UpdatePackageAsync(string packageName, string packageCRC, int timeout = 60)
+		public UpdatePackageOperation UpdatePackageAsync(string packageCRC, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -913,63 +904,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdatePackageAsync(packageName, packageCRC, timeout);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
-		}
-		#endregion
-
-		#region 沙盒相关
-		/// <summary>
-		/// 获取沙盒的根路径
-		/// </summary>
-		public string GetSandboxRoot()
-		{
-			return PathHelper.MakePersistentRootPath();
-		}
-
-		/// <summary>
-		/// 清空沙盒目录
-		/// </summary>
-		public void ClearSandbox()
-		{
-			SandboxHelper.DeleteSandbox();
-		}
-
-		/// <summary>
-		/// 清空所有的缓存文件
-		/// </summary>
-		public void ClearAllCacheFiles()
-		{
-			SandboxHelper.DeleteCacheFolder();
-		}
-
-		/// <summary>
-		/// 清空未被使用的缓存文件
-		/// </summary>
-		public ClearUnusedCacheFilesOperation ClearUnusedCacheFiles()
-		{
-			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				var operation = new EditorPlayModeClearUnusedCacheFilesOperation();
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				var operation = new OfflinePlayModeClearUnusedCacheFilesOperation();
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				var operation = new HostPlayModeClearUnusedCacheFilesOperation(_hostPlayModeImpl);
-				OperationSystem.StartOperation(operation);
-				return operation;
+				return _hostPlayModeImpl.UpdatePackageAsync(PackageName, packageCRC, timeout);
 			}
 			else
 			{
@@ -979,34 +914,6 @@ namespace YooAsset
 		#endregion
 
 		#region 内部方法
-		internal void InternalDestroy()
-		{
-			if (_isInitialize)
-			{
-				_isInitialize = false;
-				_initializeError = string.Empty;
-				_initializeStatus = EOperationStatus.None;
-
-				_bundleServices = null;
-				_locationServices = null;
-				_editorSimulateModeImpl = null;
-				_offlinePlayModeImpl = null;
-				_hostPlayModeImpl = null;
-
-				OperationSystem.DestroyAll();
-				DownloadSystem.DestroyAll();
-				CacheSystem.DestroyAll();
-				AssetSystem.DestroyAll();
-				YooLogger.Log("YooAssets destroy all !");
-			}
-		}
-		internal void InternalUpdate()
-		{
-			OperationSystem.Update();
-			DownloadSystem.Update();
-			AssetSystem.Update();
-		}
-
 		/// <summary>
 		/// 资源定位地址转换为资源完整路径
 		/// </summary>
@@ -1047,11 +954,18 @@ namespace YooAsset
 		[Conditional("DEBUG")]
 		private void DebugCheckUpdateManifest()
 		{
-			var loadedBundleInfos = AssetSystem.GetLoadedBundleInfos();
+			var loadedBundleInfos = _assetSystemImpl.GetLoadedBundleInfos();
 			if (loadedBundleInfos.Count > 0)
 			{
 				YooLogger.Warning($"Found loaded bundle before update manifest ! Recommended to call the  {nameof(ForceUnloadAllAssets)} method to release loaded bundle !");
 			}
+		}
+		#endregion
+
+		#region 调试信息
+		internal List<DebugProviderInfo> GetDebugReportInfos()
+		{
+			return _assetSystemImpl.GetDebugReportInfos();
 		}
 		#endregion
 
@@ -1063,7 +977,7 @@ namespace YooAsset
 		private AssetInfo ConvertLocationToAssetInfo(string location, System.Type assetType)
 		{
 			DebugCheckLocation(location);
-			string assetPath = _locationServices.ConvertLocationToAssetPath(location);
+			string assetPath = _locationServices.ConvertLocationToAssetPath(this, location);
 			PatchAsset patchAsset = _bundleServices.TryGetPatchAsset(assetPath);
 			if (patchAsset != null)
 			{

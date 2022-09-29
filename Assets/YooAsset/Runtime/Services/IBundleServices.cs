@@ -27,5 +27,10 @@ namespace YooAsset
 		/// 映射为资源路径
 		/// </summary>
 		string MappingToAssetPath(string location);
+
+		/// <summary>
+		/// 获取所属的包裹名
+		/// </summary>
+		string GetPackageName();
 	}
 }

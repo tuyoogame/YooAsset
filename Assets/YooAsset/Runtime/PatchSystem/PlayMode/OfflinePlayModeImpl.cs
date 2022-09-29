@@ -85,6 +85,10 @@ namespace YooAsset
 		{
 			return _appPatchManifest.MappingToAssetPath(location);
 		}
+		string IBundleServices.GetPackageName()
+		{
+			return _appPatchManifest.PackageName;
+		}
 		#endregion
 	}
 }

@@ -15,6 +15,11 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 所属资源系统
+		/// </summary>
+		public AssetSystemImpl Impl { private set; get; }
+		
+		/// <summary>
 		/// 资源包文件信息
 		/// </summary>
 		public BundleInfo MainBundleInfo { private set; get; }
@@ -43,8 +48,9 @@ namespace YooAsset
 		internal AssetBundle CacheBundle { set; get; }
 
 
-		public AssetBundleLoaderBase(BundleInfo bundleInfo)
+		public AssetBundleLoaderBase(AssetSystemImpl impl, BundleInfo bundleInfo)
 		{
+			Impl = impl;
 			MainBundleInfo = bundleInfo;
 			RefCount = 0;
 			Status = EStatus.None;
@@ -79,7 +85,7 @@ namespace YooAsset
 		/// 轮询更新
 		/// </summary>
 		public abstract void Update();
-	
+
 		/// <summary>
 		/// 销毁
 		/// </summary>
@@ -148,7 +154,7 @@ namespace YooAsset
 			}
 
 			// 从列表里移除Providers
-			AssetSystem.RemoveBundleProviders(_providers);
+			Impl.RemoveBundleProviders(_providers);
 			_providers.Clear();
 		}
 
