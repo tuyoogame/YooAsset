@@ -2,6 +2,49 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.3.0-preview] - 2022-10-08
+
+该预览版本提供了分布式构建的功能，用于解决分工程或分内容构建的问题。
+
+### Added
+
+- 新增方法设置异步系统的每帧允许运行的最大时间切片。
+
+  ```c#
+  /// <summary>
+  /// 设置异步系统的每帧允许运行的最大时间切片（单位：毫秒）
+  /// </summary>
+  public static void SetOperationSystemMaxTimeSlice(long milliseconds)
+  ```
+
+- 新增方法设置缓存系统的已经缓存文件的校验等级。
+
+  ```c#
+  /// <summary>
+  /// 设置缓存系统的已经缓存文件的校验等级
+  /// </summary>
+  public static void SetCacheSystemCachedFileVerifyLevel(EVerifyLevel verifyLevel)
+  ```
+
+- 新增方法设置下载系统的断点续传功能的文件大小。
+
+  ````C#
+  /// <summary>
+  /// 启用下载系统的断点续传功能的文件大小
+  /// </summary>
+  public static void SetDownloadSystemBreakpointResumeFileSize(int fileBytes)
+  ````
+
+### Removed
+
+- 移除了资源版本号相关概念的代码。
+- 移除了TaskCopyBuildinFiles节点在构建流程里。
+- 移除了YooAssets.ClearUnusedCacheFiles()方法。
+- 移除了初始化参数 InitializeParameters.ClearCacheOnDirty
+- 移除了初始化参数 InitializeParameters.OperationSystemMaxTimeSlice
+- 移除了初始化参数 InitializeParameters.BreakpointResumeFileSize
+- 移除了初始化参数 InitializeParameters.VerifyLevel
+
 ## [1.2.4] - 2022-09-22
 
 ### Fixed
