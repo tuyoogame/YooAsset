@@ -53,3 +53,47 @@ var go  = Instantiate(obj, transform);
 go.transform.localPosition = Vector3.zero;
 go.transform.localScale    = Vector3.one;
 ```
+
+### 分布式构建解决方案
+
+**1.3.0+版本升级指南**
+
+在升级之前请导出AssetBundleCollector的配置为XML文件，然后升级YooAssets库。
+
+首次需要打开AssetBundleCollector窗口，然后导入之前保存的XML文件。
+
+在运行游戏之前，请保证资源包可以构建成功！
+
+```c#
+public static YooAssetPackage AssetPackage;
+
+IEnumerator Start()
+{
+    // 初始化YooAssets资源系统（必须代码）
+    YooAssets.Initialize();
+    
+    // 创建资源包实例
+    AssetPackage = YooAssets.CreateAssetPackage("DefaultPackage");
+    
+    // 初始化资源包
+    ......
+    yield return AssetPackage.InitializeAsync(createParameters);
+    
+    // 更新资源包版本
+    ......
+    var operation = AssetPackage.UpdateManifestAsync(packageCRC);
+	yield return operation;
+    
+    // 下载更新文件
+    var downloader = AssetPackage.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
+    downloader.BeginDownload();
+    yield return downloader;
+    
+    // 加载资源对象
+    var assetHandle = AssetPackage.LoadAssetAsync("Assets/GameRes/npc.prefab");
+    yield return assetHandle;
+    ......
+}
+
+```
+

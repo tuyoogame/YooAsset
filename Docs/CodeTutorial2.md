@@ -2,9 +2,9 @@
 
 **获取资源版本**
 
-对于联机运行模式，在更新补丁清单之前，需要获取一个资源版本号。
+对于联机运行模式，在更新补丁清单之前，需要获取一个资源版本。
 
-该资源版本号，可以通过YooAssets提供的接口来更新，也可以通过HTTP访问游戏服务器来获取。
+该资源版本可以通过YooAssets提供的接口来更新，也可以通过HTTP访问游戏服务器来获取。
 
 ````c#
 private IEnumerator UpdateStaticVersion()
@@ -15,8 +15,8 @@ private IEnumerator UpdateStaticVersion()
     if (operation.Status == EOperationStatus.Succeed)
     {
         //更新成功
-        int resourceVersion = operation.ResourceVersion;
-        Debug.Log($"Update resource Version : {resourceVersion}");
+        string packageCRC = operation.PackageCRC;
+        Debug.Log($"Update resource Version : {packageCRC}");
     }
     else
     {
@@ -33,7 +33,7 @@ private IEnumerator UpdateStaticVersion()
 ````c#
 private IEnumerator UpdatePatchManifest()
 {
-    UpdateManifestOperation operation = YooAssets.UpdateManifestAsync(resourceVersion);
+    UpdateManifestOperation operation = YooAssets.UpdateManifestAsync(packageCRC);
     yield return operation;
 
     if (operation.Status == EOperationStatus.Succeed)
@@ -120,23 +120,22 @@ private IEnumerator UpdateStaticVersion()
     {
         // 如果获取远端资源版本成功，说明当前网络连接并无问题，可以走正常更新流程。
         ......
-            
+        
         // 注意：在成功下载所有资源之后，我们需要记录当前最新的资源版本号
-        PlayerPrefs.SetInt("STATIC_VERSION", resourceVersion);
+        PlayerPrefs.SetString("STATIC_VERSION", packageCRC);
     }
     else
     {
         // 如果获取远端资源版本失败，我们走弱联网更新模式。
         // 注意：如果从来没有保存过版本信息，则需要从内部读取StaticVersion.bytes文件的版本信息。
-        int staticVersion = PlayerPrefs.GetInt("STATIC_VERSION", -1);
-        if (staticVersion == -1)
+        string packageCRC = PlayerPrefs.GetString("STATIC_VERSION", string.Empty);
+        if (packageCRC == string.Empty)
         {
-            staticVersion = LoadStaticVersionFromStreamingAssets();
-            PlayerPrefs.SetInt("STATIC_VERSION", staticVersion);
+            packageCRC = LoadStaticVersionFromStreamingAssets();
         }
         
         // 在弱联网情况下更新补丁清单
-        UpdateManifestOperation operation2 = YooAssets.WeaklyUpdateManifestAsync(staticVersion);
+        UpdateManifestOperation operation2 = YooAssets.WeaklyUpdateManifestAsync(packageCRC);
         yield return operation2;
         if (operation2.Status == EOperationStatus.Succeed)
         {
@@ -150,5 +149,4 @@ private IEnumerator UpdateStaticVersion()
     }
 }
 ````
-
 

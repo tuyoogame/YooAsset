@@ -1,11 +1,12 @@
 # 初始化
 
-资源系统的运行模式支持三种：编辑器模拟模式，单机运行模式，联机运行模式。
+初始化资源系统
 
-````C#
-// 资源系统初始化方法，根据不同的模式，我们传递不同的创建参数类
-YooAssets.InitializeAsync(InitializeParameters parameters);
-````
+```c#
+YooAssets.Initialize();
+```
+
+资源系统的运行模式支持三种：编辑器模拟模式，单机运行模式，联机运行模式。
 
 **编辑器模拟模式**
 
@@ -18,6 +19,7 @@ private IEnumerator InitializeYooAsset()
 {
     var initParameters = new YooAssets.EditorSimulateModeParameters();
     initParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
+    initParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage", false);
     yield return YooAssets.InitializeAsync(initParameters);
 }
 ````
@@ -53,8 +55,6 @@ private IEnumerator InitializeYooAsset()
   
 - DecryptionServices : 如果资源包在构建的时候有加密，需要提供实现IDecryptionServices接口的实例类。
 
-- ClearCacheWhenDirty : 安装包在覆盖安装的时候，是否清空沙盒缓存文件夹。
-
 - DefaultHostServer : 默认的资源服务器IP地址。
 
 - FallbackHostServer : 备用的资源服务器IP地址。
@@ -66,23 +66,29 @@ private IEnumerator InitializeYooAsset()
 {
     var initParameters = new YooAssets.HostPlayModeParameters();
     initParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
-    initParameters.DecryptionServices = null;
-    initParameters.ClearCacheWhenDirty = false;
+    initParameters.DecryptionServices = new BundleDecryptionServices();
+    initParameters.QueryServices = new QueryStreamingAssetsServices();
     initParameters.DefaultHostServer = "http://127.0.0.1/CDN1/Android/v1.0";
     initParameters.FallbackHostServer = "http://127.0.0.1/CDN2/Android/v1.0";
-    initParameters.VerifyLevel = EVerifyLevel.High;
     yield return YooAssets.InitializeAsync(initParameters);
 }
-````
 
-**资源文件解密**  
-
-````c#
-public class BundleDecryption : IDecryptionServices
+// 文件解密服务类
+private class BundleDecryptionServices : IDecryptionServices
 {
     public ulong GetFileOffset(DecryptionFileInfo fileInfo)
     {
         return 32;
+    }
+}
+
+// 内置文件查询服务类
+private class QueryStreamingAssetsServices : IQueryServices
+{
+    public bool QueryStreamingAssets(string fileName)
+    {
+        // 注意：使用了BetterStreamingAssets插件
+        return BetterStreamingAssets.FileExists($"YooAssets/{fileName}");
     }
 }
 ````

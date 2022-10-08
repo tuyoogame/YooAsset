@@ -1,26 +1,18 @@
 # 资源收集
 
-![image](./Image/AssetGrouper-img1.png)
+![image](./Image/AssetCollector-img1.png)
 
 左侧为分组列表，右侧为该分组的配置界面。
 
 导出按钮可以将配置数据导出为XML文件，导入按钮可以导入保存的XML文件。
 
-**注意**：该工具仅支持Unity2019+
+**注意**：该工具仅支持Unity2019.4+
 
 #### 公共设置
 
 - Enable Addressable
 
   启用可寻址资源定位系统。
-
-- Auto Collect Shaders
-
-  自动收集所有依赖的材质球使用的着色器，并将这些着色器打进一个资源包里。
-
-- Shader Bundle Name
-
-  收集的着色器资源包名称。
 
 #### 资源分组
 

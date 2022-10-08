@@ -8,10 +8,6 @@
 
   构建输出的目录，会根据Unity编辑器当前切换的平台自动划分构建结果。
 
-- **Build Version**
-
-  构建版本号，也是资源版本号，版本号必须大于零。
-
 - **Build Pipeline**
 
   构建管线
@@ -32,6 +28,10 @@
 
   (4) 模拟构建模式：在编辑器下配合EditorSimulateMode运行模式，来模拟真实运行的环境。
 
+- **Build Package**
+
+  需要构建的资源包名称。
+
 - **Encryption**
 
   加密类列表。
@@ -51,10 +51,6 @@
   (3) BundleName_HashName：资源包名+哈希值
 
   (4) BundleName_HashName_Extension：资源包名+哈希值+后缀名
-
-- **Buildin Tags**
-
-  标记为安装包里的资源标签列表。构建成功后，会将相关标记的资源包拷贝到StreamingAssets文件夹下。
 
 - **构建**
 
@@ -98,8 +94,6 @@ public class GameEncryption : IEncryptionServices
 
 补丁包文件夹里包含补丁清单文件，资源包文件，构建报告文件等。
 
-资源包文件都是以文件的哈希值命名。
-
 ![image](./Image/AssetBuilder-img4.png)
 
 ### 补丁清单
@@ -119,9 +113,6 @@ private static void BuildInternal(BuildTarget buildTarget)
 {
     Debug.Log($"开始构建 : {buildTarget}");
 
-    // 命令行参数
-    int buildVersion = GetBuildVersion();
-
     // 构建参数
     string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
     BuildParameters buildParameters = new BuildParameters();
@@ -129,14 +120,12 @@ private static void BuildInternal(BuildTarget buildTarget)
     buildParameters.BuildTarget = buildTarget;
     buildParameters.BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;
     buildParameters.BuildMode = EBuildMode.ForceRebuild;
-    buildParameters.BuildVersion = buildVersion;
-    buildParameters.BuildinTags = "buildin";
+    buildParameters.BuildPackage = "DefaultPackage";
     buildParameters.VerifyBuildingResult = true;
-    buildParameters.EnableAddressable = false;
-    buildParameters.AppendFileExtension = false;
-    buildParameters.CopyBuildinTagFiles = true;
+    buildParameters.EnableAddressable = true;
     buildParameters.EncryptionServices = new GameEncryption();
     buildParameters.CompressOption = ECompressOption.LZ4;
+    buildParameters.OutputNameStyle = EOutputNameStyle.HashName_Extension;
     
     // 执行构建
     AssetBundleBuilder builder = new AssetBundleBuilder();
@@ -146,12 +135,12 @@ private static void BuildInternal(BuildTarget buildTarget)
 }
 
 // 从构建命令里获取参数
-private static int GetBuildVersion()
+private static string GetBuildPackageName()
 {
     foreach (string arg in System.Environment.GetCommandLineArgs())
     {
-        if (arg.StartsWith("buildVersion"))
-            return int.Parse(arg.Split("="[0])[1]);
+        if (arg.StartsWith("buildPackage"))
+            return arg.Split("="[0])[1];
     }
     return -1;
 }
@@ -167,14 +156,10 @@ private static int GetBuildVersion()
 
   强制构建是每次构建之前，都会清空之前构建的所有缓存文件，以此来重新构建资源包。
 
-- **资源版本号**
-
-  资源版本号实际上只是构建结果的一个标记符号，在构建的时间轴上记录着每次打包的标记符号，此外资源版本号没有任何作用。
-
 - **首包资源**
 
-  在构建应用程序的时候（例如安卓的APK），我们希望将某些资源打进首包里，可以通过设置Buildin Tags资源标签来决定哪些资源打进首包。首包资源如果发生变化，也可以通过热更新来更新资源。
+  在构建应用程序的时候（例如安卓的APK），我们希望将某些资源打进首包里，可以在构建成功后自己编写逻辑代码拷贝相关资源文件到StreamingAssets/YooAssets/目录里。首包资源如果发生变化，也可以通过热更新来更新资源。
 
 - **补丁包**
 
-  无论是通过增量构建还是强制构建，在构建完成后都会生成一个以资源版本号命名的文件夹，我们把这个文件夹和里面的资源统称为补丁包。补丁包里包含了游戏运行需要的所有资源，我们可以无脑的将补丁包内容覆盖到CDN目录下，也可以通过编写差异分析工具，来筛选出和线上最新版本之间的差异文件，然后将差异文件上传到CDN目录里。
+  无论是通过增量构建还是强制构建，在构建完成后都会生成一个以补丁清单文件哈希值命名的文件夹，我们把这个文件夹统称为补丁包。补丁包里包含了游戏运行需要的所有资源，我们可以无脑的将补丁包内容覆盖到CDN目录下，也可以通过编写差异分析工具，来筛选出和线上最新版本之间的差异文件，然后将差异文件上传到CDN目录里。
