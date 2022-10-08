@@ -46,11 +46,11 @@ public class GameScene1 : MonoBehaviour
 	void InitWindow()
 	{
 		var playMode = CanvasRoot.transform.Find("play_mode/label").GetComponent<Text>();
-		if (BootScene.GamePlayMode == YooAssets.EPlayMode.EditorSimulateMode)
+		if (BootScene.GamePlayMode == EPlayMode.EditorSimulateMode)
 			playMode.text = "编辑器下模拟模式";
-		else if (BootScene.GamePlayMode == YooAssets.EPlayMode.OfflinePlayMode)
+		else if (BootScene.GamePlayMode == EPlayMode.OfflinePlayMode)
 			playMode.text = "离线运行模式";
-		else if (BootScene.GamePlayMode == YooAssets.EPlayMode.HostPlayMode)
+		else if (BootScene.GamePlayMode == EPlayMode.HostPlayMode)
 			playMode.text = "网络运行模式";
 		else
 			throw new NotImplementedException();

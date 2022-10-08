@@ -2,13 +2,14 @@
 using System.Collections;
 using UnityEngine;
 using YooAsset;
+using Better.StreamingAssets;
 
 public class BootScene : MonoBehaviour
 {
 	public static BootScene Instance { private set; get; }
-	public static YooAssets.EPlayMode GamePlayMode;
+	public static EPlayMode GamePlayMode;
 
-	public YooAssets.EPlayMode PlayMode = YooAssets.EPlayMode.EditorSimulateMode;
+	public EPlayMode PlayMode = EPlayMode.EditorSimulateMode;
 
 	void Awake()
 	{
@@ -36,36 +37,37 @@ public class BootScene : MonoBehaviour
 		GamePlayMode = PlayMode;
 		Debug.Log($"资源系统运行模式：{PlayMode}");
 
+		// 初始化BetterStreaming
+		BetterStreamingAssets.Initialize();
+
+		// 初始化资源系统
+		YooAssets.Initialize();
+
 		// 编辑器下的模拟模式
-		if (PlayMode == YooAssets.EPlayMode.EditorSimulateMode)
+		if (PlayMode == EPlayMode.EditorSimulateMode)
 		{
-			var createParameters = new YooAssets.EditorSimulateModeParameters();
+			var createParameters = new EditorSimulateModeParameters();
 			createParameters.LocationServices = new AddressLocationServices();
-			createParameters.BuildinPackageName = "DefaultPackage";
-			//createParameters.SimulatePatchManifestPath = GetPatchManifestPath();
+			createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage", true);
 			yield return YooAssets.InitializeAsync(createParameters);
 		}
 
 		// 单机运行模式
-		if (PlayMode == YooAssets.EPlayMode.OfflinePlayMode)
+		if (PlayMode == EPlayMode.OfflinePlayMode)
 		{
-			var createParameters = new YooAssets.OfflinePlayModeParameters();
+			var createParameters = new OfflinePlayModeParameters();
 			createParameters.LocationServices = new AddressLocationServices();
-			createParameters.BuildinPackageName = "DefaultPackage";
 			yield return YooAssets.InitializeAsync(createParameters);
 		}
 
 		// 联机运行模式
-		if (PlayMode == YooAssets.EPlayMode.HostPlayMode)
+		if (PlayMode == EPlayMode.HostPlayMode)
 		{
-			var createParameters = new YooAssets.HostPlayModeParameters();
+			var createParameters = new HostPlayModeParameters();
 			createParameters.LocationServices = new AddressLocationServices();
-			createParameters.BuildinPackageName = "DefaultPackage";
-			createParameters.DecryptionServices = null;
-			createParameters.ClearCacheWhenDirty = false;
+			createParameters.QueryServices = new QueryStreamingAssetsFileServices();
 			createParameters.DefaultHostServer = GetHostServerURL();
 			createParameters.FallbackHostServer = GetHostServerURL();
-			createParameters.VerifyLevel = EVerifyLevel.High;
 			yield return YooAssets.InitializeAsync(createParameters);
 		}
 
@@ -73,11 +75,6 @@ public class BootScene : MonoBehaviour
 		PatchUpdater.Run();
 	}
 
-	private string GetPatchManifestPath()
-	{
-		string directory = System.IO.Path.GetDirectoryName(Application.dataPath);
-		return $"{directory}/Bundles/StandaloneWindows64/UnityManifest_SimulateBuild/PatchManifest_100.bytes";
-	}
 	private string GetHostServerURL()
 	{
 		//string hostServerIP = "http://10.0.2.2"; //安卓模拟器地址
@@ -103,5 +100,12 @@ public class BootScene : MonoBehaviour
 		else
 			return $"{hostServerIP}/CDN/PC/{gameVersion}";
 #endif
+	}
+	private class QueryStreamingAssetsFileServices : IQueryServices
+	{
+		public bool QueryStreamingAssets(string fileName)
+		{
+			return BetterStreamingAssets.FileExists($"YooAssets/{fileName}");
+		}
 	}
 }

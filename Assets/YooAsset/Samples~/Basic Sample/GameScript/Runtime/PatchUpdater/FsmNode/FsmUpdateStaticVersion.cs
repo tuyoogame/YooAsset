@@ -24,7 +24,7 @@ internal class FsmUpdateStaticVersion : IFsmNode
 		yield return new WaitForSecondsRealtime(0.5f);
 
 		// 更新资源版本号
-		var operation = YooAssets.UpdateStaticVersionAsync("DefaultPackage", 30);
+		var operation = YooAssets.UpdateStaticVersionAsync(30);
 		yield return operation;
 
 		if (operation.Status == EOperationStatus.Succeed)

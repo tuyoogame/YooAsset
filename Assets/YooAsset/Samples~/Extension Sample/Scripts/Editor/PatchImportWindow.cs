@@ -37,20 +37,15 @@ namespace YooAsset.Editor
 
 			if (string.IsNullOrEmpty(_patchManifestPath) == false)
 			{
-				if (GUILayout.Button("导入补丁包（内置文件）", GUILayout.MaxWidth(150)))
-				{
-					AssetBundleBuilderHelper.ClearStreamingAssetsFolder();
-					CopyPatchFiles(_patchManifestPath, false);
-				}
 				if (GUILayout.Button("导入补丁包（全部文件）", GUILayout.MaxWidth(150)))
 				{
 					AssetBundleBuilderHelper.ClearStreamingAssetsFolder();
-					CopyPatchFiles(_patchManifestPath, true);
+					CopyPatchFiles(_patchManifestPath);
 				}
 			}
 		}
 
-		private void CopyPatchFiles(string patchManifestFilePath, bool allPatchFile)
+		private void CopyPatchFiles(string patchManifestFilePath)
 		{
 			string manifestFileName = Path.GetFileNameWithoutExtension(patchManifestFilePath);
 			string outputDirectory = Path.GetDirectoryName(patchManifestFilePath);
@@ -74,29 +69,12 @@ namespace YooAsset.Editor
 
 			// 拷贝文件列表
 			int fileCount = 0;
-
-			if (allPatchFile)
+			foreach (var patchBundle in patchManifest.BundleList)
 			{
-				foreach (var patchBundle in patchManifest.BundleList)
-				{
-					fileCount++;
-					string sourcePath = $"{outputDirectory}/{patchBundle.FileName}";
-					string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{patchBundle.FileName}";
-					EditorTools.CopyFile(sourcePath, destPath, true);
-				}
-			}
-			else
-			{
-				foreach (var patchBundle in patchManifest.BundleList)
-				{
-					if (patchBundle.IsBuildin == false)
-						continue;
-
-					fileCount++;
-					string sourcePath = $"{outputDirectory}/{patchBundle.FileName}";
-					string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{patchBundle.FileName}";
-					EditorTools.CopyFile(sourcePath, destPath, true);
-				}
+				fileCount++;
+				string sourcePath = $"{outputDirectory}/{patchBundle.FileName}";
+				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsFolderPath()}/{patchBundle.FileName}";
+				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
 			Debug.Log($"补丁包拷贝完成，一共拷贝了{fileCount}个资源文件");
