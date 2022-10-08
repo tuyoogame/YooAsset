@@ -198,13 +198,13 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadStaticVersion)
 			{
-				YooLogger.Log($"Load application static version.");
 				string fileName = YooAssetSettingsData.GetStaticVersionFileName(_buildinPackageName);
 				string filePath = PathHelper.MakeStreamingLoadPath(fileName);
 				string url = PathHelper.ConvertToWWWPath(filePath);
 				_downloader1 = new UnityWebDataRequester();
 				_downloader1.SendRequest(url);
 				_steps = ESteps.CheckStaticVersion;
+				YooLogger.Log($"Load static version file : {filePath}");
 			}
 
 			if (_steps == ESteps.CheckStaticVersion)
@@ -227,13 +227,13 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadAppManifest)
 			{
-				YooLogger.Log($"Load application patch manifest.");
 				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_buildinPackageName, BuildinPackageCRC);
 				string filePath = PathHelper.MakeStreamingLoadPath(fileName);
 				string url = PathHelper.ConvertToWWWPath(filePath);
 				_downloader2 = new UnityWebDataRequester();
 				_downloader2.SendRequest(url);
 				_steps = ESteps.CheckAppManifest;
+				YooLogger.Log($"Load patch manifest file : {filePath}");
 			}
 
 			if (_steps == ESteps.CheckAppManifest)

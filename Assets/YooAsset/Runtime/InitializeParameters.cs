@@ -59,7 +59,6 @@ namespace YooAsset
 	{
 		/// <summary>
 		/// 用于模拟运行的资源清单路径
-		/// 注意：如果路径为空，会自动重新构建补丁清单。
 		/// </summary>
 		public string SimulatePatchManifestPath = string.Empty;
 	}
