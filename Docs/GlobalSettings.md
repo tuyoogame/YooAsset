@@ -1,6 +1,6 @@
 # 全局配置
 
-![image](./Image/Settings-img1.jpg)
+![image](./Image/Settings-img1.png)
 
 通过右键创建配置文件（Project窗体内右键 -> Create -> YooAsset -> Create Setting）
 
@@ -11,5 +11,4 @@
 - **Asset Bundle File Variant** : AssetBundle资源包后缀名
 - **Raw File Variant** : 原生资源包后缀名
 - **Patch Manifest File Name** : 补丁清单文件名称
-- **Unity Manifest File Name** : Unity构建的清单名称
 

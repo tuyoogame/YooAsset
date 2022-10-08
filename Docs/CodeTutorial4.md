@@ -82,7 +82,7 @@ IEnumerator Start()
     // 更新资源包版本
     ......
     var operation = AssetPackage.UpdateManifestAsync(packageCRC);
-	yield return operation;
+    yield return operation;
     
     // 下载更新文件
     var downloader = AssetPackage.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
