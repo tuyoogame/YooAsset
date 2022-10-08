@@ -12,7 +12,7 @@ namespace YooAsset
 		private static readonly List<YooAssetPackage> _packages = new List<YooAssetPackage>();
 
 		/// <summary>
-		/// 初始化
+		/// 初始化资源系统
 		/// </summary>
 		public static void Initialize()
 		{
@@ -37,7 +37,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 更新
+		/// 更新资源系统
 		/// </summary>
 		internal static void Update()
 		{
@@ -54,7 +54,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 销毁
+		/// 销毁资源系统
 		/// </summary>
 		internal static void Destroy()
 		{

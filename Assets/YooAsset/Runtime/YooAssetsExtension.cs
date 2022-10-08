@@ -21,7 +21,7 @@ namespace YooAsset
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public static InitializationOperation InitializeAsync(string packageName, InitializeParameters parameters)
+		public static InitializationOperation InitializeAsync(InitializeParameters parameters, string packageName = "DefaultPackage")
 		{
 			if (_mainPackage != null)
 				throw new Exception("Main package is initialized yet.");

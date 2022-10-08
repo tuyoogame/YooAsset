@@ -86,7 +86,7 @@ namespace YooAsset
 		public string FallbackHostServer = string.Empty;
 
 		/// <summary>
-		/// 查询服务类
+		/// 内置资源查询服务接口
 		/// </summary>
 		public IQueryServices QueryServices = null;
 	}
