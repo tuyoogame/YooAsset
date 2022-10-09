@@ -31,6 +31,16 @@ namespace YooAsset.Editor
 		public EOutputNameStyle OutputNameStyle = EOutputNameStyle.HashName;
 
 		/// <summary>
+		/// 首包资源文件的拷贝方式
+		/// </summary>
+		public ECopyBuildinFileOption CopyBuildinFileOption = ECopyBuildinFileOption.None;
+
+		/// <summary>
+		/// 首包资源文件的标签集合
+		/// </summary>
+		public string CopyBuildinFileTags = string.Empty;
+
+		/// <summary>
 		/// 加密类名称
 		/// </summary>
 		public string EncyptionClassName = string.Empty;

@@ -31,6 +31,8 @@ namespace YooAsset.Editor
 		private PopupField<string> _encryptionField;
 		private EnumField _compressionField;
 		private EnumField _outputNameStyleField;
+		private EnumField _copyBuildinFileOptionField;
+		private TextField _copyBuildinFileTagsField;
 
 		public void CreateGUI()
 		{
@@ -135,7 +137,7 @@ namespace YooAsset.Editor
 					encryptionContainer.Add(_encryptionField);
 				}
 
-				// 压缩方式
+				// 压缩方式选项
 				_compressionField = root.Q<EnumField>("Compression");
 				_compressionField.Init(AssetBundleBuilderSettingData.Setting.CompressOption);
 				_compressionField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.CompressOption);
@@ -155,6 +157,27 @@ namespace YooAsset.Editor
 				{
 					AssetBundleBuilderSettingData.IsDirty = true;
 					AssetBundleBuilderSettingData.Setting.OutputNameStyle = (EOutputNameStyle)_outputNameStyleField.value;
+				});
+
+				// 首包文件拷贝选项
+				_copyBuildinFileOptionField = root.Q<EnumField>("CopyBuildinFileOption");
+				_copyBuildinFileOptionField.Init(AssetBundleBuilderSettingData.Setting.CopyBuildinFileOption);
+				_copyBuildinFileOptionField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.CopyBuildinFileOption);
+				_copyBuildinFileOptionField.style.width = 350;
+				_copyBuildinFileOptionField.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleBuilderSettingData.IsDirty = true;
+					AssetBundleBuilderSettingData.Setting.CopyBuildinFileOption = (ECopyBuildinFileOption)_copyBuildinFileOptionField.value;
+					RefreshWindow();
+				});
+
+				// 首包文件的资源标签
+				_copyBuildinFileTagsField = root.Q<TextField>("CopyBuildinFileTags");
+				_copyBuildinFileTagsField.SetValueWithoutNotify(AssetBundleBuilderSettingData.Setting.CopyBuildinFileTags);
+				_copyBuildinFileTagsField.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleBuilderSettingData.IsDirty = true;
+					AssetBundleBuilderSettingData.Setting.CopyBuildinFileTags = _copyBuildinFileTagsField.value;
 				});
 
 				// 构建按钮
@@ -193,10 +216,15 @@ namespace YooAsset.Editor
 		private void RefreshWindow()
 		{
 			var buildMode = AssetBundleBuilderSettingData.Setting.BuildMode;
+			var copyOption = AssetBundleBuilderSettingData.Setting.CopyBuildinFileOption;
 			bool enableElement = buildMode == EBuildMode.ForceRebuild;
+			bool tagsFiledVisible = copyOption == ECopyBuildinFileOption.ClearAndCopyByTags || copyOption == ECopyBuildinFileOption.OnlyCopyByTags;
 			_encryptionField.SetEnabled(enableElement);
 			_compressionField.SetEnabled(enableElement);
 			_outputNameStyleField.SetEnabled(enableElement);
+			_copyBuildinFileOptionField.SetEnabled(enableElement);
+			_copyBuildinFileTagsField.SetEnabled(enableElement);
+			_copyBuildinFileTagsField.visible = tagsFiledVisible;
 		}
 		private void SaveBtn_clicked()
 		{
@@ -233,6 +261,8 @@ namespace YooAsset.Editor
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.CompressOption = AssetBundleBuilderSettingData.Setting.CompressOption;
 			buildParameters.OutputNameStyle = AssetBundleBuilderSettingData.Setting.OutputNameStyle;
+			buildParameters.CopyBuildinFileOption = AssetBundleBuilderSettingData.Setting.CopyBuildinFileOption;
+			buildParameters.CopyBuildinFileTags = AssetBundleBuilderSettingData.Setting.CopyBuildinFileTags;
 
 			if (AssetBundleBuilderSettingData.Setting.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{

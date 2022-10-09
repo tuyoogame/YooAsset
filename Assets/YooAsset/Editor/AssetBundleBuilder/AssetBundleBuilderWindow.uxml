@@ -10,6 +10,8 @@
         <ui:VisualElement name="EncryptionContainer" style="height: 24px;" />
         <uie:EnumField label="Compression" value="Center" name="Compression" />
         <uie:EnumField label="Output Name Style" value="Center" name="OutputNameStyle" />
+        <uie:EnumField label="Copy Buildin File Option" value="Center" name="CopyBuildinFileOption" />
+        <ui:TextField picking-mode="Ignore" label="Copy Buildin File Tags" name="CopyBuildinFileTags" />
         <ui:Button text="构建" display-tooltip-when-elided="true" name="Build" style="height: 50px; background-color: rgb(40, 106, 42); margin-top: 10px;" />
     </ui:VisualElement>
 </ui:UXML>

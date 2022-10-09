@@ -32,9 +32,18 @@ namespace YooAsset.Editor
 				if (EditorTools.HasDirtyScenes())
 					throw new Exception("检测到未保存的场景文件");
 
+				// 检测首包资源标签
+				if (buildParameters.CopyBuildinFileOption == ECopyBuildinFileOption.ClearAndCopyByTags
+					|| buildParameters.CopyBuildinFileOption == ECopyBuildinFileOption.OnlyCopyByTags)
+				{
+					if (string.IsNullOrEmpty(buildParameters.CopyBuildinFileTags))
+						throw new Exception("首包资源标签不能为空！");
+				}
+
 				// 保存改动的资源
 				AssetDatabase.SaveAssets();
 			}
+
 			if (buildParameters.BuildMode == EBuildMode.ForceRebuild)
 			{
 				// 删除平台总目录

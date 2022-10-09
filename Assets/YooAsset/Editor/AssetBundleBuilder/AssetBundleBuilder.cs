@@ -59,6 +59,7 @@ namespace YooAsset.Editor
 					new TaskCreatePatchManifest(), //创建清单文件
 					new TaskCreateReport(), //创建报告文件
 					new TaskCreatePatchPackage(), //制作补丁包
+					new TaskCopyBuildinFiles(), //拷贝内置文件
 				};
 			}
 			else if (buildParameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
@@ -73,6 +74,7 @@ namespace YooAsset.Editor
 					new TaskCreatePatchManifest(), //创建清单文件
 					new TaskCreateReport(), //创建报告文件
 					new TaskCreatePatchPackage(), //制作补丁包
+					new TaskCopyBuildinFiles(), //拷贝内置文件
 				};
 			}
 			else

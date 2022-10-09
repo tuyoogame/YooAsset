@@ -83,6 +83,16 @@ namespace YooAsset.Editor
 		public EOutputNameStyle OutputNameStyle = EOutputNameStyle.HashName;
 
 		/// <summary>
+		/// 拷贝内置资源选项
+		/// </summary>
+		public ECopyBuildinFileOption CopyBuildinFileOption = ECopyBuildinFileOption.None;
+
+		/// <summary>
+		/// 拷贝内置资源的标签
+		/// </summary>
+		public string CopyBuildinFileTags = string.Empty;
+
+		/// <summary>
 		/// 压缩选项
 		/// </summary>
 		public ECompressOption CompressOption = ECompressOption.Uncompressed;
