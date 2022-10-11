@@ -62,7 +62,7 @@ namespace YooAsset
 					return;
 				}
 
-				if(_setPositionRotation)
+				if (_setPositionRotation)
 				{
 					if (_parent == null)
 						Result = Object.Instantiate(_handle.AssetObject as GameObject, _position, _rotation);
@@ -79,6 +79,15 @@ namespace YooAsset
 
 				_steps = ESteps.Done;
 				Status = EOperationStatus.Succeed;
+			}
+		}
+		public override void Cancel()
+		{
+			if (IsDone == false)
+			{
+				_steps = ESteps.Done;
+				Status = EOperationStatus.Failed;
+				Error = $"User cancelled !";
 			}
 		}
 	}
