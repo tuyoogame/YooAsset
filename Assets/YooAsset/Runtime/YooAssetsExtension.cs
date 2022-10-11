@@ -15,7 +15,12 @@ namespace YooAsset
 		/// </summary>
 		public static bool IsInitialized
 		{
-			get { return _mainPackage.IsInitialized; }
+			get 
+			{
+				if (_mainPackage == null)
+					return false;
+				return _mainPackage.IsInitialized;
+			}
 		}
 
 		/// <summary>
