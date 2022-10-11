@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-	public class GameAsyncOperation : AsyncOperationBase
+	public abstract class GameAsyncOperation : AsyncOperationBase
 	{
 		internal override void Start()
 		{
@@ -12,7 +12,7 @@ namespace YooAsset
 			OnUpdate();
 		}
 
-		protected virtual void OnStart() { }
-		protected virtual void OnUpdate() { }
+		protected abstract void OnStart();
+		protected abstract void OnUpdate();
 	}
 }

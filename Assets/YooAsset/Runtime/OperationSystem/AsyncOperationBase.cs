@@ -81,14 +81,6 @@ namespace YooAsset
 				_taskCompletionSource.TrySetResult(null);
 		}
 
-		/// <summary>
-		/// 取消异步操作
-		/// </summary>
-		public virtual void Cancel()
-		{
-			throw new NotImplementedException("Can not cancel operation !");
-		}
-
 		#region 异步编程相关
 		bool IEnumerator.MoveNext()
 		{

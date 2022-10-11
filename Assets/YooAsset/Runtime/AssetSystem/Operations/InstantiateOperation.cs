@@ -81,7 +81,11 @@ namespace YooAsset
 				Status = EOperationStatus.Succeed;
 			}
 		}
-		public override void Cancel()
+
+		/// <summary>
+		/// 取消实例化对象操作
+		/// </summary>
+		public void Cancel()
 		{
 			if (IsDone == false)
 			{
