@@ -25,11 +25,11 @@ namespace YooAsset
 		public string PackageName { private set; get; }
 
 		/// <summary>
-		/// 是否已经初始化
+		/// 初始化状态
 		/// </summary>
-		public bool IsInitialized
+		public EOperationStatus InitializeStatus
 		{
-			get { return _isInitialize; }
+			get { return _initializeStatus; }
 		}
 
 

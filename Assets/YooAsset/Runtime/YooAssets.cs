@@ -17,17 +17,18 @@ namespace YooAsset
 		public static void Initialize()
 		{
 			if (_isInitialize)
-				throw new Exception("YooAssets is initialized !");
+				throw new Exception($"{nameof(YooAssets)} is initialized !");
 
-			// 创建驱动器
 			if (_isInitialize == false)
 			{
+				// 创建驱动器
 				_isInitialize = true;
-				UnityEngine.GameObject driverGo = new UnityEngine.GameObject("[YooAsset]");
+				UnityEngine.GameObject driverGo = new UnityEngine.GameObject($"[{nameof(YooAssets)}]");
 				driverGo.AddComponent<YooAssetDriver>();
 				UnityEngine.Object.DontDestroyOnLoad(driverGo);
 
 #if DEBUG
+				// 添加远程调试脚本
 				driverGo.AddComponent<RemoteDebuggerInRuntime>();
 #endif
 
@@ -83,7 +84,7 @@ namespace YooAsset
 		public static YooAssetPackage CreateAssetPackage(string packageName)
 		{
 			if (_isInitialize == false)
-				throw new Exception("YooAssets not initialize !");
+				throw new Exception($"{nameof(YooAssets)} not initialize !");
 
 			if (string.IsNullOrEmpty(packageName))
 				throw new Exception("PackageName is null or empty !");
@@ -97,11 +98,36 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取资源包
+		/// </summary>
+		/// <param name="packageName">资源包名称</param>
+		public static YooAssetPackage GetAssetPackage(string packageName)
+		{
+			if (_isInitialize == false)
+				throw new Exception($"{nameof(YooAssets)} not initialize !");
+
+			if (string.IsNullOrEmpty(packageName))
+				throw new Exception("Package name is null or empty !");
+
+			foreach (var package in _packages)
+			{
+				if (package.PackageName == packageName)
+					return package;
+			}
+
+			YooLogger.Warning($"Not found asset package : {packageName}");
+			return null;
+		}
+
+		/// <summary>
 		/// 检测资源包是否存在
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
 		public static bool HasAssetPackage(string packageName)
 		{
+			if (_isInitialize == false)
+				throw new Exception($"{nameof(YooAssets)} not initialize !");
+
 			foreach (var package in _packages)
 			{
 				if (package.PackageName == packageName)

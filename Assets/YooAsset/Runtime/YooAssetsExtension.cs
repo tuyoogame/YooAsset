@@ -11,17 +11,18 @@ namespace YooAsset
 		private static YooAssetPackage _mainPackage;
 
 		/// <summary>
-		/// 是否已经初始化
+		/// 初始化状态
 		/// </summary>
-		public static bool IsInitialized
+		public static EOperationStatus InitializeStatus
 		{
-			get 
+			get
 			{
 				if (_mainPackage == null)
-					return false;
-				return _mainPackage.IsInitialized;
+					return EOperationStatus.None;
+				return _mainPackage.InitializeStatus;
 			}
 		}
+
 
 		/// <summary>
 		/// 异步初始化
