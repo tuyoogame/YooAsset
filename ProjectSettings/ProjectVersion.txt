@@ -1,2 +1,0 @@
-m_EditorVersion: 2019.4.29f1c1
-m_EditorVersionWithRevision: 2019.4.29f1c1 (dfd1a96ce88a)
