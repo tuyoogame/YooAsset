@@ -15,7 +15,6 @@ namespace YooAsset
 		private readonly Vector3 _position;
 		private readonly Quaternion _rotation;
 		private readonly Transform _parent;
-		private readonly bool _setPositionRotation;
 		private ESteps _steps = ESteps.None;
 
 		/// <summary>
@@ -24,13 +23,12 @@ namespace YooAsset
 		public GameObject Result = null;
 
 
-		internal InstantiateOperation(AssetOperationHandle handle, Vector3 position, Quaternion rotation, Transform parent, bool setPositionRotation)
+		internal InstantiateOperation(AssetOperationHandle handle, Vector3 position, Quaternion rotation, Transform parent)
 		{
 			_handle = handle;
 			_position = position;
 			_rotation = rotation;
 			_parent = parent;
-			_setPositionRotation = setPositionRotation;
 		}
 		internal override void Start()
 		{
@@ -62,20 +60,8 @@ namespace YooAsset
 					return;
 				}
 
-				if (_setPositionRotation)
-				{
-					if (_parent == null)
-						Result = Object.Instantiate(_handle.AssetObject as GameObject, _position, _rotation);
-					else
-						Result = Object.Instantiate(_handle.AssetObject as GameObject, _position, _rotation, _parent);
-				}
-				else
-				{
-					if (_parent == null)
-						Result = Object.Instantiate(_handle.AssetObject as GameObject);
-					else
-						Result = Object.Instantiate(_handle.AssetObject as GameObject, _parent);
-				}
+				// 实例化游戏对象
+				Result = Object.Instantiate(_handle.AssetObject as GameObject, _position, _rotation, _parent);
 
 				_steps = ESteps.Done;
 				Status = EOperationStatus.Succeed;
@@ -93,6 +79,17 @@ namespace YooAsset
 				Status = EOperationStatus.Failed;
 				Error = $"User cancelled !";
 			}
+		}
+
+		/// <summary>
+		/// 等待异步实例化结束
+		/// </summary>
+		public void WaitForAsyncComplete()
+		{
+			if (_steps == ESteps.Done)
+				return;
+			_handle.WaitForAsyncComplete();
+			Update();
 		}
 	}
 }

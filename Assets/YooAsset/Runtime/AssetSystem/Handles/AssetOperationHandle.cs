@@ -87,7 +87,7 @@ namespace YooAsset
 		/// <returns></returns>
 		public GameObject InstantiateSync(Transform parent = null)
 		{
-			return InstantiateSyncInternal(Vector3.zero, Quaternion.identity, parent, false);
+			return InstantiateSyncInternal(Vector3.zero, Quaternion.identity, parent);
 		}
 
 		/// <summary>
@@ -98,7 +98,7 @@ namespace YooAsset
 		/// <param name="parent">父类对象</param>
 		public GameObject InstantiateSync(Vector3 position, Quaternion rotation, Transform parent = null)
 		{
-			return InstantiateSyncInternal(position, rotation, parent, true);
+			return InstantiateSyncInternal(position, rotation, parent);
 		}
 
 		/// <summary>
@@ -107,7 +107,7 @@ namespace YooAsset
 		/// <param name="parent">父类对象</param>
 		public InstantiateOperation InstantiateAsync(Transform parent = null)
 		{
-			return InstantiateAsyncInternal(Vector3.zero, Quaternion.identity, parent, false);
+			return InstantiateAsyncInternal(Vector3.zero, Quaternion.identity, parent);
 		}
 
 		/// <summary>
@@ -118,37 +118,23 @@ namespace YooAsset
 		/// <param name="parent">父类对象</param>
 		public InstantiateOperation InstantiateAsync(Vector3 position, Quaternion rotation, Transform parent = null)
 		{
-			return InstantiateAsyncInternal(position, rotation, parent, true);
+			return InstantiateAsyncInternal(position, rotation, parent);
 		}
 
 
-		private GameObject InstantiateSyncInternal(Vector3 position, Quaternion rotation, Transform parent, bool setPositionRotation)
+		private GameObject InstantiateSyncInternal(Vector3 position, Quaternion rotation, Transform parent)
 		{
 			if (IsValid == false)
 				return null;
 			if (Provider.AssetObject == null)
 				return null;
 
-			GameObject result;
-			if (setPositionRotation)
-			{
-				if (parent == null)
-					result = UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, position, rotation);
-				else
-					result = UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, position, rotation, parent);
-			}
-			else
-			{
-				if (parent == null)
-					result = UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject);
-				else
-					result = UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, parent);
-			}
-			return result;
+			GameObject clone = UnityEngine.Object.Instantiate(Provider.AssetObject as GameObject, position, rotation, parent);			
+			return clone;
 		}
-		private InstantiateOperation InstantiateAsyncInternal(Vector3 position, Quaternion rotation, Transform parent, bool setPositionRotation)
+		private InstantiateOperation InstantiateAsyncInternal(Vector3 position, Quaternion rotation, Transform parent)
 		{
-			InstantiateOperation operation = new InstantiateOperation(this, position, rotation, parent, setPositionRotation);
+			InstantiateOperation operation = new InstantiateOperation(this, position, rotation, parent);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}

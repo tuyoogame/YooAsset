@@ -9,7 +9,6 @@ namespace YooAsset
 	{
 		/// <summary>
 		/// 编辑器下的模拟模式
-		/// 注意：在初始化的时候自动构建真机模拟环境。
 		/// </summary>
 		EditorSimulateMode,
 
