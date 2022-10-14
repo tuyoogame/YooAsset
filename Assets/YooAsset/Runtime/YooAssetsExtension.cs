@@ -8,79 +8,15 @@ namespace YooAsset
 {
 	public static partial class YooAssets
 	{
-		private static YooAssetPackage _mainPackage;
+		private static AssetsPackage _defaultPackage;
 
 		/// <summary>
-		/// 初始化状态
+		/// 设置默认的资源包
 		/// </summary>
-		public static EOperationStatus InitializeStatus
+		public static void SetDefaultAssetsPackage(AssetsPackage assetsPackage)
 		{
-			get
-			{
-				if (_mainPackage == null)
-					return EOperationStatus.None;
-				return _mainPackage.InitializeStatus;
-			}
+			_defaultPackage = assetsPackage;
 		}
-
-
-		/// <summary>
-		/// 异步初始化
-		/// </summary>
-		public static InitializationOperation InitializeAsync(InitializeParameters parameters, string packageName = "DefaultPackage")
-		{
-			if (_mainPackage != null)
-				throw new Exception("Main package is initialized yet.");
-
-			_mainPackage = CreateAssetPackage(packageName);
-			return _mainPackage.InitializeAsync(parameters);
-		}
-
-		/// <summary>
-		/// 向网络端请求静态资源版本
-		/// </summary>
-		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public static UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
-		{
-			return _mainPackage.UpdateStaticVersionAsync(timeout);
-		}
-
-		/// <summary>
-		/// 向网络端请求并更新补丁清单
-		/// </summary>
-		/// <param name="packageCRC">更新的资源包裹版本</param>
-		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public static UpdateManifestOperation UpdateManifestAsync(string packageCRC, int timeout = 60)
-		{
-			return _mainPackage.UpdateManifestAsync(packageCRC, timeout);
-		}
-
-		/// <summary>
-		/// 弱联网情况下加载补丁清单
-		/// 注意：当指定版本内容验证失败后会返回失败。
-		/// </summary>
-		/// <param name="packageCRC">指定的资源包裹版本</param>
-		public static UpdateManifestOperation WeaklyUpdateManifestAsync(string packageCRC)
-		{
-			return _mainPackage.WeaklyUpdateManifestAsync(packageCRC);
-		}
-
-		/// <summary>
-		/// 资源回收（卸载引用计数为零的资源）
-		/// </summary>
-		public static void UnloadUnusedAssets()
-		{
-			_mainPackage.UnloadUnusedAssets();
-		}
-
-		/// <summary>
-		/// 强制回收所有资源
-		/// </summary>
-		public static void ForceUnloadAllAssets()
-		{
-			_mainPackage.ForceUnloadAllAssets();
-		}
-
 
 		#region 资源信息
 		/// <summary>
@@ -89,7 +25,8 @@ namespace YooAsset
 		/// <param name="location">资源的定位地址</param>
 		public static bool IsNeedDownloadFromRemote(string location)
 		{
-			return _mainPackage.IsNeedDownloadFromRemote(location);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.IsNeedDownloadFromRemote(location);
 		}
 
 		/// <summary>
@@ -98,7 +35,8 @@ namespace YooAsset
 		/// <param name="location">资源的定位地址</param>
 		public static bool IsNeedDownloadFromRemote(AssetInfo assetInfo)
 		{
-			return _mainPackage.IsNeedDownloadFromRemote(assetInfo);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.IsNeedDownloadFromRemote(assetInfo);
 		}
 
 		/// <summary>
@@ -107,7 +45,8 @@ namespace YooAsset
 		/// <param name="tag">资源标签</param>
 		public static AssetInfo[] GetAssetInfos(string tag)
 		{
-			return _mainPackage.GetAssetInfos(tag);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.GetAssetInfos(tag);
 		}
 
 		/// <summary>
@@ -116,7 +55,8 @@ namespace YooAsset
 		/// <param name="tags">资源标签列表</param>
 		public static AssetInfo[] GetAssetInfos(string[] tags)
 		{
-			return _mainPackage.GetAssetInfos(tags);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.GetAssetInfos(tags);
 		}
 
 		/// <summary>
@@ -125,7 +65,8 @@ namespace YooAsset
 		/// <param name="location">资源的定位地址</param>
 		public static AssetInfo GetAssetInfo(string location)
 		{
-			return _mainPackage.GetAssetInfo(location);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.GetAssetInfo(location);
 		}
 
 		/// <summary>
@@ -135,7 +76,8 @@ namespace YooAsset
 		/// <returns>如果location地址无效，则返回空字符串</returns>
 		public static string GetAssetPath(string location)
 		{
-			return _mainPackage.GetAssetPath(location);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.GetAssetPath(location);
 		}
 		#endregion
 
@@ -147,7 +89,8 @@ namespace YooAsset
 		/// <param name="copyPath">拷贝路径</param>
 		public static RawFileOperation GetRawFileAsync(string location, string copyPath = null)
 		{
-			return _mainPackage.GetRawFileAsync(location, copyPath);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.GetRawFileAsync(location, copyPath);
 		}
 
 		/// <summary>
@@ -157,7 +100,8 @@ namespace YooAsset
 		/// <param name="copyPath">拷贝路径</param>
 		public static RawFileOperation GetRawFileAsync(AssetInfo assetInfo, string copyPath = null)
 		{
-			return _mainPackage.GetRawFileAsync(assetInfo, copyPath);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.GetRawFileAsync(assetInfo, copyPath);
 		}
 		#endregion
 
@@ -171,7 +115,8 @@ namespace YooAsset
 		/// <param name="priority">优先级</param>
 		public static SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool activateOnLoad = true, int priority = 100)
 		{
-			return _mainPackage.LoadSceneAsync(location, sceneMode, activateOnLoad, priority);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadSceneAsync(location, sceneMode, activateOnLoad, priority);
 		}
 
 		/// <summary>
@@ -183,7 +128,8 @@ namespace YooAsset
 		/// <param name="priority">优先级</param>
 		public static SceneOperationHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool activateOnLoad = true, int priority = 100)
 		{
-			return _mainPackage.LoadSceneAsync(assetInfo, sceneMode, activateOnLoad, priority);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadSceneAsync(assetInfo, sceneMode, activateOnLoad, priority);
 		}
 		#endregion
 
@@ -194,7 +140,8 @@ namespace YooAsset
 		/// <param name="assetInfo">资源信息</param>
 		public static AssetOperationHandle LoadAssetSync(AssetInfo assetInfo)
 		{
-			return _mainPackage.LoadAssetSync(assetInfo);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAssetSync(assetInfo);
 		}
 
 		/// <summary>
@@ -204,7 +151,8 @@ namespace YooAsset
 		/// <param name="location">资源的定位地址</param>
 		public static AssetOperationHandle LoadAssetSync<TObject>(string location) where TObject : UnityEngine.Object
 		{
-			return _mainPackage.LoadAssetSync<TObject>(location);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAssetSync<TObject>(location);
 		}
 
 		/// <summary>
@@ -214,7 +162,8 @@ namespace YooAsset
 		/// <param name="type">资源类型</param>
 		public static AssetOperationHandle LoadAssetSync(string location, System.Type type)
 		{
-			return _mainPackage.LoadAssetSync(location, type);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAssetSync(location, type);
 		}
 
 
@@ -224,7 +173,8 @@ namespace YooAsset
 		/// <param name="assetInfo">资源信息</param>
 		public static AssetOperationHandle LoadAssetAsync(AssetInfo assetInfo)
 		{
-			return _mainPackage.LoadAssetAsync(assetInfo);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAssetAsync(assetInfo);
 		}
 
 		/// <summary>
@@ -234,7 +184,8 @@ namespace YooAsset
 		/// <param name="location">资源的定位地址</param>
 		public static AssetOperationHandle LoadAssetAsync<TObject>(string location) where TObject : UnityEngine.Object
 		{
-			return _mainPackage.LoadAssetAsync<TObject>(location);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAssetAsync<TObject>(location);
 		}
 
 		/// <summary>
@@ -244,7 +195,8 @@ namespace YooAsset
 		/// <param name="type">资源类型</param>
 		public static AssetOperationHandle LoadAssetAsync(string location, System.Type type)
 		{
-			return _mainPackage.LoadAssetAsync(location, type);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAssetAsync(location, type);
 		}
 		#endregion
 
@@ -255,7 +207,8 @@ namespace YooAsset
 		/// <param name="assetInfo">资源信息</param>
 		public static SubAssetsOperationHandle LoadSubAssetsSync(AssetInfo assetInfo)
 		{
-			return _mainPackage.LoadSubAssetsSync(assetInfo);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadSubAssetsSync(assetInfo);
 		}
 
 		/// <summary>
@@ -265,7 +218,8 @@ namespace YooAsset
 		/// <param name="location">资源的定位地址</param>
 		public static SubAssetsOperationHandle LoadSubAssetsSync<TObject>(string location) where TObject : UnityEngine.Object
 		{
-			return _mainPackage.LoadSubAssetsSync<TObject>(location);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadSubAssetsSync<TObject>(location);
 		}
 
 		/// <summary>
@@ -275,7 +229,8 @@ namespace YooAsset
 		/// <param name="type">子对象类型</param>
 		public static SubAssetsOperationHandle LoadSubAssetsSync(string location, System.Type type)
 		{
-			return _mainPackage.LoadSubAssetsSync(location, type);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadSubAssetsSync(location, type);
 		}
 
 
@@ -285,7 +240,8 @@ namespace YooAsset
 		/// <param name="assetInfo">资源信息</param>
 		public static SubAssetsOperationHandle LoadSubAssetsAsync(AssetInfo assetInfo)
 		{
-			return _mainPackage.LoadSubAssetsAsync(assetInfo);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadSubAssetsAsync(assetInfo);
 		}
 
 		/// <summary>
@@ -295,7 +251,8 @@ namespace YooAsset
 		/// <param name="location">资源的定位地址</param>
 		public static SubAssetsOperationHandle LoadSubAssetsAsync<TObject>(string location) where TObject : UnityEngine.Object
 		{
-			return _mainPackage.LoadSubAssetsAsync<TObject>(location);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadSubAssetsAsync<TObject>(location);
 		}
 
 		/// <summary>
@@ -305,7 +262,8 @@ namespace YooAsset
 		/// <param name="type">子对象类型</param>
 		public static SubAssetsOperationHandle LoadSubAssetsAsync(string location, System.Type type)
 		{
-			return _mainPackage.LoadSubAssetsAsync(location, type);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadSubAssetsAsync(location, type);
 		}
 		#endregion
 
@@ -318,7 +276,8 @@ namespace YooAsset
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		public static PatchDownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain)
 		{
-			return _mainPackage.CreatePatchDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.CreatePatchDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain);
 		}
 
 		/// <summary>
@@ -329,7 +288,8 @@ namespace YooAsset
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		public static PatchDownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain)
 		{
-			return _mainPackage.CreatePatchDownloader(tags, downloadingMaxNumber, failedTryAgain);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.CreatePatchDownloader(tags, downloadingMaxNumber, failedTryAgain);
 		}
 
 		/// <summary>
@@ -339,7 +299,8 @@ namespace YooAsset
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		public static PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain)
 		{
-			return _mainPackage.CreatePatchDownloader(downloadingMaxNumber, failedTryAgain);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.CreatePatchDownloader(downloadingMaxNumber, failedTryAgain);
 		}
 
 
@@ -351,7 +312,8 @@ namespace YooAsset
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		public static PatchDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain)
 		{
-			return _mainPackage.CreateBundleDownloader(locations, downloadingMaxNumber, failedTryAgain);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.CreateBundleDownloader(locations, downloadingMaxNumber, failedTryAgain);
 		}
 
 		/// <summary>
@@ -362,7 +324,8 @@ namespace YooAsset
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		public static PatchDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain)
 		{
-			return _mainPackage.CreateBundleDownloader(assetInfos, downloadingMaxNumber, failedTryAgain);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.CreateBundleDownloader(assetInfos, downloadingMaxNumber, failedTryAgain);
 		}
 		#endregion
 
@@ -375,7 +338,8 @@ namespace YooAsset
 		/// <param name="failedTryAgain">解压失败的重试次数</param>
 		public static PatchUnpackerOperation CreatePatchUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
 		{
-			return _mainPackage.CreatePatchUnpacker(tag, unpackingMaxNumber, failedTryAgain);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.CreatePatchUnpacker(tag, unpackingMaxNumber, failedTryAgain);
 		}
 
 		/// <summary>
@@ -386,7 +350,8 @@ namespace YooAsset
 		/// <param name="failedTryAgain">解压失败的重试次数</param>
 		public static PatchUnpackerOperation CreatePatchUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
 		{
-			return _mainPackage.CreatePatchUnpacker(tags, unpackingMaxNumber, failedTryAgain);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.CreatePatchUnpacker(tags, unpackingMaxNumber, failedTryAgain);
 		}
 
 		/// <summary>
@@ -396,7 +361,8 @@ namespace YooAsset
 		/// <param name="failedTryAgain">解压失败的重试次数</param>
 		public static PatchUnpackerOperation CreatePatchUnpacker(int unpackingMaxNumber, int failedTryAgain)
 		{
-			return _mainPackage.CreatePatchUnpacker(unpackingMaxNumber, failedTryAgain);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.CreatePatchUnpacker(unpackingMaxNumber, failedTryAgain);
 		}
 		#endregion
 
@@ -408,7 +374,17 @@ namespace YooAsset
 		/// <param name="timeout">超时时间</param>
 		public static UpdatePackageOperation UpdatePackageAsync(string packageCRC, int timeout = 60)
 		{
-			return _mainPackage.UpdatePackageAsync(packageCRC, timeout);
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.UpdatePackageAsync(packageCRC, timeout);
+		}
+		#endregion
+
+		#region 调试方法
+		[Conditional("DEBUG")]
+		private static void DebugCheckDefaultPackageValid()
+		{
+			if (_defaultPackage == null)
+				throw new Exception($"Default package is null. Please use {nameof(YooAssets.SetDefaultAssetsPackage)} !");
 		}
 		#endregion
 	}

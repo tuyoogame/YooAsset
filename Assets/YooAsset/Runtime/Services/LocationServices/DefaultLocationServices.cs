@@ -11,7 +11,7 @@ namespace YooAsset
 				_resourceRoot = PathHelper.GetRegularPath(resourceRoot);
 		}
 
-		string ILocationServices.ConvertLocationToAssetPath(YooAssetPackage package, string location)
+		string ILocationServices.ConvertLocationToAssetPath(AssetsPackage package, string location)
 		{
 			if (string.IsNullOrEmpty(_resourceRoot))
 			{

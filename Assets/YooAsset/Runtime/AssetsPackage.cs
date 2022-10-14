@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace YooAsset
 {
-	public class YooAssetPackage
+	public class AssetsPackage
 	{
 		private bool _isInitialize = false;
 		private string _initializeError = string.Empty;
@@ -33,13 +33,10 @@ namespace YooAsset
 		}
 
 
-		/// <summary>
-		/// 拒绝外部实例化
-		/// </summary>
-		internal YooAssetPackage()
+		internal AssetsPackage()
 		{
 		}
-		internal YooAssetPackage(string packageName)
+		internal AssetsPackage(string packageName)
 		{
 			PackageName = packageName;
 		}
@@ -136,10 +133,10 @@ namespace YooAsset
 		private void CheckInitializeParameters(InitializeParameters parameters)
 		{
 			if (_isInitialize)
-				throw new Exception($"{nameof(YooAssetPackage)} is initialized yet.");
+				throw new Exception($"{nameof(AssetsPackage)} is initialized yet.");
 
 			if (parameters == null)
-				throw new Exception($"{nameof(YooAssetPackage)} create parameters is null.");
+				throw new Exception($"{nameof(AssetsPackage)} create parameters is null.");
 
 #if !UNITY_EDITOR
 			if (parameters is EditorSimulateModeParameters)

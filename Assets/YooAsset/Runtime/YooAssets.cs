@@ -9,7 +9,7 @@ namespace YooAsset
 	public static partial class YooAssets
 	{
 		private static bool _isInitialize = false;
-		private static readonly List<YooAssetPackage> _packages = new List<YooAssetPackage>();
+		private static readonly List<AssetsPackage> _packages = new List<AssetsPackage>();
 
 		/// <summary>
 		/// 初始化资源系统
@@ -81,27 +81,27 @@ namespace YooAsset
 		/// 创建资源包
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static YooAssetPackage CreateAssetPackage(string packageName)
+		public static AssetsPackage CreateAssetsPackage(string packageName)
 		{
 			if (_isInitialize == false)
 				throw new Exception($"{nameof(YooAssets)} not initialize !");
 
 			if (string.IsNullOrEmpty(packageName))
-				throw new Exception("PackageName is null or empty !");
+				throw new Exception("Package name is null or empty !");
 
-			if (HasAssetPackage(packageName))
+			if (HasAssetsPackage(packageName))
 				throw new Exception($"Package {packageName} already existed !");
 
-			YooAssetPackage component = new YooAssetPackage(packageName);
-			_packages.Add(component);
-			return component;
+			AssetsPackage assetsPackage = new AssetsPackage(packageName);
+			_packages.Add(assetsPackage);
+			return assetsPackage;
 		}
 
 		/// <summary>
 		/// 获取资源包
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static YooAssetPackage GetAssetPackage(string packageName)
+		public static AssetsPackage GetAssetsPackage(string packageName)
 		{
 			if (_isInitialize == false)
 				throw new Exception($"{nameof(YooAssets)} not initialize !");
@@ -115,7 +115,7 @@ namespace YooAsset
 					return package;
 			}
 
-			YooLogger.Warning($"Not found asset package : {packageName}");
+			YooLogger.Warning($"Not found assets package : {packageName}");
 			return null;
 		}
 
@@ -123,7 +123,7 @@ namespace YooAsset
 		/// 检测资源包是否存在
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static bool HasAssetPackage(string packageName)
+		public static bool HasAssetsPackage(string packageName)
 		{
 			if (_isInitialize == false)
 				throw new Exception($"{nameof(YooAssets)} not initialize !");
@@ -135,7 +135,7 @@ namespace YooAsset
 			}
 			return false;
 		}
-
+		
 		/// <summary>
 		/// 开启一个异步操作
 		/// </summary>
