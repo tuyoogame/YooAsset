@@ -43,13 +43,19 @@ public class BootScene : MonoBehaviour
 		// 初始化资源系统
 		YooAssets.Initialize();
 
+		// 创建默认的资源包
+		var defaultPackage = YooAssets.CreateAssetsPackage("DefaultPackage");
+
+		// 设置该资源包为默认的资源包
+		YooAssets.SetDefaultAssetsPackage(defaultPackage);
+
 		// 编辑器下的模拟模式
 		if (PlayMode == EPlayMode.EditorSimulateMode)
 		{
 			var createParameters = new EditorSimulateModeParameters();
 			createParameters.LocationServices = new AddressLocationServices();
 			createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage", true);
-			yield return YooAssets.InitializeAsync(createParameters);
+			yield return defaultPackage.InitializeAsync(createParameters);
 		}
 
 		// 单机运行模式
@@ -57,7 +63,7 @@ public class BootScene : MonoBehaviour
 		{
 			var createParameters = new OfflinePlayModeParameters();
 			createParameters.LocationServices = new AddressLocationServices();
-			yield return YooAssets.InitializeAsync(createParameters);
+			yield return defaultPackage.InitializeAsync(createParameters);
 		}
 
 		// 联机运行模式
@@ -68,7 +74,7 @@ public class BootScene : MonoBehaviour
 			createParameters.QueryServices = new QueryStreamingAssetsFileServices();
 			createParameters.DefaultHostServer = GetHostServerURL();
 			createParameters.FallbackHostServer = GetHostServerURL();
-			yield return YooAssets.InitializeAsync(createParameters);
+			yield return defaultPackage.InitializeAsync(createParameters);
 		}
 
 		// 运行补丁流程

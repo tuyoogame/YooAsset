@@ -16,7 +16,8 @@ public class GameScene1 : MonoBehaviour
 
 	void Start()
 	{
-		YooAssets.UnloadUnusedAssets();
+		var package = YooAssets.GetAssetsPackage("DefaultPackage");
+		package.UnloadUnusedAssets();
 
 		// 初始化窗口
 		InitWindow();
