@@ -59,6 +59,3 @@ sysinfo.txt
 crashlytics-build.properties
 
 *.vsconfig
-
-Sandbox/
-Bundles/
