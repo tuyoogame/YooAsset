@@ -24,7 +24,7 @@ namespace YooAsset
 				// 创建驱动器
 				_isInitialize = true;
 				UnityEngine.GameObject driverGo = new UnityEngine.GameObject($"[{nameof(YooAssets)}]");
-				driverGo.AddComponent<YooAssetDriver>();
+				driverGo.AddComponent<YooAssetsDriver>();
 				UnityEngine.Object.DontDestroyOnLoad(driverGo);
 
 #if DEBUG

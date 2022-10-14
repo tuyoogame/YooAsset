@@ -2,7 +2,7 @@
 
 namespace YooAsset
 {
-	internal class YooAssetDriver : MonoBehaviour
+	internal class YooAssetsDriver : MonoBehaviour
 	{
 		void Update()
 		{
