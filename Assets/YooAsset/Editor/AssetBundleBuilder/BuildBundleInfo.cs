@@ -90,14 +90,6 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 获取文件的扩展名
-		/// </summary>
-		public string GetAppendExtension()
-		{
-			return System.IO.Path.GetExtension(BundleName);
-		}
-
-		/// <summary>
 		/// 获取构建的资源路径列表
 		/// </summary>
 		public string[] GetBuildinAssetPaths()

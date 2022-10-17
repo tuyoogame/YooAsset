@@ -63,7 +63,7 @@ namespace YooAsset.Editor
 			IsRawAsset = isRawAsset;
 
 			System.Type assetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-			if (assetType == typeof(UnityEngine.Shader))
+			if (assetType == typeof(UnityEngine.Shader) || assetType == typeof(UnityEngine.ShaderVariantCollection))
 				IsShaderAsset = true;
 			else
 				IsShaderAsset = false;
@@ -76,7 +76,7 @@ namespace YooAsset.Editor
 			IsRawAsset = false;
 
 			System.Type assetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-			if (assetType == typeof(UnityEngine.Shader))
+			if (assetType == typeof(UnityEngine.Shader) || assetType == typeof(UnityEngine.ShaderVariantCollection))
 				IsShaderAsset = true;
 			else
 				IsShaderAsset = false;
