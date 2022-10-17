@@ -22,6 +22,7 @@ namespace YooAsset
 		
 		private readonly int _downloadingMaxNumber;
 		private readonly int _failedTryAgain;
+		private readonly int _timeout;
 		private readonly List<BundleInfo> _downloadList;
 		private readonly List<DownloaderBase> _downloaders = new List<DownloaderBase>(MAX_LOADER_COUNT);
 		private readonly List<DownloaderBase> _removeList = new List<DownloaderBase>(MAX_LOADER_COUNT);
@@ -75,11 +76,12 @@ namespace YooAsset
 		public OnStartDownloadFile OnStartDownloadFileCallback { set; get; }
 		
 
-		internal DownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain)
+		internal DownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			_downloadList = downloadList;
 			_downloadingMaxNumber = UnityEngine.Mathf.Clamp(downloadingMaxNumber, 1, MAX_LOADER_COUNT); ;
 			_failedTryAgain = failedTryAgain;
+			_timeout = timeout;
 
 			if (downloadList != null)
 			{
@@ -167,7 +169,7 @@ namespace YooAsset
 					{
 						int index = _downloadList.Count - 1;
 						var bundleInfo = _downloadList[index];
-						var operation = DownloadSystem.BeginDownload(bundleInfo, _failedTryAgain);
+						var operation = DownloadSystem.BeginDownload(bundleInfo, _failedTryAgain, _timeout);
 						_downloaders.Add(operation);
 						_downloadList.RemoveAt(index);
 						OnStartDownloadFileCallback?.Invoke(bundleInfo.Bundle.BundleName, bundleInfo.Bundle.FileSize);
@@ -228,22 +230,22 @@ namespace YooAsset
 
 	public sealed class PackageDownloaderOperation : DownloaderOperation
 	{
-		internal PackageDownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain)
-			: base(downloadList, downloadingMaxNumber, failedTryAgain)
+		internal PackageDownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
+			: base(downloadList, downloadingMaxNumber, failedTryAgain, timeout)
 		{
 		}
 	}
 	public sealed class PatchDownloaderOperation : DownloaderOperation
 	{
-		internal PatchDownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain)
-			: base(downloadList, downloadingMaxNumber, failedTryAgain)
+		internal PatchDownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
+			: base(downloadList, downloadingMaxNumber, failedTryAgain, timeout)
 		{
 		}
 	}
 	public sealed class PatchUnpackerOperation : DownloaderOperation
 	{
-		internal PatchUnpackerOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain)
-			: base(downloadList, downloadingMaxNumber, failedTryAgain)
+		internal PatchUnpackerOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
+			: base(downloadList, downloadingMaxNumber, failedTryAgain, timeout)
 		{
 		}
 	}

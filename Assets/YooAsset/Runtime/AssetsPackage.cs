@@ -690,10 +690,11 @@ namespace YooAsset
 		/// <param name="tag">资源标签</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public PatchDownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain)
+		/// <param name="timeout">超时时间</param>
+		public PatchDownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			return CreatePatchDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain);
+			return CreatePatchDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		/// <summary>
@@ -702,18 +703,19 @@ namespace YooAsset
 		/// <param name="tags">资源标签列表</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public PatchDownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain)
+		/// <param name="timeout">超时时间</param>
+		public PatchDownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.CreatePatchDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain, timeout);
 			}
 			else
 			{
@@ -726,18 +728,19 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain)
+		/// <param name="timeout">超时时间</param>
+		public PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.CreatePatchDownloaderByAll(downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchDownloaderByAll(downloadingMaxNumber, failedTryAgain, timeout);
 			}
 			else
 			{
@@ -752,13 +755,14 @@ namespace YooAsset
 		/// <param name="locations">资源定位列表</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public PatchDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain)
+		/// <param name="timeout">超时时间</param>
+		public PatchDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
@@ -769,7 +773,7 @@ namespace YooAsset
 					AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
 					assetInfos.Add(assetInfo);
 				}
-				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetInfos.ToArray(), downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetInfos.ToArray(), downloadingMaxNumber, failedTryAgain, timeout);
 			}
 			else
 			{
@@ -783,18 +787,19 @@ namespace YooAsset
 		/// <param name="assetInfos">资源信息列表</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public PatchDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain)
+		/// <param name="timeout">超时时间</param>
+		public PatchDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetInfos, downloadingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
 			}
 			else
 			{
@@ -828,18 +833,18 @@ namespace YooAsset
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain);
+				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain, int.MaxValue);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain);
+				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain, int.MaxValue);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.CreatePatchUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain, int.MaxValue);
 			}
 			else
 			{
@@ -858,18 +863,18 @@ namespace YooAsset
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain);
+				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain, int.MaxValue);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
 				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain);
+				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain, int.MaxValue);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.CreatePatchUnpackerByAll(unpackingMaxNumber, failedTryAgain);
+				return _hostPlayModeImpl.CreatePatchUnpackerByAll(unpackingMaxNumber, failedTryAgain, int.MaxValue);
 			}
 			else
 			{

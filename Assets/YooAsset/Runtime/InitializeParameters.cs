@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-
+﻿
 namespace YooAsset
 {
 	/// <summary>

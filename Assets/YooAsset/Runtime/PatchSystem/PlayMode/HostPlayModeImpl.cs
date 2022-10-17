@@ -74,10 +74,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建下载器
 		/// </summary>
-		public PatchDownloaderOperation CreatePatchDownloaderByAll(int fileLoadingMaxNumber, int failedTryAgain)
+		public PatchDownloaderOperation CreatePatchDownloaderByAll(int fileLoadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByAll();
-			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
+			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		private List<BundleInfo> GetDownloadListByAll()
@@ -102,10 +102,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建下载器
 		/// </summary>
-		public PatchDownloaderOperation CreatePatchDownloaderByTags(string[] tags, int fileLoadingMaxNumber, int failedTryAgain)
+		public PatchDownloaderOperation CreatePatchDownloaderByTags(string[] tags, int fileLoadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByTags(tags);
-			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
+			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		private List<BundleInfo> GetDownloadListByTags(string[] tags)
@@ -142,10 +142,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建下载器
 		/// </summary>
-		public PatchDownloaderOperation CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int fileLoadingMaxNumber, int failedTryAgain)
+		public PatchDownloaderOperation CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int fileLoadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByPaths(assetInfos);
-			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain);
+			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		private List<BundleInfo> GetDownloadListByPaths(AssetInfo[] assetInfos)
@@ -194,10 +194,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建解压器
 		/// </summary>
-		public PatchUnpackerOperation CreatePatchUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain)
+		public PatchUnpackerOperation CreatePatchUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> unpcakList = GetUnpackListByTags(tags);
-			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
+			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		private List<BundleInfo> GetUnpackListByTags(string[] tags)
@@ -225,10 +225,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建解压器
 		/// </summary>
-		public PatchUnpackerOperation CreatePatchUnpackerByAll(int fileUpackingMaxNumber, int failedTryAgain)
+		public PatchUnpackerOperation CreatePatchUnpackerByAll(int fileUpackingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> unpcakList = GetUnpackListByAll();
-			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain);
+			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		private List<BundleInfo> GetUnpackListByAll()

@@ -12,7 +12,8 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public abstract PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain);
+		/// <param name="timeout">超时时间（单位：秒）</param>
+		public abstract PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout);
 	}
 
 	/// <summary>
@@ -31,10 +32,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建包裹下载器
 		/// </summary>
-		public override PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain)
+		public override PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = new List<BundleInfo>();
-			var operation = new PackageDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+			var operation = new PackageDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 	}
@@ -55,10 +56,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建包裹下载器
 		/// </summary>
-		public override PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain)
+		public override PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = new List<BundleInfo>();
-			var operation = new PackageDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+			var operation = new PackageDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 	}
@@ -147,18 +148,18 @@ namespace YooAsset
 		/// <summary>
 		/// 创建包裹下载器
 		/// </summary>
-		public override PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain)
+		public override PackageDownloaderOperation CreatePackageDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			if (Status == EOperationStatus.Succeed)
 			{
 				List<BundleInfo> downloadList = GetDownloadList();
-				var operation = new PackageDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain);
+				var operation = new PackageDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 				return operation;
 			}
 			else
 			{
 				YooLogger.Error($"{nameof(UpdatePackageOperation)} status is failed !");
-				var operation = new PackageDownloaderOperation(null, downloadingMaxNumber, failedTryAgain);
+				var operation = new PackageDownloaderOperation(null, downloadingMaxNumber, failedTryAgain, timeout);
 				return operation;
 			}
 		}
