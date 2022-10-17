@@ -266,7 +266,7 @@ namespace YooAsset.Editor
 		private bool IsCollectAsset(string assetPath)
 		{
 			Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-			if (assetType == typeof(UnityEngine.Shader))
+			if (assetType == typeof(UnityEngine.Shader) || assetType == typeof(UnityEngine.ShaderVariantCollection))
 				return true;
 
 			// 根据规则设置过滤资源文件
@@ -285,10 +285,8 @@ namespace YooAsset.Editor
 		private string GetBundleName(AssetBundleCollectorGroup group, string assetPath)
 		{
 			System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-			if (assetType == typeof(UnityEngine.Shader))
-			{
+			if (assetType == typeof(UnityEngine.Shader) || assetType == typeof(UnityEngine.ShaderVariantCollection))
 				return EditorTools.GetRegularPath(YooAssetSettings.UnityShadersBundleName).ToLower();
-			}
 
 			// 根据规则设置获取资源包名称
 			IPackRule packRuleInstance = AssetBundleCollectorSettingData.GetPackRuleInstance(PackRuleName);
