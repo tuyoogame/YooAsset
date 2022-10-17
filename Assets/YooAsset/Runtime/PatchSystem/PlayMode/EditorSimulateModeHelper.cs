@@ -39,7 +39,7 @@ namespace YooAsset
 		/// <summary>
 		/// 编辑器下模拟构建补丁清单
 		/// </summary>
-		public static string SimulateBuild(string packageName, bool enableAddressable) { throw new System.Exception("Only support in unity editor !"); }
+		public static string SimulateBuild(string packageName) { throw new System.Exception("Only support in unity editor !"); }
 	}
 }
 #endif
