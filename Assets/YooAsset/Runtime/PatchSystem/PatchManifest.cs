@@ -33,6 +33,11 @@ namespace YooAsset
 		public string PackageName;
 
 		/// <summary>
+		/// 人类可读的版本信息
+		/// </summary>
+		public string HumanReadableVersion;
+		
+		/// <summary>
 		/// 资源列表（主动收集的资源列表）
 		/// </summary>
 		public List<PatchAsset> AssetList = new List<PatchAsset>();

@@ -32,6 +32,16 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取人类可读的版本信息
+		/// </summary>
+		public string GetHumanReadableVersion()
+		{
+			if (LocalPatchManifest == null)
+				return string.Empty;
+			return LocalPatchManifest.HumanReadableVersion;
+		}
+
+		/// <summary>
 		/// 异步更新资源版本号
 		/// </summary>
 		public UpdateStaticVersionOperation UpdateStaticVersionAsync(string packageName, int timeout)

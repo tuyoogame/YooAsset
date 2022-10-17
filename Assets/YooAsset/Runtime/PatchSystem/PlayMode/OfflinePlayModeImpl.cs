@@ -20,6 +20,16 @@ namespace YooAsset
 			return operation;
 		}
 
+		/// <summary>
+		/// 获取人类可读的版本信息
+		/// </summary>
+		public string GetHumanReadableVersion()
+		{
+			if (_appPatchManifest == null)
+				return string.Empty;
+			return _appPatchManifest.HumanReadableVersion;
+		}
+
 		// 设置资源清单
 		internal void SetAppPatchManifest(PatchManifest patchManifest)
 		{

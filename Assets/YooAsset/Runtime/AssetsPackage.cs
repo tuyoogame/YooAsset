@@ -278,6 +278,30 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取人类可读的版本信息
+		/// </summary>
+		public string GetHumanReadableVersion()
+		{
+			DebugCheckInitialize();
+			if (_playMode == EPlayMode.EditorSimulateMode)
+			{
+				return _editorSimulateModeImpl.GetHumanReadableVersion();
+			}
+			else if (_playMode == EPlayMode.OfflinePlayMode)
+			{
+				return _offlinePlayModeImpl.GetHumanReadableVersion();
+			}
+			else if (_playMode == EPlayMode.HostPlayMode)
+			{
+				return _hostPlayModeImpl.GetHumanReadableVersion();
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+		/// <summary>
 		/// 资源回收（卸载引用计数为零的资源）
 		/// </summary>
 		public void UnloadUnusedAssets()
