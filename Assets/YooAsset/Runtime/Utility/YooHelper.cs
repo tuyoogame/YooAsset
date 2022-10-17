@@ -30,7 +30,7 @@ namespace YooAsset
 		/// </summary>
 		public static string MakeStreamingLoadPath(string path)
 		{
-			return StringUtility.Format("{0}/YooAssets/{1}", UnityEngine.Application.streamingAssetsPath, path);
+			return StringUtility.Format("{0}/{1}/{2}", UnityEngine.Application.streamingAssetsPath, YooAssetSettings.StreamingAssetsRootFolder, path);
 		}
 
 		/// <summary>
