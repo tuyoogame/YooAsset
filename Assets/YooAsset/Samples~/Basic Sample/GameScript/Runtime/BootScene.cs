@@ -54,7 +54,7 @@ public class BootScene : MonoBehaviour
 		{
 			var createParameters = new EditorSimulateModeParameters();
 			createParameters.LocationServices = new AddressLocationServices();
-			createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage", true);
+			createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage");
 			yield return defaultPackage.InitializeAsync(createParameters);
 		}
 
