@@ -61,6 +61,11 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string BuildPackage;
 
+		/// <summary>
+		/// 人类可读的版本信息
+		/// </summary>
+		public string HumanReadableVersion;
+
 
 		/// <summary>
 		/// 验证构建结果

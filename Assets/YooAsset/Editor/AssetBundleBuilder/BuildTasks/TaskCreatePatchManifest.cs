@@ -31,6 +31,7 @@ namespace YooAsset.Editor
 			patchManifest.EnableAddressable = buildParameters.EnableAddressable;
 			patchManifest.OutputNameStyle = (int)buildParameters.OutputNameStyle;
 			patchManifest.PackageName = buildParameters.BuildPackage;
+			patchManifest.HumanReadableVersion = buildParameters.HumanReadableVersion;
 			patchManifest.BundleList = GetAllPatchBundle(context);
 			patchManifest.AssetList = GetAllPatchAsset(context, patchManifest);
 
