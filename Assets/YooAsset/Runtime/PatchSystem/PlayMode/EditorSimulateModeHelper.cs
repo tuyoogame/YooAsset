@@ -10,12 +10,12 @@ namespace YooAsset
 		/// <summary>
 		/// 编辑器下模拟构建补丁清单
 		/// </summary>
-		public static string SimulateBuild(string packageName, bool enableAddressable)
+		public static string SimulateBuild(string packageName)
 		{
 			if (_classType == null)
 				_classType = Assembly.Load("YooAsset.Editor").GetType("YooAsset.Editor.AssetBundleSimulateBuilder");
 
-			string manifestFilePath = (string)InvokePublicStaticMethod(_classType, "SimulateBuild", packageName, enableAddressable);
+			string manifestFilePath = (string)InvokePublicStaticMethod(_classType, "SimulateBuild", packageName);
 			return manifestFilePath;
 		}
 
