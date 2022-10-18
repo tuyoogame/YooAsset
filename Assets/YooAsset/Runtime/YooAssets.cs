@@ -178,6 +178,14 @@ namespace YooAsset
 
 		#region 沙盒相关
 		/// <summary>
+		/// 获取内置文件夹名称
+		/// </summary>
+		public static string GetStreamingAssetBuildinFolderName()
+		{
+			return YooAssetSettings.StreamingAssetsBuildinFolder;
+		}
+
+		/// <summary>
 		/// 获取沙盒的根路径
 		/// </summary>
 		public static string GetSandboxRoot()
