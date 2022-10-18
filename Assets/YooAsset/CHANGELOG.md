@@ -2,6 +2,91 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.3.1] - 2022-10-18
+
+### Fixed
+
+- 修复了原生文件每次获取都重复拷贝的问题。
+- 修复了断点续传下载字节数统计不准确的问题。
+
+### Added
+
+- 所有下载相关方法增加超时判断参数。
+
+- 新增首包资源文件拷贝选项。
+
+  ```c#
+  public class BuildParameters
+  {
+      /// <summary>
+      /// 拷贝内置资源选项
+      /// </summary>
+      public ECopyBuildinFileOption CopyBuildinFileOption = ECopyBuildinFileOption.None;
+  
+      /// <summary>
+      /// 拷贝内置资源的标签
+      /// </summary>
+      public string CopyBuildinFileTags = string.Empty;  
+  }
+  ```
+
+- 新增资源包初始化查询字段。
+
+  ```c#
+  public class AssetsPackage
+  {
+      /// <summary>
+      /// 初始化状态
+      /// </summary>
+      public EOperationStatus InitializeStatus
+  }
+  ```
+
+- 增加获取人类可读的版本信息。
+
+  ````c#
+  public class AssetsPackage
+  {
+      /// <summary>
+      /// 获取人类可读的版本信息
+      /// </summary>
+      public string GetHumanReadableVersion()
+  }
+  ````
+
+- 新增资源缓存清理方法。
+
+  ```c#
+  public static class YooAssets
+  {
+      /// <summary>
+      /// 清理未使用的缓存文件
+      /// </summary>
+      public static ClearUnusedCacheFilesOperation ClearUnusedCacheFiles()  
+  }
+  ```
+
+- 异步操作类新增繁忙查询方法。
+
+  ````c#
+  public abstract class GameAsyncOperation
+  {
+      /// <summary>
+      /// 异步操作系统是否繁忙
+      /// </summary>
+      protected bool IsBusy() 
+  }
+  ````
+
+### Removed
+
+- 移除了AssetsPackage.IsInitialized()方法。
+- 移除了YooAssets.ClearAllCacheFiles()方法。
+
+### Changed
+
+- YooAssetsPackage类重名为AssetsPackage
+
 ## [1.3.0-preview] - 2022-10-08
 
 该预览版本提供了分布式构建的功能，用于解决分工程或分内容构建的问题。
