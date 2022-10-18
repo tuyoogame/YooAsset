@@ -15,6 +15,7 @@ namespace YooAsset
 
 		// 重置变量
 		private bool _isAbort = false;
+		private ulong _fileOriginLength;
 		private ulong _latestDownloadBytes;
 		private float _latestDownloadRealtime;
 		private float _tryAgainTimer;
@@ -60,6 +61,7 @@ namespace YooAsset
 				_downloadProgress = 0f;
 				_downloadedBytes = 0;
 				_isAbort = false;
+				_fileOriginLength = 0;
 				_latestDownloadBytes = 0;
 				_latestDownloadRealtime = Time.realtimeSinceStartup;
 				_tryAgainTimer = 0f;
@@ -72,6 +74,8 @@ namespace YooAsset
 					{
 						FileInfo fileInfo = new FileInfo(fileSavePath);
 						fileLength = fileInfo.Length;
+						_fileOriginLength = (ulong)fileLength;
+						_downloadedBytes = _fileOriginLength;
 					}
 
 					_requestURL = GetRequestURL();
@@ -109,7 +113,7 @@ namespace YooAsset
 			if (_steps == ESteps.CheckDownload)
 			{
 				_downloadProgress = _webRequest.downloadProgress;
-				_downloadedBytes = _webRequest.downloadedBytes;
+				_downloadedBytes = _fileOriginLength + _webRequest.downloadedBytes;
 				if (_webRequest.isDone == false)
 				{
 					CheckTimeout();
@@ -226,7 +230,7 @@ namespace YooAsset
 		}
 		private void DisposeWebRequest()
 		{
-			if(_downloadHandle != null)
+			if (_downloadHandle != null)
 			{
 				_downloadHandle.Cleanup();
 				_downloadHandle = null;

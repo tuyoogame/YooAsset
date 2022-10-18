@@ -8,7 +8,7 @@ namespace YooAsset
 	/// <summary>
 	/// 支持Unity2018版本的断点续传下载器
 	/// </summary>
-	public class DownloadHandlerFileRange : DownloadHandlerScript
+	internal class DownloadHandlerFileRange : DownloadHandlerScript
 	{
 		private string _fileSavePath;
 		private long _fileTotalSize;
