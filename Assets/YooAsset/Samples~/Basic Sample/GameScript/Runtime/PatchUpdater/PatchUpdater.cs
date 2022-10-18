@@ -36,6 +36,7 @@ public static class PatchUpdater
 			FsmManager.AddNode(new FsmCreateDownloader());
 			FsmManager.AddNode(new FsmDownloadWebFiles());
 			FsmManager.AddNode(new FsmPatchDone());
+			FsmManager.AddNode(new FsmClearCache());
 			FsmManager.Run(nameof(FsmPatchInit));
 		}
 		else
