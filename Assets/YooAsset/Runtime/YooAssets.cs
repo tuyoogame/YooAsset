@@ -178,6 +178,16 @@ namespace YooAsset
 
 		#region 沙盒相关
 		/// <summary>
+		/// 清理未使用的缓存文件
+		/// </summary>
+		public static ClearUnusedCacheFilesOperation ClearUnusedCacheFiles()
+		{
+			ClearUnusedCacheFilesOperation operation = new ClearUnusedCacheFilesOperation(_packages);
+			OperationSystem.StartOperation(operation);
+			return operation;
+		}
+
+		/// <summary>
 		/// 获取内置文件夹名称
 		/// </summary>
 		public static string GetStreamingAssetBuildinFolderName()
@@ -199,14 +209,6 @@ namespace YooAsset
 		public static void ClearSandbox()
 		{
 			SandboxHelper.DeleteSandbox();
-		}
-
-		/// <summary>
-		/// 清空所有的缓存文件
-		/// </summary>
-		public static void ClearAllCacheFiles()
-		{
-			SandboxHelper.DeleteCacheFolder();
 		}
 		#endregion
 

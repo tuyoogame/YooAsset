@@ -36,7 +36,7 @@ namespace YooAsset
 		/// 人类可读的版本信息
 		/// </summary>
 		public string HumanReadableVersion;
-		
+
 		/// <summary>
 		/// 资源列表（主动收集的资源列表）
 		/// </summary>
@@ -215,6 +215,19 @@ namespace YooAsset
 		public bool TryGetPatchBundle(string bundleName, out PatchBundle result)
 		{
 			return BundleDic.TryGetValue(bundleName, out result);
+		}
+
+		/// <summary>
+		/// 是否包含资源文件
+		/// </summary>
+		public bool IsIncludeBundleFile(string fileName)
+		{
+			foreach (var patchBundle in BundleList)
+			{
+				if (patchBundle.FileName == fileName)
+					return true;
+			}
+			return false;
 		}
 
 

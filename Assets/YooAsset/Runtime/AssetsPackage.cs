@@ -947,6 +947,14 @@ namespace YooAsset
 		{
 			return _bundleServices.MappingToAssetPath(location);
 		}
+
+		/// <summary>
+		/// 是否包含资源文件
+		/// </summary>
+		internal bool IsIncludeBundleFile(string fileName)
+		{
+			return _bundleServices.IsIncludeBundleFile(fileName);
+		}
 		#endregion
 
 		#region 调试方法

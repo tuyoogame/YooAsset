@@ -32,5 +32,10 @@ namespace YooAsset
 		/// 获取所属的包裹名
 		/// </summary>
 		string GetPackageName();
+
+		/// <summary>
+		/// 是否包含资源文件
+		/// </summary>
+		bool IsIncludeBundleFile(string fileName);
 	}
 }

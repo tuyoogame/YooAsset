@@ -396,6 +396,10 @@ namespace YooAsset
 		{
 			return LocalPatchManifest.PackageName;
 		}
+		bool IBundleServices.IsIncludeBundleFile(string fileName)
+		{
+			return LocalPatchManifest.IsIncludeBundleFile(fileName);
+		}
 		#endregion
 	}
 }

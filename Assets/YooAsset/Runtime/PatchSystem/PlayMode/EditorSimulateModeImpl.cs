@@ -30,7 +30,6 @@ namespace YooAsset
 			return _simulatePatchManifest.HumanReadableVersion;
 		}
 
-		// 设置资源清单
 		internal void SetSimulatePatchManifest(PatchManifest patchManifest)
 		{
 			_simulatePatchManifest = patchManifest;
@@ -70,6 +69,10 @@ namespace YooAsset
 		string IBundleServices.GetPackageName()
 		{
 			return _simulatePatchManifest.PackageName;
+		}
+		bool IBundleServices.IsIncludeBundleFile(string fileName)
+		{
+			return _simulatePatchManifest.IsIncludeBundleFile(fileName);
 		}
 		#endregion
 	}
