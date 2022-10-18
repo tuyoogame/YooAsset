@@ -146,7 +146,7 @@ namespace YooAsset
 			if (parameters.LocationServices == null)
 				throw new Exception($"{nameof(ILocationServices)} is null.");
 
-			if(parameters is EditorSimulateModeParameters)
+			if (parameters is EditorSimulateModeParameters)
 			{
 				var editorSimulateModeParameters = parameters as EditorSimulateModeParameters;
 				if (string.IsNullOrEmpty(editorSimulateModeParameters.SimulatePatchManifestPath))
@@ -953,6 +953,9 @@ namespace YooAsset
 		/// </summary>
 		internal bool IsIncludeBundleFile(string fileName)
 		{
+			// NOTE : 编辑器模拟模式下始终返回TRUE
+			if (_playMode == EPlayMode.EditorSimulateMode)
+				return true;
 			return _bundleServices.IsIncludeBundleFile(fileName);
 		}
 		#endregion
