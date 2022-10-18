@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace YooAsset
 {
@@ -30,7 +31,28 @@ namespace YooAsset
 			return _appPatchManifest.HumanReadableVersion;
 		}
 
-		// 设置资源清单
+		internal List<VerifyInfo> GetVerifyInfoList()
+		{
+			List<VerifyInfo> result = new List<VerifyInfo>(_appPatchManifest.BundleList.Count);
+
+			// 遍历所有文件然后验证并缓存合法文件
+			foreach (var patchBundle in _appPatchManifest.BundleList)
+			{
+				// 忽略缓存文件
+				if (CacheSystem.IsCached(patchBundle))
+					continue;
+
+				string filePath = patchBundle.CachedFilePath;
+				if (File.Exists(filePath))
+				{
+					bool isBuildinFile = true;
+					VerifyInfo verifyInfo = new VerifyInfo(isBuildinFile, patchBundle);
+					result.Add(verifyInfo);
+				}
+			}
+
+			return result;
+		}
 		internal void SetAppPatchManifest(PatchManifest patchManifest)
 		{
 			_appPatchManifest = patchManifest;

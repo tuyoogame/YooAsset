@@ -67,29 +67,39 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			Update,
+			LoadAppManifest,
+			InitVerifyingCache,
+			UpdateVerifyingCache,
 			Done,
 		}
 
 		private readonly OfflinePlayModeImpl _impl;
-		private AppManifestLoader _appManifestLoader;
+		private readonly AppManifestLoader _appManifestLoader;
+		private readonly CacheVerifier _patchCacheVerifier;
 		private ESteps _steps = ESteps.None;
+		private float _verifyTime;
 
 		internal OfflinePlayModeInitializationOperation(OfflinePlayModeImpl impl, string buildinPackageName)
 		{
 			_impl = impl;
 			_appManifestLoader = new AppManifestLoader(buildinPackageName);
+
+#if UNITY_WEBGL
+			_patchCacheVerifier = new CacheVerifierWithoutThread();
+#else
+			_patchCacheVerifier = new CacheVerifierWithThread();
+#endif
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.Update;
+			_steps = ESteps.LoadAppManifest;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
-			if (_steps == ESteps.Update)
+			if (_steps == ESteps.LoadAppManifest)
 			{
 				_appManifestLoader.Update();
 				Progress = _appManifestLoader.Progress();
@@ -104,9 +114,28 @@ namespace YooAsset
 				}
 				else
 				{
+					_steps = ESteps.InitVerifyingCache;
+					_impl.SetAppPatchManifest(_appManifestLoader.Result);
+				}
+			}
+
+			if (_steps == ESteps.InitVerifyingCache)
+			{
+				var verifyInfos = _impl.GetVerifyInfoList();
+				_patchCacheVerifier.InitVerifier(verifyInfos);
+				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
+				_steps = ESteps.UpdateVerifyingCache;
+			}
+
+			if (_steps == ESteps.UpdateVerifyingCache)
+			{
+				Progress = _patchCacheVerifier.GetVerifierProgress();
+				if (_patchCacheVerifier.UpdateVerifier())
+				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
-					_impl.SetAppPatchManifest(_appManifestLoader.Result);
+					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
+					YooLogger.Log($"Verify result : Success {_patchCacheVerifier.VerifySuccessList.Count}, Fail {_patchCacheVerifier.VerifyFailList.Count}, Elapsed time {costTime} seconds");
 				}
 			}
 		}

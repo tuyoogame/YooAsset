@@ -65,9 +65,9 @@ namespace YooAsset
 		private readonly string _packageName;
 		private readonly string _packageCRC;
 		private readonly int _timeout;
-		private ESteps _steps = ESteps.None;
 		private UnityWebDataRequester _downloader;
-		private PatchCacheVerifier _patchCacheVerifier;
+		private CacheVerifier _cacheVerifier;
+		private ESteps _steps = ESteps.None;
 		private float _verifyTime;
 
 		internal HostPlayModeUpdateManifestOperation(HostPlayModeImpl impl, string packageName, string packageCRC, int timeout)
@@ -78,9 +78,9 @@ namespace YooAsset
 			_timeout = timeout;
 
 #if UNITY_WEBGL
-			_patchCacheVerifier = new PatchCacheVerifierWithoutThread();
+			_cacheVerifier = new CacheVerifierWithoutThread();
 #else
-			_patchCacheVerifier = new PatchCacheVerifierWithThread();
+			_cacheVerifier = new CacheVerifierWithThread();
 #endif
 		}
 		internal override void Start()
@@ -154,20 +154,21 @@ namespace YooAsset
 
 			if (_steps == ESteps.InitVerifyingCache)
 			{
-				_patchCacheVerifier.InitVerifier(_impl, false);
+				var verifyInfos = _impl.GetVerifyInfoList(false);
+				_cacheVerifier.InitVerifier(verifyInfos);
 				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
 				_steps = ESteps.UpdateVerifyingCache;
 			}
 
 			if (_steps == ESteps.UpdateVerifyingCache)
 			{
-				Progress = _patchCacheVerifier.GetVerifierProgress();
-				if (_patchCacheVerifier.UpdateVerifier())
+				Progress = _cacheVerifier.GetVerifierProgress();
+				if (_cacheVerifier.UpdateVerifier())
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
 					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
-					YooLogger.Log($"Verify result : Success {_patchCacheVerifier.VerifySuccessCount}, Fail {_patchCacheVerifier.VerifyFailCount}, Elapsed time {costTime} seconds");
+					YooLogger.Log($"Verify result : Success {_cacheVerifier.VerifySuccessList.Count}, Fail {_cacheVerifier.VerifyFailList.Count}, Elapsed time {costTime} seconds");
 				}
 			}
 		}
@@ -254,7 +255,7 @@ namespace YooAsset
 		private readonly string _packageName;
 		private readonly string _packageCRC;
 		private ESteps _steps = ESteps.None;
-		private PatchCacheVerifier _patchCacheVerifier;
+		private CacheVerifier _cacheVerifier;
 		private float _verifyTime;
 
 		internal HostPlayModeWeaklyUpdateManifestOperation(HostPlayModeImpl impl, string packageName, string packageCRC)
@@ -264,9 +265,9 @@ namespace YooAsset
 			_packageCRC = packageCRC;
 
 #if UNITY_WEBGL
-			_patchCacheVerifier = new PatchCacheVerifierWithoutThread();
+			_cacheVerifier = new CacheVerifierWithoutThread();
 #else
-			_patchCacheVerifier = new PatchCacheVerifierWithThread();
+			_cacheVerifier = new CacheVerifierWithThread();
 #endif
 		}
 		internal override void Start()
@@ -286,36 +287,41 @@ namespace YooAsset
 
 			if (_steps == ESteps.InitVerifyingCache)
 			{
-				if (_patchCacheVerifier.InitVerifier(_impl, true))
-				{
-					_verifyTime = UnityEngine.Time.realtimeSinceStartup;
-					_steps = ESteps.UpdateVerifyingCache;
-				}
-				else
-				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = $"The package resource {_packageName}_{_packageCRC} content is not complete !";
-				}
+				var verifyInfos = _impl.GetVerifyInfoList(true);
+				_cacheVerifier.InitVerifier(verifyInfos);
+				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
+				_steps = ESteps.UpdateVerifyingCache;
 			}
 
 			if (_steps == ESteps.UpdateVerifyingCache)
 			{
-				Progress = _patchCacheVerifier.GetVerifierProgress();
-				if (_patchCacheVerifier.UpdateVerifier())
+				Progress = _cacheVerifier.GetVerifierProgress();
+				if (_cacheVerifier.UpdateVerifier())
 				{
 					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
-					YooLogger.Log($"Verify result : Success {_patchCacheVerifier.VerifySuccessCount}, Fail {_patchCacheVerifier.VerifyFailCount}, Elapsed time {costTime} seconds");
-					if (_patchCacheVerifier.VerifyFailCount > 0)
+					YooLogger.Log($"Verify result : Success {_cacheVerifier.VerifySuccessList.Count}, Fail {_cacheVerifier.VerifyFailList.Count}, Elapsed time {costTime} seconds");
+
+					bool verifySucceed = true;
+					foreach (var verifyInfo in _cacheVerifier.VerifyFailList)
+					{
+						// 注意：跳过内置资源文件
+						if (verifyInfo.IsBuildinFile)
+							continue;
+
+						verifySucceed = false;
+						YooLogger.Warning($"Failed verify file : {verifyInfo.VerifyFilePath}");
+					}
+
+					if (verifySucceed)
 					{
 						_steps = ESteps.Done;
-						Status = EOperationStatus.Failed;
-						Error = $"The package resource {_packageName}_{_packageCRC} content has verify failed file !";
+						Status = EOperationStatus.Succeed;
 					}
 					else
 					{
 						_steps = ESteps.Done;
-						Status = EOperationStatus.Succeed;
+						Status = EOperationStatus.Failed;
+						Error = $"The package resource {_packageName}_{_packageCRC} content has verify failed file !";
 					}
 				}
 			}
