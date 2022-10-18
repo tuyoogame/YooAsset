@@ -9,7 +9,8 @@
 ````c#
 private IEnumerator UpdateStaticVersion()
 {
-    UpdateStaticVersionOperation operation = YooAssets.UpdateStaticVersionAsync();
+    var package = YooAssets.GetAssetsPackage("DefaultPackage");
+    UpdateStaticVersionOperation operation = package.UpdateStaticVersionAsync();
     yield return operation;
 
     if (operation.Status == EOperationStatus.Succeed)
@@ -33,7 +34,8 @@ private IEnumerator UpdateStaticVersion()
 ````c#
 private IEnumerator UpdatePatchManifest()
 {
-    UpdateManifestOperation operation = YooAssets.UpdateManifestAsync(packageCRC);
+    var package = YooAssets.GetAssetsPackage("DefaultPackage");
+    UpdateManifestOperation operation = package.UpdateManifestAsync(packageCRC);
     yield return operation;
 
     if (operation.Status == EOperationStatus.Succeed)
@@ -56,15 +58,15 @@ private IEnumerator UpdatePatchManifest()
 
 补丁包下载接口：
 
-- YooAssets.CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain)
+- YooAssets.CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout)
 
   用于下载更新当前资源版本所有的资源包文件。
 
-- YooAssets.CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain)
+- YooAssets.CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
 
   用于下载更新资源标签指定的资源包文件。
 
-- YooAssets.CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain)
+- YooAssets.CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain, int timeout)
 
   用于下载更新指定的资源列表依赖的资源包文件。
 
@@ -73,7 +75,8 @@ IEnumerator Download()
 {
     int downloadingMaxNum = 10;
     int failedTryAgain = 3;
-    DownloaderOperation downloader = YooAssets.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
+    int timeout = 60;
+    var downloader = YooAssets.CreatePatchDownloader(downloadingMaxNum, failedTryAgain, timeout);
     
     //没有需要下载的资源
     if (downloader.TotalDownloadCount == 0)
@@ -114,7 +117,8 @@ IEnumerator Download()
 ````c#
 private IEnumerator UpdateStaticVersion()
 {
-    UpdateStaticVersionOperation operation = YooAssets.UpdateStaticVersionAsync(10);
+    var package = YooAssets.GetAssetsPackage("DefaultPackage");
+    UpdateStaticVersionOperation operation = package.UpdateStaticVersionAsync(10);
     yield return operation;
     if (operation.Status == EOperationStatus.Succeed)
     {
@@ -135,7 +139,7 @@ private IEnumerator UpdateStaticVersion()
         }
         
         // 在弱联网情况下更新补丁清单
-        UpdateManifestOperation operation2 = YooAssets.WeaklyUpdateManifestAsync(packageCRC);
+        UpdateManifestOperation operation2 = package.WeaklyUpdateManifestAsync(packageCRC);
         yield return operation2;
         if (operation2.Status == EOperationStatus.Succeed)
         {

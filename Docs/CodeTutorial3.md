@@ -18,9 +18,9 @@
 ```c#
 // 以工程内的音频文件为例："Assets/GameRes/Audio/bgMusic.mp3" 
 // 设定资源路径的根目录为："Assets/GameRes"，后续加载的资源定位地址填写相对路径："Audio/bgMusic"
-var createParameters = new YooAssets.EditorSimulateModeParameters();
+var createParameters = new EditorSimulateModeParameters();
 createParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
-yield return YooAssets.InitializeAsync(createParameters);
+yield return defaultPackage.InitializeAsync(createParameters);
 ......
 YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic");
 ```
@@ -31,9 +31,9 @@ YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic");
 // 以工程内的音频文件为例："Assets/GameRes/Audio/bgMusic.mp3" 
 // 需要在资源配置界面启用可寻址功能（Enable Addressable）。
 // 配置界面的可寻址规则为AddressByFileName，那么资源定位地址填写文件名称："bgMusic"
-var createParameters = new YooAssets.EditorSimulateModeParameters();
+var createParameters = new EditorSimulateModeParameters();
 createParameters.LocationServices = new AddressLocationServices();
-yield return YooAssets.InitializeAsync(createParameters);
+yield return defaultPackage.InitializeAsync(createParameters);
 ......
 YooAssets.LoadAssetAsync<AudioClip>("bgMusic");
 ````
@@ -104,7 +104,8 @@ IEnumerator Start()
 ````c#
 private void UnloadAssets()
 {
-    YooAssets.UnloadUnusedAssets();
+    var package = YooAssets.GetAssetsPackage("DefaultPackage");
+    package.UnloadUnusedAssets();
 }
 ````
 

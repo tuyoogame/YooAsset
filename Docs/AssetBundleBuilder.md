@@ -52,6 +52,20 @@
 
   (4) BundleName_HashName_Extension：资源包名+哈希值+后缀名
 
+ - **Copy Buildin File Option**
+
+   首包资源文件的拷贝方式
+
+   (1) None：不拷贝任何文件
+
+   (2) ClearAndCopyAll：先清空已有文件，然后拷贝所有文件
+
+   (3) ClearAndCopyByTags：先清空已有文件，然后按照资源标签拷贝文件
+
+   (4) OnlyCopyAll：不清空已有文件，直接拷贝所有文件
+
+   (5) OnlyCopyByTags：不清空已有文件，直接按照资源标签拷贝文件
+
 - **构建**
 
   点击构建按钮会开始构建流程，构建流程分为多个节点顺序执行，如果某个节点发生错误，会导致构建失败。错误信息可以在控制台查看。
@@ -126,6 +140,7 @@ private static void BuildInternal(BuildTarget buildTarget)
     buildParameters.EncryptionServices = new GameEncryption();
     buildParameters.CompressOption = ECompressOption.LZ4;
     buildParameters.OutputNameStyle = EOutputNameStyle.HashName_Extension;
+    buildParameters.CopyBuildinFileOption = ECopyBuildinFileOption.None;
     
     // 执行构建
     AssetBundleBuilder builder = new AssetBundleBuilder();

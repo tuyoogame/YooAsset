@@ -10,6 +10,10 @@
 
 #### 公共设置
 
+- Show Packages
+
+  是否展示资源包列表视图。
+  
 - Enable Addressable
 
   启用可寻址资源定位系统。

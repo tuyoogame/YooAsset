@@ -3,7 +3,14 @@
 初始化资源系统
 
 ```c#
+// 初始化资源系统
 YooAssets.Initialize();
+
+// 创建默认的资源包
+var defaultPackage = YooAssets.CreateAssetsPackage("DefaultPackage");
+
+// 设置该资源包为默认的资源包，可以使用YooAssets相关加载接口加载该资源包内容。
+YooAssets.SetDefaultAssetsPackage(defaultPackage);
 ```
 
 资源系统的运行模式支持三种：编辑器模拟模式，单机运行模式，联机运行模式。
@@ -17,10 +24,10 @@ YooAssets.Initialize();
 ````c#
 private IEnumerator InitializeYooAsset()
 {
-    var initParameters = new YooAssets.EditorSimulateModeParameters();
+    var initParameters = new EditorSimulateModeParameters();
     initParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
-    initParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage", false);
-    yield return YooAssets.InitializeAsync(initParameters);
+    initParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage");
+    yield return defaultPackage.InitializeAsync(initParameters);
 }
 ````
 
@@ -33,9 +40,9 @@ private IEnumerator InitializeYooAsset()
 ````c#
 private IEnumerator InitializeYooAsset()
 {
-    var initParameters = new YooAssets.OfflinePlayModeParameters();
+    var initParameters = new OfflinePlayModeParameters();
     initParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
-    yield return YooAssets.InitializeAsync(initParameters);
+    yield return defaultPackage.InitializeAsync(initParameters);
 }
 ````
 
@@ -55,22 +62,22 @@ private IEnumerator InitializeYooAsset()
   
 - DecryptionServices : 如果资源包在构建的时候有加密，需要提供实现IDecryptionServices接口的实例类。
 
+- QueryServices：内置资源查询服务接口。
+
 - DefaultHostServer : 默认的资源服务器IP地址。
 
 - FallbackHostServer : 备用的资源服务器IP地址。
 
-- VerifyLevel : 下载文件校验等级
-
 ````c#
 private IEnumerator InitializeYooAsset()
 {
-    var initParameters = new YooAssets.HostPlayModeParameters();
+    var initParameters = new HostPlayModeParameters();
     initParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
     initParameters.DecryptionServices = new BundleDecryptionServices();
     initParameters.QueryServices = new QueryStreamingAssetsServices();
     initParameters.DefaultHostServer = "http://127.0.0.1/CDN1/Android/v1.0";
     initParameters.FallbackHostServer = "http://127.0.0.1/CDN2/Android/v1.0";
-    yield return YooAssets.InitializeAsync(initParameters);
+    yield return defaultPackage.InitializeAsync(initParameters);
 }
 
 // 文件解密服务类
@@ -88,7 +95,8 @@ private class QueryStreamingAssetsServices : IQueryServices
     public bool QueryStreamingAssets(string fileName)
     {
         // 注意：使用了BetterStreamingAssets插件
-        return BetterStreamingAssets.FileExists($"YooAssets/{fileName}");
+        string buildinFolderName = YooAssets.GetStreamingAssetBuildinFolderName();
+        return BetterStreamingAssets.FileExists($"{buildinFolderName}/{fileName}");
     }
 }
 ````

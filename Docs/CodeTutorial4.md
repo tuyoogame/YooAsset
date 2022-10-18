@@ -65,7 +65,7 @@ go.transform.localScale    = Vector3.one;
 在运行游戏之前，请保证资源包可以构建成功！
 
 ```c#
-public static YooAssetPackage AssetPackage;
+public static AssetPackage DefaultPackage;
 
 IEnumerator Start()
 {
@@ -73,24 +73,24 @@ IEnumerator Start()
     YooAssets.Initialize();
     
     // 创建资源包实例
-    AssetPackage = YooAssets.CreateAssetPackage("DefaultPackage");
+    DefaultPackage = YooAssets.CreateAssetPackage("DefaultPackage");
     
     // 初始化资源包
     ......
-    yield return AssetPackage.InitializeAsync(createParameters);
+    yield return DefaultPackage.InitializeAsync(createParameters);
     
     // 更新资源包版本
     ......
-    var operation = AssetPackage.UpdateManifestAsync(packageCRC);
+    var operation = DefaultPackage.UpdateManifestAsync(packageCRC);
     yield return operation;
     
     // 下载更新文件
-    var downloader = AssetPackage.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
+    var downloader = DefaultPackage.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
     downloader.BeginDownload();
     yield return downloader;
     
     // 加载资源对象
-    var assetHandle = AssetPackage.LoadAssetAsync("Assets/GameRes/npc.prefab");
+    var assetHandle = DefaultPackage.LoadAssetAsync("Assets/GameRes/npc.prefab");
     yield return assetHandle;
     ......
 }

@@ -17,6 +17,10 @@ windows平台添加命令: **-force-gles**
 
 YooAsset依赖于ScriptBuildPipeline（SBP），在PackageManager里找到SBP插件安装就可以了。
 
+#### 问题：使用FileZilla等FTP上传工具后，文件下载总是验证失败
+
+把传输类型修改为二进制就可以了。
+
 #### 问题：YooAsset支持Unity2018吗
 
 YooAsset分俩部分，编辑器代码和运行时代码。因为工具界面是使用UIElements编写的，所以在Unity2019以前的版本是使用不了界面化工具。但是这并没有影响我们使用YooAsset，以下提供一种解决方案。
