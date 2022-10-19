@@ -10,11 +10,12 @@ namespace YooAsset.Editor
 {
 	public class AssetBundleCollectorConfig
 	{
-		public const string ConfigVersion = "2.0";
+		public const string ConfigVersion = "2.1";
 
 		public const string XmlVersion = "Version";
 		public const string XmlCommon = "Common";
 		public const string XmlEnableAddressable = "AutoAddressable";
+		public const string XmlUniqueBundleName = "UniqueBundleName";
 		public const string XmlShowPackageView = "ShowPackageView";
 
 		public const string XmlPackage = "Package";
@@ -62,6 +63,7 @@ namespace YooAsset.Editor
 
 			// 读取公共配置
 			bool enableAddressable = false;
+			bool uniqueBundleName = false;
 			bool showPackageView = false;
 			var commonNodeList = root.GetElementsByTagName(XmlCommon);
 			if (commonNodeList.Count > 0)
@@ -69,10 +71,13 @@ namespace YooAsset.Editor
 				XmlElement commonElement = commonNodeList[0] as XmlElement;
 				if (commonElement.HasAttribute(XmlEnableAddressable) == false)
 					throw new Exception($"Not found attribute {XmlEnableAddressable} in {XmlCommon}");
+				if (commonElement.HasAttribute(XmlUniqueBundleName) == false)
+					throw new Exception($"Not found attribute {XmlUniqueBundleName} in {XmlCommon}");
 				if (commonElement.HasAttribute(XmlShowPackageView) == false)
 					throw new Exception($"Not found attribute {XmlShowPackageView} in {XmlCommon}");
 
 				enableAddressable = commonElement.GetAttribute(XmlEnableAddressable) == "True" ? true : false;
+				uniqueBundleName = commonElement.GetAttribute(XmlUniqueBundleName) == "True" ? true : false;
 				showPackageView = commonElement.GetAttribute(XmlShowPackageView) == "True" ? true : false;
 			}
 
@@ -146,6 +151,7 @@ namespace YooAsset.Editor
 			// 保存配置数据
 			AssetBundleCollectorSettingData.ClearAll();
 			AssetBundleCollectorSettingData.Setting.EnableAddressable = enableAddressable;
+			AssetBundleCollectorSettingData.Setting.UniqueBundleName = uniqueBundleName;
 			AssetBundleCollectorSettingData.Setting.ShowPackageView = showPackageView;
 			AssetBundleCollectorSettingData.Setting.Packages.AddRange(packages);
 			AssetBundleCollectorSettingData.SaveFile();
@@ -175,6 +181,7 @@ namespace YooAsset.Editor
 			// 设置公共配置
 			var commonElement = xmlDoc.CreateElement(XmlCommon);
 			commonElement.SetAttribute(XmlEnableAddressable, AssetBundleCollectorSettingData.Setting.EnableAddressable.ToString());
+			commonElement.SetAttribute(XmlUniqueBundleName, AssetBundleCollectorSettingData.Setting.UniqueBundleName.ToString());
 			commonElement.SetAttribute(XmlShowPackageView, AssetBundleCollectorSettingData.Setting.ShowPackageView.ToString());
 			root.AppendChild(commonElement);
 
@@ -269,7 +276,23 @@ namespace YooAsset.Editor
 
 				// 更新版本
 				root.SetAttribute(XmlVersion, "2.0");
+				return UpdateXmlConfig(xmlDoc);
+			}
 
+			// 2.0 -> 2.1
+			if (configVersion == "2.0")
+			{
+				// 添加公共元素属性
+				var commonNodeList = root.GetElementsByTagName(XmlCommon);
+				if (commonNodeList.Count > 0)
+				{
+					XmlElement commonElement = commonNodeList[0] as XmlElement;
+					if (commonElement.HasAttribute(XmlUniqueBundleName) == false)
+						commonElement.SetAttribute(XmlUniqueBundleName, "False");
+				}
+
+				// 更新版本
+				root.SetAttribute(XmlVersion, "2.1");
 				return UpdateXmlConfig(xmlDoc);
 			}
 
