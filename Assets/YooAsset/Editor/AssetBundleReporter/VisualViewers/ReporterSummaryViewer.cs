@@ -40,7 +40,7 @@ namespace YooAsset.Editor
 			_visualAsset = EditorHelper.LoadWindowUXML<ReporterSummaryViewer>();
 			if (_visualAsset == null)
 				return;
-			
+
 			_root = _visualAsset.CloneTree();
 			_root.style.flexGrow = 1f;
 
@@ -56,7 +56,7 @@ namespace YooAsset.Editor
 		public void FillViewData(BuildReport buildReport)
 		{
 			_buildReport = buildReport;
-			
+
 			_items.Clear();
 
 			_items.Add(new ItemWrapper("YooAsset版本", buildReport.Summary.YooVersion));
@@ -69,6 +69,7 @@ namespace YooAsset.Editor
 			_items.Add(new ItemWrapper("构建包裹", $"{buildReport.Summary.BuildPackage}"));
 
 			_items.Add(new ItemWrapper("启用可寻址资源定位", $"{buildReport.Summary.EnableAddressable}"));
+			_items.Add(new ItemWrapper("资源包名唯一化", $"{buildReport.Summary.UniqueBundleName}"));
 			_items.Add(new ItemWrapper("加密服务类名称", $"{buildReport.Summary.EncryptionServicesClassName}"));
 
 			_items.Add(new ItemWrapper(string.Empty, string.Empty));
