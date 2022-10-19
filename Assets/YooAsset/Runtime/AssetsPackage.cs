@@ -150,7 +150,7 @@ namespace YooAsset
 			{
 				var editorSimulateModeParameters = parameters as EditorSimulateModeParameters;
 				if (string.IsNullOrEmpty(editorSimulateModeParameters.SimulatePatchManifestPath))
-					throw new Exception($"${editorSimulateModeParameters.SimulatePatchManifestPath} is null or empty.");
+					throw new Exception($"{nameof(editorSimulateModeParameters.SimulatePatchManifestPath)} is null or empty.");
 			}
 
 			if (parameters is HostPlayModeParameters)
