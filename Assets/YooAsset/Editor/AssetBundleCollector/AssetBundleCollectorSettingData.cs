@@ -347,6 +347,11 @@ namespace YooAsset.Editor
 			Setting.EnableAddressable = enableAddressable;
 			IsDirty = true;
 		}
+		public static void ModifyUniqueBundleName(bool uniqueBundleName)
+		{
+			Setting.UniqueBundleName = uniqueBundleName;
+			IsDirty = true;
+		}
 
 		// 资源包裹编辑相关
 		public static void CreatePackage(string packageName)

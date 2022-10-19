@@ -27,6 +27,7 @@ namespace YooAsset.Editor
 		
 		private Toggle _showPackageToogle;
 		private Toggle _enableAddressableToogle;
+		private Toggle _uniqueBundleNameToogle;
 
 		private VisualElement _packageContainer;
 		private ListView _packageListView;
@@ -85,6 +86,12 @@ namespace YooAsset.Editor
 				_enableAddressableToogle.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleCollectorSettingData.ModifyAddressable(evt.newValue);
+					RefreshWindow();
+				});
+				_uniqueBundleNameToogle = root.Q<Toggle>("UniqueBundleName");
+				_uniqueBundleNameToogle.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleCollectorSettingData.ModifyUniqueBundleName(evt.newValue);
 					RefreshWindow();
 				});
 
@@ -733,8 +740,8 @@ namespace YooAsset.Editor
 
 				try
 				{
-					bool enableAdressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
-					collectAssetInfos = collector.GetAllCollectAssets(EBuildMode.DryRunBuild, enableAdressable, group);
+					CollectCommand command = new CollectCommand(EBuildMode.DryRunBuild, _enableAddressableToogle.value);
+					collectAssetInfos = collector.GetAllCollectAssets(command, group);
 				}
 				catch (System.Exception e)
 				{

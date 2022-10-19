@@ -56,14 +56,14 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取打包收集的资源文件
 		/// </summary>
-		public List<CollectAssetInfo> GetAllCollectAssets(EBuildMode buildMode, bool enableAddressable)
+		public List<CollectAssetInfo> GetAllCollectAssets(CollectCommand command)
 		{
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(10000);
 
 			// 收集打包资源
 			foreach (var group in Groups)
 			{
-				var temper = group.GetAllCollectAssets(buildMode, enableAddressable);
+				var temper = group.GetAllCollectAssets(command);
 				foreach (var assetInfo in temper)
 				{
 					if (result.ContainsKey(assetInfo.AssetPath) == false)
@@ -74,7 +74,7 @@ namespace YooAsset.Editor
 			}
 
 			// 检测可寻址地址是否重复
-			if (enableAddressable)
+			if (command.EnableAddressable)
 			{
 				HashSet<string> adressTemper = new HashSet<string>();
 				foreach (var collectInfoPair in result)

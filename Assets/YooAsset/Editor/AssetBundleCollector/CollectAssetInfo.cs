@@ -50,5 +50,13 @@ namespace YooAsset.Editor
 			AssetTags = assetTags;
 			IsRawAsset = isRawAsset;
 		}
+
+		/// <summary>
+		/// 资源包名称追加包裹名
+		/// </summary>
+		public void BundleNameAppendPackageName(string packageName)
+		{
+			BundleName = $"{packageName.ToLower()}_{BundleName}";
+		}
 	}
 }

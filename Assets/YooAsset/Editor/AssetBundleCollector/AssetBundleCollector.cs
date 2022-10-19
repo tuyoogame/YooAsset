@@ -132,10 +132,10 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取打包收集的资源文件
 		/// </summary>
-		public List<CollectAssetInfo> GetAllCollectAssets(EBuildMode buildMode, bool enableAddressable, AssetBundleCollectorGroup group)
+		public List<CollectAssetInfo> GetAllCollectAssets(CollectCommand command, AssetBundleCollectorGroup group)
 		{
 			// 注意：模拟构建模式下只收集主资源
-			if (buildMode == EBuildMode.SimulateBuild)
+			if (command.BuildMode == EBuildMode.SimulateBuild)
 			{
 				if (CollectorType != ECollectorType.MainAssetCollector)
 					return new List<CollectAssetInfo>();
@@ -162,7 +162,7 @@ namespace YooAsset.Editor
 					{
 						if (result.ContainsKey(assetPath) == false)
 						{
-							var collectAssetInfo = CreateCollectAssetInfo(buildMode, group, assetPath, isRawAsset);
+							var collectAssetInfo = CreateCollectAssetInfo(command, group, assetPath, isRawAsset);
 							result.Add(assetPath, collectAssetInfo);
 						}
 						else
@@ -177,7 +177,7 @@ namespace YooAsset.Editor
 				string assetPath = CollectPath;
 				if (IsValidateAsset(assetPath) && IsCollectAsset(assetPath))
 				{
-					var collectAssetInfo = CreateCollectAssetInfo(buildMode, group, assetPath, isRawAsset);
+					var collectAssetInfo = CreateCollectAssetInfo(command, group, assetPath, isRawAsset);
 					result.Add(assetPath, collectAssetInfo);
 				}
 				else
@@ -187,7 +187,7 @@ namespace YooAsset.Editor
 			}
 
 			// 检测可寻址地址是否重复
-			if (enableAddressable)
+			if (command.EnableAddressable)
 			{
 				HashSet<string> adressTemper = new HashSet<string>();
 				foreach (var collectInfoPair in result)
@@ -207,7 +207,7 @@ namespace YooAsset.Editor
 			return result.Values.ToList();
 		}
 
-		private CollectAssetInfo CreateCollectAssetInfo(EBuildMode buildMode, AssetBundleCollectorGroup group, string assetPath, bool isRawAsset)
+		private CollectAssetInfo CreateCollectAssetInfo(CollectCommand command, AssetBundleCollectorGroup group, string assetPath, bool isRawAsset)
 		{
 			string address = GetAddress(group, assetPath);
 			string bundleName = GetBundleName(group, assetPath);
@@ -215,7 +215,7 @@ namespace YooAsset.Editor
 			CollectAssetInfo collectAssetInfo = new CollectAssetInfo(CollectorType, bundleName, address, assetPath, assetTags, isRawAsset);
 
 			// 注意：模拟构建模式下不需要收集依赖资源
-			if (buildMode == EBuildMode.SimulateBuild)
+			if (command.BuildMode == EBuildMode.SimulateBuild)
 				collectAssetInfo.DependAssets = new List<string>();
 			else
 				collectAssetInfo.DependAssets = GetAllDependencies(assetPath);
