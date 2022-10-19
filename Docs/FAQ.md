@@ -21,6 +21,29 @@ YooAsset依赖于ScriptBuildPipeline（SBP），在PackageManager里找到SBP插
 
 把传输类型修改为二进制就可以了。
 
+#### 问题：ClearCacheWhenDirty参数没了吗？
+
+不是很必须的一个功能，已经移除了。可以使用以下方法代替：
+
+````c#
+// 参考DEMO的代码
+internal class FsmClearCache : IFsmNode
+{
+    void IFsmNode.OnEnter()
+    {
+        Debug.Log("清理未使用的缓存文件！");
+        var operation = YooAsset.YooAssets.ClearUnusedCacheFiles();
+        operation.Completed += Operation_Completed;
+    }
+
+    private void Operation_Completed(YooAsset.AsyncOperationBase obj)
+    {
+        Debug.Log("开始游戏！");
+        ......
+    }
+}
+````
+
 #### 问题：YooAsset支持Unity2018吗
 
 YooAsset分俩部分，编辑器代码和运行时代码。因为工具界面是使用UIElements编写的，所以在Unity2019以前的版本是使用不了界面化工具。但是这并没有影响我们使用YooAsset，以下提供一种解决方案。

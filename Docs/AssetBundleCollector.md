@@ -17,6 +17,10 @@
 - Enable Addressable
 
   启用可寻址资源定位系统。
+  
+- Unique Bundle Name
+
+  资源包名追加PackageName作为前缀。
 
 #### 资源分组
 

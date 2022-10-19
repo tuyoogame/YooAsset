@@ -135,8 +135,8 @@ private static void BuildInternal(BuildTarget buildTarget)
     buildParameters.BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;
     buildParameters.BuildMode = EBuildMode.ForceRebuild;
     buildParameters.BuildPackage = "DefaultPackage";
+    buildParameters.HumanReadableVersion = "v1.0";
     buildParameters.VerifyBuildingResult = true;
-    buildParameters.EnableAddressable = true;
     buildParameters.EncryptionServices = new GameEncryption();
     buildParameters.CompressOption = ECompressOption.LZ4;
     buildParameters.OutputNameStyle = EOutputNameStyle.HashName_Extension;
