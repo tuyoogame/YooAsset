@@ -52,7 +52,7 @@ namespace YooAsset.Editor
 				throw new System.Exception("Shader variant file extension is invalid.");
 
 			// 注意：先删除再保存，否则ShaderVariantCollection内容将无法及时刷新
-			AssetDatabase.DeleteAsset(ShaderVariantCollectorSettingData.Setting.SavePath);		
+			AssetDatabase.DeleteAsset(ShaderVariantCollectorSettingData.Setting.SavePath);
 			EditorTools.CreateFileDirectory(saveFilePath);
 			_saveFilePath = saveFilePath;
 			_completedCallback = completedCallback;
@@ -87,9 +87,14 @@ namespace YooAsset.Editor
 			List<string> allAssets = new List<string>(1000);
 
 			// 获取所有打包的资源
-			List<CollectAssetInfo> allCollectInfos = AssetBundleCollectorSettingData.Setting.GetAllPackageAssets(EBuildMode.DryRunBuild);
-			List<string> collectAssets = allCollectInfos.Select(t => t.AssetPath).ToList();
-			foreach (var assetPath in collectAssets)
+			List<CollectAssetInfo> allCollectAssetInfos = new List<CollectAssetInfo>();
+			List<CollectResult> collectResults = AssetBundleCollectorSettingData.Setting.GetAllPackageAssets(EBuildMode.DryRunBuild);
+			foreach (var collectResult in collectResults)
+			{
+				allCollectAssetInfos.AddRange(collectResult.CollectAssets);
+			}
+			List<string> allAssetPath = allCollectAssetInfos.Select(t => t.AssetPath).ToList();
+			foreach (var assetPath in allAssetPath)
 			{
 				string[] depends = AssetDatabase.GetDependencies(assetPath, true);
 				foreach (var depend in depends)
@@ -97,7 +102,7 @@ namespace YooAsset.Editor
 					if (allAssets.Contains(depend) == false)
 						allAssets.Add(depend);
 				}
-				EditorTools.DisplayProgressBar("获取所有打包资源", ++progressValue, collectAssets.Count);
+				EditorTools.DisplayProgressBar("获取所有打包资源", ++progressValue, allAssetPath.Count);
 			}
 			EditorTools.ClearProgressBar();
 
