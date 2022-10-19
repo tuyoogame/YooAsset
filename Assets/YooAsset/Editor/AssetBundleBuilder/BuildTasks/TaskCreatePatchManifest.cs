@@ -21,6 +21,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		private void CreatePatchManifestFile(BuildContext context)
 		{
+			var buildMapContext = context.GetContextObject<BuildMapContext>();
 			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
 			var buildParameters = buildParametersContext.Parameters;
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
@@ -28,7 +29,7 @@ namespace YooAsset.Editor
 			// 创建新补丁清单
 			PatchManifest patchManifest = new PatchManifest();
 			patchManifest.FileVersion = YooAssetSettings.PatchManifestFileVersion;
-			patchManifest.EnableAddressable = buildParameters.EnableAddressable;
+			patchManifest.EnableAddressable = buildMapContext.EnableAddressable;
 			patchManifest.OutputNameStyle = (int)buildParameters.OutputNameStyle;
 			patchManifest.PackageName = buildParameters.BuildPackage;
 			patchManifest.HumanReadableVersion = buildParameters.HumanReadableVersion;
@@ -125,7 +126,6 @@ namespace YooAsset.Editor
 		/// </summary>
 		private List<PatchAsset> GetAllPatchAsset(BuildContext context, PatchManifest patchManifest)
 		{
-			var buildParameters = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 
 			List<PatchAsset> result = new List<PatchAsset>(1000);
@@ -135,7 +135,7 @@ namespace YooAsset.Editor
 				foreach (var assetInfo in assetInfos)
 				{
 					PatchAsset patchAsset = new PatchAsset();
-					if (buildParameters.Parameters.EnableAddressable)
+					if (buildMapContext.EnableAddressable)
 						patchAsset.Address = assetInfo.Address;
 					else
 						patchAsset.Address = string.Empty;

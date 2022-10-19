@@ -15,6 +15,16 @@ namespace YooAsset.Editor
 		public int AssetFileCount;
 
 		/// <summary>
+		/// 是否启用可寻址资源定位
+		/// </summary>
+		public bool EnableAddressable;
+
+		/// <summary>
+		/// 资源包名唯一化
+		/// </summary>
+		public bool UniqueBundleName;
+
+		/// <summary>
 		/// 资源包列表
 		/// </summary>
 		public readonly List<BuildBundleInfo> BundleInfos = new List<BuildBundleInfo>(1000);

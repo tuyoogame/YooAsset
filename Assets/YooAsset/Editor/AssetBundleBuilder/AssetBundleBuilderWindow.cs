@@ -257,7 +257,6 @@ namespace YooAsset.Editor
 			buildParameters.BuildMode = AssetBundleBuilderSettingData.Setting.BuildMode;
 			buildParameters.BuildPackage = AssetBundleBuilderSettingData.Setting.BuildPackage;
 			buildParameters.VerifyBuildingResult = true;
-			buildParameters.EnableAddressable = AssetBundleCollectorSettingData.Setting.EnableAddressable;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.CompressOption = AssetBundleBuilderSettingData.Setting.CompressOption;
 			buildParameters.OutputNameStyle = AssetBundleBuilderSettingData.Setting.OutputNameStyle;

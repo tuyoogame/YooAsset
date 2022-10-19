@@ -166,7 +166,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 计算主资源或共享资源的完整包名
 		/// </summary>
-		public void CalculateFullBundleName()
+		public void CalculateFullBundleName(bool uniqueBundleName, string packageName)
 		{
 			if (CollectorType == ECollectorType.None)
 			{
@@ -177,15 +177,22 @@ namespace YooAsset.Editor
 				{
 					string shareBundleName = YooAssetSettingsData.GetUnityShadersBundleFullName();
 					_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
-					return;
+				}
+				else
+				{
+					if (_referenceBundleNames.Count > 1)
+					{
+						IPackRule packRule = PackDirectory.StaticPackRule;
+						var bundleName = packRule.GetBundleName(new PackRuleData(AssetPath));
+						var shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+						_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
+					}
 				}
 
-				if (_referenceBundleNames.Count > 1)
+				if (uniqueBundleName)
 				{
-					IPackRule packRule = PackDirectory.StaticPackRule;
-					var bundleName = packRule.GetBundleName(new PackRuleData(AssetPath));
-					var shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-					_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
+					if (string.IsNullOrEmpty(_shareBundleName) == false)
+						_shareBundleName = $"{packageName.ToLower()}_{_shareBundleName}";
 				}
 			}
 			else

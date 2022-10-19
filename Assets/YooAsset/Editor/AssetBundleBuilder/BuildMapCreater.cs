@@ -19,7 +19,8 @@ namespace YooAsset.Editor
 			AssetBundleCollectorSettingData.Setting.CheckConfigError();
 
 			// 2. 获取所有收集器收集的资源
-			List<CollectAssetInfo> allCollectAssets = AssetBundleCollectorSettingData.Setting.GetPackageAssets(buildMode, packageName);
+			var buildResult = AssetBundleCollectorSettingData.Setting.GetPackageAssets(buildMode, packageName);
+			List<CollectAssetInfo> allCollectAssets = buildResult.CollectAssets;
 
 			// 3. 剔除未被引用的依赖资源
 			List<CollectAssetInfo> removeDependList = new List<CollectAssetInfo>();
@@ -72,9 +73,13 @@ namespace YooAsset.Editor
 					}
 				}
 			}
-			context.AssetFileCount = buildAssetDic.Count;
 
-			// 6. 填充主动收集资源的依赖列表
+			// 6. 记录关键信息
+			context.AssetFileCount = buildAssetDic.Count;
+			context.EnableAddressable = buildResult.EnableAddressable;
+			context.UniqueBundleName = buildResult.UniqueBundleName;
+
+			// 7. 填充主动收集资源的依赖列表
 			foreach (var collectAssetInfo in allCollectAssets)
 			{
 				var dependAssetInfos = new List<BuildAssetInfo>(collectAssetInfo.DependAssets.Count);
@@ -88,13 +93,13 @@ namespace YooAsset.Editor
 				buildAssetDic[collectAssetInfo.AssetPath].SetAllDependAssetInfos(dependAssetInfos);
 			}
 
-			// 7. 计算完整的资源包名
+			// 8. 计算完整的资源包名
 			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
 			{
-				pair.Value.CalculateFullBundleName();
+				pair.Value.CalculateFullBundleName(buildResult.UniqueBundleName, buildResult.PackageName);
 			}
 
-			// 8. 移除不参与构建的资源
+			// 9. 移除不参与构建的资源
 			List<BuildAssetInfo> removeBuildList = new List<BuildAssetInfo>();
 			foreach (KeyValuePair<string, BuildAssetInfo> pair in buildAssetDic)
 			{
@@ -107,7 +112,7 @@ namespace YooAsset.Editor
 				buildAssetDic.Remove(removeValue.AssetPath);
 			}
 
-			// 9. 构建资源包
+			// 10. 构建资源包
 			var allBuildinAssets = buildAssetDic.Values.ToList();
 			if (allBuildinAssets.Count == 0)
 				throw new Exception("构建的资源列表不能为空");

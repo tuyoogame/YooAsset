@@ -46,7 +46,9 @@ namespace YooAsset.Editor
 				buildReport.Summary.BuildPipeline = buildParameters.BuildPipeline;
 				buildReport.Summary.BuildMode = buildParameters.BuildMode;
 				buildReport.Summary.BuildPackage = buildParameters.BuildPackage;
-				buildReport.Summary.EnableAddressable = buildParameters.EnableAddressable;
+				buildReport.Summary.EnableAddressable = buildMapContext.EnableAddressable;
+				buildReport.Summary.UniqueBundleName = buildMapContext.UniqueBundleName;
+
 				buildReport.Summary.EncryptionServicesClassName = buildParameters.EncryptionServices == null ?
 					"null" : buildParameters.EncryptionServices.GetType().FullName;
 

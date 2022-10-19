@@ -71,12 +71,7 @@ namespace YooAsset.Editor
 		/// 验证构建结果
 		/// </summary>
 		public bool VerifyBuildingResult = false;
-
-		/// <summary>
-		/// 启用可寻址资源定位
-		/// </summary>
-		public bool EnableAddressable = false;
-
+		
 		/// <summary>
 		/// 加密类
 		/// </summary>

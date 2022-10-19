@@ -54,6 +54,11 @@ namespace YooAsset.Editor
 		public bool EnableAddressable;
 
 		/// <summary>
+		/// 资源包名唯一化
+		/// </summary>
+		public bool UniqueBundleName;
+
+		/// <summary>
 		/// 加密服务类名称
 		/// </summary>
 		public string EncryptionServicesClassName;
