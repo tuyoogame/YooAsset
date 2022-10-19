@@ -156,12 +156,25 @@ namespace YooAsset
 				// 如果下载失败
 				if (hasError)
 				{
-					// 注意：非断点续传下载失败后删除文件
+					// 注意：非断点续传下载失败之后删除文件
 					if (_breakResume == false)
 					{
 						string cacheFilePath = _bundleInfo.Bundle.CachedFilePath;
 						if (File.Exists(cacheFilePath))
 							File.Delete(cacheFilePath);
+					}
+					else
+					{
+						// 注意：下载断点续传文件发生特殊错误码之后删除文件
+						if (DownloadSystem.ClearFileResponseCodes != null)
+						{
+							if (DownloadSystem.ClearFileResponseCodes.Contains(_webRequest.responseCode))
+							{
+								string cacheFilePath = _bundleInfo.Bundle.CachedFilePath;
+								if (File.Exists(cacheFilePath))
+									File.Delete(cacheFilePath);
+							}
+						}
 					}
 
 					// 失败后重新尝试

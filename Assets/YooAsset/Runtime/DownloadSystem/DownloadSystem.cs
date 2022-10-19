@@ -16,9 +16,14 @@ namespace YooAsset
 		private static readonly List<string> _removeList = new List<string>(100);
 
 		/// <summary>
-		/// 启用断点续传的文件大小
+		/// 启用断点续传功能文件的最小字节数
 		/// </summary>
 		public static int BreakpointResumeFileSize { set; get; } = int.MaxValue;
+
+		/// <summary>
+		/// 下载失败后清理文件的HTTP错误码
+		/// </summary>
+		public static List<long> ClearFileResponseCodes { set; get; }
 
 		/// <summary>
 		/// 更新所有下载器

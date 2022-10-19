@@ -147,7 +147,7 @@ namespace YooAsset
 
 		#region 系统参数
 		/// <summary>
-		/// 启用下载系统的断点续传功能的文件大小
+		/// 设置下载系统参数，启用断点续传功能文件的最小字节数
 		/// </summary>
 		public static void SetDownloadSystemBreakpointResumeFileSize(int fileBytes)
 		{
@@ -155,7 +155,15 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 设置异步系统的每帧允许运行的最大时间切片（单位：毫秒）
+		/// 设置下载系统参数，下载失败后清理文件的HTTP错误码
+		/// </summary>
+		public static void SetDownloadSystemClearFileResponseCode(List<long> codes)
+		{
+			DownloadSystem.ClearFileResponseCodes = codes;
+		}
+		
+		/// <summary>
+		/// 设置异步系统参数，每帧执行消耗的最大时间切片（单位：毫秒）
 		/// </summary>
 		public static void SetOperationSystemMaxTimeSlice(long milliseconds)
 		{
@@ -168,7 +176,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 设置缓存系统的已经缓存文件的校验等级
+		/// 设置缓存系统参数，已经缓存文件的校验等级
 		/// </summary>
 		public static void SetCacheSystemCachedFileVerifyLevel(EVerifyLevel verifyLevel)
 		{
