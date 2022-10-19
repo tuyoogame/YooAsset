@@ -354,12 +354,13 @@ namespace YooAsset.Editor
 		}
 
 		// 资源包裹编辑相关
-		public static void CreatePackage(string packageName)
+		public static AssetBundleCollectorPackage CreatePackage(string packageName)
 		{
 			AssetBundleCollectorPackage package = new AssetBundleCollectorPackage();
 			package.PackageName = packageName;
 			Setting.Packages.Add(package);
 			IsDirty = true;
+			return package;
 		}
 		public static void RemovePackage(AssetBundleCollectorPackage package)
 		{
@@ -381,12 +382,13 @@ namespace YooAsset.Editor
 		}
 
 		// 资源分组编辑相关
-		public static void CreateGroup(AssetBundleCollectorPackage package, string groupName)
+		public static AssetBundleCollectorGroup CreateGroup(AssetBundleCollectorPackage package, string groupName)
 		{
 			AssetBundleCollectorGroup group = new AssetBundleCollectorGroup();
 			group.GroupName = groupName;
 			package.Groups.Add(group);
 			IsDirty = true;
+			return group;
 		}
 		public static void RemoveGroup(AssetBundleCollectorPackage package, AssetBundleCollectorGroup group)
 		{
