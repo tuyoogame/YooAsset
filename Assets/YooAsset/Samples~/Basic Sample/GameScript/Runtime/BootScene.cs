@@ -111,7 +111,8 @@ public class BootScene : MonoBehaviour
 	{
 		public bool QueryStreamingAssets(string fileName)
 		{
-			return BetterStreamingAssets.FileExists($"{YooAssets.GetStreamingAssetBuildinFolderName()}/{fileName}");
+			string buildinFolderName = YooAssets.GetStreamingAssetBuildinFolderName();
+			return BetterStreamingAssets.FileExists($"{buildinFolderName}/{fileName}");
 		}
 	}
 }

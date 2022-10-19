@@ -1,25 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<root Version="2.0">
-  <Common AutoAddressable="True" ShowPackageView="False" />
+<root Version="2.1">
+  <Common AutoAddressable="True" UniqueBundleName="False" ShowPackageView="False" />
   <Package PackageName="DefaultPackage" PackageDesc="">
     <Group GroupName="Level" GroupDesc="关卡资源" AssetTags="level">
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameRes/Entity/Level1" CollectGUID="724066efe61192e43a0d7e59166b36a4" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectPrefab" AssetTags="level1" />
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameRes/Entity/Level2" CollectGUID="8045c1986f0ae964f8b1ea29e3522388" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectPrefab" AssetTags="level2" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Entity/Level1" CollectGUID="724066efe61192e43a0d7e59166b36a4" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectPrefab" AssetTags="level1" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Entity/Level2" CollectGUID="8045c1986f0ae964f8b1ea29e3522388" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectPrefab" AssetTags="level2" />
     </Group>
     <Group GroupName="Buildin" GroupDesc="首包资源" AssetTags="buildin">
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameRes/Scene" CollectGUID="f75e7d64104fb1a48b849b72b84ade4c" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectScene" AssetTags="" />
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameRes/Config" CollectGUID="44774abdee2b91b45b42f9dadf8c17a4" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackRawFile" FilterRule="CollectAll" AssetTags="" />
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameRes/Music" CollectGUID="e05b02ee4d90ae84a99871ce75288ea2" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Scene" CollectGUID="f75e7d64104fb1a48b849b72b84ade4c" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectScene" AssetTags="" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Config" CollectGUID="44774abdee2b91b45b42f9dadf8c17a4" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackRawFile" FilterRule="CollectAll" AssetTags="" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Music" CollectGUID="e05b02ee4d90ae84a99871ce75288ea2" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
     </Group>
     <Group GroupName="Panel" GroupDesc="面板资源" AssetTags="panel">
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameRes/Texture" CollectGUID="69b046f60ca75f647b2963e0113fd779" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackCollector" FilterRule="CollectAll" AssetTags="" />
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameRes/TpAtlas" CollectGUID="06e38aac2570d2b4a97c6a90223e5344" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameRes/UIPanel" CollectGUID="926d3203fcefdb947881a7491496e039" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameRes/UISprite" CollectGUID="29f27e4abf667c04b88a3996d8cdadfc" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/Texture" CollectGUID="69b046f60ca75f647b2963e0113fd779" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackCollector" FilterRule="CollectAll" AssetTags="" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/TpAtlas" CollectGUID="06e38aac2570d2b4a97c6a90223e5344" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/UIPanel" CollectGUID="926d3203fcefdb947881a7491496e039" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameRes/UISprite" CollectGUID="29f27e4abf667c04b88a3996d8cdadfc" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
     </Group>
     <Group GroupName="Art" GroupDesc="美术资源" AssetTags="">
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameArt/ShaderVariants" CollectGUID="00781758c26692e40a9634ddeac838be" CollectType="StaticAssetCollector" AddressRule="AddressByFileName" PackRule="PackShaderVariants" FilterRule="CollectAll" AssetTags="" />
-      <Collector CollectPath="Assets/YooAsset/Samples/Basic Sample/GameArt/UIFont" CollectGUID="464727a15e4a7dc4d895346374432399" CollectType="DependAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameArt/ShaderVariants" CollectGUID="00781758c26692e40a9634ddeac838be" CollectType="StaticAssetCollector" AddressRule="AddressByFileName" PackRule="PackShaderVariants" FilterRule="CollectAll" AssetTags="" />
+      <Collector CollectPath="Assets/Samples/Basic Sample/GameArt/UIFont" CollectGUID="464727a15e4a7dc4d895346374432399" CollectType="DependAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
     </Group>
   </Package>
 </root>

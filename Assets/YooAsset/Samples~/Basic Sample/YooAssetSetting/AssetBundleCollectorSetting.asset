@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowPackageView: 0
   EnableAddressable: 1
+  UniqueBundleName: 0
   Packages:
   - PackageName: DefaultPackage
     PackageDesc: 
