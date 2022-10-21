@@ -296,6 +296,7 @@ namespace YooAsset.Editor
 		private void FixBtn_clicked()
 		{
 			AssetBundleCollectorSettingData.FixFile();
+			RefreshWindow();
 		}
 		private void ExportBtn_clicked()
 		{
