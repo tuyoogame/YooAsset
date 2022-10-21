@@ -53,7 +53,6 @@ public class BootScene : MonoBehaviour
 		if (PlayMode == EPlayMode.EditorSimulateMode)
 		{
 			var createParameters = new EditorSimulateModeParameters();
-			createParameters.LocationServices = new AddressLocationServices();
 			createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage");
 			yield return defaultPackage.InitializeAsync(createParameters);
 		}
@@ -62,7 +61,6 @@ public class BootScene : MonoBehaviour
 		if (PlayMode == EPlayMode.OfflinePlayMode)
 		{
 			var createParameters = new OfflinePlayModeParameters();
-			createParameters.LocationServices = new AddressLocationServices();
 			yield return defaultPackage.InitializeAsync(createParameters);
 		}
 
@@ -70,7 +68,6 @@ public class BootScene : MonoBehaviour
 		if (PlayMode == EPlayMode.HostPlayMode)
 		{
 			var createParameters = new HostPlayModeParameters();
-			createParameters.LocationServices = new AddressLocationServices();
 			createParameters.QueryServices = new QueryStreamingAssetsFileServices();
 			createParameters.DefaultHostServer = GetHostServerURL();
 			createParameters.FallbackHostServer = GetHostServerURL();
