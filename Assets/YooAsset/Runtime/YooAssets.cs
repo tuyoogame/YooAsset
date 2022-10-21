@@ -161,7 +161,16 @@ namespace YooAsset
 		{
 			DownloadSystem.ClearFileResponseCodes = codes;
 		}
-		
+
+		/// <summary>
+		/// 设置下载系统参数，自定义的证书认证实例
+		/// </summary>
+		/// <param name="instance"></param>
+		public static void SetDownloadSystemCertificateHandler(UnityEngine.Networking.CertificateHandler instance)
+		{
+			DownloadSystem.CertificateHandlerInstance = instance;
+		}
+
 		/// <summary>
 		/// 设置异步系统参数，每帧执行消耗的最大时间切片（单位：毫秒）
 		/// </summary>

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Networking;
 
 namespace YooAsset
 {
@@ -14,6 +15,12 @@ namespace YooAsset
 	{
 		private static readonly Dictionary<string, DownloaderBase> _downloaderDic = new Dictionary<string, DownloaderBase>();
 		private static readonly List<string> _removeList = new List<string>(100);
+
+
+		/// <summary>
+		/// 自定义的证书认证实例
+		/// </summary>
+		public static CertificateHandler CertificateHandlerInstance;
 
 		/// <summary>
 		/// 启用断点续传功能文件的最小字节数

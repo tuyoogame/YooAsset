@@ -89,6 +89,12 @@ namespace YooAsset
 					_downloadHandle = handler;
 #endif
 
+					if (DownloadSystem.CertificateHandlerInstance != null)
+					{
+						_webRequest.certificateHandler = DownloadSystem.CertificateHandlerInstance;
+						_webRequest.disposeCertificateHandlerOnDispose = false;
+					}
+
 					_webRequest.downloadHandler = handler;
 					_webRequest.disposeDownloadHandlerOnDispose = true;
 					if (fileLength > 0)
