@@ -148,6 +148,23 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 尝试映射为资源路径
+		/// </summary>
+		public string TryMappingToAssetPath(string location)
+		{
+			if (string.IsNullOrEmpty(location))
+				return string.Empty;
+
+			if (_locationToLower)
+				location = location.ToLower();
+
+			if (AssetPathMapping.TryGetValue(location, out string assetPath))
+				return assetPath;
+			else
+				return string.Empty;
+		}
+
+		/// <summary>
 		/// 获取主资源包
 		/// 注意：传入的资源路径一定合法有效！
 		/// </summary>

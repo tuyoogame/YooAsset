@@ -66,6 +66,10 @@ namespace YooAsset
 		{
 			return _simulatePatchManifest.MappingToAssetPath(location);
 		}
+		string IBundleServices.TryMappingToAssetPath(string location)
+		{
+			return _simulatePatchManifest.TryMappingToAssetPath(location);
+		}
 		string IBundleServices.GetPackageName()
 		{
 			return _simulatePatchManifest.PackageName;

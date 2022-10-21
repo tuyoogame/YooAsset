@@ -142,6 +142,7 @@ namespace YooAsset
 		{
 			if (assetInfo.IsInvalid)
 			{
+				YooLogger.Error($"Failed to load scene. {assetInfo.Error}");
 				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
 				completedProvider.SetCompleted(assetInfo.Error);
 				return completedProvider.CreateHandle<SceneOperationHandle>();
@@ -190,6 +191,7 @@ namespace YooAsset
 		{
 			if (assetInfo.IsInvalid)
 			{
+				YooLogger.Error($"Failed to load asset. {assetInfo.Error}");
 				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
 				completedProvider.SetCompleted(assetInfo.Error);
 				return completedProvider.CreateHandle<AssetOperationHandle>();
@@ -216,6 +218,7 @@ namespace YooAsset
 		{
 			if (assetInfo.IsInvalid)
 			{
+				YooLogger.Error($"Failed to load sub assets. {assetInfo.Error}");
 				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
 				completedProvider.SetCompleted(assetInfo.Error);
 				return completedProvider.CreateHandle<SubAssetsOperationHandle>();

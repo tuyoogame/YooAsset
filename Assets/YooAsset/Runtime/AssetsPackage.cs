@@ -13,7 +13,6 @@ namespace YooAsset
 		private EOperationStatus _initializeStatus = EOperationStatus.None;
 		private EPlayMode _playMode;
 		private IBundleServices _bundleServices;
-		private ILocationServices _locationServices;
 		private AssetSystemImpl _assetSystemImpl;
 		private EditorSimulateModeImpl _editorSimulateModeImpl;
 		private OfflinePlayModeImpl _offlinePlayModeImpl;
@@ -33,7 +32,7 @@ namespace YooAsset
 		}
 
 
-		internal AssetsPackage()
+		private AssetsPackage()
 		{
 		}
 		internal AssetsPackage(string packageName)
@@ -62,7 +61,6 @@ namespace YooAsset
 				_initializeStatus = EOperationStatus.None;
 
 				_bundleServices = null;
-				_locationServices = null;
 				_editorSimulateModeImpl = null;
 				_offlinePlayModeImpl = null;
 				_hostPlayModeImpl = null;
@@ -72,8 +70,6 @@ namespace YooAsset
 					_assetSystemImpl.DestroyAll();
 					_assetSystemImpl = null;
 				}
-
-				YooLogger.Log("YooAssets destroy all !");
 			}
 		}
 
@@ -87,7 +83,6 @@ namespace YooAsset
 
 			// 初始化资源系统
 			InitializationOperation initializeOperation;
-			_locationServices = parameters.LocationServices;
 			_assetSystemImpl = new AssetSystemImpl();
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
@@ -142,9 +137,6 @@ namespace YooAsset
 			if (parameters is EditorSimulateModeParameters)
 				throw new Exception($"Editor simulate mode only support unity editor.");
 #endif
-
-			if (parameters.LocationServices == null)
-				throw new Exception($"{nameof(ILocationServices)} is null.");
 
 			if (parameters is EditorSimulateModeParameters)
 			{
@@ -335,7 +327,10 @@ namespace YooAsset
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
 			if (assetInfo.IsInvalid)
+			{
+				YooLogger.Warning(assetInfo.Error);
 				return false;
+			}
 
 			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
 			if (bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
@@ -397,14 +392,14 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取资源路径
+		/// 检查资源定位地址是否有效
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
-		/// <returns>如果location地址无效，则返回空字符串</returns>
-		public string GetAssetPath(string location)
+		public bool CheckLocationValid(string location)
 		{
 			DebugCheckInitialize();
-			return _locationServices.ConvertLocationToAssetPath(this, location);
+			string assetPath = _bundleServices.TryMappingToAssetPath(location);
+			return string.IsNullOrEmpty(assetPath) == false;
 		}
 		#endregion
 
@@ -429,8 +424,6 @@ namespace YooAsset
 		public RawFileOperation GetRawFileAsync(AssetInfo assetInfo, string copyPath = null)
 		{
 			DebugCheckInitialize();
-			if (assetInfo.IsInvalid)
-				YooLogger.Warning(assetInfo.Error);
 			return GetRawFileInternal(assetInfo, copyPath);
 		}
 
@@ -439,6 +432,7 @@ namespace YooAsset
 		{
 			if (assetInfo.IsInvalid)
 			{
+				YooLogger.Error($"Failed to get raw file. {assetInfo.Error}");
 				RawFileOperation operation = new CompletedRawFileOperation(assetInfo.Error, copyPath);
 				OperationSystem.StartOperation(operation);
 				return operation;
@@ -508,8 +502,6 @@ namespace YooAsset
 		public SceneOperationHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool activateOnLoad = true, int priority = 100)
 		{
 			DebugCheckInitialize();
-			if (assetInfo.IsInvalid)
-				YooLogger.Warning(assetInfo.Error);
 			var handle = _assetSystemImpl.LoadSceneAsync(assetInfo, sceneMode, activateOnLoad, priority);
 			return handle;
 		}
@@ -523,8 +515,6 @@ namespace YooAsset
 		public AssetOperationHandle LoadAssetSync(AssetInfo assetInfo)
 		{
 			DebugCheckInitialize();
-			if (assetInfo.IsInvalid)
-				YooLogger.Warning(assetInfo.Error);
 			return LoadAssetInternal(assetInfo, true);
 		}
 
@@ -560,8 +550,6 @@ namespace YooAsset
 		public AssetOperationHandle LoadAssetAsync(AssetInfo assetInfo)
 		{
 			DebugCheckInitialize();
-			if (assetInfo.IsInvalid)
-				YooLogger.Warning(assetInfo.Error);
 			return LoadAssetInternal(assetInfo, false);
 		}
 
@@ -593,14 +581,17 @@ namespace YooAsset
 		private AssetOperationHandle LoadAssetInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
 		{
 #if UNITY_EDITOR
-			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
-			if (bundleInfo.Bundle.IsRawFile)
+			if (assetInfo.IsInvalid == false)
 			{
-				string error = $"Cannot load raw file using LoadAsset method !";
-				YooLogger.Error(error);
-				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
-				completedProvider.SetCompleted(error);
-				return completedProvider.CreateHandle<AssetOperationHandle>();
+				BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+				if (bundleInfo.Bundle.IsRawFile)
+				{
+					string error = $"Cannot load raw file using LoadAsset method !";
+					YooLogger.Error(error);
+					CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+					completedProvider.SetCompleted(error);
+					return completedProvider.CreateHandle<AssetOperationHandle>();
+				}
 			}
 #endif
 
@@ -619,8 +610,6 @@ namespace YooAsset
 		public SubAssetsOperationHandle LoadSubAssetsSync(AssetInfo assetInfo)
 		{
 			DebugCheckInitialize();
-			if (assetInfo.IsInvalid)
-				YooLogger.Warning(assetInfo.Error);
 			return LoadSubAssetsInternal(assetInfo, true);
 		}
 
@@ -656,8 +645,6 @@ namespace YooAsset
 		public SubAssetsOperationHandle LoadSubAssetsAsync(AssetInfo assetInfo)
 		{
 			DebugCheckInitialize();
-			if (assetInfo.IsInvalid)
-				YooLogger.Warning(assetInfo.Error);
 			return LoadSubAssetsInternal(assetInfo, false);
 		}
 
@@ -689,14 +676,17 @@ namespace YooAsset
 		private SubAssetsOperationHandle LoadSubAssetsInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
 		{
 #if UNITY_EDITOR
-			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
-			if (bundleInfo.Bundle.IsRawFile)
+			if (assetInfo.IsInvalid == false)
 			{
-				string error = $"Cannot load raw file using LoadSubAssets method !";
-				YooLogger.Error(error);
-				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
-				completedProvider.SetCompleted(error);
-				return completedProvider.CreateHandle<SubAssetsOperationHandle>();
+				BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+				if (bundleInfo.Bundle.IsRawFile)
+				{
+					string error = $"Cannot load raw file using LoadSubAssets method !";
+					YooLogger.Error(error);
+					CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+					completedProvider.SetCompleted(error);
+					return completedProvider.CreateHandle<SubAssetsOperationHandle>();
+				}
 			}
 #endif
 
@@ -941,14 +931,6 @@ namespace YooAsset
 
 		#region 内部方法
 		/// <summary>
-		/// 资源定位地址转换为资源完整路径
-		/// </summary>
-		internal string MappingToAssetPath(string location)
-		{
-			return _bundleServices.MappingToAssetPath(location);
-		}
-
-		/// <summary>
 		/// 是否包含资源文件
 		/// </summary>
 		internal bool IsIncludeBundleFile(string fileName)
@@ -1014,7 +996,7 @@ namespace YooAsset
 		private AssetInfo ConvertLocationToAssetInfo(string location, System.Type assetType)
 		{
 			DebugCheckLocation(location);
-			string assetPath = _locationServices.ConvertLocationToAssetPath(this, location);
+			string assetPath = _bundleServices.MappingToAssetPath(location);
 			PatchAsset patchAsset = _bundleServices.TryGetPatchAsset(assetPath);
 			if (patchAsset != null)
 			{
@@ -1028,7 +1010,6 @@ namespace YooAsset
 					error = $"The location is null or empty !";
 				else
 					error = $"The location is invalid : {location}";
-				YooLogger.Error(error);
 				AssetInfo assetInfo = new AssetInfo(error);
 				return assetInfo;
 			}

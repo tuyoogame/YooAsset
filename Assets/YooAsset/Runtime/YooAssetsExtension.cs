@@ -70,14 +70,13 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取资源路径
+		/// 检查资源定位地址是否有效
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
-		/// <returns>如果location地址无效，则返回空字符串</returns>
-		public static string GetAssetPath(string location)
+		public static bool CheckLocationValid(string location)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.GetAssetPath(location);
+			return _defaultPackage.CheckLocationValid(location);
 		}
 		#endregion
 

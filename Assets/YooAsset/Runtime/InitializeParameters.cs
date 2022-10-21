@@ -34,11 +34,6 @@ namespace YooAsset
 		public bool LocationToLower = false;
 
 		/// <summary>
-		/// 资源定位服务接口
-		/// </summary>
-		public ILocationServices LocationServices = null;
-
-		/// <summary>
 		/// 文件解密服务接口
 		/// </summary>
 		public IDecryptionServices DecryptionServices = null;
