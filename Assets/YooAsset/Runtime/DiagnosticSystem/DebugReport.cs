@@ -12,17 +12,21 @@ namespace YooAsset
 	[Serializable]
 	internal class DebugReport
 	{
-		public List<DebugProviderInfo> ProviderInfos = new List<DebugProviderInfo>(1000);
-
 		/// <summary>
 		/// 游戏帧
 		/// </summary>
 		public int FrameCount;
 
 		/// <summary>
+		/// 调试的包裹数据列表
+		/// </summary>
+		public List<DebugPackageData> PackageDatas = new List<DebugPackageData>(10);
+		
+
+		/// <summary>
 		/// 序列化
 		/// </summary>
-        public static byte[] Serialize(DebugReport debugReport)
+		public static byte[] Serialize(DebugReport debugReport)
         {
             return Encoding.UTF8.GetBytes(JsonUtility.ToJson(debugReport));
         }

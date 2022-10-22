@@ -1,10 +1,17 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace YooAsset
 {
 	[Serializable]
-	internal class DebugBundleInfo
+	internal class DebugBundleInfo : IComparer<DebugBundleInfo>, IComparable<DebugBundleInfo>
 	{
+		/// <summary>
+		/// 包裹名
+		/// </summary>
+		public string PackageName { set; get; }
+
 		/// <summary>
 		/// 资源包名称
 		/// </summary>
@@ -19,5 +26,14 @@ namespace YooAsset
 		/// 加载状态
 		/// </summary>
 		public int Status;
+
+		public int CompareTo(DebugBundleInfo other)
+		{
+			return Compare(this, other);
+		}
+		public int Compare(DebugBundleInfo a, DebugBundleInfo b)
+		{
+			return string.CompareOrdinal(a.BundleName, b.BundleName);
+		}
 	}
 }

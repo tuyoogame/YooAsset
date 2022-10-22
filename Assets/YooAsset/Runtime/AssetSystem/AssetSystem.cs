@@ -341,7 +341,6 @@ namespace YooAsset
 			foreach (var provider in _providers)
 			{
 				DebugProviderInfo providerInfo = new DebugProviderInfo();
-				providerInfo.PackageName = BundleServices.GetPackageName();
 				providerInfo.AssetPath = provider.MainAssetInfo.AssetPath;
 				providerInfo.SpawnScene = provider.SpawnScene;
 				providerInfo.SpawnTime = provider.SpawnTime;

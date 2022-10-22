@@ -135,7 +135,7 @@ namespace YooAsset
 			}
 			return false;
 		}
-		
+
 		/// <summary>
 		/// 开启一个异步操作
 		/// </summary>
@@ -236,12 +236,9 @@ namespace YooAsset
 
 			foreach (var package in _packages)
 			{
-				var result = package.GetDebugReportInfos();
-				report.ProviderInfos.AddRange(result);
+				var packageData = package.GetDebugPackageData();
+				report.PackageDatas.Add(packageData);
 			}
-
-			// 重新排序
-			report.ProviderInfos.Sort();
 			return report;
 		}
 		#endregion

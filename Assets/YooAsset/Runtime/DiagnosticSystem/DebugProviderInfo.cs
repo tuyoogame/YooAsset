@@ -8,9 +8,9 @@ namespace YooAsset
 	internal class DebugProviderInfo : IComparer<DebugProviderInfo>, IComparable<DebugProviderInfo>
 	{
 		/// <summary>
-		/// 所属的资源包裹
+		/// 包裹名
 		/// </summary>
-		public string PackageName;
+		public string PackageName { set; get; }
 
 		/// <summary>
 		/// 资源对象路径
