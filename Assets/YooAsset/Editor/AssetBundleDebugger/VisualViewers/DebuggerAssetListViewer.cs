@@ -27,7 +27,7 @@ namespace YooAsset.Editor
 			_visualAsset = EditorHelper.LoadWindowUXML<DebuggerAssetListViewer>();
 			if (_visualAsset == null)
 				return;
-			
+
 			_root = _visualAsset.CloneTree();
 			_root.style.flexGrow = 1f;
 
@@ -72,15 +72,24 @@ namespace YooAsset.Editor
 		}
 		private List<DebugProviderInfo> FilterViewItems(DebugReport debugReport, string searchKeyWord)
 		{
-			var result = new List<DebugProviderInfo>(debugReport.ProviderInfos.Count);
-			foreach (var providerInfo in debugReport.ProviderInfos)
+			List<DebugProviderInfo> result = new List<DebugProviderInfo>(1000);
+			foreach (var packageData in debugReport.PackageDatas)
 			{
-				if (string.IsNullOrEmpty(searchKeyWord) == false)
+				var tempList = new List<DebugProviderInfo>(packageData.ProviderInfos.Count);
+				foreach (var providerInfo in packageData.ProviderInfos)
 				{
-					if (providerInfo.AssetPath.Contains(searchKeyWord) == false)
-						continue;
+					if (string.IsNullOrEmpty(searchKeyWord) == false)
+					{
+						if (providerInfo.AssetPath.Contains(searchKeyWord) == false)
+							continue;
+					}
+
+					providerInfo.PackageName = packageData.PackageName;
+					tempList.Add(providerInfo);
 				}
-				result.Add(providerInfo);
+
+				tempList.Sort();
+				result.AddRange(tempList);
 			}
 			return result;
 		}
@@ -102,11 +111,21 @@ namespace YooAsset.Editor
 		}
 
 
-		// 资源列表相关
+		// 顶部列表相关
 		private VisualElement MakeAssetListViewItem()
 		{
 			VisualElement element = new VisualElement();
 			element.style.flexDirection = FlexDirection.Row;
+
+			{
+				var label = new Label();
+				label.name = "Label0";
+				label.style.unityTextAlign = TextAnchor.MiddleLeft;
+				label.style.marginLeft = 3f;
+				//label.style.flexGrow = 1f;
+				label.style.width = 150;
+				element.Add(label);
+			}
 
 			{
 				var label = new Label();
@@ -165,6 +184,10 @@ namespace YooAsset.Editor
 			var sourceData = _assetListView.itemsSource as List<DebugProviderInfo>;
 			var providerInfo = sourceData[index];
 
+			// Package Name
+			var label0 = element.Q<Label>("Label0");
+			label0.text = providerInfo.PackageName;
+
 			// Asset Path
 			var label1 = element.Q<Label>("Label1");
 			label1.text = providerInfo.AssetPath;
@@ -200,7 +223,7 @@ namespace YooAsset.Editor
 			}
 		}
 
-		// 依赖列表相关
+		// 底部列表相关
 		private VisualElement MakeDependListViewItem()
 		{
 			VisualElement element = new VisualElement();
@@ -255,11 +278,11 @@ namespace YooAsset.Editor
 			var label4 = element.Q<Label>("Label4");
 			label4.text = bundleInfo.Status.ToString();
 		}
-		private void FillDependListView(DebugProviderInfo providerInfo)
+		private void FillDependListView(DebugProviderInfo selectedProviderInfo)
 		{
 			_dependListView.Clear();
 			_dependListView.ClearSelection();
-			_dependListView.itemsSource = providerInfo.DependBundleInfos;
+			_dependListView.itemsSource = selectedProviderInfo.DependBundleInfos;
 			_dependListView.Rebuild();
 		}
 	}

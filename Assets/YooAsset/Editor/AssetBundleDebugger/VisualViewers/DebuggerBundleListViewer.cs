@@ -27,14 +27,14 @@ namespace YooAsset.Editor
 			_visualAsset = EditorHelper.LoadWindowUXML<DebuggerBundleListViewer>();
 			if (_visualAsset == null)
 				return;
-			
+
 			_root = _visualAsset.CloneTree();
 			_root.style.flexGrow = 1f;
 
 			// 资源包列表
 			_bundleListView = _root.Q<ListView>("TopListView");
-			_bundleListView.makeItem = MakeAssetListViewItem;
-			_bundleListView.bindItem = BindAssetListViewItem;
+			_bundleListView.makeItem = MakeBundleListViewItem;
+			_bundleListView.bindItem = BindBundleListViewItem;
 #if UNITY_2020_1_OR_NEWER
 			_bundleListView.onSelectionChange += BundleListView_onSelectionChange;
 #else
@@ -46,7 +46,7 @@ namespace YooAsset.Editor
 			_usingListView.makeItem = MakeIncludeListViewItem;
 			_usingListView.bindItem = BindIncludeListViewItem;
 		}
-		
+
 		/// <summary>
 		/// 清空页面
 		/// </summary>
@@ -72,21 +72,33 @@ namespace YooAsset.Editor
 		}
 		private List<DebugBundleInfo> FilterViewItems(DebugReport debugReport, string searchKeyWord)
 		{
-			Dictionary<string, DebugBundleInfo> result = new Dictionary<string, DebugBundleInfo>(debugReport.ProviderInfos.Count);
-			foreach (var providerInfo in debugReport.ProviderInfos)
+			List<DebugBundleInfo> result = new List<DebugBundleInfo>(1000);
+			foreach (var pakcageData in debugReport.PackageDatas)
 			{
-				foreach (var bundleInfo in providerInfo.DependBundleInfos)
+				Dictionary<string, DebugBundleInfo> tempDic = new Dictionary<string, DebugBundleInfo>(1000);
+				foreach (var providerInfo in pakcageData.ProviderInfos)
 				{
-					if (string.IsNullOrEmpty(searchKeyWord) == false)
+					foreach (var bundleInfo in providerInfo.DependBundleInfos)
 					{
-						if (bundleInfo.BundleName.Contains(searchKeyWord) == false)
-							continue;
+						if (string.IsNullOrEmpty(searchKeyWord) == false)
+						{
+							if (bundleInfo.BundleName.Contains(searchKeyWord) == false)
+								continue;
+						}
+
+						if (tempDic.ContainsKey(bundleInfo.BundleName) == false)
+						{
+							bundleInfo.PackageName = pakcageData.PackageName;
+							tempDic.Add(bundleInfo.BundleName, bundleInfo);
+						}
 					}
-					if (result.ContainsKey(bundleInfo.BundleName) == false)
-						result.Add(bundleInfo.BundleName, bundleInfo);
 				}
+
+				var tempList = tempDic.Values.ToList();
+				tempList.Sort();
+				result.AddRange(tempList);
 			}
-			return result.Values.ToList();
+			return result;
 		}
 
 		/// <summary>
@@ -107,10 +119,20 @@ namespace YooAsset.Editor
 
 
 		// 顶部列表相关
-		private VisualElement MakeAssetListViewItem()
+		private VisualElement MakeBundleListViewItem()
 		{
 			VisualElement element = new VisualElement();
 			element.style.flexDirection = FlexDirection.Row;
+
+			{
+				var label = new Label();
+				label.name = "Label0";
+				label.style.unityTextAlign = TextAnchor.MiddleLeft;
+				label.style.marginLeft = 3f;
+				//label.style.flexGrow = 1f;
+				label.style.width = 150;
+				element.Add(label);
+			}
 
 			{
 				var label = new Label();
@@ -144,10 +166,14 @@ namespace YooAsset.Editor
 
 			return element;
 		}
-		private void BindAssetListViewItem(VisualElement element, int index)
+		private void BindBundleListViewItem(VisualElement element, int index)
 		{
 			var sourceData = _bundleListView.itemsSource as List<DebugBundleInfo>;
 			var bundleInfo = sourceData[index];
+
+			// Package Name
+			var label0 = element.Q<Label>("Label0");
+			label0.text = bundleInfo.PackageName;
 
 			// Bundle Name
 			var label1 = element.Q<Label>("Label1");
@@ -172,7 +198,7 @@ namespace YooAsset.Editor
 			foreach (var item in objs)
 			{
 				DebugBundleInfo bundleInfo = item as DebugBundleInfo;
-				FillUsingListView(bundleInfo.BundleName);
+				FillUsingListView(bundleInfo);
 			}
 		}
 
@@ -259,17 +285,23 @@ namespace YooAsset.Editor
 			var label5 = element.Q<Label>("Label5");
 			label5.text = providerInfo.Status.ToString();
 		}
-		private void FillUsingListView(string bundleName)
-		{	
+		private void FillUsingListView(DebugBundleInfo selectedBundleInfo)
+		{
 			List<DebugProviderInfo> source = new List<DebugProviderInfo>();
-			foreach (var providerInfo in _debugReport.ProviderInfos)
+			foreach (var packageData in _debugReport.PackageDatas)
 			{
-				foreach (var bundleInfo in providerInfo.DependBundleInfos)
+				if (packageData.PackageName == selectedBundleInfo.PackageName)
 				{
-					if (bundleInfo.BundleName == bundleName)
+					foreach (var providerInfo in packageData.ProviderInfos)
 					{
-						source.Add(providerInfo);
-						continue;
+						foreach (var bundleInfo in providerInfo.DependBundleInfos)
+						{
+							if (bundleInfo.BundleName == selectedBundleInfo.BundleName)
+							{
+								source.Add(providerInfo);
+								continue;
+							}
+						}
 					}
 				}
 			}
