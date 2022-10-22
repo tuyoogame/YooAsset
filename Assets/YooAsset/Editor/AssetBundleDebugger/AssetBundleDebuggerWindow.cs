@@ -73,6 +73,10 @@ namespace YooAsset.Editor
 				var sampleBtn = root.Q<Button>("SampleButton");
 				sampleBtn.clicked += SampleBtn_onClick;
 
+				// 导出按钮
+				var exportBtn = root.Q<Button>("ExportButton");
+				exportBtn.clicked += ExportBtn_clicked;
+
 				// 用户列表菜单
 				_playerName = root.Q<Label>("PlayerName");
 				_playerName.text = "Editor player";
@@ -250,6 +254,32 @@ namespace YooAsset.Editor
 			byte[] data = RemoteCommand.Serialize(command);
 			EditorConnection.instance.Send(RemoteDebuggerDefine.kMsgSendEditorToPlayer, data);
 			RemoteDebuggerInRuntime.EditorRequestDebugReport();
+		}
+		private void ExportBtn_clicked()
+		{
+			if (_currentReport == null)
+			{
+				Debug.LogWarning("Debug report is null.");
+				return;
+			}
+
+			string resultPath = EditorTools.OpenFolderPanel("Export JSON", "Assets/");
+			if (resultPath != null)
+			{
+				// 注意：排序保证生成配置的稳定性
+				foreach (var packageData in _currentReport.PackageDatas)
+				{
+					packageData.ProviderInfos.Sort();
+					foreach (var providerInfo in packageData.ProviderInfos)
+					{
+						providerInfo.DependBundleInfos.Sort();
+					}
+				}
+
+				string filePath = $"{resultPath}/{nameof(DebugReport)}_{_currentReport.FrameCount}.json";
+				string fileContent = JsonUtility.ToJson(_currentReport, true);
+				FileUtility.CreateFile(filePath, fileContent);
+			}
 		}
 		private void OnSearchKeyWordChange(ChangeEvent<string> e)
 		{
