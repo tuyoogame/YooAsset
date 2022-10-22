@@ -2,52 +2,41 @@
 
 **加载方法**
 
-- YooAssets.LoadAssetSync() 同步加载资源对象
-- YooAssets.LoadAssetAsync() 异步加载资源对象
-- YooAssets.LoadSubAssetsSync() 同步加载子资源对象
-- YooAssets.LoadSubAssetsAsync() 异步加载子资源对象
-- YooAssets.LoadSceneAsync() 异步加载场景
-- YooAssets.GetRawFileAsync() 异步获取原生文件
+- LoadAssetSync() 同步加载资源对象
+- LoadAssetAsync() 异步加载资源对象
+- LoadSubAssetsSync() 同步加载子资源对象
+- LoadSubAssetsAsync() 异步加载子资源对象
+- LoadSceneAsync() 异步加载场景
+- GetRawFileAsync() 异步获取原生文件
 
 **统一约定**
 
 **Location**为资源的定位地址，也是加载资源对象的唯一标识符。
 
-- DefaultLocationServices 默认资源定位服务，location代表的是资源对象的相对路径。
+- 在未开启可寻址模式下，location代表的是资源对象的完整路径。
 
 ```c#
 // 以工程内的音频文件为例："Assets/GameRes/Audio/bgMusic.mp3" 
-// 设定资源路径的根目录为："Assets/GameRes"，后续加载的资源定位地址填写相对路径："Audio/bgMusic"
-var createParameters = new EditorSimulateModeParameters();
-createParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
-yield return defaultPackage.InitializeAsync(createParameters);
-......
-YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic");
+package.LoadAssetAsync<AudioClip>("Assets/GameRes/Audio/bgMusic");
 ```
 
-- AddressLocationServices 可寻址资源定位服务，location代表的是资源对象可寻址地址。
+- 在开启可寻址模式下，location代表的是资源对象可寻址地址。
 
 ````c#
 // 以工程内的音频文件为例："Assets/GameRes/Audio/bgMusic.mp3" 
 // 需要在资源配置界面启用可寻址功能（Enable Addressable）。
 // 配置界面的可寻址规则为AddressByFileName，那么资源定位地址填写文件名称："bgMusic"
-var createParameters = new EditorSimulateModeParameters();
-createParameters.LocationServices = new AddressLocationServices();
-yield return defaultPackage.InitializeAsync(createParameters);
-......
-YooAssets.LoadAssetAsync<AudioClip>("bgMusic");
+package.LoadAssetAsync<AudioClip>("bgMusic");
 ````
-
-**注意**：以下范例执行环境是在DefaultLocationServices下。
 
 **加载路径的匹配方式**
 
 ````C#
 // 不带扩展名的模糊匹配
-YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic");
+package.LoadAssetAsync<AudioClip>("Assets/GameRes/Audio/bgMusic");
 
 // 带扩展名的精准匹配
-YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
+package.LoadAssetAsync<AudioClip>("Assets/GameRes/Audio/bgMusic.mp3");
 ````
 
 **异步加载范例**
@@ -56,7 +45,7 @@ YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
 // 委托加载方式
 void Start()
 {
-    AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
+    AssetOperationHandle handle = package.LoadAssetAsync<AudioClip>("Assets/GameRes/Audio/bgMusic.mp3");
     handle.Completed += Handle_Completed;
 }
 void Handle_Completed(AssetOperationHandle handle)
@@ -68,7 +57,7 @@ void Handle_Completed(AssetOperationHandle handle)
 // 协程加载方式
 IEnumerator Start()
 {
-    AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
+    AssetOperationHandle handle = package.LoadAssetAsync<AudioClip>("Assets/GameRes/Audio/bgMusic.mp3");
     yield return handle;   
     AudioClip audioClip = handle.AssetObject as AudioClip;
 }
@@ -77,7 +66,7 @@ IEnumerator Start()
 // Task加载方式
 async void Start()
 {
-    AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
+    AssetOperationHandle handle = package.LoadAssetAsync<AudioClip>("Assets/GameRes/Audio/bgMusic.mp3");
     await handle.Task;
     AudioClip audioClip = handle.AssetObject as AudioClip;	
 }
@@ -88,7 +77,7 @@ async void Start()
 ````C#
 IEnumerator Start()
 {
-    AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("Audio/bgMusic.mp3");
+    AssetOperationHandle handle = package.LoadAssetAsync<AudioClip>("Assets/GameRes/Audio/bgMusic.mp3");
     yield return handle;
     ...
     handle.Release();
@@ -114,7 +103,7 @@ private void UnloadAssets()
 ````C#
 IEnumerator Start()
 {
-    AssetOperationHandle handle = YooAssets.LoadAssetAsync<GameObject>("Panel/login.prefab");
+    AssetOperationHandle handle = package.LoadAssetAsync<GameObject>("Assets/GameRes/Panel/login.prefab");
     yield return handle;
     GameObject go = handle.InstantiateSync();
     Debug.Log($"Prefab name is {go.name}");
@@ -128,7 +117,7 @@ IEnumerator Start()
 ````c#
 IEnumerator Start()
 {
-    SubAssetsOperationHandle handle = YooAssets.LoadSubAssetsAsync<Sprite>(location);
+    SubAssetsOperationHandle handle = package.LoadSubAssetsAsync<Sprite>(location);
     yield return handle;
     var sprite = handle.GetSubAssetObject<Sprite>("spriteName");
     Debug.Log($"Sprite name is {sprite.name}");
@@ -142,9 +131,10 @@ IEnumerator Start()
 ````c#
 IEnumerator Start()
 {
+    string location = "Assets/GameRes/Scene/Login";
     var sceneMode = UnityEngine.SceneManagement.LoadSceneMode.Single;
     bool activateOnLoad = true;
-    SceneOperationHandle handle = YooAssets.LoadSceneAsync("Scene/Login", sceneMode, activateOnLoad);
+    SceneOperationHandle handle = package.LoadSceneAsync(location, sceneMode, activateOnLoad);
     yield return handle;
     Debug.Log($"Scene name is {handle.Scene.name}");
 }
@@ -157,9 +147,9 @@ IEnumerator Start()
 ````c#
 IEnumerator Start()
 {
-    string location = "wwise/init.bnk";
+    string location = "Assets/GameRes/wwise/init.bnk";
     string copyPath = $"{Application.persistentDataPath}/Audio/init.bnk";
-    RawFileOperation operation = YooAssets.GetRawFileAsync(location, copyPath);
+    RawFileOperation operation = package.GetRawFileAsync(location, copyPath);
     yield return operation;
     byte[] fileData = operation.GetFileData();
     string fileText = operation.GetFileText();
@@ -173,7 +163,7 @@ IEnumerator Start()
 ````c#
 private GetAssetInfosByTag(string tag)
 {
-    AssetInfo[] assetInfos = YooAssets.GetAssetInfos(tag);
+    AssetInfo[] assetInfos = package.GetAssetInfos(tag);
     foreach (var assetInfo in assetInfos)
     {
         Debug.Log(assetInfo.AssetPath);

@@ -12,8 +12,9 @@ private List<AssetOperationHandle> _handles = new List<AssetOperationHandle>(100
 private object LoadFunc(string name, string extension, System.Type type, out DestroyMethod method)
 {
     method = DestroyMethod.None; //注意：这里一定要设置为None
-    string location = $"FairyRes/{name}{extension}";
-    var handle = YooAssets.LoadAssetSync(location , type);
+    string location = $"Assets/FairyRes/{name}{extension}";
+    var assetPackage = YooAssets.GetAssetsPackage("DefaultPackage");
+    var handle = assetPackage.LoadAssetSync(location , type);
     _handles.Add(handle);
     return handle.AssetObject;
 }
@@ -43,7 +44,8 @@ private void ReleaseHandles()
 代码示例
 
 ```csharp
-var handle = YooAssets.LoadAssetAsync<GameObject>("Assets/Res/Prefabs/TestImg.prefab");
+var assetPackage = YooAssets.GetAssetsPackage("DefaultPackage");
+var handle = assetPackage.LoadAssetAsync<GameObject>("Assets/Res/Prefabs/TestImg.prefab");
 
 await handle.ToUniTask();
 
@@ -65,32 +67,30 @@ go.transform.localScale    = Vector3.one;
 在运行游戏之前，请保证资源包可以构建成功！
 
 ```c#
-public static AssetPackage DefaultPackage;
-
 IEnumerator Start()
 {
     // 初始化YooAssets资源系统（必须代码）
     YooAssets.Initialize();
     
     // 创建资源包实例
-    DefaultPackage = YooAssets.CreateAssetPackage("DefaultPackage");
+    var package = YooAssets.CreateAssetPackage("DefaultPackage");
     
     // 初始化资源包
     ......
-    yield return DefaultPackage.InitializeAsync(createParameters);
+    yield return package.InitializeAsync(createParameters);
     
     // 更新资源包版本
     ......
-    var operation = DefaultPackage.UpdateManifestAsync(packageCRC);
+    var operation = package.UpdateManifestAsync(packageCRC);
     yield return operation;
     
     // 下载更新文件
-    var downloader = DefaultPackage.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
+    var downloader = package.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
     downloader.BeginDownload();
     yield return downloader;
     
     // 加载资源对象
-    var assetHandle = DefaultPackage.LoadAssetAsync("Assets/GameRes/npc.prefab");
+    var assetHandle = package.LoadAssetAsync("Assets/GameRes/npc.prefab");
     yield return assetHandle;
     ......
 }
