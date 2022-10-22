@@ -28,6 +28,11 @@ namespace YooAsset
 		public string SpawnTime;
 
 		/// <summary>
+		/// 加载耗时（单位：毫秒）
+		/// </summary>
+		public long LoadingTime;
+
+		/// <summary>
 		/// 引用计数
 		/// </summary>
 		public int RefCount;

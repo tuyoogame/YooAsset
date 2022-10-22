@@ -238,6 +238,17 @@ namespace YooAsset
 		/// </summary>
 		public string SpawnTime = string.Empty;
 
+		/// <summary>
+		/// 加载耗时（单位：毫秒）
+		/// </summary>
+		public long LoadingTime { protected set; get; }
+
+#if DEBUG
+		// 加载耗时统计
+		private bool _isRecording = false;
+		private Stopwatch _watch;
+#endif
+
 		[Conditional("DEBUG")]
 		public void InitSpawnDebugInfo()
 		{
@@ -250,6 +261,25 @@ namespace YooAsset
 			float m = UnityEngine.Mathf.FloorToInt(spawnTime / 60f - h * 60f);
 			float s = UnityEngine.Mathf.FloorToInt(spawnTime - m * 60f - h * 3600f);
 			return h.ToString("00") + ":" + m.ToString("00") + ":" + s.ToString("00");
+		}
+
+		[Conditional("DEBUG")]
+		protected void DebugRecording()
+		{
+			if (_isRecording == false)
+			{
+				_isRecording = true;
+				_watch = Stopwatch.StartNew();
+			}
+
+			if (_watch != null)
+			{
+				if (IsDone)
+				{
+					LoadingTime = _watch.ElapsedMilliseconds;
+					_watch = null;
+				}
+			}
 		}
 		#endregion
 	}

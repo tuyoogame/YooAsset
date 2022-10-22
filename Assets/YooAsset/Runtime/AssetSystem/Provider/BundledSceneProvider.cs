@@ -32,6 +32,8 @@ namespace YooAsset
 		}
 		public override void Update()
 		{
+			DebugRecording();
+
 			if (IsDone)
 				return;
 
@@ -97,7 +99,7 @@ namespace YooAsset
 						SceneManager.SetActiveScene(SceneObject);
 
 					Status = SceneObject.IsValid() ? EStatus.Success : EStatus.Fail;
-					if(Status == EStatus.Fail)
+					if (Status == EStatus.Fail)
 					{
 						LastError = $"The load scene is invalid : {MainAssetInfo.AssetPath}";
 						YooLogger.Error(LastError);

@@ -22,6 +22,8 @@ namespace YooAsset
 		}
 		public override void Update()
 		{
+			DebugRecording();
+
 			if (IsDone)
 				return;
 

@@ -344,6 +344,7 @@ namespace YooAsset
 				providerInfo.AssetPath = provider.MainAssetInfo.AssetPath;
 				providerInfo.SpawnScene = provider.SpawnScene;
 				providerInfo.SpawnTime = provider.SpawnTime;
+				providerInfo.LoadingTime = provider.LoadingTime;
 				providerInfo.RefCount = provider.RefCount;
 				providerInfo.Status = (int)provider.Status;
 				providerInfo.DependBundleInfos = new List<DebugBundleInfo>();
