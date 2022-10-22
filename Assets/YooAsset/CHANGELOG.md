@@ -2,6 +2,61 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.3.2] - 2022-10-22
+
+### Fixed
+
+- 修复了AssetBundleCollector界面点击修复按钮界面没有刷新的问题。
+
+### Added
+
+- 新增了自定义证书认证方法。
+
+  ````c#
+  public static class YooAssets
+  {
+      /// <summary>
+      /// 设置下载系统参数，自定义的证书认证实例
+      /// </summary>
+      public static void SetDownloadSystemCertificateHandler(UnityEngine.Networking.CertificateHandler instance)
+  }
+  ````
+
+- 新增了下载失败后清理文件的方法。
+
+  ````c#
+  public static class YooAssets
+  {
+      /// <summary>
+      /// 设置下载系统参数，下载失败后清理文件的HTTP错误码
+      /// </summary>
+      public static void SetDownloadSystemClearFileResponseCode(List<long> codes)
+  }
+  ````
+
+- 新增了检查资源定位地址是否有效的方法。
+
+  ```c#
+  public class AssetsPackage
+  {
+      /// <summary>
+      /// 检查资源定位地址是否有效
+      /// </summary>
+      /// <param name="location">资源的定位地址</param>
+      public bool CheckLocationValid(string location)
+  }
+  ```
+
+### Removed
+
+- 移除了ILocationServices接口类和初始化字段。
+- 移除了AssetPackage.GetAssetPath(string location)方法。
+- 移除了BuildParameters.EnableAddressable字段。
+
+### Changed
+
+- AssetBundleCollector配置增加了UniqueBundleName设置，用于解决不同包裹之间Bundle名称冲突的问题。
+
 ## [1.3.1] - 2022-10-18
 
 ### Fixed
