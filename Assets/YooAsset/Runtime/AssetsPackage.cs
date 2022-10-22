@@ -122,6 +122,7 @@ namespace YooAsset
 			}
 
 			// 监听初始化结果
+			_isInitialize = true;
 			initializeOperation.Completed += InitializeOperation_Completed;
 			return initializeOperation;
 		}
@@ -298,11 +299,9 @@ namespace YooAsset
 		/// </summary>
 		public void UnloadUnusedAssets()
 		{
-			if (_isInitialize)
-			{
-				_assetSystemImpl.Update();
-				_assetSystemImpl.UnloadUnusedAssets();
-			}
+			DebugCheckInitialize();
+			_assetSystemImpl.Update();
+			_assetSystemImpl.UnloadUnusedAssets();
 		}
 
 		/// <summary>
@@ -310,10 +309,8 @@ namespace YooAsset
 		/// </summary>
 		public void ForceUnloadAllAssets()
 		{
-			if (_isInitialize)
-			{
-				_assetSystemImpl.ForceUnloadAllAssets();
-			}
+			DebugCheckInitialize();
+			_assetSystemImpl.ForceUnloadAllAssets();
 		}
 
 
@@ -982,9 +979,12 @@ namespace YooAsset
 		#endregion
 
 		#region 调试信息
-		internal List<DebugProviderInfo> GetDebugReportInfos()
+		internal DebugPackageData GetDebugPackageData()
 		{
-			return _assetSystemImpl.GetDebugReportInfos();
+			DebugPackageData data = new DebugPackageData();
+			data.PackageName = PackageName;
+			data.ProviderInfos = _assetSystemImpl.GetDebugReportInfos();
+			return data;
 		}
 		#endregion
 
