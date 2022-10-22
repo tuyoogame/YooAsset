@@ -165,7 +165,6 @@ namespace YooAsset
 		/// <summary>
 		/// 设置下载系统参数，自定义的证书认证实例
 		/// </summary>
-		/// <param name="instance"></param>
 		public static void SetDownloadSystemCertificateHandler(UnityEngine.Networking.CertificateHandler instance)
 		{
 			DownloadSystem.CertificateHandlerInstance = instance;
