@@ -163,13 +163,23 @@ namespace YooAsset.Editor
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
-				label.style.width = 100;
+				label.style.width = 150;
 				element.Add(label);
 			}
 
 			{
 				var label = new Label();
 				label.name = "Label5";
+				label.style.unityTextAlign = TextAnchor.MiddleLeft;
+				label.style.marginLeft = 3f;
+				//label.style.flexGrow = 1f;
+				label.style.width = 100;
+				element.Add(label);
+			}
+
+			{
+				var label = new Label();
+				label.name = "Label6";
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
@@ -200,9 +210,13 @@ namespace YooAsset.Editor
 			var label3 = element.Q<Label>("Label3");
 			label3.text = providerInfo.SpawnTime;
 
-			// Ref Count
+			// Loading Time
 			var label4 = element.Q<Label>("Label4");
-			label4.text = providerInfo.RefCount.ToString();
+			label4.text = providerInfo.LoadingTime.ToString();
+
+			// Ref Count
+			var label5 = element.Q<Label>("Label5");
+			label5.text = providerInfo.RefCount.ToString();
 
 			// Status
 			StyleColor textColor;
@@ -210,9 +224,9 @@ namespace YooAsset.Editor
 				textColor = new StyleColor(Color.yellow);
 			else
 				textColor = label1.style.color;
-			var label5 = element.Q<Label>("Label5");
-			label5.text = providerInfo.Status.ToString();
-			label5.style.color = textColor;
+			var label6 = element.Q<Label>("Label6");
+			label6.text = providerInfo.Status.ToString();
+			label6.style.color = textColor;
 		}
 		private void AssetListView_onSelectionChange(IEnumerable<object> objs)
 		{

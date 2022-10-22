@@ -5,8 +5,9 @@
             <uie:ToolbarButton text="Asset Path" display-tooltip-when-elided="true" name="TopBar1" style="width: 280px; -unity-text-align: middle-left; flex-grow: 1;" />
             <uie:ToolbarButton text="Spawn Scene" display-tooltip-when-elided="true" name="TopBar2" style="width: 150px; -unity-text-align: middle-left; flex-grow: 0;" />
             <uie:ToolbarButton text="Spawn Time" display-tooltip-when-elided="true" name="TopBar3" style="width: 150px; -unity-text-align: middle-left; flex-grow: 0;" />
-            <uie:ToolbarButton text="Ref Count" display-tooltip-when-elided="true" name="TopBar4" style="width: 100px; -unity-text-align: middle-left; flex-grow: 0;" />
-            <uie:ToolbarButton text="Status" display-tooltip-when-elided="true" name="TopBar5" style="width: 120px; -unity-text-align: middle-left;" />
+            <uie:ToolbarButton text="Loading Time (ms)" display-tooltip-when-elided="true" name="TopBar4" style="width: 150px; -unity-text-align: middle-left; flex-grow: 0;" />
+            <uie:ToolbarButton text="Ref Count" display-tooltip-when-elided="true" name="TopBar5" style="width: 100px; -unity-text-align: middle-left; flex-grow: 0;" />
+            <uie:ToolbarButton text="Status" display-tooltip-when-elided="true" name="TopBar6" style="width: 120px; -unity-text-align: middle-left;" />
         </uie:Toolbar>
         <ui:ListView focusable="true" name="TopListView" item-height="18" virtualization-method="DynamicHeight" style="flex-grow: 1;" />
     </ui:VisualElement>
