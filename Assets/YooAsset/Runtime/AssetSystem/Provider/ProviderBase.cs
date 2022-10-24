@@ -243,11 +243,9 @@ namespace YooAsset
 		/// </summary>
 		public long LoadingTime { protected set; get; }
 
-#if DEBUG
 		// 加载耗时统计
 		private bool _isRecording = false;
 		private Stopwatch _watch;
-#endif
 
 		[Conditional("DEBUG")]
 		public void InitSpawnDebugInfo()
