@@ -68,6 +68,7 @@ namespace YooAsset
 						throw new System.Exception("Should never get here !");
 					Status = EStatus.Fail;
 					LastError = $"The bundle {OwnerBundle.MainBundleInfo.Bundle.BundleName} has been destroyed by unity bugs !";
+					YooLogger.Error(LastError);
 					InvokeCompletion();
 					return;
 				}
