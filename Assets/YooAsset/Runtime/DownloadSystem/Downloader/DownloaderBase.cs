@@ -24,6 +24,7 @@ namespace YooAsset
 		protected string _requestURL;
 
 		protected string _lastError = string.Empty;
+		protected long _lastCode = 0;
 		protected float _downloadProgress = 0f;
 		protected ulong _downloadedBytes = 0;
 
@@ -119,7 +120,7 @@ namespace YooAsset
 		/// </summary>
 		public string GetLastError()
 		{
-			return $"Failed to download : {_requestURL} Error : {_lastError}";
+			return $"Failed to download : {_requestURL} Error : {_lastError} Code : {_lastCode}";
 		}
 	}
 }

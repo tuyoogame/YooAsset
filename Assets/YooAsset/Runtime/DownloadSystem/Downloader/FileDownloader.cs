@@ -134,12 +134,14 @@ namespace YooAsset
 				{
 					hasError = true;
 					_lastError = _webRequest.error;
+					_lastCode = _webRequest.responseCode;
 				}
 #else
 				if (_webRequest.isNetworkError || _webRequest.isHttpError)
 				{
 					hasError = true;
 					_lastError = _webRequest.error;
+					_lastCode = _webRequest.responseCode;
 				}
 #endif
 
@@ -151,6 +153,7 @@ namespace YooAsset
 					{
 						hasError = true;
 						_lastError = $"Verify bundle content failed : {_bundleInfo.Bundle.FileName}";
+						_lastCode = _webRequest.responseCode;
 
 						// 验证失败后删除文件
 						string cacheFilePath = _bundleInfo.Bundle.CachedFilePath;
@@ -198,6 +201,7 @@ namespace YooAsset
 				else
 				{
 					_lastError = string.Empty;
+					_lastCode = 0;
 					_steps = ESteps.Succeed;
 				}
 
@@ -223,6 +227,7 @@ namespace YooAsset
 			{
 				_steps = ESteps.Failed;
 				_lastError = "user abort";
+				_lastCode = 0;
 				DisposeWebRequest();
 			}
 		}
