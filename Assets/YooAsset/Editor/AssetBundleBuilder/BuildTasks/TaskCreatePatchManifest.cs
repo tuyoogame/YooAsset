@@ -72,17 +72,22 @@ namespace YooAsset.Editor
 		/// </summary>
 		private List<PatchBundle> GetAllPatchBundle(BuildContext context)
 		{
-			var buildParameters = context.GetContextObject<BuildParametersContext>();
+			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 			var encryptionContext = context.GetContextObject<TaskEncryption.EncryptionContext>();
 
 			List<PatchBundle> result = new List<PatchBundle>(1000);
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
+				// NOTE：检测路径长度不要超过260字符。
+				string filePath = $"{buildParametersContext.GetPipelineOutputDirectory()}/{bundleInfo.BundleName}";
+				if(filePath.Length >= 260)
+					throw new Exception($"The output bundle name is too long {filePath.Length} chars : {filePath}");
+
 				var bundleName = bundleInfo.BundleName;
-				string fileHash = GetBundleFileHash(bundleInfo, buildParameters);
-				string fileCRC = GetBundleFileCRC(bundleInfo, buildParameters);
-				long fileSize = GetBundleFileSize(bundleInfo, buildParameters);
+				string fileHash = GetBundleFileHash(bundleInfo, buildParametersContext);
+				string fileCRC = GetBundleFileCRC(bundleInfo, buildParametersContext);
+				long fileSize = GetBundleFileSize(bundleInfo, buildParametersContext);
 				string[] tags = buildMapContext.GetBundleTags(bundleName);
 				bool isEncrypted = encryptionContext.IsEncryptFile(bundleName);
 				bool isRawFile = bundleInfo.IsRawFile;

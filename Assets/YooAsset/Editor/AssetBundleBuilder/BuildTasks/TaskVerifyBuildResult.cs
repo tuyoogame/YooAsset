@@ -62,6 +62,7 @@ namespace YooAsset.Editor
 			}
 
 			// 4. 验证Asset
+			/*
 			bool isPass = true;
 			var buildMode = buildParametersContext.Parameters.BuildMode;
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
@@ -98,6 +99,7 @@ namespace YooAsset.Editor
 					throw new Exception("构建结果验证没有通过，请参考警告日志！");
 				}
 			}
+			*/
 
 			BuildRunner.Log("构建结果验证成功！");
 		}
