@@ -131,6 +131,8 @@ namespace YooAsset
 			}
 			_loaders.Clear();
 
+			_sceneHandles.Clear();
+
 			// 注意：调用底层接口释放所有资源
 			Resources.UnloadUnusedAssets();
 		}
