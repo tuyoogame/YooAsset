@@ -45,21 +45,32 @@ namespace YooAsset.Editor
 					UpdateBuiltInBundleReference(patchManifest, buildResultContext.Results);
 				}
 			}
-
+			
 			// 创建补丁清单文件
-			string manifestFileName = YooAssetSettingsData.GetPatchManifestFileName(buildParameters.PackageName, buildParameters.PackageVersion);
-			string manifestFilePath = $"{pipelineOutputDirectory}/{manifestFileName}";
-			PatchManifest.Serialize(manifestFilePath, patchManifest);
-			BuildRunner.Log($"创建补丁清单文件：{manifestFilePath}");
+			string packageHash = string.Empty;
+			{
+				string fileName = YooAssetSettingsData.GetPatchManifestFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string filePath = $"{pipelineOutputDirectory}/{fileName}";
+				PatchManifest.Serialize(filePath, patchManifest);
+				packageHash = HashUtility.FileMD5(filePath);
+				BuildRunner.Log($"创建补丁清单文件：{filePath}");
+			}
 
-			// 创建静态版本文件
-			string staticVersionFileName = YooAssetSettingsData.GetStaticVersionFileName(buildParameters.PackageName);
-			string staticVersionFilePath = $"{pipelineOutputDirectory}/{staticVersionFileName}";		
-			StaticVersion staticVersion = new StaticVersion();
-			staticVersion.PackageVersion = buildParameters.PackageVersion;
-			staticVersion.ManifestCRC = HashUtility.FileCRC32(manifestFilePath);
-			StaticVersion.Serialize(staticVersionFilePath, staticVersion);
-			BuildRunner.Log($"创建静态版本文件：{staticVersionFilePath}");
+			// 创建补丁清单哈希文件
+			{
+				string fileName = YooAssetSettingsData.GetPatchManifestHashFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string filePath = $"{pipelineOutputDirectory}/{fileName}";		
+				FileUtility.CreateFile(filePath, packageHash);
+				BuildRunner.Log($"创建补丁清单哈希文件：{filePath}");
+			}
+
+			// 创建补丁清单版本文件
+			{
+				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(buildParameters.PackageName);
+				string filePath = $"{pipelineOutputDirectory}/{fileName}";
+				FileUtility.CreateFile(filePath, buildParameters.PackageVersion);
+				BuildRunner.Log($"创建补丁清单版本文件：{filePath}");
+			}
 		}
 
 		/// <summary>

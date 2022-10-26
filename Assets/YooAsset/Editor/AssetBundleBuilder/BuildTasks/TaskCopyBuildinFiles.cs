@@ -40,17 +40,25 @@ namespace YooAsset.Editor
 
 			// 拷贝补丁清单文件
 			{
-				string manifestFileName = YooAssetSettingsData.GetPatchManifestFileName(buildPackageName, buildPackageVersion);
-				string sourcePath = $"{packageOutputDirectory}/{manifestFileName}";
-				string destPath = $"{streamingAssetsDirectory}/{manifestFileName}";
+				string fileName = YooAssetSettingsData.GetPatchManifestFileName(buildPackageName, buildPackageVersion);
+				string sourcePath = $"{packageOutputDirectory}/{fileName}";
+				string destPath = $"{streamingAssetsDirectory}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
-			// 拷贝静态版本文件
+			// 拷贝补丁清单哈希文件
 			{
-				string versionFileName = YooAssetSettingsData.GetStaticVersionFileName(buildPackageName);
-				string sourcePath = $"{packageOutputDirectory}/{versionFileName}";
-				string destPath = $"{streamingAssetsDirectory}/{versionFileName}";
+				string fileName = YooAssetSettingsData.GetPatchManifestHashFileName(buildPackageName, buildPackageVersion);
+				string sourcePath = $"{packageOutputDirectory}/{fileName}";
+				string destPath = $"{streamingAssetsDirectory}/{fileName}";
+				EditorTools.CopyFile(sourcePath, destPath, true);
+			}
+
+			// 拷贝补丁清单版本文件
+			{
+				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(buildPackageName);
+				string sourcePath = $"{packageOutputDirectory}/{fileName}";
+				string destPath = $"{streamingAssetsDirectory}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 

@@ -28,25 +28,33 @@ namespace YooAsset.Editor
 
 			// 拷贝Report文件
 			{
-				string reportFileName = YooAssetSettingsData.GetReportFileName(buildParameters.PackageName, buildParameters.PackageVersion);
-				string sourcePath = $"{pipelineOutputDirectory}/{reportFileName}";
-				string destPath = $"{packageOutputDirectory}/{reportFileName}";
+				string fileName = YooAssetSettingsData.GetReportFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string sourcePath = $"{pipelineOutputDirectory}/{fileName}";
+				string destPath = $"{packageOutputDirectory}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
 			// 拷贝补丁清单文件
 			{
-				string manifestFileName = YooAssetSettingsData.GetPatchManifestFileName(buildParameters.PackageName, buildParameters.PackageVersion);
-				string sourcePath = $"{pipelineOutputDirectory}/{manifestFileName}";
-				string destPath = $"{packageOutputDirectory}/{manifestFileName}";
+				string fileName = YooAssetSettingsData.GetPatchManifestFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string sourcePath = $"{pipelineOutputDirectory}/{fileName}";
+				string destPath = $"{packageOutputDirectory}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
-			// 拷贝静态版本文件
+			// 拷贝补丁清单哈希文件
 			{
-				string versionFileName = YooAssetSettingsData.GetStaticVersionFileName(buildParameters.PackageName);
-				string sourcePath = $"{pipelineOutputDirectory}/{versionFileName}";
-				string destPath = $"{packageOutputDirectory}/{versionFileName}";
+				string fileName = YooAssetSettingsData.GetPatchManifestHashFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string sourcePath = $"{pipelineOutputDirectory}/{fileName}";
+				string destPath = $"{packageOutputDirectory}/{fileName}";
+				EditorTools.CopyFile(sourcePath, destPath, true);
+			}
+
+			// 拷贝补丁清单版本文件
+			{
+				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(buildParameters.PackageName);
+				string sourcePath = $"{pipelineOutputDirectory}/{fileName}";
+				string destPath = $"{packageOutputDirectory}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
