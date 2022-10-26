@@ -31,15 +31,15 @@ namespace YooAsset.Editor
 			patchManifest.FileVersion = YooAssetSettings.PatchManifestFileVersion;
 			patchManifest.EnableAddressable = buildMapContext.EnableAddressable;
 			patchManifest.OutputNameStyle = (int)buildParameters.OutputNameStyle;
-			patchManifest.PackageName = buildParameters.BuildPackage;
-			patchManifest.HumanReadableVersion = buildParameters.HumanReadableVersion;
+			patchManifest.PackageName = buildParameters.PackageName;
+			patchManifest.PackageVersion = buildParameters.PackageVersion;
 			patchManifest.BundleList = GetAllPatchBundle(context);
 			patchManifest.AssetList = GetAllPatchAsset(context, patchManifest);
 
 			// 更新Unity内置资源包的引用关系
 			if (buildParameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
-				if(buildParameters.BuildMode == EBuildMode.IncrementalBuild)
+				if (buildParameters.BuildMode == EBuildMode.IncrementalBuild)
 				{
 					var buildResultContext = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
 					UpdateBuiltInBundleReference(patchManifest, buildResultContext.Results);
@@ -47,24 +47,19 @@ namespace YooAsset.Editor
 			}
 
 			// 创建补丁清单文件
-			string manifestFileTempName = YooAssetSettingsData.GetPatchManifestTempFileName(buildParameters.BuildPackage);
-			string manifestFileTempPath = $"{pipelineOutputDirectory}/{manifestFileTempName}";
-			BuildRunner.Log($"创建补丁清单文件：{manifestFileTempPath}");
-			PatchManifest.Serialize(manifestFileTempPath, patchManifest);
-
-			// 计算补丁清单文件的CRC32
-			buildParametersContext.OutputPackageCRC = HashUtility.FileCRC32(manifestFileTempPath);
-
-			// 补丁清单文件重命名
-			string manifestFileName = YooAssetSettingsData.GetPatchManifestFileName(buildParameters.BuildPackage, buildParametersContext.OutputPackageCRC);
+			string manifestFileName = YooAssetSettingsData.GetPatchManifestFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 			string manifestFilePath = $"{pipelineOutputDirectory}/{manifestFileName}";
-			EditorTools.FileMoveTo(manifestFileTempPath, manifestFilePath);
+			PatchManifest.Serialize(manifestFilePath, patchManifest);
+			BuildRunner.Log($"创建补丁清单文件：{manifestFilePath}");
 
 			// 创建静态版本文件
-			string staticVersionFileName = YooAssetSettingsData.GetStaticVersionFileName(buildParameters.BuildPackage);
-			string staticVersionFilePath = $"{pipelineOutputDirectory}/{staticVersionFileName}";
+			string staticVersionFileName = YooAssetSettingsData.GetStaticVersionFileName(buildParameters.PackageName);
+			string staticVersionFilePath = $"{pipelineOutputDirectory}/{staticVersionFileName}";		
+			StaticVersion staticVersion = new StaticVersion();
+			staticVersion.PackageVersion = buildParameters.PackageVersion;
+			staticVersion.ManifestCRC = HashUtility.FileCRC32(manifestFilePath);
+			StaticVersion.Serialize(staticVersionFilePath, staticVersion);
 			BuildRunner.Log($"创建静态版本文件：{staticVersionFilePath}");
-			FileUtility.CreateFile(staticVersionFilePath, buildParametersContext.OutputPackageCRC);
 		}
 
 		/// <summary>
@@ -81,7 +76,7 @@ namespace YooAsset.Editor
 			{
 				// NOTE：检测路径长度不要超过260字符。
 				string filePath = $"{buildParametersContext.GetPipelineOutputDirectory()}/{bundleInfo.BundleName}";
-				if(filePath.Length >= 260)
+				if (filePath.Length >= 260)
 					throw new Exception($"The output bundle name is too long {filePath.Length} chars : {filePath}");
 
 				var bundleName = bundleInfo.BundleName;

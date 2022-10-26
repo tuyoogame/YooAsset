@@ -11,29 +11,11 @@ namespace YooAsset.Editor
 
 		private string _pipelineOutputDirectory = string.Empty;
 		private string _packageOutputDirectory = string.Empty;
-		private string _outputPackageCRC = string.Empty;
 
 		/// <summary>
 		/// 构建参数
 		/// </summary>
 		public BuildParameters Parameters { private set; get; }
-
-		/// <summary>
-		/// 构建输出的包裹清单哈希值
-		/// </summary>
-		public string OutputPackageCRC
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(_outputPackageCRC))
-					throw new Exception("Output package file CRC32 is empty !");
-				return _outputPackageCRC;
-			}
-			set
-			{
-				_outputPackageCRC = value;
-			}
-		}
 
 
 		public BuildParametersContext(BuildParameters parameters)
@@ -49,7 +31,7 @@ namespace YooAsset.Editor
 		{
 			if (string.IsNullOrEmpty(_pipelineOutputDirectory))
 			{
-				_pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(Parameters.OutputRoot, Parameters.BuildPackage, Parameters.BuildTarget, Parameters.BuildMode);
+				_pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(Parameters.OutputRoot, Parameters.PackageName, Parameters.BuildTarget, Parameters.BuildMode);
 			}
 			return _pipelineOutputDirectory;
 		}
@@ -61,7 +43,7 @@ namespace YooAsset.Editor
 		{
 			if (string.IsNullOrEmpty(_packageOutputDirectory))
 			{
-				_packageOutputDirectory = $"{Parameters.OutputRoot}/{Parameters.BuildPackage}/{Parameters.BuildTarget}/{OutputPackageCRC}";
+				_packageOutputDirectory = $"{Parameters.OutputRoot}/{Parameters.PackageName}/{Parameters.BuildTarget}/{Parameters.PackageVersion}";
 			}
 			return _packageOutputDirectory;
 		}

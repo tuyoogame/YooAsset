@@ -75,9 +75,9 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 加载补丁清单文件
 		/// </summary>
-		internal static PatchManifest LoadPatchManifestFile(string fileDirectory, string packageName, string packageCRC)
+		internal static PatchManifest LoadPatchManifestFile(string fileDirectory, string packageName, string packageVersion)
 		{
-			string filePath = $"{fileDirectory}/{YooAssetSettingsData.GetPatchManifestFileName(packageName, packageCRC)}";
+			string filePath = $"{fileDirectory}/{YooAssetSettingsData.GetPatchManifestFileName(packageName, packageVersion)}";
 			if (File.Exists(filePath) == false)
 			{
 				throw new System.Exception($"Not found patch manifest file : {filePath}");

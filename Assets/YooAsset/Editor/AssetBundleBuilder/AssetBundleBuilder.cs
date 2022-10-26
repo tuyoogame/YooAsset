@@ -86,7 +86,6 @@ namespace YooAsset.Editor
 			var buildResult = BuildRunner.Run(pipeline, _buildContext);
 			if (buildResult.Success)
 			{
-				buildResult.OutputPackageCRC = buildParametersContext.OutputPackageCRC;
 				buildResult.OutputPackageDirectory = buildParametersContext.GetPackageOutputDirectory();
 				Debug.Log($"{buildParameters.BuildMode} pipeline build succeed !");
 			}

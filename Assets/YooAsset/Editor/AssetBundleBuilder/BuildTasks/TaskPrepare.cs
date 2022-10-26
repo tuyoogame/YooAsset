@@ -19,8 +19,10 @@ namespace YooAsset.Editor
 			// 检测构建参数合法性
 			if (buildParameters.BuildTarget == BuildTarget.NoTarget)
 				throw new Exception("请选择目标平台");
-			if (string.IsNullOrEmpty(buildParameters.BuildPackage))
+			if (string.IsNullOrEmpty(buildParameters.PackageName))
 				throw new Exception("包裹名称不能为空");
+			if(string.IsNullOrEmpty(buildParameters.PackageVersion))
+				throw new Exception("包裹版本不能为空");
 
 			if (buildParameters.BuildMode != EBuildMode.SimulateBuild)
 			{
@@ -40,6 +42,11 @@ namespace YooAsset.Editor
 						throw new Exception("首包资源标签不能为空！");
 				}
 
+				// 检测包裹输出目录是否存在
+				string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
+				if (Directory.Exists(packageOutputDirectory))
+					throw new Exception($"本次构建的补丁目录已经存在：{packageOutputDirectory}");
+
 				// 保存改动的资源
 				AssetDatabase.SaveAssets();
 			}
@@ -47,7 +54,7 @@ namespace YooAsset.Editor
 			if (buildParameters.BuildMode == EBuildMode.ForceRebuild)
 			{
 				// 删除平台总目录
-				string platformDirectory = $"{buildParameters.OutputRoot}/{buildParameters.BuildPackage}/{buildParameters.BuildTarget}";
+				string platformDirectory = $"{buildParameters.OutputRoot}/{buildParameters.PackageName}/{buildParameters.BuildTarget}";
 				if (EditorTools.DeleteDirectory(platformDirectory))
 				{
 					BuildRunner.Log($"删除平台总目录：{platformDirectory}");

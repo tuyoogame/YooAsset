@@ -255,7 +255,8 @@ namespace YooAsset.Editor
 			buildParameters.BuildTarget = _buildTarget;
 			buildParameters.BuildPipeline = AssetBundleBuilderSettingData.Setting.BuildPipeline;
 			buildParameters.BuildMode = AssetBundleBuilderSettingData.Setting.BuildMode;
-			buildParameters.BuildPackage = AssetBundleBuilderSettingData.Setting.BuildPackage;
+			buildParameters.PackageName = AssetBundleBuilderSettingData.Setting.BuildPackage;
+			buildParameters.PackageVersion = GetDefaultPackageVersion();
 			buildParameters.VerifyBuildingResult = true;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.CompressOption = AssetBundleBuilderSettingData.Setting.CompressOption;
@@ -275,6 +276,11 @@ namespace YooAsset.Editor
 			{
 				EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
 			}
+		}
+		private string GetDefaultPackageVersion()
+		{
+			int totalMinutes = DateTime.Now.Hour * 60 + DateTime.Now.Minute;
+			return DateTime.Now.ToString("yyyy-MM-dd") + "-" + totalMinutes;
 		}
 
 		// 构建包裹相关

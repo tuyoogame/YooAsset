@@ -26,11 +26,11 @@ namespace YooAsset.Editor
 			ECopyBuildinFileOption option = buildParametersContext.Parameters.CopyBuildinFileOption;
 			string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
 			string streamingAssetsDirectory = AssetBundleBuilderHelper.GetStreamingAssetsFolderPath();
-			string buildPackageName = buildParametersContext.Parameters.BuildPackage;
-			string outputPackageCRC = buildParametersContext.OutputPackageCRC;
+			string buildPackageName = buildParametersContext.Parameters.PackageName;
+			string buildPackageVersion = buildParametersContext.Parameters.PackageVersion;
 
 			// 加载补丁清单
-			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(packageOutputDirectory, buildPackageName, outputPackageCRC);
+			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(packageOutputDirectory, buildPackageName, buildPackageVersion);
 
 			// 清空流目录
 			if (option == ECopyBuildinFileOption.ClearAndCopyAll || option == ECopyBuildinFileOption.ClearAndCopyByTags)
@@ -40,7 +40,7 @@ namespace YooAsset.Editor
 
 			// 拷贝补丁清单文件
 			{
-				string manifestFileName = YooAssetSettingsData.GetPatchManifestFileName(buildPackageName, outputPackageCRC);
+				string manifestFileName = YooAssetSettingsData.GetPatchManifestFileName(buildPackageName, buildPackageVersion);
 				string sourcePath = $"{packageOutputDirectory}/{manifestFileName}";
 				string destPath = $"{streamingAssetsDirectory}/{manifestFileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);

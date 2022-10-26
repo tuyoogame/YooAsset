@@ -66,7 +66,8 @@ namespace YooAsset.Editor
 			_items.Add(new ItemWrapper("构建平台", $"{buildReport.Summary.BuildTarget}"));
 			_items.Add(new ItemWrapper("构建管线", $"{buildReport.Summary.BuildPipeline}"));
 			_items.Add(new ItemWrapper("构建模式", $"{buildReport.Summary.BuildMode}"));
-			_items.Add(new ItemWrapper("构建包裹", $"{buildReport.Summary.BuildPackage}"));
+			_items.Add(new ItemWrapper("包裹名称", buildReport.Summary.BuildPackageName));
+			_items.Add(new ItemWrapper("包裹版本", buildReport.Summary.BuildPackageVersion));
 
 			_items.Add(new ItemWrapper("启用可寻址资源定位", $"{buildReport.Summary.EnableAddressable}"));
 			_items.Add(new ItemWrapper("资源包名唯一化", $"{buildReport.Summary.UniqueBundleName}"));

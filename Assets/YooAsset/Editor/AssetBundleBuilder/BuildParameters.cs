@@ -57,14 +57,14 @@ namespace YooAsset.Editor
 		public EBuildMode BuildMode;
 
 		/// <summary>
-		/// 构建的Package名称
+		/// 构建的包裹名称
 		/// </summary>
-		public string BuildPackage;
+		public string PackageName;
 
 		/// <summary>
-		/// 人类可读的版本信息
+		/// 构建的包裹版本
 		/// </summary>
-		public string HumanReadableVersion;
+		public string PackageVersion;
 
 
 		/// <summary>

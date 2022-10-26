@@ -29,7 +29,7 @@ namespace YooAsset.Editor
 			var buildParameters = buildParametersContext.Parameters;
 
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
-			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(pipelineOutputDirectory, buildParameters.BuildPackage, buildParametersContext.OutputPackageCRC);
+			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(pipelineOutputDirectory, buildParameters.PackageName, buildParameters.PackageVersion);
 			BuildReport buildReport = new BuildReport();
 
 			// 概述信息
@@ -45,7 +45,8 @@ namespace YooAsset.Editor
 				buildReport.Summary.BuildTarget = buildParameters.BuildTarget;
 				buildReport.Summary.BuildPipeline = buildParameters.BuildPipeline;
 				buildReport.Summary.BuildMode = buildParameters.BuildMode;
-				buildReport.Summary.BuildPackage = buildParameters.BuildPackage;
+				buildReport.Summary.BuildPackageName = buildParameters.PackageName;
+				buildReport.Summary.BuildPackageVersion = buildParameters.PackageVersion;
 				buildReport.Summary.EnableAddressable = buildMapContext.EnableAddressable;
 				buildReport.Summary.UniqueBundleName = buildMapContext.UniqueBundleName;
 
@@ -101,13 +102,9 @@ namespace YooAsset.Editor
 				buildReport.BundleInfos.Add(reportBundleInfo);
 			}
 
-			// 删除旧文件
-			string fileName = YooAssetSettingsData.GetReportFileName(buildParameters.BuildPackage, buildParametersContext.OutputPackageCRC);
-			string filePath = $"{pipelineOutputDirectory}/{fileName}";
-			if (File.Exists(filePath))
-				File.Delete(filePath);
-
 			// 序列化文件
+			string fileName = YooAssetSettingsData.GetReportFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+			string filePath = $"{pipelineOutputDirectory}/{fileName}";
 			BuildReport.Serialize(filePath, buildReport);
 			BuildRunner.Log($"资源构建报告文件创建完成：{filePath}");
 		}
