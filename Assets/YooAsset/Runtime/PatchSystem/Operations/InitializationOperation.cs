@@ -173,10 +173,11 @@ namespace YooAsset
 			Done,
 		}
 
-		private string _buildinPackageName;
+		private readonly string _buildinPackageName;
 		private ESteps _steps = ESteps.LoadStaticVersion;
 		private UnityWebDataRequester _downloader1;
 		private UnityWebDataRequester _downloader2;
+		private string _buildinPackageVersion;
 
 		/// <summary>
 		/// 错误日志
@@ -187,11 +188,6 @@ namespace YooAsset
 		/// 加载结果
 		/// </summary>
 		public PatchManifest Result { private set; get; }
-
-		/// <summary>
-		/// 内置补丁清单CRC
-		/// </summary>
-		public string BuildinPackageCRC { private set; get; }
 
 
 		public AppManifestLoader(string buildinPackageName)
@@ -227,7 +223,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadStaticVersion)
 			{
-				string fileName = YooAssetSettingsData.GetStaticVersionFileName(_buildinPackageName);
+				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(_buildinPackageName);
 				string filePath = PathHelper.MakeStreamingLoadPath(fileName);
 				string url = PathHelper.ConvertToWWWPath(filePath);
 				_downloader1 = new UnityWebDataRequester();
@@ -248,15 +244,23 @@ namespace YooAsset
 				}
 				else
 				{
-					BuildinPackageCRC = _downloader1.GetText();
-					_steps = ESteps.LoadAppManifest;
+					_buildinPackageVersion = _downloader1.GetText();
+					if (string.IsNullOrEmpty(_buildinPackageVersion))
+					{
+						Error = $"Buildin package version is empty !";
+						_steps = ESteps.Done;
+					}
+					else
+					{
+						_steps = ESteps.LoadAppManifest;
+					}
 				}
 				_downloader1.Dispose();
 			}
 
 			if (_steps == ESteps.LoadAppManifest)
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_buildinPackageName, BuildinPackageCRC);
+				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_buildinPackageName, _buildinPackageVersion);
 				string filePath = PathHelper.MakeStreamingLoadPath(fileName);
 				string url = PathHelper.ConvertToWWWPath(filePath);
 				_downloader2 = new UnityWebDataRequester();
@@ -299,7 +303,7 @@ namespace YooAsset
 		}
 
 		private string _buildinPackageName;
-		private string _buildinPackageCRC;
+		private string _buildinPackageVersion;
 		private ESteps _steps = ESteps.CopyAppManifest;
 		private UnityWebFileRequester _downloader1;
 
@@ -314,10 +318,10 @@ namespace YooAsset
 		public bool Result { private set; get; }
 
 
-		public AppManifestCopyer(string buildinPackageName, string buildinPackageCRC)
+		public AppManifestCopyer(string buildinPackageName, string buildinPackageVersion)
 		{
 			_buildinPackageName = buildinPackageName;
-			_buildinPackageCRC = buildinPackageCRC;
+			_buildinPackageVersion = buildinPackageVersion;
 		}
 
 		/// <summary>
@@ -330,7 +334,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.CopyAppManifest)
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_buildinPackageName, _buildinPackageCRC);
+				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_buildinPackageName, _buildinPackageVersion);
 				string destFilePath = PathHelper.MakePersistentLoadPath(fileName);
 				if (File.Exists(destFilePath))
 				{

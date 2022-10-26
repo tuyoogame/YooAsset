@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace YooAsset
 {
@@ -9,9 +10,9 @@ namespace YooAsset
 	public abstract class UpdateStaticVersionOperation : AsyncOperationBase
 	{
 		/// <summary>
-		/// 包裹文件的哈希值
+		/// 当前最新的包裹版本
 		/// </summary>
-		public string PackageCRC { protected set; get; } = string.Empty;
+		public string PackageVersion { protected set; get; }
 	}
 
 	/// <summary>
@@ -80,8 +81,8 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadStaticVersion)
 			{
-				string versionFileName = YooAssetSettingsData.GetStaticVersionFileName(_packageName);
-				string webURL = GetStaticVersionRequestURL(versionFileName);
+				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(_packageName);
+				string webURL = GetStaticVersionRequestURL(fileName);
 				YooLogger.Log($"Beginning to request static version : {webURL}");
 				_downloader = new UnityWebDataRequester();
 				_downloader.SendRequest(webURL, _timeout);
@@ -102,16 +103,15 @@ namespace YooAsset
 				}
 				else
 				{
-					string packageCRC = _downloader.GetText();
-					if(string.IsNullOrEmpty(packageCRC))
+					PackageVersion = _downloader.GetText();
+					if (string.IsNullOrEmpty(PackageVersion))
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
-						Error = $"URL : {_downloader.URL} Error : static version content is empty.";
+						Error = $"Static package version is empty : {_downloader.URL}";
 					}
 					else
 					{
-						PackageCRC = packageCRC;
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;
 					}

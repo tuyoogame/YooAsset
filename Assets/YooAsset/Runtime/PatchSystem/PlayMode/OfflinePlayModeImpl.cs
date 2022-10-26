@@ -22,13 +22,13 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取人类可读的版本信息
+		/// 获取包裹的版本信息
 		/// </summary>
-		public string GetHumanReadableVersion()
+		public string GetPackageVersion()
 		{
 			if (_appPatchManifest == null)
 				return string.Empty;
-			return _appPatchManifest.HumanReadableVersion;
+			return _appPatchManifest.PackageVersion;
 		}
 
 		internal List<VerifyInfo> GetVerifyInfoList()

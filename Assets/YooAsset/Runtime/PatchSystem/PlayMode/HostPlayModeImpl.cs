@@ -32,13 +32,13 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取人类可读的版本信息
+		/// 获取包裹的版本信息
 		/// </summary>
-		public string GetHumanReadableVersion()
+		public string GetPackageVersion()
 		{
 			if (LocalPatchManifest == null)
 				return string.Empty;
-			return LocalPatchManifest.HumanReadableVersion;
+			return LocalPatchManifest.PackageVersion;
 		}
 
 		/// <summary>
@@ -54,9 +54,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新补丁清单
 		/// </summary>
-		public UpdateManifestOperation UpdatePatchManifestAsync(string packageName, string packageCRC, int timeout)
+		public UpdateManifestOperation UpdatePatchManifestAsync(string packageName, string packageVersion, int timeout)
 		{
-			var operation = new HostPlayModeUpdateManifestOperation(this, packageName, packageCRC, timeout);
+			var operation = new HostPlayModeUpdateManifestOperation(this, packageName, packageVersion, timeout);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -64,9 +64,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新补丁清单（弱联网）
 		/// </summary>
-		public UpdateManifestOperation WeaklyUpdatePatchManifestAsync(string packageName, string packageCRC)
+		public UpdateManifestOperation WeaklyUpdatePatchManifestAsync(string packageName, string packageVersion)
 		{
-			var operation = new HostPlayModeWeaklyUpdateManifestOperation(this, packageName, packageCRC);
+			var operation = new HostPlayModeWeaklyUpdateManifestOperation(this, packageName, packageVersion);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -74,9 +74,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新资源包裹
 		/// </summary>
-		public UpdatePackageOperation UpdatePackageAsync(string packageName, string packageCRC, int timeout)
+		public UpdatePackageOperation UpdatePackageAsync(string packageName, string packageVersion, int timeout)
 		{
-			var operation = new HostPlayModeUpdatePackageOperation(this, packageName, packageCRC, timeout);
+			var operation = new HostPlayModeUpdatePackageOperation(this, packageName, packageVersion, timeout);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}

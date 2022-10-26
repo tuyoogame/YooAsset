@@ -21,13 +21,13 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取人类可读的版本信息
+		/// 获取包裹的版本信息
 		/// </summary>
-		public string GetHumanReadableVersion()
+		public string GetPackageVersion()
 		{
 			if (_simulatePatchManifest == null)
 				return string.Empty;
-			return _simulatePatchManifest.HumanReadableVersion;
+			return _simulatePatchManifest.PackageVersion;
 		}
 
 		internal void SetSimulatePatchManifest(PatchManifest patchManifest)

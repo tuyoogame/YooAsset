@@ -369,12 +369,12 @@ namespace YooAsset
 		/// <summary>
 		/// 创建资源包裹下载器，用于下载更新指定资源版本所有的资源包文件
 		/// </summary>
-		/// <param name="packageCRC">指定更新的资源包裹版本</param>
+		/// <param name="packageVersion">指定更新的包裹版本</param>
 		/// <param name="timeout">超时时间</param>
-		public static UpdatePackageOperation UpdatePackageAsync(string packageCRC, int timeout = 60)
+		public static UpdatePackageOperation UpdatePackageAsync(string packageVersion, int timeout = 60)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.UpdatePackageAsync(packageCRC, timeout);
+			return _defaultPackage.UpdatePackageAsync(packageVersion, timeout);
 		}
 		#endregion
 

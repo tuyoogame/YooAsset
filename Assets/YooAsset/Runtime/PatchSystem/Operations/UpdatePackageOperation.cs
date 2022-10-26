@@ -80,17 +80,17 @@ namespace YooAsset
 		private static int RequestCount = 0;
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
-		private readonly string _packageCRC;
+		private readonly string _packageVersion;
 		private readonly int _timeout;
 		private ESteps _steps = ESteps.None;
 		private UnityWebDataRequester _downloader;
 		private PatchManifest _remotePatchManifest;
 
-		internal HostPlayModeUpdatePackageOperation(HostPlayModeImpl impl, string packageName, string packageCRC, int timeout)
+		internal HostPlayModeUpdatePackageOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
 		{
 			_impl = impl;
 			_packageName = packageName;
-			_packageCRC = packageCRC;
+			_packageVersion = packageVersion;
 			_timeout = timeout;
 		}
 		internal override void Start()
@@ -105,7 +105,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadWebManifest)
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_packageName, _packageCRC);
+				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_packageName, _packageVersion);
 				string webURL = GetPatchManifestRequestURL(fileName);
 				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
 				_downloader = new UnityWebDataRequester();

@@ -33,9 +33,9 @@ namespace YooAsset
 		public string PackageName;
 
 		/// <summary>
-		/// 人类可读的版本信息
+		/// 资源包裹的版本信息
 		/// </summary>
-		public string HumanReadableVersion;
+		public string PackageVersion;
 
 		/// <summary>
 		/// 资源列表（主动收集的资源列表）

@@ -212,9 +212,9 @@ namespace YooAsset
 		/// <summary>
 		/// 向网络端请求并更新补丁清单
 		/// </summary>
-		/// <param name="packageCRC">更新的资源包裹版本</param>
+		/// <param name="packageVersion">更新的包裹版本</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdateManifestOperation UpdateManifestAsync(string packageCRC, int timeout = 60)
+		public UpdateManifestOperation UpdateManifestAsync(string packageVersion, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			DebugCheckUpdateManifest();
@@ -232,7 +232,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdatePatchManifestAsync(PackageName, packageCRC, timeout);
+				return _hostPlayModeImpl.UpdatePatchManifestAsync(PackageName, packageVersion, timeout);
 			}
 			else
 			{
@@ -244,8 +244,8 @@ namespace YooAsset
 		/// 弱联网情况下加载补丁清单
 		/// 注意：当指定版本内容验证失败后会返回失败。
 		/// </summary>
-		/// <param name="packageCRC">指定的资源包裹版本</param>
-		public UpdateManifestOperation WeaklyUpdateManifestAsync(string packageCRC)
+		/// <param name="packageVersion">指定的包裹版本</param>
+		public UpdateManifestOperation WeaklyUpdateManifestAsync(string packageVersion)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -262,7 +262,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.WeaklyUpdatePatchManifestAsync(PackageName, packageCRC);
+				return _hostPlayModeImpl.WeaklyUpdatePatchManifestAsync(PackageName, packageVersion);
 			}
 			else
 			{
@@ -271,22 +271,22 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取人类可读的版本信息
+		/// 获取包裹的版本信息
 		/// </summary>
-		public string GetHumanReadableVersion()
+		public string GetPackageVersion()
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
-				return _editorSimulateModeImpl.GetHumanReadableVersion();
+				return _editorSimulateModeImpl.GetPackageVersion();
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				return _offlinePlayModeImpl.GetHumanReadableVersion();
+				return _offlinePlayModeImpl.GetPackageVersion();
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.GetHumanReadableVersion();
+				return _hostPlayModeImpl.GetPackageVersion();
 			}
 			else
 			{
@@ -898,9 +898,9 @@ namespace YooAsset
 		/// <summary>
 		/// 创建资源包裹下载器，用于下载更新指定资源版本所有的资源包文件
 		/// </summary>
-		/// <param name="packageCRC">指定更新的资源包裹版本</param>
+		/// <param name="packageVersion">指定更新的包裹版本</param>
 		/// <param name="timeout">超时时间</param>
-		public UpdatePackageOperation UpdatePackageAsync(string packageCRC, int timeout = 60)
+		public UpdatePackageOperation UpdatePackageAsync(string packageVersion, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -917,7 +917,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdatePackageAsync(PackageName, packageCRC, timeout);
+				return _hostPlayModeImpl.UpdatePackageAsync(PackageName, packageVersion, timeout);
 			}
 			else
 			{
