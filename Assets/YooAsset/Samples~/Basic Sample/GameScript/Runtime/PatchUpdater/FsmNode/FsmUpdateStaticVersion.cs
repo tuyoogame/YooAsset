@@ -30,8 +30,8 @@ internal class FsmUpdateStaticVersion : IFsmNode
 
 		if (operation.Status == EOperationStatus.Succeed)
 		{
-			Debug.Log($"Found static version : {operation.PackageCRC}");
-			PatchUpdater.PackageCRC = operation.PackageCRC;
+			Debug.Log($"Found static version : {operation.PackageVersion}");
+			PatchUpdater.PackageVersion = operation.PackageVersion;
 			FsmManager.Transition(nameof(FsmUpdateManifest));
 		}
 		else

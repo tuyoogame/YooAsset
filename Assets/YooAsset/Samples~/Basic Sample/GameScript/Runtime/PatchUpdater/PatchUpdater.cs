@@ -14,9 +14,9 @@ public static class PatchUpdater
 	public static PatchDownloaderOperation Downloader { set; get; }
 
 	/// <summary>
-	/// 资源版本
+	/// 包裹的版本信息
 	/// </summary>
-	public static string PackageCRC { set; get; }
+	public static string PackageVersion { set; get; }
 
 	/// <summary>
 	/// 开启初始化流程
