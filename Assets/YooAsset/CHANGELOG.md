@@ -2,6 +2,36 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.3.3] - 2022-10-27
+
+### Fixed
+
+- 修复了资源回收方法无效的问题。
+
+### Added
+
+- 新增了PackageVersion构建参数。
+
+  ````c#
+  public class BuildParameters
+  {
+      /// <summary>
+      /// 构建的包裹版本
+      /// </summary>
+      public string PackageVersion;  
+  }
+  ````
+
+### Changed
+
+- AssetBundleDebugger窗口增加了包裹名称显示列。
+- AssetBundleDebugger窗口增加资源对象的加载耗时统计和显示。
+- AssetBundleDebugger窗口增加帧调试数据导出功能。
+- AssetBundleBuilder构建流程增加输出目录文件路径过长的检测。
+- 下载器返回的错误提示增加HTTP Response Code。
+- UpdateStaticVersionOperation.PackageCRC重名为UpdateStaticVersionOperation.PackageVersion。
+- AssetPackage.GetHumanReadableVersion()重名为AssetPackage.GetPackageVersion()
+
 ## [1.3.2] - 2022-10-22
 
 ### Fixed
