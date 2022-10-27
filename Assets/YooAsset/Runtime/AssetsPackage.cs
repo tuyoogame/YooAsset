@@ -114,7 +114,8 @@ namespace YooAsset
 					initializeParameters.LocationToLower,
 					initializeParameters.DefaultHostServer,
 					initializeParameters.FallbackHostServer,
-					initializeParameters.QueryServices);
+					initializeParameters.QueryServices,
+					PackageName);
 			}
 			else
 			{
