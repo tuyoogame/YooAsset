@@ -10,14 +10,14 @@
 private IEnumerator UpdateStaticVersion()
 {
     var package = YooAssets.GetAssetsPackage("DefaultPackage");
-    UpdateStaticVersionOperation operation = package.UpdateStaticVersionAsync();
+    var operation = package.UpdateStaticVersionAsync();
     yield return operation;
 
     if (operation.Status == EOperationStatus.Succeed)
     {
         //更新成功
-        string packageCRC = operation.PackageCRC;
-        Debug.Log($"Update resource Version : {packageCRC}");
+        string PackageVersion = operation.PackageVersion;
+        Debug.Log($"Updated package Version : {PackageVersion}");
     }
     else
     {
@@ -35,7 +35,7 @@ private IEnumerator UpdateStaticVersion()
 private IEnumerator UpdatePatchManifest()
 {
     var package = YooAssets.GetAssetsPackage("DefaultPackage");
-    UpdateManifestOperation operation = package.UpdateManifestAsync(packageCRC);
+    var operation = package.UpdateManifestAsync(packageVersion);
     yield return operation;
 
     if (operation.Status == EOperationStatus.Succeed)
@@ -76,7 +76,8 @@ IEnumerator Download()
     int downloadingMaxNum = 10;
     int failedTryAgain = 3;
     int timeout = 60;
-    var downloader = YooAssets.CreatePatchDownloader(downloadingMaxNum, failedTryAgain, timeout);
+    var package = YooAssets.GetAssetsPackage("DefaultPackage");
+    var downloader = package.CreatePatchDownloader(downloadingMaxNum, failedTryAgain, timeout);
     
     //没有需要下载的资源
     if (downloader.TotalDownloadCount == 0)
@@ -115,10 +116,11 @@ IEnumerator Download()
 对于偏单机但是也有资源热更需求的项目。当玩家本地网络不稳定或无网络的时候，我们又不希望玩家卡在资源更新步骤而不能正常游戏。所以当玩家本地网络有问题的时候，我们可以跳过资源更新的步骤。
 
 ````c#
-private IEnumerator UpdateStaticVersion()
+// 尝试从服务器获取最新的资源版本号
+private IEnumerator TryUpdateStaticVersion()
 {
     var package = YooAssets.GetAssetsPackage("DefaultPackage");
-    UpdateStaticVersionOperation operation = package.UpdateStaticVersionAsync(10);
+    var operation = package.UpdateStaticVersionAsync(30);
     yield return operation;
     if (operation.Status == EOperationStatus.Succeed)
     {
@@ -128,28 +130,29 @@ private IEnumerator UpdateStaticVersion()
         // 注意：在成功下载所有资源之后，我们需要记录当前最新的资源版本号
         PlayerPrefs.SetString("STATIC_VERSION", packageCRC);
     }
+}
+
+private IEnumerator TryUpdateStaticVersion()
+{
+    // 如果获取远端资源版本失败，我们走弱联网更新模式。
+    // 注意：如果从来没有保存过版本信息，则需要从内部读取StaticVersion.bytes文件的版本信息。
+    string packageVersion = PlayerPrefs.GetString("STATIC_VERSION", string.Empty);
+    if (packageVersion == string.Empty)
+    {
+        packageVersion = LoadStaticVersionFromStreamingAssets();
+    }
+    
+    // 在弱联网情况下更新补丁清单
+    var operation = package.WeaklyUpdateManifestAsync(packageVersion);
+    yield return operation;
+    if (operation.Status == EOperationStatus.Succeed)
+    {
+        StartGame();
+    }
     else
     {
-        // 如果获取远端资源版本失败，我们走弱联网更新模式。
-        // 注意：如果从来没有保存过版本信息，则需要从内部读取StaticVersion.bytes文件的版本信息。
-        string packageCRC = PlayerPrefs.GetString("STATIC_VERSION", string.Empty);
-        if (packageCRC == string.Empty)
-        {
-            packageCRC = LoadStaticVersionFromStreamingAssets();
-        }
-        
-        // 在弱联网情况下更新补丁清单
-        UpdateManifestOperation operation2 = package.WeaklyUpdateManifestAsync(packageCRC);
-        yield return operation2;
-        if (operation2.Status == EOperationStatus.Succeed)
-        {
-            StartGame();
-        }
-        else
-        {
-            // 指定版本的资源内容本地并不完整，需要提示玩家更新。
-            ShowMessageBox("请检查本地网络，有新的游戏内容需要更新！");
-        }
+        // 指定版本的资源内容本地并不完整，需要提示玩家更新。
+        ShowMessageBox("请检查本地网络，有新的游戏内容需要更新！");
     }
 }
 ````

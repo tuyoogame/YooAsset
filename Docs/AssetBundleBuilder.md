@@ -112,7 +112,11 @@ public class GameEncryption : IEncryptionServices
 
 ### 补丁清单
 
-补丁清单是一个Json格式的文本文件，里面包含了所有资源包的信息，例如：名称，大小，CRC等。
+补丁清单是一个Json格式的文本文件。
+
+AssetList组记录的是主资源对象列表。
+
+BundleList组记录的是资源包列表。
 
 ![image](./Image/AssetBuilder-img2.png)
 
@@ -134,8 +138,8 @@ private static void BuildInternal(BuildTarget buildTarget)
     buildParameters.BuildTarget = buildTarget;
     buildParameters.BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;
     buildParameters.BuildMode = EBuildMode.ForceRebuild;
-    buildParameters.BuildPackage = "DefaultPackage";
-    buildParameters.HumanReadableVersion = "v1.0";
+    buildParameters.PackageName = "DefaultPackage";
+    buildParameters.PackageVersion = "1.0.0";
     buildParameters.VerifyBuildingResult = true;
     buildParameters.EncryptionServices = new GameEncryption();
     buildParameters.CompressOption = ECompressOption.LZ4;
@@ -146,10 +150,12 @@ private static void BuildInternal(BuildTarget buildTarget)
     AssetBundleBuilder builder = new AssetBundleBuilder();
     var buildResult = builder.Run(buildParameters);
     if (buildResult.Success)
-        Debug.Log($"构建成功!");
+    {
+         Debug.Log($"构建成功 : {buildResult.OutputPackageDirectory}");
+    }
 }
 
-// 从构建命令里获取参数
+// 从构建命令里获取参数示例
 private static string GetBuildPackageName()
 {
     foreach (string arg in System.Environment.GetCommandLineArgs())
@@ -157,7 +163,7 @@ private static string GetBuildPackageName()
         if (arg.StartsWith("buildPackage"))
             return arg.Split("="[0])[1];
     }
-    return -1;
+    return string.Empty;
 }
 ````
 
@@ -173,8 +179,8 @@ private static string GetBuildPackageName()
 
 - **首包资源**
 
-  在构建应用程序的时候（例如安卓的APK），我们希望将某些资源打进首包里，可以在构建成功后自己编写逻辑代码拷贝相关资源文件到StreamingAssets/YooAssets/目录里。首包资源如果发生变化，也可以通过热更新来更新资源。
+  在构建应用程序的时候，我们希望将某些资源打进首包里，首包资源拷贝至StreamingAssets/BuildinFiles/目录下。首包资源如果发生变化，也可以通过热更新来更新资源。
 
 - **补丁包**
 
-  无论是通过增量构建还是强制构建，在构建完成后都会生成一个以补丁清单文件哈希值命名的文件夹，我们把这个文件夹统称为补丁包。补丁包里包含了游戏运行需要的所有资源，我们可以无脑的将补丁包内容覆盖到CDN目录下，也可以通过编写差异分析工具，来筛选出和线上最新版本之间的差异文件，然后将差异文件上传到CDN目录里。
+  无论是通过增量构建还是强制构建，在构建完成后都会生成一个以包裹版本（PackageVersion）命名的文件夹，我们把这个文件夹统称为补丁包。补丁包里包含了游戏运行需要的所有资源，我们可以无脑的将补丁包内容覆盖到CDN目录下，也可以通过编写差异分析工具，来筛选出和线上最新版本之间的差异文件，然后将差异文件上传到CDN目录里。

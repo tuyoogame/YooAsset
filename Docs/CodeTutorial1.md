@@ -62,29 +62,18 @@ private IEnumerator InitializeYooAsset()
 private IEnumerator InitializeYooAsset()
 {
     var initParameters = new HostPlayModeParameters();
-    initParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
-    initParameters.DecryptionServices = new BundleDecryptionServices();
-    initParameters.QueryServices = new QueryStreamingAssetsServices();
+    initParameters.QueryServices = new QueryStreamingAssetsFileServices();
     initParameters.DefaultHostServer = "http://127.0.0.1/CDN1/Android/v1.0";
     initParameters.FallbackHostServer = "http://127.0.0.1/CDN2/Android/v1.0";
     yield return defaultPackage.InitializeAsync(initParameters);
 }
 
-// 文件解密服务类
-private class BundleDecryptionServices : IDecryptionServices
-{
-    public ulong GetFileOffset(DecryptionFileInfo fileInfo)
-    {
-        return 32;
-    }
-}
-
 // 内置文件查询服务类
-private class QueryStreamingAssetsServices : IQueryServices
+private class QueryStreamingAssetsFileServices : IQueryServices
 {
     public bool QueryStreamingAssets(string fileName)
     {
-        // 注意：使用了BetterStreamingAssets插件
+        // 注意：使用了BetterStreamingAssets插件，使用前需要初始化该插件！
         string buildinFolderName = YooAssets.GetStreamingAssetBuildinFolderName();
         return BetterStreamingAssets.FileExists($"{buildinFolderName}/{fileName}");
     }
