@@ -182,7 +182,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 向网络端请求静态资源版本
+		/// 向网络端请求最新的资源版本
 		/// </summary>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
 		public UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
@@ -242,11 +242,10 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 弱联网情况下加载补丁清单
-		/// 注意：当指定版本内容验证失败后会返回失败。
+		/// 弱联网情况下加载本地的补丁清单
+		/// 注意：当清单里的内容验证失败后会返回失败。
 		/// </summary>
-		/// <param name="packageVersion">指定的包裹版本</param>
-		public UpdateManifestOperation WeaklyUpdateManifestAsync(string packageVersion)
+		public UpdateManifestOperation WeaklyUpdateManifestAsync()
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -263,7 +262,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.WeaklyUpdatePatchManifestAsync(PackageName, packageVersion);
+				return _hostPlayModeImpl.WeaklyUpdatePatchManifestAsync(PackageName);
 			}
 			else
 			{
@@ -945,9 +944,9 @@ namespace YooAsset
 		private void DebugCheckInitialize()
 		{
 			if (_initializeStatus == EOperationStatus.None)
-				throw new Exception("YooAssets initialize not completed !");
+				throw new Exception("Package initialize not completed !");
 			else if (_initializeStatus == EOperationStatus.Failed)
-				throw new Exception($"YooAssets initialize failed : {_initializeError}");
+				throw new Exception($"Package initialize failed ! {_initializeError}");
 		}
 
 		[Conditional("DEBUG")]

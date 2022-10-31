@@ -224,7 +224,7 @@ namespace YooAsset
 		/// </summary>
 		public static void ClearSandbox()
 		{
-			SandboxHelper.DeleteSandbox();
+			PersistentHelper.DeleteSandbox();
 		}
 		#endregion
 

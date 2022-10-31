@@ -64,7 +64,7 @@ namespace YooAsset
 				if (string.IsNullOrEmpty(_cachedFilePath) == false)
 					return _cachedFilePath;
 
-				string cacheRoot = SandboxHelper.GetCacheFolderPath();
+				string cacheRoot = PersistentHelper.GetCacheFolderPath();
 				_cachedFilePath = $"{cacheRoot}/{FileName}";
 				return _cachedFilePath;
 			}

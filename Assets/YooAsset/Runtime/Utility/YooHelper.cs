@@ -76,9 +76,9 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 沙盒帮助类
+	/// 持久化目录帮助类
 	/// </summary>
-	internal static class SandboxHelper
+	internal static class PersistentHelper
 	{
 		private const string CacheFolderName = "CacheFiles";
 
@@ -109,49 +109,66 @@ namespace YooAsset
 		{
 			return PathHelper.MakePersistentLoadPath(CacheFolderName);
 		}
-	}
 
-	/// <summary>
-	/// 补丁包帮助类
-	/// </summary>
-	internal static class PatchHelper
-	{
+		#region 沙盒内清单相关
 		/// <summary>
-		/// 获取资源信息列表
+		/// 获取沙盒内清单文件的路径
 		/// </summary>
-		public static AssetInfo[] GetAssetsInfoByTags(PatchManifest patchManifest, string[] tags)
+		public static string GetCacheManifestFilePath(string packageName)
 		{
-			List<AssetInfo> result = new List<AssetInfo>(100);
-			foreach (var patchAsset in patchManifest.AssetList)
-			{
-				if(patchAsset.HasTag(tags))
-				{
-					AssetInfo assetInfo = new AssetInfo(patchAsset);
-					result.Add(assetInfo);
-				}
-			}
-			return result.ToArray();
+			string fileName = YooAssetSettingsData.GetPatchManifestFileNameWithoutVersion(packageName);
+			return PathHelper.MakePersistentLoadPath(fileName);
 		}
 
 		/// <summary>
-		/// 资源解压相关
+		/// 加载沙盒内清单文件
 		/// </summary>
-		public static List<BundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
+		public static PatchManifest LoadCacheManifestFile(string packageName)
 		{
-			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
-			foreach (var patchBundle in unpackList)
+			YooLogger.Log($"Load sandbox patch manifest file : {packageName}");
+			string filePath = GetCacheManifestFilePath(packageName);
+			string jsonData = File.ReadAllText(filePath);
+			return PatchManifest.Deserialize(jsonData);
+		}
+
+		/// <summary>
+		/// 存储沙盒内清单文件
+		/// </summary>
+		public static PatchManifest SaveCacheManifestFile(string packageName, string fileContent)
+		{
+			YooLogger.Log($"Save sandbox patch manifest file : {packageName}");
+			var manifest = PatchManifest.Deserialize(fileContent);
+			string savePath = GetCacheManifestFilePath(packageName);
+			FileUtility.CreateFile(savePath, fileContent);
+			return manifest;
+		}
+
+		/// <summary>
+		/// 检测沙盒内清单文件是否存在
+		/// </summary>
+		public static bool CheckCacheManifestFileExists(string packageName)
+		{
+			string filePath = GetCacheManifestFilePath(packageName);
+			return File.Exists(filePath);
+		}
+
+		/// <summary>
+		/// 删除沙盒内清单文件
+		/// </summary>
+		public static bool DeleteCacheManifestFile(string packageName)
+		{
+			string filePath = GetCacheManifestFilePath(packageName);
+			if (File.Exists(filePath))
 			{
-				var bundleInfo = ConvertToUnpackInfo(patchBundle);
-				result.Add(bundleInfo);
+				YooLogger.Warning($"Invalid cache manifest file have been removed : {filePath}");
+				File.Delete(filePath);
+				return true;
 			}
-			return result;
+			else
+			{
+				return false;
+			}
 		}
-		public static BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
-		{
-			// 注意：我们把流加载路径指定为远端下载地址
-			string streamingPath = PathHelper.ConvertToWWWPath(patchBundle.StreamingFilePath);
-			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming, streamingPath, streamingPath);
-			return bundleInfo;
-		}
+		#endregion
 	}
 }

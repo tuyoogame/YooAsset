@@ -84,7 +84,7 @@ namespace YooAsset
 		/// </summary>
 		private List<string> GetUnusedCacheFilePaths()
 		{
-			string cacheFolderPath = SandboxHelper.GetCacheFolderPath();
+			string cacheFolderPath = PersistentHelper.GetCacheFolderPath();
 			if (Directory.Exists(cacheFolderPath) == false)
 				return new List<string>();
 

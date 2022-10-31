@@ -128,17 +128,18 @@ namespace YooAsset
 				}
 				else
 				{
-					// 解析补丁清单			
-					if (ParseRemotePatchManifest(_downloader.GetText()))
+					// 解析补丁清单
+					try
 					{
+						_remotePatchManifest = PatchManifest.Deserialize(_downloader.GetText());
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;
 					}
-					else
+					catch(System.Exception e)
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
-						Error = $"URL : {_downloader.URL} Error : remote patch manifest content is invalid";
+						Error = e.Message;
 					}
 				}
 				_downloader.Dispose();
@@ -174,23 +175,6 @@ namespace YooAsset
 				return _impl.GetPatchDownloadFallbackURL(fileName);
 			else
 				return _impl.GetPatchDownloadMainURL(fileName);
-		}
-
-		/// <summary>
-		/// 解析远端请求的补丁清单
-		/// </summary>
-		private bool ParseRemotePatchManifest(string content)
-		{
-			try
-			{
-				_remotePatchManifest = PatchManifest.Deserialize(content);
-				return true;
-			}
-			catch (Exception e)
-			{
-				YooLogger.Warning(e.ToString());
-				return false;
-			}
 		}
 
 		/// <summary>

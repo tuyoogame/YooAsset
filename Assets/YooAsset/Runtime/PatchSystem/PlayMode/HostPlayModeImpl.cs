@@ -64,9 +64,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新补丁清单（弱联网）
 		/// </summary>
-		public UpdateManifestOperation WeaklyUpdatePatchManifestAsync(string packageName, string packageVersion)
+		public UpdateManifestOperation WeaklyUpdatePatchManifestAsync(string packageName)
 		{
-			var operation = new HostPlayModeWeaklyUpdateManifestOperation(this, packageName, packageVersion);
+			var operation = new HostPlayModeWeaklyUpdateManifestOperation(this, packageName);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -229,7 +229,7 @@ namespace YooAsset
 				}
 			}
 
-			return PatchHelper.ConvertToUnpackList(downloadList);
+			return ConvertToUnpackList(downloadList);
 		}
 
 		/// <summary>
@@ -256,7 +256,7 @@ namespace YooAsset
 				}
 			}
 
-			return PatchHelper.ConvertToUnpackList(downloadList);
+			return ConvertToUnpackList(downloadList);
 		}
 
 		// WEB相关
@@ -280,11 +280,30 @@ namespace YooAsset
 			}
 			return result;
 		}
-		public BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
+		private BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
 		{
 			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.FileName);
 			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.FileName);
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, remoteMainURL, remoteFallbackURL);
+			return bundleInfo;
+		}
+
+		// 解压相关
+		public List<BundleInfo> ConvertToUnpackList(List<PatchBundle> unpackList)
+		{
+			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
+			foreach (var patchBundle in unpackList)
+			{
+				var bundleInfo = ConvertToUnpackInfo(patchBundle);
+				result.Add(bundleInfo);
+			}
+			return result;
+		}
+		public static BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
+		{
+			// 注意：我们把流加载路径指定为远端下载地址
+			string streamingPath = PathHelper.ConvertToWWWPath(patchBundle.StreamingFilePath);
+			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming, streamingPath, streamingPath);
 			return bundleInfo;
 		}
 
@@ -379,7 +398,7 @@ namespace YooAsset
 		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
-			return PatchHelper.GetAssetsInfoByTags(LocalPatchManifest, tags);
+			return LocalPatchManifest.GetAssetsInfoByTags(tags);
 		}
 		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
 		{

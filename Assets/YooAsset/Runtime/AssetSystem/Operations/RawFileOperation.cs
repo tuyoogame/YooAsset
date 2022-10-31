@@ -219,7 +219,7 @@ namespace YooAsset
 			if (_steps == ESteps.DownloadBuildinFile)
 			{
 				int failedTryAgain = int.MaxValue;
-				var bundleInfo = PatchHelper.ConvertToUnpackInfo(_bundleInfo.Bundle);
+				var bundleInfo = HostPlayModeImpl.ConvertToUnpackInfo(_bundleInfo.Bundle);
 				_downloader = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
 				_steps = ESteps.CheckDownload;
 			}
@@ -367,7 +367,7 @@ namespace YooAsset
 			if (_steps == ESteps.DownloadBuildinFile)
 			{
 				int failedTryAgain = int.MaxValue;
-				var bundleInfo = PatchHelper.ConvertToUnpackInfo(_bundleInfo.Bundle);
+				var bundleInfo = HostPlayModeImpl.ConvertToUnpackInfo(_bundleInfo.Bundle);
 				_downloader = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
 				_steps = ESteps.CheckDownload;
 			}

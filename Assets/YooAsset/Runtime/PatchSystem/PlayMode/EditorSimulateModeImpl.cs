@@ -53,7 +53,7 @@ namespace YooAsset
 		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
-			return PatchHelper.GetAssetsInfoByTags(_simulatePatchManifest, tags);
+			return _simulatePatchManifest.GetAssetsInfoByTags(tags);
 		}
 		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
 		{

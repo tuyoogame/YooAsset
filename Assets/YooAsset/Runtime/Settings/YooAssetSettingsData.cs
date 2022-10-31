@@ -41,6 +41,14 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取补丁清单文件不带版本号的名称
+		/// </summary>
+		public static string GetPatchManifestFileNameWithoutVersion(string packageName)
+		{
+			return $"{Setting.PatchManifestFileName}_{packageName}.bytes";
+		}
+
+		/// <summary>
 		/// 获取补丁清单文件完整名称
 		/// </summary>
 		public static string GetPatchManifestFileName(string packageName, string packageVersion)

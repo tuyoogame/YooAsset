@@ -104,7 +104,7 @@ namespace YooAsset
 		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
-			return PatchHelper.GetAssetsInfoByTags(_appPatchManifest, tags);
+			return _appPatchManifest.GetAssetsInfoByTags(tags);
 		}
 		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
 		{

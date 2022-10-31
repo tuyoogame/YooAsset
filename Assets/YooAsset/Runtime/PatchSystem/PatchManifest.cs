@@ -247,6 +247,23 @@ namespace YooAsset
 			return false;
 		}
 
+		/// <summary>
+		/// 获取资源信息列表
+		/// </summary>
+		public AssetInfo[] GetAssetsInfoByTags(string[] tags)
+		{
+			List<AssetInfo> result = new List<AssetInfo>(100);
+			foreach (var patchAsset in AssetList)
+			{
+				if (patchAsset.HasTag(tags))
+				{
+					AssetInfo assetInfo = new AssetInfo(patchAsset);
+					result.Add(assetInfo);
+				}
+			}
+			return result.ToArray();
+		}
+
 
 		/// <summary>
 		/// 序列化
@@ -263,6 +280,8 @@ namespace YooAsset
 		public static PatchManifest Deserialize(string jsonData)
 		{
 			PatchManifest patchManifest = JsonUtility.FromJson<PatchManifest>(jsonData);
+			if (patchManifest == null)
+				throw new System.Exception($"{nameof(PatchManifest)} deserialize object is null !");
 
 			// 检测文件版本
 			if (patchManifest.FileVersion != YooAssetSettings.PatchManifestFileVersion)
