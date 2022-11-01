@@ -56,6 +56,10 @@ public class GameScene1 : MonoBehaviour
 		else
 			throw new NotImplementedException();
 
+		var package = YooAssets.GetAssetsPackage("DefaultPackage");
+		var packageVersion = CanvasRoot.transform.Find("package_version/label").GetComponent<Text>();
+		packageVersion.text = package.GetPackageVersion();
+
 		// 通过资源标签加载资源
 		{
 			string assetTag = "sphere";
