@@ -146,7 +146,7 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = e.ToString();
+					Error = e.Message;
 				}
 			}
 		}
@@ -281,7 +281,7 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = e.ToString();
+					Error = e.Message;
 				}
 			}
 		}
@@ -429,7 +429,7 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = e.ToString();
+					Error = e.Message;
 				}
 			}
 		}

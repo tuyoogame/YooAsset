@@ -57,7 +57,7 @@ namespace YooAsset
 						}
 						catch (System.Exception e)
 						{
-							YooLogger.Warning($"Failed delete cache file : {filePath} Exception : {e}");
+							YooLogger.Warning($"Failed delete cache file : {filePath} ! {e.Message}");
 						}
 					}
 					_unusedCacheFilePaths.RemoveAt(i);

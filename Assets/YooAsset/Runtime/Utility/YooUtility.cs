@@ -149,6 +149,27 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 创建文件（如果已经存在则删除旧文件）
+		/// </summary>
+		public static void CreateFile(string filePath, byte[] data)
+		{
+			// 删除旧文件
+			if (File.Exists(filePath))
+				File.Delete(filePath);
+
+			// 创建文件夹路径
+			CreateFileDirectory(filePath);
+
+			// 创建新文件
+			using (FileStream fs = File.Create(filePath))
+			{
+				fs.Write(data, 0, data.Length);
+				fs.Flush();
+				fs.Close();
+			}
+		}
+
+		/// <summary>
 		/// 创建文件的文件夹路径
 		/// </summary>
 		public static void CreateFileDirectory(string filePath)

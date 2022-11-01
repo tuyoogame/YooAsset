@@ -125,31 +125,7 @@ namespace YooAsset
 		/// </summary>
 		public void ParseFileName(int nameStype)
 		{
-			if (nameStype == 1)
-			{
-				FileName = FileHash;
-			}
-			else if (nameStype == 2)
-			{
-				string tempFileExtension = System.IO.Path.GetExtension(BundleName);
-				FileName = $"{FileHash}{tempFileExtension}";
-			}
-			else if (nameStype == 3)
-			{
-				string tempFileExtension = System.IO.Path.GetExtension(BundleName);
-				string tempBundleName = BundleName.Replace('/', '_').Replace(tempFileExtension, "");
-				FileName = $"{tempBundleName}_{FileHash}";
-			}
-			else if (nameStype == 4)
-			{
-				string tempFileExtension = System.IO.Path.GetExtension(BundleName);
-				string tempBundleName = BundleName.Replace('/', '_').Replace(tempFileExtension, "");
-				FileName = $"{tempBundleName}_{FileHash}{tempFileExtension}";
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			FileName = PatchManifest.CreateBundleFileName(nameStype, BundleName, FileHash);
 		}
 
 		/// <summary>

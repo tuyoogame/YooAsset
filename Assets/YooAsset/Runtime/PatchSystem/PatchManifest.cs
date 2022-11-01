@@ -308,5 +308,37 @@ namespace YooAsset
 
 			return patchManifest;
 		}
+
+		/// <summary>
+		/// 生成Bundle文件的正式名称
+		/// </summary>
+		public static string CreateBundleFileName(int nameStype, string bundleName, string fileHash)
+		{
+			if (nameStype == 1)
+			{
+				return fileHash;
+			}
+			else if (nameStype == 2)
+			{
+				string tempFileExtension = System.IO.Path.GetExtension(bundleName);
+				return $"{fileHash}{tempFileExtension}";
+			}
+			else if (nameStype == 3)
+			{
+				string tempFileExtension = System.IO.Path.GetExtension(bundleName);
+				string tempBundleName = bundleName.Replace('/', '_').Replace(tempFileExtension, "");
+				return $"{tempBundleName}_{fileHash}";
+			}
+			else if (nameStype == 4)
+			{
+				string tempFileExtension = System.IO.Path.GetExtension(bundleName);
+				string tempBundleName = bundleName.Replace('/', '_').Replace(tempFileExtension, "");
+				return $"{tempBundleName}_{fileHash}{tempFileExtension}";
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
 	}
 }
