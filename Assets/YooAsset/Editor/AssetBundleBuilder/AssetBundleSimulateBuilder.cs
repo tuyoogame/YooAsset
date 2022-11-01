@@ -21,9 +21,8 @@ namespace YooAsset.Editor
 			var buildResult = builder.Run(buildParameters);
 			if (buildResult.Success)
 			{
-				string pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(buildParameters.OutputRoot, buildParameters.PackageName, buildParameters.BuildTarget, buildParameters.BuildMode);
 				string manifestFileName = YooAssetSettingsData.GetPatchManifestFileName(buildParameters.PackageName, buildParameters.PackageVersion);
-				string manifestFilePath = $"{pipelineOutputDirectory}/{manifestFileName}";
+				string manifestFilePath = $"{buildResult.OutputPackageDirectory}/{manifestFileName}";
 				return manifestFilePath;
 			}
 			else

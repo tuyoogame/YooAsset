@@ -12,16 +12,21 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
-			if (buildParametersContext.Parameters.CopyBuildinFileOption != ECopyBuildinFileOption.None)
+			var patchManifestContext = context.GetContextObject<PatchManifestContext>();
+			var buildMode = buildParametersContext.Parameters.BuildMode;
+			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
-				CopyBuildinFilesToStreaming(buildParametersContext);
+				if (buildParametersContext.Parameters.CopyBuildinFileOption != ECopyBuildinFileOption.None)
+				{
+					CopyBuildinFilesToStreaming(buildParametersContext, patchManifestContext);
+				}
 			}
 		}
 
 		/// <summary>
 		/// 拷贝首包资源文件
 		/// </summary>
-		private void CopyBuildinFilesToStreaming(BuildParametersContext buildParametersContext)
+		private void CopyBuildinFilesToStreaming(BuildParametersContext buildParametersContext, PatchManifestContext patchManifestContext)
 		{
 			ECopyBuildinFileOption option = buildParametersContext.Parameters.CopyBuildinFileOption;
 			string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
@@ -30,7 +35,7 @@ namespace YooAsset.Editor
 			string buildPackageVersion = buildParametersContext.Parameters.PackageVersion;
 
 			// 加载补丁清单
-			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(packageOutputDirectory, buildPackageName, buildPackageVersion);
+			PatchManifest patchManifest = patchManifestContext.Manifest;
 
 			// 清空流目录
 			if (option == ECopyBuildinFileOption.ClearAndCopyAll || option == ECopyBuildinFileOption.ClearAndCopyByTags)

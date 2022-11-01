@@ -25,16 +25,19 @@ namespace YooAsset.Editor
 			if (buildMode == EBuildMode.SimulateBuild)
 				return;
 
+			// 开始构建
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
 			BuildAssetBundleOptions buildOptions = buildParametersContext.GetPipelineBuildOptions();
 			AssetBundleManifest buildResults = BuildPipeline.BuildAssetBundles(pipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), buildOptions, buildParametersContext.Parameters.BuildTarget);
 			if (buildResults == null)
+			{
 				throw new Exception("构建过程中发生错误！");
+			}
 
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
-				string unityOutputManifestFilePath = $"{buildParametersContext.GetPipelineOutputDirectory()}/{YooAssetSettings.OutputFolderName}";
-				if(System.IO.File.Exists(unityOutputManifestFilePath) == false)
+				string unityOutputManifestFilePath = $"{pipelineOutputDirectory}/{YooAssetSettings.OutputFolderName}";
+				if (System.IO.File.Exists(unityOutputManifestFilePath) == false)
 					throw new Exception("构建过程中发生严重错误！请查阅上下文日志！");
 			}
 
@@ -43,10 +46,10 @@ namespace YooAsset.Editor
 			buildResultContext.UnityManifest = buildResults;
 			context.SetContextObject(buildResultContext);
 
+			// 拷贝原生文件
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
 				CopyRawBundle(buildMapContext, buildParametersContext);
-				UpdateBuildBundleInfo(buildMapContext, buildParametersContext, buildResultContext);
 			}
 		}
 
@@ -66,30 +69,6 @@ namespace YooAsset.Editor
 						if (buildAsset.IsRawAsset)
 							EditorTools.CopyFile(buildAsset.AssetPath, dest, true);
 					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// 更新构建结果
-		/// </summary>
-		private void UpdateBuildBundleInfo(BuildMapContext buildMapContext, BuildParametersContext buildParametersContext, BuildResultContext buildResult)
-		{
-			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
-			{
-				if (bundleInfo.IsRawFile)
-				{
-					string filePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
-					bundleInfo.ContentHash = HashUtility.FileMD5(filePath);
-				}
-				else
-				{
-					var hash = buildResult.UnityManifest.GetAssetBundleHash(bundleInfo.BundleName);
-					if (hash.isValid)
-						bundleInfo.ContentHash = hash.ToString();
-					else
-						throw new Exception($"Not found bundle in build result : {bundleInfo.BundleName}");
 				}
 			}
 		}

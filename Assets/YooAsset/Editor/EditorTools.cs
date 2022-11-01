@@ -349,9 +349,9 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 文件移动
+		/// 移动文件
 		/// </summary>
-		public static void FileMoveTo(string filePath, string destPath)
+		public static void MoveFile(string filePath, string destPath)
 		{
 			if (File.Exists(destPath))
 				File.Delete(destPath);
@@ -359,7 +359,7 @@ namespace YooAsset.Editor
 			FileInfo fileInfo = new FileInfo(filePath);
 			fileInfo.MoveTo(destPath);
 		}
-
+		
 		/// <summary>
 		/// 拷贝文件夹
 		/// 注意：包括所有子目录的文件

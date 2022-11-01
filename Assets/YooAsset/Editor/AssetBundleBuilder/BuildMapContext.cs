@@ -65,18 +65,6 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 获取资源包的分类标签列表
-		/// </summary>
-		public string[] GetBundleTags(string bundleName)
-		{
-			if (TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))
-			{
-				return bundleInfo.GetBundleTags();
-			}
-			throw new Exception($"Not found {nameof(BuildBundleInfo)} : {bundleName}");
-		}
-
-		/// <summary>
 		/// 获取AssetBundle内构建的资源路径列表
 		/// </summary>
 		public string[] GetBuildinAssetPaths(string bundleName)

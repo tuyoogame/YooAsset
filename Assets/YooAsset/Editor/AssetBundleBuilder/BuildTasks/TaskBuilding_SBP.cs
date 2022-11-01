@@ -46,10 +46,10 @@ namespace YooAsset.Editor
 			buildResultContext.Results = buildResults;
 			context.SetContextObject(buildResultContext);
 
+			// 拷贝原生文件
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
 				CopyRawBundle(buildMapContext, buildParametersContext);
-				UpdateBuildBundleInfo(buildMapContext, buildParametersContext, buildResultContext);
 			}
 		}
 
@@ -69,30 +69,6 @@ namespace YooAsset.Editor
 						if (buildAsset.IsRawAsset)
 							EditorTools.CopyFile(buildAsset.AssetPath, dest, true);
 					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// 更新构建结果
-		/// </summary>
-		private void UpdateBuildBundleInfo(BuildMapContext buildMapContext, BuildParametersContext buildParametersContext, BuildResultContext buildResult)
-		{
-			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
-			{
-				if (bundleInfo.IsRawFile)
-				{
-					string filePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
-					bundleInfo.ContentHash = HashUtility.FileMD5(filePath);
-				}
-				else
-				{
-					// 注意：当资源包的依赖列表发生变化的时候，ContentHash也会发生变化！
-					if (buildResult.Results.BundleInfos.TryGetValue(bundleInfo.BundleName, out var value))
-						bundleInfo.ContentHash = value.Hash.ToString();
-					else
-						throw new Exception($"Not found bundle in build result : {bundleInfo.BundleName}");
 				}
 			}
 		}

@@ -8,6 +8,11 @@ using UnityEditor.Build.Pipeline.Interfaces;
 
 namespace YooAsset.Editor
 {
+	public class PatchManifestContext : IContextObject
+	{
+		internal PatchManifest Manifest;
+	}
+
 	[TaskAttribute("创建补丁清单文件")]
 	public class TaskCreatePatchManifest : IBuildTask
 	{
@@ -24,7 +29,7 @@ namespace YooAsset.Editor
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
 			var buildParameters = buildParametersContext.Parameters;
-			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
+			string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
 
 			// 创建新补丁清单
 			PatchManifest patchManifest = new PatchManifest();
@@ -45,21 +50,26 @@ namespace YooAsset.Editor
 					UpdateBuiltInBundleReference(patchManifest, buildResultContext.Results);
 				}
 			}
-			
+
 			// 创建补丁清单文件
-			string packageHash = string.Empty;
+			string packageHash;
 			{
 				string fileName = YooAssetSettingsData.GetPatchManifestFileName(buildParameters.PackageName, buildParameters.PackageVersion);
-				string filePath = $"{pipelineOutputDirectory}/{fileName}";
+				string filePath = $"{packageOutputDirectory}/{fileName}";
 				PatchManifest.Serialize(filePath, patchManifest);
 				packageHash = HashUtility.FileMD5(filePath);
 				BuildRunner.Log($"创建补丁清单文件：{filePath}");
+
+				var patchManifestContext = new PatchManifestContext();
+				string jsonData = FileUtility.ReadFile(filePath);
+				patchManifestContext.Manifest = PatchManifest.Deserialize(jsonData);
+				context.SetContextObject(patchManifestContext);
 			}
 
 			// 创建补丁清单哈希文件
 			{
 				string fileName = YooAssetSettingsData.GetPatchManifestHashFileName(buildParameters.PackageName, buildParameters.PackageVersion);
-				string filePath = $"{pipelineOutputDirectory}/{fileName}";		
+				string filePath = $"{packageOutputDirectory}/{fileName}";
 				FileUtility.CreateFile(filePath, packageHash);
 				BuildRunner.Log($"创建补丁清单哈希文件：{filePath}");
 			}
@@ -67,7 +77,7 @@ namespace YooAsset.Editor
 			// 创建补丁清单版本文件
 			{
 				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(buildParameters.PackageName);
-				string filePath = $"{pipelineOutputDirectory}/{fileName}";
+				string filePath = $"{packageOutputDirectory}/{fileName}";
 				FileUtility.CreateFile(filePath, buildParameters.PackageVersion);
 				BuildRunner.Log($"创建补丁清单版本文件：{filePath}");
 			}
@@ -78,58 +88,16 @@ namespace YooAsset.Editor
 		/// </summary>
 		private List<PatchBundle> GetAllPatchBundle(BuildContext context)
 		{
-			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
-			var encryptionContext = context.GetContextObject<TaskEncryption.EncryptionContext>();
+			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
 
 			List<PatchBundle> result = new List<PatchBundle>(1000);
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
-				// NOTE：检测路径长度不要超过260字符。
-				string filePath = $"{buildParametersContext.GetPipelineOutputDirectory()}/{bundleInfo.BundleName}";
-				if (filePath.Length >= 260)
-					throw new Exception($"The output bundle name is too long {filePath.Length} chars : {filePath}");
-
-				var bundleName = bundleInfo.BundleName;
-				string fileHash = GetBundleFileHash(bundleInfo, buildParametersContext);
-				string fileCRC = GetBundleFileCRC(bundleInfo, buildParametersContext);
-				long fileSize = GetBundleFileSize(bundleInfo, buildParametersContext);
-				string[] tags = buildMapContext.GetBundleTags(bundleName);
-				bool isEncrypted = encryptionContext.IsEncryptFile(bundleName);
-				bool isRawFile = bundleInfo.IsRawFile;
-
-				PatchBundle patchBundle = new PatchBundle(bundleName, fileHash, fileCRC, fileSize, tags);
-				patchBundle.SetFlagsValue(isRawFile, isEncrypted);
+				var patchBundle = bundleInfo.CreatePatchBundle();
 				result.Add(patchBundle);
 			}
 			return result;
-		}
-		private string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
-		{
-			var buildMode = buildParametersContext.Parameters.BuildMode;
-			if (buildMode == EBuildMode.DryRunBuild || buildMode == EBuildMode.SimulateBuild)
-				return "00000000000000000000000000000000"; //32位
-
-			string filePath = $"{buildParametersContext.GetPipelineOutputDirectory()}/{bundleInfo.BundleName}";
-			return HashUtility.FileMD5(filePath);
-		}
-		private string GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
-		{
-			var buildMode = buildParametersContext.Parameters.BuildMode;
-			if (buildMode == EBuildMode.DryRunBuild || buildMode == EBuildMode.SimulateBuild)
-				return "00000000"; //8位
-
-			string filePath = $"{buildParametersContext.GetPipelineOutputDirectory()}/{bundleInfo.BundleName}";
-			return HashUtility.FileCRC32(filePath);
-		}
-		private long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
-		{
-			var buildMode = buildParametersContext.Parameters.BuildMode;
-			if (buildMode == EBuildMode.DryRunBuild || buildMode == EBuildMode.SimulateBuild)
-				return 0;
-
-			string filePath = $"{buildParametersContext.GetPipelineOutputDirectory()}/{bundleInfo.BundleName}";
-			return FileUtility.GetFileSize(filePath);
 		}
 
 		/// <summary>

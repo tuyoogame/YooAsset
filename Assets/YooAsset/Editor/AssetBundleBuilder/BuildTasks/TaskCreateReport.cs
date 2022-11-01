@@ -12,24 +12,25 @@ namespace YooAsset.Editor
 		{
 			var buildParameters = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
+			var patchManifestContext = context.GetContextObject<PatchManifestContext>();
 			buildParameters.StopWatch();
 
 			var buildMode = buildParameters.Parameters.BuildMode;
 			if (buildMode != EBuildMode.SimulateBuild)
 			{
-				CreateReportFile(buildParameters, buildMapContext);
+				CreateReportFile(buildParameters, buildMapContext, patchManifestContext);
 			}
 
 			float buildSeconds = buildParameters.GetBuildingSeconds();
 			BuildRunner.Info($"Build time consuming {buildSeconds} seconds.");
 		}
 
-		private void CreateReportFile(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext)
+		private void CreateReportFile(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext, PatchManifestContext patchManifestContext)
 		{
 			var buildParameters = buildParametersContext.Parameters;
 
-			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
-			PatchManifest patchManifest = AssetBundleBuilderHelper.LoadPatchManifestFile(pipelineOutputDirectory, buildParameters.PackageName, buildParameters.PackageVersion);
+			string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
+			PatchManifest patchManifest = patchManifestContext.Manifest;
 			BuildReport buildReport = new BuildReport();
 
 			// 概述信息
@@ -49,7 +50,6 @@ namespace YooAsset.Editor
 				buildReport.Summary.BuildPackageVersion = buildParameters.PackageVersion;
 				buildReport.Summary.EnableAddressable = buildMapContext.EnableAddressable;
 				buildReport.Summary.UniqueBundleName = buildMapContext.UniqueBundleName;
-
 				buildReport.Summary.EncryptionServicesClassName = buildParameters.EncryptionServices == null ?
 					"null" : buildParameters.EncryptionServices.GetType().FullName;
 
@@ -104,7 +104,7 @@ namespace YooAsset.Editor
 
 			// 序列化文件
 			string fileName = YooAssetSettingsData.GetReportFileName(buildParameters.PackageName, buildParameters.PackageVersion);
-			string filePath = $"{pipelineOutputDirectory}/{fileName}";
+			string filePath = $"{packageOutputDirectory}/{fileName}";
 			BuildReport.Serialize(filePath, buildReport);
 			BuildRunner.Log($"资源构建报告文件创建完成：{filePath}");
 		}

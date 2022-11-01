@@ -9,19 +9,6 @@ namespace YooAsset.Editor
 	[TaskAttribute("资源包加密")]
 	public class TaskEncryption : IBuildTask
 	{
-		public class EncryptionContext : IContextObject
-		{
-			public List<string> EncryptList;
-
-			/// <summary>
-			/// 检测是否为加密文件
-			/// </summary>
-			public bool IsEncryptFile(string bundleName)
-			{
-				return EncryptList.Contains(bundleName);
-			}
-		}
-
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParameters = context.GetContextObject<BuildParametersContext>();
@@ -30,31 +17,20 @@ namespace YooAsset.Editor
 			var buildMode = buildParameters.Parameters.BuildMode;
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
-				EncryptionContext encryptionContext = new EncryptionContext();
-				encryptionContext.EncryptList = EncryptFiles(buildParameters, buildMapContext);
-				context.SetContextObject(encryptionContext);
-			}
-			else
-			{
-				EncryptionContext encryptionContext = new EncryptionContext();
-				encryptionContext.EncryptList = new List<string>();
-				context.SetContextObject(encryptionContext);
+				EncryptingBundleFiles(buildParameters, buildMapContext);
 			}
 		}
 
 		/// <summary>
 		/// 加密文件
 		/// </summary>
-		private List<string> EncryptFiles(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext)
+		private void EncryptingBundleFiles(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext)
 		{
 			var encryptionServices = buildParametersContext.Parameters.EncryptionServices;
 
-			// 加密资源列表
-			List<string> encryptList = new List<string>();
-
 			// 如果没有设置加密类
 			if (encryptionServices == null)
-				return encryptList;
+				return;
 
 			int progressValue = 0;
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
@@ -68,27 +44,19 @@ namespace YooAsset.Editor
 						continue;
 					}
 
-					encryptList.Add(bundleInfo.BundleName);
-
-					// 注意：通过判断文件合法性，规避重复加密一个文件
 					string filePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
+					string savePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}.encrypt";
 					byte[] fileData = File.ReadAllBytes(filePath);
-					if (EditorTools.CheckBundleFileValid(fileData))
-					{
-						byte[] bytes = encryptionServices.Encrypt(fileData);
-						File.WriteAllBytes(filePath, bytes);
-						BuildRunner.Log($"文件加密完成：{filePath}");
-					}
+					byte[] encryptData = encryptionServices.Encrypt(fileData);
+					FileUtility.CreateFile(savePath, encryptData);
+					bundleInfo.EncryptedFilePath = savePath;
+					BuildRunner.Log($"Bundle文件加密完成：{savePath}");
 				}
 
 				// 进度条
 				EditorTools.DisplayProgressBar("加密资源包", ++progressValue, buildMapContext.BundleInfos.Count);
 			}
 			EditorTools.ClearProgressBar();
-
-			if(encryptList.Count == 0)
-				UnityEngine.Debug.LogWarning($"没有发现需要加密的文件！");
-			return encryptList;
 		}
 	}
 }

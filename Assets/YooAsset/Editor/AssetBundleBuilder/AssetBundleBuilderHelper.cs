@@ -64,27 +64,8 @@ namespace YooAsset.Editor
 		/// </summary>
 		public static string MakePipelineOutputDirectory(string outputRoot, string buildPackage, BuildTarget buildTarget, EBuildMode buildMode)
 		{
-			string result = $"{outputRoot}/{buildPackage}/{buildTarget}/{YooAssetSettings.OutputFolderName}";
-			if (buildMode == EBuildMode.DryRunBuild)
-				result += $"_{EBuildMode.DryRunBuild}";
-			else if (buildMode == EBuildMode.SimulateBuild)
-				result += $"_{EBuildMode.SimulateBuild}";
-			return result;
-		}
-
-		/// <summary>
-		/// 加载补丁清单文件
-		/// </summary>
-		internal static PatchManifest LoadPatchManifestFile(string fileDirectory, string packageName, string packageVersion)
-		{
-			string filePath = $"{fileDirectory}/{YooAssetSettingsData.GetPatchManifestFileName(packageName, packageVersion)}";
-			if (File.Exists(filePath) == false)
-			{
-				throw new System.Exception($"Not found patch manifest file : {filePath}");
-			}
-
-			string jsonData = FileUtility.ReadFile(filePath);
-			return PatchManifest.Deserialize(jsonData);
+			string outputDirectory = $"{outputRoot}/{buildPackage}/{buildTarget}/{YooAssetSettings.OutputFolderName}";
+			return outputDirectory;
 		}
 	}
 }
