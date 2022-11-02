@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.IO;
 
 namespace YooAsset
 {
@@ -28,25 +27,19 @@ namespace YooAsset
 		public long FileSize;
 
 		/// <summary>
+		/// 是否为原生文件
+		/// </summary>
+		public bool IsRawFile;
+
+		/// <summary>
+		/// 加载方法
+		/// </summary>
+		public byte LoadMethod;
+
+		/// <summary>
 		/// 资源包的分类标签
 		/// </summary>
 		public string[] Tags;
-
-		/// <summary>
-		/// Flags
-		/// </summary>
-		public int Flags;
-
-
-		/// <summary>
-		/// 是否为原生文件
-		/// </summary>
-		public bool IsRawFile { private set; get; }
-
-		/// <summary>
-		/// 是否为加密文件
-		/// </summary>
-		public bool IsEncrypted { private set; get; }
 
 		/// <summary>
 		/// 文件名称
@@ -87,37 +80,15 @@ namespace YooAsset
 		}
 
 
-		public PatchBundle(string bundleName, string fileHash, string fileCRC, long fileSize, string[] tags)
+		public PatchBundle(string bundleName, string fileHash, string fileCRC, long fileSize, bool isRawFile, byte loadMethod, string[] tags)
 		{
 			BundleName = bundleName;
 			FileHash = fileHash;
 			FileCRC = fileCRC;
 			FileSize = fileSize;
-			Tags = tags;
-		}
-
-		/// <summary>
-		/// 设置Flags
-		/// </summary>
-		public void SetFlagsValue(bool isRawFile, bool isEncrypted)
-		{
 			IsRawFile = isRawFile;
-			IsEncrypted = isEncrypted;
-
-			BitMask32 mask = new BitMask32(0);
-			if (isRawFile) mask.Open(0);
-			if (isEncrypted) mask.Open(1);
-			Flags = mask;
-		}
-
-		/// <summary>
-		/// 解析Flags
-		/// </summary>
-		public void ParseFlagsValue()
-		{
-			BitMask32 value = Flags;
-			IsRawFile = value.Test(0);
-			IsEncrypted = value.Test(1);
+			LoadMethod = loadMethod;
+			Tags = tags;
 		}
 
 		/// <summary>

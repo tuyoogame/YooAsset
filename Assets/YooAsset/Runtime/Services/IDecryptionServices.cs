@@ -1,17 +1,42 @@
 ﻿
 namespace YooAsset
 {
-	public struct DecryptionFileInfo
+	public struct DecryptFileInfo
 	{
+		/// <summary>
+		/// 资源包名称
+		/// </summary>
 		public string BundleName;
-		public string FileHash;
+
+		/// <summary>
+		/// 文件路径
+		/// </summary>
+		public string FilePath;
 	}
 
+	/// <summary>
+	/// 解密类服务接口
+	/// </summary>
 	public interface IDecryptionServices
 	{
 		/// <summary>
-		/// 获取加密文件的数据偏移量
+		/// 文件偏移解密方法
 		/// </summary>
-		ulong GetFileOffset(DecryptionFileInfo fileInfo);
+		ulong LoadFromFileOffset(DecryptFileInfo fileInfo);
+
+		/// <summary>
+		/// 文件内存解密方法
+		/// </summary>
+		byte[] LoadFromMemory(DecryptFileInfo fileInfo);
+
+		/// <summary>
+		/// 文件流解密方法
+		/// </summary>
+		System.IO.FileStream LoadFromStream(DecryptFileInfo fileInfo);
+
+		/// <summary>
+		/// 文件流解密的托管缓存大小
+		/// </summary>
+		uint GetManagedReadBufferSize();
 	}
 }

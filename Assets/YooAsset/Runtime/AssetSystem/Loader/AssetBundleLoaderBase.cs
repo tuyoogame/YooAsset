@@ -89,7 +89,7 @@ namespace YooAsset
 		/// <summary>
 		/// 销毁
 		/// </summary>
-		public void Destroy(bool forceDestroy)
+		public virtual void Destroy(bool forceDestroy)
 		{
 			IsDestroyed = true;
 

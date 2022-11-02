@@ -13,6 +13,8 @@ namespace YooAsset
 			None = 0,
 			Download,
 			CheckDownload,
+			Unpack,
+			CheckUnpack,
 			LoadFile,
 			CheckLoadFile,
 			Done,
@@ -22,8 +24,10 @@ namespace YooAsset
 		private string _fileLoadPath;
 		private bool _isWaitForAsyncComplete = false;
 		private bool _isShowWaitForAsyncError = false;
+		private DownloaderBase _unpacker;
 		private DownloaderBase _downloader;
 		private AssetBundleCreateRequest _createRequest;
+		private FileStream _fileStream;
 
 
 		public AssetBundleFileLoader(AssetSystemImpl impl, BundleInfo bundleInfo) : base(impl, bundleInfo)
@@ -47,8 +51,22 @@ namespace YooAsset
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
+#if UNITY_ANDROID
+					EBundleLoadMethod loadMethod = (EBundleLoadMethod)MainBundleInfo.Bundle.LoadMethod;
+					if (loadMethod == EBundleLoadMethod.LoadFromMemory || loadMethod == EBundleLoadMethod.LoadFromStream)
+					{
+						_steps = ESteps.Unpack;
+						_fileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					}
+					else
+					{
+						_steps = ESteps.LoadFile;
+						_fileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
+					}
+#else
 					_steps = ESteps.LoadFile;
 					_fileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
+#endif
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
@@ -87,7 +105,34 @@ namespace YooAsset
 				}
 			}
 
-			// 3. 加载AssetBundle
+			// 3. 内置文件解压
+			if (_steps == ESteps.Unpack)
+			{
+				int failedTryAgain = 1;
+				var bundleInfo = HostPlayModeImpl.ConvertToUnpackInfo(MainBundleInfo.Bundle);
+				_unpacker = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
+				_steps = ESteps.CheckUnpack;
+			}
+
+			// 4.检测内置文件解压结果
+			if (_steps == ESteps.CheckUnpack)
+			{
+				if (_unpacker.IsDone() == false)
+					return;
+
+				if (_unpacker.HasError())
+				{
+					_steps = ESteps.Done;
+					Status = EStatus.Failed;
+					LastError = _unpacker.GetLastError();
+				}
+				else
+				{
+					_steps = ESteps.LoadFile;
+				}
+			}
+
+			// 5. 加载AssetBundle
 			if (_steps == ESteps.LoadFile)
 			{
 #if UNITY_EDITOR
@@ -103,31 +148,63 @@ namespace YooAsset
 #endif
 
 				// Load assetBundle file
-				if (MainBundleInfo.Bundle.IsEncrypted)
-				{
-					if (Impl.DecryptionServices == null)
-						throw new Exception($"{nameof(AssetBundleFileLoader)} need {nameof(IDecryptionServices)} : {MainBundleInfo.Bundle.BundleName}");
-
-					DecryptionFileInfo fileInfo = new DecryptionFileInfo();
-					fileInfo.BundleName = MainBundleInfo.Bundle.BundleName;
-					fileInfo.FileHash = MainBundleInfo.Bundle.FileHash;
-					ulong offset = Impl.DecryptionServices.GetFileOffset(fileInfo);
-					if (_isWaitForAsyncComplete)
-						CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath, 0, offset);
-					else
-						_createRequest = AssetBundle.LoadFromFileAsync(_fileLoadPath, 0, offset);
-				}
-				else
+				var loadMethod = (EBundleLoadMethod)MainBundleInfo.Bundle.LoadMethod;
+				if (loadMethod == EBundleLoadMethod.Normal)
 				{
 					if (_isWaitForAsyncComplete)
 						CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath);
 					else
 						_createRequest = AssetBundle.LoadFromFileAsync(_fileLoadPath);
 				}
+				else
+				{
+					if (Impl.DecryptionServices == null)
+					{
+						_steps = ESteps.Done;
+						Status = EStatus.Failed;
+						LastError = $"{nameof(IDecryptionServices)} is null : {MainBundleInfo.Bundle.BundleName}";
+						YooLogger.Error(LastError);
+						return;
+					}
+
+					DecryptFileInfo fileInfo = new DecryptFileInfo();
+					fileInfo.BundleName = MainBundleInfo.Bundle.BundleName;
+					fileInfo.FilePath = _fileLoadPath;
+
+					if (loadMethod == EBundleLoadMethod.LoadFromFileOffset)
+					{
+						ulong offset = Impl.DecryptionServices.LoadFromFileOffset(fileInfo);
+						if (_isWaitForAsyncComplete)
+							CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath, 0, offset);
+						else
+							_createRequest = AssetBundle.LoadFromFileAsync(_fileLoadPath, 0, offset);
+					}
+					else if (loadMethod == EBundleLoadMethod.LoadFromMemory)
+					{
+						byte[] fileData = Impl.DecryptionServices.LoadFromMemory(fileInfo);
+						if (_isWaitForAsyncComplete)
+							CacheBundle = AssetBundle.LoadFromMemory(fileData);
+						else
+							_createRequest = AssetBundle.LoadFromMemoryAsync(fileData);
+					}
+					else if (loadMethod == EBundleLoadMethod.LoadFromStream)
+					{
+						_fileStream = Impl.DecryptionServices.LoadFromStream(fileInfo);
+						uint managedReadBufferSize = Impl.DecryptionServices.GetManagedReadBufferSize();
+						if (_isWaitForAsyncComplete)
+							CacheBundle = AssetBundle.LoadFromStream(_fileStream, 0, managedReadBufferSize);
+						else
+							_createRequest = AssetBundle.LoadFromStreamAsync(_fileStream, 0, managedReadBufferSize);
+					}
+					else
+					{
+						throw new System.NotImplementedException();
+					}
+				}
 				_steps = ESteps.CheckLoadFile;
 			}
 
-			// 4. 检测AssetBundle加载结果
+			// 6. 检测AssetBundle加载结果
 			if (_steps == ESteps.CheckLoadFile)
 			{
 				if (_createRequest != null)
@@ -174,6 +251,21 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EStatus.Succeed;
 				}
+			}
+		}
+
+		/// <summary>
+		/// 销毁
+		/// </summary>
+		public override void Destroy(bool forceDestroy)
+		{
+			base.Destroy(forceDestroy);
+
+			if (_fileStream != null)
+			{
+				_fileStream.Close();
+				_fileStream.Dispose();
+				_fileStream = null;
 			}
 		}
 

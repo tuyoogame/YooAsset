@@ -290,7 +290,6 @@ namespace YooAsset
 			// BundleList
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
-				patchBundle.ParseFlagsValue();
 				patchBundle.ParseFileName(patchManifest.OutputNameStyle);
 				patchManifest.BundleDic.Add(patchBundle.BundleName, patchBundle);
 			}

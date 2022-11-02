@@ -17,7 +17,7 @@ namespace YooAsset
 			LoadCacheFile,
 			CheckLoadCacheFile,
 			LoadWebFile,
-			CheckLoadWebFile,		
+			CheckLoadWebFile,
 			TryLoadWebFile,
 			Done,
 		}
@@ -30,7 +30,7 @@ namespace YooAsset
 		private UnityWebRequest _webRequest;
 		private AssetBundleCreateRequest _createRequest;
 
-		
+
 		public AssetBundleWebLoader(AssetSystemImpl impl, BundleInfo bundleInfo) : base(impl, bundleInfo)
 		{
 		}
@@ -108,20 +108,18 @@ namespace YooAsset
 #endif
 
 				// Load assetBundle file
-				if (MainBundleInfo.Bundle.IsEncrypted)
+				var loadMethod = (EBundleLoadMethod)MainBundleInfo.Bundle.LoadMethod;
+				if (loadMethod == EBundleLoadMethod.Normal)
 				{
-					if (Impl.DecryptionServices == null)
-						throw new Exception($"{nameof(AssetBundleFileLoader)} need {nameof(IDecryptionServices)} : {MainBundleInfo.Bundle.BundleName}");
-
-					DecryptionFileInfo fileInfo = new DecryptionFileInfo();
-					fileInfo.BundleName = MainBundleInfo.Bundle.BundleName;
-					fileInfo.FileHash = MainBundleInfo.Bundle.FileHash;
-					ulong offset = Impl.DecryptionServices.GetFileOffset(fileInfo);
-					_createRequest = AssetBundle.LoadFromFileAsync(_fileLoadPath, 0, offset);
+					_createRequest = AssetBundle.LoadFromFileAsync(_fileLoadPath);
 				}
 				else
 				{
-					_createRequest = AssetBundle.LoadFromFileAsync(_fileLoadPath);
+					_steps = ESteps.Done;
+					Status = EStatus.Failed;
+					LastError = $"WebGL not support encrypted bundle file : {MainBundleInfo.Bundle.BundleName}";
+					YooLogger.Error(LastError);
+					return;
 				}
 				_steps = ESteps.CheckLoadCacheFile;
 			}

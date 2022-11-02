@@ -171,14 +171,14 @@ namespace YooAsset
 		{
 			None,
 			Prepare,
-			DownloadBuildinFile,
-			CheckDownload,
+			Unpack,
+			CheckUnpack,
 			CheckAndCopyFile,
 			Done,
 		}
 
 		private ESteps _steps = ESteps.None;
-		private DownloaderBase _downloader;
+		private DownloaderBase _unpacker;
 
 		public OfflinePlayModeRawFileOperation(BundleInfo bundleInfo, string copyPath) : base(bundleInfo, copyPath)
 		{
@@ -203,7 +203,7 @@ namespace YooAsset
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-					_steps = ESteps.DownloadBuildinFile;
+					_steps = ESteps.Unpack;
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
@@ -215,27 +215,27 @@ namespace YooAsset
 				}
 			}
 
-			// 2. 下载文件
-			if (_steps == ESteps.DownloadBuildinFile)
+			// 2. 内置文件解压
+			if (_steps == ESteps.Unpack)
 			{
-				int failedTryAgain = int.MaxValue;
+				int failedTryAgain = 1;
 				var bundleInfo = HostPlayModeImpl.ConvertToUnpackInfo(_bundleInfo.Bundle);
-				_downloader = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
-				_steps = ESteps.CheckDownload;
+				_unpacker = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
+				_steps = ESteps.CheckUnpack;
 			}
 
-			// 3. 检测下载结果
-			if (_steps == ESteps.CheckDownload)
+			// 3. 检测内置文件解压结果
+			if (_steps == ESteps.CheckUnpack)
 			{
-				Progress = _downloader.DownloadProgress;
-				if (_downloader.IsDone() == false)
+				Progress = _unpacker.DownloadProgress;
+				if (_unpacker.IsDone() == false)
 					return;
 
-				if (_downloader.HasError())
+				if (_unpacker.HasError())
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _downloader.GetLastError();
+					Error = _unpacker.GetLastError();
 				}
 				else
 				{
@@ -306,14 +306,16 @@ namespace YooAsset
 		{
 			None,
 			Prepare,
-			DownloadWebFile,
-			DownloadBuildinFile,
+			Download,
 			CheckDownload,
+			Unpack,
+			CheckUnpack,
 			CheckAndCopyFile,
 			Done,
 		}
 
 		private ESteps _steps = ESteps.None;
+		private DownloaderBase _unpacker;
 		private DownloaderBase _downloader;
 
 		internal HostPlayModeRawFileOperation(BundleInfo bundleInfo, string copyPath) : base(bundleInfo, copyPath)
@@ -339,11 +341,11 @@ namespace YooAsset
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
-					_steps = ESteps.DownloadWebFile;
+					_steps = ESteps.Download;
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-					_steps = ESteps.DownloadBuildinFile;
+					_steps = ESteps.Unpack;
 				}
 				else if (_bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
@@ -356,23 +358,14 @@ namespace YooAsset
 			}
 
 			// 2. 下载远端文件
-			if (_steps == ESteps.DownloadWebFile)
+			if (_steps == ESteps.Download)
 			{
 				int failedTryAgain = int.MaxValue;
 				_downloader = DownloadSystem.BeginDownload(_bundleInfo, failedTryAgain);
 				_steps = ESteps.CheckDownload;
 			}
 
-			// 3. 下载内置文件
-			if (_steps == ESteps.DownloadBuildinFile)
-			{
-				int failedTryAgain = int.MaxValue;
-				var bundleInfo = HostPlayModeImpl.ConvertToUnpackInfo(_bundleInfo.Bundle);
-				_downloader = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
-				_steps = ESteps.CheckDownload;
-			}
-
-			// 4. 检测下载结果
+			// 3. 检测下载结果
 			if (_steps == ESteps.CheckDownload)
 			{
 				Progress = _downloader.DownloadProgress;
@@ -384,6 +377,34 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = _downloader.GetLastError();
+				}
+				else
+				{
+					_steps = ESteps.CheckAndCopyFile;
+				}
+			}
+
+			// 3. 解压内置文件
+			if (_steps == ESteps.Unpack)
+			{
+				int failedTryAgain = 1;
+				var bundleInfo = HostPlayModeImpl.ConvertToUnpackInfo(_bundleInfo.Bundle);
+				_unpacker = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
+				_steps = ESteps.CheckUnpack;
+			}
+
+			// 4. 检测解压结果
+			if (_steps == ESteps.CheckUnpack)
+			{
+				Progress = _unpacker.DownloadProgress;
+				if (_unpacker.IsDone() == false)
+					return;
+
+				if (_unpacker.HasError())
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = _unpacker.GetLastError();
 				}
 				else
 				{
