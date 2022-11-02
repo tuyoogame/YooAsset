@@ -36,21 +36,27 @@ namespace YooAsset.Editor
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
-				if (encryptionServices.Check(bundleInfo.BundleName))
+				bundleInfo.LoadMethod = EBundleLoadMethod.Normal;
+
+				EncryptFileInfo fileInfo = new EncryptFileInfo();
+				fileInfo.BundleName = bundleInfo.BundleName;
+				fileInfo.FilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
+
+				var encryptResult = encryptionServices.Encrypt(fileInfo);		
+				if (encryptResult.LoadMethod != EBundleLoadMethod.Normal)
 				{
+					// 注意：原生文件不支持加密
 					if (bundleInfo.IsRawFile)
 					{
 						UnityEngine.Debug.LogWarning($"Encryption not support raw file : {bundleInfo.BundleName}");
 						continue;
 					}
 
-					string filePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
-					string savePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}.encrypt";
-					byte[] fileData = File.ReadAllBytes(filePath);
-					byte[] encryptData = encryptionServices.Encrypt(fileData);
-					FileUtility.CreateFile(savePath, encryptData);
-					bundleInfo.EncryptedFilePath = savePath;
-					BuildRunner.Log($"Bundle文件加密完成：{savePath}");
+					string filePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}.encrypt";
+					FileUtility.CreateFile(filePath, encryptResult.EncryptedData);
+					bundleInfo.EncryptedFilePath = filePath;
+					bundleInfo.LoadMethod = encryptResult.LoadMethod;
+					BuildRunner.Log($"Bundle文件加密完成：{filePath}");
 				}
 
 				// 进度条

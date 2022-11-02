@@ -25,7 +25,7 @@ namespace YooAsset.Editor
 		private ToolbarButton _topBar1;
 		private ToolbarButton _topBar2;
 		private ToolbarButton _topBar3;
-		private ToolbarButton _topBar4;
+		private ToolbarButton _topBar5;
 		private ToolbarButton _bottomBar1;
 		private ListView _bundleListView;
 		private ListView _includeListView;
@@ -53,11 +53,11 @@ namespace YooAsset.Editor
 			_topBar1 = _root.Q<ToolbarButton>("TopBar1");
 			_topBar2 = _root.Q<ToolbarButton>("TopBar2");
 			_topBar3 = _root.Q<ToolbarButton>("TopBar3");
-			_topBar4 = _root.Q<ToolbarButton>("TopBar4");
+			_topBar5 = _root.Q<ToolbarButton>("TopBar5");
 			_topBar1.clicked += TopBar1_clicked;
 			_topBar2.clicked += TopBar2_clicked;
 			_topBar3.clicked += TopBar3_clicked;
-			_topBar4.clicked += TopBar4_clicked;
+			_topBar5.clicked += TopBar4_clicked;
 
 			// 底部按钮栏
 			_bottomBar1 = _root.Q<ToolbarButton>("BottomBar1");
@@ -144,7 +144,7 @@ namespace YooAsset.Editor
 			_topBar1.text = $"Bundle Name ({_bundleListView.itemsSource.Count})";
 			_topBar2.text = "Size";
 			_topBar3.text = "Hash";
-			_topBar4.text = "Tags";
+			_topBar5.text = "Tags";
 
 			if (_sortMode == ESortMode.BundleName)
 			{
@@ -163,9 +163,9 @@ namespace YooAsset.Editor
 			else if (_sortMode == ESortMode.BundleTags)
 			{
 				if (_descendingSort)
-					_topBar4.text = "Tags ↓";
+					_topBar5.text = "Tags ↓";
 				else
-					_topBar4.text = "Tags ↑";
+					_topBar5.text = "Tags ↑";
 			}
 			else
 			{
@@ -231,6 +231,16 @@ namespace YooAsset.Editor
 				label.name = "Label5";
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
+				//label.style.flexGrow = 1f;
+				label.style.width = 150;
+				element.Add(label);
+			}
+
+			{
+				var label = new Label();
+				label.name = "Label6";
+				label.style.unityTextAlign = TextAnchor.MiddleLeft;
+				label.style.marginLeft = 3f;
 				label.style.flexGrow = 1f;
 				label.style.width = 80;
 				element.Add(label);
@@ -255,9 +265,13 @@ namespace YooAsset.Editor
 			var label3 = element.Q<Label>("Label3");
 			label3.text = bundleInfo.FileHash;
 
-			// Tags
+			// LoadMethod
 			var label5 = element.Q<Label>("Label5");
-			label5.text = bundleInfo.GetTagsString();
+			label5.text = bundleInfo.LoadMethod.ToString();
+
+			// Tags
+			var label6 = element.Q<Label>("Label6");
+			label6.text = bundleInfo.GetTagsString();
 		}
 		private void BundleListView_onSelectionChange(IEnumerable<object> objs)
 		{
@@ -271,7 +285,7 @@ namespace YooAsset.Editor
 		}
 		private void ShowAssetBundleInspector(ReportBundleInfo bundleInfo)
 		{
-			if (bundleInfo.IsRawFile())
+			if (bundleInfo.IsRawFile)
 				return;
 
 			string rootDirectory = Path.GetDirectoryName(_reportFilePath);

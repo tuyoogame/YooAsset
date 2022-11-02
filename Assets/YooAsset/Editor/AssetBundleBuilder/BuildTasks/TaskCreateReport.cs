@@ -98,7 +98,8 @@ namespace YooAsset.Editor
 				reportBundleInfo.FileCRC = patchBundle.FileCRC;
 				reportBundleInfo.FileSize = patchBundle.FileSize;
 				reportBundleInfo.Tags = patchBundle.Tags;
-				reportBundleInfo.Flags = patchBundle.Flags;
+				reportBundleInfo.IsRawFile = patchBundle.IsRawFile;
+				reportBundleInfo.LoadMethod = (EBundleLoadMethod)patchBundle.LoadMethod;
 				buildReport.BundleInfos.Add(reportBundleInfo);
 			}
 
@@ -178,7 +179,7 @@ namespace YooAsset.Editor
 			int fileCount = 0;
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
-				if (patchBundle.IsEncrypted)
+				if (patchBundle.LoadMethod != (byte)EBundleLoadMethod.Normal)
 					fileCount++;
 			}
 			return fileCount;
@@ -188,7 +189,7 @@ namespace YooAsset.Editor
 			long fileBytes = 0;
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
-				if (patchBundle.IsEncrypted)
+				if (patchBundle.LoadMethod != (byte)EBundleLoadMethod.Normal)
 					fileBytes += patchBundle.FileSize;
 			}
 			return fileBytes;

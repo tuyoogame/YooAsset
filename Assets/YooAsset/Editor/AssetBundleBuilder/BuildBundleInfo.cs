@@ -59,10 +59,15 @@ namespace YooAsset.Editor
 		public readonly BuildPatchInfo PatchInfo = new BuildPatchInfo();
 
 		/// <summary>
+		/// Bundle文件的加载方法
+		/// </summary>
+		public EBundleLoadMethod LoadMethod { set; get; }
+
+		/// <summary>
 		/// 加密生成文件的路径
 		/// 注意：如果未加密该路径为空
 		/// </summary>
-		public string EncryptedFilePath { set; get; } = string.Empty;
+		public string EncryptedFilePath { set; get; }
 
 		/// <summary>
 		/// 是否为原生文件
@@ -177,9 +182,13 @@ namespace YooAsset.Editor
 		/// </summary>
 		internal PatchBundle CreatePatchBundle()
 		{
+			string fileHash = PatchInfo.PatchFileHash;
+			string fileCRC = PatchInfo.PatchFileCRC;
+			long fileSize = PatchInfo.PatchFileSize;
+			bool isRawFile = IsRawFile;
+			byte loadMethod = (byte)LoadMethod;
 			string[] tags = GetBundleTags();
-			PatchBundle patchBundle = new PatchBundle(BundleName, PatchInfo.PatchFileHash, PatchInfo.PatchFileCRC, PatchInfo.PatchFileSize, tags);
-			patchBundle.SetFlagsValue(IsRawFile, IsEncryptedFile);
+			PatchBundle patchBundle = new PatchBundle(BundleName, fileHash, fileCRC, fileSize, isRawFile, loadMethod, tags);
 			return patchBundle;
 		}
 	}
