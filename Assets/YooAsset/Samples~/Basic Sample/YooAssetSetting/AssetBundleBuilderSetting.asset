@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: AssetBundleBuilderSetting
   m_EditorClassIdentifier: 
   BuildPipeline: 0
-  BuildMode: 1
+  BuildMode: 0
   BuildPackage: DefaultPackage
   CompressOption: 2
   OutputNameStyle: 1
   CopyBuildinFileOption: 1
   CopyBuildinFileTags: 
-  EncyptionClassName: EncryptionNone
+  EncyptionClassName: FileStreamEncryption

@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using YooAsset;
 using Better.StreamingAssets;
+using System.IO;
 
 public class BootScene : MonoBehaviour
 {
@@ -61,6 +62,7 @@ public class BootScene : MonoBehaviour
 		if (PlayMode == EPlayMode.OfflinePlayMode)
 		{
 			var createParameters = new OfflinePlayModeParameters();
+			createParameters.DecryptionServices = new BundleDecryptionServices();
 			yield return defaultPackage.InitializeAsync(createParameters);
 		}
 
@@ -68,6 +70,7 @@ public class BootScene : MonoBehaviour
 		if (PlayMode == EPlayMode.HostPlayMode)
 		{
 			var createParameters = new HostPlayModeParameters();
+			createParameters.DecryptionServices = new BundleDecryptionServices();
 			createParameters.QueryServices = new QueryStreamingAssetsFileServices();
 			createParameters.DefaultHostServer = GetHostServerURL();
 			createParameters.FallbackHostServer = GetHostServerURL();
@@ -111,6 +114,29 @@ public class BootScene : MonoBehaviour
 			// 注意：使用了BetterStreamingAssets插件，使用前需要初始化该插件！
 			string buildinFolderName = YooAssets.GetStreamingAssetBuildinFolderName();
 			return BetterStreamingAssets.FileExists($"{buildinFolderName}/{fileName}");
+		}
+	}
+	private class BundleDecryptionServices : IDecryptionServices
+	{
+		public ulong LoadFromFileOffset(DecryptFileInfo fileInfo)
+		{
+			return 32;
+		}
+
+		public byte[] LoadFromMemory(DecryptFileInfo fileInfo)
+		{
+			throw new NotImplementedException();
+		}
+
+		public FileStream LoadFromStream(DecryptFileInfo fileInfo)
+		{
+			BundleStream bundleStream = new BundleStream(fileInfo.FilePath, FileMode.Open);
+			return bundleStream;
+		}
+
+		public uint GetManagedReadBufferSize()
+		{
+			return 1024;
 		}
 	}
 }
