@@ -168,6 +168,10 @@ namespace YooAsset.Editor
 					shaderBundleReferenceList.Add(valuePair.Key);
 			}
 
+			// 注意：没有任何资源依赖着色器
+			if (shaderBundleReferenceList.Count == 0)
+				return;
+
 			// 获取着色器资源包索引
 			Predicate<PatchBundle> predicate = new Predicate<PatchBundle>(s => s.BundleName == shadersBunldeName);
 			int shaderBundleId = patchManifest.BundleList.FindIndex(predicate);
