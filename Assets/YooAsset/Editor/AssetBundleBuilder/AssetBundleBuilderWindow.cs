@@ -27,6 +27,7 @@ namespace YooAsset.Editor
 		private TextField _buildOutputField;
 		private EnumField _buildPipelineField;
 		private EnumField _buildModeField;
+		private TextField _buildVersionField;
 		private PopupField<string> _buildPackageField;
 		private PopupField<string> _encryptionField;
 		private EnumField _compressionField;
@@ -90,6 +91,10 @@ namespace YooAsset.Editor
 					AssetBundleBuilderSettingData.Setting.BuildMode = (EBuildMode)_buildModeField.value;
 					RefreshWindow();
 				});
+
+				// 构建版本
+				_buildVersionField = root.Q<TextField>("BuildVersion");
+				_buildVersionField.SetValueWithoutNotify(GetBuildPackageVersion());
 
 				// 构建包裹
 				var buildPackageContainer = root.Q("BuildPackageContainer");
@@ -256,7 +261,7 @@ namespace YooAsset.Editor
 			buildParameters.BuildPipeline = AssetBundleBuilderSettingData.Setting.BuildPipeline;
 			buildParameters.BuildMode = AssetBundleBuilderSettingData.Setting.BuildMode;
 			buildParameters.PackageName = AssetBundleBuilderSettingData.Setting.BuildPackage;
-			buildParameters.PackageVersion = GetDefaultPackageVersion();
+			buildParameters.PackageVersion = _buildVersionField.value;
 			buildParameters.VerifyBuildingResult = true;
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.CompressOption = AssetBundleBuilderSettingData.Setting.CompressOption;
@@ -277,7 +282,9 @@ namespace YooAsset.Editor
 				EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
 			}
 		}
-		private string GetDefaultPackageVersion()
+
+		// 构建版本相关
+		private string GetBuildPackageVersion()
 		{
 			int totalMinutes = DateTime.Now.Hour * 60 + DateTime.Now.Minute;
 			return DateTime.Now.ToString("yyyy-MM-dd") + "-" + totalMinutes;

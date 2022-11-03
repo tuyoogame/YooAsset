@@ -6,6 +6,7 @@
         <ui:TextField picking-mode="Ignore" label="Build Output" name="BuildOutput" />
         <uie:EnumField label="Build Pipeline" name="BuildPipeline" />
         <uie:EnumField label="Build Mode" name="BuildMode" />
+        <ui:TextField picking-mode="Ignore" label="Build Version" name="BuildVersion" style="width: 350px;" />
         <ui:VisualElement name="BuildPackageContainer" style="height: 24px;" />
         <ui:VisualElement name="EncryptionContainer" style="height: 24px;" />
         <uie:EnumField label="Compression" value="Center" name="Compression" />
