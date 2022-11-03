@@ -30,8 +30,8 @@ namespace YooAsset.Editor
 				// 保存结果
 				ShaderVariantCollectionHelper.SaveCurrentShaderVariantCollection(_saveFilePath);
 
-				// 创建说明文件
-				CreateReadme();
+				// 创建清单
+				CreateManifest();
 
 				Debug.Log($"搜集SVC完毕！");
 				_completedCallback?.Invoke();
@@ -64,7 +64,7 @@ namespace YooAsset.Editor
 			ShaderVariantCollectionHelper.ClearCurrentShaderVariantCollection();
 
 			// 创建临时测试场景
-			CreateTemperScene();
+			CreateTempScene();
 
 			// 收集着色器变种
 			var materials = GetAllMaterials();
@@ -76,9 +76,8 @@ namespace YooAsset.Editor
 			_elapsedTime.Start();
 		}
 
-		private static void CreateTemperScene()
+		private static void CreateTempScene()
 		{
-			// 创建临时场景
 			EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects);
 		}
 		private static List<Material> GetAllMaterials()
@@ -186,17 +185,17 @@ namespace YooAsset.Editor
 			go.transform.position = position;
 			go.name = $"Sphere_{index}|{material.name}";
 		}
-		private static void CreateReadme()
+		private static void CreateManifest()
 		{
 			AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
 			ShaderVariantCollection svc = AssetDatabase.LoadAssetAtPath<ShaderVariantCollection>(_saveFilePath);
 			if (svc != null)
 			{
-				var wrapper = ShaderVariantCollectionReadme.Extract(svc);
-				string jsonContents = JsonUtility.ToJson(wrapper, true);
-				string savePath = _saveFilePath.Replace(".shadervariants", "Manifest.json");
-				File.WriteAllText(savePath, jsonContents);
+				var wrapper = ShaderVariantCollectionManifest.Extract(svc);
+				string jsonData = JsonUtility.ToJson(wrapper, true);
+				string savePath = _saveFilePath.Replace(".shadervariants", ".json");
+				File.WriteAllText(savePath, jsonData);
 			}
 
 			AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);

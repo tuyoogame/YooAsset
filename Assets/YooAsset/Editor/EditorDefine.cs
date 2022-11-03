@@ -8,7 +8,14 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 停靠窗口类型集合
 		/// </summary>
-		public static readonly Type[] DockedWindowTypes = { typeof(AssetBundleBuilderWindow), typeof(AssetBundleCollectorWindow), typeof(AssetBundleDebuggerWindow), typeof(AssetBundleReporterWindow)};
+		public static readonly Type[] DockedWindowTypes = 
+		{
+			typeof(AssetBundleBuilderWindow),
+			typeof(AssetBundleCollectorWindow),
+			typeof(AssetBundleDebuggerWindow),
+			typeof(AssetBundleReporterWindow),
+			typeof(ShaderVariantCollectorWindow)
+		};
 #endif
 	}
 

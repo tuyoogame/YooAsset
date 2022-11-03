@@ -9,7 +9,8 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	public static class ShaderVariantCollectionReadme
+	[Serializable]
+	public class ShaderVariantCollectionManifest
 	{
 		[Serializable]
 		public class ShaderVariantElement
@@ -44,52 +45,49 @@ namespace YooAsset.Editor
 			public List<ShaderVariantElement> ShaderVariantElements = new List<ShaderVariantElement>(1000);
 		}
 
-		[Serializable]
-		public class ShaderVariantCollectionManifest
+
+		/// <summary>
+		/// Number of shaders in this collection
+		/// </summary>
+		public int ShaderTotalCount;
+
+		/// <summary>
+		/// Number of total varians in this collection
+		/// </summary>
+		public int VariantTotalCount;
+
+		/// <summary>
+		/// Shader variants info list.
+		/// </summary>
+		public List<ShaderVariantInfo> ShaderVariantInfos = new List<ShaderVariantInfo>(1000);
+
+		/// <summary>
+		/// 添加着色器变种信息
+		/// </summary>
+		public void AddShaderVariant(string assetPath, string shaderName, PassType passType, string[] keywords)
 		{
-			/// <summary>
-			/// Number of shaders in this collection
-			/// </summary>
-			public int ShaderTotalCount;
-
-			/// <summary>
-			/// Number of total varians in this collection
-			/// </summary>
-			public int VariantTotalCount;
-
-			/// <summary>
-			/// Shader variants info list.
-			/// </summary>
-			public List<ShaderVariantInfo> ShaderVariantInfos = new List<ShaderVariantInfo>(1000);
-
-			/// <summary>
-			/// 添加着色器变种信息
-			/// </summary>
-			public void AddShaderVariant(string assetPath, string shaderName, PassType passType, string[] keywords)
+			var info = GetOrCreateShaderVariantInfo(assetPath, shaderName);
+			ShaderVariantElement element = new ShaderVariantElement();
+			element.PassType = passType;
+			element.Keywords = keywords;
+			info.ShaderVariantElements.Add(element);
+		}
+		private ShaderVariantInfo GetOrCreateShaderVariantInfo(string assetPath, string shaderName)
+		{
+			var selectList = ShaderVariantInfos.Where(t => t.ShaderName == shaderName && t.AssetPath == assetPath).ToList();
+			if (selectList.Count == 0)
 			{
-				var info = GetOrCreateShaderVariantInfo(assetPath, shaderName);
-				ShaderVariantElement element = new ShaderVariantElement();
-				element.PassType = passType;
-				element.Keywords = keywords;
-				info.ShaderVariantElements.Add(element);
+				ShaderVariantInfo newInfo = new ShaderVariantInfo();
+				newInfo.AssetPath = assetPath;
+				newInfo.ShaderName = shaderName;
+				ShaderVariantInfos.Add(newInfo);
+				return newInfo;
 			}
-			private ShaderVariantInfo GetOrCreateShaderVariantInfo(string assetPath, string shaderName)
-			{
-				var selectList = ShaderVariantInfos.Where(t => t.ShaderName == shaderName && t.AssetPath == assetPath).ToList();
-				if (selectList.Count == 0)
-				{
-					ShaderVariantInfo newInfo = new ShaderVariantInfo();
-					newInfo.AssetPath = assetPath;
-					newInfo.ShaderName = shaderName;
-					ShaderVariantInfos.Add(newInfo);
-					return newInfo;
-				}
 
-				if (selectList.Count != 1)
-					throw new Exception("Should never get here !");
+			if (selectList.Count != 1)
+				throw new Exception("Should never get here !");
 
-				return selectList[0];
-			}
+			return selectList[0];
 		}
 
 

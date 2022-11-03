@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <uie:Toolbar name="Toolbar" style="display: flex; flex-direction: row-reverse;" />
+    <ui:VisualElement name="BuildContainer">
+        <ui:TextField picking-mode="Ignore" label="文件保存路径" name="CollectOutput" />
+        <ui:Label text="Current Shader Count" display-tooltip-when-elided="true" name="CurrentShaderCount" />
+        <ui:Label text="Current Variant Count" display-tooltip-when-elided="true" name="CurrentVariantCount" />
+        <ui:Button text="开始搜集" display-tooltip-when-elided="true" name="CollectButton" style="height: 50px; background-color: rgb(40, 106, 42); margin-top: 10px;" />
+    </ui:VisualElement>
+</ui:UXML>

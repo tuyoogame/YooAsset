@@ -1,61 +1,82 @@
-﻿using UnityEngine;
+﻿#if UNITY_2019_4_OR_NEWER
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine;
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
-	public class ShaderVariantCollectionWindow : EditorWindow
+	public class ShaderVariantCollectorWindow : EditorWindow
 	{
-		static ShaderVariantCollectionWindow _thisInstance;
-
 		[MenuItem("YooAsset/ShaderVariant Collector", false, 201)]
-		static void ShowWindow()
+		public static void ShowExample()
 		{
-			if (_thisInstance == null)
-			{
-				_thisInstance = GetWindow<ShaderVariantCollectionWindow>("着色器变种收集工具");
-				_thisInstance.minSize = new Vector2(800, 600);
-			}
-			_thisInstance.Show();
+			ShaderVariantCollectorWindow window = GetWindow<ShaderVariantCollectorWindow>("着色器变种收集工具", true, EditorDefine.DockedWindowTypes);
+			window.minSize = new Vector2(800, 600);
 		}
 
-		private ShaderVariantCollection _selectSVC;
+		private Button _collectButton;
+		private TextField _collectOutputField;
+		private Label _currentShaderCountField;
+		private Label _currentVariantCountField;
 
-		private void OnGUI()
+		public void CreateGUI()
 		{
-			EditorGUILayout.Space();
-			ShaderVariantCollectorSettingData.Setting.SavePath = EditorGUILayout.TextField("收集文件保存路径", ShaderVariantCollectorSettingData.Setting.SavePath);
-
-			int currentShaderCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionShaderCount();
-			int currentVariantCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionVariantCount();
-			EditorGUILayout.LabelField($"CurrentShaderCount : {currentShaderCount}");
-			EditorGUILayout.LabelField($"CurrentVariantCount : {currentVariantCount}");
-
-			// 搜集变种
-			EditorGUILayout.Space();
-			if (GUILayout.Button("搜集变种", GUILayout.MaxWidth(80)))
+			try
 			{
-				ShaderVariantCollector.Run(ShaderVariantCollectorSettingData.Setting.SavePath, null);
-			}
+				VisualElement root = this.rootVisualElement;
 
-			// 查询
-			EditorGUILayout.Space();
-			if (GUILayout.Button("查询", GUILayout.MaxWidth(80)))
-			{
-				string resultPath = EditorTools.OpenFilePath("Select File", "Assets/", "shadervariants");
-				if (string.IsNullOrEmpty(resultPath))
+				// 加载布局文件
+				var visualAsset = EditorHelper.LoadWindowUXML<ShaderVariantCollectorWindow>();
+				if (visualAsset == null)
 					return;
-				string assetPath = EditorTools.AbsolutePathToAssetPath(resultPath);
-				_selectSVC = AssetDatabase.LoadAssetAtPath<ShaderVariantCollection>(assetPath);
+
+				visualAsset.CloneTree(root);
+
+				// 文件输出目录
+				_collectOutputField = root.Q<TextField>("CollectOutput");
+				_collectOutputField.SetValueWithoutNotify(ShaderVariantCollectorSettingData.Setting.SavePath);
+				_collectOutputField.RegisterValueChangedCallback(evt =>
+				{
+					ShaderVariantCollectorSettingData.Setting.SavePath = _collectOutputField.value;
+				});
+
+				_currentShaderCountField = root.Q<Label>("CurrentShaderCount");
+				_currentVariantCountField = root.Q<Label>("CurrentVariantCount");
+
+				// 变种收集按钮
+				_collectButton = root.Q<Button>("CollectButton");
+				_collectButton.clicked += CollectButton_clicked;
+
+				//RefreshWindow();
 			}
-			if (_selectSVC != null)
+			catch (Exception e)
 			{
-				EditorGUILayout.LabelField($"ShaderCount : {_selectSVC.shaderCount}");
-				EditorGUILayout.LabelField($"VariantCount : {_selectSVC.variantCount}");
+				Debug.LogError(e.ToString());
 			}
 		}
-		private void OnDestroy()
+		private void Update()
 		{
-			ShaderVariantCollectorSettingData.SaveFile();
+			if (_currentShaderCountField != null)
+			{
+				int currentShaderCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionShaderCount();
+				_currentShaderCountField.text = $"Current Shader Count : {currentShaderCount}";
+			}
+
+			if (_currentVariantCountField != null)
+			{
+				int currentVariantCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionVariantCount();
+				_currentVariantCountField.text = $"Current Variant Count : {currentVariantCount}";
+			}
+		}
+
+		private void CollectButton_clicked()
+		{
+			ShaderVariantCollector.Run(ShaderVariantCollectorSettingData.Setting.SavePath, null);
 		}
 	}
 }
+#endif
