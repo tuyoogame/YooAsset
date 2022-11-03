@@ -190,6 +190,12 @@ public class GameScene1 : MonoBehaviour
 				YooAssets.LoadSceneAsync("GameScene2");
 			});
 		}
+
+		// 加载面板
+		{
+			var handle = YooAssets.LoadAssetSync<GameObject>("ui_window");
+			handle.InstantiateSync(CanvasRoot.transform);
+		}
 	}
 
 	private void OnUnityAtlas_Completed(AssetOperationHandle handle)

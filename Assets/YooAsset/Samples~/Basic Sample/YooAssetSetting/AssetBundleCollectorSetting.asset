@@ -87,7 +87,7 @@ MonoBehaviour:
         CollectorGUID: 926d3203fcefdb947881a7491496e039
         CollectorType: 0
         AddressRuleName: AddressByFileName
-        PackRuleName: PackDirectory
+        PackRuleName: PackSeparately
         FilterRuleName: CollectAll
         AssetTags: 
       - CollectPath: Assets/Samples/Basic Sample/GameRes/UISprite
