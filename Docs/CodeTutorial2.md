@@ -126,24 +126,15 @@ private IEnumerator TryUpdateStaticVersion()
     {
         // 如果获取远端资源版本成功，说明当前网络连接并无问题，可以走正常更新流程。
         ......
-        
-        // 注意：在成功下载所有资源之后，我们需要记录当前最新的资源版本号
-        PlayerPrefs.SetString("STATIC_VERSION", packageCRC);
     }
 }
 
-private IEnumerator TryUpdateStaticVersion()
+private IEnumerator WeaklyUpdate()
 {
     // 如果获取远端资源版本失败，我们走弱联网更新模式。
-    // 注意：如果从来没有保存过版本信息，则需要从内部读取StaticVersion.bytes文件的版本信息。
-    string packageVersion = PlayerPrefs.GetString("STATIC_VERSION", string.Empty);
-    if (packageVersion == string.Empty)
-    {
-        packageVersion = LoadStaticVersionFromStreamingAssets();
-    }
-    
-    // 在弱联网情况下更新补丁清单
-    var operation = package.WeaklyUpdateManifestAsync(packageVersion);
+    // 弱联网更新方法，会优先加载沙盒内的清单，如果不存在再加载内置清单。
+    // 在加载清单之后，验证清单内资源内容本地完整性。
+    var operation = package.WeaklyUpdateManifestAsync();
     yield return operation;
     if (operation.Status == EOperationStatus.Succeed)
     {
@@ -151,7 +142,7 @@ private IEnumerator TryUpdateStaticVersion()
     }
     else
     {
-        // 指定版本的资源内容本地并不完整，需要提示玩家更新。
+        // 资源内容本地并不完整，需要提示玩家联网更新。
         ShowMessageBox("请检查本地网络，有新的游戏内容需要更新！");
     }
 }

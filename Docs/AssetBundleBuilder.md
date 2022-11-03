@@ -28,9 +28,13 @@
 
   (4) 模拟构建模式：在编辑器下配合EditorSimulateMode运行模式，来模拟真实运行的环境。
 
+- **Build Version**
+
+  构建的资源包版本。
+
 - **Build Package**
 
-  需要构建的资源包名称。
+  构建的资源包名称。
 
 - **Encryption**
 
@@ -69,38 +73,6 @@
 - **构建**
 
   点击构建按钮会开始构建流程，构建流程分为多个节点顺序执行，如果某个节点发生错误，会导致构建失败。错误信息可以在控制台查看。
-
-### 资源包加密
-
-编写继承IEncryptionServices接口的加密类。注意：加密类文件需要放置在Editor文件夹里。
-
-````C#
-using System;
-using YooAsset.Editor;
-
-public class GameEncryption : IEncryptionServices
-{
-    /// <summary>
-    /// 检测资源包是否需要加密
-    /// </summary>
-    bool IEncryptionServices.Check(string bundleName)
-    {
-        // 对配置表相关的资源包进行加密
-        return bundleName.Contains("assets/config/");
-    }
-
-    /// <summary>
-    /// 对数据进行加密，并返回加密后的数据
-    /// </summary>
-    byte[] IEncryptionServices.Encrypt(byte[] fileData)
-    {
-        int offset = 32;
-        var temper = new byte[fileData.Length + offset];
-        Buffer.BlockCopy(fileData, 0, temper, offset, fileData.Length);
-        return temper;
-    }
-}
-````
 
 ### 补丁包
 
@@ -141,7 +113,6 @@ private static void BuildInternal(BuildTarget buildTarget)
     buildParameters.PackageName = "DefaultPackage";
     buildParameters.PackageVersion = "1.0.0";
     buildParameters.VerifyBuildingResult = true;
-    buildParameters.EncryptionServices = new GameEncryption();
     buildParameters.CompressOption = ECompressOption.LZ4;
     buildParameters.OutputNameStyle = EOutputNameStyle.HashName_Extension;
     buildParameters.CopyBuildinFileOption = ECopyBuildinFileOption.None;
