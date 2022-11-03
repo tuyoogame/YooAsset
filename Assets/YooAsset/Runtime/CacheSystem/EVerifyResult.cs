@@ -4,7 +4,7 @@ namespace YooAsset
 	/// <summary>
 	/// 下载文件校验结果
 	/// </summary>
-	public enum EVerifyResult
+	internal enum EVerifyResult
 	{
 		/// <summary>
 		/// 文件不存在
