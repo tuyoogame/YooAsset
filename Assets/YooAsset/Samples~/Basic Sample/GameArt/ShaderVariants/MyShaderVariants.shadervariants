@@ -8,11 +8,6 @@ ShaderVariantCollection:
   m_PrefabAsset: {fileID: 0}
   m_Name: MyShaderVariants
   m_Shaders:
-  - first: {fileID: 64, guid: 0000000000000000f000000000000000, type: 0}
-    second:
-      variants:
-      - keywords: SHADOWS_SINGLE_CASCADE SHADOWS_SPLIT_SPHERES
-        passType: 0
   - first: {fileID: 66, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
@@ -21,9 +16,7 @@ ShaderVariantCollection:
   - first: {fileID: 106, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: BILLBOARD_FACE_CAMERA_POS UNITY_HDR_ON _SUNDISK_SIMPLE
-        passType: 0
-      - keywords: BILLBOARD_FACE_CAMERA_POS SOFTPARTICLES_ON UNITY_HDR_ON _SUNDISK_SIMPLE
+      - keywords: BILLBOARD_FACE_CAMERA_POS _SUNDISK_SIMPLE
         passType: 0
   - first: {fileID: 9000, guid: 0000000000000000f000000000000000, type: 0}
     second:
@@ -65,20 +58,24 @@ ShaderVariantCollection:
       variants:
       - keywords: BILLBOARD_FACE_CAMERA_POS
         passType: 0
-      - keywords: BILLBOARD_FACE_CAMERA_POS SOFTPARTICLES_ON
-        passType: 0
-  - first: {fileID: 4800000, guid: e1f5153da774c754aa283cf23fd64d56, type: 3}
+  - first: {fileID: 10703, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: BILLBOARD_FACE_CAMERA_POS UNITY_HDR_ON
-        passType: 0
+      - keywords: BILLBOARD_FACE_CAMERA_POS DIRECTIONAL LIGHTPROBE_SH SHADOWS_SCREEN
+          SHADOWS_SOFT SHADOWS_SPLIT_SPHERES
+        passType: 4
+      - keywords: 
+        passType: 8
+      - keywords: SHADOWS_DEPTH SHADOWS_SOFT SHADOWS_SPLIT_SPHERES
+        passType: 8
   - first: {fileID: 4800000, guid: ba67c8b1d5e59dc428ad9fc9270f8353, type: 3}
     second:
       variants:
-      - keywords: BILLBOARD_FACE_CAMERA_POS UNITY_HDR_ON _EMISSION _METALLICGLOSSMAP
-          _NORMALMAP
+      - keywords: BILLBOARD_FACE_CAMERA_POS SHADOWS_SCREEN SHADOWS_SOFT SHADOWS_SPLIT_SPHERES
+          _EMISSION _METALLICGLOSSMAP _NORMALMAP
         passType: 1
-      - keywords: SHADOWS_DEPTH
-        passType: 8
       - keywords: _EMISSION _METALLICGLOSSMAP _NORMALMAP
+        passType: 8
+      - keywords: SHADOWS_DEPTH SHADOWS_SOFT SHADOWS_SPLIT_SPHERES _EMISSION _METALLICGLOSSMAP
+          _NORMALMAP
         passType: 8
