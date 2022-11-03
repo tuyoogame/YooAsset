@@ -187,6 +187,7 @@ namespace YooAsset.Editor
 					{
 						selectGroup.GroupName = evt.newValue;
 						AssetBundleCollectorSettingData.ModifyGroup(selectPackage, selectGroup);
+						FillGroupViewData();
 					}
 				});
 
@@ -200,6 +201,7 @@ namespace YooAsset.Editor
 					{
 						selectGroup.GroupDesc = evt.newValue;
 						AssetBundleCollectorSettingData.ModifyGroup(selectPackage, selectGroup);
+						FillGroupViewData();
 					}
 				});
 
