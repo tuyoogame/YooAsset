@@ -10,6 +10,10 @@ namespace YooAsset
 	/// </summary>
 	public abstract class InitializationOperation : AsyncOperationBase
 	{
+		/// <summary>
+		/// 初始化内部加载的包裹版本
+		/// </summary>
+		public string InitializedPackageVersion;
 	}
 
 	/// <summary>
@@ -54,6 +58,7 @@ namespace YooAsset
 					YooLogger.Log($"Load simulation manifest file : {_simulatePatchManifestPath}");
 					string jsonContent = FileUtility.ReadFile(_simulatePatchManifestPath);
 					var manifest = PatchManifest.Deserialize(jsonContent);
+					InitializedPackageVersion = manifest.PackageVersion;
 					_impl.SetSimulatePatchManifest(manifest);
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
@@ -148,8 +153,9 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.InitVerifyingCache;
+					InitializedPackageVersion = manifest.PackageVersion;
 					_impl.SetAppPatchManifest(manifest);
+					_steps = ESteps.InitVerifyingCache;
 				}
 			}
 
@@ -230,6 +236,7 @@ namespace YooAsset
 					try
 					{
 						var manifest = PersistentHelper.LoadCacheManifestFile(_packageName);
+						InitializedPackageVersion = manifest.PackageVersion;
 						_impl.SetLocalPatchManifest(manifest);
 						_steps = ESteps.InitVerifyingCache;
 					}
@@ -305,6 +312,7 @@ namespace YooAsset
 				}
 				else
 				{
+					InitializedPackageVersion = manifest.PackageVersion;
 					_impl.SetLocalPatchManifest(manifest);
 					_steps = ESteps.InitVerifyingCache;
 				}

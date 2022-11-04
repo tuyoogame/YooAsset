@@ -5,7 +5,7 @@ using UnityEngine;
 namespace YooAsset
 {
 	/// <summary>
-	/// 更新静态版本操作
+	/// 获取包裹的最新版本
 	/// </summary>
 	public abstract class UpdateStaticVersionOperation : AsyncOperationBase
 	{
@@ -16,7 +16,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 编辑器下模拟运行的更新静态版本操作
+	/// 编辑器下模拟运行的获取包裹的最新版本操作
 	/// </summary>
 	internal sealed class EditorPlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
 	{
@@ -30,7 +30,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 离线模式的更新静态版本操作
+	/// 离线模式的获取包裹的最新版本操作
 	/// </summary>
 	internal sealed class OfflinePlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
 	{
@@ -44,7 +44,7 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 联机模式的更新静态版本操作
+	/// 联机模式的获取包裹的最新版本操作
 	/// </summary>
 	internal sealed class HostPlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
 	{

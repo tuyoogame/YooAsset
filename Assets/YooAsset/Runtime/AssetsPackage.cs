@@ -242,27 +242,26 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 弱联网情况下加载本地的补丁清单
-		/// 注意：当清单里的内容验证失败后会返回失败。
+		/// 检查本地包裹内容的完整性
 		/// </summary>
-		public UpdateManifestOperation WeaklyUpdateManifestAsync()
+		public CheckPackageContentsOperation CheckPackageContentsAsync()
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
-				var operation = new EditorPlayModeUpdateManifestOperation();
+				var operation = new EditorSimulateModeCheckPackageContentsOperation();
 				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				var operation = new OfflinePlayModeUpdateManifestOperation();
+				var operation = new OfflinePlayModeCheckPackageContentsOperation();
 				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.WeaklyUpdatePatchManifestAsync(PackageName);
+				return _hostPlayModeImpl.CheckPackageContentsAsync(PackageName);
 			}
 			else
 			{

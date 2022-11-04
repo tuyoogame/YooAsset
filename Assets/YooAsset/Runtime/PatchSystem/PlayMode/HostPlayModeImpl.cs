@@ -62,11 +62,11 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 异步更新补丁清单（弱联网）
+		/// 检查本地包裹内容的完整性
 		/// </summary>
-		public UpdateManifestOperation WeaklyUpdatePatchManifestAsync(string packageName)
+		public CheckPackageContentsOperation CheckPackageContentsAsync(string packageName)
 		{
-			var operation = new HostPlayModeWeaklyUpdateManifestOperation(this, packageName);
+			var operation = new HostPlayModeCheckPackageContentsOperation(this, packageName);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
