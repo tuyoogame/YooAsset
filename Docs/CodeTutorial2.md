@@ -148,3 +148,18 @@ private IEnumerator WeaklyUpdate()
 }
 ````
 
+### 源代码解析
+
+- 编辑器模拟模式
+
+  UpdateStaticVersionAsync()方法和UpdateManifestAsync()方法都不起效，但是都会返回成功！
+
+- 单机运行模式
+
+  UpdateStaticVersionAsync()方法和UpdateManifestAsync()方法都不起效，但是都会返回成功！
+
+- 联机运行模式
+
+  UpdateManifestAsync()为资源清单更新方法。该方法的内部实现原理如下：
+
+  ![image](./Image/CodeTutorial2-img1.png)
