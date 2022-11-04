@@ -2,6 +2,62 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.3.4] - 2022-11-04
+
+### Fixed
+
+- (#29)修复了EditorHelper中根据guid找uxml有时候会出错的问题。
+- (#37)修复了在修改GroupName和GroupDesc时，左侧Group栏显示没刷新的问题。
+- (#38)修复了工程里没有shader的话，SBP构建会报异常的问题。
+
+### Added
+
+- 新增了AssetsPackage.CheckPackageContentsAsync()方法
+
+  ```c#
+  /// <summary>
+  /// 检查本地包裹内容的完整性
+  /// </summary>
+  public CheckPackageContentsOperation CheckPackageContentsAsync()
+  ```
+
+### Changed
+
+- 优化了HostPlayMode的初始化逻辑，优先读取沙盒内的清单，如果不存在则读取内置清单。
+
+- 重写了文件的加密和解密逻辑。
+
+  ```c#
+  public interface IDecryptionServices
+  {
+      /// <summary>
+      /// 文件偏移解密方法
+      /// </summary>
+      ulong LoadFromFileOffset(DecryptFileInfo fileInfo);
+  
+      /// <summary>
+      /// 文件内存解密方法
+      /// </summary>
+      byte[] LoadFromMemory(DecryptFileInfo fileInfo);
+  
+      /// <summary>
+      /// 文件流解密方法
+      /// </summary>
+      System.IO.FileStream LoadFromStream(DecryptFileInfo fileInfo);
+  
+      /// <summary>
+      /// 文件流解密的托管缓存大小
+      /// </summary>
+      uint GetManagedReadBufferSize();
+  }
+  ```
+
+- AssetBundleBuilder界面增加了构建版本选项。
+
+### Removed
+
+- 移除了AssetsPackage.WeaklyUpdateManifestAsync()方法。
+
 ## [1.3.3] - 2022-10-27
 
 ### Fixed
