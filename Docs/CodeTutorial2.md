@@ -111,39 +111,36 @@ IEnumerator Download()
 }
 ````
 
-**弱联网更新解决方案**
+**弱联网环境解决方案**
 
-对于偏单机但是也有资源热更需求的项目。当玩家本地网络不稳定或无网络的时候，我们又不希望玩家卡在资源更新步骤而不能正常游戏。所以当玩家本地网络有问题的时候，我们可以跳过资源更新的步骤。
+对于偏单机但是也有资源热更需求的项目。当玩家在无网络的时候，我们又不希望玩家卡在资源更新步骤而不能正常游戏。所以当玩家本地网络有问题的时候，我们可以跳过资源更新的步骤。
 
 ````c#
-// 尝试从服务器获取最新的资源版本号
-private IEnumerator TryUpdateStaticVersion()
+private IEnumerator Start()
 {
     var package = YooAssets.GetAssetsPackage("DefaultPackage");
     var operation = package.UpdateStaticVersionAsync(30);
     yield return operation;
     if (operation.Status == EOperationStatus.Succeed)
     {
-        // 如果获取远端资源版本成功，说明当前网络连接并无问题，可以走正常更新流程。
+        // 如果获取远端资源版本成功，说明当前网络连接通畅，可以走正常更新流程。
         ......
-    }
-}
-
-private IEnumerator WeaklyUpdate()
-{
-    // 如果获取远端资源版本失败，我们走弱联网更新模式。
-    // 弱联网更新方法，会优先加载沙盒内的清单，如果不存在再加载内置清单。
-    // 在加载清单之后，验证清单内资源内容本地完整性。
-    var operation = package.WeaklyUpdateManifestAsync();
-    yield return operation;
-    if (operation.Status == EOperationStatus.Succeed)
-    {
-        StartGame();
     }
     else
     {
-        // 资源内容本地并不完整，需要提示玩家联网更新。
-        ShowMessageBox("请检查本地网络，有新的游戏内容需要更新！");
+        // 如果获取远端资源版本失败，说明当前网络无连接。
+        // 在正常开始游戏之前，需要验证本地清单内容的完整性。
+        var operation = package.CheckPackageContentsAsync();
+        yield return operation;
+        if (operation.Status == EOperationStatus.Succeed)
+        {
+            StartGame();
+        }
+        else
+        {
+            // 资源内容本地并不完整，需要提示玩家联网更新。
+            ShowMessageBox("请检查本地网络，有新的游戏内容需要更新！");
+        }
     }
 }
 ````
