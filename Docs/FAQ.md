@@ -21,6 +21,10 @@ YooAsset依赖于ScriptBuildPipeline（SBP），在PackageManager里找到SBP插
 
 把传输类型修改为二进制就可以了。
 
+#### 问题：打包的时候报错：Cannot mark assets and scenes in one AssetBundle. AssetBundle name is "assets_xxxx_scenes.bundle
+
+Unity引擎不允许把场景文件和其它资源文件一起打包。
+
 #### 问题：ClearCacheWhenDirty参数没了吗？
 
 不是很必须的一个功能，已经移除了。可以使用以下方法代替：
