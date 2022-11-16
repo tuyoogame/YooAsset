@@ -3,8 +3,9 @@
 namespace YooAsset
 {
 	public class SceneOperationHandle : OperationHandleBase
-	{
+	{	
 		private System.Action<SceneOperationHandle> _callback;
+		internal string PackageName { set; get; }
 
 		internal SceneOperationHandle(ProviderBase provider) : base(provider)
 		{

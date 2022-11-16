@@ -8,13 +8,11 @@ namespace YooAsset
 {
 	internal class AssetSystemImpl
 	{
-		private static string SceneRunningPackage = string.Empty;
-
 		private readonly List<AssetBundleLoaderBase> _loaders = new List<AssetBundleLoaderBase>(1000);
 		private readonly List<ProviderBase> _providers = new List<ProviderBase>(1000);
-		private readonly Dictionary<string, SceneOperationHandle> _sceneHandles = new Dictionary<string, SceneOperationHandle>(100);
+		private readonly static Dictionary<string, SceneOperationHandle> _sceneHandles = new Dictionary<string, SceneOperationHandle>(100);
+		private static long _sceneCreateCount = 0;
 
-		private long _sceneCreateCount = 0;
 		private bool _simulationOnEditor;
 		private int _loadingMaxNumber;
 		public IDecryptionServices DecryptionServices { private set; get; }
@@ -71,9 +69,9 @@ namespace YooAsset
 		/// </summary>
 		public void DestroyAll()
 		{
-			_loaders.Clear();
 			_providers.Clear();
-			_sceneHandles.Clear();
+			_loaders.Clear();
+			ClearSceneHandle();
 
 			DecryptionServices = null;
 			BundleServices = null;
@@ -123,15 +121,14 @@ namespace YooAsset
 			{
 				provider.Destroy();
 			}
-			_providers.Clear();
-
 			foreach (var loader in _loaders)
 			{
 				loader.Destroy(true);
 			}
-			_loaders.Clear();
 
-			_sceneHandles.Clear();
+			_providers.Clear();
+			_loaders.Clear();
+			ClearSceneHandle();
 
 			// 注意：调用底层接口释放所有资源
 			Resources.UnloadUnusedAssets();
@@ -147,19 +144,6 @@ namespace YooAsset
 				YooLogger.Error($"Failed to load scene. {assetInfo.Error}");
 				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
 				completedProvider.SetCompleted(assetInfo.Error);
-				return completedProvider.CreateHandle<SceneOperationHandle>();
-			}
-
-			// 注意：场景只允许运行在一个资源包内
-			if (string.IsNullOrEmpty(SceneRunningPackage))
-			{
-				SceneRunningPackage = BundleServices.GetPackageName();
-			}
-			if (BundleServices.GetPackageName() != SceneRunningPackage)
-			{
-				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
-				string error = $"Scene are allowed to running within only {SceneRunningPackage}";
-				completedProvider.SetCompleted(error);
 				return completedProvider.CreateHandle<SceneOperationHandle>();
 			}
 
@@ -182,6 +166,7 @@ namespace YooAsset
 			}
 
 			var handle = provider.CreateHandle<SceneOperationHandle>();
+			handle.PackageName = BundleServices.GetPackageName();
 			_sceneHandles.Add(providerGUID, handle);
 			return handle;
 		}
@@ -264,6 +249,24 @@ namespace YooAsset
 
 			// 卸载未被使用的资源（包括场景）
 			UnloadUnusedAssets();
+		}
+		internal void ClearSceneHandle()
+		{
+			// 释放资源包下的所有场景
+			string packageName = BundleServices.GetPackageName();
+			List<string> removeList = new List<string>();
+			foreach (var valuePair in _sceneHandles)
+			{
+				if (valuePair.Value.PackageName == packageName)
+				{
+					removeList.Add(valuePair.Key);
+				}
+			}
+
+			foreach (var key in removeList)
+			{
+				_sceneHandles.Remove(key);
+			}
 		}
 
 		internal AssetBundleLoaderBase CreateOwnerAssetBundleLoader(AssetInfo assetInfo)
