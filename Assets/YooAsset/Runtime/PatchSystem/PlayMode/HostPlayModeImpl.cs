@@ -86,6 +86,7 @@ namespace YooAsset
 		/// </summary>
 		public PatchDownloaderOperation CreatePatchDownloaderByAll(int fileLoadingMaxNumber, int failedTryAgain, int timeout)
 		{
+			YooLogger.Log($"Create patch downloader : {LocalPatchManifest.PackageName} {LocalPatchManifest.PackageVersion}");
 			List<BundleInfo> downloadList = GetDownloadListByAll();
 			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain, timeout);
 			return operation;
@@ -114,6 +115,7 @@ namespace YooAsset
 		/// </summary>
 		public PatchDownloaderOperation CreatePatchDownloaderByTags(string[] tags, int fileLoadingMaxNumber, int failedTryAgain, int timeout)
 		{
+			YooLogger.Log($"Create patch downloader : {LocalPatchManifest.PackageName} {LocalPatchManifest.PackageVersion}");
 			List<BundleInfo> downloadList = GetDownloadListByTags(tags);
 			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain, timeout);
 			return operation;
@@ -154,6 +156,7 @@ namespace YooAsset
 		/// </summary>
 		public PatchDownloaderOperation CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int fileLoadingMaxNumber, int failedTryAgain, int timeout)
 		{
+			YooLogger.Log($"Create patch downloader : {LocalPatchManifest.PackageName} {LocalPatchManifest.PackageVersion}");
 			List<BundleInfo> downloadList = GetDownloadListByPaths(assetInfos);
 			var operation = new PatchDownloaderOperation(downloadList, fileLoadingMaxNumber, failedTryAgain, timeout);
 			return operation;
@@ -206,6 +209,7 @@ namespace YooAsset
 		/// </summary>
 		public PatchUnpackerOperation CreatePatchUnpackerByTags(string[] tags, int fileUpackingMaxNumber, int failedTryAgain, int timeout)
 		{
+			YooLogger.Log($"Create patch unpacker : {LocalPatchManifest.PackageName} {LocalPatchManifest.PackageVersion}");
 			List<BundleInfo> unpcakList = GetUnpackListByTags(tags);
 			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain, timeout);
 			return operation;
@@ -237,6 +241,7 @@ namespace YooAsset
 		/// </summary>
 		public PatchUnpackerOperation CreatePatchUnpackerByAll(int fileUpackingMaxNumber, int failedTryAgain, int timeout)
 		{
+			YooLogger.Log($"Create patch unpacker : {LocalPatchManifest.PackageName} {LocalPatchManifest.PackageVersion}");
 			List<BundleInfo> unpcakList = GetUnpackListByAll();
 			var operation = new PatchUnpackerOperation(unpcakList, fileUpackingMaxNumber, failedTryAgain, timeout);
 			return operation;

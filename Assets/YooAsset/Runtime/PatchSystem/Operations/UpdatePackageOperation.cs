@@ -153,6 +153,7 @@ namespace YooAsset
 		{
 			if (Status == EOperationStatus.Succeed)
 			{
+				YooLogger.Log($"Create package downloader : {_remotePatchManifest.PackageName} {_remotePatchManifest.PackageVersion}");
 				List<BundleInfo> downloadList = GetDownloadList();
 				var operation = new PackageDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 				return operation;
