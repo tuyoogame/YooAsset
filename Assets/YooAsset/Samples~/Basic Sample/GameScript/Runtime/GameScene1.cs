@@ -195,6 +195,7 @@ public class GameScene1 : MonoBehaviour
 		{
 			var handle = YooAssets.LoadAssetSync<GameObject>("ui_window");
 			handle.InstantiateSync(CanvasRoot.transform);
+			_cachedAssetOperationHandles.Add(handle);
 		}
 	}
 
