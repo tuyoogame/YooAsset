@@ -25,7 +25,7 @@ internal class FsmUpdateStaticVersion : IFsmNode
 
 		// 更新资源版本号
 		var package = YooAssets.GetAssetsPackage("DefaultPackage");
-		var operation = package.UpdateStaticVersionAsync(30);
+		var operation = package.UpdatePackageVersionAsync(30);
 		yield return operation;
 
 		if (operation.Status == EOperationStatus.Succeed)

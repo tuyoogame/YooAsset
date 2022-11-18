@@ -25,7 +25,7 @@ public class FsmUpdateManifest : IFsmNode
 
 		// 更新补丁清单
 		var package = YooAssets.GetAssetsPackage("DefaultPackage");
-		var operation = package.UpdateManifestAsync(PatchUpdater.PackageVersion, 30);
+		var operation = package.UpdatePackageManifestAsync(PatchUpdater.PackageVersion, 30);
 		yield return operation;
 
 		if(operation.Status == EOperationStatus.Succeed)

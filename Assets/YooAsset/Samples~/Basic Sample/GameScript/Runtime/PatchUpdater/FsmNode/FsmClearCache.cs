@@ -9,7 +9,8 @@ internal class FsmClearCache : IFsmNode
 	void IFsmNode.OnEnter()
 	{
 		Debug.Log("清理未使用的缓存文件！");
-		var operation = YooAsset.YooAssets.ClearUnusedCacheFiles();
+		var package = YooAsset.YooAssets.GetAssetsPackage("DefaultPackage");
+		var operation = package.ClearPackageUnusedCacheFilesAsync();
 		operation.Completed += Operation_Completed;
 	}
 
