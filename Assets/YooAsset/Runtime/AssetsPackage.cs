@@ -185,24 +185,24 @@ namespace YooAsset
 		/// 向网络端请求最新的资源版本
 		/// </summary>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdateStaticVersionOperation UpdateStaticVersionAsync(int timeout = 60)
+		public UpdatePackageVersionOperation UpdatePackageVersionAsync(int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
-				var operation = new EditorPlayModeUpdateStaticVersionOperation();
+				var operation = new EditorPlayModeUpdatePackageVersionOperation();
 				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				var operation = new OfflinePlayModeUpdateStaticVersionOperation();
+				var operation = new OfflinePlayModeUpdatePackageVersionOperation();
 				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdateStaticVersionAsync(PackageName, timeout);
+				return _hostPlayModeImpl.UpdatePackageVersionAsync(PackageName, timeout);
 			}
 			else
 			{
@@ -215,25 +215,25 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="packageVersion">更新的包裹版本</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdateManifestOperation UpdateManifestAsync(string packageVersion, int timeout = 60)
+		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			DebugCheckUpdateManifest();
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
-				var operation = new EditorPlayModeUpdateManifestOperation();
+				var operation = new EditorPlayModeUpdatePackageManifestOperation();
 				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				var operation = new OfflinePlayModeUpdateManifestOperation();
+				var operation = new OfflinePlayModeUpdatePackageManifestOperation();
 				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdatePatchManifestAsync(PackageName, packageVersion, timeout);
+				return _hostPlayModeImpl.UpdatePackageManifestAsync(PackageName, packageVersion, timeout);
 			}
 			else
 			{
@@ -270,7 +270,18 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取包裹的版本信息
+		/// 清理本地包裹未使用的缓存文件
+		/// </summary>
+		public ClearPackageUnusedCacheFilesOperation ClearPackageUnusedCacheFilesAsync()
+		{
+			DebugCheckInitialize();
+			var operation = new ClearPackageUnusedCacheFilesOperation(this);
+			OperationSystem.StartOperation(operation);
+			return operation;
+		}
+
+		/// <summary>
+		/// 获取本地包裹的版本信息
 		/// </summary>
 		public string GetPackageVersion()
 		{
@@ -899,24 +910,24 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="packageVersion">指定更新的包裹版本</param>
 		/// <param name="timeout">超时时间</param>
-		public UpdatePackageOperation UpdatePackageAsync(string packageVersion, int timeout = 60)
+		public DownloadPackageOperation DownloadPackageAsync(string packageVersion, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
-				var operation = new EditorPlayModeUpdatePackageOperation();
+				var operation = new EditorPlayModeDownloadPackageOperation();
 				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				var operation = new OfflinePlayModeUpdatePackageOperation();
+				var operation = new OfflinePlayModeDownloadPackageOperation();
 				OperationSystem.StartOperation(operation);
 				return operation;
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdatePackageAsync(PackageName, packageVersion, timeout);
+				return _hostPlayModeImpl.DownloadPackageAsync(PackageName, packageVersion, timeout);
 			}
 			else
 			{

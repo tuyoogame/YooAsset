@@ -41,10 +41,11 @@ namespace YooAsset
 		/// </summary>
 		public string[] Tags;
 
+
 		/// <summary>
-		/// 文件名称
-		/// </summary>	
-		public string FileName { private set; get; }
+		/// 所属的包裹名称
+		/// </summary>
+		private string _packageName;
 
 		/// <summary>
 		/// 缓存文件路径
@@ -57,7 +58,7 @@ namespace YooAsset
 				if (string.IsNullOrEmpty(_cachedFilePath) == false)
 					return _cachedFilePath;
 
-				string cacheRoot = PersistentHelper.GetCacheFolderPath();
+				string cacheRoot = PersistentHelper.GetCacheFolderPath(_packageName);
 				_cachedFilePath = $"{cacheRoot}/{FileName}";
 				return _cachedFilePath;
 			}
@@ -79,6 +80,34 @@ namespace YooAsset
 			}
 		}
 
+		/// <summary>
+		/// 文件名称
+		/// </summary>
+		private string _fileName;
+		public string FileName
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(_fileName))
+					throw new Exception("Should never get here !");
+				return _fileName;
+			}
+		}
+
+		/// <summary>
+		/// 缓存查询Key
+		/// </summary>
+		private string _cacheKey;
+		public string CacheKey
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(_cacheKey))
+					throw new Exception("Should never get here !");
+				return _cacheKey;
+			}
+		}
+
 
 		public PatchBundle(string bundleName, string fileHash, string fileCRC, long fileSize, bool isRawFile, byte loadMethod, string[] tags)
 		{
@@ -92,11 +121,13 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 解析文件名称
+		/// 解析资源包
 		/// </summary>
-		public void ParseFileName(int nameStype)
+		public void ParseBundle(string packageName, int nameStype)
 		{
-			FileName = PatchManifest.CreateBundleFileName(nameStype, BundleName, FileHash);
+			_packageName = packageName;
+			_cacheKey = $"{packageName}-{FileHash}";
+			_fileName = PatchManifest.CreateBundleFileName(nameStype, BundleName, FileHash);
 		}
 
 		/// <summary>

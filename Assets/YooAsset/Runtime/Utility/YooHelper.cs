@@ -97,17 +97,18 @@ namespace YooAsset
 		/// </summary>
 		public static void DeleteCacheFolder()
 		{
-			string directoryPath = GetCacheFolderPath();
-			if (Directory.Exists(directoryPath))
-				Directory.Delete(directoryPath, true);
+			string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
+			if (Directory.Exists(root))
+				Directory.Delete(root, true);
 		}
 
 		/// <summary>
 		/// 获取缓存文件夹路径
 		/// </summary>
-		public static string GetCacheFolderPath()
+		public static string GetCacheFolderPath(string packageName)
 		{
-			return PathHelper.MakePersistentLoadPath(CacheFolderName);
+			string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
+			return $"{root}/{packageName}";
 		}
 
 		#region 沙盒内清单相关

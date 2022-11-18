@@ -6,9 +6,9 @@ using System.IO;
 namespace YooAsset
 {
 	/// <summary>
-	/// 更新清单操作
+	/// 向远端请求并更新补丁清单
 	/// </summary>
-	public abstract class UpdateManifestOperation : AsyncOperationBase
+	public abstract class UpdatePackageManifestOperation : AsyncOperationBase
 	{
 		/// <summary>
 		/// 是否发现了新的补丁清单
@@ -19,7 +19,7 @@ namespace YooAsset
 	/// <summary>
 	/// 编辑器下模拟运行的更新清单操作
 	/// </summary>
-	internal sealed class EditorPlayModeUpdateManifestOperation : UpdateManifestOperation
+	internal sealed class EditorPlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
 	{
 		internal override void Start()
 		{
@@ -33,7 +33,7 @@ namespace YooAsset
 	/// <summary>
 	/// 离线模式的更新清单操作
 	/// </summary>
-	internal sealed class OfflinePlayModeUpdateManifestOperation : UpdateManifestOperation
+	internal sealed class OfflinePlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
 	{
 		internal override void Start()
 		{
@@ -48,7 +48,7 @@ namespace YooAsset
 	/// 联机模式的更新清单操作
 	/// 注意：优先比对沙盒清单哈希值，如果有变化就更新远端清单文件，并保存到本地。
 	/// </summary>
-	internal sealed class HostPlayModeUpdateManifestOperation : UpdateManifestOperation
+	internal sealed class HostPlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
 	{
 		private enum ESteps
 		{
@@ -77,7 +77,7 @@ namespace YooAsset
 		private ESteps _steps = ESteps.None;
 		private float _verifyTime;
 
-		internal HostPlayModeUpdateManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
+		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
 		{
 			_impl = impl;
 			_packageName = packageName;

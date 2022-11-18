@@ -367,14 +367,14 @@ namespace YooAsset
 
 		#region 包裹更新
 		/// <summary>
-		/// 创建资源包裹下载器，用于下载更新指定资源版本所有的资源包文件
+		/// 资源包裹更新，用于下载更新指定资源版本所有的资源包文件
 		/// </summary>
 		/// <param name="packageVersion">指定更新的包裹版本</param>
 		/// <param name="timeout">超时时间</param>
-		public static UpdatePackageOperation UpdatePackageAsync(string packageVersion, int timeout = 60)
+		public static DownloadPackageOperation DownloadPackageAsync(string packageVersion, int timeout = 60)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.UpdatePackageAsync(packageVersion, timeout);
+			return _defaultPackage.DownloadPackageAsync(packageVersion, timeout);
 		}
 		#endregion
 

@@ -5,7 +5,7 @@ using System.IO;
 
 namespace YooAsset
 {
-	public abstract class UpdatePackageOperation : AsyncOperationBase
+	public abstract class DownloadPackageOperation : AsyncOperationBase
 	{
 		/// <summary>
 		/// 创建包裹下载器
@@ -19,7 +19,7 @@ namespace YooAsset
 	/// <summary>
 	/// 编辑器下模拟运行的更新资源包裹操作
 	/// </summary>
-	internal sealed class EditorPlayModeUpdatePackageOperation : UpdatePackageOperation
+	internal sealed class EditorPlayModeDownloadPackageOperation : DownloadPackageOperation
 	{
 		internal override void Start()
 		{
@@ -43,7 +43,7 @@ namespace YooAsset
 	/// <summary>
 	/// 离线模式的更新资源包裹操作
 	/// </summary>
-	internal sealed class OfflinePlayModeUpdatePackageOperation : UpdatePackageOperation
+	internal sealed class OfflinePlayModeDownloadPackageOperation : DownloadPackageOperation
 	{
 		internal override void Start()
 		{
@@ -67,7 +67,7 @@ namespace YooAsset
 	/// <summary>
 	/// 联机模式的更新资源包裹操作
 	/// </summary>
-	internal sealed class HostPlayModeUpdatePackageOperation : UpdatePackageOperation
+	internal sealed class HostPlayModeDownloadPackageOperation : DownloadPackageOperation
 	{
 		private enum ESteps
 		{
@@ -86,7 +86,7 @@ namespace YooAsset
 		private UnityWebDataRequester _downloader;
 		private PatchManifest _remotePatchManifest;
 
-		internal HostPlayModeUpdatePackageOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
+		internal HostPlayModeDownloadPackageOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
 		{
 			_impl = impl;
 			_packageName = packageName;
@@ -160,7 +160,7 @@ namespace YooAsset
 			}
 			else
 			{
-				YooLogger.Error($"{nameof(UpdatePackageOperation)} status is failed !");
+				YooLogger.Error($"{nameof(DownloadPackageOperation)} status is failed !");
 				var operation = new PackageDownloaderOperation(null, downloadingMaxNumber, failedTryAgain, timeout);
 				return operation;
 			}

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace YooAsset
 {
@@ -30,8 +29,8 @@ namespace YooAsset
 		/// </summary>
 		public static bool IsCached(PatchBundle patchBundle)
 		{
-			string fileHash = patchBundle.FileHash;
-			if (_cachedDic.ContainsKey(fileHash))
+			string cacheKey = patchBundle.CacheKey;
+			if (_cachedDic.ContainsKey(cacheKey))
 			{
 				string filePath = patchBundle.CachedFilePath;
 				if (File.Exists(filePath))
@@ -40,7 +39,7 @@ namespace YooAsset
 				}
 				else
 				{
-					_cachedDic.Remove(fileHash);
+					_cachedDic.Remove(cacheKey);
 					YooLogger.Error($"Cache file is missing : {filePath}");
 					return false;
 				}
@@ -56,12 +55,12 @@ namespace YooAsset
 		/// </summary>
 		public static void CacheBundle(PatchBundle patchBundle)
 		{
-			string fileHash = patchBundle.FileHash;
-			if (_cachedDic.ContainsKey(fileHash) == false)
+			string cacheKey = patchBundle.CacheKey;
+			if (_cachedDic.ContainsKey(cacheKey) == false)
 			{
 				string filePath = patchBundle.CachedFilePath;
 				YooLogger.Log($"Cache verify file : {filePath}");
-				_cachedDic.Add(fileHash, patchBundle);
+				_cachedDic.Add(cacheKey, patchBundle);
 			}
 		}
 

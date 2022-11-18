@@ -44,9 +44,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新资源版本号
 		/// </summary>
-		public UpdateStaticVersionOperation UpdateStaticVersionAsync(string packageName, int timeout)
+		public UpdatePackageVersionOperation UpdatePackageVersionAsync(string packageName, int timeout)
 		{
-			var operation = new HostPlayModeUpdateStaticVersionOperation(this, packageName, timeout);
+			var operation = new HostPlayModeUpdatePackageVersionOperation(this, packageName, timeout);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -54,9 +54,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新补丁清单
 		/// </summary>
-		public UpdateManifestOperation UpdatePatchManifestAsync(string packageName, string packageVersion, int timeout)
+		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageName, string packageVersion, int timeout)
 		{
-			var operation = new HostPlayModeUpdateManifestOperation(this, packageName, packageVersion, timeout);
+			var operation = new HostPlayModeUpdatePackageManifestOperation(this, packageName, packageVersion, timeout);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -74,9 +74,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新资源包裹
 		/// </summary>
-		public UpdatePackageOperation UpdatePackageAsync(string packageName, string packageVersion, int timeout)
+		public DownloadPackageOperation DownloadPackageAsync(string packageName, string packageVersion, int timeout)
 		{
-			var operation = new HostPlayModeUpdatePackageOperation(this, packageName, packageVersion, timeout);
+			var operation = new HostPlayModeDownloadPackageOperation(this, packageName, packageVersion, timeout);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}

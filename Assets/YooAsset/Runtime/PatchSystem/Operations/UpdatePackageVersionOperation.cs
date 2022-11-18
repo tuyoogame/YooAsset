@@ -5,9 +5,9 @@ using UnityEngine;
 namespace YooAsset
 {
 	/// <summary>
-	/// 获取包裹的最新版本
+	/// 请求远端包裹的最新版本
 	/// </summary>
-	public abstract class UpdateStaticVersionOperation : AsyncOperationBase
+	public abstract class UpdatePackageVersionOperation : AsyncOperationBase
 	{
 		/// <summary>
 		/// 当前最新的包裹版本
@@ -16,9 +16,9 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 编辑器下模拟运行的获取包裹的最新版本操作
+	/// 编辑器下模拟模式的请求远端包裹的最新版本
 	/// </summary>
-	internal sealed class EditorPlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
+	internal sealed class EditorPlayModeUpdatePackageVersionOperation : UpdatePackageVersionOperation
 	{
 		internal override void Start()
 		{
@@ -30,9 +30,9 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 离线模式的获取包裹的最新版本操作
+	/// 离线模式的请求远端包裹的最新版本
 	/// </summary>
-	internal sealed class OfflinePlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
+	internal sealed class OfflinePlayModeUpdatePackageVersionOperation : UpdatePackageVersionOperation
 	{
 		internal override void Start()
 		{
@@ -44,9 +44,9 @@ namespace YooAsset
 	}
 
 	/// <summary>
-	/// 联机模式的获取包裹的最新版本操作
+	/// 联机模式的请求远端包裹的最新版本
 	/// </summary>
-	internal sealed class HostPlayModeUpdateStaticVersionOperation : UpdateStaticVersionOperation
+	internal sealed class HostPlayModeUpdatePackageVersionOperation : UpdatePackageVersionOperation
 	{
 		private enum ESteps
 		{
@@ -63,7 +63,7 @@ namespace YooAsset
 		private ESteps _steps = ESteps.None;
 		private UnityWebDataRequester _downloader;
 
-		internal HostPlayModeUpdateStaticVersionOperation(HostPlayModeImpl impl, string packageName, int timeout)
+		internal HostPlayModeUpdatePackageVersionOperation(HostPlayModeImpl impl, string packageName, int timeout)
 		{
 			_impl = impl;
 			_packageName = packageName;

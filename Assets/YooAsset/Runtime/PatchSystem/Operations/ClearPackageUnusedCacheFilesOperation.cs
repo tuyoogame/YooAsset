@@ -5,9 +5,9 @@ using System.IO;
 namespace YooAsset
 {
 	/// <summary>
-	/// 清理未使用的缓存资源操作类
+	/// 清理本地包裹未使用的缓存文件
 	/// </summary>
-	public sealed class ClearUnusedCacheFilesOperation : AsyncOperationBase
+	public sealed class ClearPackageUnusedCacheFilesOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
@@ -17,14 +17,14 @@ namespace YooAsset
 			Done,
 		}
 
-		private readonly List<AssetsPackage> _packages;
+		private readonly AssetsPackage _package;
 		private ESteps _steps = ESteps.None;
 		private List<string> _unusedCacheFilePaths;
 		private int _unusedFileTotalCount = 0;
 
-		internal ClearUnusedCacheFilesOperation(List<AssetsPackage> packages)
+		internal ClearPackageUnusedCacheFilesOperation(AssetsPackage package)
 		{
-			_packages = packages;
+			_package = package;
 		}
 		internal override void Start()
 		{
@@ -84,27 +84,19 @@ namespace YooAsset
 		/// </summary>
 		private List<string> GetUnusedCacheFilePaths()
 		{
-			string cacheFolderPath = PersistentHelper.GetCacheFolderPath();
+			string cacheFolderPath = PersistentHelper.GetCacheFolderPath(_package.PackageName);
 			if (Directory.Exists(cacheFolderPath) == false)
 				return new List<string>();
 
-			// 获取所有缓存文件
 			DirectoryInfo directoryInfo = new DirectoryInfo(cacheFolderPath);
 			FileInfo[] fileInfos = directoryInfo.GetFiles();
 			List<string> result = new List<string>(fileInfos.Length);
 			foreach (FileInfo fileInfo in fileInfos)
 			{
-				bool used = false;
-				foreach (var package in _packages)
+				if (_package.IsIncludeBundleFile(fileInfo.Name) == false)
 				{
-					if (package.IsIncludeBundleFile(fileInfo.Name))
-					{
-						used = true;
-						break;
-					}
-				}
-				if (used == false)
 					result.Add(fileInfo.FullName);
+				}
 			}
 			return result;
 		}
