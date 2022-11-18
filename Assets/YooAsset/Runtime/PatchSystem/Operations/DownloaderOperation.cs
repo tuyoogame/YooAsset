@@ -226,6 +226,19 @@ namespace YooAsset
 		{
 			_isPause = false;
 		}
+
+		/// <summary>
+		/// 取消下载
+		/// </summary>
+		public void CancelDownload()
+		{
+			if (_steps != ESteps.Done)
+			{
+				_steps = ESteps.Done;
+				Status = EOperationStatus.Failed;
+				Error = "User cancel.";
+			}
+		}
 	}
 
 	public sealed class PackageDownloaderOperation : DownloaderOperation
