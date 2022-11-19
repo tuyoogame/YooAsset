@@ -82,25 +82,43 @@ namespace YooAsset
 
 		#region 原生文件
 		/// <summary>
-		/// 异步获取原生文件
+		/// 同步加载原生文件
 		/// </summary>
-		/// <param name="location">资源的定位地址</param>
-		/// <param name="copyPath">拷贝路径</param>
-		public static RawFileOperation GetRawFileAsync(string location, string copyPath = null)
+		/// <param name="assetInfo">资源信息</param>
+		public static RawFileOperationHandle LoadRawFileSync(AssetInfo assetInfo)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.GetRawFileAsync(location, copyPath);
+			return _defaultPackage.LoadRawFileSync(assetInfo);
 		}
 
 		/// <summary>
-		/// 异步获取原生文件
+		/// 同步加载原生文件
 		/// </summary>
-		/// <param name="assetInfo">资源信息</param>
-		/// <param name="copyPath">拷贝路径</param>
-		public static RawFileOperation GetRawFileAsync(AssetInfo assetInfo, string copyPath = null)
+		/// <param name="location">资源的定位地址</param>
+		public static RawFileOperationHandle LoadRawFileSync(string location)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.GetRawFileAsync(assetInfo, copyPath);
+			return _defaultPackage.LoadRawFileSync(location);
+		}
+
+		/// <summary>
+		/// 异步加载原生文件
+		/// </summary>
+		/// <param name="assetInfo">资源信息</param>
+		public static RawFileOperationHandle LoadRawFileAsync(AssetInfo assetInfo)
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadRawFileAsync(assetInfo);
+		}
+
+		/// <summary>
+		/// 异步加载原生文件
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		public static RawFileOperationHandle LoadRawFileAsync(string location)
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadRawFileAsync(location);
 		}
 		#endregion
 

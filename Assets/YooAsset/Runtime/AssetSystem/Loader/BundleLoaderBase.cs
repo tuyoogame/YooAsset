@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace YooAsset
 {
-	internal abstract class AssetBundleLoaderBase
+	internal abstract class BundleLoaderBase
 	{
 		public enum EStatus
 		{
@@ -46,9 +46,10 @@ namespace YooAsset
 
 		private readonly List<ProviderBase> _providers = new List<ProviderBase>(100);
 		internal AssetBundle CacheBundle { set; get; }
+		internal string FileLoadPath { set; get; }
+		
 
-
-		public AssetBundleLoaderBase(AssetSystemImpl impl, BundleInfo bundleInfo)
+		public BundleLoaderBase(AssetSystemImpl impl, BundleInfo bundleInfo)
 		{
 			Impl = impl;
 			MainBundleInfo = bundleInfo;

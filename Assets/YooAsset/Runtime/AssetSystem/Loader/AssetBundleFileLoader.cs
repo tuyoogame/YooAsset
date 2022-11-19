@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace YooAsset
 {
-	internal sealed class AssetBundleFileLoader : AssetBundleLoaderBase
+	internal sealed class AssetBundleFileLoader : BundleLoaderBase
 	{
 		private enum ESteps
 		{
@@ -21,7 +21,6 @@ namespace YooAsset
 		}
 
 		private ESteps _steps = ESteps.None;
-		private string _fileLoadPath;
 		private bool _isWaitForAsyncComplete = false;
 		private bool _isShowWaitForAsyncError = false;
 		private DownloaderBase _unpacker;
@@ -47,7 +46,7 @@ namespace YooAsset
 				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
 					_steps = ESteps.Download;
-					_fileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
@@ -56,22 +55,22 @@ namespace YooAsset
 					if (loadMethod == EBundleLoadMethod.LoadFromMemory || loadMethod == EBundleLoadMethod.LoadFromStream)
 					{
 						_steps = ESteps.Unpack;
-						_fileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+						FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
 					}
 					else
 					{
 						_steps = ESteps.LoadFile;
-						_fileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
+						FileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
 					}
 #else
 					_steps = ESteps.LoadFile;
-					_fileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
 #endif
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
 					_steps = ESteps.LoadFile;
-					_fileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
 				}
 				else
 				{
@@ -137,11 +136,11 @@ namespace YooAsset
 			{
 #if UNITY_EDITOR
 				// 注意：Unity2017.4编辑器模式下，如果AssetBundle文件不存在会导致编辑器崩溃，这里做了预判。
-				if (System.IO.File.Exists(_fileLoadPath) == false)
+				if (System.IO.File.Exists(FileLoadPath) == false)
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
-					LastError = $"Not found assetBundle file : {_fileLoadPath}";
+					LastError = $"Not found assetBundle file : {FileLoadPath}";
 					YooLogger.Error(LastError);
 					return;
 				}
@@ -152,9 +151,9 @@ namespace YooAsset
 				if (loadMethod == EBundleLoadMethod.Normal)
 				{
 					if (_isWaitForAsyncComplete)
-						CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath);
+						CacheBundle = AssetBundle.LoadFromFile(FileLoadPath);
 					else
-						_createRequest = AssetBundle.LoadFromFileAsync(_fileLoadPath);
+						_createRequest = AssetBundle.LoadFromFileAsync(FileLoadPath);
 				}
 				else
 				{
@@ -169,15 +168,15 @@ namespace YooAsset
 
 					DecryptFileInfo fileInfo = new DecryptFileInfo();
 					fileInfo.BundleName = MainBundleInfo.Bundle.BundleName;
-					fileInfo.FilePath = _fileLoadPath;
+					fileInfo.FilePath = FileLoadPath;
 
 					if (loadMethod == EBundleLoadMethod.LoadFromFileOffset)
 					{
 						ulong offset = Impl.DecryptionServices.LoadFromFileOffset(fileInfo);
 						if (_isWaitForAsyncComplete)
-							CacheBundle = AssetBundle.LoadFromFile(_fileLoadPath, 0, offset);
+							CacheBundle = AssetBundle.LoadFromFile(FileLoadPath, 0, offset);
 						else
-							_createRequest = AssetBundle.LoadFromFileAsync(_fileLoadPath, 0, offset);
+							_createRequest = AssetBundle.LoadFromFileAsync(FileLoadPath, 0, offset);
 					}
 					else if (loadMethod == EBundleLoadMethod.LoadFromMemory)
 					{
@@ -279,6 +278,14 @@ namespace YooAsset
 			int frame = 1000;
 			while (true)
 			{
+				// 文件解压
+				if (_unpacker != null)
+				{
+					_unpacker.Update();
+					if (_unpacker.IsDone() == false)
+						continue;
+				}
+
 				// 保险机制
 				// 注意：如果需要从WEB端下载资源，可能会触发保险机制！
 				frame--;

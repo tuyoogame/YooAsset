@@ -8,7 +8,7 @@ namespace YooAsset
 {
 	internal class AssetSystemImpl
 	{
-		private readonly List<AssetBundleLoaderBase> _loaders = new List<AssetBundleLoaderBase>(1000);
+		private readonly List<BundleLoaderBase> _loaders = new List<BundleLoaderBase>(1000);
 		private readonly List<ProviderBase> _providers = new List<ProviderBase>(1000);
 		private readonly static Dictionary<string, SceneOperationHandle> _sceneHandles = new Dictionary<string, SceneOperationHandle>(100);
 		private static long _sceneCreateCount = 0;
@@ -69,6 +69,15 @@ namespace YooAsset
 		/// </summary>
 		public void DestroyAll()
 		{
+			foreach (var provider in _providers)
+			{
+				provider.Destroy();
+			}
+			foreach (var loader in _loaders)
+			{
+				loader.Destroy(true);
+			}
+
 			_providers.Clear();
 			_loaders.Clear();
 			ClearSceneHandle();
@@ -97,12 +106,12 @@ namespace YooAsset
 			{
 				for (int i = _loaders.Count - 1; i >= 0; i--)
 				{
-					AssetBundleLoaderBase loader = _loaders[i];
+					BundleLoaderBase loader = _loaders[i];
 					loader.TryDestroyAllProviders();
 				}
 				for (int i = _loaders.Count - 1; i >= 0; i--)
 				{
-					AssetBundleLoaderBase loader = _loaders[i];
+					BundleLoaderBase loader = _loaders[i];
 					if (loader.CanDestroy())
 					{
 						loader.Destroy(false);
@@ -141,7 +150,7 @@ namespace YooAsset
 		{
 			if (assetInfo.IsInvalid)
 			{
-				YooLogger.Error($"Failed to load scene. {assetInfo.Error}");
+				YooLogger.Error($"Failed to load scene ! {assetInfo.Error}");
 				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
 				completedProvider.SetCompleted(assetInfo.Error);
 				return completedProvider.CreateHandle<SceneOperationHandle>();
@@ -178,7 +187,7 @@ namespace YooAsset
 		{
 			if (assetInfo.IsInvalid)
 			{
-				YooLogger.Error($"Failed to load asset. {assetInfo.Error}");
+				YooLogger.Error($"Failed to load asset ! {assetInfo.Error}");
 				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
 				completedProvider.SetCompleted(assetInfo.Error);
 				return completedProvider.CreateHandle<AssetOperationHandle>();
@@ -205,7 +214,7 @@ namespace YooAsset
 		{
 			if (assetInfo.IsInvalid)
 			{
-				YooLogger.Error($"Failed to load sub assets. {assetInfo.Error}");
+				YooLogger.Error($"Failed to load sub assets ! {assetInfo.Error}");
 				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
 				completedProvider.SetCompleted(assetInfo.Error);
 				return completedProvider.CreateHandle<SubAssetsOperationHandle>();
@@ -223,6 +232,33 @@ namespace YooAsset
 				_providers.Add(provider);
 			}
 			return provider.CreateHandle<SubAssetsOperationHandle>();
+		}
+
+		/// <summary>
+		/// 加载原生文件
+		/// </summary>
+		public RawFileOperationHandle LoadRawFileAsync(AssetInfo assetInfo)
+		{
+			if (assetInfo.IsInvalid)
+			{
+				YooLogger.Error($"Failed to load raw file ! {assetInfo.Error}");
+				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+				completedProvider.SetCompleted(assetInfo.Error);
+				return completedProvider.CreateHandle<RawFileOperationHandle>();
+			}
+
+			string providerGUID = assetInfo.GUID;
+			ProviderBase provider = TryGetProvider(providerGUID);
+			if (provider == null)
+			{
+				if (_simulationOnEditor)
+					provider = new DatabaseRawFileProvider(this, providerGUID, assetInfo);
+				else
+					provider = new BundledRawFileProvider(this, providerGUID, assetInfo);
+				provider.InitSpawnDebugInfo();
+				_providers.Add(provider);
+			}
+			return provider.CreateHandle<RawFileOperationHandle>();
 		}
 
 		internal void UnloadSubScene(ProviderBase provider)
@@ -269,18 +305,18 @@ namespace YooAsset
 			}
 		}
 
-		internal AssetBundleLoaderBase CreateOwnerAssetBundleLoader(AssetInfo assetInfo)
+		internal BundleLoaderBase CreateOwnerAssetBundleLoader(AssetInfo assetInfo)
 		{
 			BundleInfo bundleInfo = BundleServices.GetBundleInfo(assetInfo);
 			return CreateAssetBundleLoaderInternal(bundleInfo);
 		}
-		internal List<AssetBundleLoaderBase> CreateDependAssetBundleLoaders(AssetInfo assetInfo)
+		internal List<BundleLoaderBase> CreateDependAssetBundleLoaders(AssetInfo assetInfo)
 		{
 			BundleInfo[] depends = BundleServices.GetAllDependBundleInfos(assetInfo);
-			List<AssetBundleLoaderBase> result = new List<AssetBundleLoaderBase>(depends.Length);
+			List<BundleLoaderBase> result = new List<BundleLoaderBase>(depends.Length);
 			foreach (var bundleInfo in depends)
 			{
-				AssetBundleLoaderBase dependLoader = CreateAssetBundleLoaderInternal(bundleInfo);
+				BundleLoaderBase dependLoader = CreateAssetBundleLoaderInternal(bundleInfo);
 				result.Add(dependLoader);
 			}
 			return result;
@@ -293,10 +329,10 @@ namespace YooAsset
 			}
 		}
 
-		private AssetBundleLoaderBase CreateAssetBundleLoaderInternal(BundleInfo bundleInfo)
+		private BundleLoaderBase CreateAssetBundleLoaderInternal(BundleInfo bundleInfo)
 		{
 			// 如果加载器已经存在
-			AssetBundleLoaderBase loader = TryGetAssetBundleLoader(bundleInfo.Bundle.BundleName);
+			BundleLoaderBase loader = TryGetAssetBundleLoader(bundleInfo.Bundle.BundleName);
 			if (loader != null)
 				return loader;
 
@@ -304,18 +340,21 @@ namespace YooAsset
 #if UNITY_WEBGL
 			loader = new AssetBundleWebLoader(this, bundleInfo);
 #else
-			loader = new AssetBundleFileLoader(this, bundleInfo);
+			if (bundleInfo.Bundle.IsRawFile)
+				loader = new RawBundleFileLoader(this, bundleInfo);
+			else
+				loader = new AssetBundleFileLoader(this, bundleInfo);
 #endif
 
 			_loaders.Add(loader);
 			return loader;
 		}
-		private AssetBundleLoaderBase TryGetAssetBundleLoader(string bundleName)
+		private BundleLoaderBase TryGetAssetBundleLoader(string bundleName)
 		{
-			AssetBundleLoaderBase loader = null;
+			BundleLoaderBase loader = null;
 			for (int i = 0; i < _loaders.Count; i++)
 			{
-				AssetBundleLoaderBase temp = _loaders[i];
+				BundleLoaderBase temp = _loaders[i];
 				if (temp.MainBundleInfo.Bundle.BundleName.Equals(bundleName))
 				{
 					loader = temp;

@@ -9,10 +9,10 @@ namespace YooAsset
 		/// <summary>
 		/// 依赖的资源包加载器列表
 		/// </summary>
-		private readonly List<AssetBundleLoaderBase> _dependBundles;
+		private readonly List<BundleLoaderBase> _dependBundles;
 
 
-		public DependAssetBundleGroup(List<AssetBundleLoaderBase> dpendBundles)
+		public DependAssetBundleGroup(List<BundleLoaderBase> dpendBundles)
 		{
 			_dependBundles = dpendBundles;
 		}
@@ -37,7 +37,7 @@ namespace YooAsset
 		{
 			foreach (var loader in _dependBundles)
 			{
-				if (loader.Status != AssetBundleLoaderBase.EStatus.Succeed)
+				if (loader.Status != BundleLoaderBase.EStatus.Succeed)
 				{
 					return false;
 				}
@@ -52,7 +52,7 @@ namespace YooAsset
 		{
 			foreach (var loader in _dependBundles)
 			{
-				if (loader.Status != AssetBundleLoaderBase.EStatus.Succeed)
+				if (loader.Status != BundleLoaderBase.EStatus.Succeed)
 				{
 					return loader.LastError;
 				}

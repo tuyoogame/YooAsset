@@ -412,74 +412,63 @@ namespace YooAsset
 
 		#region 原生文件
 		/// <summary>
-		/// 异步获取原生文件
+		/// 同步加载原生文件
 		/// </summary>
-		/// <param name="location">资源的定位地址</param>
-		/// <param name="copyPath">拷贝路径</param>
-		public RawFileOperation GetRawFileAsync(string location, string copyPath = null)
+		/// <param name="assetInfo">资源信息</param>
+		public RawFileOperationHandle LoadRawFileSync(AssetInfo assetInfo)
 		{
 			DebugCheckInitialize();
-			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-			return GetRawFileInternal(assetInfo, copyPath);
+			return LoadRawFileInternal(assetInfo, true);
 		}
 
 		/// <summary>
-		/// 异步获取原生文件
+		/// 同步加载原生文件
 		/// </summary>
-		/// <param name="assetInfo">资源信息</param>
-		/// <param name="copyPath">拷贝路径</param>
-		public RawFileOperation GetRawFileAsync(AssetInfo assetInfo, string copyPath = null)
+		/// <param name="location">资源的定位地址</param>
+		public RawFileOperationHandle LoadRawFileSync(string location)
 		{
 			DebugCheckInitialize();
-			return GetRawFileInternal(assetInfo, copyPath);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+			return LoadRawFileInternal(assetInfo, true);
+		}
+
+		/// <summary>
+		/// 异步加载原生文件
+		/// </summary>
+		/// <param name="assetInfo">资源信息</param>
+		public RawFileOperationHandle LoadRawFileAsync(AssetInfo assetInfo)
+		{
+			DebugCheckInitialize();
+			return LoadRawFileInternal(assetInfo, false);
+		}
+
+		/// <summary>
+		/// 异步加载原生文件
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		public RawFileOperationHandle LoadRawFileAsync(string location)
+		{
+			DebugCheckInitialize();
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+			return LoadRawFileInternal(assetInfo, false);
 		}
 
 
-		private RawFileOperation GetRawFileInternal(AssetInfo assetInfo, string copyPath)
+		private RawFileOperationHandle LoadRawFileInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
 		{
-			if (assetInfo.IsInvalid)
-			{
-				YooLogger.Error($"Failed to get raw file. {assetInfo.Error}");
-				RawFileOperation operation = new CompletedRawFileOperation(assetInfo.Error, copyPath);
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-
-			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
-
 #if UNITY_EDITOR
-			if (bundleInfo.Bundle.IsRawFile == false)
+			if (assetInfo.IsInvalid == false)
 			{
-				string error = $"Cannot load asset bundle file using {nameof(GetRawFileAsync)} method !";
-				YooLogger.Error(error);
-				RawFileOperation operation = new CompletedRawFileOperation(error, copyPath);
-				OperationSystem.StartOperation(operation);
-				return operation;
+				BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+				if (bundleInfo.Bundle.IsRawFile == false)
+					throw new Exception($"Cannot load asset bundle file using {nameof(LoadRawFileAsync)} method !");
 			}
 #endif
 
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				RawFileOperation operation = new EditorPlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				RawFileOperation operation = new OfflinePlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				RawFileOperation operation = new HostPlayModeRawFileOperation(bundleInfo, copyPath);
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			var handle = _assetSystemImpl.LoadRawFileAsync(assetInfo);
+			if (waitForAsyncComplete)
+				handle.WaitForAsyncComplete();
+			return handle;
 		}
 		#endregion
 
@@ -592,13 +581,7 @@ namespace YooAsset
 			{
 				BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
 				if (bundleInfo.Bundle.IsRawFile)
-				{
-					string error = $"Cannot load raw file using LoadAsset method !";
-					YooLogger.Error(error);
-					CompletedProvider completedProvider = new CompletedProvider(assetInfo);
-					completedProvider.SetCompleted(error);
-					return completedProvider.CreateHandle<AssetOperationHandle>();
-				}
+					throw new Exception($"Cannot load raw file using {nameof(LoadAssetAsync)} method !");
 			}
 #endif
 
@@ -687,13 +670,7 @@ namespace YooAsset
 			{
 				BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
 				if (bundleInfo.Bundle.IsRawFile)
-				{
-					string error = $"Cannot load raw file using LoadSubAssets method !";
-					YooLogger.Error(error);
-					CompletedProvider completedProvider = new CompletedProvider(assetInfo);
-					completedProvider.SetCompleted(error);
-					return completedProvider.CreateHandle<SubAssetsOperationHandle>();
-				}
+					throw new Exception($"Cannot load raw file using {nameof(LoadSubAssetsAsync)} method !");
 			}
 #endif
 

@@ -47,6 +47,11 @@ namespace YooAsset
 		/// </summary>
 		public UnityEngine.SceneManagement.Scene SceneObject { protected set; get; }
 
+		/// <summary>
+		/// 原生文件路径
+		/// </summary>
+		public string RawFilePath { protected set; get; }
+
 
 		/// <summary>
 		/// 当前的加载状态
@@ -152,6 +157,8 @@ namespace YooAsset
 				handle = new SceneOperationHandle(this);
 			else if (typeof(T) == typeof(SubAssetsOperationHandle))
 				handle = new SubAssetsOperationHandle(this);
+			else if (typeof(T) == typeof(RawFileOperationHandle))
+				handle = new RawFileOperationHandle(this);
 			else
 				throw new System.NotImplementedException();
 

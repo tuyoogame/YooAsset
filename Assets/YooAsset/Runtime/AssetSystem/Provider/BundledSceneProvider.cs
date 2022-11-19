@@ -58,7 +58,7 @@ namespace YooAsset
 					return;
 				}
 
-				if (OwnerBundle.Status != AssetBundleLoaderBase.EStatus.Succeed)
+				if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
 				{
 					Status = EStatus.Fail;
 					LastError = OwnerBundle.LastError;
