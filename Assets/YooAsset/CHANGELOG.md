@@ -2,6 +2,53 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.3.5] - 2022-11-19
+
+### Fixed
+
+- 修复了同步接口加载加密文件失败的问题。
+
+### Added
+
+- 新增了方法AssetsPackage.ClearPackageUnusedCacheFilesAsync()
+
+  ```c#
+  /// <summary>
+  /// 清理本地包裹未使用的缓存文件
+  /// </summary>
+  public ClearPackageUnusedCacheFilesOperation ClearPackageUnusedCacheFilesAsync()
+  ```
+
+- 新增了方法AssetsPackage.LoadRawFileAsync()
+
+  ```c#
+  /// <summary>
+  /// 异步加载原生文件
+  /// </summary>
+  /// <param name="location">资源的定位地址</param>
+  public RawFileOperationHandle LoadRawFileAsync(string location)
+  ```
+
+- 新增了方法AssetsPackage.LoadRawFileSync()
+
+  ```c#
+  /// <summary>
+  /// 同步加载原生文件
+  /// </summary>
+  /// <param name="location">资源的定位地址</param>
+  public RawFileOperationHandle LoadRawFileSync(string location)
+  ```
+
+### Changed
+
+- 重命名AssetsPackage.UpdateStaticVersionAsync()为AssetsPackage.UpdatePackageVersionAsync();
+- 重命名AssetsPackage.UpdateManifestAsync()为AssetsPackage.UpdatePackageManifestAsync();
+
+### Removed
+
+- 移除了方法YooAssets.ClearUnusedCacheFiles()
+- 移除了方法AssetsPackage.GetRawFileAsync()
+
 ## [1.3.4] - 2022-11-04
 
 ### Fixed
