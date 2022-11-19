@@ -12,6 +12,7 @@ public class GameScene1 : MonoBehaviour
 
 	private readonly List<AssetOperationHandle> _cachedAssetOperationHandles = new List<AssetOperationHandle>(1000);
 	private readonly List<SubAssetsOperationHandle> _cachedSubAssetsOperationHandles = new List<SubAssetsOperationHandle>(1000);
+	private readonly List<RawFileOperationHandle> _cachedRawFileOperationHandles = new List<RawFileOperationHandle>(1000);
 	private int _npcIndex = 0;
 
 	void Start()
@@ -38,6 +39,12 @@ public class GameScene1 : MonoBehaviour
 			handle.Release();
 		}
 		_cachedSubAssetsOperationHandles.Clear();
+
+		foreach(var handle in _cachedRawFileOperationHandles)
+		{
+			handle.Release();
+		}
+		_cachedRawFileOperationHandles.Clear();
 	}
 	void OnGUI()
 	{
@@ -176,7 +183,8 @@ public class GameScene1 : MonoBehaviour
 			var btn = CanvasRoot.transform.Find("load_rawfile/btn").GetComponent<Button>();
 			btn.onClick.AddListener(() =>
 			{
-				var handle = YooAssets.LoadRawFileSync("config1");
+				RawFileOperationHandle handle = YooAssets.LoadRawFileSync("config1");
+				_cachedRawFileOperationHandles.Add(handle);
 				handle.Completed += OnRawFile_Completed;
 			});
 		}
