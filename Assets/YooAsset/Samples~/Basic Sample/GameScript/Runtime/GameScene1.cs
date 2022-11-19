@@ -22,8 +22,8 @@ public class GameScene1 : MonoBehaviour
 		// 初始化窗口
 		InitWindow();
 
-		// 异步加载背景音乐
-		AsyncLoadMusic();
+		// 加载背景音乐
+		LoadMusic();
 	}
 	void OnDestroy()
 	{
@@ -176,9 +176,8 @@ public class GameScene1 : MonoBehaviour
 			var btn = CanvasRoot.transform.Find("load_rawfile/btn").GetComponent<Button>();
 			btn.onClick.AddListener(() =>
 			{
-				string savePath = $"{YooAssets.GetSandboxRoot()}/config1.txt";
-				RawFileOperation operation = YooAssets.GetRawFileAsync("config1", savePath);
-				operation.Completed += OnRawFile_Completed;
+				var handle = YooAssets.LoadRawFileSync("config1");
+				handle.Completed += OnRawFile_Completed;
 			});
 		}
 
@@ -209,24 +208,23 @@ public class GameScene1 : MonoBehaviour
 		var icon = CanvasRoot.transform.Find("load_tp_atlas/icon").GetComponent<Image>();
 		icon.sprite = handle.GetSubAssetObject<Sprite>("Icon_Shield_128");
 	}
-	private void OnRawFile_Completed(AsyncOperationBase operation)
+	private void OnRawFile_Completed(RawFileOperationHandle handle)
 	{
 		var hint = CanvasRoot.transform.Find("load_rawfile/icon/hint").GetComponent<Text>();
-		RawFileOperation op = operation as RawFileOperation;
-		hint.text = op.LoadFileText();
+		hint.text = handle.GetRawFileText(); 
 	}
 
 	/// <summary>
 	/// 异步加载背景音乐
 	/// </summary>
-	async void AsyncLoadMusic()
+	void LoadMusic()
 	{
 		// 加载背景音乐
 		{
 			var audioSource = CanvasRoot.transform.Find("music").GetComponent<AudioSource>();
-			AssetOperationHandle handle = YooAssets.LoadAssetAsync<AudioClip>("music_town");
+			AssetOperationHandle handle = YooAssets.LoadAssetSync<AudioClip>("music_town");
 			_cachedAssetOperationHandles.Add(handle);
-			await handle.Task;
+			//await handle.Task;
 			audioSource.clip = handle.AssetObject as AudioClip;
 			audioSource.Play();
 		}
