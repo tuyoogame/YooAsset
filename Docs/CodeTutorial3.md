@@ -7,7 +7,7 @@
 - LoadSubAssetsSync() 同步加载子资源对象
 - LoadSubAssetsAsync() 异步加载子资源对象
 - LoadSceneAsync() 异步加载场景
-- GetRawFileAsync() 异步获取原生文件
+- LoadRawFileAsync() 异步获取原生文件
 
 **统一约定**
 
@@ -148,11 +148,10 @@ IEnumerator Start()
 IEnumerator Start()
 {
     string location = "Assets/GameRes/wwise/init.bnk";
-    string copyPath = $"{Application.persistentDataPath}/Audio/init.bnk";
-    RawFileOperation operation = package.GetRawFileAsync(location, copyPath);
-    yield return operation;
-    byte[] fileData = operation.GetFileData();
-    string fileText = operation.GetFileText();
+    RawFileOperationHandle handle = package.LoadRawFileAsync(location);
+    yield return handle;
+    byte[] fileData = handle.GetRawFileData();
+    string fileText = handle.GetRawFileText();
 }
 ````
 

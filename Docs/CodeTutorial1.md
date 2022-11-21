@@ -7,10 +7,10 @@
 YooAssets.Initialize();
 
 // 创建默认的资源包
-var defaultPackage = YooAssets.CreateAssetsPackage("DefaultPackage");
+var package = YooAssets.CreateAssetsPackage("DefaultPackage");
 
 // 设置该资源包为默认的资源包，可以使用YooAssets相关加载接口加载该资源包内容。
-YooAssets.SetDefaultAssetsPackage(defaultPackage);
+YooAssets.SetDefaultAssetsPackage(package);
 ```
 
 资源系统的运行模式支持三种：编辑器模拟模式，单机运行模式，联机运行模式。

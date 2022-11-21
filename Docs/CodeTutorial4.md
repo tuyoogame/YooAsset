@@ -81,7 +81,7 @@ IEnumerator Start()
     
     // 更新资源包版本
     ......
-    var operation = package.UpdateManifestAsync(packageCRC);
+    var operation = package.UpdatePackageManifestAsync(packageCRC);
     yield return operation;
     
     // 下载更新文件

@@ -10,7 +10,7 @@
 private IEnumerator UpdateStaticVersion()
 {
     var package = YooAssets.GetAssetsPackage("DefaultPackage");
-    var operation = package.UpdateStaticVersionAsync();
+    var operation = package.UpdatePackageVersionAsync();
     yield return operation;
 
     if (operation.Status == EOperationStatus.Succeed)
@@ -35,7 +35,7 @@ private IEnumerator UpdateStaticVersion()
 private IEnumerator UpdatePatchManifest()
 {
     var package = YooAssets.GetAssetsPackage("DefaultPackage");
-    var operation = package.UpdateManifestAsync(packageVersion);
+    var operation = package.UpdatePackageManifestAsync(packageVersion);
     yield return operation;
 
     if (operation.Status == EOperationStatus.Succeed)
@@ -119,7 +119,7 @@ IEnumerator Download()
 private IEnumerator Start()
 {
     var package = YooAssets.GetAssetsPackage("DefaultPackage");
-    var operation = package.UpdateStaticVersionAsync(30);
+    var operation = package.UpdatePackageVersionAsync(30);
     yield return operation;
     if (operation.Status == EOperationStatus.Succeed)
     {
@@ -149,14 +149,14 @@ private IEnumerator Start()
 
 - 编辑器模拟模式
 
-  UpdateStaticVersionAsync()方法和UpdateManifestAsync()方法都不起效，但是都会返回成功！
+  UpdatePackageVersionAsync()方法和UpdatePackageManifestAsync()方法都不起效，但是都会返回成功！
 
 - 单机运行模式
 
-  UpdateStaticVersionAsync()方法和UpdateManifestAsync()方法都不起效，但是都会返回成功！
+  UpdatePackageVersionAsync()方法和UpdatePackageManifestAsync()方法都不起效，但是都会返回成功！
 
 - 联机运行模式
 
-  UpdateManifestAsync()为资源清单更新方法。该方法的内部实现原理如下：
+  UpdatePackageManifestAsync()为资源清单更新方法。该方法的内部实现原理如下：
 
   ![image](./Image/CodeTutorial2-img1.png)
