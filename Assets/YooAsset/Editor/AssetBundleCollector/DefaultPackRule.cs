@@ -120,8 +120,8 @@ namespace YooAsset.Editor
 			if (depends.Length != 1)
 				throw new Exception($"{nameof(PackRawFile)} is not support estension : {extension}");
 
-			string bundleName = StringUtility.RemoveExtension(data.AssetPath);
-			return EditorTools.GetRegularPath(bundleName).Replace('/', '_');
+			string bundleName = data.AssetPath;
+			return EditorTools.GetRegularPath(bundleName).Replace('/', '_').Replace('.', '_');
 		}
 	}
 
