@@ -5,23 +5,20 @@ using YooAsset;
 using Better.StreamingAssets;
 using System.IO;
 
-public class BootScene : MonoBehaviour
+public class GameBoot : MonoBehaviour
 {
-	public static BootScene Instance { private set; get; }
-	public static EPlayMode GamePlayMode;
+	public static GameBoot Instance;
 
 	public EPlayMode PlayMode = EPlayMode.EditorSimulateMode;
 
 	void Awake()
 	{
+		Debug.Log($"资源系统运行模式：{PlayMode}");
 		Instance = this;
-
 		Application.targetFrameRate = 60;
 		Application.runInBackground = true;
-	}
-	void OnDestroy()
-	{
-		Instance = null;
+
+		DontDestroyOnLoad(this.gameObject);
 	}
 	void Update()
 	{
@@ -31,9 +28,6 @@ public class BootScene : MonoBehaviour
 
 	IEnumerator Start()
 	{
-		GamePlayMode = PlayMode;
-		Debug.Log($"资源系统运行模式：{PlayMode}");
-
 		// 初始化BetterStreaming
 		BetterStreamingAssets.Initialize();
 
@@ -41,39 +35,37 @@ public class BootScene : MonoBehaviour
 		YooAssets.Initialize();
 
 		// 创建默认的资源包
-		var defaultPackage = YooAssets.CreateAssetsPackage("DefaultPackage");
-
-		// 设置该资源包为默认的资源包
-		YooAssets.SetDefaultAssetsPackage(defaultPackage);
+		var package = YooAssets.CreateAssetsPackage("DefaultPackage");
+		YooAssets.SetDefaultAssetsPackage(package);
 
 		// 编辑器下的模拟模式
 		if (PlayMode == EPlayMode.EditorSimulateMode)
 		{
 			var createParameters = new EditorSimulateModeParameters();
 			createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage");
-			yield return defaultPackage.InitializeAsync(createParameters);
+			yield return package.InitializeAsync(createParameters);
 		}
 
 		// 单机运行模式
 		if (PlayMode == EPlayMode.OfflinePlayMode)
 		{
 			var createParameters = new OfflinePlayModeParameters();
-			createParameters.DecryptionServices = new BundleDecryptionServices();
-			yield return defaultPackage.InitializeAsync(createParameters);
+			createParameters.DecryptionServices = new GameDecryptionServices();
+			yield return package.InitializeAsync(createParameters);
 		}
 
 		// 联机运行模式
 		if (PlayMode == EPlayMode.HostPlayMode)
 		{
 			var createParameters = new HostPlayModeParameters();
-			createParameters.DecryptionServices = new BundleDecryptionServices();
-			createParameters.QueryServices = new QueryStreamingAssetsFileServices();
+			createParameters.DecryptionServices = new GameDecryptionServices();
+			createParameters.QueryServices = new GameQueryServices();
 			createParameters.DefaultHostServer = GetHostServerURL();
 			createParameters.FallbackHostServer = GetHostServerURL();
-			yield return defaultPackage.InitializeAsync(createParameters);
+			yield return package.InitializeAsync(createParameters);
 		}
 
-		// 运行补丁流程
+		// 运行资源更新流程
 		PatchManager.Run();
 	}
 
@@ -103,7 +95,8 @@ public class BootScene : MonoBehaviour
 			return $"{hostServerIP}/CDN/PC/{gameVersion}";
 #endif
 	}
-	private class QueryStreamingAssetsFileServices : IQueryServices
+	
+	private class GameQueryServices : IQueryServices
 	{
 		public bool QueryStreamingAssets(string fileName)
 		{
@@ -112,7 +105,7 @@ public class BootScene : MonoBehaviour
 			return BetterStreamingAssets.FileExists($"{buildinFolderName}/{fileName}");
 		}
 	}
-	private class BundleDecryptionServices : IDecryptionServices
+	private class GameDecryptionServices : IDecryptionServices
 	{
 		public ulong LoadFromFileOffset(DecryptFileInfo fileInfo)
 		{

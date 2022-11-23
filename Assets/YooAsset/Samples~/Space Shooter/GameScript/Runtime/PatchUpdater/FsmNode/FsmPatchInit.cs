@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 初始化工作
+/// </summary>
 internal class FsmPatchInit : IFsmNode
 {
 	public string Name { private set; get; } = nameof(FsmPatchInit);
@@ -12,19 +15,12 @@ internal class FsmPatchInit : IFsmNode
 		var go = Resources.Load<GameObject>("PatchWindow");
 		GameObject.Instantiate(go);
 
-		BootScene.Instance.StartCoroutine(Begin());
+		FsmManager.Transition(nameof(FsmUpdateVersion));
 	}
 	void IFsmNode.OnUpdate()
 	{
 	}
 	void IFsmNode.OnExit()
 	{
-	}
-
-	private IEnumerator Begin()
-	{
-		yield return new WaitForSecondsRealtime(0.5f);
-
-		FsmManager.Transition(nameof(FsmUpdateVersion));
 	}
 }

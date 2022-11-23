@@ -28,9 +28,16 @@ public class BattleRoom : MonoBehaviour
 		"asteroid01", "asteroid02", "asteroid03", "enemy_ship"
 	};
 
+	private AssetOperationHandle _panelHandle;
+
 	void Awake()
 	{
 		Instance = this;
+
+		var canvas = GameObject.Find("Canvas");
+		_panelHandle = YooAssets.LoadAssetSync<GameObject>("UIBattle");
+		var go = _panelHandle.InstantiateSync(canvas.transform);
+		go.transform.localPosition = Vector3.zero;
 	}
 	void Start()
 	{
@@ -44,6 +51,12 @@ public class BattleRoom : MonoBehaviour
 	void OnDestroy()
 	{
 		Instance = null;
+
+		if(_panelHandle != null)
+		{
+			_panelHandle.Release();
+			_panelHandle = null;
+		}
 	}
 
 	IEnumerator SpawnWaves()

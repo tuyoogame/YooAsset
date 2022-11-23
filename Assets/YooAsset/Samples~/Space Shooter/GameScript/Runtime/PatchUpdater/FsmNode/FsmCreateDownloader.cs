@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
 
+/// <summary>
+/// 创建文件下载器
+/// </summary>
 public class FsmCreateDownloader : IFsmNode
 {
 	public string Name { private set; get; } = nameof(FsmCreateDownloader);
 
 	void IFsmNode.OnEnter()
 	{
+		Debug.Log("创建补丁下载器！");
 		PatchEventDispatcher.SendPatchStepsChangeMsg(EPatchStates.CreateDownloader);
-		BootScene.Instance.StartCoroutine(CreateDownloader());
+		GameBoot.Instance.StartCoroutine(CreateDownloader());
 	}
 	void IFsmNode.OnUpdate()
 	{
@@ -23,7 +27,6 @@ public class FsmCreateDownloader : IFsmNode
 	{
 		yield return new WaitForSecondsRealtime(0.5f);
 
-		Debug.Log("创建补丁下载器.");
 		int downloadingMaxNum = 10;
 		int failedTryAgain = 3;
 		PatchManager.Downloader = YooAssets.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);

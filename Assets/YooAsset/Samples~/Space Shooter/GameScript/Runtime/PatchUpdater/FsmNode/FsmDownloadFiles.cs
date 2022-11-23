@@ -1,14 +1,19 @@
 ﻿using System.Collections;
+using UnityEngine;
 using YooAsset;
 
+/// <summary>
+/// 下载更新文件
+/// </summary>
 public class FsmDownloadFiles : IFsmNode
 {
 	public string Name { private set; get; } = nameof(FsmDownloadFiles);
 
 	void IFsmNode.OnEnter()
 	{
+		Debug.Log("开始下载补丁文件！");
 		PatchEventDispatcher.SendPatchStepsChangeMsg(EPatchStates.DownloadWebFiles);
-		BootScene.Instance.StartCoroutine(BeginDownload());
+		GameBoot.Instance.StartCoroutine(BeginDownload());
 	}
 	void IFsmNode.OnUpdate()
 	{

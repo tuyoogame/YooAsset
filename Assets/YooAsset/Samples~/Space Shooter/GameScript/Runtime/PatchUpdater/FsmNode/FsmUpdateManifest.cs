@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
 
+/// <summary>
+/// 更新补丁清单
+/// </summary>
 public class FsmUpdateManifest : IFsmNode
 {
 	public string Name { private set; get; } = nameof(FsmUpdateManifest);
 
 	void IFsmNode.OnEnter()
 	{
+		Debug.Log("开始更新资源版本清单！");
 		PatchEventDispatcher.SendPatchStepsChangeMsg(EPatchStates.UpdateManifest);
-		BootScene.Instance.StartCoroutine(UpdateManifest());
+		GameBoot.Instance.StartCoroutine(UpdateManifest());
 	}
 	void IFsmNode.OnUpdate()
 	{
@@ -23,7 +27,6 @@ public class FsmUpdateManifest : IFsmNode
 	{
 		yield return new WaitForSecondsRealtime(0.5f);
 
-		// 更新补丁清单
 		var package = YooAssets.GetAssetsPackage("DefaultPackage");
 		var operation = package.UpdatePackageManifestAsync(PatchManager.PackageVersion, 30);
 		yield return operation;

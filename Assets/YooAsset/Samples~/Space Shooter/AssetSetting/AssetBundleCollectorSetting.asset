@@ -38,6 +38,13 @@ MonoBehaviour:
         PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: 
+      - CollectPath: Assets/Samples/Space Shooter/GameRes/Audio
+        CollectorGUID: 306075fbe00b24251b6c889984a7a7d5
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
     - GroupName: shader
       GroupDesc: 
       AssetTags: 
@@ -85,6 +92,6 @@ MonoBehaviour:
         CollectorGUID: 01865ad6f7c806147b6cb37f2d83bc96
         CollectorType: 0
         AddressRuleName: AddressByFileName
-        PackRuleName: PackDirectory
+        PackRuleName: PackTopDirectory
         FilterRuleName: CollectAll
         AssetTags: 

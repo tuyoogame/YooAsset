@@ -6,7 +6,7 @@ SpriteAtlas:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: unityAtlas
+  m_Name: common
   serializedVersion: 2
   m_EditorData:
     serializedVersion: 2
@@ -31,7 +31,7 @@ SpriteAtlas:
       enableTightPacking: 0
     variantMultiplier: 1
     packables:
-    - {fileID: 102900000, guid: 01865ad6f7c806147b6cb37f2d83bc96, type: 3}
+    - {fileID: 102900000, guid: 5338a5ade0415264b976d834237aa226, type: 3}
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
@@ -47,19 +47,11 @@ SpriteAtlas:
   - {fileID: 21300000, guid: e9b8cd94ede145942a15f9e164af30a9, type: 3}
   - {fileID: 21300000, guid: e05004e4bcd8b3e49bb0cbaab0215760, type: 3}
   - {fileID: 21300000, guid: 9871e4d5e19cea6419d057b79ce1a1a8, type: 3}
-  - {fileID: 21300000, guid: 1ceb59d66cd59eb40a2da04ee9509bd1, type: 3}
   - {fileID: 21300000, guid: 78e3daf76621d66448e594d6993adbd8, type: 3}
   - {fileID: 21300000, guid: ba523fd85bea1e448944fe8cabed4b59, type: 3}
-  - {fileID: 21300000, guid: fd496259f55fb1f4f89429cd523c1af9, type: 3}
   - {fileID: 21300000, guid: 67c34bb955c72e6419b7528e10e73c53, type: 3}
-  - {fileID: 21300000, guid: 2678aad9451e8e44a9c17d6e98886f05, type: 3}
-  - {fileID: 21300000, guid: 3f92020a7f2ce524b8f0dc4092fbef2c, type: 3}
-  - {fileID: 21300000, guid: 0cfd497c8bf3fde418beb3fec21b33e1, type: 3}
   - {fileID: 21300000, guid: 36909c7c187739945aecb80f7c59fa4c, type: 3}
-  - {fileID: 21300000, guid: 55e7fefcb1252564e83b96186b0c9fdb, type: 3}
-  - {fileID: 21300000, guid: 5ac1b94d4d2f7eb4e966846bb93a15cc, type: 3}
   - {fileID: 21300000, guid: 20960a9e1f7b68c4f80d5078f5964057, type: 3}
-  - {fileID: 21300000, guid: 17e47abe8c135d64fb588e3425605def, type: 3}
   - {fileID: 21300000, guid: a9ef9e2f50f97a84bbd269b5f7cc5ea4, type: 3}
   - {fileID: 21300000, guid: 8a6f536f4b2392f40afb62df609f6e40, type: 3}
   - {fileID: 21300000, guid: 03cbfa7fbded80a479f24add4a997757, type: 3}
@@ -76,22 +68,14 @@ SpriteAtlas:
   - long_arrow_right
   - arrow_right
   - arrow1_left
-  - bar_purple
   - window_transparent1
   - bar_blue
-  - background_bar1
   - button_active
-  - bar_red1
-  - bar_red
-  - bar_green
   - plus
-  - bar_green1
-  - background_bar
   - bar_blue1
-  - bar_purple1
   - back_arrow
   - button1
   - button_pushed
-  m_Tag: unityAtlas
+  m_Tag: common
   m_IsVariant: 0
   m_IsPlaceholder: 0

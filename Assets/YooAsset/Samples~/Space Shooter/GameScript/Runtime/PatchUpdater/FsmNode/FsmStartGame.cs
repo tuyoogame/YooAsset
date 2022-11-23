@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 开始游戏
+/// </summary>
 internal class FsmStartGame : IFsmNode
 {
 	public string Name { private set; get; } = nameof(FsmStartGame);

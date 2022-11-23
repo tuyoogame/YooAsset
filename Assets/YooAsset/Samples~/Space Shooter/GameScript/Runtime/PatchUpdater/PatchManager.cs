@@ -27,7 +27,7 @@ public static class PatchManager
 		{
 			_isRun = true;
 
-			Debug.Log("开始补丁更新...");
+			Debug.Log("开启补丁更新流程...");
 
 			// 注意：按照先后顺序添加流程节点
 			FsmManager.AddNode(new FsmPatchInit());
