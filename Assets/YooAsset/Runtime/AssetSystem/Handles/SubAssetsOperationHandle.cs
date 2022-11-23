@@ -21,7 +21,7 @@ namespace YooAsset
 		{
 			add
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					throw new System.Exception($"{nameof(SubAssetsOperationHandle)} is invalid");
 				if (Provider.IsDone)
 					value.Invoke(this);
@@ -30,7 +30,7 @@ namespace YooAsset
 			}
 			remove
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					throw new System.Exception($"{nameof(SubAssetsOperationHandle)} is invalid");
 				_callback -= value;
 			}
@@ -43,7 +43,7 @@ namespace YooAsset
 		{
 			get
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					return null;
 				return Provider.AllAssetObjects;
 			}
@@ -54,7 +54,7 @@ namespace YooAsset
 		/// </summary>
 		public void WaitForAsyncComplete()
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return;
 			Provider.WaitForAsyncComplete();
 		}
@@ -75,7 +75,7 @@ namespace YooAsset
 		/// <param name="assetName">子资源对象名称</param>
 		public TObject GetSubAssetObject<TObject>(string assetName) where TObject : UnityEngine.Object
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return null;
 
 			foreach (var assetObject in Provider.AllAssetObjects)
@@ -94,7 +94,7 @@ namespace YooAsset
 		/// <typeparam name="TObject">子资源对象类型</typeparam>
 		public TObject[] GetSubAssetObjects<TObject>() where TObject : UnityEngine.Object
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return null;
 
 			List<TObject> ret = new List<TObject>(Provider.AllAssetObjects.Length);

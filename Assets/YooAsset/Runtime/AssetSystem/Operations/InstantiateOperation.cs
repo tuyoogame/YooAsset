@@ -41,7 +41,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.Clone)
 			{
-				if (_handle.IsValid == false)
+				if (_handle.IsValidWithWarning == false)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;

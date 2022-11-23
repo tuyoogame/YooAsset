@@ -22,7 +22,7 @@ namespace YooAsset
 		{
 			add
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					throw new System.Exception($"{nameof(RawFileOperationHandle)} is invalid");
 				if (Provider.IsDone)
 					value.Invoke(this);
@@ -31,7 +31,7 @@ namespace YooAsset
 			}
 			remove
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					throw new System.Exception($"{nameof(RawFileOperationHandle)} is invalid");
 				_callback -= value;
 			}
@@ -42,7 +42,7 @@ namespace YooAsset
 		/// </summary>
 		public void WaitForAsyncComplete()
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return;
 			Provider.WaitForAsyncComplete();
 		}
@@ -61,7 +61,7 @@ namespace YooAsset
 		/// </summary>
 		public byte[] GetRawFileData()
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return null;
 			string filePath = Provider.RawFilePath;
 			if (File.Exists(filePath) == false)
@@ -74,7 +74,7 @@ namespace YooAsset
 		/// </summary>
 		public string GetRawFileText()
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return null;
 			string filePath = Provider.RawFilePath;
 			if (File.Exists(filePath) == false)
@@ -87,7 +87,7 @@ namespace YooAsset
 		/// </summary>
 		public string GetRawFilePath()
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return string.Empty;
 			return Provider.RawFilePath;
 		}

@@ -223,7 +223,7 @@ namespace YooAsset
 			List<OperationHandleBase> tempers = new List<OperationHandleBase>(_handles);
 			foreach (var hande in tempers)
 			{
-				if (hande.IsValid)
+				if (hande.IsValidWithWarning)
 				{
 					hande.InvokeCallback();
 				}

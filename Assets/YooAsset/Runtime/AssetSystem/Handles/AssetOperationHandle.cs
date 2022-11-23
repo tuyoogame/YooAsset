@@ -22,7 +22,7 @@ namespace YooAsset
 		{
 			add
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					throw new System.Exception($"{nameof(AssetOperationHandle)} is invalid");
 				if (Provider.IsDone)
 					value.Invoke(this);
@@ -31,7 +31,7 @@ namespace YooAsset
 			}
 			remove
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					throw new System.Exception($"{nameof(AssetOperationHandle)} is invalid");
 				_callback -= value;
 			}
@@ -44,7 +44,7 @@ namespace YooAsset
 		{
 			get
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					return null;
 				return Provider.AssetObject;
 			}
@@ -56,7 +56,7 @@ namespace YooAsset
 		/// <typeparam name="TAsset">资源类型</typeparam>
 		public TAsset GetAssetObject<TAsset>() where TAsset : UnityEngine.Object
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return null;
 			return Provider.AssetObject as TAsset;
 		}
@@ -66,7 +66,7 @@ namespace YooAsset
 		/// </summary>
 		public void WaitForAsyncComplete()
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return;
 			Provider.WaitForAsyncComplete();
 		}
@@ -124,7 +124,7 @@ namespace YooAsset
 
 		private GameObject InstantiateSyncInternal(Vector3 position, Quaternion rotation, Transform parent)
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return null;
 			if (Provider.AssetObject == null)
 				return null;

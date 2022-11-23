@@ -30,7 +30,7 @@ namespace YooAsset
 		{
 			get
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					return EOperationStatus.None;
 				if (Provider.Status == ProviderBase.EStatus.Fail)
 					return EOperationStatus.Failed;
@@ -48,7 +48,7 @@ namespace YooAsset
 		{
 			get
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					return string.Empty;
 				return Provider.LastError;
 			}
@@ -61,7 +61,7 @@ namespace YooAsset
 		{
 			get
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					return 0;
 				return Provider.Progress;
 			}
@@ -74,7 +74,7 @@ namespace YooAsset
 		{
 			get
 			{
-				if (IsValid == false)
+				if (IsValidWithWarning == false)
 					return false;
 				return Provider.IsDone;
 			}
@@ -84,6 +84,20 @@ namespace YooAsset
 		/// 句柄是否有效
 		/// </summary>
 		public bool IsValid
+		{
+			get
+			{
+				if (Provider != null && Provider.IsDestroyed == false)
+					return true;
+				else
+					return false;
+			}
+		}
+
+		/// <summary>
+		/// 句柄是否有效
+		/// </summary>
+		internal bool IsValidWithWarning
 		{
 			get
 			{
@@ -103,25 +117,11 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 句柄是否有效
-		/// </summary>
-		public bool IsValidNoWarning
-		{
-			get
-			{
-				if (Provider != null && Provider.IsDestroyed == false)
-					return true;
-				else
-					return false;
-			}
-		}
-
-		/// <summary>
 		/// 释放句柄
 		/// </summary>
 		internal void ReleaseInternal()
 		{
-			if (IsValid == false)
+			if (IsValidWithWarning == false)
 				return;
 			Provider.ReleaseHandle(this);
 			Provider = null;
