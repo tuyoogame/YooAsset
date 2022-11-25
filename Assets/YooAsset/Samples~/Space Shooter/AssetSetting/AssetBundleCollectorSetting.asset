@@ -85,7 +85,7 @@ MonoBehaviour:
         CollectorGUID: 12d33f33f3a55224c9c747d7bffa1c68
         CollectorType: 0
         AddressRuleName: AddressByFileName
-        PackRuleName: PackDirectory
+        PackRuleName: PackSeparately
         FilterRuleName: CollectAll
         AssetTags: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/UISprite

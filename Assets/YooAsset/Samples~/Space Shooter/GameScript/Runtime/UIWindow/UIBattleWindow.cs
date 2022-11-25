@@ -2,43 +2,51 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using YooAsset;
+using UniFramework.Window;
+using UniFramework.Event;
 
-public class UIBattleWindow : MonoBehaviour
+[WindowAttribute(100, false)]
+public class UIBattleWindow : UIWindow
 {
+	private EventGroup _eventGroup = new EventGroup();
 	private Text _scoreLabel;
 	private GameObject _overView;
 
-	void Awake()
+	public override void OnCreate()
 	{
 		_scoreLabel = this.transform.Find("ScoreView/Score").GetComponent<Text>();
 		_scoreLabel.text = "Score : 0";
-	
+
 		var restartBtn = this.transform.Find("OverView/Restart").GetComponent<Button>();
-		restartBtn.onClick.AddListener(OnClickLoginBtn);
+		restartBtn.onClick.AddListener(OnClickRestartBtn);
 
 		var homeBtn = this.transform.Find("OverView/Home").GetComponent<Button>();
 		homeBtn.onClick.AddListener(OnClickHomeBtn);
 
 		_overView = this.transform.Find("OverView").gameObject;
-		_overView.gameObject.SetActive(false);
 
-		EventManager.AddListener<BattleEventDefine.ScoreChange>(OnHandleEventMessage);
-		EventManager.AddListener<BattleEventDefine.GameOver>(OnHandleEventMessage);
+		_eventGroup.AddListener<BattleEventDefine.ScoreChange>(OnHandleEventMessage);
+		_eventGroup.AddListener<BattleEventDefine.GameOver>(OnHandleEventMessage);
 	}
-	void OnDestroy()
+	public override void OnDestroy()
 	{
-		EventManager.RemoveListener<BattleEventDefine.ScoreChange > (OnHandleEventMessage);
-		EventManager.RemoveListener<BattleEventDefine.GameOver>(OnHandleEventMessage);
+		_eventGroup.RemoveAllListener();
+	}
+	public override void OnRefresh()
+	{
+		_overView.SetActive(false);
+	}
+	public override void OnUpdate()
+	{
 	}
 
-	private void OnClickLoginBtn()
+	private void OnClickRestartBtn()
 	{
-		YooAssets.LoadSceneAsync("scene_game");
+		SceneEventDefine.ChangeToBattleScene.SendEventMessage();
 	}
 	private void OnClickHomeBtn()
 	{
-		YooAssets.LoadSceneAsync("scene_home");
+		SceneEventDefine.ChangeToHomeScene.SendEventMessage();
 	}
 	private void OnHandleEventMessage(IEventMessage message)
 	{
