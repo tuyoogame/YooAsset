@@ -47,9 +47,9 @@ namespace YooAsset
 				OperationSystem.Update();
 				DownloadSystem.Update();
 
-				foreach (var package in _packages)
+				for (int i = 0; i < _packages.Count; i++)
 				{
-					package.UpdatePackage();
+					_packages[i].UpdatePackage();
 				}
 			}
 		}
