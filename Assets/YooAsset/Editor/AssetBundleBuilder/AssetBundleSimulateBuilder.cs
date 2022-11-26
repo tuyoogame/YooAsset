@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine;
 
 namespace YooAsset.Editor
 {
@@ -9,6 +10,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public static string SimulateBuild(string packageName)
 		{
+			Debug.Log($"Begin to create simulate package : {packageName}");
 			string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
 			BuildParameters buildParameters = new BuildParameters();
 			buildParameters.OutputRoot = defaultOutputRoot;

@@ -240,13 +240,15 @@ namespace YooAsset.Editor
 				return false;
 
 			// 忽略Unity无法识别的无效文件
-			/*
-			if (type == typeof(UnityEditor.DefaultAsset))
+			// 注意：只对非原生文件收集器处理
+			if(PackRuleName != nameof(PackRawFile))
 			{
-				UnityEngine.Debug.LogWarning($"Cannot pack default asset : {assetPath}");
-				return false;
+				if (type == typeof(UnityEditor.DefaultAsset))
+				{
+					UnityEngine.Debug.LogWarning($"Cannot pack default asset : {assetPath}");
+					return false;
+				}
 			}
-			*/
 
 			string fileExtension = System.IO.Path.GetExtension(assetPath);
 			if (IsIgnoreFile(fileExtension))
