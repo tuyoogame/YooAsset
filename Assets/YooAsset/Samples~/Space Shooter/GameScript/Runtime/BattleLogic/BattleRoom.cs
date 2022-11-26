@@ -59,8 +59,6 @@ public class BattleRoom
 	/// </summary>
 	public void DestroyRoom()
 	{
-		Debug.LogWarning("DestroyRoom");
-
 		if (_musicHandle != null)
 			_musicHandle.Release();
 

@@ -7,8 +7,12 @@ using UniFramework.Window;
 [WindowAttribute(100, false)]
 public class UIHomeWindow : UIWindow
 {
+	private Text _version;
+
 	public override void OnCreate()
 	{
+		_version = this.transform.Find("version").GetComponent<Text>();
+
 		var loginBtn = this.transform.Find("Start").GetComponent<Button>();
 		loginBtn.onClick.AddListener(OnClickLoginBtn);
 
@@ -20,6 +24,8 @@ public class UIHomeWindow : UIWindow
 	}
 	public override void OnRefresh()
 	{
+		var package = YooAsset.YooAssets.GetAssetsPackage("DefaultPackage");
+		_version.text = "Ver : " + package.GetPackageVersion();
 	}
 	public override void OnUpdate()
 	{
