@@ -2,6 +2,31 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.3.6] - 2022-11-26
+
+全新的太空战机Demo !
+
+### Fixed
+
+- (#45)修复了package列表更新触发的异常。
+
+### Added
+
+- 新增了YooAssets.Destroy()资源系统销毁方法。
+
+  ```C#
+  /// <summary>
+  /// 销毁资源系统
+  /// </summary>
+  public static void Destroy();
+  ```
+
+### Changed
+
+- 优化了资源收集规则，原生文件打包名称现在已经包含文件后缀名。
+- 优化了资源收集规则，非原生文件收集器自动移除Unity无法识别的文件。
+- 优化了调试信息窗口，列表元素的加载状态显示为文本。
+
 ## [1.3.5] - 2022-11-19
 
 ### Fixed
