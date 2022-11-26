@@ -9,6 +9,7 @@ namespace YooAsset
 	public static partial class YooAssets
 	{
 		private static bool _isInitialize = false;
+		private static GameObject _driver = null;
 		private static readonly List<AssetsPackage> _packages = new List<AssetsPackage>();
 
 		/// <summary>
@@ -23,17 +24,42 @@ namespace YooAsset
 			{
 				// 创建驱动器
 				_isInitialize = true;
-				UnityEngine.GameObject driverGo = new UnityEngine.GameObject($"[{nameof(YooAssets)}]");
-				driverGo.AddComponent<YooAssetsDriver>();
-				UnityEngine.Object.DontDestroyOnLoad(driverGo);
+				_driver = new UnityEngine.GameObject($"[{nameof(YooAssets)}]");
+				_driver.AddComponent<YooAssetsDriver>();
+				UnityEngine.Object.DontDestroyOnLoad(_driver);
 
 #if DEBUG
 				// 添加远程调试脚本
-				driverGo.AddComponent<RemoteDebuggerInRuntime>();
+				_driver.AddComponent<RemoteDebuggerInRuntime>();
 #endif
 
 				// 初始化异步系统
 				OperationSystem.Initialize();
+			}
+		}
+
+		/// <summary>
+		/// 销毁资源系统
+		/// </summary>
+		public static void Destroy()
+		{
+			if (_isInitialize)
+			{
+				OperationSystem.DestroyAll();
+				DownloadSystem.DestroyAll();
+				CacheSystem.ClearAll();
+
+				foreach (var package in _packages)
+				{
+					package.DestroyPackage();
+				}
+				_packages.Clear();
+
+				if(_driver != null)
+					GameObject.Destroy(_driver);
+
+				_isInitialize = false;
+				YooLogger.Log("YooAssets destroy all !");
 			}
 		}
 
@@ -51,28 +77,6 @@ namespace YooAsset
 				{
 					_packages[i].UpdatePackage();
 				}
-			}
-		}
-
-		/// <summary>
-		/// 销毁资源系统
-		/// </summary>
-		internal static void Destroy()
-		{
-			if (_isInitialize)
-			{
-				OperationSystem.DestroyAll();
-				DownloadSystem.DestroyAll();
-				CacheSystem.ClearAll();
-
-				foreach (var package in _packages)
-				{
-					package.DestroyPackage();
-				}
-				_packages.Clear();
-
-				_isInitialize = false;
-				YooLogger.Log("YooAssets destroy all !");
 			}
 		}
 

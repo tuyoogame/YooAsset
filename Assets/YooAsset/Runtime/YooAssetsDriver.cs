@@ -12,14 +12,6 @@ namespace YooAsset
 			DebugCheckDuplicateDriver();
 			YooAssets.Update();
 		}
-		void OnDestroy()
-		{
-			YooAssets.Destroy();
-		}
-		void OnApplicationQuit()
-		{
-			YooAssets.Destroy();
-		}
 
 		[Conditional("DEBUG")]
 		private void DebugCheckDuplicateDriver()
