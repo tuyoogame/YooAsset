@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.3.6] - 2022-11-26
+## [1.3.7] - 2022-11-26
 
 全新的太空战机Demo !
 
