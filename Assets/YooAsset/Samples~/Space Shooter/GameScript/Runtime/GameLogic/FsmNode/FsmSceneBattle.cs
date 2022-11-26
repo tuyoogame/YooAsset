@@ -17,8 +17,6 @@ internal class FsmSceneBattle : IStateNode
 	}
 	void IStateNode.OnEnter()
 	{
-		UniWindow.OpenWindowSync<UILoadingWindow>("UILoading");
-
 		UniModule.StartCoroutine(Prepare());
 	}
 	void IStateNode.OnUpdate()
@@ -37,6 +35,7 @@ internal class FsmSceneBattle : IStateNode
 
 	private IEnumerator Prepare()
 	{
+		yield return UniWindow.OpenWindowAsync<UILoadingWindow>("UILoading");
 		yield return YooAssets.LoadSceneAsync("scene_battle");
 
 		_battleRoom = new BattleRoom();

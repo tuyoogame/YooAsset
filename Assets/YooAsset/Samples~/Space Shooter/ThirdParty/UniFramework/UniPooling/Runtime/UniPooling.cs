@@ -12,8 +12,8 @@ namespace UniFramework.Pooling
 	public static class UniPooling
 	{
 		private static bool _isInitialize = false;
+		private static GameObject _driver = null;
 		private static readonly List<Spawner> _spawners = new List<Spawner>();
-		private static GameObject _poolingRoot;
 
 
 		/// <summary>
@@ -28,9 +28,30 @@ namespace UniFramework.Pooling
 			{
 				// 创建驱动器
 				_isInitialize = true;
-				_poolingRoot = new UnityEngine.GameObject($"[{nameof(UniPooling)}]");
-				_poolingRoot.AddComponent<UniPoolingDriver>();
-				UnityEngine.Object.DontDestroyOnLoad(_poolingRoot);
+				_driver = new UnityEngine.GameObject($"[{nameof(UniPooling)}]");
+				_driver.AddComponent<UniPoolingDriver>();
+				UnityEngine.Object.DontDestroyOnLoad(_driver);
+				UniLogger.Log($"{nameof(UniPooling)} initalize !");
+			}
+		}
+
+		/// <summary>
+		/// 销毁游戏对象池系统
+		/// </summary>
+		public static void Destroy()
+		{
+			if (_isInitialize)
+			{
+				foreach (var spawner in _spawners)
+				{
+					spawner.Destroy();
+				}
+				_spawners.Clear();
+
+				_isInitialize = false;
+				if (_driver != null)
+					GameObject.Destroy(_driver);
+				UniLogger.Log($"{nameof(UniPooling)} destroy all !");
 			}
 		}
 
@@ -47,25 +68,6 @@ namespace UniFramework.Pooling
 				}
 			}
 		}
-
-		/// <summary>
-		/// 销毁游戏对象池系统
-		/// </summary>
-		internal static void Destroy()
-		{
-			if (_isInitialize)
-			{
-				foreach (var spawner in _spawners)
-				{
-					spawner.Destroy();
-				}
-
-				_spawners.Clear();
-				_isInitialize = false;
-				UniLogger.Log($"{nameof(UniPooling)} destroy all !");
-			}
-		}
-
 
 		/// <summary>
 		/// 创建游戏对象生成器
@@ -87,7 +89,7 @@ namespace UniFramework.Pooling
 			if (HasSpawner(packageName))
 				return GetSpawner(packageName);
 
-			Spawner spawner = new Spawner(_poolingRoot, assetPackage);
+			Spawner spawner = new Spawner(_driver, assetPackage);
 			_spawners.Add(spawner);
 			return spawner;
 		}

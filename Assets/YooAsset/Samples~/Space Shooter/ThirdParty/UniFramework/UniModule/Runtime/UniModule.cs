@@ -20,6 +20,7 @@ namespace UniFramework.Module
 		}
 
 		private static bool _isInitialize = false;
+		private static GameObject _driver = null;
 		private static readonly List<Wrapper> _wrappers = new List<Wrapper>(100);
 		private static MonoBehaviour _behaviour;
 		private static bool _isDirty = false;
@@ -36,9 +37,26 @@ namespace UniFramework.Module
 			{
 				// 创建驱动器
 				_isInitialize = true;
-				GameObject driver = new UnityEngine.GameObject($"[{nameof(UniModule)}]");
-				_behaviour = driver.AddComponent<UniModuleDriver>();
-				UnityEngine.Object.DontDestroyOnLoad(driver);
+				_driver = new UnityEngine.GameObject($"[{nameof(UniModule)}]");
+				_behaviour = _driver.AddComponent<UniModuleDriver>();
+				UnityEngine.Object.DontDestroyOnLoad(_driver);
+				UniLogger.Log($"{nameof(UniModule)} initalize !");
+			}
+		}
+
+		/// <summary>
+		/// 销毁模块系统
+		/// </summary>
+		public static void Destroy()
+		{
+			if (_isInitialize)
+			{
+				DestroyAll();
+
+				_isInitialize = false;
+				if (_driver != null)
+					GameObject.Destroy(_driver);
+				UniLogger.Log($"{nameof(UniModule)} destroy all !");
 			}
 		}
 
@@ -66,20 +84,6 @@ namespace UniFramework.Module
 			for (int i = 0; i < _wrappers.Count; i++)
 			{
 				_wrappers[i].Module.OnUpdate();
-			}
-		}
-
-		/// <summary>
-		/// 销毁模块系统
-		/// </summary>
-		internal static void Destroy()
-		{
-			if (_isInitialize)
-			{
-				_isInitialize = false;
-				DestroyAll();
-
-				UniLogger.Log($"{nameof(UniModule)} destroy all !");
 			}
 		}
 

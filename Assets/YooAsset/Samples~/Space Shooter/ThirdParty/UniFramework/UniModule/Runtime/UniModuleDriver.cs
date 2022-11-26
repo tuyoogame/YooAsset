@@ -8,10 +8,5 @@ namespace UniFramework.Module
 		{
 			UniModule.Update();
 		}
-
-		void OnDestroy()
-		{
-			UniModule.Destroy();
-		}
 	}
 }

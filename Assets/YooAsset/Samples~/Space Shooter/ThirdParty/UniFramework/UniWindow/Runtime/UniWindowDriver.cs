@@ -8,10 +8,5 @@ namespace UniFramework.Window
 		{
 			UniWindow.Update();
 		}
-
-		void OnDestroy()
-		{
-			UniWindow.Destroy();
-		}
 	}
 }

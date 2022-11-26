@@ -8,10 +8,5 @@ namespace UniFramework.Pooling
 		{
 			UniPooling.Update();
 		}
-
-		void OnDestroy()
-		{
-			UniPooling.Destroy();
-		}
 	}
 }

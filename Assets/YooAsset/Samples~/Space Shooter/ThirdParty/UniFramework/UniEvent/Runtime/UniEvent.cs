@@ -22,6 +22,7 @@ namespace UniFramework.Event
 		}
 
 		private static bool _isInitialize = false;
+		private static GameObject _driver = null;
 		private static readonly Dictionary<int, LinkedList<Action<IEventMessage>>> _listeners = new Dictionary<int, LinkedList<Action<IEventMessage>>>(1000);
 		private static readonly List<PostWrapper> _postingList = new List<PostWrapper>(1000);
 
@@ -37,9 +38,26 @@ namespace UniFramework.Event
 			{
 				// 创建驱动器
 				_isInitialize = true;
-				GameObject driver = new UnityEngine.GameObject($"[{nameof(UniEvent)}]");
-				driver.AddComponent<UniEventDriver>();
-				UnityEngine.Object.DontDestroyOnLoad(driver);
+				_driver = new UnityEngine.GameObject($"[{nameof(UniEvent)}]");
+				_driver.AddComponent<UniEventDriver>();
+				UnityEngine.Object.DontDestroyOnLoad(_driver);
+				UniLogger.Log($"{nameof(UniEvent)} initalize !");
+			}
+		}
+
+		/// <summary>
+		/// 销毁事件系统
+		/// </summary>
+		public static void Destroy()
+		{
+			if (_isInitialize)
+			{
+				ClearAll();
+
+				_isInitialize = false;
+				if (_driver != null)
+					GameObject.Destroy(_driver);
+				UniLogger.Log($"{nameof(UniEvent)} destroy all !");
 			}
 		}
 
@@ -58,21 +76,6 @@ namespace UniFramework.Event
 				}
 			}
 		}
-
-		/// <summary>
-		/// 销毁事件系统
-		/// </summary>
-		internal static void Destroy()
-		{
-			if (_isInitialize)
-			{
-				_isInitialize = false;
-				ClearAll();
-			
-				UniLogger.Log($"{nameof(UniEvent)} destroy all !");
-			}
-		}
-
 
 		/// <summary>
 		/// 清空所有监听

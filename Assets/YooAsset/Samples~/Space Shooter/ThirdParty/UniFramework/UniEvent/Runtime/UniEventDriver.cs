@@ -8,10 +8,5 @@ namespace UniFramework.Event
 		{
 			UniEvent.Update();
 		}
-
-		void OnDestroy()
-		{
-			UniEvent.Destroy();
-		}
 	}
 }

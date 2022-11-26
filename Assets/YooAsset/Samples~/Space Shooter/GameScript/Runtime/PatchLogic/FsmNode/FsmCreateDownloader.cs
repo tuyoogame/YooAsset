@@ -39,12 +39,13 @@ public class FsmCreateDownloader : IStateNode
 
 		if (downloader.TotalDownloadCount == 0)
 		{
-			Debug.Log("没有发现需要下载的资源！");
+			Debug.Log("Not found any download files !");
 			_machine.ChangeState<FsmDownloadOver>();
 		}
 		else
 		{
-			Debug.Log($"一共发现了{downloader.TotalDownloadCount}个资源需要更新下载！");
+			//A total of 10 files were found that need to be downloaded
+			Debug.Log($"Found total {downloader.TotalDownloadCount} files that need download ！");
 
 			// 发现新更新文件后，挂起流程系统
 			// 注意：开发者需要在下载前检测磁盘空间不足

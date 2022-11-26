@@ -17,6 +17,7 @@ namespace UniFramework.Window
 		}
 
 		private static bool _isInitialize = false;
+		private static GameObject _driver = null;
 		private static readonly List<UIWindow> _stack = new List<UIWindow>(100);
 		internal static GameObject Desktop { private set; get; }
 
@@ -35,11 +36,28 @@ namespace UniFramework.Window
 			{
 				// 创建驱动器
 				_isInitialize = true;
-				GameObject driver = new UnityEngine.GameObject($"[{nameof(UniWindow)}]");
-				driver.AddComponent<UniWindowDriver>();
-				UnityEngine.Object.DontDestroyOnLoad(driver);
+				_driver = new UnityEngine.GameObject($"[{nameof(UniWindow)}]");
+				_driver.AddComponent<UniWindowDriver>();
+				UnityEngine.Object.DontDestroyOnLoad(_driver);
+				UniLogger.Log($"{nameof(UniWindow)} initalize !");
 
 				Desktop = desktop;
+			}
+		}
+
+		/// <summary>
+		/// 销毁界面系统
+		/// </summary>
+		public static void Destroy()
+		{
+			if (_isInitialize)
+			{
+				CloseAll();
+
+				_isInitialize = false;
+				if (_driver != null)
+					GameObject.Destroy(_driver);
+				UniLogger.Log($"{nameof(UniWindow)} destroy all !");
 			}
 		}
 
@@ -60,20 +78,6 @@ namespace UniFramework.Window
 				}
 			}
 		}
-
-		/// <summary>
-		/// 销毁界面系统
-		/// </summary>
-		internal static void Destroy()
-		{
-			if (_isInitialize)
-			{
-				_isInitialize = false;
-				CloseAll();		
-				UniLogger.Log($"{nameof(UniWindow)} destroy all !");
-			}
-		}
-
 
 		/// <summary>
 		/// 设置屏幕安全区域（异形屏支持）
