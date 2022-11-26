@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UniFramework.Window;
+using UniFramework.Utility;
 
 [WindowAttribute(1000, true)]
 public class UILoadingWindow : UIWindow
 {
 	private Text _info;
-	private float _timer;
 	private int _countdown;
+	private UniTimer _timer = UniTimer.CreatePepeatTimer(0, 0.2f);
 
 	public override void OnCreate()
 	{
@@ -21,15 +22,13 @@ public class UILoadingWindow : UIWindow
 	public override void OnRefresh()
 	{
 		_info.text = "Loading";
-		_timer = 0;
+		_timer.Reset();
 		_countdown = 0;
 	}
 	public override void OnUpdate()
 	{
-		_timer += Time.deltaTime;
-		if (_timer>= 0.1f)
+		if(_timer.Update(Time.deltaTime))
 		{
-			_timer = 0f;
 			_countdown++;
 			if (_countdown > 6)
 				_countdown = 0;

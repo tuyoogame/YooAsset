@@ -59,6 +59,8 @@ public class BattleRoom
 	/// </summary>
 	public void DestroyRoom()
 	{
+		Debug.LogWarning("DestroyRoom");
+
 		if (_musicHandle != null)
 			_musicHandle.Release();
 
@@ -176,7 +178,7 @@ public class BattleRoom
 		yield return _entitySpawner.CreateGameObjectPoolAsync("explosion_player");
 
 		// 创建玩家实体对象
-		var handle = _entitySpawner.SpawnSync("player_ship");
+		var handle = _entitySpawner.SpawnSync("player_ship", _roomRoot.transform);
 		var entity = handle.GameObj.GetComponent<EntityPlayer>();
 		entity.InitEntity(handle);
 

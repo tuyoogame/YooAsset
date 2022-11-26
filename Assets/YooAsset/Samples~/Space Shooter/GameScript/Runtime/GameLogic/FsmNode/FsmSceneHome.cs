@@ -31,6 +31,7 @@ internal class FsmSceneHome : IStateNode
 
 	private IEnumerator Prepare()
 	{
+		Debug.LogWarning("LoadScene Home");
 		yield return YooAssets.LoadSceneAsync("scene_home");	
 		yield return UniWindow.OpenWindowAsync<UIHomeWindow>("UIHome");
 		yield return new WaitForSeconds(0.5f);
