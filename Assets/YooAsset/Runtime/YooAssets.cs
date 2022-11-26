@@ -27,6 +27,7 @@ namespace YooAsset
 				_driver = new UnityEngine.GameObject($"[{nameof(YooAssets)}]");
 				_driver.AddComponent<YooAssetsDriver>();
 				UnityEngine.Object.DontDestroyOnLoad(_driver);
+				YooLogger.Log($"{nameof(YooAssets)} initialize !");
 
 #if DEBUG
 				// 添加远程调试脚本
@@ -55,11 +56,10 @@ namespace YooAsset
 				}
 				_packages.Clear();
 
-				if(_driver != null)
-					GameObject.Destroy(_driver);
-
 				_isInitialize = false;
-				YooLogger.Log("YooAssets destroy all !");
+				if (_driver != null)
+					GameObject.Destroy(_driver);
+				YooLogger.Log($"{nameof(YooAssets)} destroy all !");
 			}
 		}
 
