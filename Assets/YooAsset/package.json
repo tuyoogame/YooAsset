@@ -1,7 +1,7 @@
 {
     "name": "com.tuyoogame.yooasset",
     "displayName": "YooAsset",
-    "version": "1.3.6",
+    "version": "1.3.7",
     "unity": "2019.4",
     "description": "unity3d resources management system.",
     "author": {
@@ -10,9 +10,9 @@
     },
     "samples": [
         {
-            "displayName": "Basic Sample",
+            "displayName": "Space Shooter",
             "description": "YooAsset runtime sample, Include resource update, resource download, resource loading and other functions.",
-            "path": "Samples~/Basic Sample"
+            "path": "Samples~/Space Shooter"
         },
         {
             "displayName": "Extension Sample",
