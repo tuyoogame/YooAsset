@@ -48,7 +48,7 @@ namespace YooAsset
 
 				if (DependBundleGroup.IsSucceed() == false)
 				{
-					Status = EStatus.Fail;
+					Status = EStatus.Failed;
 					LastError = DependBundleGroup.GetLastError();
 					InvokeCompletion();
 					return;
@@ -56,7 +56,7 @@ namespace YooAsset
 
 				if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
 				{
-					Status = EStatus.Fail;
+					Status = EStatus.Failed;
 					LastError = OwnerBundle.LastError;
 					InvokeCompletion();
 					return;
@@ -104,8 +104,8 @@ namespace YooAsset
 					}
 				}
 
-				Status = AllAssetObjects == null ? EStatus.Fail : EStatus.Success;
-				if (Status == EStatus.Fail)
+				Status = AllAssetObjects == null ? EStatus.Failed : EStatus.Succeed;
+				if (Status == EStatus.Failed)
 				{
 					if (MainAssetInfo.AssetType == null)
 						LastError = $"Failed to load sub assets : {MainAssetInfo.AssetPath} AssetType : null AssetBundle : {OwnerBundle.MainBundleInfo.Bundle.BundleName}";

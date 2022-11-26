@@ -399,7 +399,7 @@ namespace YooAsset
 				providerInfo.SpawnTime = provider.SpawnTime;
 				providerInfo.LoadingTime = provider.LoadingTime;
 				providerInfo.RefCount = provider.RefCount;
-				providerInfo.Status = (int)provider.Status;
+				providerInfo.Status = provider.Status.ToString();
 				providerInfo.DependBundleInfos = new List<DebugBundleInfo>();
 				result.Add(providerInfo);
 

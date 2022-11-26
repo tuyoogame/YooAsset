@@ -32,9 +32,9 @@ namespace YooAsset
 			{
 				if (IsValidWithWarning == false)
 					return EOperationStatus.None;
-				if (Provider.Status == ProviderBase.EStatus.Fail)
+				if (Provider.Status == ProviderBase.EStatus.Failed)
 					return EOperationStatus.Failed;
-				else if (Provider.Status == ProviderBase.EStatus.Success)
+				else if (Provider.Status == ProviderBase.EStatus.Succeed)
 					return EOperationStatus.Succeed;
 				else
 					return EOperationStatus.None;

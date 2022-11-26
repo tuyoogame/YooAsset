@@ -29,7 +29,7 @@ namespace YooAsset
 				string guid = UnityEditor.AssetDatabase.AssetPathToGUID(MainAssetInfo.AssetPath);
 				if (string.IsNullOrEmpty(guid))
 				{
-					Status = EStatus.Fail;
+					Status = EStatus.Failed;
 					LastError = $"Not found asset : {MainAssetInfo.AssetPath}";
 					YooLogger.Error(LastError);
 					InvokeCompletion();
@@ -46,7 +46,7 @@ namespace YooAsset
 			if(Status == EStatus.Checking)
 			{
 				RawFilePath = MainAssetInfo.AssetPath;
-				Status = EStatus.Success;
+				Status = EStatus.Succeed;
 				InvokeCompletion();
 			}
 #endif

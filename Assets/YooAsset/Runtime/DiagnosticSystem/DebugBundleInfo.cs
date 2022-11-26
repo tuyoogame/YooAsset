@@ -25,7 +25,7 @@ namespace YooAsset
 		/// <summary>
 		/// 加载状态
 		/// </summary>
-		public int Status;
+		public string Status;
 
 		public int CompareTo(DebugBundleInfo other)
 		{

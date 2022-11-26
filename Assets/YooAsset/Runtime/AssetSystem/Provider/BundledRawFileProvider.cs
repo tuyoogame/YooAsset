@@ -41,7 +41,7 @@ namespace YooAsset
 
 				if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
 				{
-					Status = EStatus.Fail;
+					Status = EStatus.Failed;
 					LastError = OwnerBundle.LastError;
 					InvokeCompletion();
 					return;
@@ -53,7 +53,7 @@ namespace YooAsset
 			if (Status == EStatus.Checking)
 			{
 				RawFilePath = OwnerBundle.FileLoadPath;
-				Status = EStatus.Success;
+				Status = EStatus.Succeed;
 				InvokeCompletion();
 			}
 		}

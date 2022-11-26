@@ -40,7 +40,7 @@ namespace YooAsset
 		/// <summary>
 		/// 加载状态
 		/// </summary>
-		public int Status;
+		public string Status;
 
 		/// <summary>
 		/// 依赖的资源包列表

@@ -43,7 +43,7 @@ namespace YooAsset
 			var bundleInfo = new DebugBundleInfo();
 			bundleInfo.BundleName = OwnerBundle.MainBundleInfo.Bundle.BundleName;
 			bundleInfo.RefCount = OwnerBundle.RefCount;
-			bundleInfo.Status = (int)OwnerBundle.Status;
+			bundleInfo.Status = OwnerBundle.Status.ToString();
 			output.Add(bundleInfo);
 
 			DependBundleGroup.GetBundleDebugInfos(output);

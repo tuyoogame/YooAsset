@@ -52,7 +52,7 @@ namespace YooAsset
 
 				if (DependBundleGroup.IsSucceed() == false)
 				{
-					Status = EStatus.Fail;
+					Status = EStatus.Failed;
 					LastError = DependBundleGroup.GetLastError();
 					InvokeCompletion();
 					return;
@@ -60,7 +60,7 @@ namespace YooAsset
 
 				if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
 				{
-					Status = EStatus.Fail;
+					Status = EStatus.Failed;
 					LastError = OwnerBundle.LastError;
 					InvokeCompletion();
 					return;
@@ -83,7 +83,7 @@ namespace YooAsset
 				}
 				else
 				{
-					Status = EStatus.Fail;
+					Status = EStatus.Failed;
 					LastError = $"Failed to load scene : {_sceneName}";
 					YooLogger.Error(LastError);
 					InvokeCompletion();
@@ -98,8 +98,8 @@ namespace YooAsset
 					if (SceneObject.IsValid() && _activateOnLoad)
 						SceneManager.SetActiveScene(SceneObject);
 
-					Status = SceneObject.IsValid() ? EStatus.Success : EStatus.Fail;
-					if (Status == EStatus.Fail)
+					Status = SceneObject.IsValid() ? EStatus.Succeed : EStatus.Failed;
+					if (Status == EStatus.Failed)
 					{
 						LastError = $"The load scene is invalid : {MainAssetInfo.AssetPath}";
 						YooLogger.Error(LastError);

@@ -13,8 +13,8 @@ namespace YooAsset
 			CheckBundle,
 			Loading,
 			Checking,
-			Success,
-			Fail,
+			Succeed,
+			Failed,
 		}
 
 		/// <summary>
@@ -80,7 +80,7 @@ namespace YooAsset
 		{
 			get
 			{
-				return Status == EStatus.Success || Status == EStatus.Fail;
+				return Status == EStatus.Succeed || Status == EStatus.Failed;
 			}
 		}
 

@@ -48,7 +48,7 @@ namespace YooAsset
 
 				if (DependBundleGroup.IsSucceed() == false)
 				{
-					Status = EStatus.Fail;
+					Status = EStatus.Failed;
 					LastError = DependBundleGroup.GetLastError();
 					InvokeCompletion();
 					return;
@@ -56,7 +56,7 @@ namespace YooAsset
 
 				if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
 				{
-					Status = EStatus.Fail;
+					Status = EStatus.Failed;
 					LastError = OwnerBundle.LastError;
 					InvokeCompletion();
 					return;
@@ -66,7 +66,7 @@ namespace YooAsset
 				{
 					if (OwnerBundle.IsDestroyed)
 						throw new System.Exception("Should never get here !");
-					Status = EStatus.Fail;
+					Status = EStatus.Failed;
 					LastError = $"The bundle {OwnerBundle.MainBundleInfo.Bundle.BundleName} has been destroyed by unity bugs !";
 					YooLogger.Error(LastError);
 					InvokeCompletion();
@@ -115,8 +115,8 @@ namespace YooAsset
 					}
 				}
 
-				Status = AssetObject == null ? EStatus.Fail : EStatus.Success;
-				if (Status == EStatus.Fail)
+				Status = AssetObject == null ? EStatus.Failed : EStatus.Succeed;
+				if (Status == EStatus.Failed)
 				{
 					if (MainAssetInfo.AssetType == null)
 						LastError = $"Failed to load asset : {MainAssetInfo.AssetPath} AssetType : null AssetBundle : {OwnerBundle.MainBundleInfo.Bundle.BundleName}";

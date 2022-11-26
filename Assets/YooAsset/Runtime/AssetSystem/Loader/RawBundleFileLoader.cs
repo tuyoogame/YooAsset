@@ -16,7 +16,6 @@ namespace YooAsset
 		}
 
 		private ESteps _steps = ESteps.None;
-		private bool _isWaitForAsyncComplete = false;
 		private bool _isShowWaitForAsyncError = false;
 		private DownloaderBase _unpacker;
 		private DownloaderBase _downloader;
@@ -136,8 +135,6 @@ namespace YooAsset
 		/// </summary>
 		public override void WaitForAsyncComplete()
 		{
-			_isWaitForAsyncComplete = true;
-
 			int frame = 1000;
 			while (true)
 			{

@@ -24,7 +24,7 @@ namespace YooAsset
 		{
 			if (Status == EStatus.None)
 			{
-				Status = EStatus.Fail;
+				Status = EStatus.Failed;
 				LastError = error;
 				InvokeCompletion();
 			}
