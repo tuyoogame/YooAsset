@@ -6,6 +6,10 @@
 
 windows平台添加命令: **-force-gles**
 
+#### 问题：Unity2021编辑器运行游戏提示YooAssets is initialized !
+
+尝试关闭：Project Setting ---> Editor ---> Enter Play Mode Options
+
 #### 问题：YooAsset的DLL引用丢失导致编译报错了
 
 1. 请在PlayerSetting里修改API Level为.NET 4.x或者.NET Framework
@@ -36,7 +40,8 @@ internal class FsmClearCache : IFsmNode
     void IFsmNode.OnEnter()
     {
         Debug.Log("清理未使用的缓存文件！");
-        var operation = YooAssets.ClearUnusedCacheFiles();
+        var package = YooAssets.GetPackage("DefaultPackage");
+        var operation = package.ClearUnusedCacheFiles();
         operation.Completed += Operation_Completed;
     }
 
