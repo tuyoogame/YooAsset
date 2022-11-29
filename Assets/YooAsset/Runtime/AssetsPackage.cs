@@ -78,6 +78,9 @@ namespace YooAsset
 		/// </summary>
 		public InitializationOperation InitializeAsync(InitializeParameters parameters)
 		{
+			// 注意：WebGL平台因为网络原因可能会初始化失败！
+			ResetInitializeAfterFailed();
+
 			// 检测初始化参数合法性
 			CheckInitializeParameters(parameters);
 
@@ -126,6 +129,20 @@ namespace YooAsset
 			_isInitialize = true;
 			initializeOperation.Completed += InitializeOperation_Completed;
 			return initializeOperation;
+		}
+		private void ResetInitializeAfterFailed()
+		{
+			if(_isInitialize && _initializeStatus == EOperationStatus.Failed)
+			{
+				_isInitialize = false;
+				_initializeStatus = EOperationStatus.None;
+				_initializeError = string.Empty;
+				_bundleServices = null;
+				_assetSystemImpl = null;
+				_editorSimulateModeImpl = null;
+				_offlinePlayModeImpl = null;
+				_hostPlayModeImpl = null;
+			}
 		}
 		private void CheckInitializeParameters(InitializeParameters parameters)
 		{

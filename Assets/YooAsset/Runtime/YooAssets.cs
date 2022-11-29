@@ -107,6 +107,18 @@ namespace YooAsset
 		/// <param name="packageName">资源包名称</param>
 		public static AssetsPackage GetAssetsPackage(string packageName)
 		{
+			var package = TryGetAssetsPackage(packageName);
+			if (package == null)
+				YooLogger.Warning($"Not found assets package : {packageName}");
+			return package;
+		}
+
+		/// <summary>
+		/// 尝试获取资源包
+		/// </summary>
+		/// <param name="packageName">资源包名称</param>
+		public static AssetsPackage TryGetAssetsPackage(string packageName)
+		{
 			if (_isInitialize == false)
 				throw new Exception($"{nameof(YooAssets)} not initialize !");
 
@@ -118,8 +130,6 @@ namespace YooAsset
 				if (package.PackageName == packageName)
 					return package;
 			}
-
-			YooLogger.Warning($"Not found assets package : {packageName}");
 			return null;
 		}
 
