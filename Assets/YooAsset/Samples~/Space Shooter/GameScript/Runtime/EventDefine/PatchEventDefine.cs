@@ -3,6 +3,18 @@
 public class PatchEventDefine
 {
 	/// <summary>
+	/// 补丁包初始化失败
+	/// </summary>
+	public class InitializeFailed : IEventMessage
+	{
+		public static void SendEventMessage()
+		{
+			var msg = new InitializeFailed();
+			UniEvent.SendMessage(msg);
+		}
+	}
+
+	/// <summary>
 	/// 补丁流程步骤改变
 	/// </summary>
 	public class PatchStatesChange : IEventMessage

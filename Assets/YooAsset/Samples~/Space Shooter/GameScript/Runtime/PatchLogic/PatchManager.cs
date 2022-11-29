@@ -53,6 +53,7 @@ public class PatchManager : ModuleSingleton<PatchManager>, IModule
 			PlayMode = playMode;
 
 			// 注册监听事件
+			_eventGroup.AddListener<UserEventDefine.UserTryInitialize>(OnHandleEventMessage);
 			_eventGroup.AddListener<UserEventDefine.UserBeginDownloadWebFiles>(OnHandleEventMessage);
 			_eventGroup.AddListener<UserEventDefine.UserTryUpdatePackageVersion>(OnHandleEventMessage);
 			_eventGroup.AddListener<UserEventDefine.UserTryUpdatePatchManifest>(OnHandleEventMessage);
@@ -60,7 +61,8 @@ public class PatchManager : ModuleSingleton<PatchManager>, IModule
 
 			Debug.Log("开启补丁更新流程...");
 			_machine = new StateMachine(this);
-			_machine.AddNode<FsmPatchInit>();
+			_machine.AddNode<FsmPatchPrepare>();
+			_machine.AddNode<FsmInitialize>();
 			_machine.AddNode<FsmUpdateVersion>();
 			_machine.AddNode<FsmUpdateManifest>();
 			_machine.AddNode<FsmCreateDownloader>();
@@ -68,7 +70,7 @@ public class PatchManager : ModuleSingleton<PatchManager>, IModule
 			_machine.AddNode<FsmDownloadOver>();	
 			_machine.AddNode<FsmClearCache>();
 			_machine.AddNode<FsmPatchDone>();
-			_machine.Run<FsmPatchInit>();
+			_machine.Run<FsmPatchPrepare>();
 		}
 		else
 		{
@@ -81,7 +83,11 @@ public class PatchManager : ModuleSingleton<PatchManager>, IModule
 	/// </summary>
 	private void OnHandleEventMessage(IEventMessage message)
 	{
-		if (message is UserEventDefine.UserBeginDownloadWebFiles)
+		if (message is UserEventDefine.UserTryInitialize)
+		{
+			_machine.ChangeState<FsmInitialize>();
+		}
+		else if (message is UserEventDefine.UserBeginDownloadWebFiles)
 		{
 			_machine.ChangeState<FsmDownloadFiles>();
 		}

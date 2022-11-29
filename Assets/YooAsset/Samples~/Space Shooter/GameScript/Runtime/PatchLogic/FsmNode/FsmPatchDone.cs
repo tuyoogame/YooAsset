@@ -5,7 +5,7 @@ using UniFramework.Machine;
 using UniFramework.Module;
 
 /// <summary>
-/// 更新完毕
+/// 流程更新完毕
 /// </summary>
 internal class FsmPatchDone : IStateNode
 {

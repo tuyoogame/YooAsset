@@ -8,9 +8,9 @@ using UniFramework.Module;
 using YooAsset;
 
 /// <summary>
-/// 初始化工作
+/// 初始化资源包
 /// </summary>
-internal class FsmPatchInit : IStateNode
+internal class FsmInitialize : IStateNode
 {
 	private StateMachine _machine;
 
@@ -20,12 +20,8 @@ internal class FsmPatchInit : IStateNode
 	}
 	void IStateNode.OnEnter()
 	{
-		// 加载更新面板
-		var go = Resources.Load<GameObject>("PatchWindow");
-		GameObject.Instantiate(go);
-
-		// 初始化资源系统
-		UniModule.StartCoroutine(InitYooAsset());
+		PatchEventDefine.PatchStatesChange.SendEventMessage("初始化资源包！");
+		UniModule.StartCoroutine(InitPackage());
 	}
 	void IStateNode.OnUpdate()
 	{
@@ -34,19 +30,24 @@ internal class FsmPatchInit : IStateNode
 	{
 	}
 
-	private IEnumerator InitYooAsset()
+	private IEnumerator InitPackage()
 	{
 		var playMode = PatchManager.Instance.PlayMode;
 
-		// 创建默认的资源包	
-		var package = YooAssets.CreateAssetsPackage("DefaultPackage");
-		YooAssets.SetDefaultAssetsPackage(package);
+		// 创建默认的资源包
+		string packageName = "DefaultPackage";
+		var package = YooAssets.TryGetAssetsPackage(packageName);
+		if (package == null)
+		{
+			package = YooAssets.CreateAssetsPackage(packageName);
+			YooAssets.SetDefaultAssetsPackage(package);
+		}
 
 		// 编辑器下的模拟模式
 		if (playMode == EPlayMode.EditorSimulateMode)
 		{
 			var createParameters = new EditorSimulateModeParameters();
-			createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage");
+			createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild(packageName);
 			yield return package.InitializeAsync(createParameters);
 		}
 
@@ -69,7 +70,10 @@ internal class FsmPatchInit : IStateNode
 			yield return package.InitializeAsync(createParameters);
 		}
 
-		_machine.ChangeState<FsmUpdateVersion>();
+		if (package.InitializeStatus == EOperationStatus.Succeed)	
+			_machine.ChangeState<FsmUpdateVersion>();	
+		else	
+			PatchEventDefine.InitializeFailed.SendEventMessage();	
 	}
 
 	/// <summary>

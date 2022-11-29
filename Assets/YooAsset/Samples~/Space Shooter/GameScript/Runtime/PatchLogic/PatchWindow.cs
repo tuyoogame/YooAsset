@@ -70,6 +70,7 @@ public class PatchWindow : MonoBehaviour
 		_messageBoxObj = transform.Find("UIWindow/MessgeBox").gameObject;
 		_messageBoxObj.SetActive(false);
 
+		_eventGroup.AddListener<PatchEventDefine.InitializeFailed>(OnHandleEventMessage);
 		_eventGroup.AddListener<PatchEventDefine.PatchStatesChange>(OnHandleEventMessage);
 		_eventGroup.AddListener<PatchEventDefine.FoundUpdateFiles>(OnHandleEventMessage);
 		_eventGroup.AddListener<PatchEventDefine.DownloadProgressUpdate>(OnHandleEventMessage);
@@ -87,7 +88,15 @@ public class PatchWindow : MonoBehaviour
 	/// </summary>
 	private void OnHandleEventMessage(IEventMessage message)
 	{
-		if (message is PatchEventDefine.PatchStatesChange)
+		if (message is PatchEventDefine.InitializeFailed)
+		{
+			System.Action callback = () =>
+			{
+				UserEventDefine.UserTryInitialize.SendEventMessage();
+			};
+			ShowMessageBox($"Failed to initialize package !", callback);
+		}
+		else if (message is PatchEventDefine.PatchStatesChange)
 		{
 			var msg = message as PatchEventDefine.PatchStatesChange;
 			_tips.text = msg.Tips;
