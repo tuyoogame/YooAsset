@@ -700,7 +700,8 @@ namespace YooAsset.Editor
 				popupField1.index = GetAddressRuleIndex(collector.AddressRuleName);
 				popupField1.RegisterValueChangedCallback(evt =>
 				{
-					collector.AddressRuleName = evt.newValue;
+					var target = (PopupField<string>)evt.target;
+					collector.AddressRuleName = AssetBundleCollectorSettingData.GetAddressRuleName(target.index);
 					AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
 					if (foldout.value)
 					{
@@ -714,7 +715,8 @@ namespace YooAsset.Editor
 			popupField2.index = GetPackRuleIndex(collector.PackRuleName);
 			popupField2.RegisterValueChangedCallback(evt =>
 			{
-				collector.PackRuleName = evt.newValue;
+				var target = (PopupField<string>)evt.target;
+				collector.PackRuleName = AssetBundleCollectorSettingData.GetPackRuleName(target.index);
 				AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
 				if (foldout.value)
 				{
@@ -727,7 +729,8 @@ namespace YooAsset.Editor
 			popupField3.index = GetFilterRuleIndex(collector.FilterRuleName);
 			popupField3.RegisterValueChangedCallback(evt =>
 			{
-				collector.FilterRuleName = evt.newValue;
+				var target = (PopupField<string>)evt.target;
+				collector.FilterRuleName = AssetBundleCollectorSettingData.GetFilterRuleName(target.index);
 				AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
 				if (foldout.value)
 				{

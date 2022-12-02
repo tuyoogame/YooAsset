@@ -102,6 +102,38 @@ namespace YooAsset.Editor
 			}
 			return names;
 		}
+
+		public static string GetAddressRuleName(int index)
+		{
+			if (_setting == null)
+				LoadSettingData();
+			return GetTypesName(_cacheAddressRuleTypes, index);
+		}
+
+		public static string GetPackRuleName(int index)
+		{
+			if (_setting == null)
+				LoadSettingData();
+			return GetTypesName(_cachePackRuleTypes, index);
+		}
+
+		public static string GetFilterRuleName(int index)
+        {
+			if (_setting == null)
+				LoadSettingData();
+			return GetTypesName(_cacheFilterRuleTypes, index);
+        }
+
+		static string GetTypesName(Dictionary<string, System.Type> types, int index)
+        {
+			
+			if(index >= types.Keys.Count)
+            {
+				throw new Exception($"Invalid GetFilterRuleName Keys.Count {types.Keys.Count} : try get index {index}");
+			}
+			return types.Keys.ElementAt(index);
+		}
+
 		public static bool HasActiveRuleName(string ruleName)
 		{
 			foreach (var pair in _cacheActiveRuleTypes)
