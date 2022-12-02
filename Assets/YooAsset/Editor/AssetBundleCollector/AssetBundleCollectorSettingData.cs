@@ -38,6 +38,22 @@ namespace YooAsset.Editor
 			}
 		}
 
+		private static string GetEditorShowName(string name,Type type)
+        {
+			if (Setting != null && Setting.ShowEditorAlias)
+			{
+				var attr = YooAssetAttributes.GetAttribute<EditorShowAttribute>(type);
+				if (attr != null && !string.IsNullOrEmpty(attr.Name))
+					return attr.Name;
+				else
+					return name;
+			}
+			else
+			{
+				return name;
+			}
+		}
+
 		public static List<string> GetActiveRuleNames()
 		{
 			if (_setting == null)
@@ -47,8 +63,8 @@ namespace YooAsset.Editor
 			foreach (var pair in _cacheActiveRuleTypes)
 			{
 				names.Add(pair.Key);
-			}
-			return names;
+            }
+            return names;
 		}
 		public static List<string> GetAddressRuleNames()
 		{
@@ -58,7 +74,7 @@ namespace YooAsset.Editor
 			List<string> names = new List<string>();
 			foreach (var pair in _cacheAddressRuleTypes)
 			{
-				names.Add(pair.Key);
+				names.Add(GetEditorShowName(pair.Key, pair.Value));
 			}
 			return names;
 		}
@@ -70,7 +86,7 @@ namespace YooAsset.Editor
 			List<string> names = new List<string>();
 			foreach (var pair in _cachePackRuleTypes)
 			{
-				names.Add(pair.Key);
+				names.Add(GetEditorShowName(pair.Key, pair.Value));
 			}
 			return names;
 		}
@@ -82,10 +98,42 @@ namespace YooAsset.Editor
 			List<string> names = new List<string>();
 			foreach (var pair in _cacheFilterRuleTypes)
 			{
-				names.Add(pair.Key);
+				names.Add(GetEditorShowName(pair.Key, pair.Value));
 			}
 			return names;
 		}
+
+		public static string GetAddressRuleName(int index)
+		{
+			if (_setting == null)
+				LoadSettingData();
+			return GetTypesName(_cacheAddressRuleTypes, index);
+		}
+
+		public static string GetPackRuleName(int index)
+		{
+			if (_setting == null)
+				LoadSettingData();
+			return GetTypesName(_cachePackRuleTypes, index);
+		}
+
+		public static string GetFilterRuleName(int index)
+        {
+			if (_setting == null)
+				LoadSettingData();
+			return GetTypesName(_cacheFilterRuleTypes, index);
+        }
+
+		static string GetTypesName(Dictionary<string, System.Type> types, int index)
+        {
+			
+			if(index >= types.Keys.Count)
+            {
+				throw new Exception($"Invalid GetFilterRuleName Keys.Count {types.Keys.Count} : try get index {index}");
+			}
+			return types.Keys.ElementAt(index);
+		}
+
 		public static bool HasActiveRuleName(string ruleName)
 		{
 			foreach (var pair in _cacheActiveRuleTypes)
@@ -350,6 +398,12 @@ namespace YooAsset.Editor
 		public static void ModifyUniqueBundleName(bool uniqueBundleName)
 		{
 			Setting.UniqueBundleName = uniqueBundleName;
+			IsDirty = true;
+		}
+
+		public static void ModifyShowEditorAlias(bool showAlias)
+		{
+			Setting.ShowEditorAlias = showAlias;
 			IsDirty = true;
 		}
 

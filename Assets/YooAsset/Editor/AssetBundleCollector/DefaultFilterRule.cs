@@ -7,6 +7,7 @@ namespace YooAsset.Editor
 	/// <summary>
 	/// 收集所有资源
 	/// </summary>
+	[EditorShow("收集所有资源")]
 	public class CollectAll : IFilterRule
 	{
 		public bool IsCollectAsset(FilterRuleData data)
@@ -18,6 +19,7 @@ namespace YooAsset.Editor
 	/// <summary>
 	/// 只收集场景
 	/// </summary>
+	[EditorShow("只收集场景")]
 	public class CollectScene : IFilterRule
 	{
 		public bool IsCollectAsset(FilterRuleData data)
@@ -25,10 +27,11 @@ namespace YooAsset.Editor
 			return Path.GetExtension(data.AssetPath) == ".unity";
 		}
 	}
-	
+
 	/// <summary>
 	/// 只收集预制体
 	/// </summary>
+	[EditorShow("只收集预制体")]
 	public class CollectPrefab : IFilterRule
 	{
 		public bool IsCollectAsset(FilterRuleData data)
@@ -40,6 +43,7 @@ namespace YooAsset.Editor
 	/// <summary>
 	/// 只收集精灵类型的资源
 	/// </summary>
+	[EditorShow("只收集精灵类型的资源")]
 	public class CollectSprite : IFilterRule
 	{
 		public bool IsCollectAsset(FilterRuleData data)
@@ -63,6 +67,7 @@ namespace YooAsset.Editor
 	/// <summary>
 	/// 只收集着色器变种收集文件
 	/// </summary>
+	[EditorShow("只收集着色器变种收集文件")]
 	public class CollectShaderVariants : IFilterRule
 	{
 		public bool IsCollectAsset(FilterRuleData data)
