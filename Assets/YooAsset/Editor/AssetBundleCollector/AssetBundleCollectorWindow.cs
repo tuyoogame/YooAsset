@@ -28,6 +28,7 @@ namespace YooAsset.Editor
 		private Toggle _showPackageToogle;
 		private Toggle _enableAddressableToogle;
 		private Toggle _uniqueBundleNameToogle;
+		private Toggle _showEditorAliasToggle;
 
 		private VisualElement _packageContainer;
 		private ListView _packageListView;
@@ -57,14 +58,12 @@ namespace YooAsset.Editor
 			{
 				_collectorTypeList = new List<string>()
 				{
-					$"{nameof(ECollectorType.MainAssetCollector)}",
-					$"{nameof(ECollectorType.StaticAssetCollector)}",
-					$"{nameof(ECollectorType.DependAssetCollector)}"
-				};
-				_activeRuleList = AssetBundleCollectorSettingData.GetActiveRuleNames();
-				_addressRuleList = AssetBundleCollectorSettingData.GetAddressRuleNames();
-				_packRuleList = AssetBundleCollectorSettingData.GetPackRuleNames();
-				_filterRuleList = AssetBundleCollectorSettingData.GetFilterRuleNames();
+                    $"{nameof(ECollectorType.MainAssetCollector)}",
+                    $"{nameof(ECollectorType.StaticAssetCollector)}",
+                    $"{nameof(ECollectorType.DependAssetCollector)}"
+                };
+
+				RefreshNames();
 
 				VisualElement root = this.rootVisualElement;
 
@@ -92,6 +91,14 @@ namespace YooAsset.Editor
 				_uniqueBundleNameToogle.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleCollectorSettingData.ModifyUniqueBundleName(evt.newValue);
+					RefreshWindow();
+				});
+
+				_showEditorAliasToggle = root.Q<Toggle>("ShowEditorAlias");
+				_showEditorAliasToggle.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleCollectorSettingData.ModifyShowEditorAlias(evt.newValue);
+					RefreshNames();
 					RefreshWindow();
 				});
 
@@ -286,10 +293,21 @@ namespace YooAsset.Editor
 			}
 		}
 
+		private void RefreshNames()
+        {
+			_activeRuleList = AssetBundleCollectorSettingData.GetActiveRuleNames();
+			_addressRuleList = AssetBundleCollectorSettingData.GetAddressRuleNames();
+			_packRuleList = AssetBundleCollectorSettingData.GetPackRuleNames();
+			_filterRuleList = AssetBundleCollectorSettingData.GetFilterRuleNames();
+		}
+
 		private void RefreshWindow()
 		{
 			_showPackageToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowPackageView);
 			_enableAddressableToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.EnableAddressable);
+			_uniqueBundleNameToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.UniqueBundleName);
+			_showEditorAliasToggle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowEditorAlias);
+
 			_groupContainer.visible = false;
 			_collectorContainer.visible = false;
 
@@ -574,7 +592,7 @@ namespace YooAsset.Editor
 				var popupField = new PopupField<string>(_packRuleList, 0);
 				popupField.name = "PopupField2";
 				popupField.style.unityTextAlign = TextAnchor.MiddleLeft;
-				popupField.style.width = 150;
+				popupField.style.width = 230;
 				elementBottom.Add(popupField);
 			}
 			{
