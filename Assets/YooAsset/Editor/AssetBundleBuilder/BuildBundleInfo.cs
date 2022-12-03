@@ -182,13 +182,14 @@ namespace YooAsset.Editor
 		/// </summary>
 		internal PatchBundle CreatePatchBundle()
 		{
-			string fileHash = PatchInfo.PatchFileHash;
-			string fileCRC = PatchInfo.PatchFileCRC;
-			long fileSize = PatchInfo.PatchFileSize;
-			bool isRawFile = IsRawFile;
-			byte loadMethod = (byte)LoadMethod;
-			string[] tags = GetBundleTags();
-			PatchBundle patchBundle = new PatchBundle(BundleName, fileHash, fileCRC, fileSize, isRawFile, loadMethod, tags);
+			PatchBundle patchBundle = new PatchBundle();
+			patchBundle.BundleName = BundleName;
+			patchBundle.FileHash = PatchInfo.PatchFileHash;
+			patchBundle.FileCRC = PatchInfo.PatchFileCRC;
+			patchBundle.FileSize = PatchInfo.PatchFileSize;
+			patchBundle.IsRawFile = IsRawFile;
+			patchBundle.LoadMethod = (byte)LoadMethod;
+			patchBundle.Tags = GetBundleTags();
 			return patchBundle;
 		}
 	}

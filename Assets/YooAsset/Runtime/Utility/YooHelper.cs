@@ -128,19 +128,19 @@ namespace YooAsset
 		{
 			YooLogger.Log($"Load sandbox patch manifest file : {packageName}");
 			string filePath = GetCacheManifestFilePath(packageName);
-			string jsonData = File.ReadAllText(filePath);
-			return PatchManifest.Deserialize(jsonData);
+			byte[] bytesData = File.ReadAllBytes(filePath);
+			return PatchManifest.DeserializeFromBinary(bytesData);
 		}
 
 		/// <summary>
 		/// 存储沙盒内清单文件
 		/// </summary>
-		public static PatchManifest SaveCacheManifestFile(string packageName, string fileContent)
+		public static PatchManifest SaveCacheManifestFile(string packageName, byte[] fileBytesData)
 		{
 			YooLogger.Log($"Save sandbox patch manifest file : {packageName}");
-			var manifest = PatchManifest.Deserialize(fileContent);
+			var manifest = PatchManifest.DeserializeFromBinary(fileBytesData);
 			string savePath = GetCacheManifestFilePath(packageName);
-			FileUtility.CreateFile(savePath, fileContent);
+			FileUtility.CreateFile(savePath, fileBytesData);
 			return manifest;
 		}
 

@@ -16,13 +16,23 @@ namespace YooAsset
 		public string RawFileVariant = "rawfile";
 
 		/// <summary>
-		/// 补丁清单文件名称
+		/// 清单文件名称
 		/// </summary>
 		public string PatchManifestFileName = "PatchManifest";
 
 
 		/// <summary>
-		/// 补丁清单文件格式版本
+		/// 清单文件头标记
+		/// </summary>
+		public const uint PatchManifestFileSign = 0x594F4F;
+
+		/// <summary>
+		/// 清单文件极限大小（100MB）
+		/// </summary>
+		public const int PatchManifestFileMaxSize = 104857600;
+
+		/// <summary>
+		/// 清单文件格式版本
 		/// </summary>
 		public const string PatchManifestFileVersion = "1.3.4";
 

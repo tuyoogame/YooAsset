@@ -117,13 +117,23 @@ namespace YooAsset
 	internal static class FileUtility
 	{
 		/// <summary>
-		/// 读取文件
+		/// 读取文件的文本数据
 		/// </summary>
-		public static string ReadFile(string filePath)
+		public static string ReadAllText(string filePath)
 		{
 			if (File.Exists(filePath) == false)
 				return string.Empty;
 			return File.ReadAllText(filePath, Encoding.UTF8);
+		}
+
+		/// <summary>
+		/// 读取文件的字节数据
+		/// </summary>
+		public static byte[] ReadAllBytes(string filePath)
+		{
+			if (File.Exists(filePath) == false)
+				return null;
+			return File.ReadAllBytes(filePath);
 		}
 
 		/// <summary>

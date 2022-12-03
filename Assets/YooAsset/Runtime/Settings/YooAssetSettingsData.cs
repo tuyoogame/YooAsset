@@ -51,9 +51,17 @@ namespace YooAsset
 		/// <summary>
 		/// 获取补丁清单文件完整名称
 		/// </summary>
-		public static string GetPatchManifestFileName(string packageName, string packageVersion)
+		public static string GetPatchManifestBinaryFileName(string packageName, string packageVersion)
 		{
 			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.bytes";
+		}
+
+		/// <summary>
+		/// 获取补丁清单文件完整名称
+		/// </summary>
+		public static string GetPatchManifestJsonFileName(string packageName, string packageVersion)
+		{
+			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.json";
 		}
 
 		/// <summary>

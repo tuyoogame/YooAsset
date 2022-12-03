@@ -51,18 +51,26 @@ namespace YooAsset.Editor
 				}
 			}
 
-			// 创建补丁清单文件
+			// 创建补丁清单文本文件
+			{
+				string fileName = YooAssetSettingsData.GetPatchManifestJsonFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string filePath = $"{packageOutputDirectory}/{fileName}";
+				PatchManifest.SerializeToJson(filePath, patchManifest);
+				BuildRunner.Log($"创建补丁清单文件：{filePath}");
+			}
+
+			// 创建补丁清单二进制文件
 			string packageHash;
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
-				PatchManifest.Serialize(filePath, patchManifest);
+				PatchManifest.SerializeToBinary(filePath, patchManifest);
 				packageHash = HashUtility.FileMD5(filePath);
 				BuildRunner.Log($"创建补丁清单文件：{filePath}");
 
-				var patchManifestContext = new PatchManifestContext();
-				string jsonData = FileUtility.ReadFile(filePath);
-				patchManifestContext.Manifest = PatchManifest.Deserialize(jsonData);
+				PatchManifestContext patchManifestContext = new PatchManifestContext();
+				byte[] bytesData = FileUtility.ReadAllBytes(filePath);
+				patchManifestContext.Manifest = PatchManifest.DeserializeFromBinary(bytesData);
 				context.SetContextObject(patchManifestContext);
 			}
 

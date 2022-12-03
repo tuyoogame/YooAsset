@@ -105,7 +105,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadWebManifest)
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_packageName, _packageVersion);
+				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(_packageName, _packageVersion);
 				string webURL = GetPatchManifestRequestURL(fileName);
 				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
 				_downloader = new UnityWebDataRequester();
@@ -131,7 +131,8 @@ namespace YooAsset
 					// 解析补丁清单
 					try
 					{
-						_remotePatchManifest = PatchManifest.Deserialize(_downloader.GetText());
+						byte[] bytesData = _downloader.GetData();
+						_remotePatchManifest = PatchManifest.DeserializeFromBinary(bytesData);
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;
 					}

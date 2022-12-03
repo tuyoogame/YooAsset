@@ -45,7 +45,7 @@ namespace YooAsset.Editor
 
 			// 拷贝补丁清单文件
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestFileName(buildPackageName, buildPackageVersion);
+				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(buildPackageName, buildPackageVersion);
 				string sourcePath = $"{packageOutputDirectory}/{fileName}";
 				string destPath = $"{streamingAssetsDirectory}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);

@@ -266,47 +266,146 @@ namespace YooAsset
 
 
 		/// <summary>
-		/// 序列化
+		/// 序列化（JSON文件）
 		/// </summary>
-		public static void Serialize(string savePath, PatchManifest patchManifest)
+		public static void SerializeToJson(string savePath, PatchManifest manifest)
 		{
-			string json = JsonUtility.ToJson(patchManifest);
+			string json = JsonUtility.ToJson(manifest, true);
 			FileUtility.CreateFile(savePath, json);
 		}
 
 		/// <summary>
-		/// 反序列化
+		/// 序列化（二进制文件）
 		/// </summary>
-		public static PatchManifest Deserialize(string jsonData)
+		public static void SerializeToBinary(string savePath, PatchManifest patchManifest)
 		{
-			PatchManifest patchManifest = JsonUtility.FromJson<PatchManifest>(jsonData);
-			if (patchManifest == null)
-				throw new System.Exception($"{nameof(PatchManifest)} deserialize object is null !");
+			using (FileStream fs = new FileStream(savePath, FileMode.Create))
+			{
+				// 创建缓存器
+				BufferWriter buffer = new BufferWriter(YooAssetSettings.PatchManifestFileMaxSize);
 
-			// 检测文件版本
-			if (patchManifest.FileVersion != YooAssetSettings.PatchManifestFileVersion)
-				throw new Exception($"The manifest file version are not compatible : {patchManifest.FileVersion} != {YooAssetSettings.PatchManifestFileVersion}");
+				// 写入文件标记
+				buffer.WriteUInt32(YooAssetSettings.PatchManifestFileSign);
+
+				// 写入文件版本
+				buffer.WriteUTF8(patchManifest.FileVersion);
+
+				// 写入文件头信息
+				buffer.WriteBool(patchManifest.EnableAddressable);
+				buffer.WriteInt32(patchManifest.OutputNameStyle);
+				buffer.WriteUTF8(patchManifest.PackageName);
+				buffer.WriteUTF8(patchManifest.PackageVersion);
+
+				// 写入资源列表
+				buffer.WriteInt32(patchManifest.AssetList.Count);
+				for (int i = 0; i < patchManifest.AssetList.Count; i++)
+				{
+					var patchAsset = patchManifest.AssetList[i];
+					buffer.WriteUTF8(patchAsset.Address);
+					buffer.WriteUTF8(patchAsset.AssetPath);
+					buffer.WriteUTF8Array(patchAsset.AssetTags);
+					buffer.WriteInt32(patchAsset.BundleID);
+					buffer.WriteInt32Array(patchAsset.DependIDs);
+				}
+
+				// 写入资源包列表
+				buffer.WriteInt32(patchManifest.BundleList.Count);
+				for (int i = 0; i < patchManifest.BundleList.Count; i++)
+				{
+					var patchBundle = patchManifest.BundleList[i];
+					buffer.WriteUTF8(patchBundle.BundleName);
+					buffer.WriteUTF8(patchBundle.FileHash);
+					buffer.WriteUTF8(patchBundle.FileCRC);
+					buffer.WriteInt64(patchBundle.FileSize);
+					buffer.WriteBool(patchBundle.IsRawFile);
+					buffer.WriteByte(patchBundle.LoadMethod);
+					buffer.WriteUTF8Array(patchBundle.Tags);
+				}
+
+				// 写入文件流
+				buffer.WriteToStream(fs);
+				fs.Flush();
+			}
+		}
+
+		/// <summary>
+		/// 反序列化（二进制文件）
+		/// </summary>
+		public static PatchManifest DeserializeFromBinary(byte[] binaryData)
+		{
+			// 创建缓存器
+			BufferReader buffer = new BufferReader(binaryData);
+
+			// 读取文件标记
+			uint fileSign = buffer.ReadUInt32();
+			if (fileSign != YooAssetSettings.PatchManifestFileSign)
+				throw new Exception("Invalid manifest file !");
+
+			PatchManifest manifest = new PatchManifest();
+			{
+				// 读取文件版本
+				manifest.FileVersion = buffer.ReadUTF8();
+				if (manifest.FileVersion != YooAssetSettings.PatchManifestFileVersion)
+					throw new Exception($"The manifest file version are not compatible : {manifest.FileVersion} != {YooAssetSettings.PatchManifestFileVersion}");
+
+				// 读取文件头信息
+				manifest.EnableAddressable = buffer.ReadBool();
+				manifest.OutputNameStyle = buffer.ReadInt32();
+				manifest.PackageName = buffer.ReadUTF8();
+				manifest.PackageVersion = buffer.ReadUTF8();
+
+				// 读取资源列表
+				int patchAssetCount = buffer.ReadInt32();
+				manifest.AssetList = new List<PatchAsset>(patchAssetCount);
+				for (int i = 0; i < patchAssetCount; i++)
+				{
+					var patchAsset = new PatchAsset();
+					patchAsset.Address = buffer.ReadUTF8();
+					patchAsset.AssetPath = buffer.ReadUTF8();
+					patchAsset.AssetTags = buffer.ReadUTF8Array();
+					patchAsset.BundleID = buffer.ReadInt32();
+					patchAsset.DependIDs = buffer.ReadInt32Array();
+					manifest.AssetList.Add(patchAsset);
+				}
+
+				// 读取资源包列表
+				int patchBundleCount = buffer.ReadInt32();
+				manifest.BundleList = new List<PatchBundle>(patchBundleCount);
+				for (int i = 0; i < patchBundleCount; i++)
+				{
+					var patchBundle = new PatchBundle();
+					patchBundle.BundleName = buffer.ReadUTF8();
+					patchBundle.FileHash = buffer.ReadUTF8();
+					patchBundle.FileCRC = buffer.ReadUTF8();
+					patchBundle.FileSize = buffer.ReadInt64();
+					patchBundle.IsRawFile = buffer.ReadBool();
+					patchBundle.LoadMethod = buffer.ReadByte();
+					patchBundle.Tags = buffer.ReadUTF8Array();
+					manifest.BundleList.Add(patchBundle);
+				}
+			}
 
 			// BundleList
-			foreach (var patchBundle in patchManifest.BundleList)
+			foreach (var patchBundle in manifest.BundleList)
 			{
-				patchBundle.ParseBundle(patchManifest.PackageName, patchManifest.OutputNameStyle);
-				patchManifest.BundleDic.Add(patchBundle.BundleName, patchBundle);
+				patchBundle.ParseBundle(manifest.PackageName, manifest.OutputNameStyle);
+				manifest.BundleDic.Add(patchBundle.BundleName, patchBundle);
 			}
 
 			// AssetList
-			foreach (var patchAsset in patchManifest.AssetList)
+			foreach (var patchAsset in manifest.AssetList)
 			{
 				// 注意：我们不允许原始路径存在重名
 				string assetPath = patchAsset.AssetPath;
-				if (patchManifest.AssetDic.ContainsKey(assetPath))
+				if (manifest.AssetDic.ContainsKey(assetPath))
 					throw new Exception($"AssetPath have existed : {assetPath}");
 				else
-					patchManifest.AssetDic.Add(assetPath, patchAsset);
+					manifest.AssetDic.Add(assetPath, patchAsset);
 			}
 
-			return patchManifest;
+			return manifest;
 		}
+
 
 		/// <summary>
 		/// 生成Bundle文件的正式名称

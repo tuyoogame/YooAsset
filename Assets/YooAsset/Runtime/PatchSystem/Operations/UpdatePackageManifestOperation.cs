@@ -171,7 +171,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadWebManifest)
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_packageName, _packageVersion);
+				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(_packageName, _packageVersion);
 				string webURL = GetPatchManifestRequestURL(fileName);
 				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
 				_downloader2 = new UnityWebDataRequester();
@@ -194,8 +194,8 @@ namespace YooAsset
 				{
 					try
 					{
-						string content = _downloader2.GetText();
-						var manifest = PersistentHelper.SaveCacheManifestFile(_packageName, content);
+						byte[] bytesData = _downloader2.GetData();
+						var manifest = PersistentHelper.SaveCacheManifestFile(_packageName, bytesData);
 						_impl.SetLocalPatchManifest(manifest);
 						FoundNewManifest = true;
 						_steps = ESteps.InitVerifyingCache;

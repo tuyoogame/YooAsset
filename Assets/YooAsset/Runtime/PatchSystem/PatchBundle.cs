@@ -109,15 +109,8 @@ namespace YooAsset
 		}
 
 
-		public PatchBundle(string bundleName, string fileHash, string fileCRC, long fileSize, bool isRawFile, byte loadMethod, string[] tags)
+		public PatchBundle()
 		{
-			BundleName = bundleName;
-			FileHash = fileHash;
-			FileCRC = fileCRC;
-			FileSize = fileSize;
-			IsRawFile = isRawFile;
-			LoadMethod = loadMethod;
-			Tags = tags;
 		}
 
 		/// <summary>

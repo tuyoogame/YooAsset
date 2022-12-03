@@ -56,8 +56,8 @@ namespace YooAsset
 				try
 				{
 					YooLogger.Log($"Load simulation manifest file : {_simulatePatchManifestPath}");
-					string jsonContent = FileUtility.ReadFile(_simulatePatchManifestPath);
-					var manifest = PatchManifest.Deserialize(jsonContent);
+					byte[] bytesData = FileUtility.ReadAllBytes(_simulatePatchManifestPath);
+					var manifest = PatchManifest.DeserializeFromBinary(bytesData);
 					InitializedPackageVersion = manifest.PackageVersion;
 					_impl.SetSimulatePatchManifest(manifest);
 					_steps = ESteps.Done;
@@ -491,7 +491,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadAppManifest)
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_buildinPackageName, _buildinPackageVersion);
+				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(_buildinPackageName, _buildinPackageVersion);
 				string filePath = PathHelper.MakeStreamingLoadPath(fileName);
 				string url = PathHelper.ConvertToWWWPath(filePath);
 				_downloader = new UnityWebDataRequester();
@@ -513,7 +513,8 @@ namespace YooAsset
 					// 解析APP里的补丁清单
 					try
 					{
-						Manifest = PatchManifest.Deserialize(_downloader.GetText());
+						byte[] bytesData = _downloader.GetData();
+						Manifest = PatchManifest.DeserializeFromBinary(bytesData);
 					}
 					catch (System.Exception e)
 					{
@@ -590,7 +591,7 @@ namespace YooAsset
 			if (_steps == ESteps.CopyAppManifest)
 			{
 				string savePath = PersistentHelper.GetCacheManifestFilePath(_buildinPackageName);
-				string fileName = YooAssetSettingsData.GetPatchManifestFileName(_buildinPackageName, _buildinPackageVersion);
+				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(_buildinPackageName, _buildinPackageVersion);
 				string filePath = PathHelper.MakeStreamingLoadPath(fileName);
 				string url = PathHelper.ConvertToWWWPath(filePath);
 				_downloader = new UnityWebFileRequester();
