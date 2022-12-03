@@ -51,8 +51,8 @@ namespace YooAsset.Editor
 			string outputDirectory = Path.GetDirectoryName(patchManifestFilePath);
 
 			// 加载补丁清单
-			string jsonData = FileUtility.ReadFile(patchManifestFilePath);
-			PatchManifest patchManifest = PatchManifest.Deserialize(jsonData);
+			byte[] bytesData = FileUtility.ReadAllBytes(patchManifestFilePath);
+			PatchManifest patchManifest = PatchManifest.DeserializeFromBinary(bytesData);
 
 			// 拷贝核心文件
 			{

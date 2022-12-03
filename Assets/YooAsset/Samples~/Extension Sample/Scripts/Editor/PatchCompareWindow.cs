@@ -105,12 +105,12 @@ namespace YooAsset.Editor
 			newList.Clear();
 
 			// 加载补丁清单1
-			string jsonData1 = FileUtility.ReadFile(_patchManifestPath1);
-			PatchManifest patchManifest1 = PatchManifest.Deserialize(jsonData1);
+			byte[] bytesData1 = FileUtility.ReadAllBytes(_patchManifestPath1);
+			PatchManifest patchManifest1 = PatchManifest.DeserializeFromBinary(bytesData1);
 
 			// 加载补丁清单1
-			string jsonData2 = FileUtility.ReadFile(_patchManifestPath2);
-			PatchManifest patchManifest2 = PatchManifest.Deserialize(jsonData2);
+			byte[] bytesData2 = FileUtility.ReadAllBytes(_patchManifestPath2);
+			PatchManifest patchManifest2 = PatchManifest.DeserializeFromBinary(bytesData2);
 
 			// 拷贝文件列表
 			foreach (var patchBundle2 in patchManifest2.BundleList)
