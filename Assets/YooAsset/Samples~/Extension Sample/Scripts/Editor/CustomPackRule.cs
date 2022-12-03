@@ -5,9 +5,7 @@ using System.IO;
 using UnityEngine;
 using YooAsset.Editor;
 
-/// <summary>
-/// 按照文件名的首字母来划分资源
-/// </summary>
+[DisplayName("打包特效纹理（自定义）")]
 public class PackEffectTexture : IPackRule
 {
 	private const string PackDirectory = "Assets/Effect/Textures/";

@@ -15,6 +15,7 @@ MonoBehaviour:
   ShowPackageView: 0
   EnableAddressable: 1
   UniqueBundleName: 0
+  ShowEditorAlias: 0
   Packages:
   - PackageName: DefaultPackage
     PackageDesc: 
