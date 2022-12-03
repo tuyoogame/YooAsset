@@ -73,15 +73,15 @@ namespace YooAsset
 			{
 				provider.Destroy();
 			}
+			_providers.Clear();
+
 			foreach (var loader in _loaders)
 			{
 				loader.Destroy(true);
 			}
-
-			_providers.Clear();
 			_loaders.Clear();
-			ClearSceneHandle();
 
+			ClearSceneHandle();
 			DecryptionServices = null;
 			BundleServices = null;
 		}
@@ -298,19 +298,21 @@ namespace YooAsset
 		internal void ClearSceneHandle()
 		{
 			// 释放资源包下的所有场景
-			string packageName = BundleServices.GetPackageName();
-			List<string> removeList = new List<string>();
-			foreach (var valuePair in _sceneHandles)
+			if (BundleServices.IsServicesValid())
 			{
-				if (valuePair.Value.PackageName == packageName)
+				string packageName = BundleServices.GetPackageName();
+				List<string> removeList = new List<string>();
+				foreach (var valuePair in _sceneHandles)
 				{
-					removeList.Add(valuePair.Key);
+					if (valuePair.Value.PackageName == packageName)
+					{
+						removeList.Add(valuePair.Key);
+					}
 				}
-			}
-
-			foreach (var key in removeList)
-			{
-				_sceneHandles.Remove(key);
+				foreach (var key in removeList)
+				{
+					_sceneHandles.Remove(key);
+				}
 			}
 		}
 

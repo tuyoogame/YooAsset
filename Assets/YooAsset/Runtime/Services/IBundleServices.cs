@@ -2,7 +2,7 @@
 namespace YooAsset
 {
 	internal interface IBundleServices
-	{
+	{	
 		/// <summary>
 		/// 获取资源包信息
 		/// </summary>
@@ -42,5 +42,10 @@ namespace YooAsset
 		/// 是否包含资源文件
 		/// </summary>
 		bool IsIncludeBundleFile(string fileName);
+
+		/// <summary>
+		/// 服务接口是否有效
+		/// </summary>
+		bool IsServicesValid();
 	}
 }

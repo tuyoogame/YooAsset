@@ -428,6 +428,10 @@ namespace YooAsset
 		{
 			return LocalPatchManifest.IsIncludeBundleFile(fileName);
 		}
+		bool IBundleServices.IsServicesValid()
+		{
+			return LocalPatchManifest != null;
+		}
 		#endregion
 	}
 }

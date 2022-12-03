@@ -129,6 +129,10 @@ namespace YooAsset
 		{
 			return _appPatchManifest.IsIncludeBundleFile(fileName);
 		}
+		bool IBundleServices.IsServicesValid()
+		{
+			return _appPatchManifest != null;
+		}
 		#endregion
 	}
 }

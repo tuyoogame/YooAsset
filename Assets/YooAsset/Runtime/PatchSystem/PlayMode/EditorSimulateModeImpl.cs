@@ -78,6 +78,10 @@ namespace YooAsset
 		{
 			return _simulatePatchManifest.IsIncludeBundleFile(fileName);
 		}
+		bool IBundleServices.IsServicesValid()
+		{
+			return _simulatePatchManifest != null;
+		}
 		#endregion
 	}
 }

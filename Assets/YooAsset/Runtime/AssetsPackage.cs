@@ -132,7 +132,7 @@ namespace YooAsset
 		}
 		private void ResetInitializeAfterFailed()
 		{
-			if(_isInitialize && _initializeStatus == EOperationStatus.Failed)
+			if (_isInitialize && _initializeStatus == EOperationStatus.Failed)
 			{
 				_isInitialize = false;
 				_initializeStatus = EOperationStatus.None;
