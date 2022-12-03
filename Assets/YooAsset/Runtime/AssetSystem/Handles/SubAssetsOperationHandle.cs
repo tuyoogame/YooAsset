@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace YooAsset
 {
-	public sealed class SubAssetsOperationHandle : OperationHandleBase
+	public sealed class SubAssetsOperationHandle : OperationHandleBase, IDisposable
 	{
 		private System.Action<SubAssetsOperationHandle> _callback;
 
@@ -37,19 +38,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 子资源对象集合
-		/// </summary>
-		public UnityEngine.Object[] AllAssetObjects
-		{
-			get
-			{
-				if (IsValidWithWarning == false)
-					return null;
-				return Provider.AllAssetObjects;
-			}
-		}
-
-		/// <summary>
 		/// 等待异步执行完毕
 		/// </summary>
 		public void WaitForAsyncComplete()
@@ -67,6 +55,27 @@ namespace YooAsset
 			this.ReleaseInternal();
 		}
 
+		/// <summary>
+		/// 释放资源句柄
+		/// </summary>
+		public void Dispose()
+		{
+			this.ReleaseInternal();
+		}
+
+
+		/// <summary>
+		/// 子资源对象集合
+		/// </summary>
+		public UnityEngine.Object[] AllAssetObjects
+		{
+			get
+			{
+				if (IsValidWithWarning == false)
+					return null;
+				return Provider.AllAssetObjects;
+			}
+		}
 
 		/// <summary>
 		/// 获取子资源对象

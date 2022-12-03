@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace YooAsset
 {
-	public sealed class AssetOperationHandle : OperationHandleBase
+	public sealed class AssetOperationHandle : OperationHandleBase, IDisposable
 	{
 		private System.Action<AssetOperationHandle> _callback;
 
@@ -38,6 +39,33 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 等待异步执行完毕
+		/// </summary>
+		public void WaitForAsyncComplete()
+		{
+			if (IsValidWithWarning == false)
+				return;
+			Provider.WaitForAsyncComplete();
+		}
+
+		/// <summary>
+		/// 释放资源句柄
+		/// </summary>
+		public void Release()
+		{
+			this.ReleaseInternal();
+		}
+
+		/// <summary>
+		/// 释放资源句柄
+		/// </summary>
+		public void Dispose()
+		{
+			this.ReleaseInternal();
+		}
+
+
+		/// <summary>
 		/// 资源对象
 		/// </summary>
 		public UnityEngine.Object AssetObject
@@ -60,25 +88,6 @@ namespace YooAsset
 				return null;
 			return Provider.AssetObject as TAsset;
 		}
-
-		/// <summary>
-		/// 等待异步执行完毕
-		/// </summary>
-		public void WaitForAsyncComplete()
-		{
-			if (IsValidWithWarning == false)
-				return;
-			Provider.WaitForAsyncComplete();
-		}
-
-		/// <summary>
-		/// 释放资源句柄
-		/// </summary>
-		public void Release()
-		{
-			this.ReleaseInternal();
-		}
-
 
 		/// <summary>
 		/// 同步初始化游戏对象

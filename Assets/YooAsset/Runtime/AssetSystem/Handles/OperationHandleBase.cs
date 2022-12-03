@@ -3,20 +3,8 @@ using System.Collections;
 
 namespace YooAsset
 {
-	public abstract class OperationHandleBase : IEnumerator, IDisposable
+	public abstract class OperationHandleBase : IEnumerator
 	{
-		private bool _isDisposed;
-		public void Dispose()
-		{
-			if (_isDisposed)
-			{
-				return;
-			}
-
-			_isDisposed = true;
-			ReleaseInternal();
-		}
-		
 		private readonly AssetInfo _assetInfo;
 		internal ProviderBase Provider { private set; get; }
 
@@ -26,7 +14,6 @@ namespace YooAsset
 			_assetInfo = provider.MainAssetInfo;
 		}
 		internal abstract void InvokeCallback();
-
 
 		/// <summary>
 		/// 获取资源信息

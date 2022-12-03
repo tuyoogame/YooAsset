@@ -1,9 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 
 namespace YooAsset
 {
-	public class RawFileOperationHandle : OperationHandleBase
+	public class RawFileOperationHandle : OperationHandleBase, IDisposable
 	{
 		private System.Action<RawFileOperationHandle> _callback;
 
@@ -54,7 +55,15 @@ namespace YooAsset
 		{
 			this.ReleaseInternal();
 		}
-		
+
+		/// <summary>
+		/// 释放资源句柄
+		/// </summary>
+		public void Dispose()
+		{
+			this.ReleaseInternal();
+		}
+
 
 		/// <summary>
 		/// 获取原生文件的二进制数据
