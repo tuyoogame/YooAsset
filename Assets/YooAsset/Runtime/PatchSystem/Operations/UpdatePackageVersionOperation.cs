@@ -60,14 +60,16 @@ namespace YooAsset
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
 		private readonly int _timeout;
+		private readonly bool _appendTimeTicks;
 		private ESteps _steps = ESteps.None;
 		private UnityWebDataRequester _downloader;
 
-		internal HostPlayModeUpdatePackageVersionOperation(HostPlayModeImpl impl, string packageName, int timeout)
+		internal HostPlayModeUpdatePackageVersionOperation(HostPlayModeImpl impl, string packageName, int timeout, bool appendTimeTicks)
 		{
 			_impl = impl;
 			_packageName = packageName;
 			_timeout = timeout;
+			_appendTimeTicks = appendTimeTicks;
 		}
 		internal override void Start()
 		{
@@ -130,8 +132,11 @@ namespace YooAsset
 			else
 				url = _impl.GetPatchDownloadMainURL(fileName);
 
-			// 注意：在URL末尾添加时间戳
-			return $"{url}?{System.DateTime.UtcNow.Ticks}";
+			// 在URL末尾添加时间戳
+			if (_appendTimeTicks)
+				return $"{url}?{System.DateTime.UtcNow.Ticks}";
+			else
+				return url;
 		}
 	}
 }

@@ -44,9 +44,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步更新资源版本号
 		/// </summary>
-		public UpdatePackageVersionOperation UpdatePackageVersionAsync(string packageName, int timeout)
+		public UpdatePackageVersionOperation UpdatePackageVersionAsync(string packageName, int timeout, bool appendTimeTicks)
 		{
-			var operation = new HostPlayModeUpdatePackageVersionOperation(this, packageName, timeout);
+			var operation = new HostPlayModeUpdatePackageVersionOperation(this, packageName, timeout, appendTimeTicks);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}

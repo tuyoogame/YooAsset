@@ -202,7 +202,8 @@ namespace YooAsset
 		/// 向网络端请求最新的资源版本
 		/// </summary>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdatePackageVersionOperation UpdatePackageVersionAsync(int timeout = 60)
+		/// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
+		public UpdatePackageVersionOperation UpdatePackageVersionAsync(int timeout = 60, bool appendTimeTicks = true)
 		{
 			DebugCheckInitialize();
 			if (_playMode == EPlayMode.EditorSimulateMode)
@@ -219,7 +220,7 @@ namespace YooAsset
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				return _hostPlayModeImpl.UpdatePackageVersionAsync(PackageName, timeout);
+				return _hostPlayModeImpl.UpdatePackageVersionAsync(PackageName, timeout, appendTimeTicks);
 			}
 			else
 			{
