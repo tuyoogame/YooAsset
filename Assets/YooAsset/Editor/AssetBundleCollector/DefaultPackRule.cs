@@ -10,6 +10,7 @@ namespace YooAsset.Editor
 	/// 例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop_image_backgroud.bundle"
 	/// 例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop_view_main.bundle"
 	/// </summary>
+	[EditorShow("以文件路径作为资源包名")]
 	public class PackSeparately : IPackRule
 	{
 		string IPackRule.GetBundleName(PackRuleData data)
@@ -25,6 +26,7 @@ namespace YooAsset.Editor
 	/// 例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop_image.bundle"
 	/// 例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop_view.bundle"
 	/// </summary>
+	[EditorShow("以父类文件夹路径作为资源包名")]
 	public class PackDirectory : IPackRule
 	{
 		public static PackDirectory StaticPackRule = new PackDirectory();
@@ -43,6 +45,7 @@ namespace YooAsset.Editor
 	/// 例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop.bundle"
 	/// 例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop.bundle"
 	/// </summary>
+	[EditorShow("以收集器路径下顶级文件夹为资源包名")]
 	public class PackTopDirectory : IPackRule
 	{
 		string IPackRule.GetBundleName(PackRuleData data)
@@ -68,6 +71,7 @@ namespace YooAsset.Editor
 	/// 以收集器路径作为资源包名
 	/// 注意：收集的所有文件打进一个资源包
 	/// </summary>
+	[EditorShow("以收集器路径作为资源包名")]
 	public class PackCollector : IPackRule
 	{
 		string IPackRule.GetBundleName(PackRuleData data)
@@ -90,6 +94,7 @@ namespace YooAsset.Editor
 	/// 以分组名称作为资源包名
 	/// 注意：收集的所有文件打进一个资源包
 	/// </summary>
+	[EditorShow("以分组名称作为资源包名")]
 	public class PackGroup : IPackRule
 	{
 		string IPackRule.GetBundleName(PackRuleData data)
@@ -102,6 +107,7 @@ namespace YooAsset.Editor
 	/// 原生文件打包模式
 	/// 注意：原生文件打包支持：图片，音频，视频，文本
 	/// </summary>
+	[EditorShow("原生文件打包模式")]
 	public class PackRawFile : IPackRule
 	{
 		string IPackRule.GetBundleName(PackRuleData data)
@@ -128,6 +134,7 @@ namespace YooAsset.Editor
 	/// <summary>
 	/// 着色器变种收集文件
 	/// </summary>
+	[EditorShow("着色器变种收集文件")]
 	public class PackShaderVariants : IPackRule
 	{
 		public string GetBundleName(PackRuleData data)

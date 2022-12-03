@@ -24,6 +24,12 @@ namespace YooAsset.Editor
 		public bool UniqueBundleName = false;
 
 		/// <summary>
+		/// 是否显示编辑器别名
+		/// </summary>
+		public bool ShowEditorAlias = false;
+
+
+		/// <summary>
 		/// 包裹列表
 		/// </summary>
 		public List<AssetBundleCollectorPackage> Packages = new List<AssetBundleCollectorPackage>();

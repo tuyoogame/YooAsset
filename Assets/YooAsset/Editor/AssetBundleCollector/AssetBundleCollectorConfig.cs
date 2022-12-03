@@ -17,6 +17,7 @@ namespace YooAsset.Editor
 		public const string XmlEnableAddressable = "AutoAddressable";
 		public const string XmlUniqueBundleName = "UniqueBundleName";
 		public const string XmlShowPackageView = "ShowPackageView";
+		public const string XmlShowEditorAlias = "ShowEditorAlias";
 
 		public const string XmlPackage = "Package";
 		public const string XmlPackageName = "PackageName";
@@ -65,6 +66,7 @@ namespace YooAsset.Editor
 			bool enableAddressable = false;
 			bool uniqueBundleName = false;
 			bool showPackageView = false;
+			bool showEditorAlias = false;
 			var commonNodeList = root.GetElementsByTagName(XmlCommon);
 			if (commonNodeList.Count > 0)
 			{
@@ -79,6 +81,7 @@ namespace YooAsset.Editor
 				enableAddressable = commonElement.GetAttribute(XmlEnableAddressable) == "True" ? true : false;
 				uniqueBundleName = commonElement.GetAttribute(XmlUniqueBundleName) == "True" ? true : false;
 				showPackageView = commonElement.GetAttribute(XmlShowPackageView) == "True" ? true : false;
+				showEditorAlias = commonElement.GetAttribute(XmlShowEditorAlias) == "True" ? true : false;
 			}
 
 			// 读取包裹配置
@@ -153,6 +156,7 @@ namespace YooAsset.Editor
 			AssetBundleCollectorSettingData.Setting.EnableAddressable = enableAddressable;
 			AssetBundleCollectorSettingData.Setting.UniqueBundleName = uniqueBundleName;
 			AssetBundleCollectorSettingData.Setting.ShowPackageView = showPackageView;
+			AssetBundleCollectorSettingData.Setting.ShowEditorAlias = showEditorAlias;
 			AssetBundleCollectorSettingData.Setting.Packages.AddRange(packages);
 			AssetBundleCollectorSettingData.SaveFile();
 			Debug.Log($"导入配置完毕！");
@@ -183,6 +187,7 @@ namespace YooAsset.Editor
 			commonElement.SetAttribute(XmlEnableAddressable, AssetBundleCollectorSettingData.Setting.EnableAddressable.ToString());
 			commonElement.SetAttribute(XmlUniqueBundleName, AssetBundleCollectorSettingData.Setting.UniqueBundleName.ToString());
 			commonElement.SetAttribute(XmlShowPackageView, AssetBundleCollectorSettingData.Setting.ShowPackageView.ToString());
+			commonElement.SetAttribute(XmlShowEditorAlias, AssetBundleCollectorSettingData.Setting.ShowEditorAlias.ToString());
 			root.AppendChild(commonElement);
 
 			// 设置Package配置
