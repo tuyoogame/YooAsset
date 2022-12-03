@@ -1,9 +1,7 @@
 ﻿
 namespace YooAsset.Editor
 {
-	/// <summary>
-	/// 启用分组
-	/// </summary>
+	[DisplayName("启用分组")]
 	public class EnableGroup : IActiveRule
 	{
 		public bool IsActiveGroup()
@@ -12,9 +10,7 @@ namespace YooAsset.Editor
 		}
 	}
 
-	/// <summary>
-	/// 禁用分组
-	/// </summary>
+	[DisplayName("禁用分组")]
 	public class DisableGroup : IActiveRule
 	{
 		public bool IsActiveGroup()

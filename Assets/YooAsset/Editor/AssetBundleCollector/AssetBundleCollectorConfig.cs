@@ -10,7 +10,7 @@ namespace YooAsset.Editor
 {
 	public class AssetBundleCollectorConfig
 	{
-		public const string ConfigVersion = "2.1";
+		public const string ConfigVersion = "2.2";
 
 		public const string XmlVersion = "Version";
 		public const string XmlCommon = "Common";
@@ -77,6 +77,8 @@ namespace YooAsset.Editor
 					throw new Exception($"Not found attribute {XmlUniqueBundleName} in {XmlCommon}");
 				if (commonElement.HasAttribute(XmlShowPackageView) == false)
 					throw new Exception($"Not found attribute {XmlShowPackageView} in {XmlCommon}");
+				if (commonElement.HasAttribute(XmlShowEditorAlias) == false)
+					throw new Exception($"Not found attribute {XmlShowEditorAlias} in {XmlCommon}");
 
 				enableAddressable = commonElement.GetAttribute(XmlEnableAddressable) == "True" ? true : false;
 				uniqueBundleName = commonElement.GetAttribute(XmlUniqueBundleName) == "True" ? true : false;
@@ -298,6 +300,23 @@ namespace YooAsset.Editor
 
 				// 更新版本
 				root.SetAttribute(XmlVersion, "2.1");
+				return UpdateXmlConfig(xmlDoc);
+			}
+
+			// 2.1 -> 2.2
+			if (configVersion == "2.1")
+			{
+				// 添加公共元素属性
+				var commonNodeList = root.GetElementsByTagName(XmlCommon);
+				if (commonNodeList.Count > 0)
+				{
+					XmlElement commonElement = commonNodeList[0] as XmlElement;
+					if (commonElement.HasAttribute(XmlShowEditorAlias) == false)
+						commonElement.SetAttribute(XmlShowEditorAlias, "False");
+				}
+
+				// 更新版本
+				root.SetAttribute(XmlVersion, "2.2");
 				return UpdateXmlConfig(xmlDoc);
 			}
 

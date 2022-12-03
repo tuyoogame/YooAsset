@@ -38,140 +38,6 @@ namespace YooAsset.Editor
 			}
 		}
 
-		private static string GetEditorShowName(string name,Type type)
-        {
-			if (Setting != null && Setting.ShowEditorAlias)
-			{
-				var attr = YooAssetAttributes.GetAttribute<EditorShowAttribute>(type);
-				if (attr != null && !string.IsNullOrEmpty(attr.Name))
-					return attr.Name;
-				else
-					return name;
-			}
-			else
-			{
-				return name;
-			}
-		}
-
-		public static List<string> GetActiveRuleNames()
-		{
-			if (_setting == null)
-				LoadSettingData();
-
-			List<string> names = new List<string>();
-			foreach (var pair in _cacheActiveRuleTypes)
-			{
-				names.Add(pair.Key);
-            }
-            return names;
-		}
-		public static List<string> GetAddressRuleNames()
-		{
-			if (_setting == null)
-				LoadSettingData();
-
-			List<string> names = new List<string>();
-			foreach (var pair in _cacheAddressRuleTypes)
-			{
-				names.Add(GetEditorShowName(pair.Key, pair.Value));
-			}
-			return names;
-		}
-		public static List<string> GetPackRuleNames()
-		{
-			if (_setting == null)
-				LoadSettingData();
-
-			List<string> names = new List<string>();
-			foreach (var pair in _cachePackRuleTypes)
-			{
-				names.Add(GetEditorShowName(pair.Key, pair.Value));
-			}
-			return names;
-		}
-		public static List<string> GetFilterRuleNames()
-		{
-			if (_setting == null)
-				LoadSettingData();
-
-			List<string> names = new List<string>();
-			foreach (var pair in _cacheFilterRuleTypes)
-			{
-				names.Add(GetEditorShowName(pair.Key, pair.Value));
-			}
-			return names;
-		}
-
-		public static string GetAddressRuleName(int index)
-		{
-			if (_setting == null)
-				LoadSettingData();
-			return GetTypesName(_cacheAddressRuleTypes, index);
-		}
-
-		public static string GetPackRuleName(int index)
-		{
-			if (_setting == null)
-				LoadSettingData();
-			return GetTypesName(_cachePackRuleTypes, index);
-		}
-
-		public static string GetFilterRuleName(int index)
-        {
-			if (_setting == null)
-				LoadSettingData();
-			return GetTypesName(_cacheFilterRuleTypes, index);
-        }
-
-		static string GetTypesName(Dictionary<string, System.Type> types, int index)
-        {
-			
-			if(index >= types.Keys.Count)
-            {
-				throw new Exception($"Invalid GetFilterRuleName Keys.Count {types.Keys.Count} : try get index {index}");
-			}
-			return types.Keys.ElementAt(index);
-		}
-
-		public static bool HasActiveRuleName(string ruleName)
-		{
-			foreach (var pair in _cacheActiveRuleTypes)
-			{
-				if (pair.Key == ruleName)
-					return true;
-			}
-			return false;
-		}
-		public static bool HasAddressRuleName(string ruleName)
-		{
-			foreach (var pair in _cacheAddressRuleTypes)
-			{
-				if (pair.Key == ruleName)
-					return true;
-			}
-			return false;
-		}
-		public static bool HasPackRuleName(string ruleName)
-		{
-			foreach (var pair in _cachePackRuleTypes)
-			{
-				if (pair.Key == ruleName)
-					return true;
-			}
-			return false;
-		}
-		public static bool HasFilterRuleName(string ruleName)
-		{
-			foreach (var pair in _cacheFilterRuleTypes)
-			{
-				if (pair.Key == ruleName)
-					return true;
-			}
-			return false;
-		}
-
-
 		/// <summary>
 		/// 加载配置文件
 		/// </summary>
@@ -194,6 +60,7 @@ namespace YooAsset.Editor
 					typeof(PackCollector),
 					typeof(PackGroup),
 					typeof(PackRawFile),
+					typeof(PackShaderVariants)
 				};
 
 				var customTypes = EditorTools.GetAssignableTypes(typeof(IPackRule));
@@ -314,7 +181,92 @@ namespace YooAsset.Editor
 			SaveFile();
 		}
 
-		// 实例类相关
+		public static List<RuleDisplayName> GetActiveRuleNames()
+		{
+			if (_setting == null)
+				LoadSettingData();
+
+			List<RuleDisplayName> names = new List<RuleDisplayName>();
+			foreach (var pair in _cacheActiveRuleTypes)
+			{
+				RuleDisplayName ruleName = new RuleDisplayName();
+				ruleName.ClassName = pair.Key;
+				ruleName.DisplayName = GetRuleDisplayName(pair.Key, pair.Value);
+				names.Add(ruleName);
+			}
+			return names;
+		}
+		public static List<RuleDisplayName> GetAddressRuleNames()
+		{
+			if (_setting == null)
+				LoadSettingData();
+
+			List<RuleDisplayName> names = new List<RuleDisplayName>();
+			foreach (var pair in _cacheAddressRuleTypes)
+			{
+				RuleDisplayName ruleName = new RuleDisplayName();
+				ruleName.ClassName = pair.Key;
+				ruleName.DisplayName = GetRuleDisplayName(pair.Key, pair.Value);
+				names.Add(ruleName);
+			}
+			return names;
+		}
+		public static List<RuleDisplayName> GetPackRuleNames()
+		{
+			if (_setting == null)
+				LoadSettingData();
+
+			List<RuleDisplayName> names = new List<RuleDisplayName>();
+			foreach (var pair in _cachePackRuleTypes)
+			{
+				RuleDisplayName ruleName = new RuleDisplayName();
+				ruleName.ClassName = pair.Key;
+				ruleName.DisplayName = GetRuleDisplayName(pair.Key, pair.Value);
+				names.Add(ruleName);
+			}
+			return names;
+		}
+		public static List<RuleDisplayName> GetFilterRuleNames()
+		{
+			if (_setting == null)
+				LoadSettingData();
+
+			List<RuleDisplayName> names = new List<RuleDisplayName>();
+			foreach (var pair in _cacheFilterRuleTypes)
+			{
+				RuleDisplayName ruleName = new RuleDisplayName();
+				ruleName.ClassName = pair.Key;
+				ruleName.DisplayName = GetRuleDisplayName(pair.Key, pair.Value);
+				names.Add(ruleName);
+			}
+			return names;
+		}
+		private static string GetRuleDisplayName(string name, Type type)
+		{
+			var attribute = EditorAttribute.GetAttribute<DisplayNameAttribute>(type);
+			if (attribute != null && string.IsNullOrEmpty(attribute.DisplayName) == false)
+				return attribute.DisplayName;
+			else
+				return name;
+		}
+
+		public static bool HasActiveRuleName(string ruleName)
+		{
+			return _cacheActiveRuleTypes.Keys.Contains(ruleName);
+		}
+		public static bool HasAddressRuleName(string ruleName)
+		{
+			return _cacheAddressRuleTypes.Keys.Contains(ruleName);
+		}
+		public static bool HasPackRuleName(string ruleName)
+		{
+			return _cachePackRuleTypes.Keys.Contains(ruleName);
+		}
+		public static bool HasFilterRuleName(string ruleName)
+		{
+			return _cacheFilterRuleTypes.Keys.Contains(ruleName);
+		}
+
 		public static IActiveRule GetActiveRuleInstance(string ruleName)
 		{
 			if (_cacheActiveRuleInstance.TryGetValue(ruleName, out IActiveRule instance))
@@ -400,7 +352,6 @@ namespace YooAsset.Editor
 			Setting.UniqueBundleName = uniqueBundleName;
 			IsDirty = true;
 		}
-
 		public static void ModifyShowEditorAlias(bool showAlias)
 		{
 			Setting.ShowEditorAlias = showAlias;
