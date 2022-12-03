@@ -1,9 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 
 namespace YooAsset
 {
-	public abstract class OperationHandleBase : IEnumerator
+	public abstract class OperationHandleBase : IEnumerator, IDisposable
 	{
+		private bool _isDisposed;
+		public void Dispose()
+		{
+			if (_isDisposed)
+			{
+				return;
+			}
+
+			_isDisposed = true;
+			ReleaseInternal();
+		}
+		
 		private readonly AssetInfo _assetInfo;
 		internal ProviderBase Provider { private set; get; }
 
