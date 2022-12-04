@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
-using UnityEngine;
 
 namespace YooAsset
 {
+	/// <summary>
+	/// 数据存储以小端字节序为标准
+	/// </summary>
 	internal class BufferWriter
 	{
 		private readonly byte[] _buffer;
@@ -36,22 +38,15 @@ namespace YooAsset
 
 		public void WriteBytes(byte[] data)
 		{
-			WriteBytes(data, 0, data.Length);
-		}
-		public void WriteBytes(byte[] data, int offset, int count)
-		{
+			int count = data.Length;
 			CheckWriterIndex(count);
-			Buffer.BlockCopy(data, offset, _buffer, _index, count);
+			Buffer.BlockCopy(data, 0, _buffer, _index, count);
 			_index += count;
 		}
 		public void WriteByte(byte value)
 		{
 			CheckWriterIndex(1);
 			_buffer[_index++] = value;
-		}
-		public void WriteSbyte(sbyte value)
-		{
-			WriteByte((byte)value);
 		}
 
 		public void WriteBool(bool value)
@@ -65,10 +60,8 @@ namespace YooAsset
 		public void WriteUInt16(ushort value)
 		{
 			CheckWriterIndex(2);
-			for (int i = 0; i < 2; i++)
-			{
-				_buffer[_index++] = (byte)(value >> (i * 8));
-			}
+			_buffer[_index++] = (byte)value;
+			_buffer[_index++] = (byte)(value >> 8);
 		}
 		public void WriteInt32(int value)
 		{
@@ -77,10 +70,10 @@ namespace YooAsset
 		public void WriteUInt32(uint value)
 		{
 			CheckWriterIndex(4);
-			for (int i = 0; i < 4; i++)
-			{
-				_buffer[_index++] = (byte)(value >> (i * 8));
-			}
+			_buffer[_index++] = (byte)value;
+			_buffer[_index++] = (byte)(value >> 8);
+			_buffer[_index++] = (byte)(value >> 16);
+			_buffer[_index++] = (byte)(value >> 24);
 		}
 		public void WriteInt64(long value)
 		{
@@ -89,23 +82,14 @@ namespace YooAsset
 		public void WriteUInt64(ulong value)
 		{
 			CheckWriterIndex(8);
-			for (int i = 0; i < 8; i++)
-			{
-				_buffer[_index++] = (byte)(value >> (i * 8));
-			}
-		}
-
-		public void WriteSingle(float value)
-		{
-			FloatContent content = new FloatContent();
-			content.floatValue = value;
-			WriteUInt32(content.uintValue);
-		}
-		public void WriteDouble(double value)
-		{
-			DoubleContent content = new DoubleContent();
-			content.doubleValue = value;
-			WriteUInt64(content.ulongValue);
+			_buffer[_index++] = (byte)value;
+			_buffer[_index++] = (byte)(value >> 8);
+			_buffer[_index++] = (byte)(value >> 16);
+			_buffer[_index++] = (byte)(value >> 24);
+			_buffer[_index++] = (byte)(value >> 32);
+			_buffer[_index++] = (byte)(value >> 40);
+			_buffer[_index++] = (byte)(value >> 48);
+			_buffer[_index++] = (byte)(value >> 56);
 		}
 
 		public void WriteUTF8(string value)
@@ -163,44 +147,6 @@ namespace YooAsset
 				}
 			}
 		}
-		public void WriteSingleArray(float[] values)
-		{
-			if (values == null)
-			{
-				WriteUInt16(0);
-			}
-			else
-			{
-				int count = values.Length;
-				if (count > ushort.MaxValue)
-					throw new FormatException($"Write array length cannot be greater than {ushort.MaxValue} !");
-
-				WriteUInt16(Convert.ToUInt16(count));
-				for (int i = 0; i < count; i++)
-				{
-					WriteSingle(values[i]);
-				}
-			}
-		}
-		public void WriteDoubleArray(double[] values)
-		{
-			if (values == null)
-			{
-				WriteUInt16(0);
-			}
-			else
-			{
-				int count = values.Length;
-				if (count > ushort.MaxValue)
-					throw new FormatException($"Write array length cannot be greater than {ushort.MaxValue} !");
-
-				WriteUInt16(Convert.ToUInt16(count));
-				for (int i = 0; i < count; i++)
-				{
-					WriteDouble(values[i]);
-				}
-			}
-		}
 		public void WriteUTF8Array(string[] values)
 		{
 			if (values == null)
@@ -219,32 +165,6 @@ namespace YooAsset
 					WriteUTF8(values[i]);
 				}
 			}
-		}
-
-		public void WriteVector2(Vector2 value)
-		{
-			WriteSingle(value.x);
-			WriteSingle(value.y);
-		}
-		public void WriteVector3(Vector3 value)
-		{
-			WriteSingle(value.x);
-			WriteSingle(value.y);
-			WriteSingle(value.z);
-		}
-		public void WriteVector4(Vector4 value)
-		{
-			WriteSingle(value.x);
-			WriteSingle(value.y);
-			WriteSingle(value.z);
-			WriteSingle(value.w);
-		}
-		public void WriteQuaternion(Quaternion value)
-		{
-			WriteSingle(value.x);
-			WriteSingle(value.y);
-			WriteSingle(value.z);
-			WriteSingle(value.w);
 		}
 
 		[Conditional("DEBUG")]

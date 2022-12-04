@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using UnityEngine;
 
 namespace YooAsset
 {
@@ -38,10 +37,6 @@ namespace YooAsset
 			CheckReaderIndex(1);
 			return _buffer[_index++];
 		}
-		public sbyte ReadSbyte()
-		{
-			return (sbyte)ReadByte();
-		}
 
 		public bool ReadBool()
 		{
@@ -50,60 +45,65 @@ namespace YooAsset
 		}
 		public short ReadInt16()
 		{
-			return (short)ReadUInt16();
+			CheckReaderIndex(2);
+			if (BitConverter.IsLittleEndian)
+			{
+				short value = (short)((_buffer[_index]) | (_buffer[_index + 1] << 8));
+				_index += 2;
+				return value;
+			}
+			else
+			{
+				short value = (short)((_buffer[_index] << 8) | (_buffer[_index + 1]));
+				_index += 2;
+				return value;
+			}
 		}
 		public ushort ReadUInt16()
 		{
-			CheckReaderIndex(2);
-			ushort value = 0;
-			for (int i = 0; i < 2; i++)
-			{
-				value += (ushort)(_buffer[_index++] << (i * 8));
-			}
-			return value;
+			return (ushort)ReadInt16();
 		}
 		public int ReadInt32()
 		{
-			return (int)ReadUInt32();
+			CheckReaderIndex(4);
+			if (BitConverter.IsLittleEndian)
+			{
+				int value = (_buffer[_index]) | (_buffer[_index + 1] << 8) | (_buffer[_index + 2] << 16) | (_buffer[_index + 3] << 24);
+				_index += 4;
+				return value;
+			}
+			else
+			{
+				int value = (_buffer[_index] << 24) | (_buffer[_index + 1] << 16) | (_buffer[_index + 2] << 8) | (_buffer[_index + 3]);
+				_index += 4;
+				return value;
+			}
 		}
 		public uint ReadUInt32()
 		{
-			CheckReaderIndex(4);
-			uint value = 0;
-			for (int i = 0; i < 4; i++)
-			{
-				value += (uint)(_buffer[_index++] << (i * 8));
-			}
-			return value;
+			return (uint)ReadInt32();
 		}
 		public long ReadInt64()
 		{
-			return (long)ReadUInt64();
+			CheckReaderIndex(8);
+			if (BitConverter.IsLittleEndian)
+			{
+				int i1 = (_buffer[_index]) | (_buffer[_index + 1] << 8) | (_buffer[_index + 2] << 16) | (_buffer[_index + 3] << 24);
+				int i2 = (_buffer[_index + 4]) | (_buffer[_index + 5] << 8) | (_buffer[_index + 6] << 16) | (_buffer[_index + 7] << 24);
+				_index += 8;
+				return (uint)i1 | ((long)i2 << 32);
+			}
+			else
+			{
+				int i1 = (_buffer[_index] << 24) | (_buffer[_index + 1] << 16) | (_buffer[_index + 2] << 8) | (_buffer[_index + 3]);
+				int i2 = (_buffer[_index + 4] << 24) | (_buffer[_index + 5] << 16) | (_buffer[_index + 6] << 8) | (_buffer[_index + 7]);
+				_index += 8;
+				return (uint)i2 | ((long)i1 << 32);
+			}
 		}
 		public ulong ReadUInt64()
 		{
-			CheckReaderIndex(8);
-			ulong value = 0;
-			for (int i = 0; i < 8; i++)
-			{
-				value += (ulong)(_buffer[_index++] << (i * 8));
-			}
-			return value;
-		}
-
-		public float ReadSingle()
-		{
-			CheckReaderIndex(4);
-			FloatContent content = new FloatContent();
-			content.uintValue = ReadUInt32();
-			return content.floatValue;
-		}
-		public double ReadDouble()
-		{
-			CheckReaderIndex(8);
-			DoubleContent content = new DoubleContent();
-			content.ulongValue = ReadUInt64();
-			return content.doubleValue;
+			return (ulong)ReadInt64();
 		}
 
 		public string ReadUTF8()
@@ -137,26 +137,6 @@ namespace YooAsset
 			}
 			return values;
 		}
-		public float[] ReadFloatArray()
-		{
-			ushort count = ReadUInt16();
-			float[] values = new float[count];
-			for (int i = 0; i < count; i++)
-			{
-				values[i] = ReadSingle();
-			}
-			return values;
-		}
-		public double[] ReadDoubleArray()
-		{
-			ushort count = ReadUInt16();
-			double[] values = new double[count];
-			for (int i = 0; i < count; i++)
-			{
-				values[i] = ReadDouble();
-			}
-			return values;
-		}
 		public string[] ReadUTF8Array()
 		{
 			ushort count = ReadUInt16();
@@ -166,36 +146,6 @@ namespace YooAsset
 				values[i] = ReadUTF8();
 			}
 			return values;
-		}
-
-		public Vector2 ReadVector2()
-		{
-			float x = ReadSingle();
-			float y = ReadSingle();
-			return new Vector2(x, y);
-		}
-		public Vector3 ReadVector3()
-		{
-			float x = ReadSingle();
-			float y = ReadSingle();
-			float z = ReadSingle();
-			return new Vector3(x, y, z);
-		}
-		public Vector4 ReadVector4()
-		{
-			float x = ReadSingle();
-			float y = ReadSingle();
-			float z = ReadSingle();
-			float w = ReadSingle();
-			return new Vector4(x, y, z, w);
-		}
-		public Quaternion ReadQuaternion()
-		{
-			float x = ReadSingle();
-			float y = ReadSingle();
-			float z = ReadSingle();
-			float w = ReadSingle();
-			return new Quaternion(x, y, z, w);
 		}
 
 		[Conditional("DEBUG")]
