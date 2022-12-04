@@ -2,6 +2,19 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.0-preview] - 2022-12-04
+
+### Fixed
+
+- (#46)修复了资源包初始化失败之后，再次初始化发生异常的问题。
+- 修复了在初始化失败的之后，销毁YooAssets会报异常的问题。
+
+### Changed
+
+- 优化了资源收集界面，可以选择显示中文别名。
+- **优化了补丁清单序列化方式，由文本数据修改为二进制数据。**
+- 资源操作句柄增加using支持。
+
 ## [1.3.7] - 2022-11-26
 
 全新的太空战机Demo !
