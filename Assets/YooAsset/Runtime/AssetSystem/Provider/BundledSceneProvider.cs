@@ -84,6 +84,7 @@ namespace YooAsset
 			// 3. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
+				Progress = _asyncOp.progress;
 				if (_asyncOp.isDone)
 				{
 					if (SceneObject.IsValid() && _activateOnLoad)
@@ -98,12 +99,6 @@ namespace YooAsset
 					InvokeCompletion();
 				}
 			}
-		}
-		public override float GetLoadProgress()
-		{
-			if (_asyncOp == null)
-				return 0;
-			return _asyncOp.progress;
 		}
 	}
 }

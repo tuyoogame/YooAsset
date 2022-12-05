@@ -89,6 +89,8 @@ namespace YooAsset
 			// 2. 检测服务器下载结果
 			if (_steps == ESteps.CheckDownload)
 			{
+				DownloadProgress = _downloader.DownloadProgress;
+				DownloadedBytes = _downloader.DownloadedBytes;
 				if (_downloader.IsDone() == false)
 					return;
 
@@ -116,6 +118,8 @@ namespace YooAsset
 			// 4.检测内置文件解压结果
 			if (_steps == ESteps.CheckUnpack)
 			{
+				DownloadProgress = _unpacker.DownloadProgress;
+				DownloadedBytes = _unpacker.DownloadedBytes;
 				if (_unpacker.IsDone() == false)
 					return;
 
@@ -145,6 +149,10 @@ namespace YooAsset
 					return;
 				}
 #endif
+
+				// 设置下载进度
+				DownloadProgress = 1f;
+				DownloadedBytes = (ulong)MainBundleInfo.Bundle.FileSize;
 
 				// Load assetBundle file
 				var loadMethod = (EBundleLoadMethod)MainBundleInfo.Bundle.LoadMethod;
@@ -305,37 +313,6 @@ namespace YooAsset
 				// 完成后退出
 				if (IsDone())
 					break;
-			}
-		}
-
-		/// <summary>
-		/// 获取下载报告
-		/// </summary>
-		public override DownloadReport GetDownloadReport()
-		{
-			if (_downloader != null)
-			{
-				DownloadReport report = new DownloadReport();
-				report.Progress = _downloader.DownloadProgress;
-				report.TotalSize = MainBundleInfo.Bundle.FileSize;
-				report.DownloadedBytes = (long)_downloader.DownloadedBytes;
-				return report;
-			}
-			else if(_unpacker != null)
-			{
-				DownloadReport report = new DownloadReport();
-				report.Progress = _unpacker.DownloadProgress;
-				report.TotalSize = MainBundleInfo.Bundle.FileSize;
-				report.DownloadedBytes = (long)_unpacker.DownloadedBytes;
-				return report;
-			}
-			else
-			{
-				DownloadReport report = new DownloadReport();
-				report.Progress = 1f;
-				report.TotalSize = MainBundleInfo.Bundle.FileSize;
-				report.DownloadedBytes = MainBundleInfo.Bundle.FileSize;
-				return report;
 			}
 		}
 	}

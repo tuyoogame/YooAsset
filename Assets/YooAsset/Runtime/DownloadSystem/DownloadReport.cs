@@ -11,17 +11,17 @@ namespace YooAsset
 		/// <summary>
 		/// 需要下载的总字节数
 		/// </summary>
-		public long TotalSize;
+		public ulong TotalSize;
 
 		/// <summary>
 		/// 已经下载的字节数
 		/// </summary>
-		public long DownloadedBytes;
+		public ulong DownloadedBytes;
 
 		public static DownloadReport CreateDefaultReport()
 		{
 			DownloadReport report = new DownloadReport();
-			report.Progress = 1f;
+			report.Progress = 0f;
 			report.TotalSize = 0;
 			report.DownloadedBytes = 0;
 			return report;

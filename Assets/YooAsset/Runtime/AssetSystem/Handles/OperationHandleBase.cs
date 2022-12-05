@@ -75,7 +75,7 @@ namespace YooAsset
 			{
 				if (IsValidWithWarning == false)
 					return 0;
-				return Provider.GetLoadProgress();
+				return Provider.Progress;
 			}
 		}
 

@@ -40,12 +40,13 @@ namespace YooAsset
 		/// </summary>
 		public override DownloadReport GetDownloadReport()
 		{
-			DownloadReport result = OwnerBundle.GetDownloadReport();
-			foreach (var bundleLoader in DependBundleGroup.DependBundles)
+			DownloadReport result = new DownloadReport();
+			result.TotalSize = (ulong)OwnerBundle.MainBundleInfo.Bundle.FileSize;
+			result.DownloadedBytes = OwnerBundle.DownloadedBytes;
+			foreach (var dependBundle in DependBundleGroup.DependBundles)
 			{
-				var report = bundleLoader.GetDownloadReport();
-				result.TotalSize += report.TotalSize;
-				result.DownloadedBytes += report.DownloadedBytes;
+				result.TotalSize += (ulong)dependBundle.MainBundleInfo.Bundle.FileSize;
+				result.DownloadedBytes += dependBundle.DownloadedBytes;
 			}
 			result.Progress = result.DownloadedBytes / result.TotalSize;
 			return result;

@@ -64,6 +64,11 @@ namespace YooAsset
 		public string LastError { protected set; get; } = string.Empty;
 
 		/// <summary>
+		/// 加载进度
+		/// </summary>
+		public float Progress { protected set; get; } = 0f;
+
+		/// <summary>
 		/// 引用计数
 		/// </summary>
 		public int RefCount { private set; get; } = 0;
@@ -107,17 +112,6 @@ namespace YooAsset
 		public virtual void Destroy()
 		{
 			IsDestroyed = true;
-		}
-
-		/// <summary>
-		/// 获取加载进度
-		/// </summary>
-		public virtual float GetLoadProgress()
-		{
-			if (IsDone)
-				return 1f;
-			else
-				return 0;
 		}
 
 		/// <summary>
@@ -227,6 +221,9 @@ namespace YooAsset
 		private TaskCompletionSource<object> _taskCompletionSource;
 		protected void InvokeCompletion()
 		{
+			// 进度百分百完成
+			Progress = 1f;
+
 			// 注意：创建临时列表是为了防止外部逻辑在回调函数内创建或者释放资源句柄。
 			List<OperationHandleBase> tempers = new List<OperationHandleBase>(_handles);
 			foreach (var hande in tempers)

@@ -79,6 +79,7 @@ namespace YooAsset
 			// 3. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
+				Progress = _cacheRequest.progress;
 				if (_cacheRequest != null)
 				{
 					if (IsWaitForAsyncComplete)
@@ -106,12 +107,6 @@ namespace YooAsset
 				}
 				InvokeCompletion();
 			}
-		}
-		public override float GetLoadProgress()
-		{
-			if (_cacheRequest == null)
-				return 0;
-			return _cacheRequest.progress;
 		}
 	}
 }

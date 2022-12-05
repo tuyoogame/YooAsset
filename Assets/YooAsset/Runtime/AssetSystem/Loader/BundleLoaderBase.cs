@@ -47,6 +47,8 @@ namespace YooAsset
 		private readonly List<ProviderBase> _providers = new List<ProviderBase>(100);
 		internal AssetBundle CacheBundle { set; get; }
 		internal string FileLoadPath { set; get; }
+		internal float DownloadProgress { set; get; }
+		internal ulong DownloadedBytes { set; get; }
 
 
 		public BundleLoaderBase(AssetSystemImpl impl, BundleInfo bundleInfo)
@@ -164,10 +166,5 @@ namespace YooAsset
 		/// 主线程等待异步操作完毕
 		/// </summary>
 		public abstract void WaitForAsyncComplete();
-
-		/// <summary>
-		/// 获取下载报告
-		/// </summary>
-		public abstract DownloadReport GetDownloadReport();
 	}
 }

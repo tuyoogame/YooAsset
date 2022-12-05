@@ -76,6 +76,8 @@ namespace YooAsset
 			// 2. 检测服务器下载结果
 			if (_steps == ESteps.CheckDownload)
 			{
+				DownloadProgress = _downloader.DownloadProgress;
+				DownloadedBytes = _downloader.DownloadedBytes;
 				if (_downloader.IsDone() == false)
 					return;
 
@@ -105,6 +107,10 @@ namespace YooAsset
 					return;
 				}
 #endif
+
+				// 设置下载进度
+				DownloadProgress = 1f;
+				DownloadedBytes = (ulong)MainBundleInfo.Bundle.FileSize;
 
 				// Load assetBundle file
 				var loadMethod = (EBundleLoadMethod)MainBundleInfo.Bundle.LoadMethod;
@@ -171,6 +177,8 @@ namespace YooAsset
 			// 6. 检测AssetBundle加载结果
 			if (_steps == ESteps.CheckLoadWebFile)
 			{
+				DownloadProgress = _webRequest.downloadProgress;
+				DownloadedBytes = _webRequest.downloadedBytes;
 				if (_webRequest.isDone == false)
 					return;
 
@@ -224,37 +232,6 @@ namespace YooAsset
 			{
 				_isShowWaitForAsyncError = true;
 				YooLogger.Error($"WebGL platform not support {nameof(WaitForAsyncComplete)} ! Use the async load method instead of the sync load method !");
-			}
-		}
-
-		/// <summary>
-		/// 获取下载报告
-		/// </summary>
-		public override DownloadReport GetDownloadReport()
-		{
-			if (_downloader != null)
-			{
-				DownloadReport report = new DownloadReport();
-				report.Progress = _downloader.DownloadProgress;
-				report.TotalSize = MainBundleInfo.Bundle.FileSize;
-				report.DownloadedBytes = (long)_downloader.DownloadedBytes;
-				return report;
-			}
-			else if (_webRequest != null)
-			{
-				DownloadReport report = new DownloadReport();
-				report.Progress = _webRequest.downloadProgress;
-				report.TotalSize = MainBundleInfo.Bundle.FileSize;
-				report.DownloadedBytes = (long)_webRequest.downloadedBytes;
-				return report;
-			}
-			else
-			{
-				DownloadReport report = new DownloadReport();
-				report.Progress = 1f;
-				report.TotalSize = MainBundleInfo.Bundle.FileSize;
-				report.DownloadedBytes = MainBundleInfo.Bundle.FileSize;
-				return report;
 			}
 		}
 	}
