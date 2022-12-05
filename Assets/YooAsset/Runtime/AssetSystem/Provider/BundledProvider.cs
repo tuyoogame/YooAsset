@@ -36,6 +36,22 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取下载报告
+		/// </summary>
+		public override DownloadReport GetDownloadReport()
+		{
+			DownloadReport result = OwnerBundle.GetDownloadReport();
+			foreach (var bundleLoader in DependBundleGroup.DependBundles)
+			{
+				var report = bundleLoader.GetDownloadReport();
+				result.TotalSize += report.TotalSize;
+				result.DownloadedBytes += report.DownloadedBytes;
+			}
+			result.Progress = result.DownloadedBytes / result.TotalSize;
+			return result;
+		}
+
+		/// <summary>
 		/// 获取资源包的调试信息列表
 		/// </summary>
 		internal void GetBundleDebugInfos(List<DebugBundleInfo> output)

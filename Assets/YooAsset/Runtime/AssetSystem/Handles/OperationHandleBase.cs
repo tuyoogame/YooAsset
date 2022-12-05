@@ -24,6 +24,18 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取下载报告
+		/// </summary>
+		public DownloadReport GetDownloadReport()
+		{
+			if (IsValidWithWarning == false)
+			{
+				return DownloadReport.CreateDefaultReport();
+			}
+			return Provider.GetDownloadReport();
+		}
+
+		/// <summary>
 		/// 当前状态
 		/// </summary>
 		public EOperationStatus Status
@@ -63,7 +75,7 @@ namespace YooAsset
 			{
 				if (IsValidWithWarning == false)
 					return 0;
-				return Provider.Progress;
+				return Provider.GetLoadProgress();
 			}
 		}
 

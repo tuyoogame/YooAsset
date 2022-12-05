@@ -9,15 +9,6 @@ namespace YooAsset
 		private readonly bool _activateOnLoad;
 		private readonly int _priority;
 		private AsyncOperation _asyncOp;
-		public override float Progress
-		{
-			get
-			{
-				if (_asyncOp == null)
-					return 0;
-				return _asyncOp.progress;
-			}
-		}
 
 		public DatabaseSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool activateOnLoad, int priority) : base(impl, providerGUID, assetInfo)
 		{
@@ -76,6 +67,12 @@ namespace YooAsset
 				}
 			}
 #endif
+		}
+		public override float GetLoadProgress()
+		{
+			if (_asyncOp == null)
+				return 0;
+			return _asyncOp.progress;
 		}
 	}
 }

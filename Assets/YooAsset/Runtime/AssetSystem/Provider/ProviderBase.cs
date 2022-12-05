@@ -84,17 +84,6 @@ namespace YooAsset
 			}
 		}
 
-		/// <summary>
-		/// 加载进度
-		/// </summary>
-		public virtual float Progress
-		{
-			get
-			{
-				return 0;
-			}
-		}
-
 
 		protected bool IsWaitForAsyncComplete { private set; get; } = false;
 		private readonly List<OperationHandleBase> _handles = new List<OperationHandleBase>();
@@ -118,6 +107,25 @@ namespace YooAsset
 		public virtual void Destroy()
 		{
 			IsDestroyed = true;
+		}
+
+		/// <summary>
+		/// 获取加载进度
+		/// </summary>
+		public virtual float GetLoadProgress()
+		{
+			if (IsDone)
+				return 1f;
+			else
+				return 0;
+		}
+
+		/// <summary>
+		/// 获取下载进度
+		/// </summary>
+		public virtual DownloadReport GetDownloadReport()
+		{
+			return DownloadReport.CreateDefaultReport();
 		}
 
 		/// <summary>

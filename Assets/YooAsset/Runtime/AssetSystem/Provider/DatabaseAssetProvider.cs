@@ -6,17 +6,6 @@ namespace YooAsset
 {
 	internal sealed class DatabaseAssetProvider : ProviderBase
 	{
-		public override float Progress
-		{
-			get
-			{
-				if (IsDone)
-					return 1f;
-				else
-					return 0;
-			}
-		}
-
 		public DatabaseAssetProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo) : base(impl, providerGUID, assetInfo)
 		{
 		}

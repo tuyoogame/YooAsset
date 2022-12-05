@@ -7,15 +7,6 @@ namespace YooAsset
 	internal sealed class BundledSubAssetsProvider : BundledProvider
 	{
 		private AssetBundleRequest _cacheRequest;
-		public override float Progress
-		{
-			get
-			{
-				if (_cacheRequest == null)
-					return 0;
-				return _cacheRequest.progress;
-			}
-		}
 
 		public BundledSubAssetsProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo) : base(impl, providerGUID, assetInfo)
 		{
@@ -115,6 +106,12 @@ namespace YooAsset
 				}
 				InvokeCompletion();
 			}
+		}
+		public override float GetLoadProgress()
+		{
+			if (_cacheRequest == null)
+				return 0;
+			return _cacheRequest.progress;
 		}
 	}
 }

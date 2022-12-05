@@ -307,5 +307,36 @@ namespace YooAsset
 					break;
 			}
 		}
+
+		/// <summary>
+		/// 获取下载报告
+		/// </summary>
+		public override DownloadReport GetDownloadReport()
+		{
+			if (_downloader != null)
+			{
+				DownloadReport report = new DownloadReport();
+				report.Progress = _downloader.DownloadProgress;
+				report.TotalSize = MainBundleInfo.Bundle.FileSize;
+				report.DownloadedBytes = (long)_downloader.DownloadedBytes;
+				return report;
+			}
+			else if(_unpacker != null)
+			{
+				DownloadReport report = new DownloadReport();
+				report.Progress = _unpacker.DownloadProgress;
+				report.TotalSize = MainBundleInfo.Bundle.FileSize;
+				report.DownloadedBytes = (long)_unpacker.DownloadedBytes;
+				return report;
+			}
+			else
+			{
+				DownloadReport report = new DownloadReport();
+				report.Progress = 1f;
+				report.TotalSize = MainBundleInfo.Bundle.FileSize;
+				report.DownloadedBytes = MainBundleInfo.Bundle.FileSize;
+				return report;
+			}
+		}
 	}
 }

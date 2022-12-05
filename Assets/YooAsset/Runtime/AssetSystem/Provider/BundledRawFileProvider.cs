@@ -3,17 +3,6 @@ namespace YooAsset
 {
 	internal class BundledRawFileProvider : BundledProvider
 	{
-		public override float Progress
-		{
-			get
-			{
-				if (IsDone)
-					return 1f;
-				else
-					return 0;
-			}
-		}
-
 		public BundledRawFileProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo) : base(impl, providerGUID, assetInfo)
 		{
 		}

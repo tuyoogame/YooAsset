@@ -18,7 +18,7 @@ namespace YooAsset
 		/// 所属资源系统
 		/// </summary>
 		public AssetSystemImpl Impl { private set; get; }
-		
+
 		/// <summary>
 		/// 资源包文件信息
 		/// </summary>
@@ -47,7 +47,7 @@ namespace YooAsset
 		private readonly List<ProviderBase> _providers = new List<ProviderBase>(100);
 		internal AssetBundle CacheBundle { set; get; }
 		internal string FileLoadPath { set; get; }
-		
+
 
 		public BundleLoaderBase(AssetSystemImpl impl, BundleInfo bundleInfo)
 		{
@@ -80,34 +80,6 @@ namespace YooAsset
 		public void Release()
 		{
 			RefCount--;
-		}
-
-		/// <summary>
-		/// 轮询更新
-		/// </summary>
-		public abstract void Update();
-
-		/// <summary>
-		/// 销毁
-		/// </summary>
-		public virtual void Destroy(bool forceDestroy)
-		{
-			IsDestroyed = true;
-
-			// Check fatal
-			if (forceDestroy == false)
-			{
-				if (RefCount > 0)
-					throw new Exception($"Bundle file loader ref is not zero : {MainBundleInfo.Bundle.BundleName}");
-				if (IsDone() == false)
-					throw new Exception($"Bundle file loader is not done : {MainBundleInfo.Bundle.BundleName}");
-			}
-
-			if (CacheBundle != null)
-			{
-				CacheBundle.Unload(true);
-				CacheBundle = null;
-			}
 		}
 
 		/// <summary>
@@ -159,9 +131,43 @@ namespace YooAsset
 			_providers.Clear();
 		}
 
+
+		/// <summary>
+		/// 轮询更新
+		/// </summary>
+		public abstract void Update();
+
+		/// <summary>
+		/// 销毁
+		/// </summary>
+		public virtual void Destroy(bool forceDestroy)
+		{
+			IsDestroyed = true;
+
+			// Check fatal
+			if (forceDestroy == false)
+			{
+				if (RefCount > 0)
+					throw new Exception($"Bundle file loader ref is not zero : {MainBundleInfo.Bundle.BundleName}");
+				if (IsDone() == false)
+					throw new Exception($"Bundle file loader is not done : {MainBundleInfo.Bundle.BundleName}");
+			}
+
+			if (CacheBundle != null)
+			{
+				CacheBundle.Unload(true);
+				CacheBundle = null;
+			}
+		}
+
 		/// <summary>
 		/// 主线程等待异步操作完毕
 		/// </summary>
 		public abstract void WaitForAsyncComplete();
+
+		/// <summary>
+		/// 获取下载报告
+		/// </summary>
+		public abstract DownloadReport GetDownloadReport();
 	}
 }

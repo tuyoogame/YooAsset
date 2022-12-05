@@ -9,12 +9,12 @@ namespace YooAsset
 		/// <summary>
 		/// 依赖的资源包加载器列表
 		/// </summary>
-		private readonly List<BundleLoaderBase> _dependBundles;
+		internal readonly List<BundleLoaderBase> DependBundles;
 
 
 		public DependAssetBundleGroup(List<BundleLoaderBase> dpendBundles)
 		{
-			_dependBundles = dpendBundles;
+			DependBundles = dpendBundles;
 		}
 
 		/// <summary>
@@ -22,7 +22,7 @@ namespace YooAsset
 		/// </summary>
 		public bool IsDone()
 		{
-			foreach (var loader in _dependBundles)
+			foreach (var loader in DependBundles)
 			{
 				if (loader.IsDone() == false)
 					return false;
@@ -35,7 +35,7 @@ namespace YooAsset
 		/// </summary>
 		public bool IsSucceed()
 		{
-			foreach (var loader in _dependBundles)
+			foreach (var loader in DependBundles)
 			{
 				if (loader.Status != BundleLoaderBase.EStatus.Succeed)
 				{
@@ -50,7 +50,7 @@ namespace YooAsset
 		/// </summary>
 		public string GetLastError()
 		{
-			foreach (var loader in _dependBundles)
+			foreach (var loader in DependBundles)
 			{
 				if (loader.Status != BundleLoaderBase.EStatus.Succeed)
 				{
@@ -65,7 +65,7 @@ namespace YooAsset
 		/// </summary>
 		public void WaitForAsyncComplete()
 		{
-			foreach (var loader in _dependBundles)
+			foreach (var loader in DependBundles)
 			{
 				if (loader.IsDone() == false)
 					loader.WaitForAsyncComplete();
@@ -77,7 +77,7 @@ namespace YooAsset
 		/// </summary>
 		public void Reference()
 		{
-			foreach (var loader in _dependBundles)
+			foreach (var loader in DependBundles)
 			{
 				loader.Reference();
 			}
@@ -88,7 +88,7 @@ namespace YooAsset
 		/// </summary>
 		public void Release()
 		{
-			foreach (var loader in _dependBundles)
+			foreach (var loader in DependBundles)
 			{
 				loader.Release();
 			}
@@ -99,7 +99,7 @@ namespace YooAsset
 		/// </summary>
 		internal void GetBundleDebugInfos(List<DebugBundleInfo> output)
 		{
-			foreach (var loader in _dependBundles)
+			foreach (var loader in DependBundles)
 			{
 				var bundleInfo = new DebugBundleInfo();
 				bundleInfo.BundleName = loader.MainBundleInfo.Bundle.BundleName;

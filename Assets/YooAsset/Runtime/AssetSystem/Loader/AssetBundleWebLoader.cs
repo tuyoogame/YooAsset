@@ -226,5 +226,36 @@ namespace YooAsset
 				YooLogger.Error($"WebGL platform not support {nameof(WaitForAsyncComplete)} ! Use the async load method instead of the sync load method !");
 			}
 		}
+
+		/// <summary>
+		/// 获取下载报告
+		/// </summary>
+		public override DownloadReport GetDownloadReport()
+		{
+			if (_downloader != null)
+			{
+				DownloadReport report = new DownloadReport();
+				report.Progress = _downloader.DownloadProgress;
+				report.TotalSize = MainBundleInfo.Bundle.FileSize;
+				report.DownloadedBytes = (long)_downloader.DownloadedBytes;
+				return report;
+			}
+			else if (_webRequest != null)
+			{
+				DownloadReport report = new DownloadReport();
+				report.Progress = _webRequest.downloadProgress;
+				report.TotalSize = MainBundleInfo.Bundle.FileSize;
+				report.DownloadedBytes = (long)_webRequest.downloadedBytes;
+				return report;
+			}
+			else
+			{
+				DownloadReport report = new DownloadReport();
+				report.Progress = 1f;
+				report.TotalSize = MainBundleInfo.Bundle.FileSize;
+				report.DownloadedBytes = MainBundleInfo.Bundle.FileSize;
+				return report;
+			}
+		}
 	}
 }
