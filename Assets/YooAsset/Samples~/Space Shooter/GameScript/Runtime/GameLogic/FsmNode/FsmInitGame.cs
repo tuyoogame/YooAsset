@@ -4,6 +4,7 @@ using UnityEngine;
 using UniFramework.Pooling;
 using UniFramework.Window;
 using UniFramework.Machine;
+using UniFramework.Module;
 using YooAsset;
 
 internal class FsmInitGame : IStateNode
@@ -16,7 +17,19 @@ internal class FsmInitGame : IStateNode
 	}
 	void IStateNode.OnEnter()
 	{
-		var handle = YooAssets.LoadAssetSync<GameObject>("UICanvas");
+		UniModule.StartCoroutine(Prepare());
+	}
+	void IStateNode.OnUpdate()
+	{
+	}
+	void IStateNode.OnExit()
+	{
+	}
+
+	private IEnumerator Prepare()
+	{
+		var handle = YooAssets.LoadAssetAsync<GameObject>("UICanvas");
+		yield return handle;
 		var canvas = handle.InstantiateSync();
 		var desktop = canvas.transform.Find("Desktop").gameObject;
 		GameObject.DontDestroyOnLoad(canvas);
@@ -28,11 +41,5 @@ internal class FsmInitGame : IStateNode
 		UniPooling.Initalize();
 
 		_machine.ChangeState<FsmSceneHome>();
-	}
-	void IStateNode.OnUpdate()
-	{
-	}
-	void IStateNode.OnExit()
-	{
 	}
 }
