@@ -297,8 +297,8 @@ namespace YooAsset.Editor
 		}
 		private List<string> GetAssetTags(AssetBundleCollectorGroup group)
 		{
-			List<string> tags = StringUtility.StringToStringList(group.AssetTags, ';');
-			List<string> temper = StringUtility.StringToStringList(AssetTags, ';');
+			List<string> tags = EditorTools.StringToStringList(group.AssetTags, ';');
+			List<string> temper = EditorTools.StringToStringList(AssetTags, ';');
 			tags.AddRange(temper);
 			return tags;
 		}

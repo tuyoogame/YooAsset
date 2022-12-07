@@ -694,7 +694,7 @@ namespace YooAsset.Editor
 			popupField0.index = GetCollectorTypeIndex(collector.CollectorType.ToString());
 			popupField0.RegisterValueChangedCallback(evt =>
 			{
-				collector.CollectorType = StringUtility.NameToEnum<ECollectorType>(evt.newValue);
+				collector.CollectorType = EditorTools.NameToEnum<ECollectorType>(evt.newValue);
 				AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
 				if (foldout.value)
 				{

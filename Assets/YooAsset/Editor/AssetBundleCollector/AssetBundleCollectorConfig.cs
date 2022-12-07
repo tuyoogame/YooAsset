@@ -143,7 +143,7 @@ namespace YooAsset.Editor
 						AssetBundleCollector collector = new AssetBundleCollector();
 						collector.CollectPath = collectorElement.GetAttribute(XmlCollectPath);
 						collector.CollectorGUID = collectorElement.GetAttribute(XmlCollectorGUID);
-						collector.CollectorType = StringUtility.NameToEnum<ECollectorType>(collectorElement.GetAttribute(XmlCollectorType));
+						collector.CollectorType = EditorTools.NameToEnum<ECollectorType>(collectorElement.GetAttribute(XmlCollectorType));
 						collector.AddressRuleName = collectorElement.GetAttribute(XmlAddressRule);
 						collector.PackRuleName = collectorElement.GetAttribute(XmlPackRule);
 						collector.FilterRuleName = collectorElement.GetAttribute(XmlFilterRule);

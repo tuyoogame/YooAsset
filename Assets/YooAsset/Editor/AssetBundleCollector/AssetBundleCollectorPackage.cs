@@ -102,7 +102,7 @@ namespace YooAsset.Editor
 			HashSet<string> result = new HashSet<string>();
 			foreach (var group in Groups)
 			{
-				List<string> groupTags = StringUtility.StringToStringList(group.AssetTags, ';');
+				List<string> groupTags = EditorTools.StringToStringList(group.AssetTags, ';');
 				foreach (var tag in groupTags)
 				{
 					if (result.Contains(tag) == false)
@@ -111,7 +111,7 @@ namespace YooAsset.Editor
 
 				foreach (var collector in group.Collectors)
 				{
-					List<string> collectorTags = StringUtility.StringToStringList(collector.AssetTags, ';');
+					List<string> collectorTags = EditorTools.StringToStringList(collector.AssetTags, ';');
 					foreach (var tag in collectorTags)
 					{
 						if (result.Contains(tag) == false)
