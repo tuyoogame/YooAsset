@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -407,10 +408,13 @@ namespace YooAsset
 		}
 
 
+		[ThreadStatic]
+		private static StringBuilder _cacheBuilder = new StringBuilder(1024);
+
 		/// <summary>
 		/// 生成Bundle文件的正式名称
 		/// </summary>
-		public static string CreateBundleFileName(int nameStype, string bundleName, string fileHash)
+		public static string CreateBundleFileName(int nameStype, string bundleName, string fileHash, bool isRawFile)
 		{
 			if (nameStype == 1)
 			{
@@ -418,24 +422,26 @@ namespace YooAsset
 			}
 			else if (nameStype == 2)
 			{
-				string tempFileExtension = System.IO.Path.GetExtension(bundleName);
-				return $"{fileHash}{tempFileExtension}";
-			}
-			else if (nameStype == 3)
-			{
-				string tempFileExtension = System.IO.Path.GetExtension(bundleName);
-				string tempBundleName = bundleName.Replace('/', '_').Replace(tempFileExtension, "");
-				return $"{tempBundleName}_{fileHash}";
+				_cacheBuilder.Clear();
+				_cacheBuilder.Append(fileHash);
+				_cacheBuilder.Append(".");
+				if (isRawFile)
+					_cacheBuilder.Append(YooAssetSettingsData.Setting.RawFileVariant);
+				else
+					_cacheBuilder.Append(YooAssetSettingsData.Setting.AssetBundleFileVariant);
+				return _cacheBuilder.ToString();
 			}
 			else if (nameStype == 4)
 			{
-				string tempFileExtension = System.IO.Path.GetExtension(bundleName);
-				string tempBundleName = bundleName.Replace('/', '_').Replace(tempFileExtension, "");
-				return $"{tempBundleName}_{fileHash}{tempFileExtension}";
+				_cacheBuilder.Clear();
+				_cacheBuilder.Append(fileHash);
+				_cacheBuilder.Append("_");
+				_cacheBuilder.Append(bundleName);
+				return _cacheBuilder.ToString();
 			}
 			else
 			{
-				throw new NotImplementedException();
+				throw new NotImplementedException($"Invalid nameStype {nameStype}");
 			}
 		}
 	}
