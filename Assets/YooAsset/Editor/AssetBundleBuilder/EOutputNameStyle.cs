@@ -17,13 +17,8 @@ namespace YooAsset.Editor
 		HashName_Extension = 2,
 
 		/// <summary>
-		/// bundle_name_000000000000000f000000000000000
+		/// 000000000000000f000000000000000_bundle_name.bundle
 		/// </summary>
-		BundleName_HashName = 3,
-
-		/// <summary>
-		/// bundle_name_000000000000000f000000000000000.bundle
-		/// </summary>
-		BundleName_HashName_Extension = 4,
+		HashName_BundleName_Extension = 4,
 	}
 }

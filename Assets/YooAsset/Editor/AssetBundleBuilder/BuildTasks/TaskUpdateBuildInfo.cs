@@ -48,7 +48,7 @@ namespace YooAsset.Editor
 			// 4.更新补丁包输出的文件路径
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
-				string patchFileName = PatchManifest.CreateBundleFileName(outputNameStyle, bundleInfo.BundleName, bundleInfo.PatchInfo.PatchFileHash);
+				string patchFileName = PatchManifest.CreateBundleFileName(outputNameStyle, bundleInfo.BundleName, bundleInfo.PatchInfo.PatchFileHash, bundleInfo.IsRawFile);
 				bundleInfo.PatchInfo.PatchOutputFilePath = $"{packageOutputDirectory}/{patchFileName}";
 			}
 		}
