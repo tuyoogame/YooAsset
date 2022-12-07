@@ -55,37 +55,6 @@ namespace YooAsset
 			return _cacheBuilder.ToString();
 		}
 
-		public static List<string> StringToStringList(string str, char separator)
-		{
-			List<string> result = new List<string>();
-			if (!String.IsNullOrEmpty(str))
-			{
-				string[] splits = str.Split(separator);
-				foreach (string split in splits)
-				{
-					string value = split.Trim(); //移除首尾空格
-					if (!String.IsNullOrEmpty(value))
-					{
-						result.Add(value);
-					}
-				}
-			}
-			return result;
-		}
-		public static bool StringToBool(string str)
-		{
-			int value = (int)Convert.ChangeType(str, typeof(int));
-			return value > 0;
-		}
-		public static T NameToEnum<T>(string name)
-		{
-			if (Enum.IsDefined(typeof(T), name) == false)
-			{
-				throw new ArgumentException($"Enum {typeof(T)} is not defined name {name}");
-			}
-			return (T)Enum.Parse(typeof(T), name);
-		}
-
 		public static string RemoveFirstChar(string str)
 		{
 			if (string.IsNullOrEmpty(str))

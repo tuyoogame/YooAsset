@@ -8,29 +8,19 @@ namespace YooAsset
 	/// </summary>
 	internal static class PathHelper
 	{
-		/// <summary>
-		/// 获取规范化的路径
-		/// </summary>
-		public static string GetRegularPath(string path)
-		{
-			return path.Replace('\\', '/').Replace("\\", "/"); //替换为Linux路径格式
-		}
-
-		/// <summary>
-		/// 获取文件所在的目录路径（Linux格式）
-		/// </summary>
-		public static string GetDirectory(string filePath)
-		{
-			string directory = Path.GetDirectoryName(filePath);
-			return GetRegularPath(directory);
-		}
+		private static string _buildinPath;
+		private static string _sandboxPath;
 
 		/// <summary>
 		/// 获取基于流文件夹的加载路径
 		/// </summary>
 		public static string MakeStreamingLoadPath(string path)
 		{
-			return StringUtility.Format("{0}/{1}/{2}", UnityEngine.Application.streamingAssetsPath, YooAssetSettings.StreamingAssetsBuildinFolder, path);
+			if (string.IsNullOrEmpty(_buildinPath))
+			{
+				_buildinPath = StringUtility.Format("{0}/{1}", UnityEngine.Application.streamingAssetsPath, YooAssetSettings.StreamingAssetsBuildinFolder);
+			}
+			return StringUtility.Format("{0}/{1}", _buildinPath, path);
 		}
 
 		/// <summary>
@@ -38,22 +28,35 @@ namespace YooAsset
 		/// </summary>
 		public static string MakePersistentLoadPath(string path)
 		{
-			string root = MakePersistentRootPath();
+			string root = GetPersistentRootPath();
 			return StringUtility.Format("{0}/{1}", root, path);
 		}
 
 		/// <summary>
 		/// 获取沙盒文件夹路径
 		/// </summary>
-		public static string MakePersistentRootPath()
+		public static string GetPersistentRootPath()
 		{
 #if UNITY_EDITOR
 			// 注意：为了方便调试查看，编辑器下把存储目录放到项目里
-			string projectPath = GetDirectory(UnityEngine.Application.dataPath);
-			return StringUtility.Format("{0}/Sandbox", projectPath);
+			if (string.IsNullOrEmpty(_sandboxPath))
+			{
+				string directory = Path.GetDirectoryName(UnityEngine.Application.dataPath);
+				string projectPath = GetRegularPath(directory);
+				_sandboxPath = StringUtility.Format("{0}/Sandbox", projectPath);
+			}
+			return _sandboxPath;
 #else
-			return StringUtility.Format("{0}/Sandbox", UnityEngine.Application.persistentDataPath);
+			if (string.IsNullOrEmpty(_sandboxPath))
+			{
+				_sandboxPath = StringUtility.Format("{0}/Sandbox", UnityEngine.Application.persistentDataPath);
+			}
+			return _sandboxPath;
 #endif
+		}
+		private static string GetRegularPath(string path)
+		{
+			return path.Replace('\\', '/').Replace("\\", "/"); //替换为Linux路径格式
 		}
 
 		/// <summary>

@@ -220,7 +220,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetSandboxRoot()
 		{
-			return PathHelper.MakePersistentRootPath();
+			return PathHelper.GetPersistentRootPath();
 		}
 
 		/// <summary>

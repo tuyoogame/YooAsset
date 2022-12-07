@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -407,10 +406,6 @@ namespace YooAsset
 			return manifest;
 		}
 
-
-		[ThreadStatic]
-		private static StringBuilder _cacheBuilder = new StringBuilder(1024);
-
 		/// <summary>
 		/// 生成Bundle文件的正式名称
 		/// </summary>
@@ -422,22 +417,12 @@ namespace YooAsset
 			}
 			else if (nameStype == 2)
 			{
-				_cacheBuilder.Clear();
-				_cacheBuilder.Append(fileHash);
-				_cacheBuilder.Append(".");
-				if (isRawFile)
-					_cacheBuilder.Append(YooAssetSettingsData.Setting.RawFileVariant);
-				else
-					_cacheBuilder.Append(YooAssetSettingsData.Setting.AssetBundleFileVariant);
-				return _cacheBuilder.ToString();
+				string fileExtension = isRawFile ? YooAssetSettingsData.Setting.RawFileVariant : YooAssetSettingsData.Setting.AssetBundleFileVariant;
+				return StringUtility.Format("{0}.{1}", fileHash, fileExtension);
 			}
 			else if (nameStype == 4)
 			{
-				_cacheBuilder.Clear();
-				_cacheBuilder.Append(fileHash);
-				_cacheBuilder.Append("_");
-				_cacheBuilder.Append(bundleName);
-				return _cacheBuilder.ToString();
+				return StringUtility.Format("{0}_{1}", fileHash, bundleName);
 			}
 			else
 			{
