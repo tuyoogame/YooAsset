@@ -48,13 +48,11 @@
 
   输出的资源包文件名称样式
 
-  (1) HashName：哈希值
+  HashName：哈希值
 
-  (2) HashName_Extension：哈希值+后缀名
+  HashName_Extension：哈希值+后缀名
 
-  (3) BundleName_HashName：资源包名+哈希值
-
-  (4) BundleName_HashName_Extension：资源包名+哈希值+后缀名
+  HashName_BundleName_Extension：资源包名+哈希值+后缀名
 
  - **Copy Buildin File Option**
 
