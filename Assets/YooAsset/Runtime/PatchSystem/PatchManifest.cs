@@ -52,19 +52,19 @@ namespace YooAsset
 		/// 资源包集合（提供BundleName获取PatchBundle）
 		/// </summary>
 		[NonSerialized]
-		public readonly Dictionary<string, PatchBundle> BundleDic = new Dictionary<string, PatchBundle>();
+		public Dictionary<string, PatchBundle> BundleDic;
 
 		/// <summary>
 		/// 资源映射集合（提供AssetPath获取PatchAsset）
 		/// </summary>
 		[NonSerialized]
-		public readonly Dictionary<string, PatchAsset> AssetDic = new Dictionary<string, PatchAsset>();
+		public Dictionary<string, PatchAsset> AssetDic;
 
 		/// <summary>
 		/// 资源路径映射集合
 		/// </summary>
 		[NonSerialized]
-		public readonly Dictionary<string, string> AssetPathMapping = new Dictionary<string, string>();
+		public Dictionary<string, string> AssetPathMapping;
 
 		// 资源路径映射相关
 		private bool _isInitAssetPathMapping = false;
@@ -85,6 +85,7 @@ namespace YooAsset
 				if (locationToLower)
 					YooLogger.Error("Addressable not support location to lower !");
 
+				AssetPathMapping = new Dictionary<string, string>(AssetList.Count);
 				foreach (var patchAsset in AssetList)
 				{
 					string location = patchAsset.Address;
@@ -97,6 +98,7 @@ namespace YooAsset
 			else
 			{
 				_locationToLower = locationToLower;
+				AssetPathMapping = new Dictionary<string, string>(AssetList.Count * 2);
 				foreach (var patchAsset in AssetList)
 				{
 					string location = patchAsset.AssetPath;
@@ -385,14 +387,16 @@ namespace YooAsset
 				}
 			}
 
-			// BundleList
+			// BundleDic
+			manifest.BundleDic = new Dictionary<string, PatchBundle>(manifest.BundleList.Count);
 			foreach (var patchBundle in manifest.BundleList)
 			{
 				patchBundle.ParseBundle(manifest.PackageName, manifest.OutputNameStyle);
 				manifest.BundleDic.Add(patchBundle.BundleName, patchBundle);
 			}
 
-			// AssetList
+			// AssetDic
+			manifest.AssetDic = new Dictionary<string, PatchAsset>(manifest.AssetList.Count);
 			foreach (var patchAsset in manifest.AssetList)
 			{
 				// 注意：我们不允许原始路径存在重名
