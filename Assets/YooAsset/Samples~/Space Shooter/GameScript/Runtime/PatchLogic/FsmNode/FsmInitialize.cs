@@ -32,6 +32,8 @@ internal class FsmInitialize : IStateNode
 
 	private IEnumerator InitPackage()
 	{
+		yield return new WaitForSeconds(1f);
+
 		var playMode = PatchManager.Instance.PlayMode;
 
 		// 创建默认的资源包
@@ -44,11 +46,12 @@ internal class FsmInitialize : IStateNode
 		}
 
 		// 编辑器下的模拟模式
+		InitializationOperation initializationOperation = null;
 		if (playMode == EPlayMode.EditorSimulateMode)
 		{
 			var createParameters = new EditorSimulateModeParameters();
 			createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild(packageName);
-			yield return package.InitializeAsync(createParameters);
+			initializationOperation = package.InitializeAsync(createParameters);
 		}
 
 		// 单机运行模式
@@ -56,7 +59,7 @@ internal class FsmInitialize : IStateNode
 		{
 			var createParameters = new OfflinePlayModeParameters();
 			createParameters.DecryptionServices = new GameDecryptionServices();
-			yield return package.InitializeAsync(createParameters);
+			initializationOperation = package.InitializeAsync(createParameters);
 		}
 
 		// 联机运行模式
@@ -67,13 +70,19 @@ internal class FsmInitialize : IStateNode
 			createParameters.QueryServices = new GameQueryServices();
 			createParameters.DefaultHostServer = GetHostServerURL();
 			createParameters.FallbackHostServer = GetHostServerURL();
-			yield return package.InitializeAsync(createParameters);
+			initializationOperation = package.InitializeAsync(createParameters);
 		}
 
-		if (package.InitializeStatus == EOperationStatus.Succeed)	
-			_machine.ChangeState<FsmUpdateVersion>();	
-		else	
-			PatchEventDefine.InitializeFailed.SendEventMessage();	
+		yield return initializationOperation;
+		if (package.InitializeStatus == EOperationStatus.Succeed)
+		{
+			_machine.ChangeState<FsmUpdateVersion>();
+		}
+		else
+		{
+			Debug.LogWarning($"{initializationOperation.Error}");
+			PatchEventDefine.InitializeFailed.SendEventMessage();
+		}
 	}
 
 	/// <summary>
