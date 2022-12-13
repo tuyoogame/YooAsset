@@ -190,6 +190,7 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
+			CheckAppFootPrint,
 			TryLoadCacheManifest,
 			QueryAppPackageVersion,
 			CopyAppManifest,
@@ -222,12 +223,27 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.TryLoadCacheManifest;
+			_steps = ESteps.CheckAppFootPrint;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
+
+			if (_steps == ESteps.CheckAppFootPrint)
+			{
+				var appFootPrint = new AppFootPrint();
+				appFootPrint.Load();
+
+				// 如果水印发生变化，则说明覆盖安装后首次打开游戏
+				if (appFootPrint.IsDirty())
+				{
+					PersistentHelper.DeleteManifestFolder();
+					appFootPrint.Coverage();
+					YooLogger.Log("Delete manifest files when application foot print dirty !");
+				}
+				_steps = ESteps.TryLoadCacheManifest;
+			}
 
 			if (_steps == ESteps.TryLoadCacheManifest)
 			{
@@ -340,6 +356,57 @@ namespace YooAsset
 		}
 	}
 
+
+	/// <summary>
+	/// 应用程序水印
+	/// </summary>
+	internal class AppFootPrint
+	{
+		private string _footPrint;
+
+		/// <summary>
+		/// 读取应用程序水印
+		/// </summary>
+		public void Load()
+		{
+			string footPrintFilePath = PersistentHelper.GetAppFootPrintFilePath();
+			if (File.Exists(footPrintFilePath))
+			{
+				_footPrint = FileUtility.ReadAllText(footPrintFilePath);
+			}
+			else
+			{
+				Coverage();
+			}
+		}
+
+		/// <summary>
+		/// 检测水印是否发生变化
+		/// </summary>
+		public bool IsDirty()
+		{
+#if UNITY_EDITOR
+			return _footPrint != Application.version;
+#else
+			return _footPrint != Application.buildGUID;
+#endif
+		}
+
+		/// <summary>
+		/// 覆盖掉水印
+		/// </summary>
+		public void Coverage()
+		{
+#if UNITY_EDITOR
+			_footPrint = Application.version;
+#else
+			_footPrint = Application.buildGUID;
+#endif
+			string footPrintFilePath = PersistentHelper.GetAppFootPrintFilePath();
+			FileUtility.CreateFile(footPrintFilePath, _footPrint);
+			YooLogger.Log($"Save application foot print : {_footPrint}");
+		}
+	}
 
 	/// <summary>
 	/// 内置补丁清单版本查询器

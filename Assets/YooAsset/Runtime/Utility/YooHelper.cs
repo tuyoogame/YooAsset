@@ -84,6 +84,8 @@ namespace YooAsset
 	internal static class PersistentHelper
 	{
 		private const string CacheFolderName = "CacheFiles";
+		private const string ManifestFolderName = "ManifestFiles";
+		private const string AppFootPrintFileName = "ApplicationFootPrint.bytes";
 
 		/// <summary>
 		/// 删除沙盒总目录
@@ -106,12 +108,30 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 删除沙盒内的清单文件夹
+		/// </summary>
+		public static void DeleteManifestFolder()
+		{
+			string root = PathHelper.MakePersistentLoadPath(ManifestFolderName);
+			if (Directory.Exists(root))
+				Directory.Delete(root, true);
+		}
+
+		/// <summary>
 		/// 获取缓存文件夹路径
 		/// </summary>
 		public static string GetCacheFolderPath(string packageName)
 		{
 			string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
 			return $"{root}/{packageName}";
+		}
+
+		/// <summary>
+		/// 获取应用程序的水印文件路径
+		/// </summary>
+		public static string GetAppFootPrintFilePath()
+		{
+			return PathHelper.MakePersistentLoadPath(AppFootPrintFileName);
 		}
 
 		#region 沙盒内清单相关
@@ -121,7 +141,7 @@ namespace YooAsset
 		public static string GetCacheManifestFilePath(string packageName)
 		{
 			string fileName = YooAssetSettingsData.GetPatchManifestFileNameWithoutVersion(packageName);
-			return PathHelper.MakePersistentLoadPath(fileName);
+			return PathHelper.MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
 		}
 
 		/// <summary>
