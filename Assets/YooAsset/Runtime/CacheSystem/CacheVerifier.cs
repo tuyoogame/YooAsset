@@ -161,7 +161,7 @@ namespace YooAsset
 
 		private void VerifyFileWithoutThread(VerifyInfo verifyIno)
 		{
-			var verifyResult = CacheSystem.VerifyAndCacheBundle(verifyIno.VerifyBundle, CacheSystem.InitVerifyLevel);
+			var verifyResult = CacheSystem.VerifyAndCacheLocalBundleFile(verifyIno.VerifyBundle, CacheSystem.InitVerifyLevel);
 			if (verifyResult == EVerifyResult.Succeed)
 			{
 				VerifySuccessList.Add(verifyIno);
