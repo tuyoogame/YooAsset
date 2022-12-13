@@ -79,7 +79,6 @@ namespace YooAsset
 			// 3. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
-				Progress = _cacheRequest.progress;
 				if (_cacheRequest != null)
 				{
 					if (IsWaitForAsyncComplete)
@@ -90,6 +89,7 @@ namespace YooAsset
 					}
 					else
 					{
+						Progress = _cacheRequest.progress;
 						if (_cacheRequest.isDone == false)
 							return;
 						AllAssetObjects = _cacheRequest.allAssets;
