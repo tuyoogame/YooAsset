@@ -98,9 +98,12 @@ namespace Cysharp.Threading.Tasks
                     case SubAssetsOperationHandle sub_asset_handle:
                         sub_asset_handle.Completed += result.SubContinuation;
                         break;
+                    case RawFileOperationHandle raw_file_handle:
+                        raw_file_handle.Completed += result.RawFileContinuation;
+                        break;
                 }
 #else
-                switch(handle)
+                switch (handle)
                 {
                     case AssetOperationHandle asset_handle:
                         asset_handle.Completed += result.continuationAction;
@@ -110,6 +113,9 @@ namespace Cysharp.Threading.Tasks
                         break;
                     case SubAssetsOperationHandle sub_asset_handle:
                         sub_asset_handle.Completed += result.continuationAction;
+                        break;
+                    case RawFileOperationHandle raw_file_handle:
+                        raw_file_handle.Completed += result.continuationAction;
                         break;
                 }
 #endif
@@ -133,6 +139,12 @@ namespace Cysharp.Threading.Tasks
             private void SubContinuation(SubAssetsOperationHandle handle)
             {
                 handle.Completed -= SubContinuation;
+                BaseContinuation();
+            }
+
+            private void RawFileContinuation(RawFileOperationHandle handle)
+            {
+                handle.Completed -= RawFileContinuation;
                 BaseContinuation();
             }
 #endif
@@ -169,6 +181,9 @@ namespace Cysharp.Threading.Tasks
                         break;
                     case SubAssetsOperationHandle sub_asset_handle:
                         sub_asset_handle.Completed -= continuationAction;
+                        break;
+                    case RawFileOperationHandle raw_file_handle:
+                        raw_file_handle.Completed -= continuationAction;
                         break;
                 }
 
