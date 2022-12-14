@@ -59,8 +59,8 @@ namespace YooAsset
 			LoadCacheManifest,
 			LoadWebManifest,
 			CheckWebManifest,
-			InitVerifyingCache,
-			UpdateVerifyingCache,
+			StartVerifyOperation,
+			CheckVerifyOperation,
 			Done,
 		}
 
@@ -68,10 +68,10 @@ namespace YooAsset
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
 		private readonly string _packageVersion;
-		private readonly CacheVerifier _cacheVerifier;
 		private readonly int _timeout;
 		private UnityWebDataRequester _downloader1;
 		private UnityWebDataRequester _downloader2;
+		private CacheFilesVerifyOperation _verifyOperation;
 
 		private string _cacheManifestHash;
 		private ESteps _steps = ESteps.None;
@@ -83,12 +83,6 @@ namespace YooAsset
 			_packageName = packageName;
 			_packageVersion = packageVersion;
 			_timeout = timeout;
-
-#if UNITY_WEBGL
-			_cacheVerifier = new CacheVerifierWithoutThread();
-#else
-			_cacheVerifier = new CacheVerifierWithThread();
-#endif
 		}
 		internal override void Start()
 		{
@@ -158,7 +152,7 @@ namespace YooAsset
 				{
 					var manifest = PersistentHelper.LoadCacheManifestFile(_packageName);
 					_impl.SetLocalPatchManifest(manifest);
-					_steps = ESteps.InitVerifyingCache;
+					_steps = ESteps.StartVerifyOperation;
 				}
 				catch (System.Exception e)
 				{
@@ -198,7 +192,7 @@ namespace YooAsset
 						var manifest = PersistentHelper.SaveCacheManifestFile(_packageName, bytesData);
 						_impl.SetLocalPatchManifest(manifest);
 						FoundNewManifest = true;
-						_steps = ESteps.InitVerifyingCache;
+						_steps = ESteps.StartVerifyOperation;
 					}
 					catch (Exception e)
 					{
@@ -210,23 +204,28 @@ namespace YooAsset
 				_downloader2.Dispose();
 			}
 
-			if (_steps == ESteps.InitVerifyingCache)
+			if (_steps == ESteps.StartVerifyOperation)
 			{
-				var verifyInfos = _impl.GetVerifyInfoList(false);
-				_cacheVerifier.InitVerifier(verifyInfos);
+#if UNITY_WEBGL
+				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
+#else
+				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
+#endif
+
+				OperationSystem.StartOperation(_verifyOperation);
 				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
-				_steps = ESteps.UpdateVerifyingCache;
+				_steps = ESteps.CheckVerifyOperation;
 			}
 
-			if (_steps == ESteps.UpdateVerifyingCache)
+			if (_steps == ESteps.CheckVerifyOperation)
 			{
-				Progress = _cacheVerifier.GetVerifierProgress();
-				if (_cacheVerifier.UpdateVerifier())
+				Progress = _verifyOperation.Progress;
+				if (_verifyOperation.IsDone)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
 					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
-					YooLogger.Log($"Verify result : Success {_cacheVerifier.VerifySuccessList.Count}, Fail {_cacheVerifier.VerifyFailList.Count}, Elapsed time {costTime} seconds");
+					YooLogger.Log($"Verify result : Success {_verifyOperation.VerifySuccessList.Count}, Fail {_verifyOperation.VerifyFailList.Count}, Elapsed time {costTime} seconds");
 				}
 			}
 		}

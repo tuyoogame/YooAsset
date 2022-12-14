@@ -7,7 +7,7 @@ namespace YooAsset
 {
 	internal class OfflinePlayModeImpl : IBundleServices
 	{
-		private PatchManifest _appPatchManifest;
+		public PatchManifest AppPatchManifest { private set; get; }
 		private bool _locationToLower;
 
 		/// <summary>
@@ -26,37 +26,15 @@ namespace YooAsset
 		/// </summary>
 		public string GetPackageVersion()
 		{
-			if (_appPatchManifest == null)
+			if (AppPatchManifest == null)
 				return string.Empty;
-			return _appPatchManifest.PackageVersion;
+			return AppPatchManifest.PackageVersion;
 		}
 
-		internal List<VerifyInfo> GetVerifyInfoList()
-		{
-			List<VerifyInfo> result = new List<VerifyInfo>(_appPatchManifest.BundleList.Count);
-
-			// 遍历所有文件然后验证并缓存合法文件
-			foreach (var patchBundle in _appPatchManifest.BundleList)
-			{
-				// 忽略缓存文件
-				if (CacheSystem.IsCached(patchBundle))
-					continue;
-
-				string filePath = patchBundle.CachedFilePath;
-				if (File.Exists(filePath))
-				{
-					bool isBuildinFile = true;
-					VerifyInfo verifyInfo = new VerifyInfo(isBuildinFile, patchBundle);
-					result.Add(verifyInfo);
-				}
-			}
-
-			return result;
-		}
 		internal void SetAppPatchManifest(PatchManifest patchManifest)
 		{
-			_appPatchManifest = patchManifest;
-			_appPatchManifest.InitAssetPathMapping(_locationToLower);
+			AppPatchManifest = patchManifest;
+			AppPatchManifest.InitAssetPathMapping(_locationToLower);
 		}
 
 		#region IBundleServices接口
@@ -84,7 +62,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 注意：如果补丁清单里未找到资源包会抛出异常！
-			var patchBundle = _appPatchManifest.GetMainPatchBundle(assetInfo.AssetPath);
+			var patchBundle = AppPatchManifest.GetMainPatchBundle(assetInfo.AssetPath);
 			return CreateBundleInfo(patchBundle);
 		}
 		BundleInfo[] IBundleServices.GetAllDependBundleInfos(AssetInfo assetInfo)
@@ -93,7 +71,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 注意：如果补丁清单里未找到资源包会抛出异常！
-			var depends = _appPatchManifest.GetAllDependencies(assetInfo.AssetPath);
+			var depends = AppPatchManifest.GetAllDependencies(assetInfo.AssetPath);
 			List<BundleInfo> result = new List<BundleInfo>(depends.Length);
 			foreach (var patchBundle in depends)
 			{
@@ -104,34 +82,34 @@ namespace YooAsset
 		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
-			return _appPatchManifest.GetAssetsInfoByTags(tags);
+			return AppPatchManifest.GetAssetsInfoByTags(tags);
 		}
 		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
 		{
-			if (_appPatchManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
+			if (AppPatchManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
 				return patchAsset;
 			else
 				return null;
 		}
 		string IBundleServices.MappingToAssetPath(string location)
 		{
-			return _appPatchManifest.MappingToAssetPath(location);
+			return AppPatchManifest.MappingToAssetPath(location);
 		}
 		string IBundleServices.TryMappingToAssetPath(string location)
 		{
-			return _appPatchManifest.TryMappingToAssetPath(location);
+			return AppPatchManifest.TryMappingToAssetPath(location);
 		}
 		string IBundleServices.GetPackageName()
 		{
-			return _appPatchManifest.PackageName;
+			return AppPatchManifest.PackageName;
 		}
 		bool IBundleServices.IsIncludeBundleFile(string fileName)
 		{
-			return _appPatchManifest.IsIncludeBundleFile(fileName);
+			return AppPatchManifest.IsIncludeBundleFile(fileName);
 		}
 		bool IBundleServices.IsServicesValid()
 		{
-			return _appPatchManifest != null;
+			return AppPatchManifest != null;
 		}
 		#endregion
 	}

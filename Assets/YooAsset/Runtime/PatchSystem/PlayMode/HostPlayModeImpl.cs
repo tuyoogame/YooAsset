@@ -14,7 +14,7 @@ namespace YooAsset
 		private bool _locationToLower;
 		private string _defaultHostServer;
 		private string _fallbackHostServer;
-		private IQueryServices _queryServices;
+		public IQueryServices QueryServices { private set; get; }
 
 		/// <summary>
 		/// 异步初始化
@@ -24,7 +24,7 @@ namespace YooAsset
 			_locationToLower = locationToLower;
 			_defaultHostServer = defaultHostServer;
 			_fallbackHostServer = fallbackHostServer;
-			_queryServices = queryServices;
+			QueryServices = queryServices;
 
 			var operation = new HostPlayModeInitializationOperation(this, packageName);
 			OperationSystem.StartOperation(operation);
@@ -312,38 +312,6 @@ namespace YooAsset
 			return bundleInfo;
 		}
 
-		internal List<VerifyInfo> GetVerifyInfoList(bool weaklyUpdateMode)
-		{
-			List<VerifyInfo> result = new List<VerifyInfo>(LocalPatchManifest.BundleList.Count);
-
-			// 遍历所有文件然后验证并缓存合法文件
-			foreach (var patchBundle in LocalPatchManifest.BundleList)
-			{
-				// 忽略缓存文件
-				if (CacheSystem.IsCached(patchBundle))
-					continue;
-
-				// 注意：在弱联网模式下，我们需要验证指定资源版本的所有资源完整性
-				if (weaklyUpdateMode)
-				{
-					bool isBuildinFile = IsBuildinPatchBundle(patchBundle);
-					VerifyInfo verifyInfo = new VerifyInfo(isBuildinFile, patchBundle);
-					result.Add(verifyInfo);
-				}
-				else
-				{
-					string filePath = patchBundle.CachedFilePath;
-					if (File.Exists(filePath))
-					{
-						bool isBuildinFile = IsBuildinPatchBundle(patchBundle);
-						VerifyInfo verifyInfo = new VerifyInfo(isBuildinFile, patchBundle);
-						result.Add(verifyInfo);
-					}
-				}
-			}
-
-			return result;
-		}
 		internal void SetLocalPatchManifest(PatchManifest patchManifest)
 		{
 			LocalPatchManifest = patchManifest;
@@ -351,7 +319,7 @@ namespace YooAsset
 		}
 		internal bool IsBuildinPatchBundle(PatchBundle patchBundle)
 		{
-			return _queryServices.QueryStreamingAssets(patchBundle.FileName);
+			return QueryServices.QueryStreamingAssets(patchBundle.FileName);
 		}
 
 		#region IBundleServices接口

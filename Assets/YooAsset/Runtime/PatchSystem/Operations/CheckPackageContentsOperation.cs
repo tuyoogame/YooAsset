@@ -44,14 +44,14 @@ namespace YooAsset
 		{
 			None,
 			CheckLoadedManifest,
-			InitVerifyingCache,
-			UpdateVerifyingCache,
+			StartVerifyOperation,
+			CheckVerifyOperation,
 			Done,
 		}
 
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
-		private readonly CacheVerifier _cacheVerifier;
+		private CacheFilesVerifyOperation _verifyOperation;
 		private ESteps _steps = ESteps.None;
 		private float _verifyTime;
 
@@ -59,12 +59,6 @@ namespace YooAsset
 		{
 			_impl = impl;
 			_packageName = packageName;
-
-#if UNITY_WEBGL
-			_cacheVerifier = new CacheVerifierWithoutThread();
-#else
-			_cacheVerifier = new CacheVerifierWithThread();
-#endif
 		}
 		internal override void Start()
 		{
@@ -85,28 +79,33 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.InitVerifyingCache;
+					_steps = ESteps.StartVerifyOperation;
 				}
 			}
 
-			if (_steps == ESteps.InitVerifyingCache)
+			if (_steps == ESteps.StartVerifyOperation)
 			{
-				var verifyInfos = _impl.GetVerifyInfoList(true);
-				_cacheVerifier.InitVerifier(verifyInfos);
+#if UNITY_WEBGL
+				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
+#else
+				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
+#endif
+
+				OperationSystem.StartOperation(_verifyOperation);
 				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
-				_steps = ESteps.UpdateVerifyingCache;
+				_steps = ESteps.CheckVerifyOperation;
 			}
 
-			if (_steps == ESteps.UpdateVerifyingCache)
+			if (_steps == ESteps.CheckVerifyOperation)
 			{
-				Progress = _cacheVerifier.GetVerifierProgress();
-				if (_cacheVerifier.UpdateVerifier())
+				Progress = _verifyOperation.Progress;
+				if (_verifyOperation.IsDone)
 				{
 					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
-					YooLogger.Log($"Verify result : Success {_cacheVerifier.VerifySuccessList.Count}, Fail {_cacheVerifier.VerifyFailList.Count}, Elapsed time {costTime} seconds");
+					YooLogger.Log($"Verify result : Success {_verifyOperation.VerifySuccessList.Count}, Fail {_verifyOperation.VerifyFailList.Count}, Elapsed time {costTime} seconds");
 
 					bool verifySucceed = true;
-					foreach (var verifyInfo in _cacheVerifier.VerifyFailList)
+					foreach (var verifyInfo in _verifyOperation.VerifyFailList)
 					{
 						// 注意：跳过内置资源文件
 						if (verifyInfo.IsBuildinFile)
