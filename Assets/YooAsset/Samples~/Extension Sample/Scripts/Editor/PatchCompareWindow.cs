@@ -106,11 +106,11 @@ namespace YooAsset.Editor
 
 			// 加载补丁清单1
 			byte[] bytesData1 = FileUtility.ReadAllBytes(_patchManifestPath1);
-			PatchManifest patchManifest1 = PatchManifest.DeserializeFromBinary(bytesData1);
+			PatchManifest patchManifest1 = PatchManifestTools.DeserializeFromBinary(bytesData1);
 
 			// 加载补丁清单1
 			byte[] bytesData2 = FileUtility.ReadAllBytes(_patchManifestPath2);
-			PatchManifest patchManifest2 = PatchManifest.DeserializeFromBinary(bytesData2);
+			PatchManifest patchManifest2 = PatchManifestTools.DeserializeFromBinary(bytesData2);
 
 			// 拷贝文件列表
 			foreach (var patchBundle2 in patchManifest2.BundleList)

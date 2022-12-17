@@ -52,7 +52,7 @@ namespace YooAsset.Editor
 
 			// 加载补丁清单
 			byte[] bytesData = FileUtility.ReadAllBytes(patchManifestFilePath);
-			PatchManifest patchManifest = PatchManifest.DeserializeFromBinary(bytesData);
+			PatchManifest patchManifest = PatchManifestTools.DeserializeFromBinary(bytesData);
 
 			// 拷贝核心文件
 			{
