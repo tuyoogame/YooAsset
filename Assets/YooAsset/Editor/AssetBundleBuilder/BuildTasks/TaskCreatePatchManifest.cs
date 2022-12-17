@@ -55,7 +55,7 @@ namespace YooAsset.Editor
 			{
 				string fileName = YooAssetSettingsData.GetPatchManifestJsonFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
-				PatchManifest.SerializeToJson(filePath, patchManifest);
+				PatchManifestTools.SerializeToJson(filePath, patchManifest);
 				BuildRunner.Log($"创建补丁清单文件：{filePath}");
 			}
 
@@ -64,13 +64,13 @@ namespace YooAsset.Editor
 			{
 				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
-				PatchManifest.SerializeToBinary(filePath, patchManifest);
+				PatchManifestTools.SerializeToBinary(filePath, patchManifest);
 				packageHash = HashUtility.FileMD5(filePath);
 				BuildRunner.Log($"创建补丁清单文件：{filePath}");
 
 				PatchManifestContext patchManifestContext = new PatchManifestContext();
 				byte[] bytesData = FileUtility.ReadAllBytes(filePath);
-				patchManifestContext.Manifest = PatchManifest.DeserializeFromBinary(bytesData);
+				patchManifestContext.Manifest = PatchManifestTools.DeserializeFromBinary(bytesData);
 				context.SetContextObject(patchManifestContext);
 			}
 
