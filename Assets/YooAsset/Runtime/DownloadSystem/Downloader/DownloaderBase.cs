@@ -6,6 +6,7 @@ namespace YooAsset
 		protected enum ESteps
 		{
 			None,
+			CheckLocalFile,
 			CheckTempFile,
 			PrepareDownload,
 			CreateResumeDownloader,
@@ -59,7 +60,7 @@ namespace YooAsset
 			{
 				_failedTryAgain = failedTryAgain;
 				_timeout = timeout;
-				_steps = ESteps.CheckTempFile;
+				_steps = ESteps.CheckLocalFile;
 			}
 		}
 		public abstract void Update();

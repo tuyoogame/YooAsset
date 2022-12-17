@@ -70,7 +70,7 @@ namespace YooAsset
 					{
 						var manifest = _deserializer.Manifest;
 						InitializedPackageVersion = manifest.PackageVersion;
-						_impl.SetActivePatchManifest(manifest);
+						_impl.ActivePatchManifest = manifest;
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;
 					}
@@ -160,7 +160,7 @@ namespace YooAsset
 				else
 				{
 					InitializedPackageVersion = manifest.PackageVersion;
-					_impl.SetActivePatchManifest(manifest);
+					_impl.ActivePatchManifest = manifest;
 					_steps = ESteps.StartVerifyOperation;
 				}
 			}
@@ -168,9 +168,9 @@ namespace YooAsset
 			if (_steps == ESteps.StartVerifyOperation)
 			{
 #if UNITY_WEBGL
-				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.AppPatchManifest, null);
+				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.ActivePatchManifest, _impl);
 #else
-				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, null);
+				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, _impl);
 #endif
 
 				OperationSystem.StartOperation(_verifyOperation);
@@ -263,7 +263,7 @@ namespace YooAsset
 					if (manifest != null)
 					{
 						InitializedPackageVersion = manifest.PackageVersion;
-						_impl.SetActivePatchManifest(manifest);
+						_impl.ActivePatchManifest = manifest;
 						_steps = ESteps.StartVerifyOperation;
 					}
 					else
@@ -332,7 +332,7 @@ namespace YooAsset
 				else
 				{
 					InitializedPackageVersion = manifest.PackageVersion;
-					_impl.SetActivePatchManifest(manifest);
+					_impl.ActivePatchManifest = manifest;
 					_steps = ESteps.StartVerifyOperation;
 				}
 			}
@@ -340,9 +340,9 @@ namespace YooAsset
 			if (_steps == ESteps.StartVerifyOperation)
 			{
 #if UNITY_WEBGL
-				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
+				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.ActivePatchManifest, _impl);
 #else
-				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, _impl.QueryServices);
+				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, _impl);
 #endif
 
 				OperationSystem.StartOperation(_verifyOperation);

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
+/*
 namespace YooAsset
 {
 	public abstract class DownloadPackageOperation : AsyncOperationBase
@@ -215,3 +216,4 @@ namespace YooAsset
 		}
 	}
 }
+*/

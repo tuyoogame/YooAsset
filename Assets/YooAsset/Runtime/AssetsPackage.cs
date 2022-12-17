@@ -13,10 +13,8 @@ namespace YooAsset
 		private EOperationStatus _initializeStatus = EOperationStatus.None;
 		private EPlayMode _playMode;
 		private IBundleServices _bundleServices;
+		private IPlayModeServices _playModeServices;
 		private AssetSystemImpl _assetSystemImpl;
-		private EditorSimulateModeImpl _editorSimulateModeImpl;
-		private OfflinePlayModeImpl _offlinePlayModeImpl;
-		private HostPlayModeImpl _hostPlayModeImpl;
 
 		/// <summary>
 		/// 包裹名
@@ -59,11 +57,8 @@ namespace YooAsset
 				_isInitialize = false;
 				_initializeError = string.Empty;
 				_initializeStatus = EOperationStatus.None;
-
 				_bundleServices = null;
-				_editorSimulateModeImpl = null;
-				_offlinePlayModeImpl = null;
-				_hostPlayModeImpl = null;
+				_playModeServices = null;
 
 				if (_assetSystemImpl != null)
 				{
@@ -89,36 +84,39 @@ namespace YooAsset
 			_assetSystemImpl = new AssetSystemImpl();
 			if (_playMode == EPlayMode.EditorSimulateMode)
 			{
-				_editorSimulateModeImpl = new EditorSimulateModeImpl();
-				_bundleServices = _editorSimulateModeImpl;
+				var editorSimulateModeImpl = new EditorSimulateModeImpl();
+				_bundleServices = editorSimulateModeImpl;
+				_playModeServices = editorSimulateModeImpl;
 				_assetSystemImpl.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+
 				var initializeParameters = parameters as EditorSimulateModeParameters;
-				initializeOperation = _editorSimulateModeImpl.InitializeAsync(
-					initializeParameters.LocationToLower,
-					initializeParameters.SimulatePatchManifestPath);
+				initializeOperation = editorSimulateModeImpl.InitializeAsync(PackageName, initializeParameters.LocationToLower, initializeParameters.SimulatePatchManifestPath);
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
-				_offlinePlayModeImpl = new OfflinePlayModeImpl();
-				_bundleServices = _offlinePlayModeImpl;
+				var offlinePlayModeImpl = new OfflinePlayModeImpl();
+				_bundleServices = offlinePlayModeImpl;
+				_playModeServices = offlinePlayModeImpl;
 				_assetSystemImpl.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+
 				var initializeParameters = parameters as OfflinePlayModeParameters;
-				initializeOperation = _offlinePlayModeImpl.InitializeAsync(
-					initializeParameters.LocationToLower,
-					PackageName);
+				initializeOperation = offlinePlayModeImpl.InitializeAsync(PackageName, initializeParameters.LocationToLower);
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
-				_hostPlayModeImpl = new HostPlayModeImpl();
-				_bundleServices = _hostPlayModeImpl;
+				var hostPlayModeImpl = new HostPlayModeImpl();
+				_bundleServices = hostPlayModeImpl;
+				_playModeServices = hostPlayModeImpl;
 				_assetSystemImpl.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+
 				var initializeParameters = parameters as HostPlayModeParameters;
-				initializeOperation = _hostPlayModeImpl.InitializeAsync(
+				initializeOperation = hostPlayModeImpl.InitializeAsync(
+					PackageName,
 					initializeParameters.LocationToLower,
 					initializeParameters.DefaultHostServer,
 					initializeParameters.FallbackHostServer,
-					initializeParameters.QueryServices,
-					PackageName);
+					initializeParameters.QueryServices
+					);
 			}
 			else
 			{
@@ -138,10 +136,8 @@ namespace YooAsset
 				_initializeStatus = EOperationStatus.None;
 				_initializeError = string.Empty;
 				_bundleServices = null;
+				_playModeServices = null;
 				_assetSystemImpl = null;
-				_editorSimulateModeImpl = null;
-				_offlinePlayModeImpl = null;
-				_hostPlayModeImpl = null;
 			}
 		}
 		private void CheckInitializeParameters(InitializeParameters parameters)
@@ -201,62 +197,25 @@ namespace YooAsset
 		/// <summary>
 		/// 向网络端请求最新的资源版本
 		/// </summary>
-		/// <param name="timeout">超时时间（默认值：60秒）</param>
 		/// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
-		public UpdatePackageVersionOperation UpdatePackageVersionAsync(int timeout = 60, bool appendTimeTicks = true)
+		/// <param name="timeout">超时时间（默认值：60秒）</param>
+		public UpdatePackageVersionOperation UpdatePackageVersionAsync(bool appendTimeTicks = true, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				var operation = new EditorPlayModeUpdatePackageVersionOperation();
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				var operation = new OfflinePlayModeUpdatePackageVersionOperation();
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.UpdatePackageVersionAsync(PackageName, timeout, appendTimeTicks);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			return _playModeServices.UpdatePackageVersionAsync(appendTimeTicks, timeout);
 		}
 
 		/// <summary>
 		/// 向网络端请求并更新补丁清单
 		/// </summary>
 		/// <param name="packageVersion">更新的包裹版本</param>
+		/// <param name="autoActiveManifest">自动激活清单</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, int timeout = 60)
+		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifest = true, bool autoActiveManifest = true, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			DebugCheckUpdateManifest();
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				var operation = new EditorPlayModeUpdatePackageManifestOperation();
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				var operation = new OfflinePlayModeUpdatePackageManifestOperation();
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.UpdatePackageManifestAsync(PackageName, packageVersion, timeout);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			return _playModeServices.UpdatePackageManifestAsync(packageVersion, autoSaveManifest, autoActiveManifest, timeout);
 		}
 
 		/// <summary>
@@ -265,26 +224,7 @@ namespace YooAsset
 		public CheckPackageContentsOperation CheckPackageContentsAsync()
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				var operation = new EditorSimulateModeCheckPackageContentsOperation();
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				var operation = new OfflinePlayModeCheckPackageContentsOperation();
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.CheckPackageContentsAsync(PackageName);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			return _playModeServices.CheckPackageContentsAsync();
 		}
 
 		/// <summary>
@@ -304,22 +244,7 @@ namespace YooAsset
 		public string GetPackageVersion()
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				return _editorSimulateModeImpl.GetPackageVersion();
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				return _offlinePlayModeImpl.GetPackageVersion();
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.GetPackageVersion();
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			return _playModeServices.GetPackageVersion();
 		}
 
 		/// <summary>
@@ -710,7 +635,7 @@ namespace YooAsset
 		public PatchDownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			return CreatePatchDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain, timeout);
+			return _playModeServices.CreatePatchDownloaderByTags(new string[] { tag }, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		/// <summary>
@@ -723,20 +648,7 @@ namespace YooAsset
 		public PatchDownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
-			{
-				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.CreatePatchDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain, timeout);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			return _playModeServices.CreatePatchDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		/// <summary>
@@ -748,20 +660,7 @@ namespace YooAsset
 		public PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
-			{
-				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.CreatePatchDownloaderByAll(downloadingMaxNumber, failedTryAgain, timeout);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			return _playModeServices.CreatePatchDownloaderByAll(downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 
@@ -775,26 +674,15 @@ namespace YooAsset
 		public PatchDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
+
+			List<AssetInfo> assetInfos = new List<AssetInfo>(locations.Length);
+			foreach (var location in locations)
 			{
-				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
-				return operation;
+				AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+				assetInfos.Add(assetInfo);
 			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				List<AssetInfo> assetInfos = new List<AssetInfo>(locations.Length);
-				foreach (var location in locations)
-				{
-					AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-					assetInfos.Add(assetInfo);
-				}
-				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetInfos.ToArray(), downloadingMaxNumber, failedTryAgain, timeout);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+
+			return _playModeServices.CreatePatchDownloaderByPaths(assetInfos.ToArray(), downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		/// <summary>
@@ -807,20 +695,7 @@ namespace YooAsset
 		public PatchDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode || _playMode == EPlayMode.OfflinePlayMode)
-			{
-				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.CreatePatchDownloaderByPaths(assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			return _playModeServices.CreatePatchDownloaderByPaths(assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 		#endregion
 
@@ -834,7 +709,7 @@ namespace YooAsset
 		public PatchUnpackerOperation CreatePatchUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			return CreatePatchUnpacker(new string[] { tag }, unpackingMaxNumber, failedTryAgain);
+			return _playModeServices.CreatePatchUnpackerByTags(new string[] { tag }, unpackingMaxNumber, failedTryAgain, int.MaxValue);
 		}
 
 		/// <summary>
@@ -846,26 +721,7 @@ namespace YooAsset
 		public PatchUnpackerOperation CreatePatchUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain, int.MaxValue);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain, int.MaxValue);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.CreatePatchUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain, int.MaxValue);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			return _playModeServices.CreatePatchUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain, int.MaxValue);
 		}
 
 		/// <summary>
@@ -876,58 +732,7 @@ namespace YooAsset
 		public PatchUnpackerOperation CreatePatchUnpacker(int unpackingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain, int.MaxValue);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				List<BundleInfo> downloadList = new List<BundleInfo>();
-				var operation = new PatchUnpackerOperation(downloadList, unpackingMaxNumber, failedTryAgain, int.MaxValue);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.CreatePatchUnpackerByAll(unpackingMaxNumber, failedTryAgain, int.MaxValue);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
-		}
-		#endregion
-
-		#region 包裹更新
-		/// <summary>
-		/// 创建资源包裹下载器，用于下载更新指定资源版本所有的资源包文件
-		/// </summary>
-		/// <param name="packageVersion">指定更新的包裹版本</param>
-		/// <param name="timeout">超时时间</param>
-		public DownloadPackageOperation DownloadPackageAsync(string packageVersion, int timeout = 60)
-		{
-			DebugCheckInitialize();
-			if (_playMode == EPlayMode.EditorSimulateMode)
-			{
-				var operation = new EditorPlayModeDownloadPackageOperation();
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.OfflinePlayMode)
-			{
-				var operation = new OfflinePlayModeDownloadPackageOperation();
-				OperationSystem.StartOperation(operation);
-				return operation;
-			}
-			else if (_playMode == EPlayMode.HostPlayMode)
-			{
-				return _hostPlayModeImpl.DownloadPackageAsync(PackageName, packageVersion, timeout);
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			return _playModeServices.CreatePatchUnpackerByAll(unpackingMaxNumber, failedTryAgain, int.MaxValue);
 		}
 		#endregion
 

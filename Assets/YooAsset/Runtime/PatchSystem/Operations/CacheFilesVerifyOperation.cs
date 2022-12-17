@@ -30,7 +30,7 @@ namespace YooAsset
 		}
 
 		private readonly PatchManifest _patchManifest;
-		private readonly IQueryServices _queryServices;
+		private readonly IPlayModeServices _playModeServices;
 		private ESteps _steps = ESteps.None;
 
 		private readonly ThreadSyncContext _syncContext = new ThreadSyncContext();
@@ -39,10 +39,10 @@ namespace YooAsset
 		private int _verifyMaxNum;
 		private int _verifyTotalCount;
 
-		public CacheFilesVerifyWithThreadOperation(PatchManifest patchManifest, IQueryServices queryServices)
+		public CacheFilesVerifyWithThreadOperation(PatchManifest patchManifest, IPlayModeServices playModeServices)
 		{
 			_patchManifest = patchManifest;
-			_queryServices = queryServices;
+			_playModeServices = playModeServices;
 		}
 		internal override void Start()
 		{
@@ -79,7 +79,7 @@ namespace YooAsset
 					if (CacheSystem.IsCached(patchBundle))
 						continue;
 
-					bool isBuildinFile = IsBuildinFile(patchBundle);
+					bool isBuildinFile = _playModeServices.IsBuildinPatchBundle(patchBundle);
 					VerifyInfo verifyInfo = new VerifyInfo(isBuildinFile, patchBundle);
 					_waitingList.Add(verifyInfo);
 				}
@@ -125,13 +125,6 @@ namespace YooAsset
 			if (_verifyTotalCount == 0)
 				return 1f;
 			return (float)(VerifySuccessList.Count + VerifyFailList.Count) / _verifyTotalCount;
-		}
-		private bool IsBuildinFile(PatchBundle patchBundle)
-		{
-			if (_queryServices == null)
-				return true;
-
-			return _queryServices.QueryStreamingAssets(patchBundle.FileName);
 		}
 		private bool VerifyFileWithThread(VerifyInfo verifyInfo)
 		{
@@ -181,7 +174,7 @@ namespace YooAsset
 		}
 
 		private readonly PatchManifest _patchManifest;
-		private readonly IQueryServices _queryServices;
+		private readonly IPlayModeServices _playModeServices;
 		private ESteps _steps = ESteps.None;
 
 		private List<VerifyInfo> _waitingList;
@@ -189,10 +182,10 @@ namespace YooAsset
 		private int _verifyMaxNum;
 		private int _verifyTotalCount;
 
-		public CacheFilesVerifyWithoutThreadOperation(PatchManifest patchManifest, IQueryServices queryServices)
+		public CacheFilesVerifyWithoutThreadOperation(PatchManifest patchManifest, IPlayModeServices playModeServices)
 		{
 			_patchManifest = patchManifest;
-			_queryServices = queryServices;
+			_playModeServices = playModeServices;
 		}
 		internal override void Start()
 		{
@@ -225,7 +218,7 @@ namespace YooAsset
 					if (CacheSystem.IsCached(patchBundle))
 						continue;
 
-					bool isBuildinFile = IsBuildinFile(patchBundle);
+					bool isBuildinFile = _playModeServices.IsBuildinPatchBundle(patchBundle);
 					VerifyInfo verifyInfo = new VerifyInfo(isBuildinFile, patchBundle);
 					_waitingList.Add(verifyInfo);
 				}
@@ -264,13 +257,6 @@ namespace YooAsset
 			if (_verifyTotalCount == 0)
 				return 1f;
 			return (float)(VerifySuccessList.Count + VerifyFailList.Count) / _verifyTotalCount;
-		}
-		private bool IsBuildinFile(PatchBundle patchBundle)
-		{
-			if (_queryServices == null)
-				return true;
-
-			return _queryServices.QueryStreamingAssets(patchBundle.FileName);
 		}
 		private void VerifyFileWithoutThread(VerifyInfo verifyIno)
 		{

@@ -86,9 +86,9 @@ namespace YooAsset
 			if (_steps == ESteps.StartVerifyOperation)
 			{
 #if UNITY_WEBGL
-				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
+				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.ActivePatchManifest, _impl);
 #else
-				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, _impl.QueryServices);
+				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, _impl);
 #endif
 
 				OperationSystem.StartOperation(_verifyOperation);

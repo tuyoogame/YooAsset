@@ -68,6 +68,8 @@ namespace YooAsset
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
 		private readonly string _packageVersion;
+		private bool _autoSaveManifest;
+		private bool _autoActiveManifest;
 		private readonly int _timeout;
 		private UnityWebDataRequester _downloader1;
 		private UnityWebDataRequester _downloader2;
@@ -76,13 +78,16 @@ namespace YooAsset
 
 		private string _cacheManifestHash;
 		private ESteps _steps = ESteps.None;
+		private byte[] _fileBytes = null;
 		private float _verifyTime;
 
-		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
+		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, bool autoSaveManifest, bool autoActiveManifest, int timeout)
 		{
 			_impl = impl;
 			_packageName = packageName;
 			_packageVersion = packageVersion;
+			_autoSaveManifest = autoSaveManifest;
+			_autoActiveManifest = autoActiveManifest;
 			_timeout = timeout;
 		}
 		internal override void Start()
@@ -171,16 +176,25 @@ namespace YooAsset
 				}
 				else
 				{
-					// 保存文件到沙盒内
 					byte[] bytesData = _downloader2.GetData();
-					string savePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
-					FileUtility.CreateFile(savePath, bytesData);
+
+					// 保存文件到沙盒内
+					if (_autoSaveManifest)
+					{
+						string savePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
+						FileUtility.CreateFile(savePath, bytesData);
+					}
+					else
+					{
+						_fileBytes = bytesData;
+					}
 
 					// 解析二进制数据
 					_deserializer = new DeserializeManifestOperation(bytesData);
 					OperationSystem.StartOperation(_deserializer);
 					_steps = ESteps.CheckDeserializeWebManifest;
 				}
+
 				_downloader2.Dispose();
 			}
 
@@ -191,7 +205,11 @@ namespace YooAsset
 				{
 					if (_deserializer.Status == EOperationStatus.Succeed)
 					{
-						_impl.SetActivePatchManifest(_deserializer.Manifest);
+						if (_autoActiveManifest)
+						{
+							_impl.ActivePatchManifest = _deserializer.Manifest;
+						}
+
 						FoundNewManifest = true;
 						_steps = ESteps.StartVerifyOperation;
 					}
@@ -207,9 +225,9 @@ namespace YooAsset
 			if (_steps == ESteps.StartVerifyOperation)
 			{
 #if UNITY_WEBGL
-				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
+				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_deserializer.Manifest, _impl);
 #else
-				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, _impl.QueryServices);
+				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_deserializer.Manifest, _impl);
 #endif
 
 				OperationSystem.StartOperation(_verifyOperation);
@@ -226,6 +244,37 @@ namespace YooAsset
 					Status = EOperationStatus.Succeed;
 					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
 					YooLogger.Log($"Verify result : Success {_verifyOperation.VerifySuccessList.Count}, Fail {_verifyOperation.VerifyFailList.Count}, Elapsed time {costTime} seconds");
+				}
+			}
+		}
+
+		/// <summary>
+		/// 手动保存清单文件
+		/// </summary>
+		public void SaveManifest()
+		{
+			if (_autoSaveManifest == false)
+			{
+				if (_fileBytes != null)
+				{
+					_autoSaveManifest = true;
+					string savePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
+					FileUtility.CreateFile(savePath, _fileBytes);
+				}
+			}
+		}
+
+		/// <summary>
+		/// 手动激活清单文件
+		/// </summary>
+		public void ActiveManifest()
+		{
+			if (_autoActiveManifest == false)
+			{
+				if (_deserializer.Status == EOperationStatus.Succeed)
+				{
+					_autoActiveManifest = true;
+					_impl.ActivePatchManifest = _deserializer.Manifest;
 				}
 			}
 		}

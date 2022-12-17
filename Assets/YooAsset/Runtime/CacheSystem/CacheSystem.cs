@@ -86,9 +86,8 @@ namespace YooAsset
 		/// <summary>
 		/// 验证并缓存下载文件
 		/// </summary>
-		public static EVerifyResult VerifyAndCacheDownloadBundleFile(PatchBundle patchBundle, EVerifyLevel verifyLevel)
+		public static EVerifyResult VerifyAndCacheDownloadBundleFile(string tempFilePath, PatchBundle patchBundle, EVerifyLevel verifyLevel)
 		{
-			string tempFilePath = patchBundle.CachedFilePath + ".temp";
 			var verifyResult = VerifyContentInternal(tempFilePath, patchBundle.FileSize, patchBundle.FileCRC, verifyLevel);
 			if (verifyResult == EVerifyResult.Succeed)
 			{

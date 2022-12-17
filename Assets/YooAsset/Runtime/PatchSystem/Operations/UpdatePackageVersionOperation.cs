@@ -59,17 +59,17 @@ namespace YooAsset
 		private static int RequestCount = 0;
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
-		private readonly int _timeout;
 		private readonly bool _appendTimeTicks;
+		private readonly int _timeout;
 		private ESteps _steps = ESteps.None;
 		private UnityWebDataRequester _downloader;
 
-		internal HostPlayModeUpdatePackageVersionOperation(HostPlayModeImpl impl, string packageName, int timeout, bool appendTimeTicks)
+		internal HostPlayModeUpdatePackageVersionOperation(HostPlayModeImpl impl, string packageName, bool appendTimeTicks, int timeout)
 		{
 			_impl = impl;
-			_packageName = packageName;
-			_timeout = timeout;
+			_packageName = packageName;		
 			_appendTimeTicks = appendTimeTicks;
+			_timeout = timeout;
 		}
 		internal override void Start()
 		{

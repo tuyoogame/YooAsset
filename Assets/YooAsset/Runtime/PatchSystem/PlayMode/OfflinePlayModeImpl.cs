@@ -1,41 +1,101 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 
 namespace YooAsset
 {
-	internal class OfflinePlayModeImpl : IBundleServices
+	internal class OfflinePlayModeImpl : IPlayModeServices, IBundleServices
 	{
-		public PatchManifest ActivePatchManifest { private set; get; }
+		private PatchManifest _activePatchManifest;
+		private string _packageName;
 		private bool _locationToLower;
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(bool locationToLower, string packageName)
+		public InitializationOperation InitializeAsync(string packageName, bool locationToLower)
 		{
+			_packageName = packageName;
 			_locationToLower = locationToLower;
 			var operation = new OfflinePlayModeInitializationOperation(this, packageName);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-
-		/// <summary>
-		/// 获取包裹的版本信息
-		/// </summary>
+		
+		#region IPlayModeServices接口
+		public PatchManifest ActivePatchManifest
+		{
+			set
+			{
+				_activePatchManifest = value;
+				_activePatchManifest.InitAssetPathMapping(_locationToLower);
+			}
+			get
+			{
+				return _activePatchManifest;
+			}
+		}
 		public string GetPackageVersion()
 		{
-			if (ActivePatchManifest == null)
+			if (_activePatchManifest == null)
 				return string.Empty;
-			return ActivePatchManifest.PackageVersion;
+			return _activePatchManifest.PackageVersion;
+		}
+		public bool IsBuildinPatchBundle(PatchBundle patchBundle)
+		{
+			return true;
 		}
 
-		internal void SetActivePatchManifest(PatchManifest patchManifest)
+		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)
 		{
-			ActivePatchManifest = patchManifest;
-			ActivePatchManifest.InitAssetPathMapping(_locationToLower);
+			var operation = new OfflinePlayModeUpdatePackageVersionOperation();
+			OperationSystem.StartOperation(operation);
+			return operation;
 		}
+		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifest, bool autoActiveManifest, int timeout)
+		{
+			var operation = new OfflinePlayModeUpdatePackageManifestOperation();
+			OperationSystem.StartOperation(operation);
+			return operation;
+		}
+		CheckPackageContentsOperation IPlayModeServices.CheckPackageContentsAsync()
+		{
+			var operation = new OfflinePlayModeCheckPackageContentsOperation();
+			OperationSystem.StartOperation(operation);
+			return operation;
+		}
+
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> downloadList = new List<BundleInfo>();
+			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> downloadList = new List<BundleInfo>();
+			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> downloadList = new List<BundleInfo>();
+			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> downloadList = new List<BundleInfo>();
+			var operation = new PatchUnpackerOperation(downloadList, upackingMaxNumber, failedTryAgain, int.MaxValue);
+			return operation;
+		}
+		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> downloadList = new List<BundleInfo>();
+			var operation = new PatchUnpackerOperation(downloadList, upackingMaxNumber, failedTryAgain, int.MaxValue);
+			return operation;
+		}
+		#endregion
 
 		#region IBundleServices接口
 		private BundleInfo CreateBundleInfo(PatchBundle patchBundle)
@@ -62,7 +122,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 注意：如果补丁清单里未找到资源包会抛出异常！
-			var patchBundle = ActivePatchManifest.GetMainPatchBundle(assetInfo.AssetPath);
+			var patchBundle = _activePatchManifest.GetMainPatchBundle(assetInfo.AssetPath);
 			return CreateBundleInfo(patchBundle);
 		}
 		BundleInfo[] IBundleServices.GetAllDependBundleInfos(AssetInfo assetInfo)
@@ -71,7 +131,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 注意：如果补丁清单里未找到资源包会抛出异常！
-			var depends = ActivePatchManifest.GetAllDependencies(assetInfo.AssetPath);
+			var depends = _activePatchManifest.GetAllDependencies(assetInfo.AssetPath);
 			List<BundleInfo> result = new List<BundleInfo>(depends.Length);
 			foreach (var patchBundle in depends)
 			{
@@ -82,34 +142,34 @@ namespace YooAsset
 		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
-			return ActivePatchManifest.GetAssetsInfoByTags(tags);
+			return _activePatchManifest.GetAssetsInfoByTags(tags);
 		}
 		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
 		{
-			if (ActivePatchManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
+			if (_activePatchManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
 				return patchAsset;
 			else
 				return null;
 		}
 		string IBundleServices.MappingToAssetPath(string location)
 		{
-			return ActivePatchManifest.MappingToAssetPath(location);
+			return _activePatchManifest.MappingToAssetPath(location);
 		}
 		string IBundleServices.TryMappingToAssetPath(string location)
 		{
-			return ActivePatchManifest.TryMappingToAssetPath(location);
+			return _activePatchManifest.TryMappingToAssetPath(location);
 		}
 		string IBundleServices.GetPackageName()
 		{
-			return ActivePatchManifest.PackageName;
+			return _packageName;
 		}
 		bool IBundleServices.IsIncludeBundleFile(string fileName)
 		{
-			return ActivePatchManifest.IsIncludeBundleFile(fileName);
+			return _activePatchManifest.IsIncludeBundleFile(fileName);
 		}
 		bool IBundleServices.IsServicesValid()
 		{
-			return ActivePatchManifest != null;
+			return _activePatchManifest != null;
 		}
 		#endregion
 	}

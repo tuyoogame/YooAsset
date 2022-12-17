@@ -34,10 +34,26 @@ namespace YooAsset
 			if (IsDone())
 				return;
 
-			// 检测本地文件
+			// 检测本地正式文件
+			if (_steps == ESteps.CheckLocalFile)
+			{
+				var verifyResult = CacheSystem.VerifyAndCacheLocalBundleFile(_bundleInfo.Bundle, CacheSystem.InitVerifyLevel);
+				if (verifyResult == EVerifyResult.Succeed)
+				{
+					_steps = ESteps.Succeed;
+				}
+				else
+				{
+					if (File.Exists(_bundleInfo.Bundle.CachedFilePath))
+						File.Delete(_bundleInfo.Bundle.CachedFilePath);
+					_steps = ESteps.CheckTempFile;
+				}
+			}
+
+			// 检测本地临时文件
 			if (_steps == ESteps.CheckTempFile)
 			{
-				var verifyResult = CacheSystem.VerifyAndCacheDownloadBundleFile(_bundleInfo.Bundle, EVerifyLevel.High);
+				var verifyResult = CacheSystem.VerifyAndCacheDownloadBundleFile(_tempFilePath, _bundleInfo.Bundle, EVerifyLevel.High);
 				if (verifyResult == EVerifyResult.Succeed)
 				{
 					_steps = ESteps.Succeed;
@@ -200,7 +216,7 @@ namespace YooAsset
 			// 验证下载文件
 			if (_steps == ESteps.VerifyDownload)
 			{
-				var verifyResult = CacheSystem.VerifyAndCacheDownloadBundleFile(_bundleInfo.Bundle, EVerifyLevel.High);
+				var verifyResult = CacheSystem.VerifyAndCacheDownloadBundleFile(_tempFilePath, _bundleInfo.Bundle, EVerifyLevel.High);
 				if (verifyResult == EVerifyResult.Succeed)
 				{
 					_lastError = string.Empty;
