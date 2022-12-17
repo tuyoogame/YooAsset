@@ -6,7 +6,7 @@ namespace YooAsset
 {
 	internal class EditorSimulateModeImpl : IBundleServices
 	{
-		private PatchManifest _simulatePatchManifest;
+		public PatchManifest ActivePatchManifest { private set; get; }
 		private bool _locationToLower;
 
 		/// <summary>
@@ -25,15 +25,15 @@ namespace YooAsset
 		/// </summary>
 		public string GetPackageVersion()
 		{
-			if (_simulatePatchManifest == null)
+			if (ActivePatchManifest == null)
 				return string.Empty;
-			return _simulatePatchManifest.PackageVersion;
+			return ActivePatchManifest.PackageVersion;
 		}
 
-		internal void SetSimulatePatchManifest(PatchManifest patchManifest)
+		internal void SetActivePatchManifest(PatchManifest patchManifest)
 		{
-			_simulatePatchManifest = patchManifest;
-			_simulatePatchManifest.InitAssetPathMapping(_locationToLower);
+			ActivePatchManifest = patchManifest;
+			ActivePatchManifest.InitAssetPathMapping(_locationToLower);
 		}
 
 		#region IBundleServices接口
@@ -43,7 +43,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 注意：如果补丁清单里未找到资源包会抛出异常！
-			var patchBundle = _simulatePatchManifest.GetMainPatchBundle(assetInfo.AssetPath);
+			var patchBundle = ActivePatchManifest.GetMainPatchBundle(assetInfo.AssetPath);
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromEditor, assetInfo.AssetPath);
 			return bundleInfo;
 		}
@@ -53,34 +53,34 @@ namespace YooAsset
 		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
-			return _simulatePatchManifest.GetAssetsInfoByTags(tags);
+			return ActivePatchManifest.GetAssetsInfoByTags(tags);
 		}
 		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
 		{
-			if (_simulatePatchManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
+			if (ActivePatchManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
 				return patchAsset;
 			else
 				return null;
 		}
 		string IBundleServices.MappingToAssetPath(string location)
 		{
-			return _simulatePatchManifest.MappingToAssetPath(location);
+			return ActivePatchManifest.MappingToAssetPath(location);
 		}
 		string IBundleServices.TryMappingToAssetPath(string location)
 		{
-			return _simulatePatchManifest.TryMappingToAssetPath(location);
+			return ActivePatchManifest.TryMappingToAssetPath(location);
 		}
 		string IBundleServices.GetPackageName()
 		{
-			return _simulatePatchManifest.PackageName;
+			return ActivePatchManifest.PackageName;
 		}
 		bool IBundleServices.IsIncludeBundleFile(string fileName)
 		{
-			return _simulatePatchManifest.IsIncludeBundleFile(fileName);
+			return ActivePatchManifest.IsIncludeBundleFile(fileName);
 		}
 		bool IBundleServices.IsServicesValid()
 		{
-			return _simulatePatchManifest != null;
+			return ActivePatchManifest != null;
 		}
 		#endregion
 	}

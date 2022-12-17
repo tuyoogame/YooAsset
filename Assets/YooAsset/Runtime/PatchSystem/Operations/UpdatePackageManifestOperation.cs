@@ -191,7 +191,7 @@ namespace YooAsset
 				{
 					if (_deserializer.Status == EOperationStatus.Succeed)
 					{
-						_impl.SetLocalPatchManifest(_deserializer.Manifest);
+						_impl.SetActivePatchManifest(_deserializer.Manifest);
 						FoundNewManifest = true;
 						_steps = ESteps.StartVerifyOperation;
 					}
@@ -209,7 +209,7 @@ namespace YooAsset
 #if UNITY_WEBGL
 				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
 #else
-				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
+				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, _impl.QueryServices);
 #endif
 
 				OperationSystem.StartOperation(_verifyOperation);

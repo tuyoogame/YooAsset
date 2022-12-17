@@ -71,7 +71,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.CheckLoadedManifest)
 			{
-				if (_impl.LocalPatchManifest == null)
+				if (_impl.ActivePatchManifest == null)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
@@ -88,7 +88,7 @@ namespace YooAsset
 #if UNITY_WEBGL
 				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
 #else
-				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.LocalPatchManifest, _impl.QueryServices);
+				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, _impl.QueryServices);
 #endif
 
 				OperationSystem.StartOperation(_verifyOperation);
