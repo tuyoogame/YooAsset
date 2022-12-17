@@ -29,6 +29,7 @@ public class Boot : MonoBehaviour
 
 		// 初始化资源系统
 		YooAssets.Initialize();
+		YooAssets.SetOperationSystemMaxTimeSlice(30);
 
 		// 创建补丁管理器
 		UniModule.CreateModule<PatchManager>();

@@ -33,7 +33,7 @@ public class FsmUpdateManifest : IStateNode
 		yield return new WaitForSecondsRealtime(0.5f);
 
 		var package = YooAssets.GetAssetsPackage("DefaultPackage");
-		var operation = package.UpdatePackageManifestAsync(PatchManager.Instance.PackageVersion, 30);
+		var operation = package.UpdatePackageManifestAsync(PatchManager.Instance.PackageVersion);
 		yield return operation;
 
 		if(operation.Status == EOperationStatus.Succeed)
