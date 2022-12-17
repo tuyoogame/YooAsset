@@ -24,12 +24,14 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			Load,
+			LoadManifestFileData,
+			CheckDeserializeManifest,
 			Done,
 		}
 
 		private readonly EditorSimulateModeImpl _impl;
 		private readonly string _simulatePatchManifestPath;
+		private DeserializeManifestOperation _deserializer;
 		private ESteps _steps = ESteps.None;
 
 		internal EditorSimulateModeInitializationOperation(EditorSimulateModeImpl impl, string simulatePatchManifestPath)
@@ -39,11 +41,11 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.Load;
+			_steps = ESteps.LoadManifestFileData;
 		}
 		internal override void Update()
 		{
-			if (_steps == ESteps.Load)
+			if (_steps == ESteps.LoadManifestFileData)
 			{
 				if (File.Exists(_simulatePatchManifestPath) == false)
 				{
@@ -53,21 +55,31 @@ namespace YooAsset
 					return;
 				}
 
-				try
+				YooLogger.Log($"Load simulation manifest file : {_simulatePatchManifestPath}");
+				byte[] bytesData = FileUtility.ReadAllBytes(_simulatePatchManifestPath);
+				_deserializer = new DeserializeManifestOperation(bytesData);
+				OperationSystem.StartOperation(_deserializer);
+				_steps = ESteps.CheckDeserializeManifest;
+			}
+
+			if (_steps == ESteps.CheckDeserializeManifest)
+			{
+				if (_deserializer.IsDone)
 				{
-					YooLogger.Log($"Load simulation manifest file : {_simulatePatchManifestPath}");
-					byte[] bytesData = FileUtility.ReadAllBytes(_simulatePatchManifestPath);
-					var manifest = PatchManifest.DeserializeFromBinary(bytesData);
-					InitializedPackageVersion = manifest.PackageVersion;
-					_impl.SetSimulatePatchManifest(manifest);
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Succeed;
-				}
-				catch (System.Exception e)
-				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = e.Message;
+					if (_deserializer.Status == EOperationStatus.Succeed)
+					{
+						var manifest = _deserializer.Manifest;
+						InitializedPackageVersion = manifest.PackageVersion;
+						_impl.SetSimulatePatchManifest(manifest);
+						_steps = ESteps.Done;
+						Status = EOperationStatus.Succeed;
+					}
+					else
+					{
+						_steps = ESteps.Done;
+						Status = EOperationStatus.Failed;
+						Error = _deserializer.Error;
+					}
 				}
 			}
 		}
@@ -81,8 +93,8 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			QueryAppPackageVersion,
-			LoadAppManifest,
+			QueryBuildinPackageVersion,
+			LoadBuildinManifest,
 			StartVerifyOperation,
 			CheckVerifyOperation,
 			Done,
@@ -90,8 +102,8 @@ namespace YooAsset
 
 		private readonly OfflinePlayModeImpl _impl;
 		private readonly string _packageName;
-		private readonly AppPackageVersionQuerier _appPackageVersionQuerier;
-		private AppManifestLoader _appManifestLoader;
+		private readonly BuildinPackageVersionQuerier _buildinPackageVersionQuerier;
+		private BuildinManifestLoader _buildinManifestLoader;
 		private CacheFilesVerifyOperation _verifyOperation;
 		private ESteps _steps = ESteps.None;
 		private float _verifyTime;
@@ -100,24 +112,24 @@ namespace YooAsset
 		{
 			_impl = impl;
 			_packageName = packageName;
-			_appPackageVersionQuerier = new AppPackageVersionQuerier(packageName);
+			_buildinPackageVersionQuerier = new BuildinPackageVersionQuerier(packageName);
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.QueryAppPackageVersion;
+			_steps = ESteps.QueryBuildinPackageVersion;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
-			if (_steps == ESteps.QueryAppPackageVersion)
+			if (_steps == ESteps.QueryBuildinPackageVersion)
 			{
-				_appPackageVersionQuerier.Update();
-				if (_appPackageVersionQuerier.IsDone == false)
+				_buildinPackageVersionQuerier.Update();
+				if (_buildinPackageVersionQuerier.IsDone == false)
 					return;
 
-				string error = _appPackageVersionQuerier.Error;
+				string error = _buildinPackageVersionQuerier.Error;
 				if (string.IsNullOrEmpty(error) == false)
 				{
 					_steps = ESteps.Done;
@@ -126,24 +138,24 @@ namespace YooAsset
 				}
 				else
 				{
-					_appManifestLoader = new AppManifestLoader(_packageName, _appPackageVersionQuerier.Version);
-					_steps = ESteps.LoadAppManifest;
+					_buildinManifestLoader = new BuildinManifestLoader(_packageName, _buildinPackageVersionQuerier.Version);
+					_steps = ESteps.LoadBuildinManifest;
 				}
 			}
 
-			if (_steps == ESteps.LoadAppManifest)
+			if (_steps == ESteps.LoadBuildinManifest)
 			{
-				_appManifestLoader.Update();
-				Progress = _appManifestLoader.Progress;
-				if (_appManifestLoader.IsDone == false)
+				_buildinManifestLoader.Update();
+				Progress = _buildinManifestLoader.Progress;
+				if (_buildinManifestLoader.IsDone == false)
 					return;
 
-				var manifest = _appManifestLoader.Manifest;
+				var manifest = _buildinManifestLoader.Manifest;
 				if (manifest == null)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _appManifestLoader.Error;
+					Error = _buildinManifestLoader.Error;
 				}
 				else
 				{
@@ -191,9 +203,9 @@ namespace YooAsset
 			None,
 			CheckAppFootPrint,
 			TryLoadCacheManifest,
-			QueryAppPackageVersion,
-			CopyAppManifest,
-			LoadAppManifest,
+			QueryBuildinPackageVersion,
+			CopyBuildinManifest,
+			LoadBuildinManifest,
 			StartVerifyOperation,
 			CheckVerifyOperation,
 			Done,
@@ -201,9 +213,10 @@ namespace YooAsset
 
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
-		private readonly AppPackageVersionQuerier _appPackageVersionQuerier;
-		private AppManifestCopyer _appManifestCopyer;
-		private AppManifestLoader _appManifestLoader;
+		private readonly BuildinPackageVersionQuerier _buildinPackageVersionQuerier;
+		private BuildinManifestCopyer _buildinManifestCopyer;
+		private BuildinManifestLoader _buildinManifestLoader;
+		private CacheManifestLoader _cacheManifestLoader;
 		private CacheFilesVerifyOperation _verifyOperation;
 		private ESteps _steps = ESteps.None;
 		private float _verifyTime;
@@ -212,7 +225,7 @@ namespace YooAsset
 		{
 			_impl = impl;
 			_packageName = packageName;
-			_appPackageVersionQuerier = new AppPackageVersionQuerier(packageName);
+			_buildinPackageVersionQuerier = new BuildinPackageVersionQuerier(packageName);
 		}
 		internal override void Start()
 		{
@@ -240,37 +253,34 @@ namespace YooAsset
 
 			if (_steps == ESteps.TryLoadCacheManifest)
 			{
-				if (PersistentHelper.CheckCacheManifestFileExists(_packageName))
+				if (_cacheManifestLoader == null)
+					_cacheManifestLoader = new CacheManifestLoader(_packageName);
+
+				_cacheManifestLoader.Update();
+				if (_cacheManifestLoader.IsDone)
 				{
-					try
+					var manifest = _cacheManifestLoader.Manifest;
+					if (manifest != null)
 					{
-						var manifest = PersistentHelper.LoadCacheManifestFile(_packageName);
 						InitializedPackageVersion = manifest.PackageVersion;
 						_impl.SetLocalPatchManifest(manifest);
 						_steps = ESteps.StartVerifyOperation;
 					}
-					catch (System.Exception e)
+					else
 					{
-						// 注意：如果加载沙盒内的清单报错，为了避免流程被卡住，我们主动把损坏的文件删除。
-						YooLogger.Warning($"Failed to load cache manifest file : {e.Message}");
-						PersistentHelper.DeleteCacheManifestFile(_packageName);
-						_steps = ESteps.QueryAppPackageVersion;
+						_steps = ESteps.QueryBuildinPackageVersion;
 					}
-				}
-				else
-				{
-					_steps = ESteps.QueryAppPackageVersion;
 				}
 			}
 
-			if (_steps == ESteps.QueryAppPackageVersion)
+			if (_steps == ESteps.QueryBuildinPackageVersion)
 			{
-				_appPackageVersionQuerier.Update();
-				if (_appPackageVersionQuerier.IsDone == false)
+				_buildinPackageVersionQuerier.Update();
+				if (_buildinPackageVersionQuerier.IsDone == false)
 					return;
 
 				// 注意：为了兼容MOD模式，初始化动态新增的包裹的时候，如果内置清单不存在也不需要报错！
-				string error = _appPackageVersionQuerier.Error;
+				string error = _buildinPackageVersionQuerier.Error;
 				if (string.IsNullOrEmpty(error) == false)
 				{
 					_steps = ESteps.Done;
@@ -279,20 +289,20 @@ namespace YooAsset
 				}
 				else
 				{
-					_appManifestCopyer = new AppManifestCopyer(_packageName, _appPackageVersionQuerier.Version);
-					_appManifestLoader = new AppManifestLoader(_packageName, _appPackageVersionQuerier.Version);
-					_steps = ESteps.CopyAppManifest;
+					_buildinManifestCopyer = new BuildinManifestCopyer(_packageName, _buildinPackageVersionQuerier.Version);
+					_buildinManifestLoader = new BuildinManifestLoader(_packageName, _buildinPackageVersionQuerier.Version);
+					_steps = ESteps.CopyBuildinManifest;
 				}
 			}
 
-			if (_steps == ESteps.CopyAppManifest)
+			if (_steps == ESteps.CopyBuildinManifest)
 			{
-				_appManifestCopyer.Update();
-				Progress = _appManifestCopyer.Progress;
-				if (_appManifestCopyer.IsDone == false)
+				_buildinManifestCopyer.Update();
+				Progress = _buildinManifestCopyer.Progress;
+				if (_buildinManifestCopyer.IsDone == false)
 					return;
 
-				string error = _appManifestCopyer.Error;
+				string error = _buildinManifestCopyer.Error;
 				if (string.IsNullOrEmpty(error) == false)
 				{
 					_steps = ESteps.Done;
@@ -301,23 +311,23 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.LoadAppManifest;
+					_steps = ESteps.LoadBuildinManifest;
 				}
 			}
 
-			if (_steps == ESteps.LoadAppManifest)
+			if (_steps == ESteps.LoadBuildinManifest)
 			{
-				_appManifestLoader.Update();
-				Progress = _appManifestLoader.Progress;
-				if (_appManifestLoader.IsDone == false)
+				_buildinManifestLoader.Update();
+				Progress = _buildinManifestLoader.Progress;
+				if (_buildinManifestLoader.IsDone == false)
 					return;
 
-				var manifest = _appManifestLoader.Manifest;
+				var manifest = _buildinManifestLoader.Manifest;
 				if (manifest == null)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _appManifestLoader.Error;
+					Error = _buildinManifestLoader.Error;
 				}
 				else
 				{
@@ -409,7 +419,7 @@ namespace YooAsset
 	/// <summary>
 	/// 内置补丁清单版本查询器
 	/// </summary>
-	internal class AppPackageVersionQuerier
+	internal class BuildinPackageVersionQuerier
 	{
 		private enum ESteps
 		{
@@ -444,7 +454,7 @@ namespace YooAsset
 		}
 
 
-		public AppPackageVersionQuerier(string buildinPackageName)
+		public BuildinPackageVersionQuerier(string buildinPackageName)
 		{
 			_buildinPackageName = buildinPackageName;
 		}
@@ -491,24 +501,31 @@ namespace YooAsset
 	/// <summary>
 	/// 内置补丁清单加载器
 	/// </summary>
-	internal class AppManifestLoader
+	internal class BuildinManifestLoader
 	{
 		private enum ESteps
 		{
-			LoadAppManifest,
-			CheckAppManifest,
+			LoadBuildinManifest,
+			CheckLoadBuildinManifest,
+			CheckDeserializeManifest,
 			Done,
 		}
 
 		private readonly string _buildinPackageName;
 		private readonly string _buildinPackageVersion;
-		private ESteps _steps = ESteps.LoadAppManifest;
+		private ESteps _steps = ESteps.LoadBuildinManifest;
 		private UnityWebDataRequester _downloader;
+		private DeserializeManifestOperation _deserializer;
 
 		/// <summary>
 		/// 加载结果
 		/// </summary>
 		public PatchManifest Manifest { private set; get; }
+
+		/// <summary>
+		/// 加载进度
+		/// </summary>
+		public float Progress { private set; get; }
 
 		/// <summary>
 		/// 错误日志
@@ -526,21 +543,8 @@ namespace YooAsset
 			}
 		}
 
-		/// <summary>
-		/// 加载进度
-		/// </summary>
-		public float Progress
-		{
-			get
-			{
-				if (_downloader == null)
-					return 0;
-				return _downloader.Progress();
-			}
-		}
 
-
-		public AppManifestLoader(string buildinPackageName, string buildinPackageVersion)
+		public BuildinManifestLoader(string buildinPackageName, string buildinPackageVersion)
 		{
 			_buildinPackageName = buildinPackageName;
 			_buildinPackageVersion = buildinPackageVersion;
@@ -554,17 +558,17 @@ namespace YooAsset
 			if (IsDone)
 				return;
 
-			if (_steps == ESteps.LoadAppManifest)
+			if (_steps == ESteps.LoadBuildinManifest)
 			{
 				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(_buildinPackageName, _buildinPackageVersion);
 				string filePath = PathHelper.MakeStreamingLoadPath(fileName);
 				string url = PathHelper.ConvertToWWWPath(filePath);
 				_downloader = new UnityWebDataRequester();
 				_downloader.SendRequest(url);
-				_steps = ESteps.CheckAppManifest;
+				_steps = ESteps.CheckLoadBuildinManifest;
 			}
 
-			if (_steps == ESteps.CheckAppManifest)
+			if (_steps == ESteps.CheckLoadBuildinManifest)
 			{
 				if (_downloader.IsDone() == false)
 					return;
@@ -572,22 +576,34 @@ namespace YooAsset
 				if (_downloader.HasError())
 				{
 					Error = _downloader.GetError();
+					_steps = ESteps.Done;
 				}
 				else
 				{
 					// 解析APP里的补丁清单
-					try
-					{
-						byte[] bytesData = _downloader.GetData();
-						Manifest = PatchManifest.DeserializeFromBinary(bytesData);
-					}
-					catch (System.Exception e)
-					{
-						Error = e.Message;
-					}
+					byte[] bytesData = _downloader.GetData();
+					_deserializer = new DeserializeManifestOperation(bytesData);
+					OperationSystem.StartOperation(_deserializer);
+					_steps = ESteps.CheckDeserializeManifest;
 				}
-				_steps = ESteps.Done;
 				_downloader.Dispose();
+			}
+
+			if (_steps == ESteps.CheckDeserializeManifest)
+			{
+				Progress = _deserializer.Progress;
+				if (_deserializer.IsDone)
+				{
+					if (_deserializer.Status == EOperationStatus.Succeed)
+					{
+						Manifest = _deserializer.Manifest;
+					}
+					else
+					{
+						Error = _deserializer.Error;
+					}
+					_steps = ESteps.Done;
+				}
 			}
 		}
 	}
@@ -595,18 +611,18 @@ namespace YooAsset
 	/// <summary>
 	/// 内置补丁清单复制器
 	/// </summary>
-	internal class AppManifestCopyer
+	internal class BuildinManifestCopyer
 	{
 		private enum ESteps
 		{
-			CopyAppManifest,
-			CheckAppManifest,
+			CopyBuildinManifest,
+			CheckCopyBuildinManifest,
 			Done,
 		}
 
 		private readonly string _buildinPackageName;
 		private readonly string _buildinPackageVersion;
-		private ESteps _steps = ESteps.CopyAppManifest;
+		private ESteps _steps = ESteps.CopyBuildinManifest;
 		private UnityWebFileRequester _downloader;
 
 		/// <summary>
@@ -639,7 +655,7 @@ namespace YooAsset
 		}
 
 
-		public AppManifestCopyer(string buildinPackageName, string buildinPackageVersion)
+		public BuildinManifestCopyer(string buildinPackageName, string buildinPackageVersion)
 		{
 			_buildinPackageName = buildinPackageName;
 			_buildinPackageVersion = buildinPackageVersion;
@@ -653,7 +669,7 @@ namespace YooAsset
 			if (IsDone)
 				return;
 
-			if (_steps == ESteps.CopyAppManifest)
+			if (_steps == ESteps.CopyBuildinManifest)
 			{
 				string savePath = PersistentHelper.GetCacheManifestFilePath(_buildinPackageName);
 				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(_buildinPackageName, _buildinPackageVersion);
@@ -661,10 +677,10 @@ namespace YooAsset
 				string url = PathHelper.ConvertToWWWPath(filePath);
 				_downloader = new UnityWebFileRequester();
 				_downloader.SendRequest(url, savePath);
-				_steps = ESteps.CheckAppManifest;
+				_steps = ESteps.CheckCopyBuildinManifest;
 			}
 
-			if (_steps == ESteps.CheckAppManifest)
+			if (_steps == ESteps.CheckCopyBuildinManifest)
 			{
 				if (_downloader.IsDone() == false)
 					return;
@@ -675,6 +691,106 @@ namespace YooAsset
 				}
 				_steps = ESteps.Done;
 				_downloader.Dispose();
+			}
+		}
+	}
+
+	/// <summary>
+	/// 沙盒补丁清单加载器
+	/// </summary>
+	internal class CacheManifestLoader
+	{
+		private enum ESteps
+		{
+			LoadCacheManifestFile,
+			CheckDeserializeManifest,
+			Done,
+		}
+
+		private readonly string _packageName;
+		private ESteps _steps = ESteps.LoadCacheManifestFile;
+		private DeserializeManifestOperation _deserializer;
+		private string _manifestFilePath;
+
+		/// <summary>
+		/// 加载结果
+		/// </summary>
+		public PatchManifest Manifest { private set; get; }
+
+		/// <summary>
+		/// 加载进度
+		/// </summary>
+		public float Progress { private set; get; }
+
+		/// <summary>
+		/// 错误日志
+		/// </summary>
+		public string Error { private set; get; }
+
+		/// <summary>
+		/// 是否已经完成
+		/// </summary>
+		public bool IsDone
+		{
+			get
+			{
+				return _steps == ESteps.Done;
+			}
+		}
+
+
+		public CacheManifestLoader(string packageName)
+		{
+			_packageName = packageName;
+		}
+
+		/// <summary>
+		/// 更新流程
+		/// </summary>
+		public void Update()
+		{
+			if (IsDone)
+				return;
+
+			if (_steps == ESteps.LoadCacheManifestFile)
+			{
+				_manifestFilePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
+				if (File.Exists(_manifestFilePath) == false)
+				{
+					_steps = ESteps.Done;
+					Error = $"Manifest file not found : {_manifestFilePath}";
+					return;
+				}
+
+				byte[] bytesData = File.ReadAllBytes(_manifestFilePath);
+				_deserializer = new DeserializeManifestOperation(bytesData);
+				OperationSystem.StartOperation(_deserializer);
+				_steps = ESteps.CheckDeserializeManifest;
+			}
+
+			if (_steps == ESteps.CheckDeserializeManifest)
+			{
+				Progress = _deserializer.Progress;
+				if (_deserializer.IsDone)
+				{
+					if (_deserializer.Status == EOperationStatus.Succeed)
+					{
+						Manifest = _deserializer.Manifest;
+					}
+					else
+					{
+						Error = _deserializer.Error;
+
+						// 注意：如果加载沙盒内的清单报错，为了避免流程被卡住，我们主动把损坏的文件删除。
+						if (File.Exists(_manifestFilePath))
+						{
+							YooLogger.Warning($"Failed to load cache manifest file : {Error}");
+							YooLogger.Warning($"Invalid cache manifest file have been removed : {_manifestFilePath}");
+							File.Delete(_manifestFilePath);
+						}
+					}
+					_steps = ESteps.Done;
+				}
 			}
 		}
 	}

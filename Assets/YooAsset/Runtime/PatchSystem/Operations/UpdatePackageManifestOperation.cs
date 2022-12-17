@@ -54,11 +54,11 @@ namespace YooAsset
 		{
 			None,
 			TryLoadCacheHash,
-			LoadWebHash,
-			CheckWebHash,
-			LoadCacheManifest,
-			LoadWebManifest,
-			CheckWebManifest,
+			DownloadWebHash,
+			CheckDownloadWebHash,
+			DownloadWebManifest,
+			CheckDownloadWebManifest,
+			CheckDeserializeWebManifest,
 			StartVerifyOperation,
 			CheckVerifyOperation,
 			Done,
@@ -71,6 +71,7 @@ namespace YooAsset
 		private readonly int _timeout;
 		private UnityWebDataRequester _downloader1;
 		private UnityWebDataRequester _downloader2;
+		private DeserializeManifestOperation _deserializer;
 		private CacheFilesVerifyOperation _verifyOperation;
 
 		private string _cacheManifestHash;
@@ -100,25 +101,25 @@ namespace YooAsset
 				if (File.Exists(filePath))
 				{
 					_cacheManifestHash = HashUtility.FileMD5(filePath);
-					_steps = ESteps.LoadWebHash;
+					_steps = ESteps.DownloadWebHash;
 				}
 				else
 				{
-					_steps = ESteps.LoadWebManifest;
+					_steps = ESteps.DownloadWebManifest;
 				}
 			}
 
-			if (_steps == ESteps.LoadWebHash)
+			if (_steps == ESteps.DownloadWebHash)
 			{
 				string fileName = YooAssetSettingsData.GetPatchManifestHashFileName(_packageName, _packageVersion);
 				string webURL = GetPatchManifestRequestURL(fileName);
 				YooLogger.Log($"Beginning to request patch manifest hash : {webURL}");
 				_downloader1 = new UnityWebDataRequester();
 				_downloader1.SendRequest(webURL, _timeout);
-				_steps = ESteps.CheckWebHash;
+				_steps = ESteps.CheckDownloadWebHash;
 			}
 
-			if (_steps == ESteps.CheckWebHash)
+			if (_steps == ESteps.CheckDownloadWebHash)
 			{
 				if (_downloader1.IsDone() == false)
 					return;
@@ -135,45 +136,29 @@ namespace YooAsset
 					if (_cacheManifestHash == webManifestHash)
 					{
 						YooLogger.Log($"Not found new package : {_packageName}");
-						_steps = ESteps.LoadCacheManifest;
+						_steps = ESteps.Done;
+						Status = EOperationStatus.Succeed;
 					}
 					else
 					{
 						YooLogger.Log($"Package {_packageName} is change : {_cacheManifestHash} -> {webManifestHash}");
-						_steps = ESteps.LoadWebManifest;
+						_steps = ESteps.DownloadWebManifest;
 					}
 				}
 				_downloader1.Dispose();
 			}
 
-			if (_steps == ESteps.LoadCacheManifest)
-			{
-				try
-				{
-					var manifest = PersistentHelper.LoadCacheManifestFile(_packageName);
-					_impl.SetLocalPatchManifest(manifest);
-					_steps = ESteps.StartVerifyOperation;
-				}
-				catch (System.Exception e)
-				{
-					// 注意：如果加载沙盒内的清单报错，为了避免流程被卡住，我们主动把损坏的文件删除。
-					YooLogger.Warning($"Failed to load cache manifest file : {e.Message}");
-					PersistentHelper.DeleteCacheManifestFile(_packageName);
-					_steps = ESteps.LoadWebManifest;
-				}
-			}
-
-			if (_steps == ESteps.LoadWebManifest)
+			if (_steps == ESteps.DownloadWebManifest)
 			{
 				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(_packageName, _packageVersion);
 				string webURL = GetPatchManifestRequestURL(fileName);
 				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
 				_downloader2 = new UnityWebDataRequester();
 				_downloader2.SendRequest(webURL, _timeout);
-				_steps = ESteps.CheckWebManifest;
+				_steps = ESteps.CheckDownloadWebManifest;
 			}
 
-			if (_steps == ESteps.CheckWebManifest)
+			if (_steps == ESteps.CheckDownloadWebManifest)
 			{
 				if (_downloader2.IsDone() == false)
 					return;
@@ -186,22 +171,37 @@ namespace YooAsset
 				}
 				else
 				{
-					try
+					// 保存文件到沙盒内
+					byte[] bytesData = _downloader2.GetData();
+					string savePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
+					FileUtility.CreateFile(savePath, bytesData);
+
+					// 解析二进制数据
+					_deserializer = new DeserializeManifestOperation(bytesData);
+					OperationSystem.StartOperation(_deserializer);
+					_steps = ESteps.CheckDeserializeWebManifest;
+				}
+				_downloader2.Dispose();
+			}
+
+			if (_steps == ESteps.CheckDeserializeWebManifest)
+			{
+				Progress = _deserializer.Progress;
+				if (_deserializer.IsDone)
+				{
+					if (_deserializer.Status == EOperationStatus.Succeed)
 					{
-						byte[] bytesData = _downloader2.GetData();
-						var manifest = PersistentHelper.SaveCacheManifestFile(_packageName, bytesData);
-						_impl.SetLocalPatchManifest(manifest);
+						_impl.SetLocalPatchManifest(_deserializer.Manifest);
 						FoundNewManifest = true;
 						_steps = ESteps.StartVerifyOperation;
 					}
-					catch (Exception e)
+					else
 					{
-						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
-						Error = e.Message;
+						Error = _deserializer.Error;
+						_steps = ESteps.Done;
 					}
 				}
-				_downloader2.Dispose();
 			}
 
 			if (_steps == ESteps.StartVerifyOperation)

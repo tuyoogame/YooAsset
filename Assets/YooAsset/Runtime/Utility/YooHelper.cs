@@ -134,7 +134,6 @@ namespace YooAsset
 			return PathHelper.MakePersistentLoadPath(AppFootPrintFileName);
 		}
 
-		#region 沙盒内清单相关
 		/// <summary>
 		/// 获取沙盒内清单文件的路径
 		/// </summary>
@@ -143,56 +142,5 @@ namespace YooAsset
 			string fileName = YooAssetSettingsData.GetPatchManifestFileNameWithoutVersion(packageName);
 			return PathHelper.MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
 		}
-
-		/// <summary>
-		/// 加载沙盒内清单文件
-		/// </summary>
-		public static PatchManifest LoadCacheManifestFile(string packageName)
-		{
-			YooLogger.Log($"Load sandbox patch manifest file : {packageName}");
-			string filePath = GetCacheManifestFilePath(packageName);
-			byte[] bytesData = File.ReadAllBytes(filePath);
-			return PatchManifest.DeserializeFromBinary(bytesData);
-		}
-
-		/// <summary>
-		/// 存储沙盒内清单文件
-		/// </summary>
-		public static PatchManifest SaveCacheManifestFile(string packageName, byte[] fileBytesData)
-		{
-			YooLogger.Log($"Save sandbox patch manifest file : {packageName}");
-			var manifest = PatchManifest.DeserializeFromBinary(fileBytesData);
-			string savePath = GetCacheManifestFilePath(packageName);
-			FileUtility.CreateFile(savePath, fileBytesData);
-			return manifest;
-		}
-
-		/// <summary>
-		/// 检测沙盒内清单文件是否存在
-		/// </summary>
-		public static bool CheckCacheManifestFileExists(string packageName)
-		{
-			string filePath = GetCacheManifestFilePath(packageName);
-			return File.Exists(filePath);
-		}
-
-		/// <summary>
-		/// 删除沙盒内清单文件
-		/// </summary>
-		public static bool DeleteCacheManifestFile(string packageName)
-		{
-			string filePath = GetCacheManifestFilePath(packageName);
-			if (File.Exists(filePath))
-			{
-				YooLogger.Warning($"Invalid cache manifest file have been removed : {filePath}");
-				File.Delete(filePath);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		#endregion
 	}
 }

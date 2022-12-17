@@ -73,7 +73,8 @@ namespace YooAsset
 		{
 			None,
 			LoadWebManifest,
-			CheckWebManifest,
+			CheckLoadWebManifest,
+			CheckDeserializeManifest,
 			Done,
 		}
 
@@ -84,6 +85,7 @@ namespace YooAsset
 		private readonly int _timeout;
 		private ESteps _steps = ESteps.None;
 		private UnityWebDataRequester _downloader;
+		private DeserializeManifestOperation _deserializer;
 		private PatchManifest _remotePatchManifest;
 
 		internal HostPlayModeDownloadPackageOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
@@ -95,7 +97,7 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			RequestCount++;		
+			RequestCount++;
 			_steps = ESteps.LoadWebManifest;
 		}
 		internal override void Update()
@@ -110,10 +112,10 @@ namespace YooAsset
 				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
 				_downloader = new UnityWebDataRequester();
 				_downloader.SendRequest(webURL, _timeout);
-				_steps = ESteps.CheckWebManifest;
+				_steps = ESteps.CheckLoadWebManifest;
 			}
 
-			if (_steps == ESteps.CheckWebManifest)
+			if (_steps == ESteps.CheckLoadWebManifest)
 			{
 				Progress = _downloader.Progress();
 				if (_downloader.IsDone() == false)
@@ -129,21 +131,32 @@ namespace YooAsset
 				else
 				{
 					// 解析补丁清单
-					try
+					byte[] bytesData = _downloader.GetData();
+					_deserializer = new DeserializeManifestOperation(bytesData);
+					OperationSystem.StartOperation(_deserializer);
+					_steps = ESteps.CheckDeserializeManifest;
+				}
+				_downloader.Dispose();
+			}
+
+			if (_steps == ESteps.CheckDeserializeManifest)
+			{
+				Progress = _deserializer.Progress;
+				if (_deserializer.IsDone)
+				{
+					if (_deserializer.Status == EOperationStatus.Succeed)
 					{
-						byte[] bytesData = _downloader.GetData();
-						_remotePatchManifest = PatchManifest.DeserializeFromBinary(bytesData);
+						_remotePatchManifest = _deserializer.Manifest;
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;
 					}
-					catch(System.Exception e)
+					else
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
-						Error = e.Message;
+						Error = _deserializer.Error;
 					}
 				}
-				_downloader.Dispose();
 			}
 		}
 
