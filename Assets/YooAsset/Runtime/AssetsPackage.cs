@@ -663,28 +663,6 @@ namespace YooAsset
 			return _playModeServices.CreatePatchDownloaderByAll(downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
-
-		/// <summary>
-		/// 创建补丁下载器，用于下载更新指定的资源列表依赖的资源包文件
-		/// </summary>
-		/// <param name="locations">资源定位列表</param>
-		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		/// <param name="timeout">超时时间</param>
-		public PatchDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
-		{
-			DebugCheckInitialize();
-
-			List<AssetInfo> assetInfos = new List<AssetInfo>(locations.Length);
-			foreach (var location in locations)
-			{
-				AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-				assetInfos.Add(assetInfo);
-			}
-
-			return _playModeServices.CreatePatchDownloaderByPaths(assetInfos.ToArray(), downloadingMaxNumber, failedTryAgain, timeout);
-		}
-
 		/// <summary>
 		/// 创建补丁下载器，用于下载更新指定的资源列表依赖的资源包文件
 		/// </summary>

@@ -34,12 +34,17 @@ namespace YooAsset
 		CheckPackageContentsOperation CheckPackageContentsAsync();
 
 		// 下载相关方法
+		PatchDownloaderOperation CreatePatchDownloaderByAll(PatchManifest patchManifest, int downloadingMaxNumber, int failedTryAgain, int timeout);
 		PatchDownloaderOperation CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout);
+		PatchDownloaderOperation CreatePatchDownloaderByTags(PatchManifest patchManifest, string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout);
 		PatchDownloaderOperation CreatePatchDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout);
+		PatchDownloaderOperation CreatePatchDownloaderByPaths(PatchManifest patchManifest, AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout);
 		PatchDownloaderOperation CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout);
 
 		// 解压相关方法
-		PatchUnpackerOperation CreatePatchUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout);
+		PatchUnpackerOperation CreatePatchUnpackerByAll(PatchManifest patchManifest, int upackingMaxNumber, int failedTryAgain, int timeout);
 		PatchUnpackerOperation CreatePatchUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout);
+		PatchUnpackerOperation CreatePatchUnpackerByTags(PatchManifest patchManifest, string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout);
+		PatchUnpackerOperation CreatePatchUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout);
 	}
 }

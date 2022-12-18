@@ -122,16 +122,22 @@ namespace YooAsset
 			return operation;
 		}
 
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(PatchManifest patchManifest, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = GetDownloadListByAll();
+			List<BundleInfo> downloadList = GetDownloadListByAll(patchManifest);
 			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
-		private List<BundleInfo> GetDownloadListByAll()
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> downloadList = GetDownloadListByAll(_activePatchManifest);
+			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		private List<BundleInfo> GetDownloadListByAll(PatchManifest patchManifest)
 		{
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
-			foreach (var patchBundle in _activePatchManifest.BundleList)
+			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				// 忽略缓存文件
 				if (CacheSystem.IsCached(patchBundle))
@@ -147,16 +153,22 @@ namespace YooAsset
 			return ConvertToDownloadList(downloadList);
 		}
 
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(PatchManifest patchManifest, string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = GetDownloadListByTags(tags);
+			List<BundleInfo> downloadList = GetDownloadListByTags(patchManifest, tags);
 			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
-		private List<BundleInfo> GetDownloadListByTags(string[] tags)
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> downloadList = GetDownloadListByTags(_activePatchManifest, tags);
+			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		private List<BundleInfo> GetDownloadListByTags(PatchManifest patchManifest, string[] tags)
 		{
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
-			foreach (var patchBundle in _activePatchManifest.BundleList)
+			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				// 忽略缓存文件
 				if (CacheSystem.IsCached(patchBundle))
@@ -184,13 +196,19 @@ namespace YooAsset
 			return ConvertToDownloadList(downloadList);
 		}
 
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(PatchManifest patchManifest, AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = GetDownloadListByPaths(assetInfos);
+			List<BundleInfo> downloadList = GetDownloadListByPaths(patchManifest, assetInfos);
 			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
-		private List<BundleInfo> GetDownloadListByPaths(AssetInfo[] assetInfos)
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> downloadList = GetDownloadListByPaths(_activePatchManifest, assetInfos);
+			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		private List<BundleInfo> GetDownloadListByPaths(PatchManifest patchManifest, AssetInfo[] assetInfos)
 		{
 			// 获取资源对象的资源包和所有依赖资源包
 			List<PatchBundle> checkList = new List<PatchBundle>();
@@ -203,12 +221,12 @@ namespace YooAsset
 				}
 
 				// 注意：如果补丁清单里未找到资源包会抛出异常！
-				PatchBundle mainBundle = _activePatchManifest.GetMainPatchBundle(assetInfo.AssetPath);
+				PatchBundle mainBundle = patchManifest.GetMainPatchBundle(assetInfo.AssetPath);
 				if (checkList.Contains(mainBundle) == false)
 					checkList.Add(mainBundle);
 
 				// 注意：如果补丁清单里未找到资源包会抛出异常！
-				PatchBundle[] dependBundles = _activePatchManifest.GetAllDependencies(assetInfo.AssetPath);
+				PatchBundle[] dependBundles = patchManifest.GetAllDependencies(assetInfo.AssetPath);
 				foreach (var dependBundle in dependBundles)
 				{
 					if (checkList.Contains(dependBundle) == false)
@@ -233,16 +251,52 @@ namespace YooAsset
 			return ConvertToDownloadList(downloadList);
 		}
 
-		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
+		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(PatchManifest patchManifest, int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> unpcakList = GetUnpackListByTags(tags);
+			List<BundleInfo> unpcakList = GetUnpackListByAll(patchManifest);
 			var operation = new PatchUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
-		private List<BundleInfo> GetUnpackListByTags(string[] tags)
+		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> unpcakList = GetUnpackListByAll(_activePatchManifest);
+			var operation = new PatchUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		private List<BundleInfo> GetUnpackListByAll(PatchManifest patchManifest)
 		{
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
-			foreach (var patchBundle in _activePatchManifest.BundleList)
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				// 忽略缓存文件
+				if (CacheSystem.IsCached(patchBundle))
+					continue;
+
+				if (IsBuildinPatchBundle(patchBundle))
+				{
+					downloadList.Add(patchBundle);
+				}
+			}
+
+			return ConvertToUnpackList(downloadList);
+		}
+
+		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(PatchManifest patchManifest, string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> unpcakList = GetUnpackListByTags(patchManifest, tags);
+			var operation = new PatchUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> unpcakList = GetUnpackListByTags(_activePatchManifest, tags);
+			var operation = new PatchUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		private List<BundleInfo> GetUnpackListByTags(PatchManifest patchManifest, string[] tags)
+		{
+			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
+			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				// 忽略缓存文件
 				if (CacheSystem.IsCached(patchBundle))
@@ -255,30 +309,6 @@ namespace YooAsset
 					{
 						downloadList.Add(patchBundle);
 					}
-				}
-			}
-
-			return ConvertToUnpackList(downloadList);
-		}
-
-		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
-		{
-			List<BundleInfo> unpcakList = GetUnpackListByAll();
-			var operation = new PatchUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
-			return operation;
-		}
-		private List<BundleInfo> GetUnpackListByAll()
-		{
-			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
-			foreach (var patchBundle in _activePatchManifest.BundleList)
-			{
-				// 忽略缓存文件
-				if (CacheSystem.IsCached(patchBundle))
-					continue;
-
-				if (IsBuildinPatchBundle(patchBundle))
-				{
-					downloadList.Add(patchBundle);
 				}
 			}
 

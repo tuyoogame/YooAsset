@@ -61,13 +61,13 @@ namespace YooAsset
 		private readonly string _packageName;
 		private readonly bool _appendTimeTicks;
 		private readonly int _timeout;
-		private ESteps _steps = ESteps.None;
 		private UnityWebDataRequester _downloader;
+		private ESteps _steps = ESteps.None;
 
 		internal HostPlayModeUpdatePackageVersionOperation(HostPlayModeImpl impl, string packageName, bool appendTimeTicks, int timeout)
 		{
 			_impl = impl;
-			_packageName = packageName;		
+			_packageName = packageName;
 			_appendTimeTicks = appendTimeTicks;
 			_timeout = timeout;
 		}
@@ -85,7 +85,7 @@ namespace YooAsset
 			{
 				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(_packageName);
 				string webURL = GetStaticVersionRequestURL(fileName);
-				YooLogger.Log($"Beginning to request static version : {webURL}");
+				YooLogger.Log($"Beginning to request package version : {webURL}");
 				_downloader = new UnityWebDataRequester();
 				_downloader.SendRequest(webURL, _timeout);
 				_steps = ESteps.CheckStaticVersion;
@@ -110,7 +110,7 @@ namespace YooAsset
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
-						Error = $"Static package version is empty : {_downloader.URL}";
+						Error = $"Package version is empty : {_downloader.URL}";
 					}
 					else
 					{
@@ -118,6 +118,7 @@ namespace YooAsset
 						Status = EOperationStatus.Succeed;
 					}
 				}
+
 				_downloader.Dispose();
 			}
 		}

@@ -153,6 +153,7 @@ namespace YooAsset
 			}
 			catch(System.Exception e)
 			{
+				Manifest = null;
 				_steps = ESteps.Done;
 				Status = EOperationStatus.Failed;
 				Error = e.Message;

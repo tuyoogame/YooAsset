@@ -21,7 +21,7 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		
+
 		#region IPlayModeServices接口
 		public PatchManifest ActivePatchManifest
 		{
@@ -54,7 +54,7 @@ namespace YooAsset
 		}
 		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifest, bool autoActiveManifest, int timeout)
 		{
-			var operation = new OfflinePlayModeUpdatePackageManifestOperation();
+			var operation = new OfflinePlayModeUpdatePackageManifestOperation(this);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -65,35 +65,49 @@ namespace YooAsset
 			return operation;
 		}
 
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(PatchManifest patchManifest, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		{
+			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+		}
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = new List<BundleInfo>();
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
-			return operation;
+			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+		}
+
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(PatchManifest patchManifest, string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		{
+			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = new List<BundleInfo>();
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
-			return operation;
+			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+		}
+
+		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(PatchManifest patchManifest, AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		{
+			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = new List<BundleInfo>();
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
-			return operation;
+			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
-		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
+
+		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(PatchManifest patchManifest, int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = new List<BundleInfo>();
-			var operation = new PatchUnpackerOperation(downloadList, upackingMaxNumber, failedTryAgain, int.MaxValue);
-			return operation;
+			return PatchUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
 		}
 		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = new List<BundleInfo>();
-			var operation = new PatchUnpackerOperation(downloadList, upackingMaxNumber, failedTryAgain, int.MaxValue);
-			return operation;
+			return PatchUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
+		}
+
+		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(PatchManifest patchManifest, string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
+		{
+			return PatchUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
+		}
+		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
+		{
+			return PatchUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
 		}
 		#endregion
 

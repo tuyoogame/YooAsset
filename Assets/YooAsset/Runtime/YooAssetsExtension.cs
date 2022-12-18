@@ -320,19 +320,6 @@ namespace YooAsset
 			return _defaultPackage.CreatePatchDownloader(downloadingMaxNumber, failedTryAgain);
 		}
 
-
-		/// <summary>
-		/// 创建补丁下载器，用于下载更新指定的资源列表依赖的资源包文件
-		/// </summary>
-		/// <param name="locations">资源定位列表</param>
-		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		public static PatchDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain)
-		{
-			DebugCheckDefaultPackageValid();
-			return _defaultPackage.CreateBundleDownloader(locations, downloadingMaxNumber, failedTryAgain);
-		}
-
 		/// <summary>
 		/// 创建补丁下载器，用于下载更新指定的资源列表依赖的资源包文件
 		/// </summary>
