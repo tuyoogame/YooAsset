@@ -7,7 +7,7 @@ namespace YooAsset
 	/// <summary>
 	/// 清理本地包裹未使用的缓存文件
 	/// </summary>
-	public sealed class ClearPackageUnusedCacheFilesOperation : AsyncOperationBase
+	public sealed class ClearUnusedCacheFilesOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
@@ -18,11 +18,11 @@ namespace YooAsset
 		}
 
 		private readonly AssetsPackage _package;
-		private ESteps _steps = ESteps.None;
 		private List<string> _unusedCacheFilePaths;
 		private int _unusedFileTotalCount = 0;
+		private ESteps _steps = ESteps.None;
 
-		internal ClearPackageUnusedCacheFilesOperation(AssetsPackage package)
+		internal ClearUnusedCacheFilesOperation(AssetsPackage package)
 		{
 			_package = package;
 		}

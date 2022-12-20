@@ -5,7 +5,7 @@ namespace YooAsset
 	/// <summary>
 	/// 沙盒补丁清单加载器
 	/// </summary>
-	internal class CacheManifestLoadOperation : AsyncOperationBase
+	internal class LoadCacheManifestOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
@@ -17,8 +17,8 @@ namespace YooAsset
 
 		private readonly string _packageName;
 		private DeserializeManifestOperation _deserializer;
-		private ESteps _steps = ESteps.None;
 		private string _manifestFilePath;
+		private ESteps _steps = ESteps.None;
 
 		/// <summary>
 		/// 加载结果
@@ -26,7 +26,7 @@ namespace YooAsset
 		public PatchManifest Manifest { private set; get; }
 
 
-		public CacheManifestLoadOperation(string packageName)
+		public LoadCacheManifestOperation(string packageName)
 		{
 			_packageName = packageName;
 		}

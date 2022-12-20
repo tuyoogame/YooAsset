@@ -4,7 +4,7 @@ namespace YooAsset
 	/// <summary>
 	/// 内置补丁清单复制器
 	/// </summary>
-	internal class BuildinManifestCopyOperation : AsyncOperationBase
+	internal class CopyBuildinManifestOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
@@ -20,7 +20,7 @@ namespace YooAsset
 		private ESteps _steps = ESteps.None;
 
 
-		public BuildinManifestCopyOperation(string buildinPackageName, string buildinPackageVersion)
+		public CopyBuildinManifestOperation(string buildinPackageName, string buildinPackageVersion)
 		{
 			_buildinPackageName = buildinPackageName;
 			_buildinPackageVersion = buildinPackageVersion;

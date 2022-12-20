@@ -4,7 +4,7 @@ namespace YooAsset
 	/// <summary>
 	/// 内置补丁清单加载器
 	/// </summary>
-	internal class BuildinManifestLoadOperation : AsyncOperationBase
+	internal class LoadBuildinManifestOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
@@ -27,7 +27,7 @@ namespace YooAsset
 		public PatchManifest Manifest { private set; get; }
 
 
-		public BuildinManifestLoadOperation(string buildinPackageName, string buildinPackageVersion)
+		public LoadBuildinManifestOperation(string buildinPackageName, string buildinPackageVersion)
 		{
 			_buildinPackageName = buildinPackageName;
 			_buildinPackageVersion = buildinPackageVersion;

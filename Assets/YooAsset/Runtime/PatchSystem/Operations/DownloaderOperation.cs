@@ -29,10 +29,10 @@ namespace YooAsset
 		private readonly List<DownloaderBase> _failedList = new List<DownloaderBase>(MAX_LOADER_COUNT);
 
 		// 数据相关
-		private ESteps _steps = ESteps.None;
 		private bool _isPause = false;
 		private long _lastDownloadBytes = 0;
 		private int _lastDownloadCount = 0;
+		private ESteps _steps = ESteps.None;
 
 
 		/// <summary>

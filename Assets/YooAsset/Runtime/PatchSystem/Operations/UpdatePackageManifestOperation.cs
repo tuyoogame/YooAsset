@@ -10,131 +10,20 @@ namespace YooAsset
 	/// </summary>
 	public abstract class UpdatePackageManifestOperation : AsyncOperationBase
 	{
-		internal IPlayModeServices _playModeServices;
-		internal PatchManifest _patchManifest;
-
 		/// <summary>
-		/// 是否发现了新的补丁清单
+		/// 发现了新的清单
 		/// </summary>
 		public bool FoundNewManifest { protected set; get; } = false;
 
-		#region 资源下载
 		/// <summary>
-		/// 创建补丁下载器，用于下载更新资源标签指定的资源包文件
+		/// 手动保存清单文件
 		/// </summary>
-		/// <param name="tag">资源标签</param>
-		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		/// <param name="timeout">超时时间</param>
-		public PatchDownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
-		{
-			if (Status != EOperationStatus.Succeed)
-			{
-				YooLogger.Error($"Please check { nameof(UpdatePackageManifestOperation)} status before call downloader !");
-				return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
-			}
-			return _playModeServices.CreatePatchDownloaderByTags(_patchManifest, new string[] { tag }, downloadingMaxNumber, failedTryAgain, timeout);
-		}
+		public virtual void SaveManifestFile() { }
 
 		/// <summary>
-		/// 创建补丁下载器，用于下载更新资源标签指定的资源包文件
+		/// 还原补丁清单
 		/// </summary>
-		/// <param name="tags">资源标签列表</param>
-		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		/// <param name="timeout">超时时间</param>
-		public PatchDownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
-		{
-			if (Status != EOperationStatus.Succeed)
-			{
-				YooLogger.Error($"Please check { nameof(UpdatePackageManifestOperation)} status before call downloader !");
-				return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
-			}
-			return _playModeServices.CreatePatchDownloaderByTags(_patchManifest, tags, downloadingMaxNumber, failedTryAgain, timeout);
-		}
-
-		/// <summary>
-		/// 创建补丁下载器，用于下载更新当前资源版本所有的资源包文件
-		/// </summary>
-		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		/// <param name="timeout">超时时间</param>
-		public PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
-		{
-			if (Status != EOperationStatus.Succeed)
-			{
-				YooLogger.Error($"Please check { nameof(UpdatePackageManifestOperation)} status before call downloader !");
-				return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
-			}
-			return _playModeServices.CreatePatchDownloaderByAll(_patchManifest, downloadingMaxNumber, failedTryAgain, timeout);
-		}
-
-		/// <summary>
-		/// 创建补丁下载器，用于下载更新指定的资源列表依赖的资源包文件
-		/// </summary>
-		/// <param name="assetInfos">资源信息列表</param>
-		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-		/// <param name="failedTryAgain">下载失败的重试次数</param>
-		/// <param name="timeout">超时时间</param>
-		public PatchDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
-		{
-			if (Status != EOperationStatus.Succeed)
-			{
-				YooLogger.Error($"Please check { nameof(UpdatePackageManifestOperation)} status before call downloader !");
-				return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
-			}
-			return _playModeServices.CreatePatchDownloaderByPaths(_patchManifest, assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
-		}
-		#endregion
-
-		#region 资源解压
-		/// <summary>
-		/// 创建补丁解压器
-		/// </summary>
-		/// <param name="tag">资源标签</param>
-		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
-		/// <param name="failedTryAgain">解压失败的重试次数</param>
-		public PatchUnpackerOperation CreatePatchUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
-		{
-			if (Status != EOperationStatus.Succeed)
-			{
-				YooLogger.Error($"Please check { nameof(UpdatePackageManifestOperation)} status before call unpacker !");
-				return PatchUnpackerOperation.CreateEmptyUnpacker(unpackingMaxNumber, failedTryAgain, int.MaxValue);
-			}
-			return _playModeServices.CreatePatchUnpackerByTags(_patchManifest, new string[] { tag }, unpackingMaxNumber, failedTryAgain, int.MaxValue);
-		}
-
-		/// <summary>
-		/// 创建补丁解压器
-		/// </summary>
-		/// <param name="tags">资源标签列表</param>
-		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
-		/// <param name="failedTryAgain">解压失败的重试次数</param>
-		public PatchUnpackerOperation CreatePatchUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
-		{
-			if (Status != EOperationStatus.Succeed)
-			{
-				YooLogger.Error($"Please check { nameof(UpdatePackageManifestOperation)} status before call unpacker !");
-				return PatchUnpackerOperation.CreateEmptyUnpacker(unpackingMaxNumber, failedTryAgain, int.MaxValue);
-			}
-			return _playModeServices.CreatePatchUnpackerByTags(_patchManifest, tags, unpackingMaxNumber, failedTryAgain, int.MaxValue);
-		}
-
-		/// <summary>
-		/// 创建补丁解压器
-		/// </summary>
-		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
-		/// <param name="failedTryAgain">解压失败的重试次数</param>
-		public PatchUnpackerOperation CreatePatchUnpacker(int unpackingMaxNumber, int failedTryAgain)
-		{
-			if (Status != EOperationStatus.Succeed)
-			{
-				YooLogger.Error($"Please check { nameof(UpdatePackageManifestOperation)} status before call unpacker !");
-				return PatchUnpackerOperation.CreateEmptyUnpacker(unpackingMaxNumber, failedTryAgain, int.MaxValue);
-			}
-			return _playModeServices.CreatePatchUnpackerByAll(_patchManifest, unpackingMaxNumber, failedTryAgain, int.MaxValue);
-		}
-		#endregion
+		public virtual void RevertManifest() { }
 	}
 
 	/// <summary>
@@ -142,9 +31,8 @@ namespace YooAsset
 	/// </summary>
 	internal sealed class EditorPlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
 	{
-		public EditorPlayModeUpdatePackageManifestOperation(EditorSimulateModeImpl impl)
+		public EditorPlayModeUpdatePackageManifestOperation()
 		{
-			_playModeServices = impl;
 		}
 		internal override void Start()
 		{
@@ -160,9 +48,8 @@ namespace YooAsset
 	/// </summary>
 	internal sealed class OfflinePlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
 	{
-		public OfflinePlayModeUpdatePackageManifestOperation(OfflinePlayModeImpl impl)
+		public OfflinePlayModeUpdatePackageManifestOperation()
 		{
-			_playModeServices = impl;
 		}
 		internal override void Start()
 		{
@@ -197,27 +84,24 @@ namespace YooAsset
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
 		private readonly string _packageVersion;
-		private bool _autoSaveManifest;
-		private bool _autoActiveManifest;
+		private readonly bool _autoSaveManifestFile;
 		private readonly int _timeout;
 		private UnityWebDataRequester _downloader1;
 		private UnityWebDataRequester _downloader2;
 		private DeserializeManifestOperation _deserializer;
-		private CacheFilesVerifyOperation _verifyOperation;
+		private VerifyCacheFilesOperation _verifyOperation;
 
+		internal PatchManifest _prePatchManifest;
 		private string _cacheManifestHash;
+		private byte[] _fileBytesData = null;
 		private ESteps _steps = ESteps.None;
-		private byte[] _fileBytes = null;
-		private float _verifyTime;
 
-		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, bool autoSaveManifest, bool autoActiveManifest, int timeout)
+		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, bool autoSaveManifestFile, int timeout)
 		{
-			_playModeServices = impl;
 			_impl = impl;
 			_packageName = packageName;
 			_packageVersion = packageVersion;
-			_autoSaveManifest = autoSaveManifest;
-			_autoActiveManifest = autoActiveManifest;
+			_autoSaveManifestFile = autoSaveManifestFile;
 			_timeout = timeout;
 		}
 		internal override void Start()
@@ -234,7 +118,7 @@ namespace YooAsset
 			{
 				string filePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
 				if (File.Exists(filePath))
-				{				
+				{
 					_cacheManifestHash = HashUtility.FileMD5(filePath);
 					_steps = ESteps.DownloadWebHash;
 				}
@@ -271,7 +155,6 @@ namespace YooAsset
 					if (_cacheManifestHash == webManifestHash)
 					{
 						YooLogger.Log($"Not found new package : {_packageName}");
-						_patchManifest = _impl.ActivePatchManifest;
 						FoundNewManifest = false;
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;
@@ -310,16 +193,13 @@ namespace YooAsset
 				else
 				{
 					byte[] bytesData = _downloader2.GetData();
-
-					// 保存文件到沙盒内
-					if (_autoSaveManifest)
+					if (_autoSaveManifestFile)
 					{
-						string savePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
-						FileUtility.CreateFile(savePath, bytesData);
+						SaveManifestFileInternal(bytesData);
 					}
 					else
 					{
-						_fileBytes = bytesData;
+						_fileBytesData = bytesData;
 					}
 
 					// 解析二进制数据
@@ -334,37 +214,27 @@ namespace YooAsset
 			if (_steps == ESteps.CheckDeserializeWebManifest)
 			{
 				Progress = _deserializer.Progress;
-				if (_deserializer.IsDone)
-				{
-					if (_deserializer.Status == EOperationStatus.Succeed)
-					{
-						if (_autoActiveManifest)
-						{
-							_impl.ActivePatchManifest = _deserializer.Manifest;
-						}
+				if (_deserializer.IsDone == false)
+					return;
 
-						_patchManifest = _deserializer.Manifest;
-						_steps = ESteps.StartVerifyOperation;
-					}
-					else
-					{
-						_steps = ESteps.Done;
-						Status = EOperationStatus.Failed;
-						Error = _deserializer.Error;				
-					}
+				if (_deserializer.Status == EOperationStatus.Succeed)
+				{
+					_prePatchManifest = _impl.ActivePatchManifest;
+					_impl.ActivePatchManifest = _deserializer.Manifest;
+					_steps = ESteps.StartVerifyOperation;
+				}
+				else
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = _deserializer.Error;
 				}
 			}
 
 			if (_steps == ESteps.StartVerifyOperation)
 			{
-#if UNITY_WEBGL
-				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_deserializer.Manifest, _impl);
-#else
-				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_deserializer.Manifest, _impl);
-#endif
-
+				_verifyOperation = VerifyCacheFilesOperation.CreateOperation(_deserializer.Manifest, _impl);
 				OperationSystem.StartOperation(_verifyOperation);
-				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
 				_steps = ESteps.CheckVerifyOperation;
 			}
 
@@ -375,8 +245,6 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
-					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
-					YooLogger.Log($"Verify result : Success {_verifyOperation.VerifySuccessList.Count}, Fail {_verifyOperation.VerifyFailList.Count}, Elapsed time {costTime} seconds");
 				}
 			}
 		}
@@ -384,37 +252,50 @@ namespace YooAsset
 		/// <summary>
 		/// 手动保存清单文件
 		/// </summary>
-		public void SaveManifest()
+		public override void SaveManifestFile()
 		{
-			if (_autoSaveManifest == false)
+			if (IsDone == false)
 			{
-				if (_fileBytes != null)
+				YooLogger.Warning($"{nameof(UpdatePackageManifestOperation)} is not done !");
+				return;
+			}
+
+			if (Status == EOperationStatus.Succeed)
+			{
+				if (_fileBytesData != null)
 				{
-					_autoSaveManifest = true;
-					string savePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
-					FileUtility.CreateFile(savePath, _fileBytes);
+					SaveManifestFileInternal(_fileBytesData);
+					_fileBytesData = null;
 				}
 			}
 		}
 
 		/// <summary>
-		/// 手动激活清单文件
+		/// 还原补丁清单
 		/// </summary>
-		public void ActiveManifest()
+		public override void RevertManifest()
 		{
-			if (_autoActiveManifest == false)
+			if (IsDone == false)
 			{
-				if (_deserializer.Status == EOperationStatus.Succeed)
+				YooLogger.Warning($"{nameof(UpdatePackageManifestOperation)} is not done !");
+				return;
+			}
+
+			if (Status == EOperationStatus.Succeed)
+			{
+				if (_prePatchManifest != null)
 				{
-					_autoActiveManifest = true;
-					_impl.ActivePatchManifest = _deserializer.Manifest;
+					_impl.ActivePatchManifest = _prePatchManifest;
+					_prePatchManifest = null;
 				}
 			}
 		}
 
-		/// <summary>
-		/// 获取补丁清单请求地址
-		/// </summary>
+		private void SaveManifestFileInternal(byte[] bytesData)
+		{
+			string savePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
+			FileUtility.CreateFile(savePath, bytesData);
+		}
 		private string GetPatchManifestRequestURL(string fileName)
 		{
 			// 轮流返回请求地址

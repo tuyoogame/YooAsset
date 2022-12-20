@@ -52,38 +52,24 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifest, bool autoActiveManifest, int timeout)
+		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifestFile, int timeout)
 		{
-			var operation = new OfflinePlayModeUpdatePackageManifestOperation(this);
+			var operation = new OfflinePlayModeUpdatePackageManifestOperation();
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		CheckPackageContentsOperation IPlayModeServices.CheckPackageContentsAsync()
+		CheckContentsIntegrityOperation IPlayModeServices.CheckContentsIntegrityAsync()
 		{
-			var operation = new OfflinePlayModeCheckPackageContentsOperation();
+			var operation = new OfflinePlayModeCheckContentsIntegrityOperation();
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
 
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(PatchManifest patchManifest, int downloadingMaxNumber, int failedTryAgain, int timeout)
-		{
-			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
-		}
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
-
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(PatchManifest patchManifest, string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
-		{
-			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
-		}
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
-		{
-			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
-		}
-
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(PatchManifest patchManifest, AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
@@ -92,16 +78,7 @@ namespace YooAsset
 			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
-		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(PatchManifest patchManifest, int upackingMaxNumber, int failedTryAgain, int timeout)
-		{
-			return PatchUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
-		}
 		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
-		{
-			return PatchUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
-		}
-
-		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(PatchManifest patchManifest, string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
 			return PatchUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
 		}

@@ -211,29 +211,29 @@ namespace YooAsset
 		/// <param name="packageVersion">更新的包裹版本</param>
 		/// <param name="autoActiveManifest">自动激活清单</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifest = true, bool autoActiveManifest = true, int timeout = 60)
+		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifestFile = true, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			DebugCheckUpdateManifest();
-			return _playModeServices.UpdatePackageManifestAsync(packageVersion, autoSaveManifest, autoActiveManifest, timeout);
+			return _playModeServices.UpdatePackageManifestAsync(packageVersion, autoSaveManifestFile, timeout);
 		}
 
 		/// <summary>
-		/// 检查本地包裹内容的完整性
+		/// 检查包裹内容的完整性
 		/// </summary>
-		public CheckPackageContentsOperation CheckPackageContentsAsync()
+		public CheckContentsIntegrityOperation CheckContentsIntegrityAsync()
 		{
 			DebugCheckInitialize();
-			return _playModeServices.CheckPackageContentsAsync();
+			return _playModeServices.CheckContentsIntegrityAsync();
 		}
 
 		/// <summary>
-		/// 清理本地包裹未使用的缓存文件
+		/// 清理包裹未使用的缓存文件
 		/// </summary>
-		public ClearPackageUnusedCacheFilesOperation ClearPackageUnusedCacheFilesAsync()
+		public ClearUnusedCacheFilesOperation ClearUnusedCacheFilesAsync()
 		{
 			DebugCheckInitialize();
-			var operation = new ClearPackageUnusedCacheFilesOperation(this);
+			var operation = new ClearUnusedCacheFilesOperation(this);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}

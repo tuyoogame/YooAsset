@@ -101,17 +101,15 @@ namespace YooAsset
 
 		private readonly OfflinePlayModeImpl _impl;
 		private readonly string _packageName;
-		private BuildinPackageVersionQueryOperation _buildinPackageVersionQuery;
-		private BuildinManifestLoadOperation _buildinManifestLoad;
-		private CacheFilesVerifyOperation _verifyOperation;
+		private QueryBuildinPackageVersionOperation _buildinPackageVersionQuery;
+		private LoadBuildinManifestOperation _buildinManifestLoad;
+		private VerifyCacheFilesOperation _verifyOperation;
 		private ESteps _steps = ESteps.None;
-		private float _verifyTime;
-
+	
 		internal OfflinePlayModeInitializationOperation(OfflinePlayModeImpl impl, string packageName)
 		{
 			_impl = impl;
 			_packageName = packageName;
-
 		}
 		internal override void Start()
 		{
@@ -126,7 +124,7 @@ namespace YooAsset
 			{
 				if (_buildinPackageVersionQuery == null)
 				{
-					_buildinPackageVersionQuery = new BuildinPackageVersionQueryOperation(_packageName);
+					_buildinPackageVersionQuery = new QueryBuildinPackageVersionOperation(_packageName);
 					OperationSystem.StartOperation(_buildinPackageVersionQuery);
 				}
 
@@ -149,7 +147,7 @@ namespace YooAsset
 			{
 				if (_buildinManifestLoad == null)
 				{
-					_buildinManifestLoad = new BuildinManifestLoadOperation(_packageName, _buildinPackageVersionQuery.Version);
+					_buildinManifestLoad = new LoadBuildinManifestOperation(_packageName, _buildinPackageVersionQuery.Version);
 					OperationSystem.StartOperation(_buildinManifestLoad);
 				}
 
@@ -173,14 +171,8 @@ namespace YooAsset
 
 			if (_steps == ESteps.StartVerifyOperation)
 			{
-#if UNITY_WEBGL
-				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.ActivePatchManifest, _impl);
-#else
-				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, _impl);
-#endif
-
+				_verifyOperation = VerifyCacheFilesOperation.CreateOperation(_impl.ActivePatchManifest, _impl);
 				OperationSystem.StartOperation(_verifyOperation);
-				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
 				_steps = ESteps.CheckVerifyOperation;
 			}
 
@@ -191,8 +183,6 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
-					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
-					YooLogger.Log($"Verify result : Success {_verifyOperation.VerifySuccessList.Count}, Fail {_verifyOperation.VerifyFailList.Count}, Elapsed time {costTime} seconds");
 				}
 			}
 		}
@@ -219,13 +209,12 @@ namespace YooAsset
 
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
-		private BuildinPackageVersionQueryOperation _buildinPackageVersionQuery;
-		private BuildinManifestCopyOperation _buildinManifestCopy;
-		private BuildinManifestLoadOperation _buildinManifestLoad;
-		private CacheManifestLoadOperation _cacheManifestLoad;
-		private CacheFilesVerifyOperation _verifyOperation;
+		private QueryBuildinPackageVersionOperation _buildinPackageVersionQuery;
+		private CopyBuildinManifestOperation _buildinManifestCopy;
+		private LoadBuildinManifestOperation _buildinManifestLoad;
+		private LoadCacheManifestOperation _cacheManifestLoad;
+		private VerifyCacheFilesOperation _verifyOperation;
 		private ESteps _steps = ESteps.None;
-		private float _verifyTime;
 
 		internal HostPlayModeInitializationOperation(HostPlayModeImpl impl, string packageName)
 		{
@@ -260,7 +249,7 @@ namespace YooAsset
 			{
 				if (_cacheManifestLoad == null)
 				{
-					_cacheManifestLoad = new CacheManifestLoadOperation(_packageName);
+					_cacheManifestLoad = new LoadCacheManifestOperation(_packageName);
 					OperationSystem.StartOperation(_cacheManifestLoad);
 				}
 
@@ -283,7 +272,7 @@ namespace YooAsset
 			{
 				if (_buildinPackageVersionQuery == null)
 				{
-					_buildinPackageVersionQuery = new BuildinPackageVersionQueryOperation(_packageName);
+					_buildinPackageVersionQuery = new QueryBuildinPackageVersionOperation(_packageName);
 					OperationSystem.StartOperation(_buildinPackageVersionQuery);
 				}
 
@@ -308,7 +297,7 @@ namespace YooAsset
 			{
 				if (_buildinManifestCopy == null)
 				{
-					_buildinManifestCopy = new BuildinManifestCopyOperation(_packageName, _buildinPackageVersionQuery.Version);
+					_buildinManifestCopy = new CopyBuildinManifestOperation(_packageName, _buildinPackageVersionQuery.Version);
 					OperationSystem.StartOperation(_buildinManifestCopy);
 				}
 
@@ -332,7 +321,7 @@ namespace YooAsset
 			{
 				if (_buildinManifestLoad == null)
 				{
-					_buildinManifestLoad = new BuildinManifestLoadOperation(_packageName, _buildinPackageVersionQuery.Version);
+					_buildinManifestLoad = new LoadBuildinManifestOperation(_packageName, _buildinPackageVersionQuery.Version);
 					OperationSystem.StartOperation(_buildinManifestLoad);
 				}
 
@@ -356,14 +345,8 @@ namespace YooAsset
 
 			if (_steps == ESteps.StartVerifyOperation)
 			{
-#if UNITY_WEBGL
-				_verifyOperation = new CacheFilesVerifyWithoutThreadOperation(_impl.ActivePatchManifest, _impl);
-#else
-				_verifyOperation = new CacheFilesVerifyWithThreadOperation(_impl.ActivePatchManifest, _impl);
-#endif
-
+				_verifyOperation = VerifyCacheFilesOperation.CreateOperation(_impl.ActivePatchManifest, _impl);
 				OperationSystem.StartOperation(_verifyOperation);
-				_verifyTime = UnityEngine.Time.realtimeSinceStartup;
 				_steps = ESteps.CheckVerifyOperation;
 			}
 
@@ -374,8 +357,6 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
-					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyTime;
-					YooLogger.Log($"Verify result : Success {_verifyOperation.VerifySuccessList.Count}, Fail {_verifyOperation.VerifyFailList.Count}, Elapsed time {costTime} seconds");
 				}
 			}
 		}

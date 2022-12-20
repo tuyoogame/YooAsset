@@ -4,7 +4,7 @@ namespace YooAsset
 	/// <summary>
 	/// 内置补丁清单版本查询器
 	/// </summary>
-	internal class BuildinPackageVersionQueryOperation : AsyncOperationBase
+	internal class QueryBuildinPackageVersionOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
@@ -24,7 +24,7 @@ namespace YooAsset
 		public string Version { private set; get; }
 
 
-		public BuildinPackageVersionQueryOperation(string packageName)
+		public QueryBuildinPackageVersionOperation(string packageName)
 		{
 			_packageName = packageName;
 		}

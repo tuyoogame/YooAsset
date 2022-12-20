@@ -9,16 +9,26 @@ namespace YooAsset
 	/// <summary>
 	/// 本地缓存文件验证
 	/// </summary>
-	internal abstract class CacheFilesVerifyOperation : AsyncOperationBase
+	internal abstract class VerifyCacheFilesOperation : AsyncOperationBase
 	{
 		public List<VerifyInfo> VerifySuccessList { protected set; get; }
 		public List<VerifyInfo> VerifyFailList { protected set; get; }
-	}
 
+		public static VerifyCacheFilesOperation CreateOperation(PatchManifest patchManifest, IPlayModeServices playModeServices)
+		{
+#if UNITY_WEBGL
+			VerifyCacheFilesOperation operation = new VerifyCacheFilesWithoutThreadOperation(patchManifest, playModeServices);
+#else
+			VerifyCacheFilesOperation operation = new VerifyCacheFilesWithThreadOperation(patchManifest, playModeServices);
+#endif
+			return operation;
+		}
+	}
+	
 	/// <summary>
 	/// 本地缓存文件验证（线程版）
 	/// </summary>
-	internal class CacheFilesVerifyWithThreadOperation : CacheFilesVerifyOperation
+	internal class VerifyCacheFilesWithThreadOperation : VerifyCacheFilesOperation
 	{
 		private enum ESteps
 		{
@@ -31,15 +41,15 @@ namespace YooAsset
 
 		private readonly PatchManifest _patchManifest;
 		private readonly IPlayModeServices _playModeServices;
-		private ESteps _steps = ESteps.None;
-
 		private readonly ThreadSyncContext _syncContext = new ThreadSyncContext();
 		private List<VerifyInfo> _waitingList;
 		private List<VerifyInfo> _verifyingList;
 		private int _verifyMaxNum;
 		private int _verifyTotalCount;
+		private float _verifyStartTime;
+		private ESteps _steps = ESteps.None;
 
-		public CacheFilesVerifyWithThreadOperation(PatchManifest patchManifest, IPlayModeServices playModeServices)
+		public VerifyCacheFilesWithThreadOperation(PatchManifest patchManifest, IPlayModeServices playModeServices)
 		{
 			_patchManifest = patchManifest;
 			_playModeServices = playModeServices;
@@ -47,6 +57,7 @@ namespace YooAsset
 		internal override void Start()
 		{
 			_steps = ESteps.InitVerify;
+			_verifyStartTime = UnityEngine.Time.realtimeSinceStartup;
 		}
 		internal override void Update()
 		{
@@ -95,6 +106,8 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
+					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyStartTime;
+					YooLogger.Log($"Verify elapsed time {costTime:f1} seconds");
 				}
 
 				for (int i = _waitingList.Count - 1; i >= 0; i--)
@@ -162,7 +175,7 @@ namespace YooAsset
 	/// <summary>
 	/// 本地缓存文件验证（非线程版）
 	/// </summary>
-	internal class CacheFilesVerifyWithoutThreadOperation : CacheFilesVerifyOperation
+	internal class VerifyCacheFilesWithoutThreadOperation : VerifyCacheFilesOperation
 	{
 		private enum ESteps
 		{
@@ -175,14 +188,14 @@ namespace YooAsset
 
 		private readonly PatchManifest _patchManifest;
 		private readonly IPlayModeServices _playModeServices;
-		private ESteps _steps = ESteps.None;
-
 		private List<VerifyInfo> _waitingList;
 		private List<VerifyInfo> _verifyingList;
 		private int _verifyMaxNum;
 		private int _verifyTotalCount;
+		private float _verifyStartTime;
+		private ESteps _steps = ESteps.None;
 
-		public CacheFilesVerifyWithoutThreadOperation(PatchManifest patchManifest, IPlayModeServices playModeServices)
+		public VerifyCacheFilesWithoutThreadOperation(PatchManifest patchManifest, IPlayModeServices playModeServices)
 		{
 			_patchManifest = patchManifest;
 			_playModeServices = playModeServices;
@@ -190,6 +203,7 @@ namespace YooAsset
 		internal override void Start()
 		{
 			_steps = ESteps.InitVerify;
+			_verifyStartTime = UnityEngine.Time.realtimeSinceStartup;
 		}
 		internal override void Update()
 		{
@@ -232,6 +246,8 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
+					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyStartTime;
+					YooLogger.Log($"Verify elapsed time {costTime:f1} seconds");
 				}
 
 				for (int i = _waitingList.Count - 1; i >= 0; i--)

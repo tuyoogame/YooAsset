@@ -19,15 +19,13 @@ namespace YooAsset
 
 		public PatchManifest Manifest { private set; get; }
 		private readonly BufferReader _buffer;
-		private ESteps _steps = ESteps.None;
 		private int _patchAssetCount;
 		private int _patchBundleCount;
 		private int _progressTotalValue;
-
+		private ESteps _steps = ESteps.None;
 
 		public DeserializeManifestOperation(byte[] binaryData)
 		{
-			// 创建缓存器
 			_buffer = new BufferReader(binaryData);
 		}
 		internal override void Start()
@@ -43,13 +41,21 @@ namespace YooAsset
 			{
 				if (_steps == ESteps.DeserializeFileHeader)
 				{
+					if (_buffer.IsValid == false)
+					{
+						_steps = ESteps.Done;
+						Status = EOperationStatus.Failed;
+						Error = "Buffer is invalid !";
+						return;
+					}
+
 					// 读取文件标记
 					uint fileSign = _buffer.ReadUInt32();
 					if (fileSign != YooAssetSettings.PatchManifestFileSign)
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
-						Error = "Invalid manifest file format !";
+						Error = "The manifest file format is invalid !";
 						return;
 					}
 
@@ -151,7 +157,7 @@ namespace YooAsset
 					}
 				}
 			}
-			catch(System.Exception e)
+			catch (System.Exception e)
 			{
 				Manifest = null;
 				_steps = ESteps.Done;

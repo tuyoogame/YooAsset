@@ -17,6 +17,20 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 是否有效
+		/// </summary>
+		public bool IsValid
+		{
+			get
+			{
+				if (_buffer == null || _buffer.Length == 0)
+					return false;
+				else
+					return true;
+			}
+		}
+
+		/// <summary>
 		/// 缓冲区容量
 		/// </summary>
 		public int Capacity

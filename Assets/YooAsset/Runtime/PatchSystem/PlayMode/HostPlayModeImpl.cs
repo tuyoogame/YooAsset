@@ -109,25 +109,19 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifest, bool autoActiveManifest, int timeout)
+		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifestFile, int timeout)
 		{
-			var operation = new HostPlayModeUpdatePackageManifestOperation(this, _packageName, packageVersion, autoSaveManifest, autoActiveManifest, timeout);
+			var operation = new HostPlayModeUpdatePackageManifestOperation(this, _packageName, packageVersion, autoSaveManifestFile, timeout);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		CheckPackageContentsOperation IPlayModeServices.CheckPackageContentsAsync()
+		CheckContentsIntegrityOperation IPlayModeServices.CheckContentsIntegrityAsync()
 		{
-			var operation = new HostPlayModeCheckPackageContentsOperation(this, _packageName);
+			var operation = new HostPlayModeCheckContentsIntegrityOperation(this, _packageName);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
 
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(PatchManifest patchManifest, int downloadingMaxNumber, int failedTryAgain, int timeout)
-		{
-			List<BundleInfo> downloadList = GetDownloadListByAll(patchManifest);
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
-			return operation;
-		}
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByAll(_activePatchManifest);
@@ -153,12 +147,6 @@ namespace YooAsset
 			return ConvertToDownloadList(downloadList);
 		}
 
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(PatchManifest patchManifest, string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
-		{
-			List<BundleInfo> downloadList = GetDownloadListByTags(patchManifest, tags);
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
-			return operation;
-		}
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByTags(_activePatchManifest, tags);
@@ -196,12 +184,6 @@ namespace YooAsset
 			return ConvertToDownloadList(downloadList);
 		}
 
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(PatchManifest patchManifest, AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
-		{
-			List<BundleInfo> downloadList = GetDownloadListByPaths(patchManifest, assetInfos);
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
-			return operation;
-		}
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByPaths(_activePatchManifest, assetInfos);
@@ -251,12 +233,6 @@ namespace YooAsset
 			return ConvertToDownloadList(downloadList);
 		}
 
-		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(PatchManifest patchManifest, int upackingMaxNumber, int failedTryAgain, int timeout)
-		{
-			List<BundleInfo> unpcakList = GetUnpackListByAll(patchManifest);
-			var operation = new PatchUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
-			return operation;
-		}
 		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> unpcakList = GetUnpackListByAll(_activePatchManifest);
@@ -281,12 +257,6 @@ namespace YooAsset
 			return ConvertToUnpackList(downloadList);
 		}
 
-		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(PatchManifest patchManifest, string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
-		{
-			List<BundleInfo> unpcakList = GetUnpackListByTags(patchManifest, tags);
-			var operation = new PatchUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
-			return operation;
-		}
 		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> unpcakList = GetUnpackListByTags(_activePatchManifest, tags);

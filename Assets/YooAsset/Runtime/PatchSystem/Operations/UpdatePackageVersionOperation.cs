@@ -51,8 +51,8 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			LoadStaticVersion,
-			CheckStaticVersion,
+			LoadPackageVersion,
+			CheckLoadPackageVersion,
 			Done,
 		}
 
@@ -74,24 +74,24 @@ namespace YooAsset
 		internal override void Start()
 		{
 			RequestCount++;
-			_steps = ESteps.LoadStaticVersion;
+			_steps = ESteps.LoadPackageVersion;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
-			if (_steps == ESteps.LoadStaticVersion)
+			if (_steps == ESteps.LoadPackageVersion)
 			{
 				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(_packageName);
-				string webURL = GetStaticVersionRequestURL(fileName);
+				string webURL = GetPackageVersionRequestURL(fileName);
 				YooLogger.Log($"Beginning to request package version : {webURL}");
 				_downloader = new UnityWebDataRequester();
 				_downloader.SendRequest(webURL, _timeout);
-				_steps = ESteps.CheckStaticVersion;
+				_steps = ESteps.CheckLoadPackageVersion;
 			}
 
-			if (_steps == ESteps.CheckStaticVersion)
+			if (_steps == ESteps.CheckLoadPackageVersion)
 			{
 				Progress = _downloader.Progress();
 				if (_downloader.IsDone() == false)
@@ -123,7 +123,7 @@ namespace YooAsset
 			}
 		}
 
-		private string GetStaticVersionRequestURL(string fileName)
+		private string GetPackageVersionRequestURL(string fileName)
 		{
 			string url;
 
