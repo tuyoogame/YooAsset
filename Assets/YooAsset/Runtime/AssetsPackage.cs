@@ -761,7 +761,7 @@ namespace YooAsset
 			var loadedBundleInfos = _assetSystemImpl.GetLoadedBundleInfos();
 			if (loadedBundleInfos.Count > 0)
 			{
-				YooLogger.Error($"Found loaded bundle before update manifest ! Recommended to call the  {nameof(ForceUnloadAllAssets)} method to release loaded bundle !");
+				YooLogger.Warning($"Found loaded bundle before update manifest ! Recommended to call the  {nameof(ForceUnloadAllAssets)} method to release loaded bundle !");
 			}
 		}
 		#endregion
