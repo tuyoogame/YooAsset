@@ -41,6 +41,7 @@ namespace YooAsset
 		/// </summary>
 		public const string PatchManifestFileVersion = "1.4.0";
 
+
 		/// <summary>
 		/// 构建输出文件夹名称
 		/// </summary>

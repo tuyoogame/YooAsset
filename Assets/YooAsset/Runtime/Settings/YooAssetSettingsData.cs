@@ -83,9 +83,14 @@ namespace YooAsset
 		/// <summary>
 		/// 获取着色器资源包全名称（包含后缀名）
 		/// </summary>
-		public static string GetUnityShadersBundleFullName()
+		public static string GetUnityShadersBundleFullName(bool uniqueBundleName, string packageName)
 		{
-			return $"{YooAssetSettings.UnityShadersBundleName}.{Setting.AssetBundleFileVariant}";
+			string shareBundleName;
+			if (uniqueBundleName)
+				shareBundleName = $"{packageName.ToLower()}_{YooAssetSettings.UnityShadersBundleName}.{Setting.AssetBundleFileVariant}";
+			else
+				shareBundleName = $"{YooAssetSettings.UnityShadersBundleName}.{Setting.AssetBundleFileVariant}";
+			return shareBundleName.ToLower();
 		}
 	}
 }
