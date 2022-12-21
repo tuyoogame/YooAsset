@@ -33,7 +33,7 @@ namespace YooAsset.Editor
 			// 开始构建
 			IBundleBuildResults buildResults;
 			var buildParameters = buildParametersContext.GetSBPBuildParameters();
-			var shadersBunldeName = YooAssetSettingsData.GetUnityShadersBundleFullName();
+			var shadersBunldeName = YooAssetSettingsData.GetUnityShadersBundleFullName(buildMapContext.UniqueBundleName, buildParametersContext.Parameters.PackageName);
 			var taskList = SBPBuildTasks.Create(shadersBunldeName);
 			ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out buildResults, taskList);
 			if (exitCode < 0)

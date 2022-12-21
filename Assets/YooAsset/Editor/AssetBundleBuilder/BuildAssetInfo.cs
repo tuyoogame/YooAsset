@@ -175,8 +175,7 @@ namespace YooAsset.Editor
 
 				if (IsShaderAsset)
 				{
-					string shareBundleName = YooAssetSettingsData.GetUnityShadersBundleFullName();
-					_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
+					_shareBundleName = YooAssetSettingsData.GetUnityShadersBundleFullName(uniqueBundleName, packageName);
 				}
 				else
 				{
@@ -188,14 +187,12 @@ namespace YooAsset.Editor
 							bundleName = EditorTools.GetRegularPath(bundleName).Replace('/', '_').Replace('.', '_').ToLower();
 						else
 							bundleName = EditorTools.GetRegularPath(bundleName).ToLower();
-						_shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-					}
-				}
 
-				if (uniqueBundleName)
-				{
-					if (string.IsNullOrEmpty(_shareBundleName) == false)
-						_shareBundleName = $"{packageName.ToLower()}_{_shareBundleName}";
+						if (uniqueBundleName)
+							_shareBundleName = $"{packageName.ToLower()}_share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+						else
+							_shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
+					}
 				}
 			}
 			else
@@ -203,12 +200,17 @@ namespace YooAsset.Editor
 				if (IsRawAsset)
 				{
 					string mainBundleName = $"{_mainBundleName}.{YooAssetSettingsData.Setting.RawFileVariant}";
-					_mainBundleName = EditorTools.GetRegularPath(mainBundleName).ToLower();
+					_mainBundleName = mainBundleName.ToLower();
 				}
 				else
 				{
 					string mainBundleName = $"{_mainBundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-					_mainBundleName = EditorTools.GetRegularPath(mainBundleName).ToLower(); ;
+					_mainBundleName = mainBundleName.ToLower(); ;
+				}
+
+				if (uniqueBundleName)
+				{
+					_mainBundleName = $"{packageName.ToLower()}_{_mainBundleName}";
 				}
 			}
 		}

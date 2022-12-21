@@ -36,14 +36,6 @@ namespace YooAsset.Editor
 		public void SetCollectAssets(List<CollectAssetInfo> collectAssets)
 		{
 			CollectAssets = collectAssets;
-
-			if (UniqueBundleName)
-			{
-				foreach (var collectAsset in CollectAssets)
-				{
-					collectAsset.BundleNameAppendPackageName(PackageName);
-				}
-			}
 		}
 	}
 }

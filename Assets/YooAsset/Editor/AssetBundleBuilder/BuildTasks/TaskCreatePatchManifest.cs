@@ -42,12 +42,13 @@ namespace YooAsset.Editor
 			patchManifest.AssetList = GetAllPatchAsset(context, patchManifest);
 
 			// 更新Unity内置资源包的引用关系
+			string shadersBunldeName = YooAssetSettingsData.GetUnityShadersBundleFullName(buildMapContext.UniqueBundleName, buildParameters.PackageName);
 			if (buildParameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
 				if (buildParameters.BuildMode == EBuildMode.IncrementalBuild)
 				{
 					var buildResultContext = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
-					UpdateBuiltInBundleReference(patchManifest, buildResultContext.Results);
+					UpdateBuiltInBundleReference(patchManifest, buildResultContext.Results, shadersBunldeName);
 				}
 			}
 
@@ -165,10 +166,9 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 更新Unity内置资源包的引用关系
 		/// </summary>
-		private void UpdateBuiltInBundleReference(PatchManifest patchManifest, IBundleBuildResults buildResults)
+		private void UpdateBuiltInBundleReference(PatchManifest patchManifest, IBundleBuildResults buildResults, string shadersBunldeName)
 		{
 			// 获取所有依赖着色器资源包的资源包列表
-			string shadersBunldeName = YooAssetSettingsData.GetUnityShadersBundleFullName();
 			List<string> shaderBundleReferenceList = new List<string>();
 			foreach (var valuePair in buildResults.BundleInfos)
 			{
