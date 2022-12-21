@@ -15,4 +15,4 @@ MonoBehaviour:
   AssetBundleFileVariant: bundle
   RawFileVariant: rawfile
   PatchManifestFileName: PatchManifest
-  UnityManifestFileName: UnityManifest
+  RegularBundleName: 1
