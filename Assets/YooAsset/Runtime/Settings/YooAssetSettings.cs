@@ -20,6 +20,11 @@ namespace YooAsset
 		/// </summary>
 		public string PatchManifestFileName = "PatchManifest";
 
+		/// <summary>
+		/// 资源包名正规化（移除路径分隔符）
+		/// </summary>
+		public bool RegularBundleName = true;
+
 
 		/// <summary>
 		/// 清单文件头标记
@@ -34,7 +39,7 @@ namespace YooAsset
 		/// <summary>
 		/// 清单文件格式版本
 		/// </summary>
-		public const string PatchManifestFileVersion = "1.3.4";
+		public const string PatchManifestFileVersion = "1.4.0";
 
 		/// <summary>
 		/// 构建输出文件夹名称
