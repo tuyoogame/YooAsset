@@ -7,18 +7,18 @@ namespace YooAsset.Editor
 	public enum EOutputNameStyle
 	{
 		/// <summary>
-		/// 000000000000000f000000000000000
+		/// 哈希值名称
 		/// </summary>
 		HashName = 1,
 
 		/// <summary>
-		/// 000000000000000f000000000000000.bundle
+		/// 资源包名称
 		/// </summary>
-		HashName_Extension = 2,
+		BundleName = 2,
 
 		/// <summary>
-		/// 000000000000000f000000000000000_bundle_name.bundle
+		/// 资源包名称 + 哈希值名称
 		/// </summary>
-		HashName_BundleName_Extension = 4,
+		BundleName_HashName = 4,
 	}
 }

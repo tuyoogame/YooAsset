@@ -293,7 +293,10 @@ namespace YooAsset.Editor
 			// 根据规则设置获取资源包名称
 			IPackRule packRuleInstance = AssetBundleCollectorSettingData.GetPackRuleInstance(PackRuleName);
 			string bundleName = packRuleInstance.GetBundleName(new PackRuleData(assetPath, CollectPath, group.GroupName));
-			return EditorTools.GetRegularPath(bundleName).ToLower();
+			if(YooAssetSettingsData.Setting.RegularBundleName)
+				return EditorTools.GetRegularPath(bundleName).Replace('/', '_').Replace('.', '_').ToLower();
+			else
+				return EditorTools.GetRegularPath(bundleName).ToLower();
 		}
 		private List<string> GetAssetTags(AssetBundleCollectorGroup group)
 		{

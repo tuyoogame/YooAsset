@@ -184,8 +184,11 @@ namespace YooAsset.Editor
 					{
 						IPackRule packRule = PackDirectory.StaticPackRule;
 						var bundleName = packRule.GetBundleName(new PackRuleData(AssetPath));
-						var shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-						_shareBundleName = EditorTools.GetRegularPath(shareBundleName).ToLower();
+						if (YooAssetSettingsData.Setting.RegularBundleName)
+							bundleName = EditorTools.GetRegularPath(bundleName).Replace('/', '_').Replace('.', '_').ToLower();
+						else
+							bundleName = EditorTools.GetRegularPath(bundleName).ToLower();
+						_shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
 					}
 				}
 
