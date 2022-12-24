@@ -13,6 +13,7 @@ namespace YooAsset
 		private readonly static Dictionary<string, SceneOperationHandle> _sceneHandles = new Dictionary<string, SceneOperationHandle>(100);
 		private static long _sceneCreateCount = 0;
 
+		private string _packageName;
 		private bool _simulationOnEditor;
 		private int _loadingMaxNumber;
 		public IDecryptionServices DecryptionServices { private set; get; }
@@ -23,8 +24,9 @@ namespace YooAsset
 		/// 初始化
 		/// 注意：在使用AssetSystem之前需要初始化
 		/// </summary>
-		public void Initialize(bool simulationOnEditor, int loadingMaxNumber, IDecryptionServices decryptionServices, IBundleServices bundleServices)
+		public void Initialize(string packageName, bool simulationOnEditor, int loadingMaxNumber, IDecryptionServices decryptionServices, IBundleServices bundleServices)
 		{
+			_packageName = packageName;
 			_simulationOnEditor = simulationOnEditor;
 			_loadingMaxNumber = loadingMaxNumber;
 			DecryptionServices = decryptionServices;
@@ -184,7 +186,7 @@ namespace YooAsset
 			}
 
 			var handle = provider.CreateHandle<SceneOperationHandle>();
-			handle.PackageName = BundleServices.GetPackageName();
+			handle.PackageName = _packageName;
 			_sceneHandles.Add(providerGUID, handle);
 			return handle;
 		}
@@ -300,7 +302,7 @@ namespace YooAsset
 			// 释放资源包下的所有场景
 			if (BundleServices.IsServicesValid())
 			{
-				string packageName = BundleServices.GetPackageName();
+				string packageName = _packageName;
 				List<string> removeList = new List<string>();
 				foreach (var valuePair in _sceneHandles)
 				{

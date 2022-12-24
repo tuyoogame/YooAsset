@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -265,6 +266,31 @@ namespace YooAsset
 			return result.ToArray();
 		}
 
+		/// <summary>
+		/// 资源定位地址转换为资源信息类，失败时内部会发出错误日志。
+		/// </summary>
+		/// <returns>如果转换失败会返回一个无效的资源信息类</returns>
+		public AssetInfo ConvertLocationToAssetInfo(string location, System.Type assetType)
+		{
+			DebugCheckLocation(location);
+
+			string assetPath = MappingToAssetPath(location);
+			if (TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
+			{
+				AssetInfo assetInfo = new AssetInfo(patchAsset, assetType);
+				return assetInfo;
+			}
+			else
+			{
+				string error;
+				if (string.IsNullOrEmpty(location))
+					error = $"The location is null or empty !";
+				else
+					error = $"The location is invalid : {location}";
+				AssetInfo assetInfo = new AssetInfo(error);
+				return assetInfo;
+			}
+		}
 
 		/// <summary>
 		/// 生成Bundle文件的正式名称
@@ -291,5 +317,25 @@ namespace YooAsset
 				throw new NotImplementedException($"Invalid name style : {nameStyle}");
 			}
 		}
+
+		#region 调试方法
+		[Conditional("DEBUG")]
+		private void DebugCheckLocation(string location)
+		{
+			if (string.IsNullOrEmpty(location) == false)
+			{
+				// 检查路径末尾是否有空格
+				int index = location.LastIndexOf(" ");
+				if (index != -1)
+				{
+					if (location.Length == index + 1)
+						YooLogger.Warning($"Found blank character in location : \"{location}\"");
+				}
+
+				if (location.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
+					YooLogger.Warning($"Found illegal character in location : \"{location}\"");
+			}
+		}
+		#endregion
 	}
 }

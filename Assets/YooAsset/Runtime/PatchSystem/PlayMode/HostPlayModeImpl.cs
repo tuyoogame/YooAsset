@@ -185,7 +185,7 @@ namespace YooAsset
 			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
-		private List<BundleInfo> GetDownloadListByPaths(PatchManifest patchManifest, AssetInfo[] assetInfos)
+		public List<BundleInfo> GetDownloadListByPaths(PatchManifest patchManifest, AssetInfo[] assetInfos)
 		{
 			// 获取资源对象的资源包和所有依赖资源包
 			List<PatchBundle> checkList = new List<PatchBundle>();
@@ -327,33 +327,6 @@ namespace YooAsset
 				result.Add(bundleInfo);
 			}
 			return result.ToArray();
-		}
-		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
-		{
-			return _activeManifest.GetAssetsInfoByTags(tags);
-		}
-		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
-		{
-			if (_activeManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
-				return patchAsset;
-			else
-				return null;
-		}
-		string IBundleServices.MappingToAssetPath(string location)
-		{
-			return _activeManifest.MappingToAssetPath(location);
-		}
-		string IBundleServices.TryMappingToAssetPath(string location)
-		{
-			return _activeManifest.TryMappingToAssetPath(location);
-		}
-		string IBundleServices.GetPackageName()
-		{
-			return _packageName;
-		}
-		bool IBundleServices.IsIncludeBundleFile(string fileName)
-		{
-			return _activeManifest.IsIncludeBundleFile(fileName);
 		}
 		bool IBundleServices.IsServicesValid()
 		{

@@ -58,7 +58,7 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-
+		
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
@@ -96,33 +96,6 @@ namespace YooAsset
 		BundleInfo[] IBundleServices.GetAllDependBundleInfos(AssetInfo assetInfo)
 		{
 			throw new NotImplementedException();
-		}
-		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
-		{
-			return _activeManifest.GetAssetsInfoByTags(tags);
-		}
-		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
-		{
-			if (_activeManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
-				return patchAsset;
-			else
-				return null;
-		}
-		string IBundleServices.MappingToAssetPath(string location)
-		{
-			return _activeManifest.MappingToAssetPath(location);
-		}
-		string IBundleServices.TryMappingToAssetPath(string location)
-		{
-			return _activeManifest.TryMappingToAssetPath(location);
-		}
-		string IBundleServices.GetPackageName()
-		{
-			return _packageName;
-		}
-		bool IBundleServices.IsIncludeBundleFile(string fileName)
-		{
-			return _activeManifest.IsIncludeBundleFile(fileName);
 		}
 		bool IBundleServices.IsServicesValid()
 		{

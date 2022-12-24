@@ -87,7 +87,7 @@ namespace YooAsset
 				var editorSimulateModeImpl = new EditorSimulateModeImpl();
 				_bundleServices = editorSimulateModeImpl;
 				_playModeServices = editorSimulateModeImpl;
-				_assetSystemImpl.Initialize(true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+				_assetSystemImpl.Initialize(PackageName, true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
 
 				var initializeParameters = parameters as EditorSimulateModeParameters;
 				initializeOperation = editorSimulateModeImpl.InitializeAsync(PackageName, initializeParameters.LocationToLower, initializeParameters.SimulatePatchManifestPath);
@@ -97,7 +97,7 @@ namespace YooAsset
 				var offlinePlayModeImpl = new OfflinePlayModeImpl();
 				_bundleServices = offlinePlayModeImpl;
 				_playModeServices = offlinePlayModeImpl;
-				_assetSystemImpl.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+				_assetSystemImpl.Initialize(PackageName, false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
 
 				var initializeParameters = parameters as OfflinePlayModeParameters;
 				initializeOperation = offlinePlayModeImpl.InitializeAsync(PackageName, initializeParameters.LocationToLower);
@@ -107,7 +107,7 @@ namespace YooAsset
 				var hostPlayModeImpl = new HostPlayModeImpl();
 				_bundleServices = hostPlayModeImpl;
 				_playModeServices = hostPlayModeImpl;
-				_assetSystemImpl.Initialize(false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
+				_assetSystemImpl.Initialize(PackageName, false, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
 
 				var initializeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = hostPlayModeImpl.InitializeAsync(
@@ -319,7 +319,7 @@ namespace YooAsset
 		{
 			DebugCheckInitialize();
 			string[] tags = new string[] { tag };
-			return _bundleServices.GetAssetInfos(tags);
+			return _playModeServices.ActiveManifest.GetAssetsInfoByTags(tags);
 		}
 
 		/// <summary>
@@ -329,7 +329,7 @@ namespace YooAsset
 		public AssetInfo[] GetAssetInfos(string[] tags)
 		{
 			DebugCheckInitialize();
-			return _bundleServices.GetAssetInfos(tags);
+			return _playModeServices.ActiveManifest.GetAssetsInfoByTags(tags);
 		}
 
 		/// <summary>
@@ -350,7 +350,7 @@ namespace YooAsset
 		public bool CheckLocationValid(string location)
 		{
 			DebugCheckInitialize();
-			string assetPath = _bundleServices.TryMappingToAssetPath(location);
+			string assetPath = _playModeServices.ActiveManifest.TryMappingToAssetPath(location);
 			return string.IsNullOrEmpty(assetPath) == false;
 		}
 		#endregion
@@ -725,7 +725,15 @@ namespace YooAsset
 			// NOTE : 编辑器模拟模式下始终返回TRUE
 			if (_playMode == EPlayMode.EditorSimulateMode)
 				return true;
-			return _bundleServices.IsIncludeBundleFile(fileName);
+			return _playModeServices.ActiveManifest.IsIncludeBundleFile(fileName);
+		}
+
+		/// <summary>
+		/// 资源定位地址转换为资源信息类
+		/// </summary>
+		private AssetInfo ConvertLocationToAssetInfo(string location, System.Type assetType)
+		{
+			return _playModeServices.ActiveManifest.ConvertLocationToAssetInfo(location, assetType);
 		}
 		#endregion
 
@@ -737,24 +745,6 @@ namespace YooAsset
 				throw new Exception("Package initialize not completed !");
 			else if (_initializeStatus == EOperationStatus.Failed)
 				throw new Exception($"Package initialize failed ! {_initializeError}");
-		}
-
-		[Conditional("DEBUG")]
-		private void DebugCheckLocation(string location)
-		{
-			if (string.IsNullOrEmpty(location) == false)
-			{
-				// 检查路径末尾是否有空格
-				int index = location.LastIndexOf(" ");
-				if (index != -1)
-				{
-					if (location.Length == index + 1)
-						YooLogger.Warning($"Found blank character in location : \"{location}\"");
-				}
-
-				if (location.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
-					YooLogger.Warning($"Found illegal character in location : \"{location}\"");
-			}
 		}
 
 		[Conditional("DEBUG")]
@@ -775,34 +765,6 @@ namespace YooAsset
 			data.PackageName = PackageName;
 			data.ProviderInfos = _assetSystemImpl.GetDebugReportInfos();
 			return data;
-		}
-		#endregion
-
-		#region 私有方法
-		/// <summary>
-		/// 资源定位地址转换为资源信息类，失败时内部会发出错误日志。
-		/// </summary>
-		/// <returns>如果转换失败会返回一个无效的资源信息类</returns>
-		private AssetInfo ConvertLocationToAssetInfo(string location, System.Type assetType)
-		{
-			DebugCheckLocation(location);
-			string assetPath = _bundleServices.MappingToAssetPath(location);
-			PatchAsset patchAsset = _bundleServices.TryGetPatchAsset(assetPath);
-			if (patchAsset != null)
-			{
-				AssetInfo assetInfo = new AssetInfo(patchAsset, assetType);
-				return assetInfo;
-			}
-			else
-			{
-				string error;
-				if (string.IsNullOrEmpty(location))
-					error = $"The location is null or empty !";
-				else
-					error = $"The location is invalid : {location}";
-				AssetInfo assetInfo = new AssetInfo(error);
-				return assetInfo;
-			}
 		}
 		#endregion
 	}
