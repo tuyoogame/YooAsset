@@ -23,7 +23,7 @@ namespace YooAsset.Editor
 			var buildResult = builder.Run(buildParameters);
 			if (buildResult.Success)
 			{
-				string manifestFileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string manifestFileName = YooAssetSettingsData.GetManifestBinaryFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string manifestFilePath = $"{buildResult.OutputPackageDirectory}/{manifestFileName}";
 				return manifestFilePath;
 			}

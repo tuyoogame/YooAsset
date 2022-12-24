@@ -54,7 +54,7 @@ namespace YooAsset.Editor
 
 			// 创建补丁清单文本文件
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestJsonFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string fileName = YooAssetSettingsData.GetManifestJsonFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				PatchManifestTools.SerializeToJson(filePath, patchManifest);
 				BuildRunner.Log($"创建补丁清单文件：{filePath}");
@@ -63,7 +63,7 @@ namespace YooAsset.Editor
 			// 创建补丁清单二进制文件
 			string packageHash;
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string fileName = YooAssetSettingsData.GetManifestBinaryFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				PatchManifestTools.SerializeToBinary(filePath, patchManifest);
 				packageHash = HashUtility.FileMD5(filePath);
@@ -77,7 +77,7 @@ namespace YooAsset.Editor
 
 			// 创建补丁清单哈希文件
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestHashFileName(buildParameters.PackageName, buildParameters.PackageVersion);
+				string fileName = YooAssetSettingsData.GetPackageHashFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				FileUtility.CreateFile(filePath, packageHash);
 				BuildRunner.Log($"创建补丁清单哈希文件：{filePath}");
@@ -85,7 +85,7 @@ namespace YooAsset.Editor
 
 			// 创建补丁清单版本文件
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(buildParameters.PackageName);
+				string fileName = YooAssetSettingsData.GetPackageVersionFileName(buildParameters.PackageName);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				FileUtility.CreateFile(filePath, buildParameters.PackageVersion);
 				BuildRunner.Log($"创建补丁清单版本文件：{filePath}");

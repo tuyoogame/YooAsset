@@ -45,7 +45,7 @@ namespace YooAsset.Editor
 
 			// 拷贝补丁清单文件
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(buildPackageName, buildPackageVersion);
+				string fileName = YooAssetSettingsData.GetManifestBinaryFileName(buildPackageName, buildPackageVersion);
 				string sourcePath = $"{packageOutputDirectory}/{fileName}";
 				string destPath = $"{streamingAssetsDirectory}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
@@ -53,7 +53,7 @@ namespace YooAsset.Editor
 
 			// 拷贝补丁清单哈希文件
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestHashFileName(buildPackageName, buildPackageVersion);
+				string fileName = YooAssetSettingsData.GetPackageHashFileName(buildPackageName, buildPackageVersion);
 				string sourcePath = $"{packageOutputDirectory}/{fileName}";
 				string destPath = $"{streamingAssetsDirectory}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
@@ -61,7 +61,7 @@ namespace YooAsset.Editor
 
 			// 拷贝补丁清单版本文件
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(buildPackageName);
+				string fileName = YooAssetSettingsData.GetPackageVersionFileName(buildPackageName);
 				string sourcePath = $"{packageOutputDirectory}/{fileName}";
 				string destPath = $"{streamingAssetsDirectory}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
