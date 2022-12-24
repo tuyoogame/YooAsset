@@ -41,41 +41,33 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取补丁清单文件不带版本号的名称
+		/// 获取清单文件完整名称
 		/// </summary>
-		public static string GetPatchManifestFileNameWithoutVersion(string packageName)
-		{
-			return $"{Setting.PatchManifestFileName}_{packageName}.bytes";
-		}
-
-		/// <summary>
-		/// 获取补丁清单文件完整名称
-		/// </summary>
-		public static string GetPatchManifestBinaryFileName(string packageName, string packageVersion)
+		public static string GetManifestBinaryFileName(string packageName, string packageVersion)
 		{
 			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.bytes";
 		}
 
 		/// <summary>
-		/// 获取补丁清单文件完整名称
+		/// 获取清单文件完整名称
 		/// </summary>
-		public static string GetPatchManifestJsonFileName(string packageName, string packageVersion)
+		public static string GetManifestJsonFileName(string packageName, string packageVersion)
 		{
 			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.json";
 		}
 
 		/// <summary>
-		/// 获取补丁清单哈希文件完整名称
+		/// 获取包裹的哈希文件完整名称
 		/// </summary>
-		public static string GetPatchManifestHashFileName(string packageName, string packageVersion)
+		public static string GetPackageHashFileName(string packageName, string packageVersion)
 		{
 			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.hash";
 		}
 
 		/// <summary>
-		/// 获取补丁清单版本文件完整名称
+		/// 获取包裹的版本文件完整名称
 		/// </summary>
-		public static string GetPatchManifestVersionFileName(string packageName)
+		public static string GetPackageVersionFileName(string packageName)
 		{
 			return $"{Setting.PatchManifestFileName}_{packageName}.version";
 		}

@@ -1,16 +1,12 @@
 ﻿
 namespace YooAsset
 {
-	/// <summary>
-	/// 内置补丁清单版本查询器
-	/// </summary>
 	internal class QueryBuildinPackageVersionOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
 			None,
-			LoadPackageVersion,
-			CheckLoadPackageVersion,
+			LoadBuildinPackageVersionFile,
 			Done,
 		}
 
@@ -19,9 +15,9 @@ namespace YooAsset
 		private ESteps _steps = ESteps.None;
 
 		/// <summary>
-		/// 内置包裹版本
+		/// 包裹版本
 		/// </summary>
-		public string Version { private set; get; }
+		public string PackageVersion { private set; get; }
 
 
 		public QueryBuildinPackageVersionOperation(string packageName)
@@ -30,25 +26,24 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.LoadPackageVersion;
+			_steps = ESteps.LoadBuildinPackageVersionFile;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
-			if (_steps == ESteps.LoadPackageVersion)
+			if (_steps == ESteps.LoadBuildinPackageVersionFile)
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestVersionFileName(_packageName);
-				string filePath = PathHelper.MakeStreamingLoadPath(fileName);
-				string url = PathHelper.ConvertToWWWPath(filePath);
-				_downloader = new UnityWebDataRequester();
-				_downloader.SendRequest(url);
-				_steps = ESteps.CheckLoadPackageVersion;
-			}
+				if (_downloader == null)
+				{
+					string fileName = YooAssetSettingsData.GetPackageVersionFileName(_packageName);
+					string filePath = PathHelper.MakeStreamingLoadPath(fileName);
+					string url = PathHelper.ConvertToWWWPath(filePath);
+					_downloader = new UnityWebDataRequester();
+					_downloader.SendRequest(url);
+				}
 
-			if (_steps == ESteps.CheckLoadPackageVersion)
-			{
 				if (_downloader.IsDone() == false)
 					return;
 
@@ -60,8 +55,8 @@ namespace YooAsset
 				}
 				else
 				{
-					Version = _downloader.GetText();
-					if (string.IsNullOrEmpty(Version))
+					PackageVersion = _downloader.GetText();
+					if (string.IsNullOrEmpty(PackageVersion))
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;

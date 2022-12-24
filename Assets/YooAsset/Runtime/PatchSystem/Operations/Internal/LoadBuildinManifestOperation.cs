@@ -1,16 +1,12 @@
 ﻿
 namespace YooAsset
 {
-	/// <summary>
-	/// 内置补丁清单加载器
-	/// </summary>
 	internal class LoadBuildinManifestOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
 			None,
 			LoadBuildinManifest,
-			CheckLoadBuildinManifest,
 			CheckDeserializeManifest,
 			Done,
 		}
@@ -22,7 +18,7 @@ namespace YooAsset
 		private ESteps _steps = ESteps.None;
 
 		/// <summary>
-		/// 加载结果
+		/// 加载的清单实例
 		/// </summary>
 		public PatchManifest Manifest { private set; get; }
 
@@ -43,16 +39,15 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadBuildinManifest)
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(_buildinPackageName, _buildinPackageVersion);
-				string filePath = PathHelper.MakeStreamingLoadPath(fileName);
-				string url = PathHelper.ConvertToWWWPath(filePath);
-				_downloader = new UnityWebDataRequester();
-				_downloader.SendRequest(url);
-				_steps = ESteps.CheckLoadBuildinManifest;
-			}
+				if (_downloader == null)
+				{
+					string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_buildinPackageName, _buildinPackageVersion);
+					string filePath = PathHelper.MakeStreamingLoadPath(fileName);
+					string url = PathHelper.ConvertToWWWPath(filePath);
+					_downloader = new UnityWebDataRequester();
+					_downloader.SendRequest(url);
+				}
 
-			if (_steps == ESteps.CheckLoadBuildinManifest)
-			{
 				if (_downloader.IsDone() == false)
 					return;
 

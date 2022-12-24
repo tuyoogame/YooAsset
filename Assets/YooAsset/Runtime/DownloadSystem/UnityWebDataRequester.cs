@@ -11,8 +11,8 @@ namespace YooAsset
 	/// </summary>
 	internal class UnityWebDataRequester
 	{
-		protected UnityWebRequest _webRequest;
-		protected UnityWebRequestAsyncOperation _operationHandle;
+		private UnityWebRequest _webRequest;
+		private UnityWebRequestAsyncOperation _operationHandle;
 
 		/// <summary>
 		/// 请求URL地址

@@ -6,20 +6,17 @@ using System.Threading;
 
 namespace YooAsset
 {
-	/// <summary>
-	/// 本地缓存文件验证
-	/// </summary>
-	internal abstract class VerifyCacheFilesOperation : AsyncOperationBase
+	internal abstract class VerifyPackageOperation : AsyncOperationBase
 	{
 		public List<VerifyInfo> VerifySuccessList { protected set; get; }
 		public List<VerifyInfo> VerifyFailList { protected set; get; }
 
-		public static VerifyCacheFilesOperation CreateOperation(PatchManifest patchManifest, IPlayModeServices playModeServices)
+		public static VerifyPackageOperation CreateOperation(PatchManifest manifest, IPlayModeServices playModeServices)
 		{
 #if UNITY_WEBGL
-			VerifyCacheFilesOperation operation = new VerifyCacheFilesWithoutThreadOperation(patchManifest, playModeServices);
+			VerifyPackageOperation operation = new VerifyPackageWithoutThreadOperation(manifest, playModeServices);
 #else
-			VerifyCacheFilesOperation operation = new VerifyCacheFilesWithThreadOperation(patchManifest, playModeServices);
+			VerifyPackageOperation operation = new VerifyPackageWithThreadOperation(manifest, playModeServices);
 #endif
 			return operation;
 		}
@@ -28,7 +25,7 @@ namespace YooAsset
 	/// <summary>
 	/// 本地缓存文件验证（线程版）
 	/// </summary>
-	internal class VerifyCacheFilesWithThreadOperation : VerifyCacheFilesOperation
+	internal class VerifyPackageWithThreadOperation : VerifyPackageOperation
 	{
 		private enum ESteps
 		{
@@ -39,7 +36,7 @@ namespace YooAsset
 			Done,
 		}
 
-		private readonly PatchManifest _patchManifest;
+		private readonly PatchManifest _manifest;
 		private readonly IPlayModeServices _playModeServices;
 		private readonly ThreadSyncContext _syncContext = new ThreadSyncContext();
 		private List<VerifyInfo> _waitingList;
@@ -49,9 +46,9 @@ namespace YooAsset
 		private float _verifyStartTime;
 		private ESteps _steps = ESteps.None;
 
-		public VerifyCacheFilesWithThreadOperation(PatchManifest patchManifest, IPlayModeServices playModeServices)
+		public VerifyPackageWithThreadOperation(PatchManifest manifest, IPlayModeServices playModeServices)
 		{
-			_patchManifest = patchManifest;
+			_manifest = manifest;
 			_playModeServices = playModeServices;
 		}
 		internal override void Start()
@@ -66,7 +63,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.InitVerify)
 			{
-				int bundleCount = _patchManifest.BundleList.Count;
+				int bundleCount = _manifest.BundleList.Count;
 				VerifySuccessList = new List<VerifyInfo>(bundleCount);
 				VerifyFailList = new List<VerifyInfo>(bundleCount);
 
@@ -85,7 +82,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.PrepareVerify)
 			{
-				foreach (var patchBundle in _patchManifest.BundleList)
+				foreach (var patchBundle in _manifest.BundleList)
 				{
 					if (CacheSystem.IsCached(patchBundle))
 						continue;
@@ -175,7 +172,7 @@ namespace YooAsset
 	/// <summary>
 	/// 本地缓存文件验证（非线程版）
 	/// </summary>
-	internal class VerifyCacheFilesWithoutThreadOperation : VerifyCacheFilesOperation
+	internal class VerifyPackageWithoutThreadOperation : VerifyPackageOperation
 	{
 		private enum ESteps
 		{
@@ -186,7 +183,7 @@ namespace YooAsset
 			Done,
 		}
 
-		private readonly PatchManifest _patchManifest;
+		private readonly PatchManifest _manifest;
 		private readonly IPlayModeServices _playModeServices;
 		private List<VerifyInfo> _waitingList;
 		private List<VerifyInfo> _verifyingList;
@@ -195,9 +192,9 @@ namespace YooAsset
 		private float _verifyStartTime;
 		private ESteps _steps = ESteps.None;
 
-		public VerifyCacheFilesWithoutThreadOperation(PatchManifest patchManifest, IPlayModeServices playModeServices)
+		public VerifyPackageWithoutThreadOperation(PatchManifest manifest, IPlayModeServices playModeServices)
 		{
-			_patchManifest = patchManifest;
+			_manifest = manifest;
 			_playModeServices = playModeServices;
 		}
 		internal override void Start()
@@ -212,7 +209,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.InitVerify)
 			{
-				int bundleCount = _patchManifest.BundleList.Count;
+				int bundleCount = _manifest.BundleList.Count;
 				VerifySuccessList = new List<VerifyInfo>(bundleCount);
 				VerifyFailList = new List<VerifyInfo>(bundleCount);
 
@@ -227,7 +224,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.PrepareVerify)
 			{
-				foreach (var patchBundle in _patchManifest.BundleList)
+				foreach (var patchBundle in _manifest.BundleList)
 				{
 					if (CacheSystem.IsCached(patchBundle))
 						continue;

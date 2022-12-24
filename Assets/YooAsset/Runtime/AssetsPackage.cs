@@ -211,11 +211,11 @@ namespace YooAsset
 		/// <param name="packageVersion">更新的包裹版本</param>
 		/// <param name="autoActiveManifest">自动激活清单</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifestFile = true, int timeout = 60)
+		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			DebugCheckUpdateManifest();
-			return _playModeServices.UpdatePackageManifestAsync(packageVersion, autoSaveManifestFile, timeout);
+			return _playModeServices.UpdatePackageManifestAsync(packageVersion, timeout);
 		}
 
 		/// <summary>
@@ -244,7 +244,9 @@ namespace YooAsset
 		public string GetPackageVersion()
 		{
 			DebugCheckInitialize();
-			return _playModeServices.GetPackageVersion();
+			if (_playModeServices.ActiveManifest == null)
+				return string.Empty;
+			return _playModeServices.ActiveManifest.PackageVersion;
 		}
 
 		/// <summary>

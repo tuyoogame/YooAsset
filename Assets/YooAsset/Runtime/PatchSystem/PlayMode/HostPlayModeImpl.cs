@@ -6,7 +6,7 @@ namespace YooAsset
 {
 	internal class HostPlayModeImpl : IPlayModeServices, IBundleServices
 	{
-		private PatchManifest _activePatchManifest;
+		private PatchManifest _activeManifest;
 
 		// 参数相关
 		private string _packageName;
@@ -80,23 +80,18 @@ namespace YooAsset
 		}
 
 		#region IPlayModeServices接口
-		public PatchManifest ActivePatchManifest
+		public PatchManifest ActiveManifest
 		{
 			set
 			{
-				_activePatchManifest = value;
-				_activePatchManifest.InitAssetPathMapping(_locationToLower);
+				_activeManifest = value;
+				_activeManifest.InitAssetPathMapping(_locationToLower);
+				PersistentHelper.SaveCachePackageVersionFile(_packageName, _activeManifest.PackageVersion);
 			}
 			get
 			{
-				return _activePatchManifest;
+				return _activeManifest;
 			}
-		}
-		public string GetPackageVersion()
-		{
-			if (_activePatchManifest == null)
-				return string.Empty;
-			return _activePatchManifest.PackageVersion;
 		}
 		public bool IsBuildinPatchBundle(PatchBundle patchBundle)
 		{
@@ -109,9 +104,9 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveManifestFile, int timeout)
+		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, int timeout)
 		{
-			var operation = new HostPlayModeUpdatePackageManifestOperation(this, _packageName, packageVersion, autoSaveManifestFile, timeout);
+			var operation = new HostPlayModeUpdatePackageManifestOperation(this, _packageName, packageVersion, timeout);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -124,11 +119,11 @@ namespace YooAsset
 
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = GetDownloadListByAll(_activePatchManifest);
+			List<BundleInfo> downloadList = GetDownloadListByAll(_activeManifest);
 			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
-		private List<BundleInfo> GetDownloadListByAll(PatchManifest patchManifest)
+		public List<BundleInfo> GetDownloadListByAll(PatchManifest patchManifest)
 		{
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
 			foreach (var patchBundle in patchManifest.BundleList)
@@ -149,11 +144,11 @@ namespace YooAsset
 
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = GetDownloadListByTags(_activePatchManifest, tags);
+			List<BundleInfo> downloadList = GetDownloadListByTags(_activeManifest, tags);
 			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
-		private List<BundleInfo> GetDownloadListByTags(PatchManifest patchManifest, string[] tags)
+		public List<BundleInfo> GetDownloadListByTags(PatchManifest patchManifest, string[] tags)
 		{
 			List<PatchBundle> downloadList = new List<PatchBundle>(1000);
 			foreach (var patchBundle in patchManifest.BundleList)
@@ -186,7 +181,7 @@ namespace YooAsset
 
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> downloadList = GetDownloadListByPaths(_activePatchManifest, assetInfos);
+			List<BundleInfo> downloadList = GetDownloadListByPaths(_activeManifest, assetInfos);
 			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
@@ -235,7 +230,7 @@ namespace YooAsset
 
 		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> unpcakList = GetUnpackListByAll(_activePatchManifest);
+			List<BundleInfo> unpcakList = GetUnpackListByAll(_activeManifest);
 			var operation = new PatchUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
@@ -259,7 +254,7 @@ namespace YooAsset
 
 		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			List<BundleInfo> unpcakList = GetUnpackListByTags(_activePatchManifest, tags);
+			List<BundleInfo> unpcakList = GetUnpackListByTags(_activeManifest, tags);
 			var operation = new PatchUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
@@ -315,7 +310,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 注意：如果补丁清单里未找到资源包会抛出异常！
-			var patchBundle = _activePatchManifest.GetMainPatchBundle(assetInfo.AssetPath);
+			var patchBundle = _activeManifest.GetMainPatchBundle(assetInfo.AssetPath);
 			return CreateBundleInfo(patchBundle);
 		}
 		BundleInfo[] IBundleServices.GetAllDependBundleInfos(AssetInfo assetInfo)
@@ -324,7 +319,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 注意：如果补丁清单里未找到资源包会抛出异常！
-			var depends = _activePatchManifest.GetAllDependencies(assetInfo.AssetPath);
+			var depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
 			List<BundleInfo> result = new List<BundleInfo>(depends.Length);
 			foreach (var patchBundle in depends)
 			{
@@ -335,22 +330,22 @@ namespace YooAsset
 		}
 		AssetInfo[] IBundleServices.GetAssetInfos(string[] tags)
 		{
-			return _activePatchManifest.GetAssetsInfoByTags(tags);
+			return _activeManifest.GetAssetsInfoByTags(tags);
 		}
 		PatchAsset IBundleServices.TryGetPatchAsset(string assetPath)
 		{
-			if (_activePatchManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
+			if (_activeManifest.TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
 				return patchAsset;
 			else
 				return null;
 		}
 		string IBundleServices.MappingToAssetPath(string location)
 		{
-			return _activePatchManifest.MappingToAssetPath(location);
+			return _activeManifest.MappingToAssetPath(location);
 		}
 		string IBundleServices.TryMappingToAssetPath(string location)
 		{
-			return _activePatchManifest.TryMappingToAssetPath(location);
+			return _activeManifest.TryMappingToAssetPath(location);
 		}
 		string IBundleServices.GetPackageName()
 		{
@@ -358,11 +353,11 @@ namespace YooAsset
 		}
 		bool IBundleServices.IsIncludeBundleFile(string fileName)
 		{
-			return _activePatchManifest.IsIncludeBundleFile(fileName);
+			return _activeManifest.IsIncludeBundleFile(fileName);
 		}
 		bool IBundleServices.IsServicesValid()
 		{
-			return _activePatchManifest != null;
+			return _activeManifest != null;
 		}
 		#endregion
 	}

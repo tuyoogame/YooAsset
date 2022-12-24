@@ -10,10 +10,7 @@ namespace YooAsset
 	/// </summary>
 	public abstract class InitializationOperation : AsyncOperationBase
 	{
-		/// <summary>
-		/// 初始化内部加载的包裹版本
-		/// </summary>
-		public string InitializedPackageVersion;
+		public string PackageVersion { protected set; get; }
 	}
 
 	/// <summary>
@@ -24,53 +21,41 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			LoadManifestFileData,
-			CheckDeserializeManifest,
+			LoadEditorManifest,
 			Done,
 		}
 
 		private readonly EditorSimulateModeImpl _impl;
-		private readonly string _simulatePatchManifestPath;
-		private DeserializeManifestOperation _deserializer;
+		private readonly string _simulateManifestPath;
+		private LoadEditorManifestOperation _loadEditorManifestOp;
 		private ESteps _steps = ESteps.None;
 
-		internal EditorSimulateModeInitializationOperation(EditorSimulateModeImpl impl, string simulatePatchManifestPath)
+		internal EditorSimulateModeInitializationOperation(EditorSimulateModeImpl impl, string simulateManifestPath)
 		{
 			_impl = impl;
-			_simulatePatchManifestPath = simulatePatchManifestPath;
+			_simulateManifestPath = simulateManifestPath;
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.LoadManifestFileData;
+			_steps = ESteps.LoadEditorManifest;
 		}
 		internal override void Update()
 		{
-			if (_steps == ESteps.LoadManifestFileData)
+			if (_steps == ESteps.LoadEditorManifest)
 			{
-				if (File.Exists(_simulatePatchManifestPath) == false)
+				if (_loadEditorManifestOp == null)
 				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = $"Not found simulation manifest file : {_simulatePatchManifestPath}";
-					return;
+					_loadEditorManifestOp = new LoadEditorManifestOperation(_simulateManifestPath);
+					OperationSystem.StartOperation(_loadEditorManifestOp);
 				}
 
-				YooLogger.Log($"Load simulation manifest file : {_simulatePatchManifestPath}");
-				byte[] bytesData = FileUtility.ReadAllBytes(_simulatePatchManifestPath);
-				_deserializer = new DeserializeManifestOperation(bytesData);
-				OperationSystem.StartOperation(_deserializer);
-				_steps = ESteps.CheckDeserializeManifest;
-			}
-
-			if (_steps == ESteps.CheckDeserializeManifest)
-			{
-				if (_deserializer.IsDone == false)
+				if (_loadEditorManifestOp.IsDone == false)
 					return;
 
-				if (_deserializer.Status == EOperationStatus.Succeed)
+				if (_loadEditorManifestOp.Status == EOperationStatus.Succeed)
 				{
-					InitializedPackageVersion = _deserializer.Manifest.PackageVersion;
-					_impl.ActivePatchManifest = _deserializer.Manifest;
+					PackageVersion = _loadEditorManifestOp.Manifest.PackageVersion;
+					_impl.ActiveManifest = _loadEditorManifestOp.Manifest;
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
 				}
@@ -78,7 +63,7 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _deserializer.Error;
+					Error = _loadEditorManifestOp.Error;
 				}
 			}
 		}
@@ -94,18 +79,17 @@ namespace YooAsset
 			None,
 			QueryBuildinPackageVersion,
 			LoadBuildinManifest,
-			StartVerifyOperation,
-			CheckVerifyOperation,
+			VerifyPackage,
 			Done,
 		}
 
 		private readonly OfflinePlayModeImpl _impl;
 		private readonly string _packageName;
-		private QueryBuildinPackageVersionOperation _buildinPackageVersionQuery;
-		private LoadBuildinManifestOperation _buildinManifestLoad;
-		private VerifyCacheFilesOperation _verifyOperation;
+		private QueryBuildinPackageVersionOperation _queryBuildinPackageVersionOp;
+		private LoadBuildinManifestOperation _loadBuildinManifestOp;
+		private VerifyPackageOperation _verifyOperation;
 		private ESteps _steps = ESteps.None;
-	
+
 		internal OfflinePlayModeInitializationOperation(OfflinePlayModeImpl impl, string packageName)
 		{
 			_impl = impl;
@@ -122,16 +106,16 @@ namespace YooAsset
 
 			if (_steps == ESteps.QueryBuildinPackageVersion)
 			{
-				if (_buildinPackageVersionQuery == null)
+				if (_queryBuildinPackageVersionOp == null)
 				{
-					_buildinPackageVersionQuery = new QueryBuildinPackageVersionOperation(_packageName);
-					OperationSystem.StartOperation(_buildinPackageVersionQuery);
+					_queryBuildinPackageVersionOp = new QueryBuildinPackageVersionOperation(_packageName);
+					OperationSystem.StartOperation(_queryBuildinPackageVersionOp);
 				}
 
-				if (_buildinPackageVersionQuery.IsDone == false)
+				if (_queryBuildinPackageVersionOp.IsDone == false)
 					return;
 
-				if (_buildinPackageVersionQuery.Status == EOperationStatus.Succeed)
+				if (_queryBuildinPackageVersionOp.Status == EOperationStatus.Succeed)
 				{
 					_steps = ESteps.LoadBuildinManifest;
 				}
@@ -139,45 +123,44 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _buildinPackageVersionQuery.Error;
+					Error = _queryBuildinPackageVersionOp.Error;
 				}
 			}
 
 			if (_steps == ESteps.LoadBuildinManifest)
 			{
-				if (_buildinManifestLoad == null)
+				if (_loadBuildinManifestOp == null)
 				{
-					_buildinManifestLoad = new LoadBuildinManifestOperation(_packageName, _buildinPackageVersionQuery.Version);
-					OperationSystem.StartOperation(_buildinManifestLoad);
+					_loadBuildinManifestOp = new LoadBuildinManifestOperation(_packageName, _queryBuildinPackageVersionOp.PackageVersion);
+					OperationSystem.StartOperation(_loadBuildinManifestOp);
 				}
 
-				Progress = _buildinManifestLoad.Progress;
-				if (_buildinManifestLoad.IsDone == false)
+				Progress = _loadBuildinManifestOp.Progress;
+				if (_loadBuildinManifestOp.IsDone == false)
 					return;
 
-				if (_buildinManifestLoad.Status == EOperationStatus.Succeed)
+				if (_loadBuildinManifestOp.Status == EOperationStatus.Succeed)
 				{
-					InitializedPackageVersion = _buildinManifestLoad.Manifest.PackageVersion;
-					_impl.ActivePatchManifest = _buildinManifestLoad.Manifest;
-					_steps = ESteps.StartVerifyOperation;
+					PackageVersion = _loadBuildinManifestOp.Manifest.PackageVersion;
+					_impl.ActiveManifest = _loadBuildinManifestOp.Manifest;
+					_steps = ESteps.VerifyPackage;
 				}
 				else
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _buildinManifestLoad.Error;
+					Error = _loadBuildinManifestOp.Error;
 				}
 			}
 
-			if (_steps == ESteps.StartVerifyOperation)
+			if (_steps == ESteps.VerifyPackage)
 			{
-				_verifyOperation = VerifyCacheFilesOperation.CreateOperation(_impl.ActivePatchManifest, _impl);
-				OperationSystem.StartOperation(_verifyOperation);
-				_steps = ESteps.CheckVerifyOperation;
-			}
+				if (_verifyOperation == null)
+				{
+					_verifyOperation = VerifyPackageOperation.CreateOperation(_impl.ActiveManifest, _impl);
+					OperationSystem.StartOperation(_verifyOperation);
+				}
 
-			if (_steps == ESteps.CheckVerifyOperation)
-			{
 				Progress = _verifyOperation.Progress;
 				if (_verifyOperation.IsDone)
 				{
@@ -198,22 +181,25 @@ namespace YooAsset
 		{
 			None,
 			CheckAppFootPrint,
+			QueryCachePackageVersion,
 			TryLoadCacheManifest,
 			QueryBuildinPackageVersion,
+			CopyBuildinPackageHash,
 			CopyBuildinManifest,
 			LoadBuildinManifest,
-			StartVerifyOperation,
-			CheckVerifyOperation,
+			VerifyPackage,
 			Done,
 		}
 
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
-		private QueryBuildinPackageVersionOperation _buildinPackageVersionQuery;
-		private CopyBuildinManifestOperation _buildinManifestCopy;
-		private LoadBuildinManifestOperation _buildinManifestLoad;
-		private LoadCacheManifestOperation _cacheManifestLoad;
-		private VerifyCacheFilesOperation _verifyOperation;
+		private QueryBuildinPackageVersionOperation _queryBuildinPackageVersionOp;
+		private QueryCachePackageVersionOperation _queryCachePackageVersionOp;
+		private CopyBuildinPackageHashOperation _copyBuildinPackageHashOp;
+		private CopyBuildinManifestOperation _copyBuildinManifestOp;
+		private LoadBuildinManifestOperation _loadBuildinManifestOp;
+		private LoadCacheManifestOperation _loadCacheManifestOp;
+		private VerifyPackageOperation _verifyOperation;
 		private ESteps _steps = ESteps.None;
 
 		internal HostPlayModeInitializationOperation(HostPlayModeImpl impl, string packageName)
@@ -242,25 +228,46 @@ namespace YooAsset
 					appFootPrint.Coverage();
 					YooLogger.Log("Delete manifest files when application foot print dirty !");
 				}
-				_steps = ESteps.TryLoadCacheManifest;
+				_steps = ESteps.QueryCachePackageVersion;
+			}
+
+			if (_steps == ESteps.QueryCachePackageVersion)
+			{
+				if (_queryCachePackageVersionOp == null)
+				{
+					_queryCachePackageVersionOp = new QueryCachePackageVersionOperation(_packageName);
+					OperationSystem.StartOperation(_queryCachePackageVersionOp);
+				}
+
+				if (_queryCachePackageVersionOp.IsDone == false)
+					return;
+
+				if (_queryCachePackageVersionOp.Status == EOperationStatus.Succeed)
+				{
+					_steps = ESteps.TryLoadCacheManifest;
+				}
+				else
+				{
+					_steps = ESteps.QueryBuildinPackageVersion;
+				}
 			}
 
 			if (_steps == ESteps.TryLoadCacheManifest)
 			{
-				if (_cacheManifestLoad == null)
+				if (_loadCacheManifestOp == null)
 				{
-					_cacheManifestLoad = new LoadCacheManifestOperation(_packageName);
-					OperationSystem.StartOperation(_cacheManifestLoad);
+					_loadCacheManifestOp = new LoadCacheManifestOperation(_packageName, _queryCachePackageVersionOp.PackageVersion);
+					OperationSystem.StartOperation(_loadCacheManifestOp);
 				}
 
-				if (_cacheManifestLoad.IsDone == false)
+				if (_loadCacheManifestOp.IsDone == false)
 					return;
 
-				if (_cacheManifestLoad.Status == EOperationStatus.Succeed)
+				if (_loadCacheManifestOp.Status == EOperationStatus.Succeed)
 				{
-					InitializedPackageVersion = _cacheManifestLoad.Manifest.PackageVersion;
-					_impl.ActivePatchManifest = _cacheManifestLoad.Manifest;
-					_steps = ESteps.StartVerifyOperation;
+					PackageVersion = _loadCacheManifestOp.Manifest.PackageVersion;
+					_impl.ActiveManifest = _loadCacheManifestOp.Manifest;
+					_steps = ESteps.VerifyPackage;
 				}
 				else
 				{
@@ -270,42 +277,64 @@ namespace YooAsset
 
 			if (_steps == ESteps.QueryBuildinPackageVersion)
 			{
-				if (_buildinPackageVersionQuery == null)
+				if (_queryBuildinPackageVersionOp == null)
 				{
-					_buildinPackageVersionQuery = new QueryBuildinPackageVersionOperation(_packageName);
-					OperationSystem.StartOperation(_buildinPackageVersionQuery);
+					_queryBuildinPackageVersionOp = new QueryBuildinPackageVersionOperation(_packageName);
+					OperationSystem.StartOperation(_queryBuildinPackageVersionOp);
 				}
 
-				if (_buildinPackageVersionQuery.IsDone == false)
+				if (_queryBuildinPackageVersionOp.IsDone == false)
 					return;
 
 				// 注意：为了兼容MOD模式，初始化动态新增的包裹的时候，如果内置清单不存在也不需要报错！
-				if (_buildinPackageVersionQuery.Status == EOperationStatus.Succeed)
+				if (_queryBuildinPackageVersionOp.Status == EOperationStatus.Succeed)
+				{
+					_steps = ESteps.CopyBuildinPackageHash;
+				}
+				else
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
+					string error = _queryBuildinPackageVersionOp.Error;
+					YooLogger.Log($"Failed to load buildin package version file : {error}");
+				}
+			}
+
+			if (_steps == ESteps.CopyBuildinPackageHash)
+			{
+				if (_copyBuildinPackageHashOp == null)
+				{
+					_copyBuildinPackageHashOp = new CopyBuildinPackageHashOperation(_packageName, _queryBuildinPackageVersionOp.PackageVersion);
+					OperationSystem.StartOperation(_copyBuildinPackageHashOp);
+				}
+
+				if (_copyBuildinPackageHashOp.IsDone == false)
+					return;
+
+				if (_copyBuildinPackageHashOp.Status == EOperationStatus.Succeed)
 				{
 					_steps = ESteps.CopyBuildinManifest;
 				}
 				else
 				{
 					_steps = ESteps.Done;
-					Status = EOperationStatus.Succeed;
-					string error = _buildinPackageVersionQuery.Error;
-					YooLogger.Log($"Failed to load buildin package version file : {error}");
+					Status = EOperationStatus.Failed;
+					Error = _copyBuildinPackageHashOp.Error;
 				}
 			}
 
 			if (_steps == ESteps.CopyBuildinManifest)
 			{
-				if (_buildinManifestCopy == null)
+				if (_copyBuildinManifestOp == null)
 				{
-					_buildinManifestCopy = new CopyBuildinManifestOperation(_packageName, _buildinPackageVersionQuery.Version);
-					OperationSystem.StartOperation(_buildinManifestCopy);
+					_copyBuildinManifestOp = new CopyBuildinManifestOperation(_packageName, _queryBuildinPackageVersionOp.PackageVersion);
+					OperationSystem.StartOperation(_copyBuildinManifestOp);
 				}
 
-				Progress = _buildinManifestCopy.Progress;
-				if (_buildinManifestCopy.IsDone == false)
+				if (_copyBuildinManifestOp.IsDone == false)
 					return;
 
-				if (_buildinManifestCopy.Status == EOperationStatus.Succeed)
+				if (_copyBuildinManifestOp.Status == EOperationStatus.Succeed)
 				{
 					_steps = ESteps.LoadBuildinManifest;
 				}
@@ -313,45 +342,44 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _buildinManifestCopy.Error;
+					Error = _copyBuildinManifestOp.Error;
 				}
 			}
 
 			if (_steps == ESteps.LoadBuildinManifest)
 			{
-				if (_buildinManifestLoad == null)
+				if (_loadBuildinManifestOp == null)
 				{
-					_buildinManifestLoad = new LoadBuildinManifestOperation(_packageName, _buildinPackageVersionQuery.Version);
-					OperationSystem.StartOperation(_buildinManifestLoad);
+					_loadBuildinManifestOp = new LoadBuildinManifestOperation(_packageName, _queryBuildinPackageVersionOp.PackageVersion);
+					OperationSystem.StartOperation(_loadBuildinManifestOp);
 				}
 
-				Progress = _buildinManifestLoad.Progress;
-				if (_buildinManifestLoad.IsDone == false)
+				Progress = _loadBuildinManifestOp.Progress;
+				if (_loadBuildinManifestOp.IsDone == false)
 					return;
 
-				if (_buildinManifestLoad.Status == EOperationStatus.Succeed)
-				{			
-					InitializedPackageVersion = _buildinManifestLoad.Manifest.PackageVersion;
-					_impl.ActivePatchManifest = _buildinManifestLoad.Manifest;
-					_steps = ESteps.StartVerifyOperation;
+				if (_loadBuildinManifestOp.Status == EOperationStatus.Succeed)
+				{
+					PackageVersion = _loadBuildinManifestOp.Manifest.PackageVersion;
+					_impl.ActiveManifest = _loadBuildinManifestOp.Manifest;
+					_steps = ESteps.VerifyPackage;
 				}
 				else
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _buildinManifestLoad.Error;
+					Error = _loadBuildinManifestOp.Error;
 				}
 			}
 
-			if (_steps == ESteps.StartVerifyOperation)
+			if (_steps == ESteps.VerifyPackage)
 			{
-				_verifyOperation = VerifyCacheFilesOperation.CreateOperation(_impl.ActivePatchManifest, _impl);
-				OperationSystem.StartOperation(_verifyOperation);
-				_steps = ESteps.CheckVerifyOperation;
-			}
+				if (_verifyOperation == null)
+				{
+					_verifyOperation = VerifyPackageOperation.CreateOperation(_impl.ActiveManifest, _impl);
+					OperationSystem.StartOperation(_verifyOperation);
+				}
 
-			if (_steps == ESteps.CheckVerifyOperation)
-			{
 				Progress = _verifyOperation.Progress;
 				if (_verifyOperation.IsDone)
 				{
@@ -361,7 +389,6 @@ namespace YooAsset
 			}
 		}
 	}
-
 
 	/// <summary>
 	/// 应用程序水印

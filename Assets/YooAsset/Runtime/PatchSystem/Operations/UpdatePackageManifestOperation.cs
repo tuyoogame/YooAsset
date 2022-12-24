@@ -10,20 +10,6 @@ namespace YooAsset
 	/// </summary>
 	public abstract class UpdatePackageManifestOperation : AsyncOperationBase
 	{
-		/// <summary>
-		/// 发现了新的清单
-		/// </summary>
-		public bool FoundNewManifest { protected set; get; } = false;
-
-		/// <summary>
-		/// 手动保存清单文件
-		/// </summary>
-		public virtual void SaveManifestFile() { }
-
-		/// <summary>
-		/// 还原补丁清单
-		/// </summary>
-		public virtual void RevertManifest() { }
 	}
 
 	/// <summary>
@@ -69,177 +55,134 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			TryLoadCacheHash,
-			DownloadWebHash,
-			CheckDownloadWebHash,
-			DownloadWebManifest,
-			CheckDownloadWebManifest,
-			CheckDeserializeWebManifest,
-			StartVerifyOperation,
-			CheckVerifyOperation,
+			CheckActiveManifest,
+			TryLoadCacheManifest,
+			DownloadManifest,
+			LoadCacheManifest,
+			CheckDeserializeManifest,
+			VerifyPackage,
 			Done,
 		}
 
-		private static int RequestCount = 0;
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
 		private readonly string _packageVersion;
-		private readonly bool _autoSaveManifestFile;
 		private readonly int _timeout;
-		private UnityWebDataRequester _downloader1;
-		private UnityWebDataRequester _downloader2;
-		private DeserializeManifestOperation _deserializer;
-		private VerifyCacheFilesOperation _verifyOperation;
-
-		internal PatchManifest _prePatchManifest;
-		private string _cacheManifestHash;
-		private byte[] _fileBytesData = null;
+		private LoadCacheManifestOperation _tryLoadCacheManifestOp;
+		private LoadCacheManifestOperation _loadCacheManifestOp;
+		private DownloadManifestOperation _downloadManifestOp;
+		private VerifyPackageOperation _verifyOperation;
 		private ESteps _steps = ESteps.None;
 
-		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, bool autoSaveManifestFile, int timeout)
+
+		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
 		{
 			_impl = impl;
 			_packageName = packageName;
 			_packageVersion = packageVersion;
-			_autoSaveManifestFile = autoSaveManifestFile;
 			_timeout = timeout;
 		}
 		internal override void Start()
 		{
-			RequestCount++;
-			_steps = ESteps.TryLoadCacheHash;
+			_steps = ESteps.CheckActiveManifest;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
-			if (_steps == ESteps.TryLoadCacheHash)
+			if (_steps == ESteps.CheckActiveManifest)
 			{
-				string filePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
-				if (File.Exists(filePath))
+				// 检测当前激活的清单对象
+				if (_impl.ActiveManifest != null)
 				{
-					_cacheManifestHash = HashUtility.FileMD5(filePath);
-					_steps = ESteps.DownloadWebHash;
-				}
-				else
-				{
-					_steps = ESteps.DownloadWebManifest;
-				}
-			}
-
-			if (_steps == ESteps.DownloadWebHash)
-			{
-				string fileName = YooAssetSettingsData.GetPatchManifestHashFileName(_packageName, _packageVersion);
-				string webURL = GetPatchManifestRequestURL(fileName);
-				YooLogger.Log($"Beginning to request patch manifest hash : {webURL}");
-				_downloader1 = new UnityWebDataRequester();
-				_downloader1.SendRequest(webURL, _timeout);
-				_steps = ESteps.CheckDownloadWebHash;
-			}
-
-			if (_steps == ESteps.CheckDownloadWebHash)
-			{
-				if (_downloader1.IsDone() == false)
-					return;
-
-				if (_downloader1.HasError())
-				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = _downloader1.GetError();
-				}
-				else
-				{
-					string webManifestHash = _downloader1.GetText();
-					if (_cacheManifestHash == webManifestHash)
+					if (_impl.ActiveManifest.PackageVersion == _packageVersion)
 					{
-						YooLogger.Log($"Not found new package : {_packageName}");
-						FoundNewManifest = false;
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;
-					}
-					else
-					{
-						YooLogger.Log($"Package {_packageName} is change : {_cacheManifestHash} -> {webManifestHash}");
-						FoundNewManifest = true;
-						_steps = ESteps.DownloadWebManifest;
+						return;
 					}
 				}
-				_downloader1.Dispose();
+				_steps = ESteps.TryLoadCacheManifest;
 			}
 
-			if (_steps == ESteps.DownloadWebManifest)
+			if (_steps == ESteps.TryLoadCacheManifest)
 			{
-				string fileName = YooAssetSettingsData.GetPatchManifestBinaryFileName(_packageName, _packageVersion);
-				string webURL = GetPatchManifestRequestURL(fileName);
-				YooLogger.Log($"Beginning to request patch manifest : {webURL}");
-				_downloader2 = new UnityWebDataRequester();
-				_downloader2.SendRequest(webURL, _timeout);
-				_steps = ESteps.CheckDownloadWebManifest;
-			}
+				if (_tryLoadCacheManifestOp == null)
+				{
+					_tryLoadCacheManifestOp = new LoadCacheManifestOperation(_packageName, _packageVersion);
+					OperationSystem.StartOperation(_tryLoadCacheManifestOp);
+				}
 
-			if (_steps == ESteps.CheckDownloadWebManifest)
-			{
-				if (_downloader2.IsDone() == false)
+				if (_tryLoadCacheManifestOp.IsDone == false)
 					return;
 
-				if (_downloader2.HasError())
+				if (_tryLoadCacheManifestOp.Status == EOperationStatus.Succeed)
 				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = _downloader2.GetError();
+					_impl.ActiveManifest = _tryLoadCacheManifestOp.Manifest;
+					_steps = ESteps.VerifyPackage;
 				}
 				else
 				{
-					byte[] bytesData = _downloader2.GetData();
-					if (_autoSaveManifestFile)
-					{
-						SaveManifestFileInternal(bytesData);
-					}
-					else
-					{
-						_fileBytesData = bytesData;
-					}
-
-					// 解析二进制数据
-					_deserializer = new DeserializeManifestOperation(bytesData);
-					OperationSystem.StartOperation(_deserializer);
-					_steps = ESteps.CheckDeserializeWebManifest;
+					_steps = ESteps.DownloadManifest;
 				}
-
-				_downloader2.Dispose();
 			}
 
-			if (_steps == ESteps.CheckDeserializeWebManifest)
+			if (_steps == ESteps.DownloadManifest)
 			{
-				Progress = _deserializer.Progress;
-				if (_deserializer.IsDone == false)
+				if (_downloadManifestOp == null)
+				{
+					_downloadManifestOp = new DownloadManifestOperation(_impl, _packageName, _packageVersion, _timeout);
+					OperationSystem.StartOperation(_downloadManifestOp);
+				}
+
+				if (_downloadManifestOp.IsDone == false)
 					return;
 
-				if (_deserializer.Status == EOperationStatus.Succeed)
+				if (_downloadManifestOp.Status == EOperationStatus.Succeed)
 				{
-					_prePatchManifest = _impl.ActivePatchManifest;
-					_impl.ActivePatchManifest = _deserializer.Manifest;
-					_steps = ESteps.StartVerifyOperation;
+					_steps = ESteps.LoadCacheManifest;
 				}
 				else
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _deserializer.Error;
+					Error = _downloadManifestOp.Error;
 				}
 			}
 
-			if (_steps == ESteps.StartVerifyOperation)
+			if (_steps == ESteps.LoadCacheManifest)
 			{
-				_verifyOperation = VerifyCacheFilesOperation.CreateOperation(_deserializer.Manifest, _impl);
-				OperationSystem.StartOperation(_verifyOperation);
-				_steps = ESteps.CheckVerifyOperation;
+				if (_loadCacheManifestOp == null)
+				{
+					_loadCacheManifestOp = new LoadCacheManifestOperation(_packageName, _packageVersion);
+					OperationSystem.StartOperation(_loadCacheManifestOp);
+				}
+
+				if (_loadCacheManifestOp.IsDone == false)
+					return;
+
+				if (_loadCacheManifestOp.Status == EOperationStatus.Succeed)
+				{
+					_impl.ActiveManifest = _loadCacheManifestOp.Manifest;
+					_steps = ESteps.VerifyPackage;
+				}
+				else
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = _loadCacheManifestOp.Error;
+				}
 			}
 
-			if (_steps == ESteps.CheckVerifyOperation)
+			if (_steps == ESteps.VerifyPackage)
 			{
+				if (_verifyOperation == null)
+				{
+					_verifyOperation = VerifyPackageOperation.CreateOperation(_impl.ActiveManifest, _impl);
+					OperationSystem.StartOperation(_verifyOperation);
+				}
+
 				Progress = _verifyOperation.Progress;
 				if (_verifyOperation.IsDone)
 				{
@@ -247,62 +190,6 @@ namespace YooAsset
 					Status = EOperationStatus.Succeed;
 				}
 			}
-		}
-
-		/// <summary>
-		/// 手动保存清单文件
-		/// </summary>
-		public override void SaveManifestFile()
-		{
-			if (IsDone == false)
-			{
-				YooLogger.Warning($"{nameof(UpdatePackageManifestOperation)} is not done !");
-				return;
-			}
-
-			if (Status == EOperationStatus.Succeed)
-			{
-				if (_fileBytesData != null)
-				{
-					SaveManifestFileInternal(_fileBytesData);
-					_fileBytesData = null;
-				}
-			}
-		}
-
-		/// <summary>
-		/// 还原补丁清单
-		/// </summary>
-		public override void RevertManifest()
-		{
-			if (IsDone == false)
-			{
-				YooLogger.Warning($"{nameof(UpdatePackageManifestOperation)} is not done !");
-				return;
-			}
-
-			if (Status == EOperationStatus.Succeed)
-			{
-				if (_prePatchManifest != null)
-				{
-					_impl.ActivePatchManifest = _prePatchManifest;
-					_prePatchManifest = null;
-				}
-			}
-		}
-
-		private void SaveManifestFileInternal(byte[] bytesData)
-		{
-			string savePath = PersistentHelper.GetCacheManifestFilePath(_packageName);
-			FileUtility.CreateFile(savePath, bytesData);
-		}
-		private string GetPatchManifestRequestURL(string fileName)
-		{
-			// 轮流返回请求地址
-			if (RequestCount % 2 == 0)
-				return _impl.GetPatchDownloadFallbackURL(fileName);
-			else
-				return _impl.GetPatchDownloadMainURL(fileName);
 		}
 	}
 }

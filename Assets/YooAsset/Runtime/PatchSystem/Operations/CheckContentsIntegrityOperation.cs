@@ -44,14 +44,13 @@ namespace YooAsset
 		{
 			None,
 			CheckLoadedManifest,
-			StartVerifyOperation,
-			CheckVerifyOperation,
+			VerifyPackage,
 			Done,
 		}
 
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
-		private VerifyCacheFilesOperation _verifyOperation;
+		private VerifyPackageOperation _verifyOperation;
 		private ESteps _steps = ESteps.None;
 
 		internal HostPlayModeCheckContentsIntegrityOperation(HostPlayModeImpl impl, string packageName)
@@ -70,7 +69,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.CheckLoadedManifest)
 			{
-				if (_impl.ActivePatchManifest == null)
+				if (_impl.ActiveManifest == null)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
@@ -78,19 +77,18 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.StartVerifyOperation;
+					_steps = ESteps.VerifyPackage;
 				}
 			}
 
-			if (_steps == ESteps.StartVerifyOperation)
+			if (_steps == ESteps.VerifyPackage)
 			{
-				_verifyOperation = VerifyCacheFilesOperation.CreateOperation(_impl.ActivePatchManifest, _impl);
-				OperationSystem.StartOperation(_verifyOperation);
-				_steps = ESteps.CheckVerifyOperation;
-			}
+				if (_verifyOperation == null)
+				{
+					_verifyOperation = VerifyPackageOperation.CreateOperation(_impl.ActiveManifest, _impl);
+					OperationSystem.StartOperation(_verifyOperation);
+				}
 
-			if (_steps == ESteps.CheckVerifyOperation)
-			{
 				Progress = _verifyOperation.Progress;
 				if (_verifyOperation.IsDone == false)
 					return;

@@ -1,12 +1,12 @@
 ﻿
 namespace YooAsset
 {
-	internal class CopyBuildinManifestOperation : AsyncOperationBase
+	internal class CopyBuildinPackageHashOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
 			None,
-			CopyBuildinManifestFile,
+			CopyBuildinPackageHashFile,
 			Done,
 		}
 
@@ -15,26 +15,26 @@ namespace YooAsset
 		private UnityWebFileRequester _downloader;
 		private ESteps _steps = ESteps.None;
 
-		public CopyBuildinManifestOperation(string buildinPackageName, string buildinPackageVersion)
+		public CopyBuildinPackageHashOperation(string buildinPackageName, string buildinPackageVersion)
 		{
 			_buildinPackageName = buildinPackageName;
 			_buildinPackageVersion = buildinPackageVersion;
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.CopyBuildinManifestFile;
+			_steps = ESteps.CopyBuildinPackageHashFile;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
-			if (_steps == ESteps.CopyBuildinManifestFile)
+			if (_steps == ESteps.CopyBuildinPackageHashFile)
 			{
 				if (_downloader == null)
 				{
-					string savePath = PersistentHelper.GetCacheManifestFilePath(_buildinPackageName, _buildinPackageVersion);
-					string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_buildinPackageName, _buildinPackageVersion);
+					string savePath = PersistentHelper.GetCachePackageHashFilePath(_buildinPackageName, _buildinPackageVersion);
+					string fileName = YooAssetSettingsData.GetPackageHashFileName(_buildinPackageName, _buildinPackageVersion);
 					string filePath = PathHelper.MakeStreamingLoadPath(fileName);
 					string url = PathHelper.ConvertToWWWPath(filePath);
 					_downloader = new UnityWebFileRequester();

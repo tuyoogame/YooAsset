@@ -87,6 +87,7 @@ namespace YooAsset
 		private const string ManifestFolderName = "ManifestFiles";
 		private const string AppFootPrintFileName = "ApplicationFootPrint.bytes";
 
+
 		/// <summary>
 		/// 删除沙盒总目录
 		/// </summary>
@@ -117,6 +118,7 @@ namespace YooAsset
 				Directory.Delete(root, true);
 		}
 
+
 		/// <summary>
 		/// 获取缓存文件夹路径
 		/// </summary>
@@ -137,10 +139,37 @@ namespace YooAsset
 		/// <summary>
 		/// 获取沙盒内清单文件的路径
 		/// </summary>
-		public static string GetCacheManifestFilePath(string packageName)
+		public static string GetCacheManifestFilePath(string packageName, string packageVersion)
 		{
-			string fileName = YooAssetSettingsData.GetPatchManifestFileNameWithoutVersion(packageName);
+			string fileName = YooAssetSettingsData.GetManifestBinaryFileName(packageName, packageVersion);
 			return PathHelper.MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
+		}
+
+		/// <summary>
+		/// 获取沙盒内包裹的哈希文件的路径
+		/// </summary>
+		public static string GetCachePackageHashFilePath(string packageName, string packageVersion)
+		{
+			string fileName = YooAssetSettingsData.GetPackageHashFileName(packageName, packageVersion);
+			return PathHelper.MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
+		}
+
+		/// <summary>
+		/// 获取沙盒内包裹的版本文件的路径
+		/// </summary>
+		public static string GetCachePackageVersionFilePath(string packageName)
+		{
+			string fileName = YooAssetSettingsData.GetPackageVersionFileName(packageName);
+			return PathHelper.MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
+		}
+
+		/// <summary>
+		/// 保存默认的包裹版本
+		/// </summary>
+		public static void SaveCachePackageVersionFile(string packageName, string version)
+		{
+			string filePath = GetCachePackageVersionFilePath(packageName);
+			FileUtility.CreateFile(filePath, version);
 		}
 	}
 }

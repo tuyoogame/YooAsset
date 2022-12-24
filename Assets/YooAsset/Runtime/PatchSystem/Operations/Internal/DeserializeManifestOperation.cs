@@ -16,13 +16,17 @@ namespace YooAsset
 			DeserializeBundleList,
 			Done,
 		}
-
-		public PatchManifest Manifest { private set; get; }
+	
 		private readonly BufferReader _buffer;
 		private int _patchAssetCount;
 		private int _patchBundleCount;
 		private int _progressTotalValue;
 		private ESteps _steps = ESteps.None;
+
+		/// <summary>
+		/// 解析的清单实例
+		/// </summary>
+		public PatchManifest Manifest { private set; get; }
 
 		public DeserializeManifestOperation(byte[] binaryData)
 		{
