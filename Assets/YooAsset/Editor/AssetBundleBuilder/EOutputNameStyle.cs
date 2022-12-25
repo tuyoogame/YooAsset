@@ -12,11 +12,6 @@ namespace YooAsset.Editor
 		HashName = 1,
 
 		/// <summary>
-		/// 资源包名称
-		/// </summary>
-		BundleName = 2,
-
-		/// <summary>
 		/// 资源包名称 + 哈希值名称
 		/// </summary>
 		BundleName_HashName = 4,
