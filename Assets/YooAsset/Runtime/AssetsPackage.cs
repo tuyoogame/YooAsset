@@ -90,7 +90,7 @@ namespace YooAsset
 				_assetSystemImpl.Initialize(PackageName, true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
 
 				var initializeParameters = parameters as EditorSimulateModeParameters;
-				initializeOperation = editorSimulateModeImpl.InitializeAsync(PackageName, initializeParameters.LocationToLower, initializeParameters.SimulatePatchManifestPath);
+				initializeOperation = editorSimulateModeImpl.InitializeAsync(initializeParameters.LocationToLower, initializeParameters.SimulatePatchManifestPath);
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
@@ -219,12 +219,23 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 检查包裹内容的完整性
+		/// 预下载指定版本的包裹资源
 		/// </summary>
-		public CheckContentsIntegrityOperation CheckContentsIntegrityAsync()
+		/// <param name="packageVersion">下载的包裹版本</param>
+		/// <param name="timeout">超时时间（默认值：60秒）</param>
+		public PreDownloadPackageOperation PreDownloadPackageAsync(string packageVersion, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			return _playModeServices.CheckContentsIntegrityAsync();
+			return _playModeServices.PreDownloadPackageAsync(packageVersion, timeout);
+		}
+
+		/// <summary>
+		/// 检查包裹内容的完整性
+		/// </summary>
+		public CheckPackageContentsOperation CheckPackageContentsAsync(string packageVersion)
+		{
+			DebugCheckInitialize();
+			return _playModeServices.CheckPackageContentsOperation(packageVersion);
 		}
 
 		/// <summary>

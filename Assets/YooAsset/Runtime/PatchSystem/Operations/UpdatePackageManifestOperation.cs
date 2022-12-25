@@ -47,7 +47,7 @@ namespace YooAsset
 
 	/// <summary>
 	/// 联机模式的更新清单操作
-	/// 注意：优先比对沙盒清单哈希值，如果有变化就更新远端清单文件，并保存到本地。
+	/// 注意：优先加载沙盒里缓存的清单文件，如果有变化就更新远端清单文件，并保存到本地。
 	/// </summary>
 	internal sealed class HostPlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
 	{
@@ -92,17 +92,16 @@ namespace YooAsset
 
 			if (_steps == ESteps.CheckActiveManifest)
 			{
-				// 检测当前激活的清单对象
-				if (_impl.ActiveManifest != null)
+				// 检测当前激活的清单对象	
+				if (_impl.ActiveManifest != null && _impl.ActiveManifest.PackageVersion == _packageVersion)
 				{
-					if (_impl.ActiveManifest.PackageVersion == _packageVersion)
-					{
-						_steps = ESteps.Done;
-						Status = EOperationStatus.Succeed;
-						return;
-					}
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
 				}
-				_steps = ESteps.TryLoadCacheManifest;
+				else
+				{
+					_steps = ESteps.TryLoadCacheManifest;
+				}
 			}
 
 			if (_steps == ESteps.TryLoadCacheManifest)

@@ -7,15 +7,13 @@ namespace YooAsset
 	internal class EditorSimulateModeImpl : IPlayModeServices, IBundleServices
 	{
 		private PatchManifest _activeManifest;
-		private string _packageName;
 		private bool _locationToLower;
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(string packageName, bool locationToLower, string simulatePatchManifestPath)
+		public InitializationOperation InitializeAsync(bool locationToLower, string simulatePatchManifestPath)
 		{
-			_packageName = packageName;
 			_locationToLower = locationToLower;
 			var operation = new EditorSimulateModeInitializationOperation(this, simulatePatchManifestPath);
 			OperationSystem.StartOperation(operation);
@@ -52,9 +50,15 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		CheckContentsIntegrityOperation IPlayModeServices.CheckContentsIntegrityAsync()
+		PreDownloadPackageOperation IPlayModeServices.PreDownloadPackageAsync(string packageVersion, int timeout)
 		{
-			var operation = new EditorSimulateModeCheckContentsIntegrityOperation();
+			var operation = new EditorPlayModePreDownloadPackageOperation();
+			OperationSystem.StartOperation(operation);
+			return operation;
+		}
+		CheckPackageContentsOperation IPlayModeServices.CheckPackageContentsOperation(string packageVersion)
+		{
+			var operation = new EditorSimulateModeCheckPackageContentsOperation();
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}

@@ -51,16 +51,15 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			DownloadPackageVersion,
+			QueryRemotePackageVersion,
 			Done,
 		}
 
-		private static int RequestCount = 0;
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
 		private readonly bool _appendTimeTicks;
 		private readonly int _timeout;
-		private UnityWebDataRequester _downloader;
+		private QueryRemotePackageVersionOperation _queryRemotePackageVersionOp;
 		private ESteps _steps = ESteps.None;
 
 		internal HostPlayModeUpdatePackageVersionOperation(HostPlayModeImpl impl, string packageName, bool appendTimeTicks, int timeout)
@@ -72,70 +71,37 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			RequestCount++;
-			_steps = ESteps.DownloadPackageVersion;
+			_steps = ESteps.QueryRemotePackageVersion;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
-			if (_steps == ESteps.DownloadPackageVersion)
+			if (_steps == ESteps.QueryRemotePackageVersion)
 			{
-				if (_downloader == null)
+				if (_queryRemotePackageVersionOp == null)
 				{
-					string fileName = YooAssetSettingsData.GetPackageVersionFileName(_packageName);
-					string webURL = GetPackageVersionRequestURL(fileName);
-					YooLogger.Log($"Beginning to request package version : {webURL}");
-					_downloader = new UnityWebDataRequester();
-					_downloader.SendRequest(webURL, _timeout);
+					_queryRemotePackageVersionOp = new QueryRemotePackageVersionOperation(_impl, _packageName, _appendTimeTicks, _timeout);
+					OperationSystem.StartOperation(_queryRemotePackageVersionOp);
 				}
 
-				Progress = _downloader.Progress();
-				if (_downloader.IsDone() == false)
+				if (_queryRemotePackageVersionOp.IsDone == false)
 					return;
 
-				if (_downloader.HasError())
+				if (_queryRemotePackageVersionOp.Status == EOperationStatus.Succeed)
 				{
+					PackageVersion = _queryRemotePackageVersionOp.PackageVersion;
 					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = _downloader.GetError();
+					Status = EOperationStatus.Succeed;
 				}
 				else
 				{
-					PackageVersion = _downloader.GetText();
-					if (string.IsNullOrEmpty(PackageVersion))
-					{
-						_steps = ESteps.Done;
-						Status = EOperationStatus.Failed;
-						Error = $"Package version is empty : {_downloader.URL}";
-					}
-					else
-					{
-						_steps = ESteps.Done;
-						Status = EOperationStatus.Succeed;
-					}
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = _queryRemotePackageVersionOp.Error;
 				}
-
-				_downloader.Dispose();
 			}
-		}
-
-		private string GetPackageVersionRequestURL(string fileName)
-		{
-			string url;
-
-			// 轮流返回请求地址
-			if (RequestCount % 2 == 0)
-				url = _impl.GetPatchDownloadFallbackURL(fileName);
-			else
-				url = _impl.GetPatchDownloadMainURL(fileName);
-
-			// 在URL末尾添加时间戳
-			if (_appendTimeTicks)
-				return $"{url}?{System.DateTime.UtcNow.Ticks}";
-			else
-				return url;
 		}
 	}
 }

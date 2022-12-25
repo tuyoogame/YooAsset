@@ -7,7 +7,6 @@ namespace YooAsset
 	internal class OfflinePlayModeImpl : IPlayModeServices, IBundleServices
 	{
 		private PatchManifest _activeManifest;
-		private string _packageName;
 		private bool _locationToLower;
 
 		/// <summary>
@@ -15,7 +14,6 @@ namespace YooAsset
 		/// </summary>
 		public InitializationOperation InitializeAsync(string packageName, bool locationToLower)
 		{
-			_packageName = packageName;
 			_locationToLower = locationToLower;
 			var operation = new OfflinePlayModeInitializationOperation(this, packageName);
 			OperationSystem.StartOperation(operation);
@@ -52,9 +50,15 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		CheckContentsIntegrityOperation IPlayModeServices.CheckContentsIntegrityAsync()
+		PreDownloadPackageOperation IPlayModeServices.PreDownloadPackageAsync(string packageVersion, int timeout)
 		{
-			var operation = new OfflinePlayModeCheckContentsIntegrityOperation();
+			var operation = new OfflinePlayModePreDownloadPackageOperation();
+			OperationSystem.StartOperation(operation);
+			return operation;
+		}
+		CheckPackageContentsOperation IPlayModeServices.CheckPackageContentsOperation(string packageVersion)
+		{
+			var operation = new OfflinePlayModeCheckPackageContentsOperation();
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}

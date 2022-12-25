@@ -110,9 +110,15 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		CheckContentsIntegrityOperation IPlayModeServices.CheckContentsIntegrityAsync()
+		PreDownloadPackageOperation IPlayModeServices.PreDownloadPackageAsync(string packageVersion, int timeout)
 		{
-			var operation = new HostPlayModeCheckContentsIntegrityOperation(this, _packageName);
+			var operation = new HostPlayModePreDownloadPackageOperation(this, _packageName, packageVersion, timeout);
+			OperationSystem.StartOperation(operation);
+			return operation;
+		}
+		CheckPackageContentsOperation IPlayModeServices.CheckPackageContentsOperation(string packageVersion)
+		{
+			var operation = new HostPlayModeCheckPackageContentsOperation(this, _packageName, packageVersion);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}

@@ -24,9 +24,14 @@ namespace YooAsset
 		UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, int timeout);
 
 		/// <summary>
+		/// 预下载指定版本的包裹资源
+		/// </summary>
+		PreDownloadPackageOperation PreDownloadPackageAsync(string packageVersion, int timeout);
+
+		/// <summary>
 		/// 检查包裹内容的完整性
 		/// </summary>
-		CheckContentsIntegrityOperation CheckContentsIntegrityAsync();
+		CheckPackageContentsOperation CheckPackageContentsOperation(string packageVersion);
 
 		// 下载相关
 		PatchDownloaderOperation CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout);

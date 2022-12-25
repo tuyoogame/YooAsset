@@ -64,7 +64,6 @@ namespace YooAsset
 		{
 		}
 	}
-
 	public class OfflinePlayModePreDownloadPackageOperation : PreDownloadPackageOperation
 	{
 		internal override void Start()
@@ -75,7 +74,6 @@ namespace YooAsset
 		{
 		}
 	}
-
 	public class HostPlayModePreDownloadPackageOperation : PreDownloadPackageOperation
 	{
 		private enum ESteps

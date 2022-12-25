@@ -6,8 +6,8 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			DownloadPackageHash,
-			DownloadManifest,
+			DownloadPackageHashFile,
+			DownloadManifestFile,
 			Done,
 		}
 
@@ -30,14 +30,14 @@ namespace YooAsset
 		internal override void Start()
 		{
 			RequestCount++;
-			_steps = ESteps.DownloadPackageHash;
+			_steps = ESteps.DownloadPackageHashFile;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
-			if (_steps == ESteps.DownloadPackageHash)
+			if (_steps == ESteps.DownloadPackageHashFile)
 			{
 				if (_downloader1 == null)
 				{
@@ -61,13 +61,13 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.DownloadManifest;
+					_steps = ESteps.DownloadManifestFile;
 				}
 
 				_downloader1.Dispose();
 			}
 
-			if (_steps == ESteps.DownloadManifest)
+			if (_steps == ESteps.DownloadManifestFile)
 			{
 				if (_downloader2 == null)
 				{

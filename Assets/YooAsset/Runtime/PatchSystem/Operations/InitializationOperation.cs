@@ -184,8 +184,7 @@ namespace YooAsset
 			QueryCachePackageVersion,
 			TryLoadCacheManifest,
 			QueryBuildinPackageVersion,
-			CopyBuildinPackageHash,
-			CopyBuildinManifest,
+			UnpackBuildinManifest,
 			LoadBuildinManifest,
 			VerifyPackage,
 			Done,
@@ -195,8 +194,7 @@ namespace YooAsset
 		private readonly string _packageName;
 		private QueryBuildinPackageVersionOperation _queryBuildinPackageVersionOp;
 		private QueryCachePackageVersionOperation _queryCachePackageVersionOp;
-		private CopyBuildinPackageHashOperation _copyBuildinPackageHashOp;
-		private CopyBuildinManifestOperation _copyBuildinManifestOp;
+		private UnpackBuildinManifestOperation _unpackBuildinManifestOp;
 		private LoadBuildinManifestOperation _loadBuildinManifestOp;
 		private LoadCacheManifestOperation _loadCacheManifestOp;
 		private VerifyPackageOperation _verifyOperation;
@@ -289,7 +287,7 @@ namespace YooAsset
 				// 注意：为了兼容MOD模式，初始化动态新增的包裹的时候，如果内置清单不存在也不需要报错！
 				if (_queryBuildinPackageVersionOp.Status == EOperationStatus.Succeed)
 				{
-					_steps = ESteps.CopyBuildinPackageHash;
+					_steps = ESteps.UnpackBuildinManifest;
 				}
 				else
 				{
@@ -300,41 +298,18 @@ namespace YooAsset
 				}
 			}
 
-			if (_steps == ESteps.CopyBuildinPackageHash)
+			if (_steps == ESteps.UnpackBuildinManifest)
 			{
-				if (_copyBuildinPackageHashOp == null)
+				if (_unpackBuildinManifestOp == null)
 				{
-					_copyBuildinPackageHashOp = new CopyBuildinPackageHashOperation(_packageName, _queryBuildinPackageVersionOp.PackageVersion);
-					OperationSystem.StartOperation(_copyBuildinPackageHashOp);
+					_unpackBuildinManifestOp = new UnpackBuildinManifestOperation(_packageName, _queryBuildinPackageVersionOp.PackageVersion);
+					OperationSystem.StartOperation(_unpackBuildinManifestOp);
 				}
 
-				if (_copyBuildinPackageHashOp.IsDone == false)
+				if (_unpackBuildinManifestOp.IsDone == false)
 					return;
 
-				if (_copyBuildinPackageHashOp.Status == EOperationStatus.Succeed)
-				{
-					_steps = ESteps.CopyBuildinManifest;
-				}
-				else
-				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = _copyBuildinPackageHashOp.Error;
-				}
-			}
-
-			if (_steps == ESteps.CopyBuildinManifest)
-			{
-				if (_copyBuildinManifestOp == null)
-				{
-					_copyBuildinManifestOp = new CopyBuildinManifestOperation(_packageName, _queryBuildinPackageVersionOp.PackageVersion);
-					OperationSystem.StartOperation(_copyBuildinManifestOp);
-				}
-
-				if (_copyBuildinManifestOp.IsDone == false)
-					return;
-
-				if (_copyBuildinManifestOp.Status == EOperationStatus.Succeed)
+				if (_unpackBuildinManifestOp.Status == EOperationStatus.Succeed)
 				{
 					_steps = ESteps.LoadBuildinManifest;
 				}
@@ -342,7 +317,7 @@ namespace YooAsset
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
-					Error = _copyBuildinManifestOp.Error;
+					Error = _unpackBuildinManifestOp.Error;
 				}
 			}
 
