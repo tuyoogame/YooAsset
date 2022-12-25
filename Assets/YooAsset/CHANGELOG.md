@@ -2,6 +2,42 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.1-preview] - 2022-12-26
+
+### Fixed
+
+- 修复了开启UniqueBundleName选项后，SBP构建报错的问题。
+
+### Added
+
+- 新增了AssetsPackage.PreDownloadPackageAsync()方法
+
+  ````c#
+  /// <summary>
+  /// 预下载指定版本的包裹资源
+  /// </summary>
+  /// <param name="packageVersion">下载的包裹版本</param>
+  /// <param name="timeout">超时时间（默认值：60秒）</param>
+  public PreDownloadPackageOperation PreDownloadPackageAsync(string packageVersion, int timeout = 60)
+  ````
+
+- 新增了OperationHandleBase.GetDownloadReport()方法
+
+  ````c#
+  /// <summary>
+  /// 获取下载报告
+  /// </summary>
+  public DownloadReport GetDownloadReport();
+  ````
+
+### Changed
+
+- 优化了资源清单更新流程，支持缓存下载的清单。
+- 优化了清单文件的解析流程，支持分帧解析避免卡顿。
+- 优化了缓存文件的验证流程，支持分帧处理。
+- 初始化的时候支持覆盖安装检测，然后清理所有的缓存清单文件。
+- ClearPackageUnusedCacheFilesAsync重名为ClearUnusedCacheFilesAsync
+
 ## [1.4.0-preview] - 2022-12-04
 
 ### Fixed
