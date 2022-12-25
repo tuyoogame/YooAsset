@@ -302,10 +302,6 @@ namespace YooAsset
 				string fileExtension = isRawFile ? YooAssetSettingsData.Setting.RawFileVariant : YooAssetSettingsData.Setting.AssetBundleFileVariant;
 				return StringUtility.Format("{0}.{1}", fileHash, fileExtension);
 			}
-			else if (nameStyle == 2) //BundleName
-			{
-				return bundleName;
-			}
 			else if (nameStyle == 4) //BundleName_HashName
 			{
 				string fileName = bundleName.Remove(bundleName.LastIndexOf('.'));
