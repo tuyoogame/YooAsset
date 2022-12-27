@@ -130,7 +130,8 @@ private IEnumerator Start()
     {
         // 如果获取远端资源版本失败，说明当前网络无连接。
         // 在正常开始游戏之前，需要验证本地清单内容的完整性。
-        var operation = package.CheckPackageContentsAsync();
+        string packageVersion = package.GetPackageVersion();
+        var operation = package.CheckPackageContentsAsync(packageVersion);
         yield return operation;
         if (operation.Status == EOperationStatus.Succeed)
         {
@@ -146,14 +147,6 @@ private IEnumerator Start()
 ````
 
 ### 源代码解析
-
-- 编辑器模拟模式
-
-  UpdatePackageVersionAsync()方法和UpdatePackageManifestAsync()方法都不起效，但是都会返回成功！
-
-- 单机运行模式
-
-  UpdatePackageVersionAsync()方法和UpdatePackageManifestAsync()方法都不起效，但是都会返回成功！
 
 - 联机运行模式
 
