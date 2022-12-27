@@ -12,7 +12,7 @@ namespace YooAsset
 		}
 
 		private static int RequestCount = 0;
-		private readonly HostPlayModeImpl _impl;
+		private readonly IRemoteServices _remoteServices;
 		private readonly string _packageName;
 		private readonly string _packageVersion;
 		private readonly int _timeout;
@@ -20,9 +20,9 @@ namespace YooAsset
 		private UnityWebFileRequester _downloader2;
 		private ESteps _steps = ESteps.None;
 
-		internal DownloadManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
+		internal DownloadManifestOperation(IRemoteServices remoteServices, string packageName, string packageVersion, int timeout)
 		{
-			_impl = impl;
+			_remoteServices = remoteServices;
 			_packageName = packageName;
 			_packageVersion = packageVersion;
 			_timeout = timeout;
@@ -103,9 +103,9 @@ namespace YooAsset
 		{
 			// 轮流返回请求地址
 			if (RequestCount % 2 == 0)
-				return _impl.GetPatchDownloadFallbackURL(fileName);
+				return _remoteServices.GetRemoteFallbackURL(fileName);
 			else
-				return _impl.GetPatchDownloadMainURL(fileName);
+				return _remoteServices.GetRemoteMainURL(fileName);
 		}
 	}
 }

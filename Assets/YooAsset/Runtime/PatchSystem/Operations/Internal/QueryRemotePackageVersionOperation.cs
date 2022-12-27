@@ -12,7 +12,7 @@ namespace YooAsset
 		}
 
 		private static int RequestCount = 0;
-		private readonly HostPlayModeImpl _impl;
+		private readonly IRemoteServices _remoteServices;
 		private readonly string _packageName;
 		private readonly bool _appendTimeTicks;
 		private readonly int _timeout;
@@ -25,9 +25,9 @@ namespace YooAsset
 		public string PackageVersion { private set; get; }
 		
 
-		public QueryRemotePackageVersionOperation(HostPlayModeImpl impl, string packageName, bool appendTimeTicks, int timeout)
+		public QueryRemotePackageVersionOperation(IRemoteServices remoteServices, string packageName, bool appendTimeTicks, int timeout)
 		{
-			_impl = impl;
+			_remoteServices = remoteServices;
 			_packageName = packageName;
 			_appendTimeTicks = appendTimeTicks;
 			_timeout = timeout;
@@ -89,9 +89,9 @@ namespace YooAsset
 
 			// 轮流返回请求地址
 			if (RequestCount % 2 == 0)
-				url = _impl.GetPatchDownloadFallbackURL(fileName);
+				url = _remoteServices.GetRemoteFallbackURL(fileName);
 			else
-				url = _impl.GetPatchDownloadMainURL(fileName);
+				url = _remoteServices.GetRemoteMainURL(fileName);
 
 			// 在URL末尾添加时间戳
 			if (_appendTimeTicks)

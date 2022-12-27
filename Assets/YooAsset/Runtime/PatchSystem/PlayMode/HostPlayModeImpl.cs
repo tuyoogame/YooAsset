@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	internal class HostPlayModeImpl : IPlayModeServices, IBundleServices
+	internal class HostPlayModeImpl : IPlayModeServices, IBundleServices, IRemoteServices
 	{
 		private PatchManifest _activeManifest;
 
@@ -31,16 +31,6 @@ namespace YooAsset
 			return operation;
 		}
 
-		// WEB相关
-		public string GetPatchDownloadMainURL(string fileName)
-		{
-			return $"{_defaultHostServer}/{fileName}";
-		}
-		public string GetPatchDownloadFallbackURL(string fileName)
-		{
-			return $"{_fallbackHostServer}/{fileName}";
-		}
-
 		// 下载相关
 		private List<BundleInfo> ConvertToDownloadList(List<PatchBundle> downloadList)
 		{
@@ -54,8 +44,8 @@ namespace YooAsset
 		}
 		private BundleInfo ConvertToDownloadInfo(PatchBundle patchBundle)
 		{
-			string remoteMainURL = GetPatchDownloadMainURL(patchBundle.FileName);
-			string remoteFallbackURL = GetPatchDownloadFallbackURL(patchBundle.FileName);
+			string remoteMainURL = GetRemoteMainURL(patchBundle.FileName);
+			string remoteFallbackURL = GetRemoteFallbackURL(patchBundle.FileName);
 			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromRemote, remoteMainURL, remoteFallbackURL);
 			return bundleInfo;
 		}
@@ -71,13 +61,21 @@ namespace YooAsset
 			}
 			return result;
 		}
-		public static BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
+		private BundleInfo ConvertToUnpackInfo(PatchBundle patchBundle)
 		{
-			// 注意：我们把流加载路径指定为远端下载地址
-			string streamingPath = PathHelper.ConvertToWWWPath(patchBundle.StreamingFilePath);
-			BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming, streamingPath, streamingPath);
-			return bundleInfo;
+			return PatchManifestTools.GetUnpackInfo(patchBundle);
 		}
+
+		#region IRemoteServices接口
+		public string GetRemoteMainURL(string fileName)
+		{
+			return $"{_defaultHostServer}/{fileName}";
+		}
+		public string GetRemoteFallbackURL(string fileName)
+		{
+			return $"{_fallbackHostServer}/{fileName}";
+		}
+		#endregion
 
 		#region IPlayModeServices接口
 		public PatchManifest ActiveManifest

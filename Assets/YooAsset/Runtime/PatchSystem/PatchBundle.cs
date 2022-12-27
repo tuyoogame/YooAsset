@@ -120,7 +120,7 @@ namespace YooAsset
 		{
 			_packageName = packageName;
 			_cacheKey = $"{packageName}-{FileHash}";
-			_fileName = PatchManifest.CreateBundleFileName(nameStype, BundleName, FileHash, IsRawFile);
+			_fileName = PatchManifestTools.CreateBundleFileName(nameStype, BundleName, FileHash, IsRawFile);
 		}
 
 		/// <summary>
