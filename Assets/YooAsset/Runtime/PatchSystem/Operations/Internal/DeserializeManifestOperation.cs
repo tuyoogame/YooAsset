@@ -112,7 +112,7 @@ namespace YooAsset
 							Manifest.AssetDic.Add(assetPath, patchAsset);
 
 						_patchAssetCount--;
-						Progress = _patchAssetCount / _progressTotalValue;
+						Progress = 1f - _patchAssetCount / _progressTotalValue;
 						if (OperationSystem.IsBusy)
 							break;
 					}
@@ -149,7 +149,7 @@ namespace YooAsset
 						Manifest.BundleDic.Add(patchBundle.BundleName, patchBundle);
 
 						_patchBundleCount--;
-						Progress = _patchBundleCount / _progressTotalValue;
+						Progress = 1f - _patchBundleCount / _progressTotalValue;
 						if (OperationSystem.IsBusy)
 							break;
 					}
