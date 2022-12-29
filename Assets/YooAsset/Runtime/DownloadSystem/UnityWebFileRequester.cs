@@ -36,6 +36,9 @@ namespace YooAsset
 			{
 				URL = url;
 				_timeout = timeout;
+				_latestDownloadBytes = 0;
+				_latestDownloadRealtime = Time.realtimeSinceStartup;
+
 				_webRequest = new UnityWebRequest(URL, UnityWebRequest.kHttpVerbGET);
 				DownloadHandlerFile handler = new DownloadHandlerFile(savePath);
 				handler.removeFileOnAbort = true;
