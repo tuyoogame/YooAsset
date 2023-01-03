@@ -2,6 +2,13 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.2-preview] - 2023-01-03
+
+### Fixed
+
+- 修复了清单解析异步操作的进度条变化错误。
+- 修复了更新资源清单错误计算超时时间的问题。
+
 ## [1.4.1-preview] - 2022-12-26
 
 ### Fixed
