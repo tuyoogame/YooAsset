@@ -25,21 +25,21 @@ MonoBehaviour:
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
-      - CollectPath: Assets/Samples/Space Shooter/GameRes/Effect
+      - CollectPath: Assets/YooAsset/Assets/YooAsset/Samples/Space Shooter/GameRes/Effect
         CollectorGUID: 80d76514758554baaa96a9efffe9f3ef
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: 
-      - CollectPath: Assets/Samples/Space Shooter/GameRes/Entity
+      - CollectPath: Assets/YooAsset/Assets/YooAsset/Samples/Space Shooter/GameRes/Entity
         CollectorGUID: 4d7c84745db8e884f8020a8c5356e67c
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: 
-      - CollectPath: Assets/Samples/Space Shooter/GameRes/Audio
+      - CollectPath: Assets/YooAsset/Assets/YooAsset/Samples/Space Shooter/GameRes/Audio
         CollectorGUID: 306075fbe00b24251b6c889984a7a7d5
         CollectorType: 0
         AddressRuleName: AddressByFileName
@@ -51,7 +51,7 @@ MonoBehaviour:
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
-      - CollectPath: Assets/Samples/Space Shooter/GameArt/ShaderVariants
+      - CollectPath: Assets/YooAsset/Assets/YooAsset/Samples/Space Shooter/GameArt/ShaderVariants
         CollectorGUID: 00781758c26692e40a9634ddeac838be
         CollectorType: 0
         AddressRuleName: AddressByFileName
@@ -63,7 +63,7 @@ MonoBehaviour:
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
-      - CollectPath: Assets/Samples/Space Shooter/GameRes/Scene
+      - CollectPath: Assets/YooAsset/Assets/YooAsset/Samples/Space Shooter/GameRes/Scene
         CollectorGUID: 6070eae1192f2994887f2983a177d503
         CollectorType: 0
         AddressRuleName: AddressByFileName
@@ -75,21 +75,21 @@ MonoBehaviour:
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
-      - CollectPath: Assets/Samples/Space Shooter/GameRes/UIImage
+      - CollectPath: Assets/YooAsset/Assets/YooAsset/Samples/Space Shooter/GameRes/UIImage
         CollectorGUID: 30c57db62bb02a24590e7046d3a9e33a
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: 
-      - CollectPath: Assets/Samples/Space Shooter/GameRes/UIPanel
+      - CollectPath: Assets/YooAsset/Assets/YooAsset/Samples/Space Shooter/GameRes/UIPanel
         CollectorGUID: 12d33f33f3a55224c9c747d7bffa1c68
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackSeparately
         FilterRuleName: CollectAll
         AssetTags: 
-      - CollectPath: Assets/Samples/Space Shooter/GameRes/UISprite
+      - CollectPath: Assets/YooAsset/Assets/YooAsset/Samples/Space Shooter/GameRes/UISprite
         CollectorGUID: 01865ad6f7c806147b6cb37f2d83bc96
         CollectorType: 0
         AddressRuleName: AddressByFileName
