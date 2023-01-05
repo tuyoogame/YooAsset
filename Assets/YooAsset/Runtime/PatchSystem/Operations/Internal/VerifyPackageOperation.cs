@@ -215,7 +215,7 @@ namespace YooAsset
 
 				// 设置同时验证的最大数
 				_verifyMaxNum = bundleCount;
-				_verifyTotalCount = _waitingList.Count;
+				_verifyTotalCount = bundleCount;
 
 				_waitingList = new List<VerifyInfo>(bundleCount);
 				_verifyingList = new List<VerifyInfo>(_verifyMaxNum);
