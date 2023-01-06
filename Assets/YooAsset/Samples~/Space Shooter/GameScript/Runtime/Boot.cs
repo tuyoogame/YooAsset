@@ -3,7 +3,6 @@ using UniFramework.Event;
 using UniFramework.Module;
 using YooAsset;
 
-//TODO wht real 框架加入该类
 public class Boot : MonoBehaviour
 {
 	/// <summary>
@@ -14,8 +13,8 @@ public class Boot : MonoBehaviour
 	void Awake()
 	{
 		Debug.Log($"资源系统运行模式：{PlayMode}");
-		// Application.targetFrameRate = 60;
-		// Application.runInBackground = true;  		//TODO wht real 加入框架
+		Application.targetFrameRate = 60;
+		Application.runInBackground = true;  		//TODO wht real 加入框架
 	}
 	void Start()
 	{

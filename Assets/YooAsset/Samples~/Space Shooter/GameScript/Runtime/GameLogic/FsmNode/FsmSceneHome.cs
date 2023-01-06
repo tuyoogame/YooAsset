@@ -31,7 +31,10 @@ internal class FsmSceneHome : IStateNode
 		if (_machine.PreviousNode != typeof(FsmInitGame).FullName)
 			yield return  UniWindow.OpenWindowAsync<UILoadingWindow>("UILoading");
 
-		yield return YooAssets.LoadSceneAsync("scene_home");	
+		yield return YooAssets.LoadSceneAsync("scene_home");
+		//TODO wht ref 参考；关闭Enable Addressable，使用全路径
+		// yield return YooAssets.LoadSceneAsync("Assets/YooAsset/Assets/YooAsset/Samples/Space Shooter/GameRes/Scene/scene_home.unity");
+		
 		yield return UniWindow.OpenWindowAsync<UIHomeWindow>("UIHome");
 		yield return new WaitForSeconds(0.5f);
 		
