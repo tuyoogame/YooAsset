@@ -32,12 +32,13 @@ public class FsmCreateDownloader : IStateNode
 	{
 		yield return new WaitForSecondsRealtime(0.5f);
 
+		//TODO wht real 以下代码全拿
 		int downloadingMaxNum = 10;
 		int failedTryAgain = 3;
 		var downloader = YooAssets.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
 		PatchManager.Instance.Downloader = downloader;
 
-		if (downloader.TotalDownloadCount == 0)
+		if (downloader.TotalDownloadCount == 0)		//没有需要下载的资源
 		{
 			Debug.Log("Not found any download files !");
 			_machine.ChangeState<FsmDownloadOver>();
@@ -51,7 +52,7 @@ public class FsmCreateDownloader : IStateNode
 			// 注意：开发者需要在下载前检测磁盘空间不足
 			int totalDownloadCount = downloader.TotalDownloadCount;
 			long totalDownloadBytes = downloader.TotalDownloadBytes;
-			PatchEventDefine.FoundUpdateFiles.SendEventMessage(totalDownloadCount, totalDownloadBytes);
+			PatchEventDefine.FoundUpdateFiles.SendEventMessage(totalDownloadCount, totalDownloadBytes);		//TODO wht real 不要
 		}
 	}
 }

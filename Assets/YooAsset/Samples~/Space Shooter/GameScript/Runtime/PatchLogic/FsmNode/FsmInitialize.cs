@@ -36,6 +36,8 @@ internal class FsmInitialize : IStateNode
 
 		var playMode = PatchManager.Instance.PlayMode;
 
+		// TODO wht real 以下代码全拿
+
 		// 创建默认的资源包
 		string packageName = "DefaultPackage";
 		var package = YooAssets.TryGetAssetsPackage(packageName);
@@ -76,12 +78,13 @@ internal class FsmInitialize : IStateNode
 		yield return initializationOperation;
 		if (package.InitializeStatus == EOperationStatus.Succeed)
 		{
-			_machine.ChangeState<FsmUpdateVersion>();
+			_machine.ChangeState<FsmUpdateVersion>();		//TODO wht ref 搜ChangeState去跟流程
 		}
 		else
 		{
 			Debug.LogWarning($"{initializationOperation.Error}");
-			PatchEventDefine.InitializeFailed.SendEventMessage();
+			//TODO wht 重试
+			PatchEventDefine.InitializeFailed.SendEventMessage();		//TODO wht real 不要
 		}
 	}
 
@@ -124,7 +127,7 @@ internal class FsmInitialize : IStateNode
 		{
 			// 注意：使用了BetterStreamingAssets插件，使用前需要初始化该插件！
 			string buildinFolderName = YooAssets.GetStreamingAssetBuildinFolderName();
-			return BetterStreamingAssets.FileExists($"{buildinFolderName}/{fileName}");
+			return BetterStreamingAssets.FileExists($"{buildinFolderName}/{fileName}");		//TODO wht real 有没有其它接口可以替代，不想用BetterStreamingAssets这种第三方
 		}
 	}
 

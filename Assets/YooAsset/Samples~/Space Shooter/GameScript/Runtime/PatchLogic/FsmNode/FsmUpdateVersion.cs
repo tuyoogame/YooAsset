@@ -32,6 +32,7 @@ internal class FsmUpdateVersion : IStateNode
 	{
 		yield return new WaitForSecondsRealtime(0.5f);
 
+		//TODO wht real 以下代码全拿
 		var package = YooAssets.GetAssetsPackage("DefaultPackage");
 		var operation = package.UpdatePackageVersionAsync();
 		yield return operation;
@@ -44,7 +45,8 @@ internal class FsmUpdateVersion : IStateNode
 		else
 		{
 			Debug.LogWarning(operation.Error);
-			PatchEventDefine.PackageVersionUpdateFailed.SendEventMessage();
+			//TODO wht real 重试
+			PatchEventDefine.PackageVersionUpdateFailed.SendEventMessage();		//TODO wht real 不要
 		}
 	}
 }

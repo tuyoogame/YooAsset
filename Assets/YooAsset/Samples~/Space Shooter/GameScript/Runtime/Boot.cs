@@ -3,6 +3,7 @@ using UniFramework.Event;
 using UniFramework.Module;
 using YooAsset;
 
+//TODO wht real 框架加入该类
 public class Boot : MonoBehaviour
 {
 	/// <summary>
@@ -13,28 +14,32 @@ public class Boot : MonoBehaviour
 	void Awake()
 	{
 		Debug.Log($"资源系统运行模式：{PlayMode}");
-		Application.targetFrameRate = 60;
-		Application.runInBackground = true;
+		// Application.targetFrameRate = 60;
+		// Application.runInBackground = true;  		//TODO wht real 加入框架
 	}
 	void Start()
 	{
 		// 初始化BetterStreaming
-		BetterStreamingAssets.Initialize();
+		BetterStreamingAssets.Initialize();		//TODO wht ref 不是必要的
 
 		// 初始化事件系统
-		UniEvent.Initalize();
+		UniEvent.Initalize();		//TODO wht ref 不是必要的
 
 		// 初始化管理系统
-		UniModule.Initialize();
+		UniModule.Initialize();		//TODO wht ref 不是必要的
 
 		// 初始化资源系统
-		YooAssets.Initialize();
-		YooAssets.SetOperationSystemMaxTimeSlice(30);
+		YooAssets.Initialize();		//TODO wht real 拿
+		YooAssets.SetOperationSystemMaxTimeSlice(30);		//TODO wht real 拿
+
+		// TODO wht ref 上面 都要有
 
 		// 创建补丁管理器
-		UniModule.CreateModule<PatchManager>();
+		UniModule.CreateModule<PatchManager>();		//TODO wht ref 不是必要的
 
 		// 开始补丁更新流程
-		PatchManager.Instance.Run(PlayMode);
+		PatchManager.Instance.Run(PlayMode);		//TODo wht ref 不是必要的
+
+		//TODO wht real 把UniFramework和BetterStreamingAssets去掉
 	}
 }
