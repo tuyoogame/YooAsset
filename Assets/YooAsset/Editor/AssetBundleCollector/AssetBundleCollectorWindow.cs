@@ -583,6 +583,18 @@ namespace YooAsset.Editor
 				elementBottom.Add(label);
 			}
 			{
+				var textField = new TextField();
+				textField.name = "TextField0";
+				textField.label = "Address";
+				textField.style.unityTextAlign = TextAnchor.MiddleLeft;
+				textField.style.flexGrow = 1f;
+				elementBottom.Add(textField);
+				var label = textField.Q<Label>();
+				textField.style.width = 200;
+
+				label.style.minWidth = 63;
+			}
+			{
 				var popupField = new PopupField<string>(_collectorTypeList, 0);
 				popupField.name = "PopupField0";
 				popupField.style.unityTextAlign = TextAnchor.MiddleLeft;
@@ -610,6 +622,14 @@ namespace YooAsset.Editor
 				popupField.style.unityTextAlign = TextAnchor.MiddleLeft;
 				popupField.style.width = 150;
 				elementBottom.Add(popupField);
+			}
+			{
+				var IsMultiPlatform = new Toggle();
+				IsMultiPlatform.name = "IsMultiPlatform";
+				IsMultiPlatform.text = "MultiPlatform";
+				IsMultiPlatform.style.unityTextAlign = TextAnchor.MiddleCenter;
+				IsMultiPlatform.style.flexGrow = 0f;
+				elementTop.Add(IsMultiPlatform);
 			}
 			{
 				var textField = new TextField();
@@ -673,6 +693,15 @@ namespace YooAsset.Editor
 			{
 				RemoveCollectorBtn_clicked(collector);
 			};
+
+			// Address
+			var textFiled0 = element.Q<TextField>("TextField0");
+			textFiled0.SetValueWithoutNotify(collector.Address);
+			textFiled0.RegisterValueChangedCallback(evt =>
+			{
+				collector.Address = evt.newValue;
+				AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
+			});
 
 			// Collector Path
 			var objectField1 = element.Q<ObjectField>("ObjectField1");
@@ -750,6 +779,15 @@ namespace YooAsset.Editor
 				}
 			});
 
+			// MultiPlatform
+			var IsMultiPlatform = element.Q<Toggle>("IsMultiPlatform");
+			IsMultiPlatform.SetValueWithoutNotify(collector.IsMultiPlatform);
+			IsMultiPlatform.RegisterValueChangedCallback(evt =>
+			{
+				collector.IsMultiPlatform = evt.newValue;
+				AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
+			});
+
 			// Tags
 			var textFiled1 = element.Q<TextField>("TextField1");
 			textFiled1.SetValueWithoutNotify(collector.AssetTags);
@@ -796,7 +834,7 @@ namespace YooAsset.Editor
 						if (_enableAddressableToogle.value)
 						{
 							IAddressRule instance = AssetBundleCollectorSettingData.GetAddressRuleInstance(collector.AddressRuleName);
-							AddressRuleData ruleData = new AddressRuleData(collectAssetInfo.AssetPath, collector.CollectPath, group.GroupName);
+							AddressRuleData ruleData = new AddressRuleData(collectAssetInfo.AssetPath, collector.CollectPath, group.GroupName, collector.Address, collector.IsMultiPlatform);
 							string addressValue = instance.GetAssetAddress(ruleData);
 							showInfo = $"[{addressValue}] {showInfo}";
 						}

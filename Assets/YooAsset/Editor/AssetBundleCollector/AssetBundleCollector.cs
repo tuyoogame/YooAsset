@@ -47,6 +47,16 @@ namespace YooAsset.Editor
 
 
 		/// <summary>
+		/// 可寻址路径
+		/// </summary>
+		public string Address = string.Empty;
+
+		/// <summary>
+		/// 跨平台
+		/// </summary>
+		public bool IsMultiPlatform = false;
+
+		/// <summary>
 		/// 收集器是否有效
 		/// </summary>
 		public bool IsValid()
@@ -160,6 +170,20 @@ namespace YooAsset.Editor
 				{
 					if (IsValidateAsset(assetPath) && IsCollectAsset(assetPath))
 					{
+                        if (IsMultiPlatform)
+                        {
+							string platform = "Windows";
+#if UNITY_ANDROID
+							platform = "Android";
+#elif UNITY_IOS
+							platform = "iOS";
+#elif UNITY_STANDALONE_OSX
+							platform = "OSX";
+#endif
+							if (!assetPath.Contains(platform))
+								continue;
+						}
+
 						if (result.ContainsKey(assetPath) == false)
 						{
 							var collectAssetInfo = CreateCollectAssetInfo(command, group, assetPath, isRawAsset);
@@ -281,7 +305,7 @@ namespace YooAsset.Editor
 				return string.Empty;
 
 			IAddressRule addressRuleInstance = AssetBundleCollectorSettingData.GetAddressRuleInstance(AddressRuleName);
-			string adressValue = addressRuleInstance.GetAssetAddress(new AddressRuleData(assetPath, CollectPath, group.GroupName));
+			string adressValue = addressRuleInstance.GetAssetAddress(new AddressRuleData(assetPath, CollectPath, group.GroupName, Address, IsMultiPlatform));
 			return adressValue;
 		}
 		private string GetBundleName(AssetBundleCollectorGroup group, string assetPath)
