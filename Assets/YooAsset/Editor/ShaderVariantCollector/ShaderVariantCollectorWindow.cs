@@ -18,10 +18,13 @@ namespace YooAsset.Editor
 			window.minSize = new Vector2(800, 600);
 		}
 
+		private List<string> _packageNames;
+
 		private Button _collectButton;
 		private TextField _collectOutputField;
 		private Label _currentShaderCountField;
 		private Label _currentVariantCountField;
+		private PopupField<string> _packageField;
 
 		public void CreateGUI()
 		{
@@ -36,6 +39,9 @@ namespace YooAsset.Editor
 
 				visualAsset.CloneTree(root);
 
+				// 包裹名称列表
+				_packageNames = GetBuildPackageNames();
+
 				// 文件输出目录
 				_collectOutputField = root.Q<TextField>("CollectOutput");
 				_collectOutputField.SetValueWithoutNotify(ShaderVariantCollectorSettingData.Setting.SavePath);
@@ -44,14 +50,34 @@ namespace YooAsset.Editor
 					ShaderVariantCollectorSettingData.Setting.SavePath = _collectOutputField.value;
 				});
 
+				// 收集的包裹
+				var packageContainer = root.Q("PackageContainer");
+				if (_packageNames.Count > 0)
+				{
+					int defaultIndex = GetDefaultPackageIndex(ShaderVariantCollectorSettingData.Setting.CollectPackage);
+					_packageField = new PopupField<string>(_packageNames, defaultIndex);
+					_packageField.label = "Package";
+					_packageField.style.width = 350;
+					_packageField.RegisterValueChangedCallback(evt =>
+					{
+						ShaderVariantCollectorSettingData.Setting.CollectPackage = _packageField.value;
+					});
+					packageContainer.Add(_packageField);
+				}
+				else
+				{
+					_packageField = new PopupField<string>();
+					_packageField.label = "Package";
+					_packageField.style.width = 350;
+					packageContainer.Add(_packageField);
+				}
+
 				_currentShaderCountField = root.Q<Label>("CurrentShaderCount");
 				_currentVariantCountField = root.Q<Label>("CurrentVariantCount");
 
 				// 变种收集按钮
 				_collectButton = root.Q<Button>("CollectButton");
 				_collectButton.clicked += CollectButton_clicked;
-
-				//RefreshWindow();
 			}
 			catch (Exception e)
 			{
@@ -75,7 +101,33 @@ namespace YooAsset.Editor
 
 		private void CollectButton_clicked()
 		{
-			ShaderVariantCollector.Run(ShaderVariantCollectorSettingData.Setting.SavePath, null);
+			string savePath = ShaderVariantCollectorSettingData.Setting.SavePath;
+			string packageName = ShaderVariantCollectorSettingData.Setting.CollectPackage;
+			ShaderVariantCollector.Run(savePath, packageName, null);
+		}
+
+		// 构建包裹相关
+		private int GetDefaultPackageIndex(string packageName)
+		{
+			for (int index = 0; index < _packageNames.Count; index++)
+			{
+				if (_packageNames[index] == packageName)
+				{
+					return index;
+				}
+			}
+
+			ShaderVariantCollectorSettingData.Setting.CollectPackage = _packageNames[0];
+			return 0;
+		}
+		private List<string> GetBuildPackageNames()
+		{
+			List<string> result = new List<string>();
+			foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
+			{
+				result.Add(package.PackageName);
+			}
+			return result;
 		}
 	}
 }
