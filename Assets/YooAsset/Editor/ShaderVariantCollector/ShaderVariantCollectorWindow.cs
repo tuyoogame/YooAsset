@@ -103,7 +103,7 @@ namespace YooAsset.Editor
 		{
 			string savePath = ShaderVariantCollectorSettingData.Setting.SavePath;
 			string packageName = ShaderVariantCollectorSettingData.Setting.CollectPackage;
-			ShaderVariantCollector.Run(savePath, packageName, null);
+			ShaderVariantCollector.Run(savePath, packageName, int.MaxValue, null);
 		}
 
 		// 构建包裹相关

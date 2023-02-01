@@ -18,24 +18,26 @@ namespace YooAsset.Editor
 			Prepare,
 			CollectAllMaterial,
 			CollectVariants,
-			CollectVariantsFinish,
+			CollectSleeping,
 			WaitingDone,
 		}
 
 		private const float WaitMilliseconds = 1000f;
 		private static string _savePath;
 		private static string _packageName;
+		private static int _processMaxNum;
 		private static Action _completedCallback;
 
 		private static ESteps _steps = ESteps.None;
 		private static Stopwatch _elapsedTime;
 		private static List<string> _allMaterials;
+		private static List<GameObject> _allSpheres = new List<GameObject>(1000);
 
 
 		/// <summary>
 		/// 开始收集
 		/// </summary>
-		public static void Run(string savePath, string packageName, Action completedCallback)
+		public static void Run(string savePath, string packageName, int processMaxNum, Action completedCallback)
 		{
 			if (_steps != ESteps.None)
 				return;
@@ -52,6 +54,7 @@ namespace YooAsset.Editor
 			EditorTools.CreateFileDirectory(savePath);
 			_savePath = savePath;
 			_packageName = packageName;
+			_processMaxNum = processMaxNum;
 			_completedCallback = completedCallback;
 
 			// 聚焦到游戏窗口
@@ -73,28 +76,43 @@ namespace YooAsset.Editor
 			{
 				ShaderVariantCollectionHelper.ClearCurrentShaderVariantCollection();
 				_steps = ESteps.CollectAllMaterial;
-				return;
+				return; //等待一帧
 			}
 
 			if (_steps == ESteps.CollectAllMaterial)
 			{
 				_allMaterials = GetAllMaterials();
 				_steps = ESteps.CollectVariants;
-				return;
+				return; //等待一帧
 			}
-
+			
 			if (_steps == ESteps.CollectVariants)
 			{
-				CollectVariants(_allMaterials);
-				_steps = ESteps.CollectVariantsFinish;
-				return;
+				int count = Mathf.Min(_processMaxNum, _allMaterials.Count);
+				List<string> range = _allMaterials.GetRange(0, count);
+				_allMaterials.RemoveRange(0, count);
+				CollectVariants(range);
+
+				if (_allMaterials.Count > 0)
+				{
+					_elapsedTime = Stopwatch.StartNew();
+					_steps = ESteps.CollectSleeping;
+				}
+				else
+				{
+					_elapsedTime = Stopwatch.StartNew();
+					_steps = ESteps.WaitingDone;
+				}
 			}
 
-			if (_steps == ESteps.CollectVariantsFinish)
+			if (_steps == ESteps.CollectSleeping)
 			{
-				_elapsedTime = Stopwatch.StartNew();
-				_steps = ESteps.WaitingDone;
-				return;
+				if (_elapsedTime.ElapsedMilliseconds > WaitMilliseconds)
+				{
+					DestroyAllSpheres();
+					_elapsedTime.Stop();
+					_steps = ESteps.CollectVariants;
+				}
 			}
 
 			if (_steps == ESteps.WaitingDone)
@@ -180,7 +198,9 @@ namespace YooAsset.Editor
 			{
 				var material = materials[i];
 				var position = new Vector3(x - halfWidth + 1f, y - halfHeight + 1f, 0f);
-				CreateSphere(material, position, i);
+				var go = CreateSphere(material, position, i);
+				if (go != null)
+					_allSpheres.Add(go);
 				if (x == xMax)
 				{
 					x = 0;
@@ -190,21 +210,35 @@ namespace YooAsset.Editor
 				{
 					x++;
 				}
-				EditorTools.DisplayProgressBar("测试所有材质球", ++progressValue, materials.Count);
+				EditorTools.DisplayProgressBar("照射所有材质球", ++progressValue, materials.Count);
 			}
 			EditorTools.ClearProgressBar();
 		}
-		private static void CreateSphere(string assetPath, Vector3 position, int index)
+		private static GameObject CreateSphere(string assetPath, Vector3 position, int index)
 		{
 			var material = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
 			var shader = material.shader;
 			if (shader == null)
-				return;
+				return null;
 
 			var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-			go.GetComponent<Renderer>().material = material;
+			go.GetComponent<Renderer>().sharedMaterial = material;
 			go.transform.position = position;
 			go.name = $"Sphere_{index} | {material.name}";
+			return go;
+		}
+		private static void DestroyAllSpheres()
+		{
+			foreach(var go in _allSpheres)
+			{
+				var mat = go.GetComponent<Renderer>().sharedMaterial;
+				Resources.UnloadAsset(mat);
+				GameObject.DestroyImmediate(go);
+			}
+			_allSpheres.Clear();
+
+			// 尝试释放编辑器加载的资源
+			Resources.UnloadUnusedAssets();
 		}
 		private static void CreateManifest()
 		{
