@@ -231,14 +231,12 @@ namespace YooAsset.Editor
 		{
 			foreach(var go in _allSpheres)
 			{
-				var mat = go.GetComponent<Renderer>().sharedMaterial;
-				Resources.UnloadAsset(mat);
 				GameObject.DestroyImmediate(go);
 			}
 			_allSpheres.Clear();
 
 			// 尝试释放编辑器加载的资源
-			Resources.UnloadUnusedAssets();
+			EditorUtility.UnloadUnusedAssetsImmediate();
 		}
 		private static void CreateManifest()
 		{
