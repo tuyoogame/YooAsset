@@ -23,6 +23,7 @@ namespace YooAsset.Editor
 		}
 
 		private const float WaitMilliseconds = 1000f;
+		private const float SleepMilliseconds = 100f;
 		private static string _savePath;
 		private static string _packageName;
 		private static int _processMaxNum;
@@ -107,7 +108,7 @@ namespace YooAsset.Editor
 
 			if (_steps == ESteps.CollectSleeping)
 			{
-				if (_elapsedTime.ElapsedMilliseconds > WaitMilliseconds)
+				if (_elapsedTime.ElapsedMilliseconds > SleepMilliseconds)
 				{
 					DestroyAllSpheres();
 					_elapsedTime.Stop();
@@ -236,7 +237,7 @@ namespace YooAsset.Editor
 			_allSpheres.Clear();
 
 			// 尝试释放编辑器加载的资源
-			EditorUtility.UnloadUnusedAssetsImmediate();
+			EditorUtility.UnloadUnusedAssetsImmediate(true);
 		}
 		private static void CreateManifest()
 		{

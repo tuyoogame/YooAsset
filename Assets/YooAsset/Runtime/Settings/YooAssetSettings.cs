@@ -8,7 +8,7 @@ namespace YooAsset
 		/// <summary>
 		/// AssetBundle文件的后缀名
 		/// </summary>
-		public string AssetBundleFileVariant = "bundle";
+		public string BundleFileVariant = "bundle";
 
 		/// <summary>
 		/// 原生文件的后缀名
@@ -40,6 +40,17 @@ namespace YooAsset
 		/// 清单文件格式版本
 		/// </summary>
 		public const string PatchManifestFileVersion = "1.4.0";
+
+		
+		/// <summary>
+		/// 缓存的数据文件名称
+		/// </summary>
+		public const string CacheBundleDataFileName = "__data";
+
+		/// <summary>
+		/// 缓存的信息文件名称
+		/// </summary>
+		public const string CacheBundleInfoFileName = "__info";
 
 
 		/// <summary>
