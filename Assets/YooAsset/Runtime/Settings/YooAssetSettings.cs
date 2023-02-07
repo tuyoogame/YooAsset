@@ -8,7 +8,7 @@ namespace YooAsset
 		/// <summary>
 		/// AssetBundle文件的后缀名
 		/// </summary>
-		public string AssetBundleFileVariant = "bundle";
+		public string BundleFileVariant = "bundle";
 
 		/// <summary>
 		/// 原生文件的后缀名
@@ -41,6 +41,17 @@ namespace YooAsset
 		/// </summary>
 		public const string PatchManifestFileVersion = "1.4.0";
 
+		
+		/// <summary>
+		/// 缓存的数据文件名称
+		/// </summary>
+		public const string CacheBundleDataFileName = "__data";
+
+		/// <summary>
+		/// 缓存的信息文件名称
+		/// </summary>
+		public const string CacheBundleInfoFileName = "__info";
+
 
 		/// <summary>
 		/// 构建输出文件夹名称
@@ -66,6 +77,6 @@ namespace YooAsset
 		/// <summary>
 		/// 忽略的文件类型
 		/// </summary>
-		public static readonly string[] IgnoreFileExtensions = { "", ".so", ".dll", ".cs", ".js", ".boo", ".meta", ".cginc" };
+		public static readonly string[] IgnoreFileExtensions = { "", ".so", ".dll", ".cs", ".js", ".boo", ".meta", ".cginc", ".hlsl" };
 	}
 }

@@ -48,7 +48,7 @@ namespace YooAsset
 				result.TotalSize += (ulong)dependBundle.MainBundleInfo.Bundle.FileSize;
 				result.DownloadedBytes += dependBundle.DownloadedBytes;
 			}
-			result.Progress = result.DownloadedBytes / result.TotalSize;
+			result.Progress = (float)result.DownloadedBytes / result.TotalSize;
 			return result;
 		}
 
