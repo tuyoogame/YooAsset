@@ -79,7 +79,7 @@ namespace YooAsset
 			None,
 			QueryBuildinPackageVersion,
 			LoadBuildinManifest,
-			VerifyPackage,
+			PackageCaching,
 			Done,
 		}
 
@@ -87,7 +87,7 @@ namespace YooAsset
 		private readonly string _packageName;
 		private QueryBuildinPackageVersionOperation _queryBuildinPackageVersionOp;
 		private LoadBuildinManifestOperation _loadBuildinManifestOp;
-		private VerifyPackageOperation _verifyOperation;
+		private PackageCachingOperation _cachingOperation;
 		private ESteps _steps = ESteps.None;
 
 		internal OfflinePlayModeInitializationOperation(OfflinePlayModeImpl impl, string packageName)
@@ -143,7 +143,7 @@ namespace YooAsset
 				{
 					PackageVersion = _loadBuildinManifestOp.Manifest.PackageVersion;
 					_impl.ActiveManifest = _loadBuildinManifestOp.Manifest;
-					_steps = ESteps.VerifyPackage;
+					_steps = ESteps.PackageCaching;
 				}
 				else
 				{
@@ -153,16 +153,16 @@ namespace YooAsset
 				}
 			}
 
-			if (_steps == ESteps.VerifyPackage)
+			if (_steps == ESteps.PackageCaching)
 			{
-				if (_verifyOperation == null)
+				if (_cachingOperation == null)
 				{
-					_verifyOperation = VerifyPackageOperation.CreateOperation(_impl.ActiveManifest, _impl);
-					OperationSystem.StartOperation(_verifyOperation);
+					_cachingOperation = new PackageCachingOperation(_packageName);
+					OperationSystem.StartOperation(_cachingOperation);
 				}
 
-				Progress = _verifyOperation.Progress;
-				if (_verifyOperation.IsDone)
+				Progress = _cachingOperation.Progress;
+				if (_cachingOperation.IsDone)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
@@ -186,7 +186,7 @@ namespace YooAsset
 			QueryBuildinPackageVersion,
 			UnpackBuildinManifest,
 			LoadBuildinManifest,
-			VerifyPackage,
+			PackageCaching,
 			Done,
 		}
 
@@ -197,7 +197,7 @@ namespace YooAsset
 		private UnpackBuildinManifestOperation _unpackBuildinManifestOp;
 		private LoadBuildinManifestOperation _loadBuildinManifestOp;
 		private LoadCacheManifestOperation _loadCacheManifestOp;
-		private VerifyPackageOperation _verifyOperation;
+		private PackageCachingOperation _cachingOperation;
 		private ESteps _steps = ESteps.None;
 
 		internal HostPlayModeInitializationOperation(HostPlayModeImpl impl, string packageName)
@@ -265,7 +265,7 @@ namespace YooAsset
 				{
 					PackageVersion = _loadCacheManifestOp.Manifest.PackageVersion;
 					_impl.ActiveManifest = _loadCacheManifestOp.Manifest;
-					_steps = ESteps.VerifyPackage;
+					_steps = ESteps.PackageCaching;
 				}
 				else
 				{
@@ -284,15 +284,14 @@ namespace YooAsset
 				if (_queryBuildinPackageVersionOp.IsDone == false)
 					return;
 
-				// 注意：为了兼容MOD模式，初始化动态新增的包裹的时候，如果内置清单不存在也不需要报错！
 				if (_queryBuildinPackageVersionOp.Status == EOperationStatus.Succeed)
 				{
 					_steps = ESteps.UnpackBuildinManifest;
 				}
 				else
 				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Succeed;
+					// 注意：为了兼容MOD模式，初始化动态新增的包裹的时候，如果内置清单不存在也不需要报错！
+					_steps = ESteps.PackageCaching;
 					string error = _queryBuildinPackageVersionOp.Error;
 					YooLogger.Log($"Failed to load buildin package version file : {error}");
 				}
@@ -337,7 +336,7 @@ namespace YooAsset
 				{
 					PackageVersion = _loadBuildinManifestOp.Manifest.PackageVersion;
 					_impl.ActiveManifest = _loadBuildinManifestOp.Manifest;
-					_steps = ESteps.VerifyPackage;
+					_steps = ESteps.PackageCaching;
 				}
 				else
 				{
@@ -347,16 +346,16 @@ namespace YooAsset
 				}
 			}
 
-			if (_steps == ESteps.VerifyPackage)
+			if (_steps == ESteps.PackageCaching)
 			{
-				if (_verifyOperation == null)
+				if (_cachingOperation == null)
 				{
-					_verifyOperation = VerifyPackageOperation.CreateOperation(_impl.ActiveManifest, _impl);
-					OperationSystem.StartOperation(_verifyOperation);
+					_cachingOperation = new PackageCachingOperation(_packageName);
+					OperationSystem.StartOperation(_cachingOperation);
 				}
 
-				Progress = _verifyOperation.Progress;
-				if (_verifyOperation.IsDone)
+				Progress = _cachingOperation.Progress;
+				if (_cachingOperation.IsDone)
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;

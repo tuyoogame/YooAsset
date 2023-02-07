@@ -95,7 +95,11 @@ namespace YooAsset
 		{
 			return _queryServices.QueryStreamingAssets(patchBundle.FileName);
 		}
-
+		public bool IsCachedPatchBundle(PatchBundle patchBundle)
+		{
+			return CacheSystem.IsCached(patchBundle.PackageName, patchBundle.CacheGUID);
+		}
+		
 		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)
 		{
 			var operation = new HostPlayModeUpdatePackageVersionOperation(this, _packageName, appendTimeTicks, timeout);
@@ -114,12 +118,6 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		CheckPackageContentsOperation IPlayModeServices.CheckPackageContentsOperation(string packageVersion)
-		{
-			var operation = new HostPlayModeCheckPackageContentsOperation(this, _packageName, packageVersion);
-			OperationSystem.StartOperation(operation);
-			return operation;
-		}
 
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
@@ -133,7 +131,7 @@ namespace YooAsset
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.IsCached(patchBundle))
+				if (IsCachedPatchBundle(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -158,7 +156,7 @@ namespace YooAsset
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.IsCached(patchBundle))
+				if (IsCachedPatchBundle(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -219,7 +217,7 @@ namespace YooAsset
 			foreach (var patchBundle in checkList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.IsCached(patchBundle))
+				if (IsCachedPatchBundle(patchBundle))
 					continue;
 
 				// 忽略APP资源
@@ -244,7 +242,7 @@ namespace YooAsset
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.IsCached(patchBundle))
+				if (IsCachedPatchBundle(patchBundle))
 					continue;
 
 				if (IsBuildinPatchBundle(patchBundle))
@@ -268,7 +266,7 @@ namespace YooAsset
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				// 忽略缓存文件
-				if (CacheSystem.IsCached(patchBundle))
+				if (IsCachedPatchBundle(patchBundle))
 					continue;
 
 				// 查询DLC资源
@@ -292,7 +290,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 查询沙盒资源
-			if (CacheSystem.IsCached(patchBundle))
+			if (IsCachedPatchBundle(patchBundle))
 			{
 				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromCache);
 				return bundleInfo;

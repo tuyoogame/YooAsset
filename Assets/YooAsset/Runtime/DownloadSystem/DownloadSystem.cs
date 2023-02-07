@@ -77,13 +77,13 @@ namespace YooAsset
 		public static DownloaderBase BeginDownload(BundleInfo bundleInfo, int failedTryAgain, int timeout = 60)
 		{
 			// 查询存在的下载器
-			if (_downloaderDic.TryGetValue(bundleInfo.Bundle.CachedFilePath, out var downloader))
+			if (_downloaderDic.TryGetValue(bundleInfo.Bundle.CachedDataFilePath, out var downloader))
 			{
 				return downloader;
 			}
 
 			// 如果资源已经缓存
-			if (CacheSystem.IsCached(bundleInfo.Bundle))
+			if (CacheSystem.IsCached(bundleInfo.Bundle.PackageName, bundleInfo.Bundle.CacheGUID))
 			{
 				var tempDownloader = new TempDownloader(bundleInfo);
 				return tempDownloader;
@@ -92,11 +92,11 @@ namespace YooAsset
 			// 创建新的下载器	
 			{
 				YooLogger.Log($"Beginning to download file : {bundleInfo.Bundle.FileName} URL : {bundleInfo.RemoteMainURL}");
-				FileUtility.CreateFileDirectory(bundleInfo.Bundle.CachedFilePath);
+				FileUtility.CreateFileDirectory(bundleInfo.Bundle.CachedDataFilePath);
 				bool breakDownload = bundleInfo.Bundle.FileSize >= BreakpointResumeFileSize;
 				DownloaderBase newDownloader = new FileDownloader(bundleInfo, breakDownload);
 				newDownloader.SendRequest(failedTryAgain, timeout);
-				_downloaderDic.Add(bundleInfo.Bundle.CachedFilePath, newDownloader);
+				_downloaderDic.Add(bundleInfo.Bundle.CachedDataFilePath, newDownloader);
 				return newDownloader;
 			}
 		}

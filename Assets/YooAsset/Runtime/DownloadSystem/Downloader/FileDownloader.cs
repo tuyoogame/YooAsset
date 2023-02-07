@@ -25,7 +25,7 @@ namespace YooAsset
 		public FileDownloader(BundleInfo bundleInfo, bool breakResume) : base(bundleInfo)
 		{
 			_breakResume = breakResume;
-			_tempFilePath = bundleInfo.Bundle.CachedFilePath + ".temp";
+			_tempFilePath = bundleInfo.Bundle.TempDataFilePath;
 		}
 		public override void Update()
 		{
@@ -34,29 +34,13 @@ namespace YooAsset
 			if (IsDone())
 				return;
 
-			// 检测本地正式文件
-			if (_steps == ESteps.CheckLocalFile)
-			{
-				var verifyResult = CacheSystem.VerifyAndCacheLocalBundleFile(_bundleInfo.Bundle, CacheSystem.InitVerifyLevel);
-				if (verifyResult == EVerifyResult.Succeed)
-				{
-					_steps = ESteps.Succeed;
-				}
-				else
-				{
-					if (File.Exists(_bundleInfo.Bundle.CachedFilePath))
-						File.Delete(_bundleInfo.Bundle.CachedFilePath);
-					_steps = ESteps.CheckTempFile;
-				}
-			}
-
 			// 检测本地临时文件
 			if (_steps == ESteps.CheckTempFile)
 			{
-				var verifyResult = CacheSystem.VerifyAndCacheDownloadBundleFile(_tempFilePath, _bundleInfo.Bundle, EVerifyLevel.High);
+				var verifyResult = CacheSystem.VerifyingTempFile(_bundleInfo.Bundle, EVerifyLevel.High);
 				if (verifyResult == EVerifyResult.Succeed)
 				{
-					_steps = ESteps.Succeed;
+					_steps = ESteps.CachingFile;
 				}
 				else
 				{
@@ -94,9 +78,7 @@ namespace YooAsset
 			if (_steps == ESteps.CreateGeneralDownloader)
 			{
 				if (File.Exists(_tempFilePath))
-				{
 					File.Delete(_tempFilePath);
-				}
 
 				_webRequest = new UnityWebRequest(_requestURL, UnityWebRequest.kHttpVerbGET);
 				DownloadHandlerFile handler = new DownloadHandlerFile(_tempFilePath);
@@ -206,7 +188,7 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.VerifyDownload;
+					_steps = ESteps.VerifyingFile;
 				}
 
 				// 释放下载器
@@ -214,23 +196,55 @@ namespace YooAsset
 			}
 
 			// 验证下载文件
-			if (_steps == ESteps.VerifyDownload)
+			if (_steps == ESteps.VerifyingFile)
 			{
-				var verifyResult = CacheSystem.VerifyAndCacheDownloadBundleFile(_tempFilePath, _bundleInfo.Bundle, EVerifyLevel.High);
+				var verifyResult = CacheSystem.VerifyingTempFile(_bundleInfo.Bundle, EVerifyLevel.High);
 				if (verifyResult == EVerifyResult.Succeed)
 				{
+					_steps = ESteps.CachingFile;
+				}
+				else
+				{
+					_lastError = $"Failed to verifying file : {_bundleInfo.Bundle.FileName}, ErrorCode : {verifyResult}";
+
+					// 注意：验证失败后删除文件
+					if (File.Exists(_tempFilePath))
+						File.Delete(_tempFilePath);
+
+					_steps = ESteps.TryAgain;
+				}
+			}
+
+			// 缓存下载文件
+			if (_steps == ESteps.CachingFile)
+			{
+				try
+				{
+					string destFilePath = _bundleInfo.Bundle.CachedDataFilePath;
+					if (File.Exists(destFilePath))
+						File.Delete(destFilePath);
+
+					FileInfo fileInfo = new FileInfo(_tempFilePath);
+					fileInfo.MoveTo(destFilePath);
+
+					// 写入信息文件记录验证数据
+					CacheFileInfo cacheInfo = new CacheFileInfo();
+					cacheInfo.FileCRC = _bundleInfo.Bundle.FileCRC;
+					cacheInfo.FileSize = _bundleInfo.Bundle.FileSize;
+					string jsonContent = UnityEngine.JsonUtility.ToJson(cacheInfo);
+					FileUtility.CreateFile(_bundleInfo.Bundle.CachedInfoFilePath, jsonContent);
+
+					// 记录缓存文件
+					var wrapper = new PackageCache.RecordWrapper(_bundleInfo.Bundle.CachedInfoFilePath, _bundleInfo.Bundle.CachedDataFilePath, _bundleInfo.Bundle.FileCRC, _bundleInfo.Bundle.FileSize);
+					CacheSystem.RecordFile(_bundleInfo.Bundle.PackageName, _bundleInfo.Bundle.CacheGUID, wrapper);
+
 					_lastError = string.Empty;
 					_lastCode = 0;
 					_steps = ESteps.Succeed;
 				}
-				else
+				catch (Exception e)
 				{
-					_lastError = $"Verify bundle content failed : {_bundleInfo.Bundle.FileName}";
-
-					// 验证失败后删除文件
-					if (File.Exists(_tempFilePath))
-						File.Delete(_tempFilePath);
-
+					_lastError = e.Message;
 					_steps = ESteps.TryAgain;
 				}
 			}

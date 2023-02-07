@@ -46,7 +46,7 @@ namespace YooAsset
 				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
 					_steps = ESteps.Download;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
@@ -55,7 +55,7 @@ namespace YooAsset
 					if (loadMethod == EBundleLoadMethod.LoadFromMemory || loadMethod == EBundleLoadMethod.LoadFromStream)
 					{
 						_steps = ESteps.Unpack;
-						FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+						FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 					}
 					else
 					{
@@ -70,7 +70,7 @@ namespace YooAsset
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
 					_steps = ESteps.LoadFile;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else
 				{
@@ -242,14 +242,11 @@ namespace YooAsset
 					// 在AssetBundle文件加载失败的情况下，我们需要重新验证文件的完整性！
 					if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 					{
-						string cacheLoadPath = MainBundleInfo.Bundle.CachedFilePath;
-						if (CacheSystem.VerifyBundle(MainBundleInfo.Bundle, EVerifyLevel.High) != EVerifyResult.Succeed)
+						var result = CacheSystem.VerifyingRecordFile(MainBundleInfo.Bundle.PackageName, MainBundleInfo.Bundle.CacheGUID);
+						if (result != EVerifyResult.Succeed)
 						{
-							if (File.Exists(cacheLoadPath))
-							{
-								YooLogger.Error($"Delete the invalid cache file : {cacheLoadPath}");
-								File.Delete(cacheLoadPath);
-							}
+							YooLogger.Error($"Found possibly corrupt file ! {MainBundleInfo.Bundle.CacheGUID}");
+							CacheSystem.DiscardFile(MainBundleInfo.Bundle.PackageName, MainBundleInfo.Bundle.CacheGUID);
 						}
 					}
 				}

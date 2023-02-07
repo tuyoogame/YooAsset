@@ -79,9 +79,9 @@ namespace YooAsset
 		{
 			string shareBundleName;
 			if (uniqueBundleName)
-				shareBundleName = $"{packageName.ToLower()}_{YooAssetSettings.UnityShadersBundleName}.{Setting.BundleFileVariant}";
+				shareBundleName = $"{packageName.ToLower()}_{YooAssetSettings.UnityShadersBundleName}.{Setting.AssetBundleFileVariant}";
 			else
-				shareBundleName = $"{YooAssetSettings.UnityShadersBundleName}.{Setting.BundleFileVariant}";
+				shareBundleName = $"{YooAssetSettings.UnityShadersBundleName}.{Setting.AssetBundleFileVariant}";
 			return shareBundleName.ToLower();
 		}
 	}

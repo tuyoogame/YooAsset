@@ -230,15 +230,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 检查包裹内容的完整性
-		/// </summary>
-		public CheckPackageContentsOperation CheckPackageContentsAsync(string packageVersion)
-		{
-			DebugCheckInitialize();
-			return _playModeServices.CheckPackageContentsOperation(packageVersion);
-		}
-
-		/// <summary>
 		/// 清理包裹未使用的缓存文件
 		/// </summary>
 		public ClearUnusedCacheFilesOperation ClearUnusedCacheFilesAsync()
@@ -731,12 +722,12 @@ namespace YooAsset
 		/// <summary>
 		/// 是否包含资源文件
 		/// </summary>
-		internal bool IsIncludeBundleFile(string fileName)
+		internal bool IsIncludeBundleFile(string cacheGUID)
 		{
 			// NOTE : 编辑器模拟模式下始终返回TRUE
 			if (_playMode == EPlayMode.EditorSimulateMode)
 				return true;
-			return _playModeServices.ActiveManifest.IsIncludeBundleFile(fileName);
+			return _playModeServices.ActiveManifest.IsIncludeBundleFile(cacheGUID);
 		}
 
 		/// <summary>

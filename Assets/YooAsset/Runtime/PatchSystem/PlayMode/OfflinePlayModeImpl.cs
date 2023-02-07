@@ -56,12 +56,6 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		CheckPackageContentsOperation IPlayModeServices.CheckPackageContentsOperation(string packageVersion)
-		{
-			var operation = new OfflinePlayModeCheckPackageContentsOperation();
-			OperationSystem.StartOperation(operation);
-			return operation;
-		}
 
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
@@ -93,7 +87,7 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 查询沙盒资源
-			if (CacheSystem.IsCached(patchBundle))
+			if (CacheSystem.IsCached(patchBundle.PackageName, patchBundle.CacheGUID))
 			{
 				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromCache);
 				return bundleInfo;

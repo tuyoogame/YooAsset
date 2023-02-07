@@ -8,12 +8,12 @@ namespace YooAsset
 		/// <summary>
 		/// AssetBundle文件的后缀名
 		/// </summary>
-		public string BundleFileVariant = "bundle";
+		public string AssetBundleFileVariant = "bundle";
 
 		/// <summary>
 		/// 原生文件的后缀名
 		/// </summary>
-		public string RawFileVariant = "rawfile";
+		public string RawBundleFileVariant = "rawfile";
 
 		/// <summary>
 		/// 清单文件名称

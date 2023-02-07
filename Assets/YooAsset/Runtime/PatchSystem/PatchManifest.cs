@@ -239,11 +239,11 @@ namespace YooAsset
 		/// <summary>
 		/// 是否包含资源文件
 		/// </summary>
-		public bool IsIncludeBundleFile(string fileName)
+		public bool IsIncludeBundleFile(string cacheGUID)
 		{
 			foreach (var patchBundle in BundleList)
 			{
-				if (patchBundle.FileName == fileName)
+				if (patchBundle.CacheGUID == cacheGUID)
 					return true;
 			}
 			return false;
