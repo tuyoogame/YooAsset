@@ -56,12 +56,6 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		CheckPackageContentsOperation IPlayModeServices.CheckPackageContentsOperation(string packageVersion)
-		{
-			var operation = new EditorSimulateModeCheckPackageContentsOperation();
-			OperationSystem.StartOperation(operation);
-			return operation;
-		}
 		
 		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{

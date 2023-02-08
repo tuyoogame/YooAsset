@@ -38,13 +38,13 @@ namespace YooAsset
 				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
 					_steps = ESteps.Download;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
 #if UNITY_ANDROID || UNITY_WEBGL
 					_steps = ESteps.Unpack;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 #else
 					_steps = ESteps.CheckFile;
 					FileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
@@ -53,7 +53,7 @@ namespace YooAsset
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
 					_steps = ESteps.CheckFile;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else
 				{

@@ -45,22 +45,63 @@ namespace YooAsset
 		/// <summary>
 		/// 所属的包裹名称
 		/// </summary>
-		private string _packageName;
+		public string PackageName { private set; get; }
 
 		/// <summary>
-		/// 缓存文件路径
+		/// 缓存GUID
 		/// </summary>
-		private string _cachedFilePath;
-		public string CachedFilePath
+		public string CacheGUID
+		{
+			get { return FileHash; }
+		}
+
+		/// <summary>
+		/// 缓存的数据文件路径
+		/// </summary>
+		private string _cachedDataFilePath;
+		public string CachedDataFilePath
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(_cachedFilePath) == false)
-					return _cachedFilePath;
+				if (string.IsNullOrEmpty(_cachedDataFilePath) == false)
+					return _cachedDataFilePath;
 
-				string cacheRoot = PersistentHelper.GetCacheFolderPath(_packageName);
-				_cachedFilePath = $"{cacheRoot}/{FileName}";
-				return _cachedFilePath;
+				string cacheRoot = PersistentHelper.GetCacheFolderPath(PackageName);
+				_cachedDataFilePath = $"{cacheRoot}/{CacheGUID}/{YooAssetSettings.CacheBundleDataFileName}";
+				return _cachedDataFilePath;
+			}
+		}
+
+		/// <summary>
+		/// 缓存的信息文件路径
+		/// </summary>
+		private string _cachedInfoFilePath;
+		public string CachedInfoFilePath
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(_cachedInfoFilePath) == false)
+					return _cachedInfoFilePath;
+
+				string cacheRoot = PersistentHelper.GetCacheFolderPath(PackageName);
+				_cachedInfoFilePath = $"{cacheRoot}/{CacheGUID}/{YooAssetSettings.CacheBundleInfoFileName}";
+				return _cachedInfoFilePath;
+			}
+		}
+
+		/// <summary>
+		/// 临时的数据文件路径
+		/// </summary>
+		private string _tempDataFilePath;
+		public string TempDataFilePath
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(_tempDataFilePath) == false)
+					return _tempDataFilePath;
+
+				_tempDataFilePath = $"{CachedDataFilePath}.temp";
+				return _tempDataFilePath;
 			}
 		}
 
@@ -81,7 +122,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 文件名称
+		/// 文件名称（远端文件名和内置文件名）
 		/// </summary>
 		private string _fileName;
 		public string FileName
@@ -91,20 +132,6 @@ namespace YooAsset
 				if (string.IsNullOrEmpty(_fileName))
 					throw new Exception("Should never get here !");
 				return _fileName;
-			}
-		}
-
-		/// <summary>
-		/// 缓存查询Key
-		/// </summary>
-		private string _cacheKey;
-		public string CacheKey
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(_cacheKey))
-					throw new Exception("Should never get here !");
-				return _cacheKey;
 			}
 		}
 
@@ -118,8 +145,7 @@ namespace YooAsset
 		/// </summary>
 		public void ParseBundle(string packageName, int nameStype)
 		{
-			_packageName = packageName;
-			_cacheKey = $"{packageName}-{FileHash}";
+			PackageName = packageName;
 			_fileName = PatchManifestTools.CreateBundleFileName(nameStype, BundleName, FileHash, IsRawFile);
 		}
 

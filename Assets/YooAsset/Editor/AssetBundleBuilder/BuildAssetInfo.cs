@@ -199,7 +199,7 @@ namespace YooAsset.Editor
 			{
 				if (IsRawAsset)
 				{
-					string mainBundleName = $"{_mainBundleName}.{YooAssetSettingsData.Setting.RawFileVariant}";
+					string mainBundleName = $"{_mainBundleName}.{YooAssetSettingsData.Setting.RawBundleFileVariant}";
 					_mainBundleName = mainBundleName.ToLower();
 				}
 				else

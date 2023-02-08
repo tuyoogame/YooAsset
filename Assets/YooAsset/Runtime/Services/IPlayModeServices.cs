@@ -28,11 +28,6 @@ namespace YooAsset
 		/// </summary>
 		PreDownloadPackageOperation PreDownloadPackageAsync(string packageVersion, int timeout);
 
-		/// <summary>
-		/// 检查包裹内容的完整性
-		/// </summary>
-		CheckPackageContentsOperation CheckPackageContentsOperation(string packageVersion);
-
 		// 下载相关
 		PatchDownloaderOperation CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout);
 		PatchDownloaderOperation CreatePatchDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout);

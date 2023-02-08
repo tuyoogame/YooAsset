@@ -47,7 +47,7 @@ namespace YooAsset
 
 	/// <summary>
 	/// 联机模式的更新清单操作
-	/// 注意：优先加载沙盒里缓存的清单文件，如果有变化就更新远端清单文件，并保存到本地。
+	/// 注意：优先加载沙盒里缓存的清单文件，如果缓存没找到就下载远端清单文件，并保存到本地。
 	/// </summary>
 	internal sealed class HostPlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
 	{
@@ -59,7 +59,6 @@ namespace YooAsset
 			DownloadManifest,
 			LoadCacheManifest,
 			CheckDeserializeManifest,
-			VerifyPackage,
 			Done,
 		}
 
@@ -70,7 +69,6 @@ namespace YooAsset
 		private LoadCacheManifestOperation _tryLoadCacheManifestOp;
 		private LoadCacheManifestOperation _loadCacheManifestOp;
 		private DownloadManifestOperation _downloadManifestOp;
-		private VerifyPackageOperation _verifyOperation;
 		private ESteps _steps = ESteps.None;
 
 
@@ -118,7 +116,8 @@ namespace YooAsset
 				if (_tryLoadCacheManifestOp.Status == EOperationStatus.Succeed)
 				{
 					_impl.ActiveManifest = _tryLoadCacheManifestOp.Manifest;
-					_steps = ESteps.VerifyPackage;
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
 				}
 				else
 				{
@@ -163,29 +162,14 @@ namespace YooAsset
 				if (_loadCacheManifestOp.Status == EOperationStatus.Succeed)
 				{
 					_impl.ActiveManifest = _loadCacheManifestOp.Manifest;
-					_steps = ESteps.VerifyPackage;
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
 				}
 				else
 				{
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = _loadCacheManifestOp.Error;
-				}
-			}
-
-			if (_steps == ESteps.VerifyPackage)
-			{
-				if (_verifyOperation == null)
-				{
-					_verifyOperation = VerifyPackageOperation.CreateOperation(_impl.ActiveManifest, _impl);
-					OperationSystem.StartOperation(_verifyOperation);
-				}
-
-				Progress = _verifyOperation.Progress;
-				if (_verifyOperation.IsDone)
-				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Succeed;
 				}
 			}
 		}

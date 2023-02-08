@@ -159,13 +159,13 @@ namespace YooAsset
 		{
 			if (nameStyle == 1) //HashName
 			{
-				string fileExtension = isRawFile ? YooAssetSettingsData.Setting.RawFileVariant : YooAssetSettingsData.Setting.AssetBundleFileVariant;
+				string fileExtension = isRawFile ? YooAssetSettingsData.Setting.RawBundleFileVariant : YooAssetSettingsData.Setting.AssetBundleFileVariant;
 				return StringUtility.Format("{0}.{1}", fileHash, fileExtension);
 			}
 			else if (nameStyle == 4) //BundleName_HashName
 			{
 				string fileName = bundleName.Remove(bundleName.LastIndexOf('.'));
-				string fileExtension = isRawFile ? YooAssetSettingsData.Setting.RawFileVariant : YooAssetSettingsData.Setting.AssetBundleFileVariant;
+				string fileExtension = isRawFile ? YooAssetSettingsData.Setting.RawBundleFileVariant : YooAssetSettingsData.Setting.AssetBundleFileVariant;
 				return StringUtility.Format("{0}_{1}.{2}", fileName, fileHash, fileExtension);
 			}
 			else
