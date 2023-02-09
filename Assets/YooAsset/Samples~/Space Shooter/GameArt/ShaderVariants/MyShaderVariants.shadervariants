@@ -13,10 +13,45 @@ ShaderVariantCollection:
       variants:
       - keywords: 
         passType: 0
+  - first: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: DIRECTIONAL LIGHTPROBE_SH SHADOWS_SCREEN SHADOWS_SPLIT_SPHERES
+        passType: 4
+      - keywords: DIRECTIONAL LIGHTPROBE_SH SHADOWS_SCREEN SHADOWS_SPLIT_SPHERES
+          _EMISSION
+        passType: 4
+      - keywords: DIRECTIONAL LIGHTPROBE_SH SHADOWS_SCREEN SHADOWS_SPLIT_SPHERES
+          _NORMALMAP
+        passType: 4
+      - keywords: DIRECTIONAL LIGHTPROBE_SH SHADOWS_SCREEN SHADOWS_SPLIT_SPHERES
+          _EMISSION _NORMALMAP
+        passType: 4
+      - keywords: 
+        passType: 8
+      - keywords: SHADOWS_DEPTH SHADOWS_SPLIT_SPHERES
+        passType: 8
+      - keywords: _EMISSION
+        passType: 8
+      - keywords: SHADOWS_DEPTH SHADOWS_SPLIT_SPHERES _EMISSION
+        passType: 8
+      - keywords: _NORMALMAP
+        passType: 8
+      - keywords: SHADOWS_DEPTH SHADOWS_SPLIT_SPHERES _NORMALMAP
+        passType: 8
+      - keywords: _EMISSION _NORMALMAP
+        passType: 8
+      - keywords: SHADOWS_DEPTH SHADOWS_SPLIT_SPHERES _EMISSION _NORMALMAP
+        passType: 8
   - first: {fileID: 106, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: BILLBOARD_FACE_CAMERA_POS _SUNDISK_SIMPLE
+      - keywords: _SUNDISK_SIMPLE
+        passType: 0
+  - first: {fileID: 200, guid: 0000000000000000f000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: 
         passType: 0
   - first: {fileID: 9000, guid: 0000000000000000f000000000000000, type: 0}
     second:
@@ -43,39 +78,23 @@ ShaderVariantCollection:
       variants:
       - keywords: 
         passType: 0
+  - first: {fileID: 9006, guid: 0000000000000000f000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
   - first: {fileID: 9007, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
       - keywords: 
         passType: 0
-  - first: {fileID: 9101, guid: 0000000000000000f000000000000000, type: 0}
+  - first: {fileID: 10720, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
       - keywords: 
         passType: 0
-  - first: {fileID: 9103, guid: 0000000000000000f000000000000000, type: 0}
+  - first: {fileID: 10752, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: BILLBOARD_FACE_CAMERA_POS
+      - keywords: SHADOWS_SCREEN SHADOWS_SPLIT_SPHERES
         passType: 0
-  - first: {fileID: 10703, guid: 0000000000000000f000000000000000, type: 0}
-    second:
-      variants:
-      - keywords: BILLBOARD_FACE_CAMERA_POS DIRECTIONAL LIGHTPROBE_SH SHADOWS_SCREEN
-          SHADOWS_SOFT SHADOWS_SPLIT_SPHERES
-        passType: 4
-      - keywords: 
-        passType: 8
-      - keywords: SHADOWS_DEPTH SHADOWS_SOFT SHADOWS_SPLIT_SPHERES
-        passType: 8
-  - first: {fileID: 4800000, guid: ba67c8b1d5e59dc428ad9fc9270f8353, type: 3}
-    second:
-      variants:
-      - keywords: BILLBOARD_FACE_CAMERA_POS SHADOWS_SCREEN SHADOWS_SOFT SHADOWS_SPLIT_SPHERES
-          _EMISSION _METALLICGLOSSMAP _NORMALMAP
-        passType: 1
-      - keywords: _EMISSION _METALLICGLOSSMAP _NORMALMAP
-        passType: 8
-      - keywords: SHADOWS_DEPTH SHADOWS_SOFT SHADOWS_SPLIT_SPHERES _EMISSION _METALLICGLOSSMAP
-          _NORMALMAP
-        passType: 8
