@@ -220,15 +220,27 @@ namespace YooAsset.Editor
 
 		private void RefreshWindow()
 		{
+			var buildPipeline = AssetBundleBuilderSettingData.Setting.BuildPipeline;
 			var buildMode = AssetBundleBuilderSettingData.Setting.BuildMode;
 			var copyOption = AssetBundleBuilderSettingData.Setting.CopyBuildinFileOption;
 			bool enableElement = buildMode == EBuildMode.ForceRebuild;
 			bool tagsFiledVisible = copyOption == ECopyBuildinFileOption.ClearAndCopyByTags || copyOption == ECopyBuildinFileOption.OnlyCopyByTags;
-			_encryptionField.SetEnabled(enableElement);
-			_compressionField.SetEnabled(enableElement);
-			_outputNameStyleField.SetEnabled(enableElement);
-			_copyBuildinFileOptionField.SetEnabled(enableElement);
-			_copyBuildinFileTagsField.SetEnabled(enableElement);
+
+			if (buildPipeline == EBuildPipeline.BuiltinBuildPipeline)
+			{
+				_compressionField.SetEnabled(enableElement);
+				_outputNameStyleField.SetEnabled(enableElement);
+				_copyBuildinFileOptionField.SetEnabled(enableElement);
+				_copyBuildinFileTagsField.SetEnabled(enableElement);
+			}
+			else
+			{
+				_compressionField.SetEnabled(true);
+				_outputNameStyleField.SetEnabled(true);
+				_copyBuildinFileOptionField.SetEnabled(true);
+				_copyBuildinFileTagsField.SetEnabled(true);
+			}
+
 			_copyBuildinFileTagsField.visible = tagsFiledVisible;
 		}
 		private void SaveBtn_clicked()
