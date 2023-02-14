@@ -350,7 +350,7 @@ namespace YooAsset
 				return loader;
 
 			// 新增下载需求
-#if !UNITY_WEBGL
+#if UNITY_WEBGL
 			if (bundleInfo.Bundle.IsRawFile)
 				loader = new RawBundleFileLoader(this, bundleInfo);
 			else
