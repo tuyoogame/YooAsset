@@ -18,9 +18,6 @@ public class Boot : MonoBehaviour
 	}
 	void Start()
 	{
-		// 初始化BetterStreaming
-		BetterStreamingAssets.Initialize();
-
 		// 初始化事件系统
 		UniEvent.Initalize();
 

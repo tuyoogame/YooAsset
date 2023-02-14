@@ -2,6 +2,32 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.4-preview] - 2023-02-14
+
+### Fixed
+
+- (#65)修复了AssetBundle构建宏逻辑错误。
+- 修复了AssetBundle加载宏逻辑错误。
+
+## [1.4.3-preview] - 2023-02-10
+
+全新的缓存系统！
+
+### Fixed
+
+- 修复了WebGL平台本地文件验证报错。
+- 修复了WEBGL平台加载原生文件失败的问题。
+- 修复了通过Handle句柄查询资源包下载进度为零的问题。
+
+### Changed
+
+- 着色器变种收集增加分批次处理功能。
+- Unity2021版本开始不再支持内置构建管线。
+
+### Removed
+
+- 太空战机DEMO移除了BetterStreamingAssets插件。
+
 ## [1.4.2-preview] - 2023-01-03
 
 ### Fixed

@@ -220,22 +220,24 @@ namespace YooAsset
 			{
 				try
 				{
-					string destFilePath = _bundleInfo.Bundle.CachedDataFilePath;
-					if (File.Exists(destFilePath))
-						File.Delete(destFilePath);
+					string infoFilePath = _bundleInfo.Bundle.CachedInfoFilePath;
+					string dataFilePath = _bundleInfo.Bundle.CachedDataFilePath;
+					string dataFileCRC = _bundleInfo.Bundle.FileCRC;
+					long dataFileSize = _bundleInfo.Bundle.FileSize;
+
+					if (File.Exists(infoFilePath))
+						File.Delete(infoFilePath);		
+					if (File.Exists(dataFilePath))
+						File.Delete(dataFilePath);
 
 					FileInfo fileInfo = new FileInfo(_tempFilePath);
-					fileInfo.MoveTo(destFilePath);
+					fileInfo.MoveTo(dataFilePath);
 
 					// 写入信息文件记录验证数据
-					CacheFileInfo cacheInfo = new CacheFileInfo();
-					cacheInfo.FileCRC = _bundleInfo.Bundle.FileCRC;
-					cacheInfo.FileSize = _bundleInfo.Bundle.FileSize;
-					string jsonContent = UnityEngine.JsonUtility.ToJson(cacheInfo);
-					FileUtility.CreateFile(_bundleInfo.Bundle.CachedInfoFilePath, jsonContent);
+					CacheFileInfo.WriteInfoToFile(infoFilePath, dataFileCRC, dataFileSize);
 
 					// 记录缓存文件
-					var wrapper = new PackageCache.RecordWrapper(_bundleInfo.Bundle.CachedInfoFilePath, _bundleInfo.Bundle.CachedDataFilePath, _bundleInfo.Bundle.FileCRC, _bundleInfo.Bundle.FileSize);
+					var wrapper = new PackageCache.RecordWrapper(infoFilePath, dataFilePath, dataFileCRC, dataFileSize);
 					CacheSystem.RecordFile(_bundleInfo.Bundle.PackageName, _bundleInfo.Bundle.CacheGUID, wrapper);
 
 					_lastError = string.Empty;

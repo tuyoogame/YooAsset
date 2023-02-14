@@ -351,7 +351,10 @@ namespace YooAsset
 
 			// 新增下载需求
 #if UNITY_WEBGL
-			loader = new AssetBundleWebLoader(this, bundleInfo);
+			if (bundleInfo.Bundle.IsRawFile)
+				loader = new RawBundleFileLoader(this, bundleInfo);
+			else
+				loader = new AssetBundleWebLoader(this, bundleInfo);
 #else
 			if (bundleInfo.Bundle.IsRawFile)
 				loader = new RawBundleFileLoader(this, bundleInfo);

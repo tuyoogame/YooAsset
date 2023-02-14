@@ -1,6 +1,6 @@
 {
-    "ShaderTotalCount": 12,
-    "VariantTotalCount": 16,
+    "ShaderTotalCount": 13,
+    "VariantTotalCount": 24,
     "ShaderVariantInfos": [
         {
             "AssetPath": "Resources/unity_builtin_extra",
@@ -16,13 +16,127 @@
         },
         {
             "AssetPath": "Resources/unity_builtin_extra",
+            "ShaderName": "Standard",
+            "ShaderVariantElements": [
+                {
+                    "PassType": 4,
+                    "Keywords": [
+                        "DIRECTIONAL",
+                        "LIGHTPROBE_SH",
+                        "SHADOWS_SCREEN",
+                        "SHADOWS_SPLIT_SPHERES"
+                    ]
+                },
+                {
+                    "PassType": 4,
+                    "Keywords": [
+                        "DIRECTIONAL",
+                        "LIGHTPROBE_SH",
+                        "SHADOWS_SCREEN",
+                        "SHADOWS_SPLIT_SPHERES",
+                        "_EMISSION"
+                    ]
+                },
+                {
+                    "PassType": 4,
+                    "Keywords": [
+                        "DIRECTIONAL",
+                        "LIGHTPROBE_SH",
+                        "SHADOWS_SCREEN",
+                        "SHADOWS_SPLIT_SPHERES",
+                        "_NORMALMAP"
+                    ]
+                },
+                {
+                    "PassType": 4,
+                    "Keywords": [
+                        "DIRECTIONAL",
+                        "LIGHTPROBE_SH",
+                        "SHADOWS_SCREEN",
+                        "SHADOWS_SPLIT_SPHERES",
+                        "_EMISSION",
+                        "_NORMALMAP"
+                    ]
+                },
+                {
+                    "PassType": 8,
+                    "Keywords": [
+                        ""
+                    ]
+                },
+                {
+                    "PassType": 8,
+                    "Keywords": [
+                        "SHADOWS_DEPTH",
+                        "SHADOWS_SPLIT_SPHERES"
+                    ]
+                },
+                {
+                    "PassType": 8,
+                    "Keywords": [
+                        "_EMISSION"
+                    ]
+                },
+                {
+                    "PassType": 8,
+                    "Keywords": [
+                        "SHADOWS_DEPTH",
+                        "SHADOWS_SPLIT_SPHERES",
+                        "_EMISSION"
+                    ]
+                },
+                {
+                    "PassType": 8,
+                    "Keywords": [
+                        "_NORMALMAP"
+                    ]
+                },
+                {
+                    "PassType": 8,
+                    "Keywords": [
+                        "SHADOWS_DEPTH",
+                        "SHADOWS_SPLIT_SPHERES",
+                        "_NORMALMAP"
+                    ]
+                },
+                {
+                    "PassType": 8,
+                    "Keywords": [
+                        "_EMISSION",
+                        "_NORMALMAP"
+                    ]
+                },
+                {
+                    "PassType": 8,
+                    "Keywords": [
+                        "SHADOWS_DEPTH",
+                        "SHADOWS_SPLIT_SPHERES",
+                        "_EMISSION",
+                        "_NORMALMAP"
+                    ]
+                }
+            ]
+        },
+        {
+            "AssetPath": "Resources/unity_builtin_extra",
             "ShaderName": "Skybox/Procedural",
             "ShaderVariantElements": [
                 {
                     "PassType": 0,
                     "Keywords": [
-                        "BILLBOARD_FACE_CAMERA_POS",
                         "_SUNDISK_SIMPLE"
+                    ]
+                }
+            ]
+        },
+        {
+            "AssetPath": "Resources/unity_builtin_extra",
+            "ShaderName": "Legacy Shaders/Particles/Additive",
+            "ShaderVariantElements": [
+                {
+                    "PassType": 0,
+                    "Keywords": [
+                        ""
                     ]
                 }
             ]
@@ -89,18 +203,6 @@
         },
         {
             "AssetPath": "Resources/unity_builtin_extra",
-            "ShaderName": "Hidden/Internal-GUIRoundedRectWithColorPerBorder",
-            "ShaderVariantElements": [
-                {
-                    "PassType": 0,
-                    "Keywords": [
-                        ""
-                    ]
-                }
-            ]
-        },
-        {
-            "AssetPath": "Resources/unity_builtin_extra",
             "ShaderName": "Hidden/Internal-UIRAtlasBlitCopy",
             "ShaderVariantElements": [
                 {
@@ -113,80 +215,37 @@
         },
         {
             "AssetPath": "Resources/unity_builtin_extra",
-            "ShaderName": "Hidden/UIElements/EditorUIE",
+            "ShaderName": "Hidden/Internal-GUIRoundedRectWithColorPerBorder",
             "ShaderVariantElements": [
                 {
                     "PassType": 0,
                     "Keywords": [
-                        "BILLBOARD_FACE_CAMERA_POS"
+                        ""
                     ]
                 }
             ]
         },
         {
             "AssetPath": "Resources/unity_builtin_extra",
-            "ShaderName": "Mobile/Diffuse",
+            "ShaderName": "Mobile/Particles/Additive",
             "ShaderVariantElements": [
                 {
-                    "PassType": 4,
-                    "Keywords": [
-                        "BILLBOARD_FACE_CAMERA_POS",
-                        "DIRECTIONAL",
-                        "LIGHTPROBE_SH",
-                        "SHADOWS_SCREEN",
-                        "SHADOWS_SOFT",
-                        "SHADOWS_SPLIT_SPHERES"
-                    ]
-                },
-                {
-                    "PassType": 8,
+                    "PassType": 0,
                     "Keywords": [
                         ""
-                    ]
-                },
-                {
-                    "PassType": 8,
-                    "Keywords": [
-                        "SHADOWS_DEPTH",
-                        "SHADOWS_SOFT",
-                        "SHADOWS_SPLIT_SPHERES"
                     ]
                 }
             ]
         },
         {
-            "AssetPath": "Assets/Samples/Basic Sample/GameArt/Shaders/StandardMobile.shader",
-            "ShaderName": "Mobile/Standard",
+            "AssetPath": "Resources/unity_builtin_extra",
+            "ShaderName": "Unlit/Texture",
             "ShaderVariantElements": [
                 {
-                    "PassType": 1,
+                    "PassType": 0,
                     "Keywords": [
-                        "BILLBOARD_FACE_CAMERA_POS",
                         "SHADOWS_SCREEN",
-                        "SHADOWS_SOFT",
-                        "SHADOWS_SPLIT_SPHERES",
-                        "_EMISSION",
-                        "_METALLICGLOSSMAP",
-                        "_NORMALMAP"
-                    ]
-                },
-                {
-                    "PassType": 8,
-                    "Keywords": [
-                        "_EMISSION",
-                        "_METALLICGLOSSMAP",
-                        "_NORMALMAP"
-                    ]
-                },
-                {
-                    "PassType": 8,
-                    "Keywords": [
-                        "SHADOWS_DEPTH",
-                        "SHADOWS_SOFT",
-                        "SHADOWS_SPLIT_SPHERES",
-                        "_EMISSION",
-                        "_METALLICGLOSSMAP",
-                        "_NORMALMAP"
+                        "SHADOWS_SPLIT_SPHERES"
                     ]
                 }
             ]

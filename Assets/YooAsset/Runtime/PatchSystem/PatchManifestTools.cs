@@ -8,6 +8,8 @@ namespace YooAsset
 {
 	internal static class PatchManifestTools
 	{
+
+#if UNITY_EDITOR
 		/// <summary>
 		/// 序列化（JSON文件）
 		/// </summary>
@@ -151,6 +153,7 @@ namespace YooAsset
 
 			return manifest;
 		}
+#endif
 
 		/// <summary>
 		/// 生成Bundle文件的正式名称

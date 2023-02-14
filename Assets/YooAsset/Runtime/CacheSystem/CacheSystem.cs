@@ -78,10 +78,7 @@ namespace YooAsset
 					return EVerifyResult.InfoFileNotExisted;
 
 				// 解析信息文件获取验证数据
-				string jsonContent = FileUtility.ReadAllText(infoFilePath);
-				CacheFileInfo fileInfo = UnityEngine.JsonUtility.FromJson<CacheFileInfo>(jsonContent);
-				element.DataFileCRC = fileInfo.FileCRC;
-				element.DataFileSize = fileInfo.FileSize;
+				CacheFileInfo.ReadInfoFromFile(infoFilePath, out element.DataFileCRC, out element.DataFileSize);
 			}
 			catch (Exception)
 			{
