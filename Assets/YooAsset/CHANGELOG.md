@@ -2,6 +2,13 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.4-preview] - 2023-02-14
+
+### Fixed
+
+- (#65)修复了AssetBundle构建宏逻辑错误。
+- 修复了AssetBundle加载宏逻辑错误。
+
 ## [1.4.3-preview] - 2023-02-10
 
 全新的缓存系统！
