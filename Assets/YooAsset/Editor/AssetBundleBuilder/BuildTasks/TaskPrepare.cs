@@ -16,11 +16,6 @@ namespace YooAsset.Editor
 
 			var buildParameters = buildParametersContext.Parameters;
 
-#if UNITY_2021_1_OR_NEWER
-			if (buildParameters.BuildPipeline == EBuildPipeline.BuiltinBuildPipeline)
-				throw new Exception($"Unity2021 or newer not support {nameof(EBuildPipeline.BuiltinBuildPipeline)}, Please use {nameof(EBuildPipeline.ScriptableBuildPipeline)}");
-#endif
-
 			// 检测构建参数合法性
 			if (buildParameters.BuildTarget == BuildTarget.NoTarget)
 				throw new Exception("请选择目标平台");
