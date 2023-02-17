@@ -25,6 +25,11 @@ namespace YooAsset.Editor
 		public bool UniqueBundleName;
 
 		/// <summary>
+		/// 着色器统一的全名称
+		/// </summary>
+		public string ShadersBundleName;
+
+		/// <summary>
 		/// 资源包列表
 		/// </summary>
 		public readonly List<BuildBundleInfo> BundleInfos = new List<BuildBundleInfo>(1000);
@@ -35,7 +40,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public void PackAsset(BuildAssetInfo assetInfo)
 		{
-			string bundleName = assetInfo.GetBundleName();
+			string bundleName = assetInfo.BundleName;
 			if (string.IsNullOrEmpty(bundleName))
 				throw new Exception("Should never get here !");
 

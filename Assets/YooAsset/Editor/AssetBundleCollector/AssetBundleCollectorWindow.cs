@@ -776,7 +776,7 @@ namespace YooAsset.Editor
 
 				try
 				{
-					CollectCommand command = new CollectCommand(EBuildMode.DryRunBuild, _enableAddressableToogle.value);
+					CollectCommand command = new CollectCommand(EBuildMode.DryRunBuild, _packageNameTxt.value, _enableAddressableToogle.value, _uniqueBundleNameToogle.value);
 					collectAssetInfos = collector.GetAllCollectAssets(command, group);
 				}
 				catch (System.Exception e)

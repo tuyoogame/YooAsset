@@ -6,19 +6,14 @@ namespace YooAsset.Editor
 	public class CollectResult
 	{
 		/// <summary>
-		/// 包裹名称
+		/// 收集命令
 		/// </summary>
-		public string PackageName { private set; get; }
+		public CollectCommand Command { private set; get; }
 
 		/// <summary>
-		/// 是否启用可寻址资源定位
+		/// 着色器统一全名称
 		/// </summary>
-		public bool EnableAddressable { private set; get; }
-
-		/// <summary>
-		/// 资源包名唯一化
-		/// </summary>
-		public bool UniqueBundleName { private set; get; }
+		public string ShadersBundleName { private set; get; }
 
 		/// <summary>
 		/// 收集的资源信息列表
@@ -26,11 +21,13 @@ namespace YooAsset.Editor
 		public List<CollectAssetInfo> CollectAssets { private set; get; }
 
 
-		public CollectResult(string packageName, bool enableAddressable, bool uniqueBundleName)
+		public CollectResult(CollectCommand command)
 		{
-			PackageName = packageName;
-			EnableAddressable = enableAddressable;
-			UniqueBundleName = uniqueBundleName;
+			Command = command;
+
+			// 着色器统一全名称
+			var packRuleResult = DefaultPackRule.CreateShadersPackRuleResult();
+			ShadersBundleName = packRuleResult.GetMainBundleName(command.PackageName, command.UniqueBundleName);
 		}
 
 		public void SetCollectAssets(List<CollectAssetInfo> collectAssets)

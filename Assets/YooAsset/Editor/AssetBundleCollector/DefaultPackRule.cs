@@ -4,6 +4,31 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
+	public class DefaultPackRule
+	{
+		/// <summary>
+		/// AssetBundle文件的后缀名
+		/// </summary>
+		public const string AssetBundleFileExtension = "bundle";
+
+		/// <summary>
+		/// 原生文件的后缀名
+		/// </summary>
+		public const string RawFileExtension = "rawfile";
+
+		/// <summary>
+		/// Unity着色器资源包名称
+		/// </summary>
+		public const string ShadersBundleName = "unityshaders";
+
+
+		public static PackRuleResult CreateShadersPackRuleResult()
+		{
+			PackRuleResult result = new PackRuleResult(ShadersBundleName, AssetBundleFileExtension);
+			return result;
+		}
+	}
+
 	/// <summary>
 	/// 以文件路径作为资源包名
 	/// 注意：每个文件独自打资源包
@@ -13,9 +38,16 @@ namespace YooAsset.Editor
 	[DisplayName("以文件路径作为资源包名")]
 	public class PackSeparately : IPackRule
 	{
-		string IPackRule.GetBundleName(PackRuleData data)
+		PackRuleResult IPackRule.GetPackRuleResult(PackRuleData data)
 		{
-			return StringUtility.RemoveExtension(data.AssetPath);
+			string bundleName = StringUtility.RemoveExtension(data.AssetPath);
+			PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
+			return result;
+		}
+
+		bool IPackRule.IsRawFilePackRule()
+		{
+			return false;
 		}
 	}
 
@@ -30,9 +62,16 @@ namespace YooAsset.Editor
 	{
 		public static PackDirectory StaticPackRule = new PackDirectory();
 
-		string IPackRule.GetBundleName(PackRuleData data)
+		PackRuleResult IPackRule.GetPackRuleResult(PackRuleData data)
 		{
-			return Path.GetDirectoryName(data.AssetPath);
+			string bundleName = Path.GetDirectoryName(data.AssetPath);
+			PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
+			return result;
+		}
+
+		bool IPackRule.IsRawFilePackRule()
+		{
+			return false;
 		}
 	}
 
@@ -46,7 +85,7 @@ namespace YooAsset.Editor
 	[DisplayName("以收集器路径下顶级文件夹为资源包名")]
 	public class PackTopDirectory : IPackRule
 	{
-		string IPackRule.GetBundleName(PackRuleData data)
+		PackRuleResult IPackRule.GetPackRuleResult(PackRuleData data)
 		{
 			string assetPath = data.AssetPath.Replace(data.CollectPath, string.Empty);
 			assetPath = assetPath.TrimStart('/');
@@ -56,12 +95,18 @@ namespace YooAsset.Editor
 				if (Path.HasExtension(splits[0]))
 					throw new Exception($"Not found root directory : {assetPath}");
 				string bundleName = $"{data.CollectPath}/{splits[0]}";
-				return bundleName;
+				PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
+				return result;
 			}
 			else
 			{
 				throw new Exception($"Not found root directory : {assetPath}");
 			}
+		}
+
+		bool IPackRule.IsRawFilePackRule()
+		{
+			return false;
 		}
 	}
 
@@ -72,17 +117,26 @@ namespace YooAsset.Editor
 	[DisplayName("以收集器路径作为资源包名")]
 	public class PackCollector : IPackRule
 	{
-		string IPackRule.GetBundleName(PackRuleData data)
+		PackRuleResult IPackRule.GetPackRuleResult(PackRuleData data)
 		{
+			string bundleName;
 			string collectPath = data.CollectPath;
 			if (AssetDatabase.IsValidFolder(collectPath))
 			{
-				return collectPath;
+				bundleName = collectPath;
 			}
 			else
 			{
-				return StringUtility.RemoveExtension(collectPath);
+				bundleName = StringUtility.RemoveExtension(collectPath);
 			}
+
+			PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
+			return result;
+		}
+
+		bool IPackRule.IsRawFilePackRule()
+		{
+			return false;
 		}
 	}
 
@@ -93,9 +147,16 @@ namespace YooAsset.Editor
 	[DisplayName("以分组名称作为资源包名")]
 	public class PackGroup : IPackRule
 	{
-		string IPackRule.GetBundleName(PackRuleData data)
+		PackRuleResult IPackRule.GetPackRuleResult(PackRuleData data)
 		{
-			return data.GroupName;
+			string bundleName = data.GroupName;
+			PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
+			return result;
+		}
+
+		bool IPackRule.IsRawFilePackRule()
+		{
+			return false;
 		}
 	}
 
@@ -106,23 +167,16 @@ namespace YooAsset.Editor
 	[DisplayName("打包原生文件")]
 	public class PackRawFile : IPackRule
 	{
-		string IPackRule.GetBundleName(PackRuleData data)
+		PackRuleResult IPackRule.GetPackRuleResult(PackRuleData data)
 		{
-			string extension = StringUtility.RemoveFirstChar(Path.GetExtension(data.AssetPath));
-			if (extension == EAssetFileExtension.unity.ToString() || extension == EAssetFileExtension.prefab.ToString() ||
-				extension == EAssetFileExtension.mat.ToString() || extension == EAssetFileExtension.controller.ToString() ||
-				extension == EAssetFileExtension.fbx.ToString() || extension == EAssetFileExtension.anim.ToString() ||
-				extension == EAssetFileExtension.shader.ToString())
-			{
-				throw new Exception($"{nameof(PackRawFile)} is not support file estension : {extension}");
-			}
+			string bundleName = data.AssetPath;
+			PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.RawFileExtension);
+			return result;
+		}
 
-			// 注意：原生文件只支持无依赖关系的资源
-			string[] depends = AssetDatabase.GetDependencies(data.AssetPath, true);
-			if (depends.Length != 1)
-				throw new Exception($"{nameof(PackRawFile)} is not support estension : {extension}");
-
-			return data.AssetPath;
+		bool IPackRule.IsRawFilePackRule()
+		{
+			return true;
 		}
 	}
 
@@ -132,9 +186,14 @@ namespace YooAsset.Editor
 	[DisplayName("打包着色器变种集合")]
 	public class PackShaderVariants : IPackRule
 	{
-		public string GetBundleName(PackRuleData data)
+		public PackRuleResult GetPackRuleResult(PackRuleData data)
 		{
-			return YooAssetSettings.UnityShadersBundleName;
+			return DefaultPackRule.CreateShadersPackRuleResult();
+		}
+
+		bool IPackRule.IsRawFilePackRule()
+		{
+			return false;
 		}
 	}
 }
