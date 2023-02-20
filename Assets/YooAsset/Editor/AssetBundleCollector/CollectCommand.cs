@@ -9,14 +9,26 @@ namespace YooAsset.Editor
 		public EBuildMode BuildMode { private set; get; }
 
 		/// <summary>
+		/// 包裹名称
+		/// </summary>
+		public string PackageName { private set; get; }
+
+		/// <summary>
 		/// 是否启用可寻址资源定位
 		/// </summary>
 		public bool EnableAddressable { private set; get; }
 
-		public CollectCommand(EBuildMode buildMode, bool enableAddressable)
+		/// <summary>
+		/// 资源包名唯一化
+		/// </summary>
+		public bool UniqueBundleName { private set; get; }
+
+		public CollectCommand(EBuildMode buildMode, string packageName, bool enableAddressable, bool uniqueBundleName)
 		{
 			BuildMode = buildMode;
+			PackageName = packageName;
 			EnableAddressable = enableAddressable;
+			UniqueBundleName = uniqueBundleName;
 		}
 	}
 }

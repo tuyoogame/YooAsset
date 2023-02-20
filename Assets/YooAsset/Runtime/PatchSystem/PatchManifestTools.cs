@@ -155,21 +155,21 @@ namespace YooAsset
 		}
 #endif
 
-		/// <summary>
-		/// 生成Bundle文件的正式名称
-		/// </summary>
-		public static string CreateBundleFileName(int nameStyle, string bundleName, string fileHash, bool isRawFile)
+		public static string GetRemoteBundleFileExtension(string bundleName)
+		{
+			string fileExtension = Path.GetExtension(bundleName);
+			return fileExtension;
+		}
+		public static string GetRemoteBundleFileName(int nameStyle, string bundleName, string fileExtension, string fileHash)
 		{
 			if (nameStyle == 1) //HashName
 			{
-				string fileExtension = isRawFile ? YooAssetSettingsData.Setting.RawBundleFileVariant : YooAssetSettingsData.Setting.AssetBundleFileVariant;
-				return StringUtility.Format("{0}.{1}", fileHash, fileExtension);
+				return StringUtility.Format("{0}{1}", fileHash, fileExtension);
 			}
 			else if (nameStyle == 4) //BundleName_HashName
 			{
 				string fileName = bundleName.Remove(bundleName.LastIndexOf('.'));
-				string fileExtension = isRawFile ? YooAssetSettingsData.Setting.RawBundleFileVariant : YooAssetSettingsData.Setting.AssetBundleFileVariant;
-				return StringUtility.Format("{0}_{1}.{2}", fileName, fileHash, fileExtension);
+				return StringUtility.Format("{0}_{1}{2}", fileName, fileHash, fileExtension);
 			}
 			else
 			{

@@ -4,6 +4,14 @@ using System.IO;
 
 namespace YooAsset.Editor
 {
+	public class DefaultFilterRule
+	{
+		/// <summary>
+		/// 忽略的文件类型
+		/// </summary>
+		public static readonly string[] IgnoreFileExtensions = { "", ".so", ".dll", ".cs", ".js", ".boo", ".meta", ".cginc", ".hlsl" };
+	}
+
 	[DisplayName("收集所有资源")]
 	public class CollectAll : IFilterRule
 	{

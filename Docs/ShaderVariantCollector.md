@@ -4,6 +4,8 @@
 
 点击搜集变种按钮开始收集，请耐心等待结束。
 
+**注意：在收集完成之后，需要将生成的shadervariants文件配置到收集界面（AssetBundle Collector）。**
+
 ### Jenkins支持
 
 ```c#

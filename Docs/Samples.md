@@ -17,3 +17,9 @@
 1. Space Shooter在导入完成后，打开YooAsset->AssetBundle Collector窗口。
 1. 点击修复按钮，然后点击Save按钮保存配置，最后关闭窗口。
 3. 找到Boot.scene场景启动游戏。
+
+#### 太空战机项目
+
+首次需要在项目里手动添加Tags才可以保证真机演示正常运行。
+
+![image](./Image/Samples-img3.jpg)

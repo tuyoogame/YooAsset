@@ -122,7 +122,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 文件名称（远端文件名和内置文件名）
+		/// 文件名称
 		/// </summary>
 		private string _fileName;
 		public string FileName
@@ -132,6 +132,20 @@ namespace YooAsset
 				if (string.IsNullOrEmpty(_fileName))
 					throw new Exception("Should never get here !");
 				return _fileName;
+			}
+		}
+
+		/// <summary>
+		/// 文件后缀名
+		/// </summary>
+		private string _fileExtension;
+		public string FileExtension
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(_fileExtension))
+					throw new Exception("Should never get here !");
+				return _fileExtension;
 			}
 		}
 
@@ -146,7 +160,8 @@ namespace YooAsset
 		public void ParseBundle(string packageName, int nameStype)
 		{
 			PackageName = packageName;
-			_fileName = PatchManifestTools.CreateBundleFileName(nameStype, BundleName, FileHash, IsRawFile);
+			_fileExtension = PatchManifestTools.GetRemoteBundleFileExtension(BundleName);
+			_fileName = PatchManifestTools.GetRemoteBundleFileName(nameStype, BundleName, _fileExtension, FileHash);
 		}
 
 		/// <summary>

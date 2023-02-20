@@ -2,6 +2,35 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.5-preview] - 2023-02-17
+
+### Fixed
+
+- (#67)修复了报告查看界面在Unity2021.3上的兼容性问题。
+- (#66)修复了在Unity2021.3上编辑器模拟模式运行报错的问题。
+
+### Changed
+
+- 接口变更：IPackRule
+
+  ````c#
+  /// <summary>
+  /// 资源打包规则接口
+  /// </summary>
+  public interface IPackRule
+  {
+      /// <summary>
+      /// 获取打包规则结果
+      /// </summary>
+      PackRuleResult GetPackRuleResult(PackRuleData data);
+  
+      /// <summary>
+      /// 是否为原生文件打包规则
+      /// </summary>
+      bool IsRawFilePackRule();
+  }
+  ````
+
 ## [1.4.4-preview] - 2023-02-14
 
 ### Fixed
