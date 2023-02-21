@@ -37,7 +37,7 @@ namespace YooAsset
 			// 检测本地临时文件
 			if (_steps == ESteps.CheckTempFile)
 			{
-				var verifyResult = CacheSystem.VerifyingTempFile(_bundleInfo.Bundle, EVerifyLevel.High);
+				var verifyResult = CacheSystem.VerifyingTempFile(_bundleInfo.Bundle);
 				if (verifyResult == EVerifyResult.Succeed)
 				{
 					_steps = ESteps.CachingFile;
@@ -198,7 +198,7 @@ namespace YooAsset
 			// 验证下载文件
 			if (_steps == ESteps.VerifyingFile)
 			{
-				var verifyResult = CacheSystem.VerifyingTempFile(_bundleInfo.Bundle, EVerifyLevel.High);
+				var verifyResult = CacheSystem.VerifyingTempFile(_bundleInfo.Bundle);
 				if (verifyResult == EVerifyResult.Succeed)
 				{
 					_steps = ESteps.CachingFile;

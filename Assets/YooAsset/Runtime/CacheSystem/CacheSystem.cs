@@ -69,31 +69,41 @@ namespace YooAsset
 		/// <summary>
 		/// 验证缓存文件（子线程内操作）
 		/// </summary>
-		public static EVerifyResult VerifyingCacheFile(VerifyElement element, EVerifyLevel verifyLevel)
+		public static EVerifyResult VerifyingCacheFile(VerifyElement element)
 		{
 			try
 			{
-				string infoFilePath = element.InfoFilePath;
-				if (File.Exists(infoFilePath) == false)
-					return EVerifyResult.InfoFileNotExisted;
+				if (InitVerifyLevel == EVerifyLevel.Low)
+				{
+					if (File.Exists(element.InfoFilePath) == false)
+						return EVerifyResult.InfoFileNotExisted;
+					if (File.Exists(element.DataFilePath) == false)
+						return EVerifyResult.DataFileNotExisted;
+					return EVerifyResult.Succeed;
+				}
+				else
+				{
+					if (File.Exists(element.InfoFilePath) == false)
+						return EVerifyResult.InfoFileNotExisted;
 
-				// 解析信息文件获取验证数据
-				CacheFileInfo.ReadInfoFromFile(infoFilePath, out element.DataFileCRC, out element.DataFileSize);
+					// 解析信息文件获取验证数据
+					CacheFileInfo.ReadInfoFromFile(element.InfoFilePath, out element.DataFileCRC, out element.DataFileSize);
+				}
 			}
 			catch (Exception)
 			{
 				return EVerifyResult.Exception;
 			}
 
-			return VerifyingInternal(element.DataFilePath, element.DataFileSize, element.DataFileCRC, verifyLevel);
+			return VerifyingInternal(element.DataFilePath, element.DataFileSize, element.DataFileCRC, InitVerifyLevel);
 		}
 
 		/// <summary>
 		/// 验证下载文件
 		/// </summary>
-		public static EVerifyResult VerifyingTempFile(PatchBundle patchBundle, EVerifyLevel verifyLevel)
+		public static EVerifyResult VerifyingTempFile(PatchBundle patchBundle)
 		{
-			return VerifyingInternal(patchBundle.TempDataFilePath, patchBundle.FileSize, patchBundle.FileCRC, verifyLevel);
+			return VerifyingInternal(patchBundle.TempDataFilePath, patchBundle.FileSize, patchBundle.FileCRC, EVerifyLevel.High);
 		}
 
 		/// <summary>

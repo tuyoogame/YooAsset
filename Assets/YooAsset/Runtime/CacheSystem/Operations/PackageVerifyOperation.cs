@@ -121,7 +121,7 @@ namespace YooAsset
 		private void VerifyInThread(object obj)
 		{
 			VerifyElement element = (VerifyElement)obj;
-			element.Result = CacheSystem.VerifyingCacheFile(element, CacheSystem.InitVerifyLevel);
+			element.Result = CacheSystem.VerifyingCacheFile(element);
 			_syncContext.Post(VerifyCallback, element);
 		}
 		private void VerifyCallback(object obj)
@@ -235,7 +235,7 @@ namespace YooAsset
 		}
 		private void BeginVerifyFileWithoutThread(VerifyElement element)
 		{
-			element.Result = CacheSystem.VerifyingCacheFile(element, CacheSystem.InitVerifyLevel);
+			element.Result = CacheSystem.VerifyingCacheFile(element);
 			if (element.Result == EVerifyResult.Succeed)
 			{
 				_succeedCount++;
