@@ -54,6 +54,7 @@ namespace YooAsset.Editor
 					new TaskPrepare(), //前期准备工作
 					new TaskGetBuildMap(), //获取构建列表
 					new TaskBuilding(), //开始执行构建
+					new TaskCopyRawFile(), //拷贝原生文件
 					new TaskVerifyBuildResult(), //验证构建结果
 					new TaskEncryption(), //加密资源文件
 					new TaskUpdateBuildInfo(), //更新构建信息
@@ -70,6 +71,7 @@ namespace YooAsset.Editor
 					new TaskPrepare(), //前期准备工作
 					new TaskGetBuildMap(), //获取构建列表
 					new TaskBuilding_SBP(), //开始执行构建
+					new TaskCopyRawFile(), //拷贝原生文件
 					new TaskVerifyBuildResult_SBP(), //验证构建结果
 					new TaskEncryption(), //加密资源文件
 					new TaskUpdateBuildInfo(), //更新构建信息

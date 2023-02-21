@@ -44,32 +44,6 @@ namespace YooAsset.Editor
 			BuildResultContext buildResultContext = new BuildResultContext();
 			buildResultContext.Results = buildResults;
 			context.SetContextObject(buildResultContext);
-
-			// 拷贝原生文件
-			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
-			{
-				CopyRawBundle(buildMapContext, buildParametersContext);
-			}
-		}
-
-		/// <summary>
-		/// 拷贝原生文件
-		/// </summary>
-		private void CopyRawBundle(BuildMapContext buildMapContext, BuildParametersContext buildParametersContext)
-		{
-			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
-			{
-				if (bundleInfo.IsRawFile)
-				{
-					string dest = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
-					foreach (var buildAsset in bundleInfo.BuildinAssets)
-					{
-						if (buildAsset.IsRawAsset)
-							EditorTools.CopyFile(buildAsset.AssetPath, dest, true);
-					}
-				}
-			}
 		}
 	}
 }
