@@ -2,6 +2,42 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.6-preview] - 2023-02-22
+
+### Changed
+
+- EVerifyLevel新增Middle级别。
+
+  ```c#
+  public enum EVerifyLevel
+  {
+      /// <summary>
+      /// 验证文件存在
+      /// </summary>
+      Low,
+      
+      /// <summary>
+      /// 验证文件大小
+      /// </summary>
+      Middle,
+  
+      /// <summary>
+      /// 验证文件大小和CRC
+      /// </summary>
+      High,
+  }
+  ```
+
+- 补丁清单的资源包列表新增引用链。
+
+  （解决复杂依赖关系下，错误卸载资源包的问题）
+
+- 缓存系统支持后缀格式存储。
+
+  （解决原生文件没有后缀格式的问题）
+
+- 收集界面增加用户自定义数据栏。
+
 ## [1.4.5-preview] - 2023-02-17
 
 ### Fixed
