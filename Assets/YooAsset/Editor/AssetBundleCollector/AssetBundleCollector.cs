@@ -45,16 +45,11 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string AssetTags = string.Empty;
 
-
 		/// <summary>
-		/// 可寻址路径
+		/// 用户自定义数据
 		/// </summary>
-		public string Address = string.Empty;
+		public string UserData = string.Empty;
 
-		/// <summary>
-		/// 跨平台
-		/// </summary>
-		public bool IsMultiPlatform = false;
 
 		/// <summary>
 		/// 收集器是否有效
@@ -173,20 +168,6 @@ namespace YooAsset.Editor
 				{
 					if (IsValidateAsset(assetPath, isRawFilePackRule) && IsCollectAsset(assetPath))
 					{
-                        if (IsMultiPlatform)
-                        {
-							string platform = "Windows";
-#if UNITY_ANDROID
-							platform = "Android";
-#elif UNITY_IOS
-							platform = "iOS";
-#elif UNITY_STANDALONE_OSX
-							platform = "OSX";
-#endif
-							if (!assetPath.Contains(platform))
-								continue;
-						}
-
 						if (result.ContainsKey(assetPath) == false)
 						{
 							var collectAssetInfo = CreateCollectAssetInfo(command, group, assetPath, isRawFilePackRule);
@@ -329,7 +310,7 @@ namespace YooAsset.Editor
 				return string.Empty;
 
 			IAddressRule addressRuleInstance = AssetBundleCollectorSettingData.GetAddressRuleInstance(AddressRuleName);
-			string adressValue = addressRuleInstance.GetAssetAddress(new AddressRuleData(assetPath, CollectPath, group.GroupName, Address, IsMultiPlatform));
+			string adressValue = addressRuleInstance.GetAssetAddress(new AddressRuleData(assetPath, CollectPath, group.GroupName, UserData));
 			return adressValue;
 		}
 		private string GetBundleName(CollectCommand command, AssetBundleCollectorGroup group, string assetPath)
@@ -345,7 +326,7 @@ namespace YooAsset.Editor
 			{
 				// 获取其它资源打包规则结果
 				IPackRule packRuleInstance = AssetBundleCollectorSettingData.GetPackRuleInstance(PackRuleName);
-				PackRuleResult packRuleResult = packRuleInstance.GetPackRuleResult(new PackRuleData(assetPath, CollectPath, group.GroupName));
+				PackRuleResult packRuleResult = packRuleInstance.GetPackRuleResult(new PackRuleData(assetPath, CollectPath, group.GroupName, UserData));
 				return packRuleResult.GetMainBundleName(command.PackageName, command.UniqueBundleName);
 			}
 		}

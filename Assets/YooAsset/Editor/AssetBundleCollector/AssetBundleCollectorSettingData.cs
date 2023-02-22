@@ -108,7 +108,7 @@ namespace YooAsset.Editor
 				List<Type> types = new List<Type>(100)
 				{
 					typeof(AddressByFileName),
-					typeof(AddressByCollectorAndFileName),
+					typeof(AddressByFolderAndFileName),
 					typeof(AddressByGroupAndFileName)
 				};
 
