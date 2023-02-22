@@ -13,7 +13,7 @@ namespace YooAsset
 		/// <summary>
 		/// 初始化时的验证级别
 		/// </summary>
-		public static EVerifyLevel InitVerifyLevel { set; get; } = EVerifyLevel.Low;
+		public static EVerifyLevel InitVerifyLevel { set; get; } = EVerifyLevel.Middle;
 
 		/// <summary>
 		/// 清空所有数据
@@ -37,6 +37,7 @@ namespace YooAsset
 		/// </summary>
 		public static void RecordFile(string packageName, string cacheGUID, PackageCache.RecordWrapper wrapper)
 		{
+			//YooLogger.Log($"Record file : {packageName} = {cacheGUID}");
 			var cache = GetOrCreateCache(packageName);
 			cache.Record(cacheGUID, wrapper);
 		}

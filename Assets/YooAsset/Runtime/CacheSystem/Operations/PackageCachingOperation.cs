@@ -67,8 +67,23 @@ namespace YooAsset
 				if (CacheSystem.IsCached(_packageName, cacheGUID))
 					continue;
 
+				// 获取数据文件的后缀名
+				string dataFileExtension = string.Empty;
+				var fileInfos = fileFoder.GetFiles();
+				foreach (var fileInfo in fileInfos)
+				{
+					if (fileInfo.Extension == ".temp")
+						continue;
+
+					if (fileInfo.Name.StartsWith(YooAssetSettings.CacheBundleDataFileName))
+					{
+						dataFileExtension = fileInfo.Extension;
+						break;
+					}
+				}
+
 				string fileRootPath = fileFoder.FullName;
-				string dataFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleDataFileName}";
+				string dataFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleDataFileName}{dataFileExtension}";
 				string infoFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleInfoFileName}";
 				VerifyElement element = new VerifyElement(_packageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
 				result.Add(element);

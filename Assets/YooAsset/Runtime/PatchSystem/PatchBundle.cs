@@ -72,7 +72,7 @@ namespace YooAsset
 					return _cachedDataFilePath;
 
 				string cacheRoot = PersistentHelper.GetCacheFolderPath(PackageName);
-				_cachedDataFilePath = $"{cacheRoot}/{CacheGUID}/{YooAssetSettings.CacheBundleDataFileName}";
+				_cachedDataFilePath = $"{cacheRoot}/{CacheGUID}/{YooAssetSettings.CacheBundleDataFileName}{_fileExtension}";
 				return _cachedDataFilePath;
 			}
 		}

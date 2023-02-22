@@ -1,4 +1,5 @@
-﻿
+﻿using System.IO;
+
 namespace YooAsset
 {
 	internal class VerifyElement
@@ -20,6 +21,19 @@ namespace YooAsset
 			FileRootPath = fileRootPath;
 			DataFilePath = dataFilePath;
 			InfoFilePath = infoFilePath;
+		}
+
+		public void DeleteFiles()
+		{
+			if (File.Exists(DataFilePath))
+			{
+				File.Delete(DataFilePath);
+			}
+
+			if (File.Exists(InfoFilePath))
+			{
+				File.Delete(InfoFilePath);
+			}
 		}
 	}
 }

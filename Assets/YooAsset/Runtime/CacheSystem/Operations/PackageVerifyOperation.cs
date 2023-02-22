@@ -139,12 +139,8 @@ namespace YooAsset
 			{
 				_failedCount++;
 
-				// 删除验证失败的缓存文件
-				if (Directory.Exists(element.FileRootPath))
-				{
-					YooLogger.Warning($"Failed verify file and delete files : {element.FileRootPath}");
-					Directory.Delete(element.FileRootPath, true);
-				}
+				YooLogger.Warning($"Failed verify file and delete files : {element.FileRootPath}");
+				element.DeleteFiles();
 			}
 		}
 	}
@@ -246,12 +242,8 @@ namespace YooAsset
 			{
 				_failedCount++;
 
-				// 删除验证失败的缓存文件
-				if (Directory.Exists(element.FileRootPath))
-				{
-					YooLogger.Warning($"Failed verify file and delete files : {element.FileRootPath}");
-					Directory.Delete(element.FileRootPath, true);
-				}
+				YooLogger.Warning($"Failed verify file and delete files : {element.FileRootPath}");
+				element.DeleteFiles();
 			}
 		}
 	}
