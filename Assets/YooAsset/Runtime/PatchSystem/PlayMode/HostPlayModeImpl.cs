@@ -330,6 +330,10 @@ namespace YooAsset
 			}
 			return result.ToArray();
 		}
+		string IBundleServices.GetBundleName(int bundleID)
+		{
+			return _activeManifest.GetBundleName(bundleID);
+		}
 		bool IBundleServices.IsServicesValid()
 		{
 			return _activeManifest != null;

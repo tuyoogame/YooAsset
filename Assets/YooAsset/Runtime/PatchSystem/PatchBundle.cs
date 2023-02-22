@@ -41,7 +41,12 @@ namespace YooAsset
 		/// </summary>
 		public string[] Tags;
 
+		/// <summary>
+		/// 引用该资源包的ID列表
+		/// </summary>
+		public int[] ReferenceIDs;
 
+		
 		/// <summary>
 		/// 所属的包裹名称
 		/// </summary>

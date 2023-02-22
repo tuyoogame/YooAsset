@@ -221,6 +221,22 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取资源包名称
+		/// </summary>
+		public string GetBundleName(int bundleID)
+		{
+			if (bundleID >= 0 && bundleID < BundleList.Count)
+			{
+				var patchBundle = BundleList[bundleID];
+				return patchBundle.BundleName;
+			}
+			else
+			{
+				throw new Exception($"Invalid bundle id : {bundleID}");
+			}
+		}
+
+		/// <summary>
 		/// 尝试获取补丁资源
 		/// </summary>
 		public bool TryGetPatchAsset(string assetPath, out PatchAsset result)

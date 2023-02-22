@@ -143,6 +143,7 @@ namespace YooAsset
 						patchBundle.IsRawFile = _buffer.ReadBool();
 						patchBundle.LoadMethod = _buffer.ReadByte();
 						patchBundle.Tags = _buffer.ReadUTF8Array();
+						patchBundle.ReferenceIDs = _buffer.ReadInt32Array();
 						Manifest.BundleList.Add(patchBundle);
 
 						patchBundle.ParseBundle(Manifest.PackageName, Manifest.OutputNameStyle);

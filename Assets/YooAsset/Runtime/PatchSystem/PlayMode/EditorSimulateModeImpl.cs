@@ -95,6 +95,10 @@ namespace YooAsset
 		{
 			throw new NotImplementedException();
 		}
+		string IBundleServices.GetBundleName(int bundleID)
+		{
+			throw new NotImplementedException();
+		}
 		bool IBundleServices.IsServicesValid()
 		{
 			return _activeManifest != null;

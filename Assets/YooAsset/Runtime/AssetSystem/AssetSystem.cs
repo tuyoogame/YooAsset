@@ -341,6 +341,14 @@ namespace YooAsset
 				_providers.Remove(provider);
 			}
 		}
+		internal bool CheckBundleCanDestroy(int bundleID)
+		{
+			string bundleName = BundleServices.GetBundleName(bundleID);
+			BundleLoaderBase loader = TryGetAssetBundleLoader(bundleName);
+			if (loader == null)
+				return true;
+			return loader.CanDestroy();
+		}
 
 		private BundleLoaderBase CreateAssetBundleLoaderInternal(BundleInfo bundleInfo)
 		{

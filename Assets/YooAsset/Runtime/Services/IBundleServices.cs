@@ -14,6 +14,11 @@ namespace YooAsset
 		BundleInfo[] GetAllDependBundleInfos(AssetInfo assetPath);
 
 		/// <summary>
+		/// 获取资源包名称
+		/// </summary>
+		string GetBundleName(int bundleID);
+
+		/// <summary>
 		/// 服务接口是否有效
 		/// </summary>
 		bool IsServicesValid();

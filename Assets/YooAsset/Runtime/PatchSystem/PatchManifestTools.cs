@@ -65,6 +65,7 @@ namespace YooAsset
 					buffer.WriteBool(patchBundle.IsRawFile);
 					buffer.WriteByte(patchBundle.LoadMethod);
 					buffer.WriteUTF8Array(patchBundle.Tags);
+					buffer.WriteInt32Array(patchBundle.ReferenceIDs);
 				}
 
 				// 写入文件流
@@ -127,6 +128,7 @@ namespace YooAsset
 					patchBundle.IsRawFile = buffer.ReadBool();
 					patchBundle.LoadMethod = buffer.ReadByte();
 					patchBundle.Tags = buffer.ReadUTF8Array();
+					patchBundle.ReferenceIDs = buffer.ReadInt32Array();
 					manifest.BundleList.Add(patchBundle);
 				}
 			}
