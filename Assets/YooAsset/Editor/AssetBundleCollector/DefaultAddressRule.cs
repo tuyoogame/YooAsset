@@ -31,4 +31,36 @@ namespace YooAsset.Editor
 			return $"{collectorName}_{fileName}";
 		}
 	}
+
+
+	[DisplayName("以Address+文件路径为定位地址")]
+	public class AddressByAddressAndFilePath : IAddressRule
+	{
+		string IAddressRule.GetAssetAddress(AddressRuleData data)
+		{
+			if (Path.HasExtension(data.CollectPath))
+			{
+				return data.Address;
+			}
+			else
+			{
+				string path = data.AssetPath.Replace(data.CollectPath, "");
+				if (data.IsMultiPlatform)
+				{
+					string platform = "Windows";
+#if UNITY_ANDROID
+					platform = "Android";
+#elif UNITY_IOS
+					platform = "iOS";
+#elif UNITY_STANDALONE_OSX
+					platform = "OSX";
+#endif
+					path = path.Replace($"{platform}/", "");
+				}
+				string fileName = Path.GetFileName(data.AssetPath);
+				return $"{data.Address}{path}";
+			}
+
+		}
+	}
 }
