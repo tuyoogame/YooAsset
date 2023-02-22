@@ -32,6 +32,7 @@ MonoBehaviour:
         PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/Entity
         CollectorGUID: 4d7c84745db8e884f8020a8c5356e67c
         CollectorType: 0
@@ -39,6 +40,7 @@ MonoBehaviour:
         PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/Audio
         CollectorGUID: 306075fbe00b24251b6c889984a7a7d5
         CollectorType: 0
@@ -46,6 +48,7 @@ MonoBehaviour:
         PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 
     - GroupName: shader
       GroupDesc: 
       AssetTags: 
@@ -58,6 +61,7 @@ MonoBehaviour:
         PackRuleName: PackShaderVariants
         FilterRuleName: CollectShaderVariants
         AssetTags: 
+        UserData: 
     - GroupName: scene
       GroupDesc: 
       AssetTags: 
@@ -70,6 +74,7 @@ MonoBehaviour:
         PackRuleName: PackSeparately
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 
     - GroupName: ugui
       GroupDesc: 
       AssetTags: 
@@ -82,6 +87,7 @@ MonoBehaviour:
         PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/UIPanel
         CollectorGUID: 12d33f33f3a55224c9c747d7bffa1c68
         CollectorType: 0
@@ -89,6 +95,7 @@ MonoBehaviour:
         PackRuleName: PackSeparately
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/UISprite
         CollectorGUID: 01865ad6f7c806147b6cb37f2d83bc96
         CollectorType: 0
@@ -96,3 +103,4 @@ MonoBehaviour:
         PackRuleName: PackTopDirectory
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 
