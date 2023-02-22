@@ -64,8 +64,11 @@ namespace YooAsset.Editor
 			// 更新资源包之间的引用关系
 			if (buildParameters.BuildPipeline == EBuildPipeline.BuiltinBuildPipeline)
 			{
-				var buildResultContext = context.GetContextObject<TaskBuilding.BuildResultContext>();
-				UpdateBuiltinPipelineReference(patchManifest, buildResultContext, buildMapContext);
+				if (buildParameters.BuildMode != EBuildMode.SimulateBuild)
+				{
+					var buildResultContext = context.GetContextObject<TaskBuilding.BuildResultContext>();
+					UpdateBuiltinPipelineReference(patchManifest, buildResultContext, buildMapContext);
+				}
 			}
 
 			// 创建补丁清单文本文件
