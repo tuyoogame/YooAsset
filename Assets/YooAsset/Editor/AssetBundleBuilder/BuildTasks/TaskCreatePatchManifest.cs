@@ -47,8 +47,25 @@ namespace YooAsset.Editor
 				if (buildParameters.BuildMode == EBuildMode.IncrementalBuild)
 				{
 					var buildResultContext = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
-					UpdateBuiltInBundleReference(patchManifest, buildResultContext.Results, buildMapContext.ShadersBundleName);
+					UpdateBuiltInBundleReference(patchManifest, buildResultContext, buildMapContext.ShadersBundleName);
 				}
+			}
+
+			// 更新资源包之间的引用关系
+			if (buildParameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
+			{
+				if (buildParameters.BuildMode == EBuildMode.IncrementalBuild)
+				{
+					var buildResultContext = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
+					UpdateScriptPipelineReference(patchManifest, buildResultContext);
+				}
+			}
+
+			// 更新资源包之间的引用关系
+			if (buildParameters.BuildPipeline == EBuildPipeline.BuiltinBuildPipeline)
+			{
+				var buildResultContext = context.GetContextObject<TaskBuilding.BuildResultContext>();
+				UpdateBuiltinPipelineReference(patchManifest, buildResultContext, buildMapContext);
 			}
 
 			// 创建补丁清单文本文件
@@ -164,11 +181,11 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 更新Unity内置资源包的引用关系
 		/// </summary>
-		private void UpdateBuiltInBundleReference(PatchManifest patchManifest, IBundleBuildResults buildResults, string shadersBunldeName)
+		private void UpdateBuiltInBundleReference(PatchManifest patchManifest, TaskBuilding_SBP.BuildResultContext buildResultContext, string shadersBunldeName)
 		{
 			// 获取所有依赖着色器资源包的资源包列表
 			List<string> shaderBundleReferenceList = new List<string>();
-			foreach (var valuePair in buildResults.BundleInfos)
+			foreach (var valuePair in buildResultContext.Results.BundleInfos)
 			{
 				if (valuePair.Value.Dependencies.Any(t => t == shadersBunldeName))
 					shaderBundleReferenceList.Add(valuePair.Key);
@@ -209,6 +226,80 @@ namespace YooAsset.Editor
 				result.Add(dependBundle);
 			}
 			return result;
+		}
+
+		/// <summary>
+		/// 更新资源包之间的引用关系
+		/// </summary>
+		private void UpdateScriptPipelineReference(PatchManifest patchManifest, TaskBuilding_SBP.BuildResultContext buildResultContext)
+		{
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				patchBundle.ReferenceIDs = GetScriptPipelineRefrenceIDs(patchManifest, patchBundle, buildResultContext);
+			}
+		}
+		private int[] GetScriptPipelineRefrenceIDs(PatchManifest patchManifest, PatchBundle patchBundle, TaskBuilding_SBP.BuildResultContext buildResultContext)
+		{
+			if (buildResultContext.Results.BundleInfos.TryGetValue(patchBundle.BundleName, out var details) == false)
+			{
+				throw new Exception("Should never get here !");
+			}
+
+			List<string> referenceList = new List<string>();
+			foreach (var keyValuePair in buildResultContext.Results.BundleInfos)
+			{
+				string bundleName = keyValuePair.Key;
+				if (bundleName == patchBundle.BundleName)
+					continue;
+				if (keyValuePair.Value.Dependencies.Contains(patchBundle.BundleName))
+				{
+					referenceList.Add(bundleName);
+				}
+			}
+
+			List<int> result = new List<int>();
+			foreach (var bundleName in referenceList)
+			{
+				int bundleID = GetAssetBundleID(bundleName, patchManifest);
+				if (result.Contains(bundleID) == false)
+					result.Add(bundleID);
+			}
+			return result.ToArray();
+		}
+
+		/// <summary>
+		/// 更新资源包之间的引用关系
+		/// </summary>
+		private void UpdateBuiltinPipelineReference(PatchManifest patchManifest, TaskBuilding.BuildResultContext buildResultContext, BuildMapContext buildMapContext)
+		{
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				patchBundle.ReferenceIDs = GetBuiltinPipelineRefrenceIDs(patchManifest, patchBundle, buildResultContext, buildMapContext);
+			}
+		}
+		private int[] GetBuiltinPipelineRefrenceIDs(PatchManifest patchManifest, PatchBundle patchBundle, TaskBuilding.BuildResultContext buildResultContext, BuildMapContext buildMapContext)
+		{
+			List<string> referenceList = new List<string>();
+			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			{
+				string bundleName = bundleInfo.BundleName;
+				if (bundleName == patchBundle.BundleName)
+					continue;
+				string[] dependencies = buildResultContext.UnityManifest.GetAllDependencies(bundleName);
+				if (dependencies.Contains(patchBundle.BundleName))
+				{
+					referenceList.Add(bundleName);
+				}
+			}
+
+			List<int> result = new List<int>();
+			foreach (var bundleName in referenceList)
+			{
+				int bundleID = GetAssetBundleID(bundleName, patchManifest);
+				if (result.Contains(bundleID) == false)
+					result.Add(bundleID);
+			}
+			return result.ToArray();
 		}
 	}
 }
