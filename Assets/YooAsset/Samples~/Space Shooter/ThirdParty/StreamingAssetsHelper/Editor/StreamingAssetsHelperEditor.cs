@@ -13,27 +13,51 @@ internal class AndroidPost : UnityEditor.Android.IPostGenerateGradleAndroidProje
 		path = path.Replace("\\", "/");
 		string untityActivityFilePath = $"{path}/src/main/java/com/unity3d/player/UnityPlayerActivity.java";
 		var readContent = System.IO.File.ReadAllLines(untityActivityFilePath);
-		string postContent = "  //auto-gen-function\n" +
-			"   public boolean CheckAssetExist(String filePath){\n" +
-			"       android.content.res.AssetManager assetManager = getAssets();\n" +
-			"       java.io.InputStream inputStream = null;\n" +
-			"       try {\n" +
-			"           inputStream = assetManager.open(filePath);\n" +
-			"           if(null != inputStream)return true;\n" +
-			"       }catch(java.io.IOException e) {\n" +
-			"           e.printStackTrace();\n" +
-			"        }finally{\n" +
-			"            try {\n" +
-			"               inputStream.close();\n" +
-			"           } catch (java.io.IOException e) {\n" +
-			"               e.printStackTrace();\n" +
-			"           }\n" +
-			"       }\n" +
-			"       return false;\n" +
-			"   }\n" +
+		string postContent =
+			"    //auto-gen-function \n" +
+			"    public boolean CheckAssetExist(String filePath) \n" +
+			"    { \n" +
+			"        android.content.res.AssetManager assetManager = getAssets(); \n" +
+			"        try \n" +
+			"        { \n" +
+			"            java.io.InputStream inputStream = assetManager.open(filePath); \n" +
+			"            if (null != inputStream) \n" +
+			"            { \n" +
+			"                 inputStream.close(); \n" +
+			"                 return true; \n" +
+			"            } \n" +
+			"        } \n" +
+			"        catch(java.io.IOException e) \n" +
+			"        { \n" +
+			"            e.printStackTrace(); \n" +
+			"        } \n" +
+			"        return false; \n" +
+			"    } \n" +
 			"}";
 		if (!readContent[readContent.Length - 18].Contains("CheckAssetExist"))
 			readContent[readContent.Length - 1] = postContent;
 		System.IO.File.WriteAllLines(untityActivityFilePath, readContent);
 	}
 }
+
+/*
+//auto-gen-function
+public boolean CheckAssetExist(String filePath)
+{
+	android.content.res.AssetManager assetManager = getAssets();
+	try
+	{
+		java.io.InputStream inputStream = assetManager.open(filePath);
+		if(null != inputStream)
+		{
+			inputStream.close();
+			return true;
+		}
+	}
+	catch(java.io.IOException e)
+	{
+		e.printStackTrace();
+	}
+	return false;
+}
+*/

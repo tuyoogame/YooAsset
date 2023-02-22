@@ -1,10 +1,13 @@
 //-------------------------------------
 // 作者：Stark
 //-------------------------------------
+using System.Collections.Generic;
 using UnityEngine;
 
 public sealed class StreamingAssetsHelper
 {
+	private static readonly Dictionary<string, bool> _cacheData = new Dictionary<string, bool>(1000);
+
 #if UNITY_ANDROID && !UNITY_EDITOR
 	private static AndroidJavaClass _unityPlayerClass;
 	public static AndroidJavaClass UnityPlayerClass
@@ -33,12 +36,22 @@ public sealed class StreamingAssetsHelper
 	/// </summary>
 	public static bool FileExists(string filePath)
 	{
-		return CurrentActivity.Call<bool>("CheckAssetExist", filePath);
+		if (_cacheData.TryGetValue(filePath, out bool result) == false)
+		{
+			result = CurrentActivity.Call<bool>("CheckAssetExist", filePath);
+			_cacheData.Add(filePath, result);
+		}
+		return result;
 	}
 #else
 	public static bool FileExists(string filePath)
 	{
-		return System.IO.File.Exists(System.IO.Path.Combine(Application.streamingAssetsPath, filePath));
+		if (_cacheData.TryGetValue(filePath, out bool result) == false)
+		{
+			result = System.IO.File.Exists(System.IO.Path.Combine(Application.streamingAssetsPath, filePath));
+			_cacheData.Add(filePath, result);
+		}
+		return result;
 	}
 #endif
 }
