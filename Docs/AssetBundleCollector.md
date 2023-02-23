@@ -1,10 +1,14 @@
 # 资源收集
 
-![image](./Image/AssetCollector-img1.png)
+![image](./Image/AssetCollector-img1.jpg)
 
 左侧为分组列表，右侧为该分组的配置界面。
 
-导出按钮可以将配置数据导出为XML文件，导入按钮可以导入保存的XML文件。
+导入按钮：可以导入保存的XML文件。
+
+导出按钮：可以将配置数据导出为XML文件。
+
+修复按钮：在配置里的文件夹挪动位置之后，可以通过该按钮按钮来修正。
 
 **注意**：该工具仅支持Unity2019.4+
 
@@ -13,11 +17,15 @@
 - Show Packages
 
   是否展示资源包列表视图。
-  
+
+- Show Editor Alias
+
+  是否显示为中文模式。
+
 - Enable Addressable
 
   启用可寻址资源定位系统。
-  
+
 - Unique Bundle Name
 
   资源包名追加PackageName作为前缀。
@@ -36,10 +44,10 @@
   //自定义扩展范例
   public class DisableGroup : IActiveRule
   {
-    public bool IsActiveGroup()
-    {
-      return false;
-    }
+      public bool IsActiveGroup()
+      {
+          return false;
+      }
   }
   ````
 
@@ -83,18 +91,18 @@
 
   - AddressByFileName 以文件名为定位地址。
 
-  - AddressByGrouperAndFileName 以分组名称+文件名为定位地址。
+  - AddressByGrouperAndFileName 以分组名+文件名为定位地址。
 
-  - AddressByCollectorAndFileName 以收集器名+文件名为定位地址。
+  - AddressByFolderAndFileName 以文件夹名+文件名为定位地址。
 
   ````c#
   //自定义扩展范例
   public class AddressByFileName : IAddressRule
   {
-    string IAddressRule.GetAssetAddress(AddressRuleData data)
-    {
-      return Path.GetFileNameWithoutExtension(data.AssetPath);
-    }
+      string IAddressRule.GetAssetAddress(AddressRuleData data)
+      {
+          return Path.GetFileNameWithoutExtension(data.AssetPath);
+      }
   }
   ````
 
@@ -102,21 +110,28 @@
 
   打包规则，规则可以自定义扩展。下面是内置规则：
 
-  - PackSeparately 以收集文件路径作为资源包名，每个资源文件单独打包。
-  - PackDirectory 以收集文件所在的文件夹路径作为资源包名，该文件夹下所有文件打进一个资源包。
-  - PackTopDirectory 以收集器路径下顶级文件夹为资源包名，该文件夹下所有文件打进一个资源包。
+  - PackSeparately 以文件路径作为资源包名，每个资源文件单独打包。
+  - PackDirectory 以文件所在的文件夹路径作为资源包名，该文件夹下所有文件打进一个资源包。
+  - PackTopDirectory 以收集器下顶级文件夹为资源包名，该文件夹下所有文件打进一个资源包。
   - PackCollector 以收集器路径作为资源包名，收集的所有文件打进一个资源包。
-  - PackGrouper 以分组名称作为资源包名，收集的所有文件打进一个资源包。
+  - PackGroup 以分组名称作为资源包名，收集的所有文件打进一个资源包。
   - PackRawFile 目录下的资源文件会被处理为原生资源包。
 
   ````c#
   //自定义扩展范例
   public class PackDirectory : IPackRule
   {
-    string IPackRule.GetBundleName(PackRuleData data)
-    {
-      return Path.GetDirectoryName(data.AssetPath); //"Assets/Config/test.txt" --> "Assets/Config"
-    }
+      PackRuleResult IPackRule.GetBundleName(PackRuleData data)
+      {
+          //"Assets/Config/test.txt" --> "Assets/Config"
+          string bundleName = Path.GetDirectoryName(data.AssetPath);
+          PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
+          return result;   
+      }
+      bool IPackRule.IsRawFilePackRule()
+      {
+          return false;
+      }
   }
   ````
 
@@ -133,13 +148,17 @@
   //自定义扩展范例
   public class CollectScene : IFilterRule
   {
-    public bool IsCollectAsset(FilterRuleData data)
-    {
-      return Path.GetExtension(data.AssetPath) == ".unity";
-    }
+      public bool IsCollectAsset(FilterRuleData data)
+      {
+          return Path.GetExtension(data.AssetPath) == ".unity";
+      }
   }
   ````
 
+- **UserData**
+
+  用户自定义数据，可以帮助定制化AddressRule和PackRule。
+  
 - **AssetTags**
 
   资源分类标签列表，该收集器下收集的资源会全部被打上该标签。

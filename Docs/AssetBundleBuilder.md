@@ -1,6 +1,6 @@
 # 资源构建
 
-![image](./Image/AssetBuilder-img1.png)
+![image](./Image/AssetBuilder-img1.jpg)
 
 ### 界面介绍
 
@@ -50,9 +50,7 @@
 
   HashName：哈希值
 
-  HashName_Extension：哈希值+后缀名
-
-  HashName_BundleName_Extension：资源包名+哈希值+后缀名
+  BundleName_HashName：资源包名+哈希值
 
  - **Copy Buildin File Option**
 
@@ -78,17 +76,23 @@
 
 补丁包文件夹里包含补丁清单文件，资源包文件，构建报告文件等。
 
-![image](./Image/AssetBuilder-img4.png)
+![image](./Image/AssetBuilder-img2.jpg)
 
 ### 补丁清单
 
-补丁清单是一个Json格式的文本文件。
+补丁清单文件是上图中以PatchManifest开头命名的文件。
 
-AssetList组记录的是主资源对象列表。
+- PatchManifest_DefaultPackage_xxxxxx.hash
 
-BundleList组记录的是资源包列表。
+  记录了补丁清单文件的哈希值。
 
-![image](./Image/AssetBuilder-img2.png)
+- PatchManifest_DefaultPackage_xxxxxx.json
+
+  该文件为Json文本格式，主要用于开发者预览信息。
+
+- PatchManifest_DefaultPackage_xxxxxx.bytes
+
+  该文件为二进制格式，主要用于程序内读取加载。
 
 ### Jenkins支持
 
@@ -109,10 +113,10 @@ private static void BuildInternal(BuildTarget buildTarget)
     buildParameters.BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;
     buildParameters.BuildMode = EBuildMode.ForceRebuild;
     buildParameters.PackageName = "DefaultPackage";
-    buildParameters.PackageVersion = "1.0.0";
+    buildParameters.PackageVersion = "1.0";
     buildParameters.VerifyBuildingResult = true;
     buildParameters.CompressOption = ECompressOption.LZ4;
-    buildParameters.OutputNameStyle = EOutputNameStyle.HashName_Extension;
+    buildParameters.OutputNameStyle = EOutputNameStyle.HashName;
     buildParameters.CopyBuildinFileOption = ECopyBuildinFileOption.None;
     
     // 执行构建
@@ -121,6 +125,10 @@ private static void BuildInternal(BuildTarget buildTarget)
     if (buildResult.Success)
     {
          Debug.Log($"构建成功 : {buildResult.OutputPackageDirectory}");
+    }
+    else
+    {
+        Debug.LogError($"构建失败 : {buildResult.FailedInfo}");
     }
 }
 

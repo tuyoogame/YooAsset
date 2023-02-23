@@ -73,14 +73,16 @@ private class QueryStreamingAssetsFileServices : IQueryServices
 {
     public bool QueryStreamingAssets(string fileName)
     {
-        // 注意：使用了BetterStreamingAssets插件，使用前需要初始化该插件！
+        // StreamingAssetsHelper.cs是太空战机里提供的一个查询脚本。
         string buildinFolderName = YooAssets.GetStreamingAssetBuildinFolderName();
-        return BetterStreamingAssets.FileExists($"{buildinFolderName}/{fileName}");
+		return StreamingAssetsHelper.FileExists($"{buildinFolderName}/{fileName}");
     }
 }
 ````
 
 ### 源代码解析
+
+Package.InitializeAsync()方法解析。
 
 - 编辑器模拟模式
 
@@ -90,11 +92,11 @@ private class QueryStreamingAssetsFileServices : IQueryServices
 
 - 单机运行模式
 
-  在初始化的时候，会直接读取内置清单文件（StreamingAssets文件夹里的文件），最后根据加载的清单去验证沙盒里缓存的文件。
+  在初始化的时候，会直接读取内置清单文件（StreamingAssets文件夹里的文件），最后初始化缓存系统。
 
 - 联机运行模式
 
-  在初始化的时候，会优先从沙盒里加载清单，如果沙盒里不存在，则会尝试加载内置清单并将其拷贝到沙盒里。最后根据加载的清单去验证沙盒里缓存的文件。
+  在初始化的时候，会优先从沙盒里加载清单，如果沙盒里不存在，则会尝试加载内置清单并将其拷贝到沙盒里。最后初始化缓存系统。
 
   **注意**：如果沙盒清单和内置清单都不存在，初始化也会被判定为成功！
 

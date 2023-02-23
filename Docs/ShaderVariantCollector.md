@@ -1,6 +1,6 @@
 # 着色器变种收集
 
-![image](./Image/ShaderVariantCollector-img1.png)
+![image](./Image/ShaderVariantCollector-img1.jpg)
 
 点击搜集变种按钮开始收集，请耐心等待结束。
 
