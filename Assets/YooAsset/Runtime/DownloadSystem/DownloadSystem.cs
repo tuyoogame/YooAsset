@@ -33,6 +33,15 @@ namespace YooAsset
 		public static List<long> ClearFileResponseCodes { set; get; }
 
 		/// <summary>
+		/// 自定义下载请求
+		/// </summary>
+		/// <param name="requestDelegate"></param>
+		public static void SetRequestDelegate(DownloadRequestDelegate requestDelegate)
+		{
+			DownloadRequestUtil.SetRequestDelegate(requestDelegate);
+		}
+
+		/// <summary>
 		/// 更新所有下载器
 		/// </summary>
 		public static void Update()
