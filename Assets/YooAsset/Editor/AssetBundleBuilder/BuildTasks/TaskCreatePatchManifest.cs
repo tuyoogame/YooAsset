@@ -288,7 +288,7 @@ namespace YooAsset.Editor
 				string bundleName = bundleInfo.BundleName;
 				if (bundleName == patchBundle.BundleName)
 					continue;
-				string[] dependencies = buildResultContext.UnityManifest.GetAllDependencies(bundleName);
+				string[] dependencies = buildResultContext.UnityManifest.GetDirectDependencies(bundleName);
 				if (dependencies.Contains(patchBundle.BundleName))
 				{
 					referenceList.Add(bundleName);
