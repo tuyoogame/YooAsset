@@ -169,15 +169,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 自定义下载请求
-		/// </summary>
-		/// <param name="requestDelegate"></param>
-		public static void SetDownloadSystemUnityWebRequest(DownloadRequestDelegate requestDelegate)
-		{
-			DownloadSystem.SetRequestDelegate(requestDelegate);
-		}
-
-		/// <summary>
 		/// 设置下载系统参数，下载失败后清理文件的HTTP错误码
 		/// </summary>
 		public static void SetDownloadSystemClearFileResponseCode(List<long> codes)
@@ -191,6 +182,14 @@ namespace YooAsset
 		public static void SetDownloadSystemCertificateHandler(UnityEngine.Networking.CertificateHandler instance)
 		{
 			DownloadSystem.CertificateHandlerInstance = instance;
+		}
+
+		/// <summary>
+		/// 设置下载系统参数，自定义下载请求
+		/// </summary>
+		public static void SetDownloadSystemUnityWebRequest(DownloadRequestDelegate requestDelegate)
+		{
+			DownloadSystem.RequestDelegate = requestDelegate;
 		}
 
 		/// <summary>

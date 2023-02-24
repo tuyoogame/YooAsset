@@ -29,7 +29,7 @@ namespace YooAsset
 			if (_webRequest == null)
 			{
 				URL = url;
-				_webRequest = DownloadRequestUtil.NewRequest(URL);
+				_webRequest = DownloadSystem.NewRequest(URL);
 				DownloadHandlerBuffer handler = new DownloadHandlerBuffer();
 				_webRequest.downloadHandler = handler;
 				_webRequest.disposeDownloadHandlerOnDispose = true;

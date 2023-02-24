@@ -80,7 +80,7 @@ namespace YooAsset
 				if (File.Exists(_tempFilePath))
 					File.Delete(_tempFilePath);
 
-				_webRequest = DownloadRequestUtil.NewRequest(_requestURL);
+				_webRequest = DownloadSystem.NewRequest(_requestURL);
 				DownloadHandlerFile handler = new DownloadHandlerFile(_tempFilePath);
 				handler.removeFileOnAbort = true;
 				_webRequest.downloadHandler = handler;
@@ -109,11 +109,11 @@ namespace YooAsset
 				}
 
 #if UNITY_2019_4_OR_NEWER
-				_webRequest = DownloadRequestUtil.NewRequest(_requestURL);
+				_webRequest = DownloadSystem.NewRequest(_requestURL);
 				var handler = new DownloadHandlerFile(_tempFilePath, true);
 				handler.removeFileOnAbort = false;
 #else
-				_webRequest = UnityWebRequestUtil.NewRequest(_requestURL);
+				_webRequest = DownloadSystem.NewRequest(_requestURL);
 				var handler = new DownloadHandlerFileRange(_tempFilePath, _bundleInfo.Bundle.FileSize, _webRequest);
 				_downloadHandle = handler;
 #endif
