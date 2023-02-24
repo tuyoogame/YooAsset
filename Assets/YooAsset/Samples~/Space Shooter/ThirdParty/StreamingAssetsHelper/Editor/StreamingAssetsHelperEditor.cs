@@ -34,9 +34,21 @@ internal class AndroidPost : UnityEditor.Android.IPostGenerateGradleAndroidProje
 			"        return false; \n" +
 			"    } \n" +
 			"}";
-		if (!readContent[readContent.Length - 18].Contains("CheckAssetExist"))
+
+		if (CheckFunctionExist(readContent) == false)
 			readContent[readContent.Length - 1] = postContent;
 		System.IO.File.WriteAllLines(untityActivityFilePath, readContent);
+	}
+	private bool CheckFunctionExist(string[] contents)
+	{
+		for (int i = 0; i < contents.Length; i++)
+		{
+			if (contents[i].Contains("CheckAssetExist"))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }
 
