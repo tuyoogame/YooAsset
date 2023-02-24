@@ -100,7 +100,18 @@ namespace YooAsset
 			if (IsDone() == false)
 				return false;
 
-			return RefCount <= 0;
+			if (RefCount > 0)
+				return false;
+
+			// 检查引用链上的资源包是否已经全部销毁
+			// 注意：互相引用的资源包无法卸载！
+			foreach (var bundleID in MainBundleInfo.Bundle.ReferenceIDs)
+			{
+				if (Impl.CheckBundleDestroyed(bundleID) == false)
+					return false;
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -122,24 +133,15 @@ namespace YooAsset
 			if (RefCount > _providers.Count)
 				return;
 
-			// 条件3：检查依赖链上的资源包
-			// 依赖该资源包的所有资源包可以销毁
-			// 注意：互相引用的资源包无法卸载！
-			foreach (var bundleID in MainBundleInfo.Bundle.ReferenceIDs)
-			{
-				if (Impl.CheckBundleCanDestroy(bundleID) == false)
-					return;
-			}
-
 			// 销毁所有Providers
-			foreach (var provider in _providers)
 			{
-				provider.Destroy();
+				foreach (var provider in _providers)
+				{
+					provider.Destroy();
+				}
+				Impl.RemoveBundleProviders(_providers);
+				_providers.Clear();
 			}
-
-			// 从列表里移除Providers
-			Impl.RemoveBundleProviders(_providers);
-			_providers.Clear();
 		}
 
 
