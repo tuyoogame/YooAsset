@@ -12,7 +12,7 @@
 
 #### 导入流程注意事项
 
-![image](./Image/Samples-img2.png)
+![image](./Image/AssetCollector-img1.jpg)
 
 1. Space Shooter在导入完成后，打开YooAsset->AssetBundle Collector窗口。
 1. 点击修复按钮，然后点击Save按钮保存配置，最后关闭窗口。
