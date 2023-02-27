@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44454e58a49818040a1aef5799e71b30, type: 3}
   m_Name: ShaderVariantCollectorSetting
   m_EditorClassIdentifier: 
-  SavePath: Assets/Samples/BassicSample/GameArt/ShaderVariants/MyShaderVariants.shadervariants
+  SavePath: Assets/ShaderVariants/MyShaderVariants.shadervariants
+  CollectPackage: DefaultPackage
+  ProcessCapacity: 1000
