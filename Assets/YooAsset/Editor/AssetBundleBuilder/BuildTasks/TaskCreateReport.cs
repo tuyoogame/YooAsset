@@ -94,6 +94,7 @@ namespace YooAsset.Editor
 				reportBundleInfo.FileCRC = patchBundle.FileCRC;
 				reportBundleInfo.FileSize = patchBundle.FileSize;
 				reportBundleInfo.Tags = patchBundle.Tags;
+				reportBundleInfo.ReferenceIDs = patchBundle.ReferenceIDs;
 				reportBundleInfo.IsRawFile = patchBundle.IsRawFile;
 				reportBundleInfo.LoadMethod = (EBundleLoadMethod)patchBundle.LoadMethod;
 				buildReport.BundleInfos.Add(reportBundleInfo);
