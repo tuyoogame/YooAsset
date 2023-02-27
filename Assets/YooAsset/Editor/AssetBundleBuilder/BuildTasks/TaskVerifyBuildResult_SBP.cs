@@ -62,7 +62,7 @@ namespace YooAsset.Editor
 				throw new System.Exception("存在差异资源包！请查看警告信息！");
 			}
 
-			BuildRunner.Log("构建结果验证成功！");
+			BuildLogger.Log("构建结果验证成功！");
 		}
 	}
 }

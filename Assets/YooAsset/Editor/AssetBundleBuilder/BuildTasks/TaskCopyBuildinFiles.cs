@@ -94,7 +94,7 @@ namespace YooAsset.Editor
 
 			// 刷新目录
 			AssetDatabase.Refresh();
-			BuildRunner.Log($"内置文件拷贝完成：{streamingAssetsDirectory}");
+			BuildLogger.Log($"内置文件拷贝完成：{streamingAssetsDirectory}");
 		}
 	}
 }

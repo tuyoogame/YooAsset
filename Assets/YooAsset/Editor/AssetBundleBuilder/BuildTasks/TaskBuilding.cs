@@ -41,7 +41,7 @@ namespace YooAsset.Editor
 					throw new Exception("构建过程中发生严重错误！请查阅上下文日志！");
 			}
 
-			BuildRunner.Log("Unity引擎打包成功！");
+			BuildLogger.Log("Unity引擎打包成功！");
 			BuildResultContext buildResultContext = new BuildResultContext();
 			buildResultContext.UnityManifest = buildResults;
 			context.SetContextObject(buildResultContext);

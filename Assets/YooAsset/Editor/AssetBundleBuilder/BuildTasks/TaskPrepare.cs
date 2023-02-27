@@ -12,8 +12,6 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
-			buildParametersContext.BeginWatch();
-
 			var buildParameters = buildParametersContext.Parameters;
 
 			// 检测构建参数合法性
@@ -57,7 +55,7 @@ namespace YooAsset.Editor
 				string platformDirectory = $"{buildParameters.OutputRoot}/{buildParameters.PackageName}/{buildParameters.BuildTarget}";
 				if (EditorTools.DeleteDirectory(platformDirectory))
 				{
-					BuildRunner.Log($"删除平台总目录：{platformDirectory}");
+					BuildLogger.Log($"删除平台总目录：{platformDirectory}");
 				}
 			}
 
@@ -65,7 +63,7 @@ namespace YooAsset.Editor
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
 			if (EditorTools.CreateDirectory(pipelineOutputDirectory))
 			{
-				BuildRunner.Log($"创建输出目录：{pipelineOutputDirectory}");
+				BuildLogger.Log($"创建输出目录：{pipelineOutputDirectory}");
 			}
 		}
 	}

@@ -25,7 +25,7 @@ namespace YooAsset.Editor
 			var buildParameters = buildParametersContext.Parameters;
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
 			string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
-			BuildRunner.Log($"开始拷贝补丁文件到补丁包目录：{packageOutputDirectory}");
+			BuildLogger.Log($"开始拷贝补丁文件到补丁包目录：{packageOutputDirectory}");
 
 			if (buildParameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{

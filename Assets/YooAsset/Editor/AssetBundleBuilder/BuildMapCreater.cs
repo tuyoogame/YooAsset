@@ -138,7 +138,7 @@ namespace YooAsset.Editor
 				}
 			}
 
-			BuildRunner.Log($"发现未被依赖的资源并自动移除 : {dependAssetPath}");
+			BuildLogger.Log($"发现未被依赖的资源并自动移除 : {dependAssetPath}");
 			return true;
 		}
 	}

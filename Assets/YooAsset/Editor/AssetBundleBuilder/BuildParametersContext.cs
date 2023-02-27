@@ -7,8 +7,6 @@ namespace YooAsset.Editor
 {
 	public class BuildParametersContext : IContextObject
 	{
-		private readonly System.Diagnostics.Stopwatch _buildWatch = new System.Diagnostics.Stopwatch();
-
 		private string _pipelineOutputDirectory = string.Empty;
 		private string _packageOutputDirectory = string.Empty;
 
@@ -116,23 +114,6 @@ namespace YooAsset.Editor
 			buildParams.WriteLinkXML = Parameters.SBPParameters.WriteLinkXML;
 
 			return buildParams;
-		}
-
-		/// <summary>
-		/// 获取构建的耗时（单位：秒）
-		/// </summary>
-		public float GetBuildingSeconds()
-		{
-			float seconds = _buildWatch.ElapsedMilliseconds / 1000f;
-			return seconds;
-		}
-		public void BeginWatch()
-		{
-			_buildWatch.Start();
-		}
-		public void StopWatch()
-		{
-			_buildWatch.Stop();
 		}
 	}
 }

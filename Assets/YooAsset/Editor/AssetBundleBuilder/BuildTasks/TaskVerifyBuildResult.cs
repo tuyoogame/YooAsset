@@ -101,7 +101,7 @@ namespace YooAsset.Editor
 			}
 			*/
 
-			BuildRunner.Log("构建结果验证成功！");
+			BuildLogger.Log("构建结果验证成功！");
 		}
 
 		/// <summary>

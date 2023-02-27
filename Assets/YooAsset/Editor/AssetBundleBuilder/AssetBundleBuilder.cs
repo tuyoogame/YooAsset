@@ -41,9 +41,9 @@ namespace YooAsset.Editor
 
 			// 是否显示LOG
 			if (buildParameters.BuildMode == EBuildMode.SimulateBuild)
-				BuildRunner.EnableLog = false;
+				BuildLogger.EnableLog = false;
 			else
-				BuildRunner.EnableLog = true;
+				BuildLogger.EnableLog = true;
 
 			// 创建构建节点
 			List<IBuildTask> pipeline;

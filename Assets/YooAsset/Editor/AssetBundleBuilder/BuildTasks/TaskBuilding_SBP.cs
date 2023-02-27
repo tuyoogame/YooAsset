@@ -40,7 +40,7 @@ namespace YooAsset.Editor
 				throw new Exception($"构建过程中发生错误 : {exitCode}");
 			}
 
-			BuildRunner.Log("Unity引擎打包成功！");
+			BuildLogger.Log("Unity引擎打包成功！");
 			BuildResultContext buildResultContext = new BuildResultContext();
 			buildResultContext.Results = buildResults;
 			context.SetContextObject(buildResultContext);

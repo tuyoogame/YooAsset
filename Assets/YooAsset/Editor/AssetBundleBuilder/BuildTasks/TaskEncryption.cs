@@ -56,7 +56,7 @@ namespace YooAsset.Editor
 					FileUtility.CreateFile(filePath, encryptResult.EncryptedData);
 					bundleInfo.EncryptedFilePath = filePath;
 					bundleInfo.LoadMethod = encryptResult.LoadMethod;
-					BuildRunner.Log($"Bundle文件加密完成：{filePath}");
+					BuildLogger.Log($"Bundle文件加密完成：{filePath}");
 				}
 
 				// 进度条

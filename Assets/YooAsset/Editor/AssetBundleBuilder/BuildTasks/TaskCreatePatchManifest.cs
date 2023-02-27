@@ -67,7 +67,7 @@ namespace YooAsset.Editor
 				if (buildParameters.BuildMode != EBuildMode.SimulateBuild)
 				{
 					var buildResultContext = context.GetContextObject<TaskBuilding.BuildResultContext>();
-					UpdateBuiltinPipelineReference(patchManifest, buildResultContext, buildMapContext);
+					UpdateBuiltinPipelineReference(patchManifest, buildResultContext);
 				}
 			}
 
@@ -76,7 +76,7 @@ namespace YooAsset.Editor
 				string fileName = YooAssetSettingsData.GetManifestJsonFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				PatchManifestTools.SerializeToJson(filePath, patchManifest);
-				BuildRunner.Log($"创建补丁清单文件：{filePath}");
+				BuildLogger.Log($"创建补丁清单文件：{filePath}");
 			}
 
 			// 创建补丁清单二进制文件
@@ -86,7 +86,7 @@ namespace YooAsset.Editor
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				PatchManifestTools.SerializeToBinary(filePath, patchManifest);
 				packageHash = HashUtility.FileMD5(filePath);
-				BuildRunner.Log($"创建补丁清单文件：{filePath}");
+				BuildLogger.Log($"创建补丁清单文件：{filePath}");
 
 				PatchManifestContext patchManifestContext = new PatchManifestContext();
 				byte[] bytesData = FileUtility.ReadAllBytes(filePath);
@@ -99,7 +99,7 @@ namespace YooAsset.Editor
 				string fileName = YooAssetSettingsData.GetPackageHashFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				FileUtility.CreateFile(filePath, packageHash);
-				BuildRunner.Log($"创建补丁清单哈希文件：{filePath}");
+				BuildLogger.Log($"创建补丁清单哈希文件：{filePath}");
 			}
 
 			// 创建补丁清单版本文件
@@ -107,7 +107,7 @@ namespace YooAsset.Editor
 				string fileName = YooAssetSettingsData.GetPackageVersionFileName(buildParameters.PackageName);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				FileUtility.CreateFile(filePath, buildParameters.PackageVersion);
-				BuildRunner.Log($"创建补丁清单版本文件：{filePath}");
+				BuildLogger.Log($"创建补丁清单版本文件：{filePath}");
 			}
 		}
 
@@ -231,30 +231,96 @@ namespace YooAsset.Editor
 			return result;
 		}
 
-		/// <summary>
-		/// 更新资源包之间的引用关系
-		/// </summary>
+		#region 资源包引用关系相关
+		private readonly Dictionary<string, int> _cachedBundleID = new Dictionary<string, int>(10000);
+		private readonly Dictionary<string, string[]> _cachedBundleDepends = new Dictionary<string, string[]>(10000);
+
 		private void UpdateScriptPipelineReference(PatchManifest patchManifest, TaskBuilding_SBP.BuildResultContext buildResultContext)
 		{
+			int progressValue;
+			int totalCount = patchManifest.BundleList.Count;
+
+			// 缓存资源包ID
+			_cachedBundleID.Clear();
+			progressValue = 0;
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
-				patchBundle.ReferenceIDs = GetScriptPipelineRefrenceIDs(patchManifest, patchBundle, buildResultContext);
+				int bundleID = GetAssetBundleID(patchBundle.BundleName, patchManifest);
+				_cachedBundleID.Add(patchBundle.BundleName, bundleID);
+				EditorTools.DisplayProgressBar("缓存资源包索引", ++progressValue, totalCount);
 			}
-		}
-		private int[] GetScriptPipelineRefrenceIDs(PatchManifest patchManifest, PatchBundle patchBundle, TaskBuilding_SBP.BuildResultContext buildResultContext)
-		{
-			if (buildResultContext.Results.BundleInfos.TryGetValue(patchBundle.BundleName, out var details) == false)
-			{
-				throw new Exception("Should never get here !");
-			}
+			EditorTools.ClearProgressBar();
 
-			List<string> referenceList = new List<string>();
-			foreach (var keyValuePair in buildResultContext.Results.BundleInfos)
+			// 缓存资源包依赖
+			_cachedBundleDepends.Clear();
+			progressValue = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
 			{
-				string bundleName = keyValuePair.Key;
-				if (bundleName == patchBundle.BundleName)
+				if (buildResultContext.Results.BundleInfos.ContainsKey(patchBundle.BundleName) == false)
+					throw new Exception($"Not found bundle in SBP build results : {patchBundle.BundleName}");
+
+				var depends = buildResultContext.Results.BundleInfos[patchBundle.BundleName].Dependencies;
+				_cachedBundleDepends.Add(patchBundle.BundleName, depends);
+				EditorTools.DisplayProgressBar("缓存资源包依赖列表", ++progressValue, totalCount);
+			}
+			EditorTools.ClearProgressBar();
+
+			// 计算资源包引用列表
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				patchBundle.ReferenceIDs = GetBundleRefrenceIDs(patchManifest, patchBundle);
+				EditorTools.DisplayProgressBar("计算资源包引用关系", ++progressValue, totalCount);
+			}
+			EditorTools.ClearProgressBar();
+		}
+		private void UpdateBuiltinPipelineReference(PatchManifest patchManifest, TaskBuilding.BuildResultContext buildResultContext)
+		{
+			int progressValue;
+			int totalCount = patchManifest.BundleList.Count;
+
+			// 缓存资源包ID
+			_cachedBundleID.Clear();
+			progressValue = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				int bundleID = GetAssetBundleID(patchBundle.BundleName, patchManifest);
+				_cachedBundleID.Add(patchBundle.BundleName, bundleID);
+				EditorTools.DisplayProgressBar("缓存资源包索引", ++progressValue, totalCount);
+			}
+			EditorTools.ClearProgressBar();
+
+			// 缓存资源包依赖
+			_cachedBundleDepends.Clear();
+			progressValue = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				var depends = buildResultContext.UnityManifest.GetDirectDependencies(patchBundle.BundleName);
+				_cachedBundleDepends.Add(patchBundle.BundleName, depends);
+				EditorTools.DisplayProgressBar("缓存资源包依赖列表", ++progressValue, totalCount);
+			}
+			EditorTools.ClearProgressBar();
+
+			// 计算资源包引用列表
+			progressValue = 0;
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				patchBundle.ReferenceIDs = GetBundleRefrenceIDs(patchManifest, patchBundle);
+				EditorTools.DisplayProgressBar("计算资源包引用关系", ++progressValue, totalCount);
+			}
+			EditorTools.ClearProgressBar();
+		}
+		
+		private int[] GetBundleRefrenceIDs(PatchManifest patchManifest, PatchBundle targetBundle)
+		{
+			List<string> referenceList = new List<string>();
+			foreach (var patchBundle in patchManifest.BundleList)
+			{
+				string bundleName = patchBundle.BundleName;
+				if (bundleName == targetBundle.BundleName)
 					continue;
-				if (keyValuePair.Value.Dependencies.Contains(patchBundle.BundleName))
+
+				string[] dependencies = GetCachedBundleDepends(bundleName);
+				if (dependencies.Contains(targetBundle.BundleName))
 				{
 					referenceList.Add(bundleName);
 				}
@@ -263,46 +329,28 @@ namespace YooAsset.Editor
 			List<int> result = new List<int>();
 			foreach (var bundleName in referenceList)
 			{
-				int bundleID = GetAssetBundleID(bundleName, patchManifest);
+				int bundleID = GetCachedBundleID(bundleName);
 				if (result.Contains(bundleID) == false)
 					result.Add(bundleID);
 			}
 			return result.ToArray();
 		}
-
-		/// <summary>
-		/// 更新资源包之间的引用关系
-		/// </summary>
-		private void UpdateBuiltinPipelineReference(PatchManifest patchManifest, TaskBuilding.BuildResultContext buildResultContext, BuildMapContext buildMapContext)
+		private int GetCachedBundleID(string bundleName)
 		{
-			foreach (var patchBundle in patchManifest.BundleList)
+			if (_cachedBundleID.TryGetValue(bundleName, out int value) == false)
 			{
-				patchBundle.ReferenceIDs = GetBuiltinPipelineRefrenceIDs(patchManifest, patchBundle, buildResultContext, buildMapContext);
+				throw new Exception($"Not found cached bundle ID : {bundleName}");
 			}
+			return value;
 		}
-		private int[] GetBuiltinPipelineRefrenceIDs(PatchManifest patchManifest, PatchBundle patchBundle, TaskBuilding.BuildResultContext buildResultContext, BuildMapContext buildMapContext)
+		private string[] GetCachedBundleDepends(string bundleName)
 		{
-			List<string> referenceList = new List<string>();
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			if (_cachedBundleDepends.TryGetValue(bundleName, out string[] value) == false)
 			{
-				string bundleName = bundleInfo.BundleName;
-				if (bundleName == patchBundle.BundleName)
-					continue;
-				string[] dependencies = buildResultContext.UnityManifest.GetDirectDependencies(bundleName);
-				if (dependencies.Contains(patchBundle.BundleName))
-				{
-					referenceList.Add(bundleName);
-				}
+				throw new Exception($"Not found cached bundle depends : {bundleName}");
 			}
-
-			List<int> result = new List<int>();
-			foreach (var bundleName in referenceList)
-			{
-				int bundleID = GetAssetBundleID(bundleName, patchManifest);
-				if (result.Contains(bundleID) == false)
-					result.Add(bundleID);
-			}
-			return result.ToArray();
+			return value;
 		}
+		#endregion
 	}
 }
