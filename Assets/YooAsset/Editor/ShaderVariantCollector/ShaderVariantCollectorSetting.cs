@@ -13,5 +13,10 @@ namespace YooAsset.Editor
 		/// 收集的包裹名称
 		/// </summary>
 		public string CollectPackage = string.Empty;
+
+		/// <summary>
+		/// 容器值
+		/// </summary>
+		public int ProcessCapacity = 1000;
 	}
 }

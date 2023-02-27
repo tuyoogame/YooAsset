@@ -24,6 +24,7 @@ namespace YooAsset.Editor
 		private TextField _collectOutputField;
 		private Label _currentShaderCountField;
 		private Label _currentVariantCountField;
+		private SliderInt _processCapacitySlider;
 		private PopupField<string> _packageField;
 
 		public void CreateGUI()
@@ -72,6 +73,23 @@ namespace YooAsset.Editor
 					packageContainer.Add(_packageField);
 				}
 
+				// 容器值
+				_processCapacitySlider = root.Q<SliderInt>("ProcessCapacity");
+				_processCapacitySlider.SetValueWithoutNotify(ShaderVariantCollectorSettingData.Setting.ProcessCapacity);
+#if !UNITY_2020_3_OR_NEWER
+				_processCapacitySlider.label = $"Capacity ({_processCapacitySlider.value})";
+				_processCapacitySlider.RegisterValueChangedCallback(evt =>
+				{
+					ShaderVariantCollectorSettingData.Setting.ProcessCapacity = _processCapacitySlider.value;
+					_processCapacitySlider.label = $"Capacity ({_processCapacitySlider.value})";
+				});
+#else
+				_processCapacitySlider.RegisterValueChangedCallback(evt =>
+				{
+					ShaderVariantCollectorSettingData.Setting.ProcessCapacity = _processCapacitySlider.value;
+				});
+#endif
+
 				_currentShaderCountField = root.Q<Label>("CurrentShaderCount");
 				_currentVariantCountField = root.Q<Label>("CurrentVariantCount");
 
@@ -103,7 +121,8 @@ namespace YooAsset.Editor
 		{
 			string savePath = ShaderVariantCollectorSettingData.Setting.SavePath;
 			string packageName = ShaderVariantCollectorSettingData.Setting.CollectPackage;
-			ShaderVariantCollector.Run(savePath, packageName, int.MaxValue, null);
+			int processCapacity = _processCapacitySlider.value;
+			ShaderVariantCollector.Run(savePath, packageName, processCapacity, null);
 		}
 
 		// 构建包裹相关
