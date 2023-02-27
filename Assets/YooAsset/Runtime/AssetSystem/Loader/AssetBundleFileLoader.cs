@@ -51,16 +51,25 @@ namespace YooAsset
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
 #if UNITY_ANDROID
-					EBundleLoadMethod loadMethod = (EBundleLoadMethod)MainBundleInfo.Bundle.LoadMethod;
-					if (loadMethod == EBundleLoadMethod.LoadFromMemory || loadMethod == EBundleLoadMethod.LoadFromStream)
-					{
-						_steps = ESteps.Unpack;
-						FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
-					}
-					else
+					/// 判断是否需要解压文件
+					if( Impl.DecryptionServices != null && Impl.DecryptionServices.UnpackBundleFile == false)
 					{
 						_steps = ESteps.LoadFile;
 						FileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
+					}
+                    else
+					{
+						EBundleLoadMethod loadMethod = (EBundleLoadMethod)MainBundleInfo.Bundle.LoadMethod;
+						if (loadMethod == EBundleLoadMethod.LoadFromMemory || loadMethod == EBundleLoadMethod.LoadFromStream)
+						{
+							_steps = ESteps.Unpack;
+							FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
+						}
+						else
+						{
+							_steps = ESteps.LoadFile;
+							FileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
+						}
 					}
 #else
 					_steps = ESteps.LoadFile;

@@ -19,6 +19,12 @@ namespace YooAsset
 	/// </summary>
 	public interface IDecryptionServices
 	{
+
+		/// <summary>
+		/// 是否需要解压文件
+		/// </summary>
+		bool UnpackBundleFile { get; }
+
 		/// <summary>
 		/// 文件偏移解密方法
 		/// </summary>
