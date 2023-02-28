@@ -48,6 +48,7 @@ namespace YooAsset.Editor
 				}
 				catch (Exception e)
 				{
+					EditorTools.ClearProgressBar();
 					buildResult.FailedTask = task.GetType().Name;
 					buildResult.FailedInfo = e.ToString();
 					buildResult.Success = false;
