@@ -2,6 +2,7 @@
 // 作者：Stark
 //-------------------------------------
 
+#if UNITY_ANDROID
 /// <summary>
 /// 为Github对开发者的友好，采用自动补充UnityPlayerActivity.java文件的通用姿势满足各个开发者
 /// </summary>
@@ -51,6 +52,7 @@ internal class AndroidPost : UnityEditor.Android.IPostGenerateGradleAndroidProje
 		return false;
 	}
 }
+#endif
 
 /*
 //auto-gen-function
