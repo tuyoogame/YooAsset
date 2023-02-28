@@ -10,13 +10,14 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
-			GetCacheFiles,
+			FindCacheFiles,
 			VerifyCacheFiles,
 			Done,
 		}
 
 		private readonly string _packageName;
-		private PackageVerifyOperation _packageVerifyOp;
+		private FindCacheFilesOperation _findCacheFilesOp;
+		private VerifyCacheFilesOperation _verifyCacheFilesOp;
 		private ESteps _steps = ESteps.None;
 
 		public PackageCachingOperation(string packageName)
@@ -25,71 +26,46 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.GetCacheFiles;
+			_steps = ESteps.FindCacheFiles;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
-			if (_steps == ESteps.GetCacheFiles)
+			if (_steps == ESteps.FindCacheFiles)
 			{
-				var elements = GetVerifyElements();
-				_packageVerifyOp = PackageVerifyOperation.CreateOperation(elements);
-				OperationSystem.StartOperation(_packageVerifyOp);
+				if (_findCacheFilesOp == null)
+				{
+					_findCacheFilesOp = new FindCacheFilesOperation(_packageName);
+					OperationSystem.StartOperation(_findCacheFilesOp);
+					_steps = ESteps.VerifyCacheFiles;
+				}
+
+				Progress = _findCacheFilesOp.Progress;
+				if (_findCacheFilesOp.IsDone == false)
+					return;
+
 				_steps = ESteps.VerifyCacheFiles;
 			}
 
 			if (_steps == ESteps.VerifyCacheFiles)
 			{
-				Progress = _packageVerifyOp.Progress;
-				if (_packageVerifyOp.IsDone == false)
+				if (_verifyCacheFilesOp == null)
+				{
+					_verifyCacheFilesOp = VerifyCacheFilesOperation.CreateOperation(_findCacheFilesOp.VerifyElements);
+					OperationSystem.StartOperation(_verifyCacheFilesOp);
+					_steps = ESteps.VerifyCacheFiles;
+				}
+
+				Progress = _verifyCacheFilesOp.Progress;
+				if (_verifyCacheFilesOp.IsDone == false)
 					return;
 
 				// 注意：总是返回成功
 				_steps = ESteps.Done;
 				Status = EOperationStatus.Succeed;
 			}
-		}
-
-		private List<VerifyElement> GetVerifyElements()
-		{
-			string cacheFolderPath = PersistentHelper.GetCacheFolderPath(_packageName);
-			if (Directory.Exists(cacheFolderPath) == false)
-				return new List<VerifyElement>();
-
-			DirectoryInfo rootDirectory = new DirectoryInfo(cacheFolderPath);
-			DirectoryInfo[] fileFolders = rootDirectory.GetDirectories();
-			List<VerifyElement> result = new List<VerifyElement>(fileFolders.Length);
-			foreach (var fileFoder in fileFolders)
-			{
-				string cacheGUID = fileFoder.Name;
-				if (CacheSystem.IsCached(_packageName, cacheGUID))
-					continue;
-
-				// 获取数据文件的后缀名
-				string dataFileExtension = string.Empty;
-				var fileInfos = fileFoder.GetFiles();
-				foreach (var fileInfo in fileInfos)
-				{
-					if (fileInfo.Extension == ".temp")
-						continue;
-
-					if (fileInfo.Name.StartsWith(YooAssetSettings.CacheBundleDataFileName))
-					{
-						dataFileExtension = fileInfo.Extension;
-						break;
-					}
-				}
-
-				string fileRootPath = fileFoder.FullName;
-				string dataFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleDataFileName}{dataFileExtension}";
-				string infoFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleInfoFileName}";
-				VerifyElement element = new VerifyElement(_packageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
-				result.Add(element);
-			}
-
-			return result;
 		}
 	}
 }

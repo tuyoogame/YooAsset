@@ -6,14 +6,14 @@ using System.Threading;
 
 namespace YooAsset
 {
-	internal abstract class PackageVerifyOperation : AsyncOperationBase
+	internal abstract class VerifyCacheFilesOperation : AsyncOperationBase
 	{
-		public static PackageVerifyOperation CreateOperation(List<VerifyElement> elements)
+		public static VerifyCacheFilesOperation CreateOperation(List<VerifyElement> elements)
 		{
 #if UNITY_WEBGL
-			var operation = new PackageVerifyWithoutThreadOperation(elements);
+			var operation = new VerifyCacheFilesWithoutThreadOperation(elements);
 #else
-			var operation = new PackageVerifyWithThreadOperation(elements);
+			var operation = new VerifyCacheFilesWithThreadOperation(elements);
 #endif
 			return operation;
 		}
@@ -22,7 +22,7 @@ namespace YooAsset
 	/// <summary>
 	/// 本地缓存文件验证（线程版）
 	/// </summary>
-	internal class PackageVerifyWithThreadOperation : PackageVerifyOperation
+	internal class VerifyCacheFilesWithThreadOperation : VerifyCacheFilesOperation
 	{
 		private enum ESteps
 		{
@@ -42,7 +42,7 @@ namespace YooAsset
 		private int _failedCount;
 		private ESteps _steps = ESteps.None;
 
-		public PackageVerifyWithThreadOperation(List<VerifyElement> elements)
+		public VerifyCacheFilesWithThreadOperation(List<VerifyElement> elements)
 		{
 			_waitingList = elements;
 		}
@@ -82,7 +82,7 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
 					float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyStartTime;
-					YooLogger.Log($"Package verify elapsed time {costTime:f1} seconds");
+					YooLogger.Log($"Verify cache files elapsed time {costTime:f1} seconds");
 				}
 
 				for (int i = _waitingList.Count - 1; i >= 0; i--)
@@ -148,7 +148,7 @@ namespace YooAsset
 	/// <summary>
 	/// 本地缓存文件验证（非线程版）
 	/// </summary>
-	internal class PackageVerifyWithoutThreadOperation : PackageVerifyOperation
+	internal class VerifyCacheFilesWithoutThreadOperation : VerifyCacheFilesOperation
 	{
 		private enum ESteps
 		{
@@ -166,8 +166,8 @@ namespace YooAsset
 		private int _succeedCount;
 		private int _failedCount;
 		private ESteps _steps = ESteps.None;
-
-		public PackageVerifyWithoutThreadOperation(List<VerifyElement> elements)
+		
+		public VerifyCacheFilesWithoutThreadOperation(List<VerifyElement> elements)
 		{
 			_waitingList = elements;
 		}

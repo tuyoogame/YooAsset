@@ -84,6 +84,8 @@ namespace YooAsset
 	internal static class PersistentHelper
 	{
 		private const string CacheFolderName = "CacheFiles";
+		private const string CachedBundleFileFolder = "BundleFiles";
+		private const string CachedRawFileFolder = "RawFiles";
 		private const string ManifestFolderName = "ManifestFiles";
 		private const string AppFootPrintFileName = "ApplicationFootPrint.bytes";
 
@@ -120,12 +122,21 @@ namespace YooAsset
 
 
 		/// <summary>
-		/// 获取缓存文件夹路径
+		/// 获取缓存的BundleFile文件夹路径
 		/// </summary>
-		public static string GetCacheFolderPath(string packageName)
+		public static string GetCachedBundleFileFolderPath(string packageName)
 		{
 			string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
-			return $"{root}/{packageName}";
+			return $"{root}/{packageName}/{CachedBundleFileFolder}";
+		}
+
+		/// <summary>
+		/// 获取缓存的RawFile文件夹路径
+		/// </summary>
+		public static string GetCachedRawFileFolderPath(string packageName)
+		{
+			string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
+			return $"{root}/{packageName}/{CachedRawFileFolder}";
 		}
 
 		/// <summary>

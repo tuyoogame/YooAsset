@@ -46,7 +46,7 @@ namespace YooAsset
 		/// </summary>
 		public int[] ReferenceIDs;
 
-		
+
 		/// <summary>
 		/// 所属的包裹名称
 		/// </summary>
@@ -71,8 +71,16 @@ namespace YooAsset
 				if (string.IsNullOrEmpty(_cachedDataFilePath) == false)
 					return _cachedDataFilePath;
 
-				string cacheRoot = PersistentHelper.GetCacheFolderPath(PackageName);
-				_cachedDataFilePath = $"{cacheRoot}/{CacheGUID}/{YooAssetSettings.CacheBundleDataFileName}{_fileExtension}";
+				if (IsRawFile)
+				{
+					string cacheRoot = PersistentHelper.GetCachedRawFileFolderPath(PackageName);
+					_cachedDataFilePath = $"{cacheRoot}/{CacheGUID}/{YooAssetSettings.CacheBundleDataFileName}{_fileExtension}";
+				}
+				else
+				{
+					string cacheRoot = PersistentHelper.GetCachedBundleFileFolderPath(PackageName);
+					_cachedDataFilePath = $"{cacheRoot}/{CacheGUID}/{YooAssetSettings.CacheBundleDataFileName}";
+				}
 				return _cachedDataFilePath;
 			}
 		}
@@ -88,8 +96,16 @@ namespace YooAsset
 				if (string.IsNullOrEmpty(_cachedInfoFilePath) == false)
 					return _cachedInfoFilePath;
 
-				string cacheRoot = PersistentHelper.GetCacheFolderPath(PackageName);
-				_cachedInfoFilePath = $"{cacheRoot}/{CacheGUID}/{YooAssetSettings.CacheBundleInfoFileName}";
+				if (IsRawFile)
+				{
+					string cacheRoot = PersistentHelper.GetCachedRawFileFolderPath(PackageName);
+					_cachedInfoFilePath = $"{cacheRoot}/{CacheGUID}/{YooAssetSettings.CacheBundleInfoFileName}";
+				}
+				else
+				{
+					string cacheRoot = PersistentHelper.GetCachedBundleFileFolderPath(PackageName);
+					_cachedInfoFilePath = $"{cacheRoot}/{CacheGUID}/{YooAssetSettings.CacheBundleInfoFileName}";
+				}
 				return _cachedInfoFilePath;
 			}
 		}
