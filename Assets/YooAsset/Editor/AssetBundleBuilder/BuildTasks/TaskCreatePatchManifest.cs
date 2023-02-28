@@ -256,6 +256,9 @@ namespace YooAsset.Editor
 			progressValue = 0;
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
+				if (patchBundle.IsRawFile)
+					continue;
+
 				if (buildResultContext.Results.BundleInfos.ContainsKey(patchBundle.BundleName) == false)
 					throw new Exception($"Not found bundle in SBP build results : {patchBundle.BundleName}");
 
