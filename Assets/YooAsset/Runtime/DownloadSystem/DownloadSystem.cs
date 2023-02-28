@@ -77,11 +77,11 @@ namespace YooAsset
 			}
 			_downloaderDic.Clear();
 			_removeList.Clear();
-			
+
 			RequestDelegate = null;
 			CertificateHandlerInstance = null;
 			BreakpointResumeFileSize = int.MaxValue;
-			ClearFileResponseCodes.Clear();
+			ClearFileResponseCodes = null;
 		}
 
 
