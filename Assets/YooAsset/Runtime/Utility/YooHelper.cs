@@ -124,19 +124,31 @@ namespace YooAsset
 		/// <summary>
 		/// 获取缓存的BundleFile文件夹路径
 		/// </summary>
+		private readonly static Dictionary<string, string> _cachedBundleFileFolder = new Dictionary<string, string>(100);
 		public static string GetCachedBundleFileFolderPath(string packageName)
 		{
-			string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
-			return $"{root}/{packageName}/{CachedBundleFileFolder}";
+			if (_cachedBundleFileFolder.TryGetValue(packageName, out string value) == false)
+			{
+				string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
+				value = $"{root}/{packageName}/{CachedBundleFileFolder}";
+				_cachedBundleFileFolder.Add(packageName, value);
+			}
+			return value;
 		}
 
 		/// <summary>
 		/// 获取缓存的RawFile文件夹路径
 		/// </summary>
+		private readonly static Dictionary<string, string> _cachedRawFileFolder = new Dictionary<string, string>(100);
 		public static string GetCachedRawFileFolderPath(string packageName)
 		{
-			string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
-			return $"{root}/{packageName}/{CachedRawFileFolder}";
+			if (_cachedRawFileFolder.TryGetValue(packageName, out string value) == false)
+			{
+				string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
+				value = $"{root}/{packageName}/{CachedRawFileFolder}";
+				_cachedRawFileFolder.Add(packageName, value);
+			}
+			return value;
 		}
 
 		/// <summary>

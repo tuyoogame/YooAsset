@@ -39,7 +39,6 @@ namespace YooAsset
 				{
 					_findCacheFilesOp = new FindCacheFilesOperation(_packageName);
 					OperationSystem.StartOperation(_findCacheFilesOp);
-					_steps = ESteps.VerifyCacheFiles;
 				}
 
 				Progress = _findCacheFilesOp.Progress;
@@ -55,7 +54,6 @@ namespace YooAsset
 				{
 					_verifyCacheFilesOp = VerifyCacheFilesOperation.CreateOperation(_findCacheFilesOp.VerifyElements);
 					OperationSystem.StartOperation(_verifyCacheFilesOp);
-					_steps = ESteps.VerifyCacheFiles;
 				}
 
 				Progress = _verifyCacheFilesOp.Progress;
