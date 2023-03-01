@@ -185,6 +185,15 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 自定义日志处理
+		/// </summary>
+		/// <param name="logger"></param>
+		public static void SetLogger(IYooLogger logger)
+		{
+			YooLogger.Logger = logger;
+		}
+
+		/// <summary>
 		/// 设置下载系统参数，自定义下载请求
 		/// </summary>
 		public static void SetDownloadSystemUnityWebRequest(DownloadRequestDelegate requestDelegate)
