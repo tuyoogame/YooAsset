@@ -63,6 +63,9 @@ namespace YooAsset
 				// 注意：总是返回成功
 				_steps = ESteps.Done;
 				Status = EOperationStatus.Succeed;
+
+				int totalCount = CacheSystem.GetCachedFilesCount(_packageName);
+				YooLogger.Log($"Package '{_packageName}' cached files count : {totalCount}");
 			}
 		}
 	}

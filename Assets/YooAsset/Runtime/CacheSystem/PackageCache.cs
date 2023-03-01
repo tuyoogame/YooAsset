@@ -45,6 +45,14 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取缓存文件总数
+		/// </summary>
+		public int GetCachedFilesCount()
+		{
+			return _wrappers.Count;
+		}
+
+		/// <summary>
 		/// 查询缓存记录
 		/// </summary>
 		public bool IsCached(string cacheGUID)

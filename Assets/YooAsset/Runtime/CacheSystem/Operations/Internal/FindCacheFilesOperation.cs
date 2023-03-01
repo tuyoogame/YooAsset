@@ -101,17 +101,21 @@ namespace YooAsset
 				if (isFindItem == false)
 					break;
 
-				var fileFoder = _bundleFilesEnumerator.Current;
-				string cacheGUID = fileFoder.Name;
-				if (CacheSystem.IsCached(_packageName, cacheGUID))
-					continue;
+				var rootFoder = _bundleFilesEnumerator.Current;
+				var childDirectories = rootFoder.GetDirectories();
+				foreach(var chidDirectory in childDirectories)
+				{
+					string cacheGUID = chidDirectory.Name;
+					if (CacheSystem.IsCached(_packageName, cacheGUID))
+						continue;
 
-				// 创建验证元素类
-				string fileRootPath = fileFoder.FullName;
-				string dataFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleDataFileName}";
-				string infoFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleInfoFileName}";
-				VerifyElement element = new VerifyElement(_packageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
-				VerifyElements.Add(element);
+					// 创建验证元素类
+					string fileRootPath = chidDirectory.FullName;
+					string dataFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleDataFileName}";
+					string infoFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleInfoFileName}";
+					VerifyElement element = new VerifyElement(_packageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
+					VerifyElements.Add(element);
+				}
 
 				if (OperationSystem.IsBusy)
 					break;
@@ -131,32 +135,35 @@ namespace YooAsset
 				if (isFindItem == false)
 					break;
 
-				var fileFoder = _rawFilesEnumerator.Current;
-				string cacheGUID = fileFoder.Name;
-				if (CacheSystem.IsCached(_packageName, cacheGUID))
-					continue;
-
-				// 获取数据文件的后缀名
-				string dataFileExtension = string.Empty;
-				var fileInfos = fileFoder.GetFiles();
-				foreach (var fileInfo in fileInfos)
+				var rootFoder = _rawFilesEnumerator.Current;
+				var childDirectories = rootFoder.GetDirectories();
+				foreach (var chidDirectory in childDirectories)
 				{
-					if (fileInfo.Extension == ".temp")
+					string cacheGUID = chidDirectory.Name;
+					if (CacheSystem.IsCached(_packageName, cacheGUID))
 						continue;
 
-					if (fileInfo.Name.StartsWith(YooAssetSettings.CacheBundleDataFileName))
+					// 获取数据文件的后缀名
+					string dataFileExtension = string.Empty;
+					var fileInfos = chidDirectory.GetFiles();
+					foreach (var fileInfo in fileInfos)
 					{
-						dataFileExtension = fileInfo.Extension;
-						break;
+						if (fileInfo.Extension == ".temp")
+							continue;
+						if (fileInfo.Name.StartsWith(YooAssetSettings.CacheBundleDataFileName))
+						{
+							dataFileExtension = fileInfo.Extension;
+							break;
+						}
 					}
-				}
 
-				// 创建验证元素类
-				string fileRootPath = fileFoder.FullName;
-				string dataFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleDataFileName}{dataFileExtension}";
-				string infoFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleInfoFileName}";
-				VerifyElement element = new VerifyElement(_packageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
-				VerifyElements.Add(element);
+					// 创建验证元素类
+					string fileRootPath = chidDirectory.FullName;
+					string dataFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleDataFileName}{dataFileExtension}";
+					string infoFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleInfoFileName}";
+					VerifyElement element = new VerifyElement(_packageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
+					VerifyElements.Add(element);
+				}
 
 				if (OperationSystem.IsBusy)
 					break;

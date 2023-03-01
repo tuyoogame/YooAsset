@@ -24,6 +24,15 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取缓存文件总数
+		/// </summary>
+		public static int GetCachedFilesCount(string packageName)
+		{
+			var cache = GetOrCreateCache(packageName);
+			return cache.GetCachedFilesCount();
+		}
+
+		/// <summary>
 		/// 查询是否为验证文件
 		/// </summary>
 		public static bool IsCached(string packageName, string cacheGUID)
