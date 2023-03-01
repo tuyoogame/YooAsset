@@ -794,7 +794,7 @@ namespace YooAsset.Editor
 
 				try
 				{
-					CollectCommand command = new CollectCommand(EBuildMode.DryRunBuild, _packageNameTxt.value, _enableAddressableToogle.value, _uniqueBundleNameToogle.value);
+					CollectCommand command = new CollectCommand(EBuildMode.SimulateBuild, _packageNameTxt.value, _enableAddressableToogle.value, _uniqueBundleNameToogle.value);
 					collectAssetInfos = collector.GetAllCollectAssets(command, group);
 				}
 				catch (System.Exception e)
@@ -812,12 +812,7 @@ namespace YooAsset.Editor
 
 						string showInfo = collectAssetInfo.AssetPath;
 						if (_enableAddressableToogle.value)
-						{
-							IAddressRule instance = AssetBundleCollectorSettingData.GetAddressRuleInstance(collector.AddressRuleName);
-							AddressRuleData ruleData = new AddressRuleData(collectAssetInfo.AssetPath, collector.CollectPath, group.GroupName, collector.UserData);
-							string addressValue = instance.GetAssetAddress(ruleData);
-							showInfo = $"[{addressValue}] {showInfo}";
-						}
+							showInfo = $"[{collectAssetInfo.Address}] {collectAssetInfo.AssetPath}";
 
 						var label = new Label();
 						label.text = showInfo;
