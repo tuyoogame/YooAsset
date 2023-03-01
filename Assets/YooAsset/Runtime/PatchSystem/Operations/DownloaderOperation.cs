@@ -32,28 +32,36 @@ namespace YooAsset
 		private bool _isPause = false;
 		private long _lastDownloadBytes = 0;
 		private int _lastDownloadCount = 0;
+		private long _cachedDownloadBytes = 0;
+		private int _cachedDownloadCount = 0;
 		private ESteps _steps = ESteps.None;
-
+		
 
 		/// <summary>
-		/// 下载文件总数量
+		/// 统计的下载文件总数量
 		/// </summary>
 		public int TotalDownloadCount { private set; get; }
-
+		
 		/// <summary>
-		/// 下载文件的总大小
+		/// 统计的下载文件的总大小
 		/// </summary>
 		public long TotalDownloadBytes { private set; get; }
-
+		
 		/// <summary>
 		/// 当前已经完成的下载总数量
 		/// </summary>
-		public int CurrentDownloadCount { private set; get; }
+		public int CurrentDownloadCount 
+		{
+			get { return _lastDownloadCount; }
+		}
 
 		/// <summary>
 		/// 当前已经完成的下载总大小
 		/// </summary>
-		public long CurrentDownloadBytes { private set; get; }
+		public long CurrentDownloadBytes
+		{
+			get { return _lastDownloadBytes; }
+		}
 
 		/// <summary>
 		/// 当下载器结束（无论成功或失败）
@@ -120,7 +128,7 @@ namespace YooAsset
 			{
 				// 检测下载器结果
 				_removeList.Clear();
-				long downloadBytes = CurrentDownloadBytes;
+				long downloadBytes = _cachedDownloadBytes;
 				foreach (var downloader in _downloaders)
 				{
 					downloadBytes += (long)downloader.DownloadedBytes;
@@ -139,8 +147,8 @@ namespace YooAsset
 
 					// 下载成功
 					_removeList.Add(downloader);
-					CurrentDownloadCount++;
-					CurrentDownloadBytes += bundleInfo.Bundle.FileSize;
+					_cachedDownloadCount++;
+					_cachedDownloadBytes += bundleInfo.Bundle.FileSize;
 				}
 
 				// 移除已经完成的下载器（无论成功或失败）
@@ -150,10 +158,10 @@ namespace YooAsset
 				}
 
 				// 如果下载进度发生变化
-				if (_lastDownloadBytes != downloadBytes || _lastDownloadCount != CurrentDownloadCount)
+				if (_lastDownloadBytes != downloadBytes || _lastDownloadCount != _cachedDownloadCount)
 				{
 					_lastDownloadBytes = downloadBytes;
-					_lastDownloadCount = CurrentDownloadCount;
+					_lastDownloadCount = _cachedDownloadCount;
 					Progress = (float)_lastDownloadBytes / TotalDownloadBytes;
 					OnDownloadProgressCallback?.Invoke(TotalDownloadCount, _lastDownloadCount, TotalDownloadBytes, _lastDownloadBytes);
 				}
