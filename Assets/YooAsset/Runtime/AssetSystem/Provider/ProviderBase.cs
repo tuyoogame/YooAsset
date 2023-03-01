@@ -221,6 +221,8 @@ namespace YooAsset
 		private TaskCompletionSource<object> _taskCompletionSource;
 		protected void InvokeCompletion()
 		{
+			DebugEndRecording();
+
 			// 进度百分百完成
 			Progress = 1f;
 
@@ -256,8 +258,7 @@ namespace YooAsset
 		public long LoadingTime { protected set; get; }
 
 		// 加载耗时统计
-		private bool _isRecording = false;
-		private Stopwatch _watch;
+		private Stopwatch _watch = null;
 
 		[Conditional("DEBUG")]
 		public void InitSpawnDebugInfo()
@@ -274,21 +275,21 @@ namespace YooAsset
 		}
 
 		[Conditional("DEBUG")]
-		protected void DebugRecording()
+		protected void DebugBeginRecording()
 		{
-			if (_isRecording == false)
+			if (_watch == null)
 			{
-				_isRecording = true;
 				_watch = Stopwatch.StartNew();
 			}
+		}
 
+		[Conditional("DEBUG")]
+		private void DebugEndRecording()
+		{
 			if (_watch != null)
 			{
-				if (IsDone)
-				{
-					LoadingTime = _watch.ElapsedMilliseconds;
-					_watch = null;
-				}
+				LoadingTime = _watch.ElapsedMilliseconds;
+				_watch = null;
 			}
 		}
 		#endregion

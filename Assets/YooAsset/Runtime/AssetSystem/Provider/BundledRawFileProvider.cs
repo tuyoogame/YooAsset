@@ -8,7 +8,7 @@ namespace YooAsset
 		}
 		public override void Update()
 		{
-			DebugRecording();
+			DebugBeginRecording();
 
 			if (IsDone)
 				return;
