@@ -2,6 +2,41 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.7] - 2023-03-03
+
+### Fixed
+
+- 修复了在运行时资源引用链无效的问题。
+- 修复了在构建过程中发生异常后进度条未消失的问题。
+- 修复了使用SBP构建管线，如果有原生文件会导致打包失败的问题。
+
+### Changed
+
+- 支持自定义下载请求
+
+  ```c#
+  /// <summary>
+  /// 设置下载系统参数，自定义下载请求
+  /// </summary>
+  public static void SetDownloadSystemUnityWebRequest(DownloadRequestDelegate requestDelegate)
+  ```
+
+- 优化了打包时资源包引用关系计算的逻辑。
+
+- 优化了缓存系统初始化逻辑，支持分帧获取所有缓存文件。
+
+- 优化了缓存系统的存储目录结构，提高了文件夹查询速度。
+
+- 优化了在资源收集界面，点击查看Collector主资源列表卡顿问题。
+
+- 优化了资源对象加载耗时统计的逻辑，现在更加准确了。
+
+- 优化了资源加载器查询逻辑。
+
+- 优化了资源下载系统，下载文件的验证支持了多线程。
+
+- 着色器变种收集界面增加单次照射数量的控制。
+
 ## [1.4.6-preview] - 2023-02-22
 
 ### Changed
