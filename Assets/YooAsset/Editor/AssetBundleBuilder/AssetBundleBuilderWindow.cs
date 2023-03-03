@@ -60,7 +60,7 @@ namespace YooAsset.Editor
 
 				// 加密服务类
 				_encryptionServicesClassTypes = GetEncryptionServicesClassTypes();
-				_encryptionServicesClassNames = _encryptionServicesClassTypes.Select(t => t.FullName).ToList();
+				_encryptionServicesClassNames = _encryptionServicesClassTypes.Select(t => t.Name).ToList();
 
 				// 输出目录
 				string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();

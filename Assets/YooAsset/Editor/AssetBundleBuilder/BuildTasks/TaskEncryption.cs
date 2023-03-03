@@ -27,17 +27,16 @@ namespace YooAsset.Editor
 		private void EncryptingBundleFiles(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext)
 		{
 			var encryptionServices = buildParametersContext.Parameters.EncryptionServices;
-
-			// 如果没有设置加密类
 			if (encryptionServices == null)
+				return;
+
+			if (encryptionServices.GetType() == typeof(EncryptionNone))
 				return;
 
 			int progressValue = 0;
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
 			foreach (var bundleInfo in buildMapContext.BundleInfos)
 			{
-				bundleInfo.LoadMethod = EBundleLoadMethod.Normal;
-
 				EncryptFileInfo fileInfo = new EncryptFileInfo();
 				fileInfo.BundleName = bundleInfo.BundleName;
 				fileInfo.FilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
