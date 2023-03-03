@@ -29,6 +29,10 @@ YooAsset依赖于ScriptBuildPipeline（SBP），在PackageManager里找到SBP插
 
 Unity引擎不允许把场景文件和其它资源文件一起打包。
 
+#### 问题：WebGL平台运行时报错：Failed to decompress data for the AssetBundle.
+
+WebGL平台不支持资源文件加密。在构建选项里，可以将加密方法设置为空
+
 #### 问题：ClearCacheWhenDirty参数没了吗？
 
 不是很必须的一个功能，已经移除了。可以使用以下方法代替：
