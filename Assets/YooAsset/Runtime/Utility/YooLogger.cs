@@ -2,24 +2,21 @@
 
 namespace YooAsset
 {
-
-	public abstract class IYooLogger
+	/// <summary>
+	/// 自定义日志处理
+	/// </summary>
+	public interface ILogger
 	{
-		public abstract void Info(string msg);
-		public abstract void Warning(string msg);
-		
-		public abstract void Error(string msg);
-		public abstract void Exception(System.Exception exception);
+		void Log(string message);
+		void Warning(string message);
+		void Error(string message);
+		void Exception(System.Exception exception);
 	}
 
 	internal static class YooLogger
 	{
+		public static ILogger Logger = null;
 
-		/// <summary>
-		/// 自定义日志处理
-		/// </summary>
-		public static IYooLogger Logger = null;
-		
 		/// <summary>
 		/// 日志
 		/// </summary>
@@ -28,7 +25,7 @@ namespace YooAsset
 		{
 			if (Logger != null)
 			{
-				Logger.Info(info);
+				Logger.Log(info);
 			}
 			else
 			{

@@ -15,13 +15,16 @@ namespace YooAsset
 		/// <summary>
 		/// 初始化资源系统
 		/// </summary>
-		public static void Initialize()
+		/// <param name="logger">自定义日志处理</param>
+		public static void Initialize(ILogger logger = null)
 		{
 			if (_isInitialize)
 				throw new Exception($"{nameof(YooAssets)} is initialized !");
 
 			if (_isInitialize == false)
 			{
+				YooLogger.Logger = logger;
+
 				// 创建驱动器
 				_isInitialize = true;
 				_driver = new UnityEngine.GameObject($"[{nameof(YooAssets)}]");
@@ -182,15 +185,6 @@ namespace YooAsset
 		public static void SetDownloadSystemCertificateHandler(UnityEngine.Networking.CertificateHandler instance)
 		{
 			DownloadSystem.CertificateHandlerInstance = instance;
-		}
-
-		/// <summary>
-		/// 自定义日志处理
-		/// </summary>
-		/// <param name="logger"></param>
-		public static void SetLogger(IYooLogger logger)
-		{
-			YooLogger.Logger = logger;
 		}
 
 		/// <summary>
