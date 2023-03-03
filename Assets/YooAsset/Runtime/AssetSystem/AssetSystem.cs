@@ -8,11 +8,16 @@ namespace YooAsset
 {
 	internal class AssetSystemImpl
 	{
-		private readonly List<BundleLoaderBase> _loaders = new List<BundleLoaderBase>(1000);
-		private readonly List<ProviderBase> _providers = new List<ProviderBase>(1000);
+		private readonly Dictionary<string, BundleLoaderBase> _loaderDic = new Dictionary<string, BundleLoaderBase>(5000);
+		private readonly List<BundleLoaderBase> _loaderList = new List<BundleLoaderBase>(5000);
+
+		private readonly Dictionary<string, ProviderBase> _providerDic = new Dictionary<string, ProviderBase>(5000);
+		private readonly List<ProviderBase> _providerList = new List<ProviderBase>(5000);
+
 		private readonly static Dictionary<string, SceneOperationHandle> _sceneHandles = new Dictionary<string, SceneOperationHandle>(100);
 		private static long _sceneCreateCount = 0;
 
+		private bool _isUnloadSafe = true;
 		private string _packageName;
 		private bool _simulationOnEditor;
 		private int _loadingMaxNumber;
@@ -39,7 +44,7 @@ namespace YooAsset
 		public void Update()
 		{
 			// 更新加载器	
-			foreach (var loader in _loaders)
+			foreach (var loader in _loaderList)
 			{
 				loader.Update();
 			}
@@ -47,10 +52,11 @@ namespace YooAsset
 			// 更新资源提供者
 			// 注意：循环更新的时候，可能会扩展列表
 			// 注意：不能限制场景对象的加载
+			_isUnloadSafe = false;
 			int loadingCount = 0;
-			for (int i = 0; i < _providers.Count; i++)
+			for (int i = 0; i < _providerList.Count; i++)
 			{
-				var provider = _providers[i];
+				var provider = _providerList[i];
 				if (provider.IsSceneProvider())
 				{
 					provider.Update();
@@ -64,6 +70,7 @@ namespace YooAsset
 						loadingCount++;
 				}
 			}
+			_isUnloadSafe = true;
 		}
 
 		/// <summary>
@@ -71,17 +78,19 @@ namespace YooAsset
 		/// </summary>
 		public void DestroyAll()
 		{
-			foreach (var provider in _providers)
+			foreach (var provider in _providerList)
 			{
 				provider.Destroy();
 			}
-			_providers.Clear();
+			_providerList.Clear();
+			_providerDic.Clear();
 
-			foreach (var loader in _loaders)
+			foreach (var loader in _loaderList)
 			{
 				loader.Destroy(true);
 			}
-			_loaders.Clear();
+			_loaderList.Clear();
+			_loaderDic.Clear();
 
 			ClearSceneHandle();
 			DecryptionServices = null;
@@ -93,6 +102,12 @@ namespace YooAsset
 		/// </summary>
 		public void UnloadUnusedAssets()
 		{
+			if (_isUnloadSafe == false)
+			{
+				YooLogger.Warning("Can not unload unused assets when processing resource loading !");
+				return;
+			}
+
 			// 注意：资源包之间可能存在多层深层嵌套，需要多次循环释放。
 			int loopCount = 10;
 			for (int i = 0; i < loopCount; i++)
@@ -104,29 +119,33 @@ namespace YooAsset
 		{
 			if (_simulationOnEditor)
 			{
-				for (int i = _providers.Count - 1; i >= 0; i--)
+				for (int i = _providerList.Count - 1; i >= 0; i--)
 				{
-					if (_providers[i].CanDestroy())
+					var provider = _providerList[i];
+					if (provider.CanDestroy())
 					{
-						_providers[i].Destroy();
-						_providers.RemoveAt(i);
+						provider.Destroy();
+						_providerList.RemoveAt(i);
+						_providerDic.Remove(provider.ProviderGUID);
 					}
 				}
 			}
 			else
 			{
-				for (int i = _loaders.Count - 1; i >= 0; i--)
+				for (int i = _loaderList.Count - 1; i >= 0; i--)
 				{
-					BundleLoaderBase loader = _loaders[i];
+					BundleLoaderBase loader = _loaderList[i];
 					loader.TryDestroyAllProviders();
 				}
-				for (int i = _loaders.Count - 1; i >= 0; i--)
+				for (int i = _loaderList.Count - 1; i >= 0; i--)
 				{
-					BundleLoaderBase loader = _loaders[i];
+					BundleLoaderBase loader = _loaderList[i];
 					if (loader.CanDestroy())
 					{
+						string bundleName = loader.MainBundleInfo.Bundle.BundleName;
 						loader.Destroy(false);
-						_loaders.RemoveAt(i);
+						_loaderList.RemoveAt(i);
+						_loaderDic.Remove(bundleName);
 					}
 				}
 			}
@@ -137,17 +156,19 @@ namespace YooAsset
 		/// </summary>
 		public void ForceUnloadAllAssets()
 		{
-			foreach (var provider in _providers)
+			foreach (var provider in _providerList)
 			{
 				provider.Destroy();
 			}
-			foreach (var loader in _loaders)
+			foreach (var loader in _loaderList)
 			{
 				loader.Destroy(true);
 			}
 
-			_providers.Clear();
-			_loaders.Clear();
+			_providerList.Clear();
+			_providerDic.Clear();
+			_loaderList.Clear();
+			_loaderDic.Clear();
 			ClearSceneHandle();
 
 			// 注意：调用底层接口释放所有资源
@@ -182,7 +203,8 @@ namespace YooAsset
 				else
 					provider = new BundledSceneProvider(this, providerGUID, assetInfo, sceneMode, activateOnLoad, priority);
 				provider.InitSpawnDebugInfo();
-				_providers.Add(provider);
+				_providerList.Add(provider);
+				_providerDic.Add(providerGUID, provider);
 			}
 
 			var handle = provider.CreateHandle<SceneOperationHandle>();
@@ -213,7 +235,8 @@ namespace YooAsset
 				else
 					provider = new BundledAssetProvider(this, providerGUID, assetInfo);
 				provider.InitSpawnDebugInfo();
-				_providers.Add(provider);
+				_providerList.Add(provider);
+				_providerDic.Add(providerGUID, provider);
 			}
 			return provider.CreateHandle<AssetOperationHandle>();
 		}
@@ -240,7 +263,8 @@ namespace YooAsset
 				else
 					provider = new BundledSubAssetsProvider(this, providerGUID, assetInfo);
 				provider.InitSpawnDebugInfo();
-				_providers.Add(provider);
+				_providerList.Add(provider);
+				_providerDic.Add(providerGUID, provider);
 			}
 			return provider.CreateHandle<SubAssetsOperationHandle>();
 		}
@@ -267,7 +291,8 @@ namespace YooAsset
 				else
 					provider = new BundledRawFileProvider(this, providerGUID, assetInfo);
 				provider.InitSpawnDebugInfo();
-				_providers.Add(provider);
+				_providerList.Add(provider);
+				_providerDic.Add(providerGUID, provider);
 			}
 			return provider.CreateHandle<RawFileOperationHandle>();
 		}
@@ -338,7 +363,8 @@ namespace YooAsset
 		{
 			foreach (var provider in providers)
 			{
-				_providers.Remove(provider);
+				_providerList.Remove(provider);
+				_providerDic.Remove(provider.ProviderGUID);
 			}
 		}
 		internal bool CheckBundleDestroyed(int bundleID)
@@ -353,7 +379,8 @@ namespace YooAsset
 		private BundleLoaderBase CreateAssetBundleLoaderInternal(BundleInfo bundleInfo)
 		{
 			// 如果加载器已经存在
-			BundleLoaderBase loader = TryGetAssetBundleLoader(bundleInfo.Bundle.BundleName);
+			string bundleName = bundleInfo.Bundle.BundleName;
+			BundleLoaderBase loader = TryGetAssetBundleLoader(bundleName);
 			if (loader != null)
 				return loader;
 
@@ -370,43 +397,30 @@ namespace YooAsset
 				loader = new AssetBundleFileLoader(this, bundleInfo);
 #endif
 
-			_loaders.Add(loader);
+			_loaderList.Add(loader);
+			_loaderDic.Add(bundleName, loader);
 			return loader;
 		}
 		private BundleLoaderBase TryGetAssetBundleLoader(string bundleName)
 		{
-			BundleLoaderBase loader = null;
-			for (int i = 0; i < _loaders.Count; i++)
-			{
-				BundleLoaderBase temp = _loaders[i];
-				if (temp.MainBundleInfo.Bundle.BundleName.Equals(bundleName))
-				{
-					loader = temp;
-					break;
-				}
-			}
-			return loader;
+			if (_loaderDic.TryGetValue(bundleName, out BundleLoaderBase value))
+				return value;
+			else
+				return null;
 		}
 		private ProviderBase TryGetProvider(string providerGUID)
 		{
-			ProviderBase provider = null;
-			for (int i = 0; i < _providers.Count; i++)
-			{
-				ProviderBase temp = _providers[i];
-				if (temp.ProviderGUID.Equals(providerGUID))
-				{
-					provider = temp;
-					break;
-				}
-			}
-			return provider;
+			if (_providerDic.TryGetValue(providerGUID, out ProviderBase value))
+				return value;
+			else
+				return null;
 		}
 
 		#region 调试信息
 		internal List<DebugProviderInfo> GetDebugReportInfos()
 		{
-			List<DebugProviderInfo> result = new List<DebugProviderInfo>(_providers.Count);
-			foreach (var provider in _providers)
+			List<DebugProviderInfo> result = new List<DebugProviderInfo>(_providerList.Count);
+			foreach (var provider in _providerList)
 			{
 				DebugProviderInfo providerInfo = new DebugProviderInfo();
 				providerInfo.AssetPath = provider.MainAssetInfo.AssetPath;
@@ -429,9 +443,9 @@ namespace YooAsset
 		internal List<BundleInfo> GetLoadedBundleInfos()
 		{
 			List<BundleInfo> result = new List<BundleInfo>(100);
-			foreach (var bundleLoader in _loaders)
+			foreach (var loader in _loaderList)
 			{
-				result.Add(bundleLoader.MainBundleInfo);
+				result.Add(loader.MainBundleInfo);
 			}
 			return result;
 		}
