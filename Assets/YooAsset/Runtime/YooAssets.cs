@@ -34,8 +34,8 @@ namespace YooAsset
 				_driver.AddComponent<RemoteDebuggerInRuntime>();
 #endif
 
-				// 初始化异步系统
 				OperationSystem.Initialize();
+				DownloadSystem.Initialize();
 			}
 		}
 

@@ -8,7 +8,7 @@ namespace YooAsset
 {
 	internal abstract class VerifyCacheFilesOperation : AsyncOperationBase
 	{
-		public static VerifyCacheFilesOperation CreateOperation(List<VerifyElement> elements)
+		public static VerifyCacheFilesOperation CreateOperation(List<VerifyCacheElement> elements)
 		{
 #if UNITY_WEBGL
 			var operation = new VerifyCacheFilesWithoutThreadOperation(elements);
@@ -33,8 +33,8 @@ namespace YooAsset
 		}
 
 		private readonly ThreadSyncContext _syncContext = new ThreadSyncContext();
-		private List<VerifyElement> _waitingList;
-		private List<VerifyElement> _verifyingList;
+		private List<VerifyCacheElement> _waitingList;
+		private List<VerifyCacheElement> _verifyingList;
 		private int _verifyMaxNum;
 		private int _verifyTotalCount;
 		private float _verifyStartTime;
@@ -42,7 +42,7 @@ namespace YooAsset
 		private int _failedCount;
 		private ESteps _steps = ESteps.None;
 
-		public VerifyCacheFilesWithThreadOperation(List<VerifyElement> elements)
+		public VerifyCacheFilesWithThreadOperation(List<VerifyCacheElement> elements)
 		{
 			_waitingList = elements;
 		}
@@ -68,7 +68,7 @@ namespace YooAsset
 				if (_verifyMaxNum < 1)
 					_verifyMaxNum = 1;
 
-				_verifyingList = new List<VerifyElement>(_verifyMaxNum);
+				_verifyingList = new List<VerifyCacheElement>(_verifyMaxNum);
 				_steps = ESteps.UpdateVerify;
 			}
 
@@ -114,19 +114,19 @@ namespace YooAsset
 				return 1f;
 			return (float)(_succeedCount + _failedCount) / _verifyTotalCount;
 		}
-		private bool BeginVerifyFileWithThread(VerifyElement element)
+		private bool BeginVerifyFileWithThread(VerifyCacheElement element)
 		{
 			return ThreadPool.QueueUserWorkItem(new WaitCallback(VerifyInThread), element);
 		}
 		private void VerifyInThread(object obj)
 		{
-			VerifyElement element = (VerifyElement)obj;
+			VerifyCacheElement element = (VerifyCacheElement)obj;
 			element.Result = CacheSystem.VerifyingCacheFile(element);
 			_syncContext.Post(VerifyCallback, element);
 		}
 		private void VerifyCallback(object obj)
 		{
-			VerifyElement element = (VerifyElement)obj;
+			VerifyCacheElement element = (VerifyCacheElement)obj;
 			_verifyingList.Remove(element);
 
 			if (element.Result == EVerifyResult.Succeed)
@@ -158,8 +158,8 @@ namespace YooAsset
 			Done,
 		}
 
-		private List<VerifyElement> _waitingList;
-		private List<VerifyElement> _verifyingList;
+		private List<VerifyCacheElement> _waitingList;
+		private List<VerifyCacheElement> _verifyingList;
 		private int _verifyMaxNum;
 		private int _verifyTotalCount;
 		private float _verifyStartTime;
@@ -167,7 +167,7 @@ namespace YooAsset
 		private int _failedCount;
 		private ESteps _steps = ESteps.None;
 		
-		public VerifyCacheFilesWithoutThreadOperation(List<VerifyElement> elements)
+		public VerifyCacheFilesWithoutThreadOperation(List<VerifyCacheElement> elements)
 		{
 			_waitingList = elements;
 		}
@@ -189,7 +189,7 @@ namespace YooAsset
 				_verifyMaxNum = fileCount;
 				_verifyTotalCount = fileCount;
 
-				_verifyingList = new List<VerifyElement>(_verifyMaxNum);
+				_verifyingList = new List<VerifyCacheElement>(_verifyMaxNum);
 				_steps = ESteps.UpdateVerify;
 			}
 
@@ -229,7 +229,7 @@ namespace YooAsset
 				return 1f;
 			return (float)(_succeedCount + _failedCount) / _verifyTotalCount;
 		}
-		private void BeginVerifyFileWithoutThread(VerifyElement element)
+		private void BeginVerifyFileWithoutThread(VerifyCacheElement element)
 		{
 			element.Result = CacheSystem.VerifyingCacheFile(element);
 			if (element.Result == EVerifyResult.Succeed)

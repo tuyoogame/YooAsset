@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine.Networking;
 
 namespace YooAsset
@@ -21,6 +22,10 @@ namespace YooAsset
 		private static readonly Dictionary<string, DownloaderBase> _downloaderDic = new Dictionary<string, DownloaderBase>();
 		private static readonly List<string> _removeList = new List<string>(100);
 
+		/// <summary>
+		/// 线程同步
+		/// </summary>
+		public static ThreadSyncContext SyncContext { set; get; }
 
 		/// <summary>
 		/// 自定义下载器的请求委托
@@ -44,10 +49,21 @@ namespace YooAsset
 
 
 		/// <summary>
-		/// 更新所有下载器
+		/// 初始化下载器
+		/// </summary>
+		public static void Initialize()
+		{
+			SyncContext = new ThreadSyncContext();
+		}
+
+		/// <summary>
+		/// 更新下载器
 		/// </summary>
 		public static void Update()
 		{
+			if (SyncContext != null)
+				SyncContext.Update();
+
 			// 更新下载器
 			_removeList.Clear();
 			foreach (var valuePair in _downloaderDic)
@@ -78,6 +94,7 @@ namespace YooAsset
 			_downloaderDic.Clear();
 			_removeList.Clear();
 
+			SyncContext = null;
 			RequestDelegate = null;
 			CertificateHandlerInstance = null;
 			BreakpointResumeFileSize = int.MaxValue;

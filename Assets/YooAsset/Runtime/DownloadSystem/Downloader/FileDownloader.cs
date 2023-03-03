@@ -13,6 +13,8 @@ namespace YooAsset
 		private readonly string _tempFilePath;
 		private UnityWebRequest _webRequest = null;
 		private DownloadHandlerFileRange _downloadHandle = null;
+		private VerifyTempFileOperation _checkFileOp = null;
+		private VerifyTempFileOperation _verifyFileOp = null;
 
 		// 重置变量
 		private bool _isAbort = false;
@@ -34,17 +36,28 @@ namespace YooAsset
 			if (IsDone())
 				return;
 
-			// 检测本地临时文件
+			// 检测临时文件
 			if (_steps == ESteps.CheckTempFile)
 			{
-				var verifyResult = CacheSystem.VerifyingTempFile(_bundleInfo.Bundle);
-				if (verifyResult == EVerifyResult.Succeed)
+				VerifyTempElement element = new VerifyTempElement(_bundleInfo.Bundle.TempDataFilePath, _bundleInfo.Bundle.FileCRC, _bundleInfo.Bundle.FileSize);
+				_checkFileOp = VerifyTempFileOperation.CreateOperation(element);
+				OperationSystem.StartOperation(_checkFileOp);
+				_steps = ESteps.WaitingCheckTempFile;
+			}
+
+			// 等待检测结果
+			if (_steps == ESteps.WaitingCheckTempFile)
+			{
+				if (_checkFileOp.IsDone == false)
+					return;
+
+				if (_checkFileOp.Status == EOperationStatus.Succeed)
 				{
 					_steps = ESteps.CachingFile;
 				}
 				else
 				{
-					if (verifyResult == EVerifyResult.FileOverflow)
+					if (_checkFileOp.VerifyResult == EVerifyResult.FileOverflow)
 					{
 						if (File.Exists(_tempFilePath))
 							File.Delete(_tempFilePath);
@@ -188,7 +201,7 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.VerifyingFile;
+					_steps = ESteps.VerifyTempFile;
 				}
 
 				// 释放下载器
@@ -196,21 +209,30 @@ namespace YooAsset
 			}
 
 			// 验证下载文件
-			if (_steps == ESteps.VerifyingFile)
+			if (_steps == ESteps.VerifyTempFile)
 			{
-				var verifyResult = CacheSystem.VerifyingTempFile(_bundleInfo.Bundle);
-				if (verifyResult == EVerifyResult.Succeed)
+				VerifyTempElement element = new VerifyTempElement(_bundleInfo.Bundle.TempDataFilePath, _bundleInfo.Bundle.FileCRC, _bundleInfo.Bundle.FileSize);
+				_verifyFileOp = VerifyTempFileOperation.CreateOperation(element);
+				OperationSystem.StartOperation(_verifyFileOp);
+				_steps = ESteps.WaitingVerifyTempFile;
+			}
+
+			// 等待验证完成
+			if (_steps == ESteps.WaitingVerifyTempFile)
+			{
+				if (_verifyFileOp.IsDone == false)
+					return;
+
+				if (_verifyFileOp.Status == EOperationStatus.Succeed)
 				{
 					_steps = ESteps.CachingFile;
 				}
 				else
 				{
-					_lastError = $"Failed to verifying file : {_bundleInfo.Bundle.FileName}, ErrorCode : {verifyResult}";
-
-					// 注意：验证失败后删除文件
 					if (File.Exists(_tempFilePath))
 						File.Delete(_tempFilePath);
 
+					_lastError = _verifyFileOp.Error;
 					_steps = ESteps.TryAgain;
 				}
 			}
@@ -226,7 +248,7 @@ namespace YooAsset
 					long dataFileSize = _bundleInfo.Bundle.FileSize;
 
 					if (File.Exists(infoFilePath))
-						File.Delete(infoFilePath);		
+						File.Delete(infoFilePath);
 					if (File.Exists(dataFilePath))
 						File.Delete(dataFilePath);
 

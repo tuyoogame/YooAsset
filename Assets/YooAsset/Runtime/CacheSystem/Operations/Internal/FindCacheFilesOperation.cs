@@ -25,7 +25,7 @@ namespace YooAsset
 		/// <summary>
 		/// 需要验证的元素
 		/// </summary>
-		public readonly List<VerifyElement> VerifyElements = new List<VerifyElement>(5000);
+		public readonly List<VerifyCacheElement> VerifyElements = new List<VerifyCacheElement>(5000);
 
 		public FindCacheFilesOperation(string packageName)
 		{
@@ -113,7 +113,7 @@ namespace YooAsset
 					string fileRootPath = chidDirectory.FullName;
 					string dataFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleDataFileName}";
 					string infoFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleInfoFileName}";
-					VerifyElement element = new VerifyElement(_packageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
+					VerifyCacheElement element = new VerifyCacheElement(_packageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
 					VerifyElements.Add(element);
 				}
 
@@ -161,7 +161,7 @@ namespace YooAsset
 					string fileRootPath = chidDirectory.FullName;
 					string dataFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleDataFileName}{dataFileExtension}";
 					string infoFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleInfoFileName}";
-					VerifyElement element = new VerifyElement(_packageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
+					VerifyCacheElement element = new VerifyCacheElement(_packageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
 					VerifyElements.Add(element);
 				}
 

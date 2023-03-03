@@ -79,7 +79,7 @@ namespace YooAsset
 		/// <summary>
 		/// 验证缓存文件（子线程内操作）
 		/// </summary>
-		public static EVerifyResult VerifyingCacheFile(VerifyElement element)
+		public static EVerifyResult VerifyingCacheFile(VerifyCacheElement element)
 		{
 			try
 			{
@@ -109,15 +109,15 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 验证下载文件
+		/// 验证下载文件（子线程内操作）
 		/// </summary>
-		public static EVerifyResult VerifyingTempFile(PatchBundle patchBundle)
+		public static EVerifyResult VerifyingTempFile(VerifyTempElement element)
 		{
-			return VerifyingInternal(patchBundle.TempDataFilePath, patchBundle.FileSize, patchBundle.FileCRC, EVerifyLevel.High);
+			return VerifyingInternal(element.TempDataFilePath, element.FileSize, element.FileCRC, EVerifyLevel.High);
 		}
-
+		
 		/// <summary>
-		/// 验证记录文件
+		/// 验证记录文件（主线程内操作）
 		/// </summary>
 		public static EVerifyResult VerifyingRecordFile(string packageName, string cacheGUID)
 		{
