@@ -47,7 +47,7 @@ namespace YooAsset.Editor
 					// 注意：原生文件不支持加密
 					if (bundleInfo.IsRawFile)
 					{
-						UnityEngine.Debug.LogWarning($"Encryption not support raw file : {bundleInfo.BundleName}");
+						BuildLogger.Warning($"Encryption not support raw file : {bundleInfo.BundleName}");
 						continue;
 					}
 

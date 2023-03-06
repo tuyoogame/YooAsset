@@ -39,12 +39,6 @@ namespace YooAsset.Editor
 			var buildParametersContext = new BuildParametersContext(buildParameters);
 			_buildContext.SetContextObject(buildParametersContext);
 
-			// 是否显示LOG
-			if (buildParameters.BuildMode == EBuildMode.SimulateBuild)
-				BuildLogger.EnableLog = false;
-			else
-				BuildLogger.EnableLog = true;
-
 			// 创建构建节点
 			List<IBuildTask> pipeline;
 			if (buildParameters.BuildPipeline == EBuildPipeline.BuiltinBuildPipeline)
@@ -86,19 +80,23 @@ namespace YooAsset.Editor
 				throw new NotImplementedException();
 			}
 
+			// 初始化日志
+			BuildLogger.InitLogger(buildParameters.EnableLog);
+
 			// 执行构建流程
 			var buildResult = BuildRunner.Run(pipeline, _buildContext);
 			if (buildResult.Success)
 			{
 				buildResult.OutputPackageDirectory = buildParametersContext.GetPackageOutputDirectory();
-				Debug.Log($"{buildParameters.BuildMode} pipeline build succeed !");
+				BuildLogger.Log($"{buildParameters.BuildMode} pipeline build succeed !");
 			}
 			else
 			{
-				Debug.LogWarning($"{buildParameters.BuildMode} pipeline build failed !");
-				Debug.LogError($"Build task failed : {buildResult.FailedTask}");
-				Debug.LogError($"Build task error : {buildResult.FailedInfo}");
+				BuildLogger.Warning($"{buildParameters.BuildMode} pipeline build failed !");
+				BuildLogger.Error($"Build task failed : {buildResult.FailedTask}");
+				BuildLogger.Error($"Build task error : {buildResult.FailedInfo}");
 			}
+
 			return buildResult;
 		}
 	}

@@ -68,6 +68,11 @@ namespace YooAsset.Editor
 
 
 		/// <summary>
+		/// 是否显示普通日志
+		/// </summary>
+		public bool EnableLog = true;
+		
+		/// <summary>
 		/// 验证构建结果
 		/// </summary>
 		public bool VerifyBuildingResult = false;

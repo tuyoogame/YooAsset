@@ -1,30 +1,33 @@
-﻿
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace YooAsset.Editor
 {
 	public static class BuildLogger
 	{
-		/// <summary>
-		/// 是否启用LOG
-		/// </summary>
-		public static bool EnableLog = true;
+		private static bool _enableLog = true;
 
-		/// <summary>
-		/// 日志输出
-		/// </summary>
-		public static void Log(string info)
+		public static void InitLogger(bool enableLog)
 		{
-			if (EnableLog)
-			{
-				UnityEngine.Debug.Log(info);
-			}
+			_enableLog = enableLog;
 		}
 
-		/// <summary>
-		/// 日志输出
-		/// </summary>
-		public static void Info(string info)
+		public static void Log(string message)
 		{
-			UnityEngine.Debug.Log(info);
+			if (_enableLog)
+			{
+				Debug.Log(message);
+			}
+		}
+		public static void Warning(string message)
+		{
+			Debug.LogWarning(message);
+		}
+		public static void Error(string message)
+		{
+			Debug.LogError(message);
 		}
 	}
 }

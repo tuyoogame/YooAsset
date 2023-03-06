@@ -45,7 +45,7 @@ namespace YooAsset.Editor
 			{
 				foreach (var exceptBundle in exceptBundleList1)
 				{
-					Debug.LogWarning($"差异资源包: {exceptBundle}");
+					BuildLogger.Warning($"差异资源包: {exceptBundle}");
 				}
 				throw new System.Exception("存在差异资源包！请查看警告信息！");
 			}
@@ -56,7 +56,7 @@ namespace YooAsset.Editor
 			{
 				foreach (var exceptBundle in exceptBundleList2)
 				{
-					Debug.LogWarning($"差异资源包: {exceptBundle}");
+					BuildLogger.Warning($"差异资源包: {exceptBundle}");
 				}
 				throw new System.Exception("存在差异资源包！请查看警告信息！");
 			}
@@ -76,16 +76,16 @@ namespace YooAsset.Editor
 					string[] mapAssetPaths = buildMapContext.GetBuildinAssetPaths(buildedBundle);
 					if (mapAssetPaths.Length != buildedAssetPaths.Length)
 					{
-						Debug.LogWarning($"构建的Bundle文件内的资源对象数量和预期不匹配 : {buildedBundle}");
+						BuildLogger.Warning($"构建的Bundle文件内的资源对象数量和预期不匹配 : {buildedBundle}");
 						var exceptAssetList1 = mapAssetPaths.Except(buildedAssetPaths).ToList();
 						foreach (var excpetAsset in exceptAssetList1)
 						{
-							Debug.LogWarning($"构建失败的资源对象路径为 : {excpetAsset}");
+							BuildLogger.Warning($"构建失败的资源对象路径为 : {excpetAsset}");
 						}
 						var exceptAssetList2 = buildedAssetPaths.Except(mapAssetPaths).ToList();
 						foreach (var excpetAsset in exceptAssetList2)
 						{
-							Debug.LogWarning($"构建失败的资源对象路径为 : {excpetAsset}");
+							BuildLogger.Warning($"构建失败的资源对象路径为 : {excpetAsset}");
 						}
 						isPass = false;
 						continue;

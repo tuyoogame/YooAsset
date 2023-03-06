@@ -46,7 +46,7 @@ namespace YooAsset.Editor
 			{
 				foreach (var exceptBundle in exceptBundleList1)
 				{
-					Debug.LogWarning($"差异资源包: {exceptBundle}");
+					BuildLogger.Warning($"差异资源包: {exceptBundle}");
 				}
 				throw new System.Exception("存在差异资源包！请查看警告信息！");
 			}
@@ -57,7 +57,7 @@ namespace YooAsset.Editor
 			{
 				foreach (var exceptBundle in exceptBundleList2)
 				{
-					Debug.LogWarning($"差异资源包: {exceptBundle}");
+					BuildLogger.Warning($"差异资源包: {exceptBundle}");
 				}
 				throw new System.Exception("存在差异资源包！请查看警告信息！");
 			}
