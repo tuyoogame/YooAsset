@@ -34,6 +34,11 @@ namespace YooAsset
 		protected float _downloadProgress = 0f;
 		protected ulong _downloadedBytes = 0;
 
+		/// <summary>
+		/// 是否等待异步结束
+		/// 警告：只能用于解压APP内部资源
+		/// </summary>
+		public bool WaitForAsyncComplete = false;
 
 		/// <summary>
 		/// 下载进度（0f~1f）

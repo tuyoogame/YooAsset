@@ -57,6 +57,25 @@ namespace YooAsset
 					_steps = ESteps.Waiting;
 				}
 			}
+
+			if (_steps == ESteps.Waiting)
+			{
+				if (_element.IsDone == false)
+					return;
+
+				VerifyResult = _element.Result;
+				if (_element.Result == EVerifyResult.Succeed)
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
+				}
+				else
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = $"Failed verify file : {_element.TempDataFilePath} ! ErrorCode : {_element.Result}";
+				}
+			}
 		}
 
 		private bool BeginVerifyFileWithThread(VerifyTempElement element)
@@ -67,23 +86,7 @@ namespace YooAsset
 		{
 			VerifyTempElement element = (VerifyTempElement)obj;
 			element.Result = CacheSystem.VerifyingTempFile(element);
-			DownloadSystem.SyncContext.Post(VerifyCallback, element);
-		}
-		private void VerifyCallback(object obj)
-		{
-			VerifyTempElement element = (VerifyTempElement)obj;
-			VerifyResult = element.Result;
-			if (element.Result == EVerifyResult.Succeed)
-			{
-				_steps = ESteps.Done;
-				Status = EOperationStatus.Succeed;
-			}
-			else
-			{
-				_steps = ESteps.Done;
-				Status = EOperationStatus.Failed;
-				Error = $"Failed verify file : {element.TempDataFilePath} ! ErrorCode : {element.Result}";
-			}
+			element.IsDone = true;
 		}
 	}
 
@@ -101,7 +104,7 @@ namespace YooAsset
 
 		private readonly VerifyTempElement _element;
 		private ESteps _steps = ESteps.None;
-		
+
 		public VerifyTempFileWithoutThreadOperation(VerifyTempElement element)
 		{
 			_element = element;
@@ -118,6 +121,8 @@ namespace YooAsset
 			if (_steps == ESteps.VerifyFile)
 			{
 				_element.Result = CacheSystem.VerifyingTempFile(_element);
+				_element.IsDone = true;
+
 				VerifyResult = _element.Result;
 				if (_element.Result == EVerifyResult.Succeed)
 				{

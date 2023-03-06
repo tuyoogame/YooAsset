@@ -48,6 +48,9 @@ namespace YooAsset
 			// 等待检测结果
 			if (_steps == ESteps.WaitingCheckTempFile)
 			{
+				if (WaitForAsyncComplete)
+					_checkFileOp.Update();
+
 				if (_checkFileOp.IsDone == false)
 					return;
 
@@ -220,6 +223,9 @@ namespace YooAsset
 			// 等待验证完成
 			if (_steps == ESteps.WaitingVerifyTempFile)
 			{
+				if (WaitForAsyncComplete)
+					_verifyFileOp.Update();
+
 				if (_verifyFileOp.IsDone == false)
 					return;
 

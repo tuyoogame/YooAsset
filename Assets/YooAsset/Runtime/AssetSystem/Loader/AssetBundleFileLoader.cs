@@ -286,6 +286,7 @@ namespace YooAsset
 				// 文件解压
 				if (_unpacker != null)
 				{
+					_unpacker.WaitForAsyncComplete = true;
 					_unpacker.Update();
 					if (_unpacker.IsDone() == false)
 						continue;

@@ -23,11 +23,6 @@ namespace YooAsset
 		private static readonly List<string> _removeList = new List<string>(100);
 
 		/// <summary>
-		/// 线程同步
-		/// </summary>
-		public static ThreadSyncContext SyncContext { set; get; }
-
-		/// <summary>
 		/// 自定义下载器的请求委托
 		/// </summary>
 		public static DownloadRequestDelegate RequestDelegate = null;
@@ -53,7 +48,6 @@ namespace YooAsset
 		/// </summary>
 		public static void Initialize()
 		{
-			SyncContext = new ThreadSyncContext();
 		}
 
 		/// <summary>
@@ -61,9 +55,6 @@ namespace YooAsset
 		/// </summary>
 		public static void Update()
 		{
-			if (SyncContext != null)
-				SyncContext.Update();
-
 			// 更新下载器
 			_removeList.Clear();
 			foreach (var valuePair in _downloaderDic)
@@ -94,7 +85,6 @@ namespace YooAsset
 			_downloaderDic.Clear();
 			_removeList.Clear();
 
-			SyncContext = null;
 			RequestDelegate = null;
 			CertificateHandlerInstance = null;
 			BreakpointResumeFileSize = int.MaxValue;
