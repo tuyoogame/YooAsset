@@ -257,7 +257,10 @@ namespace YooAsset.Editor
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
 				if (patchBundle.IsRawFile)
+				{
+					_cachedBundleDepends.Add(patchBundle.BundleName, new string[] { });
 					continue;
+				}
 
 				if (buildResultContext.Results.BundleInfos.ContainsKey(patchBundle.BundleName) == false)
 					throw new Exception($"Not found bundle in SBP build results : {patchBundle.BundleName}");
@@ -297,6 +300,12 @@ namespace YooAsset.Editor
 			progressValue = 0;
 			foreach (var patchBundle in patchManifest.BundleList)
 			{
+				if (patchBundle.IsRawFile)
+				{
+					_cachedBundleDepends.Add(patchBundle.BundleName, new string[] { } );
+					continue;
+				}
+
 				var depends = buildResultContext.UnityManifest.GetDirectDependencies(patchBundle.BundleName);
 				_cachedBundleDepends.Add(patchBundle.BundleName, depends);
 				EditorTools.DisplayProgressBar("缓存资源包依赖列表", ++progressValue, totalCount);
