@@ -32,7 +32,7 @@ namespace YooAsset
 		/// <summary>
 		/// 文件流解密方法
 		/// </summary>
-		System.IO.FileStream LoadFromStream(DecryptFileInfo fileInfo);
+		System.IO.Stream LoadFromStream(DecryptFileInfo fileInfo);
 
 		/// <summary>
 		/// 文件流解密的托管缓存大小

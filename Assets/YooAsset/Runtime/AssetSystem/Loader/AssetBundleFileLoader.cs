@@ -26,7 +26,7 @@ namespace YooAsset
 		private DownloaderBase _unpacker;
 		private DownloaderBase _downloader;
 		private AssetBundleCreateRequest _createRequest;
-		private FileStream _fileStream;
+		private Stream _stream;
 
 
 		public AssetBundleFileLoader(AssetSystemImpl impl, BundleInfo bundleInfo) : base(impl, bundleInfo)
@@ -196,12 +196,12 @@ namespace YooAsset
 					}
 					else if (loadMethod == EBundleLoadMethod.LoadFromStream)
 					{
-						_fileStream = Impl.DecryptionServices.LoadFromStream(fileInfo);
+						_stream = Impl.DecryptionServices.LoadFromStream(fileInfo);
 						uint managedReadBufferSize = Impl.DecryptionServices.GetManagedReadBufferSize();
 						if (_isWaitForAsyncComplete)
-							CacheBundle = AssetBundle.LoadFromStream(_fileStream, 0, managedReadBufferSize);
+							CacheBundle = AssetBundle.LoadFromStream(_stream, 0, managedReadBufferSize);
 						else
-							_createRequest = AssetBundle.LoadFromStreamAsync(_fileStream, 0, managedReadBufferSize);
+							_createRequest = AssetBundle.LoadFromStreamAsync(_stream, 0, managedReadBufferSize);
 					}
 					else
 					{
@@ -265,11 +265,11 @@ namespace YooAsset
 		{
 			base.Destroy(forceDestroy);
 
-			if (_fileStream != null)
+			if (_stream != null)
 			{
-				_fileStream.Close();
-				_fileStream.Dispose();
-				_fileStream = null;
+				_stream.Close();
+				_stream.Dispose();
+				_stream = null;
 			}
 		}
 
