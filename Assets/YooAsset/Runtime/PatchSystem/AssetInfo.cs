@@ -7,6 +7,17 @@ namespace YooAsset
 		private string _providerGUID;
 
 		/// <summary>
+		/// 资源类型
+		/// </summary>
+		public System.Type AssetType { private set; get; }
+
+		/// <summary>
+		/// 错误信息
+		/// </summary>
+		public string Error { private set; get; }
+
+
+		/// <summary>
 		/// 唯一标识符
 		/// </summary>
 		internal string GUID
@@ -36,39 +47,44 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 错误信息
-		/// </summary>
-		internal string Error { private set; get; }
-
-		/// <summary>
 		/// 可寻址地址
 		/// </summary>
-		public string Address { private set; get; }
+		public string Address
+		{
+			get
+			{
+				if (_patchAsset == null)
+					return string.Empty;
+				return _patchAsset.Address;
+			}
+		}
 
 		/// <summary>
 		/// 资源路径
 		/// </summary>
-		public string AssetPath { private set; get; }
-		
-		/// <summary>
-		/// 资源类型
-		/// </summary>
-		public System.Type AssetType { private set; get; }
+		public string AssetPath
+		{
+			get
+			{
+				if (_patchAsset == null)
+					return string.Empty;
+				return _patchAsset.AssetPath;
+			}
+		}
 
 
-		// 注意：这是一个内部类，严格限制外部创建。
 		private AssetInfo()
 		{
+			// 注意：禁止从外部创建该类
 		}
 		internal AssetInfo(PatchAsset patchAsset, System.Type assetType)
 		{
 			if (patchAsset == null)
 				throw new System.Exception("Should never get here !");
 
+			_providerGUID = string.Empty;
 			_patchAsset = patchAsset;
 			AssetType = assetType;
-			Address = patchAsset.Address;
-			AssetPath = patchAsset.AssetPath;
 			Error = string.Empty;
 		}
 		internal AssetInfo(PatchAsset patchAsset)
@@ -76,18 +92,16 @@ namespace YooAsset
 			if (patchAsset == null)
 				throw new System.Exception("Should never get here !");
 
+			_providerGUID = string.Empty;
 			_patchAsset = patchAsset;
 			AssetType = null;
-			Address = patchAsset.Address;
-			AssetPath = patchAsset.AssetPath;
 			Error = string.Empty;
 		}
 		internal AssetInfo(string error)
 		{
+			_providerGUID = string.Empty;
 			_patchAsset = null;
 			AssetType = null;
-			Address = string.Empty;
-			AssetPath = string.Empty;
 			Error = error;
 		}
 	}
