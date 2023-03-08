@@ -27,8 +27,8 @@ namespace YooAsset.Editor
 		string IAddressRule.GetAssetAddress(AddressRuleData data)
 		{
 			string fileName = Path.GetFileNameWithoutExtension(data.AssetPath);
-			string collectorName = Path.GetFileNameWithoutExtension(data.CollectPath);
-			return $"{collectorName}_{fileName}";
+			FileInfo fileInfo = new FileInfo(data.AssetPath);
+			return $"{fileInfo.Directory.Name}_{fileName}";
 		}
 	}
 }
