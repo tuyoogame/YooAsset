@@ -127,7 +127,7 @@ namespace YooAsset.Editor
 		private List<string> GetDependAssets(BuildMapContext buildMapContext, string bundleName, string assetPath)
 		{
 			List<string> result = new List<string>();
-			if (buildMapContext.TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))
+			var bundleInfo = buildMapContext.GetBundleInfo(bundleName);
 			{
 				BuildAssetInfo findAssetInfo = null;
 				foreach (var buildinAsset in bundleInfo.BuildinAssets)
@@ -146,10 +146,6 @@ namespace YooAsset.Editor
 				{
 					result.Add(dependAssetInfo.AssetPath);
 				}
-			}
-			else
-			{
-				throw new Exception($"Not found bundle : {bundleName}");
 			}
 			return result;
 		}

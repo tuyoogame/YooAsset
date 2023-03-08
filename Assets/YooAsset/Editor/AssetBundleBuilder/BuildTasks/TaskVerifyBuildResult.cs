@@ -34,13 +34,13 @@ namespace YooAsset.Editor
 		{
 			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
-			string[] buildedBundles = unityManifest.GetAllAssetBundles();
+			string[] unityCreateBundles = unityManifest.GetAllAssetBundles();
 
 			// 1. 过滤掉原生Bundle
 			string[] mapBundles = buildMapContext.BundleInfos.Where(t => t.IsRawFile == false).Select(t => t.BundleName).ToArray();
 
 			// 2. 验证Bundle
-			List<string> exceptBundleList1 = buildedBundles.Except(mapBundles).ToList();
+			List<string> exceptBundleList1 = unityCreateBundles.Except(mapBundles).ToList();
 			if (exceptBundleList1.Count > 0)
 			{
 				foreach (var exceptBundle in exceptBundleList1)
@@ -51,7 +51,7 @@ namespace YooAsset.Editor
 			}
 
 			// 3. 验证Bundle
-			List<string> exceptBundleList2 = mapBundles.Except(buildedBundles).ToList();
+			List<string> exceptBundleList2 = mapBundles.Except(unityCreateBundles).ToList();
 			if (exceptBundleList2.Count > 0)
 			{
 				foreach (var exceptBundle in exceptBundleList2)

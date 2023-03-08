@@ -8,6 +8,8 @@ namespace YooAsset.Editor
 {
 	public class BuildMapContext : IContextObject
 	{
+		private readonly Dictionary<string, BuildBundleInfo> _bundleInfoDic = new Dictionary<string, BuildBundleInfo>(10000);
+
 		/// <summary>
 		/// 参与构建的资源总数
 		/// 说明：包括主动收集的资源以及其依赖的所有资源
@@ -32,7 +34,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 资源包列表
 		/// </summary>
-		public readonly List<BuildBundleInfo> BundleInfos = new List<BuildBundleInfo>(1000);
+		public readonly List<BuildBundleInfo> BundleInfos = new List<BuildBundleInfo>(10000);
 
 
 		/// <summary>
@@ -44,7 +46,7 @@ namespace YooAsset.Editor
 			if (string.IsNullOrEmpty(bundleName))
 				throw new Exception("Should never get here !");
 
-			if (TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))
+			if (_bundleInfoDic.TryGetValue(bundleName, out BuildBundleInfo bundleInfo))
 			{
 				bundleInfo.PackAsset(assetInfo);
 			}
@@ -53,6 +55,7 @@ namespace YooAsset.Editor
 				BuildBundleInfo newBundleInfo = new BuildBundleInfo(bundleName);
 				newBundleInfo.PackAsset(assetInfo);
 				BundleInfos.Add(newBundleInfo);
+				_bundleInfoDic.Add(bundleName, newBundleInfo);
 			}
 		}
 
@@ -74,7 +77,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string[] GetBuildinAssetPaths(string bundleName)
 		{
-			if (TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))
+			if (_bundleInfoDic.TryGetValue(bundleName, out BuildBundleInfo bundleInfo))
 			{
 				return bundleInfo.GetBuildinAssetPaths();
 			}
@@ -100,21 +103,19 @@ namespace YooAsset.Editor
 		/// </summary>
 		public bool IsContainsBundle(string bundleName)
 		{
-			return TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo);
+			return _bundleInfoDic.ContainsKey(bundleName);
 		}
 
-		public bool TryGetBundleInfo(string bundleName, out BuildBundleInfo result)
+		/// <summary>
+		/// 获取资源包信息，如果没找到返回NULL
+		/// </summary>
+		public BuildBundleInfo GetBundleInfo(string bundleName)
 		{
-			foreach (var bundleInfo in BundleInfos)
+			if (_bundleInfoDic.TryGetValue(bundleName, out BuildBundleInfo result))
 			{
-				if (bundleInfo.BundleName == bundleName)
-				{
-					result = bundleInfo;
-					return true;
-				}
+				return result;
 			}
-			result = null;
-			return false;
+			throw new Exception($"Not found bundle : {bundleName}");
 		}
 	}
 }
