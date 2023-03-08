@@ -7,6 +7,9 @@ using UnityEngine.Networking;
 
 namespace YooAsset
 {
+	/// <summary>
+	/// WebGL平台加载器
+	/// </summary>
 	internal sealed class AssetBundleWebLoader : BundleLoaderBase
 	{
 		private enum ESteps
@@ -24,7 +27,6 @@ namespace YooAsset
 
 		private ESteps _steps = ESteps.None;
 		private float _tryTimer = 0;
-		private bool _isShowWaitForAsyncError = false;
 		private DownloaderBase _downloader;
 		private UnityWebRequest _webRequest;
 		private AssetBundleCreateRequest _createRequest;
@@ -225,10 +227,11 @@ namespace YooAsset
 		/// </summary>
 		public override void WaitForAsyncComplete()
 		{
-			if (_isShowWaitForAsyncError == false)
+			if (IsDone() == false)
 			{
-				_isShowWaitForAsyncError = true;
-				YooLogger.Error($"WebGL platform not support {nameof(WaitForAsyncComplete)} ! Use the async load method instead of the sync load method !");
+				Status = EStatus.Failed;
+				LastError = $"{nameof(WaitForAsyncComplete)} failed ! WebGL platform not support sync load method !";
+				YooLogger.Error(LastError);
 			}
 		}
 	}

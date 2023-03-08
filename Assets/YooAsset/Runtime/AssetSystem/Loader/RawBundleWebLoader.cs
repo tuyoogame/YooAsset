@@ -2,25 +2,28 @@
 
 namespace YooAsset
 {
-	internal class RawBundleFileLoader : BundleLoaderBase
+	/// <summary>
+	/// WebGL平台加载器
+	/// </summary>
+	internal class RawBundleWebLoader : BundleLoaderBase
 	{
 		private enum ESteps
 		{
 			None,
 			Download,
 			CheckDownload,
-			Unpack,
-			CheckUnpack,
+			Website,
+			CheckWebsite,
 			CheckFile,
 			Done,
 		}
 
 		private ESteps _steps = ESteps.None;
-		private DownloaderBase _unpacker;
+		private DownloaderBase _website;
 		private DownloaderBase _downloader;
 
 
-		public RawBundleFileLoader(AssetSystemImpl impl, BundleInfo bundleInfo) : base(impl, bundleInfo)
+		public RawBundleWebLoader(AssetSystemImpl impl, BundleInfo bundleInfo) : base(impl, bundleInfo)
 		{
 		}
 
@@ -41,13 +44,8 @@ namespace YooAsset
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-#if UNITY_ANDROID
-					_steps = ESteps.Unpack;
+					_steps = ESteps.Website;
 					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
-#else
-					_steps = ESteps.CheckFile;
-					FileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
-#endif
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
@@ -88,28 +86,28 @@ namespace YooAsset
 				}
 			}
 
-			// 3. 解压内置文件
-			if (_steps == ESteps.Unpack)
+			// 3. 从站点下载
+			if (_steps == ESteps.Website)
 			{
 				int failedTryAgain = 1;
 				var bundleInfo = PatchManifestTools.GetUnpackInfo(MainBundleInfo.Bundle);
-				_unpacker = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
-				_steps = ESteps.CheckUnpack;
+				_website = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
+				_steps = ESteps.CheckWebsite;
 			}
 
-			// 4. 检测解压结果
-			if (_steps == ESteps.CheckUnpack)
+			// 4. 检测站点下载
+			if (_steps == ESteps.CheckWebsite)
 			{
-				DownloadProgress = _unpacker.DownloadProgress;
-				DownloadedBytes = _unpacker.DownloadedBytes;
-				if (_unpacker.IsDone() == false)
+				DownloadProgress = _website.DownloadProgress;
+				DownloadedBytes = _website.DownloadedBytes;
+				if (_website.IsDone() == false)
 					return;
 
-				if (_unpacker.HasError())
+				if (_website.HasError())
 				{
 					_steps = ESteps.Done;
 					Status = EStatus.Failed;
-					LastError = _unpacker.GetLastError();
+					LastError = _website.GetLastError();
 				}
 				else
 				{
@@ -142,38 +140,11 @@ namespace YooAsset
 		/// </summary>
 		public override void WaitForAsyncComplete()
 		{
-			int frame = 1000;
-			while (true)
+			if (IsDone() == false)
 			{
-				// 文件解压
-				if (_unpacker != null)
-				{
-					_unpacker.WaitForAsyncComplete = true;
-					_unpacker.Update();
-					if (_unpacker.IsDone() == false)
-						continue;
-				}
-
-				// 保险机制
-				// 注意：如果需要从远端下载资源，可能会触发保险机制！
-				frame--;
-				if (frame == 0)
-				{
-					if (IsDone() == false)
-					{
-						Status = EStatus.Failed;
-						LastError = $"WaitForAsyncComplete failed ! Try load bundle : {MainBundleInfo.Bundle.BundleName} from remote with sync load method !";
-						YooLogger.Error(LastError);
-					}
-					break;
-				}
-
-				// 驱动流程
-				Update();
-
-				// 完成后退出
-				if (IsDone())
-					break;
+				Status = EStatus.Failed;
+				LastError = $"{nameof(WaitForAsyncComplete)} failed ! WebGL platform not support sync load method !";
+				YooLogger.Error(LastError);
 			}
 		}
 	}
