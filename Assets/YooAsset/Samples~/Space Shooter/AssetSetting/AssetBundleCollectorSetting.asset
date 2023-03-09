@@ -21,7 +21,7 @@ MonoBehaviour:
     PackageDesc: 
     Groups:
     - GroupName: battle
-      GroupDesc: 
+      GroupDesc: "\u6218\u6597"
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
@@ -50,7 +50,7 @@ MonoBehaviour:
         AssetTags: 
         UserData: 
     - GroupName: shader
-      GroupDesc: 
+      GroupDesc: "\u7740\u8272\u5668"
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
@@ -63,7 +63,7 @@ MonoBehaviour:
         AssetTags: 
         UserData: 
     - GroupName: scene
-      GroupDesc: 
+      GroupDesc: "\u573A\u666F"
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
@@ -76,7 +76,7 @@ MonoBehaviour:
         AssetTags: 
         UserData: 
     - GroupName: ugui
-      GroupDesc: 
+      GroupDesc: "\u9762\u677F"
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
@@ -101,6 +101,19 @@ MonoBehaviour:
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackTopDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+    - GroupName: config
+      GroupDesc: "\u914D\u7F6E\u8868"
+      AssetTags: 
+      ActiveRuleName: EnableGroup
+      Collectors:
+      - CollectPath: Assets/Samples/Space Shooter/GameRes/Config
+        CollectorGUID: 1894d23646ddbf8479e579cc03261dde
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackRawFile
         FilterRuleName: CollectAll
         AssetTags: 
         UserData: 

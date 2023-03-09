@@ -54,7 +54,8 @@ public class EntityPlayer : MonoBehaviour
 	}
 	void OnTriggerEnter(Collider other)
 	{
-		if (other.CompareTag("Enemy") || other.CompareTag("EnemyBullet") || other.CompareTag("Asteroid"))
+		var name = other.gameObject.name;
+		if (name.StartsWith("enemy") || name.StartsWith("asteroid"))
 		{
 			BattleEventDefine.PlayerDead.SendEventMessage(this.transform.position, this.transform.rotation);
 			_handle.Restore();

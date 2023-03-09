@@ -142,7 +142,7 @@ internal class FsmInitialize : IStateNode
 			throw new NotImplementedException();
 		}
 
-		public FileStream LoadFromStream(DecryptFileInfo fileInfo)
+		public Stream LoadFromStream(DecryptFileInfo fileInfo)
 		{
 			BundleStream bundleStream = new BundleStream(fileInfo.FilePath, FileMode.Open);
 			return bundleStream;

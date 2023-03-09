@@ -68,7 +68,8 @@ public class EntityEnemy : MonoBehaviour
 	}
 	void OnTriggerEnter(Collider other)
 	{
-		if (other.CompareTag("PlayerBullet"))
+		var name = other.gameObject.name;
+		if (name.StartsWith("player"))
 		{
 			BattleEventDefine.EnemyDead.SendEventMessage(this.transform.position, this.transform.rotation);
 			_handle.Restore();
@@ -77,7 +78,8 @@ public class EntityEnemy : MonoBehaviour
 	}
 	void OnTriggerExit(Collider other)
 	{
-		if (other.CompareTag("Boundary"))
+		var name = other.gameObject.name;
+		if (name.StartsWith("Boundary"))
 		{
 			_handle.Restore();
 			_handle = null;
