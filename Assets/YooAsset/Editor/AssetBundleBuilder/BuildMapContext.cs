@@ -60,31 +60,6 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 获取所有的打包资源
-		/// </summary>
-		public List<BuildAssetInfo> GetAllAssets()
-		{
-			List<BuildAssetInfo> result = new List<BuildAssetInfo>(BundleInfos.Count);
-			foreach (var bundleInfo in BundleInfos)
-			{
-				result.AddRange(bundleInfo.BuildinAssets);
-			}
-			return result;
-		}
-
-		/// <summary>
-		/// 获取AssetBundle内构建的资源路径列表
-		/// </summary>
-		public string[] GetBuildinAssetPaths(string bundleName)
-		{
-			if (_bundleInfoDic.TryGetValue(bundleName, out BuildBundleInfo bundleInfo))
-			{
-				return bundleInfo.GetBuildinAssetPaths();
-			}
-			throw new Exception($"Not found {nameof(BuildBundleInfo)} : {bundleName}");
-		}
-
-		/// <summary>
 		/// 获取构建管线里需要的数据
 		/// </summary>
 		public UnityEditor.AssetBundleBuild[] GetPipelineBuilds()
@@ -116,6 +91,19 @@ namespace YooAsset.Editor
 				return result;
 			}
 			throw new Exception($"Not found bundle : {bundleName}");
+		}
+
+		/// <summary>
+		/// 创建着色器信息类
+		/// </summary>
+		public void CreateShadersBundleInfo(string shadersBundleName)
+		{
+			if (IsContainsBundle(shadersBundleName) == false)
+			{
+				var shaderBundleInfo = new BuildBundleInfo(shadersBundleName);
+				BundleInfos.Add(shaderBundleInfo);
+				_bundleInfoDic.Add(shadersBundleName, shaderBundleInfo);
+			}
 		}
 	}
 }
