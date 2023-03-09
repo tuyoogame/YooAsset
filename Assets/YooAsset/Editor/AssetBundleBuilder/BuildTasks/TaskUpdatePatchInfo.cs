@@ -6,8 +6,8 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("更新构建信息")]
-	public class TaskUpdateBuildInfo : IBuildTask
+	[TaskAttribute("更新补丁信息")]
+	public class TaskUpdatePatchInfo : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
 		{
@@ -18,7 +18,7 @@ namespace YooAsset.Editor
 			int outputNameStyle = (int)buildParametersContext.Parameters.OutputNameStyle;
 
 			// 1.检测路径长度
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				// NOTE：检测路径长度不要超过260字符。
 				string filePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
@@ -27,7 +27,7 @@ namespace YooAsset.Editor
 			}
 
 			// 2.更新构建输出的文件路径
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				if (bundleInfo.IsEncryptedFile)
 					bundleInfo.PatchInfo.BuildOutputFilePath = bundleInfo.EncryptedFilePath;
@@ -36,7 +36,7 @@ namespace YooAsset.Editor
 			}
 
 			// 3.更新文件其它信息
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				string buildOutputFilePath = bundleInfo.PatchInfo.BuildOutputFilePath;
 				bundleInfo.PatchInfo.ContentHash = GetBundleContentHash(bundleInfo, context);
@@ -46,7 +46,7 @@ namespace YooAsset.Editor
 			}
 
 			// 4.更新补丁包输出的文件路径
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				string patchFileExtension = PatchManifestTools.GetRemoteBundleFileExtension(bundleInfo.BundleName);
 				string patchFileName = PatchManifestTools.GetRemoteBundleFileName(outputNameStyle, bundleInfo.BundleName, patchFileExtension, bundleInfo.PatchInfo.PatchFileHash);

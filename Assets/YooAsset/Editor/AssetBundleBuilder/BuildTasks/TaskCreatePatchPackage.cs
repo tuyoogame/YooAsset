@@ -67,8 +67,8 @@ namespace YooAsset.Editor
 
 			// 拷贝所有补丁文件
 			int progressValue = 0;
-			int patchFileTotalCount = buildMapContext.BundleInfos.Count;
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			int patchFileTotalCount = buildMapContext.Collection.Count;
+			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				EditorTools.CopyFile(bundleInfo.PatchInfo.BuildOutputFilePath, bundleInfo.PatchInfo.PatchOutputFilePath, true);
 				EditorTools.DisplayProgressBar("拷贝补丁文件", ++progressValue, patchFileTotalCount);

@@ -27,7 +27,7 @@ namespace YooAsset.Editor
 		private void CopyRawBundle(BuildMapContext buildMapContext, BuildParametersContext buildParametersContext)
 		{
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				if (bundleInfo.IsRawFile)
 				{

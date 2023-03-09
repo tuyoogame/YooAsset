@@ -119,7 +119,7 @@ namespace YooAsset.Editor
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 
 			List<PatchBundle> result = new List<PatchBundle>(1000);
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				var patchBundle = bundleInfo.CreatePatchBundle();
 				result.Add(patchBundle);
@@ -135,7 +135,7 @@ namespace YooAsset.Editor
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
 
 			List<PatchAsset> result = new List<PatchAsset>(1000);
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				var assetInfos = bundleInfo.GetAllPatchAssetInfos();
 				foreach (var assetInfo in assetInfos)

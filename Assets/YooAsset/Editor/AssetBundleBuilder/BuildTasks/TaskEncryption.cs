@@ -35,7 +35,7 @@ namespace YooAsset.Editor
 
 			int progressValue = 0;
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				EncryptFileInfo fileInfo = new EncryptFileInfo();
 				fileInfo.BundleName = bundleInfo.BundleName;
@@ -59,7 +59,7 @@ namespace YooAsset.Editor
 				}
 
 				// 进度条
-				EditorTools.DisplayProgressBar("加密资源包", ++progressValue, buildMapContext.BundleInfos.Count);
+				EditorTools.DisplayProgressBar("加密资源包", ++progressValue, buildMapContext.Collection.Count);
 			}
 			EditorTools.ClearProgressBar();
 		}

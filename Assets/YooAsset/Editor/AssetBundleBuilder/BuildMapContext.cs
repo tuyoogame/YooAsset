@@ -32,9 +32,15 @@ namespace YooAsset.Editor
 		public string ShadersBundleName;
 
 		/// <summary>
-		/// 资源包列表
+		/// 资源包信息列表
 		/// </summary>
-		public readonly List<BuildBundleInfo> BundleInfos = new List<BuildBundleInfo>(10000);
+		public Dictionary<string, BuildBundleInfo>.ValueCollection Collection
+		{
+			get
+			{
+				return _bundleInfoDic.Values;
+			}
+		}
 
 
 		/// <summary>
@@ -54,23 +60,8 @@ namespace YooAsset.Editor
 			{
 				BuildBundleInfo newBundleInfo = new BuildBundleInfo(bundleName);
 				newBundleInfo.PackAsset(assetInfo);
-				BundleInfos.Add(newBundleInfo);
 				_bundleInfoDic.Add(bundleName, newBundleInfo);
 			}
-		}
-
-		/// <summary>
-		/// 获取构建管线里需要的数据
-		/// </summary>
-		public UnityEditor.AssetBundleBuild[] GetPipelineBuilds()
-		{
-			List<UnityEditor.AssetBundleBuild> builds = new List<UnityEditor.AssetBundleBuild>(BundleInfos.Count);
-			foreach (var bundleInfo in BundleInfos)
-			{
-				if (bundleInfo.IsRawFile == false)
-					builds.Add(bundleInfo.CreatePipelineBuild());
-			}
-			return builds.ToArray();
 		}
 
 		/// <summary>
@@ -94,6 +85,20 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
+		/// 获取构建管线里需要的数据
+		/// </summary>
+		public UnityEditor.AssetBundleBuild[] GetPipelineBuilds()
+		{
+			List<UnityEditor.AssetBundleBuild> builds = new List<UnityEditor.AssetBundleBuild>(_bundleInfoDic.Count);
+			foreach (var bundleInfo in _bundleInfoDic.Values)
+			{
+				if (bundleInfo.IsRawFile == false)
+					builds.Add(bundleInfo.CreatePipelineBuild());
+			}
+			return builds.ToArray();
+		}
+
+		/// <summary>
 		/// 创建着色器信息类
 		/// </summary>
 		public void CreateShadersBundleInfo(string shadersBundleName)
@@ -101,7 +106,6 @@ namespace YooAsset.Editor
 			if (IsContainsBundle(shadersBundleName) == false)
 			{
 				var shaderBundleInfo = new BuildBundleInfo(shadersBundleName);
-				BundleInfos.Add(shaderBundleInfo);
 				_bundleInfoDic.Add(shadersBundleName, shaderBundleInfo);
 			}
 		}

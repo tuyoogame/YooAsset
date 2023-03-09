@@ -11,25 +11,14 @@ namespace YooAsset.Editor
 		public CollectCommand Command { private set; get; }
 
 		/// <summary>
-		/// 着色器统一全名称
-		/// </summary>
-		public string ShadersBundleName { private set; get; }
-
-		/// <summary>
 		/// 收集的资源信息列表
 		/// </summary>
 		public List<CollectAssetInfo> CollectAssets { private set; get; }
 
-
 		public CollectResult(CollectCommand command)
 		{
 			Command = command;
-
-			// 着色器统一全名称
-			var packRuleResult = DefaultPackRule.CreateShadersPackRuleResult();
-			ShadersBundleName = packRuleResult.GetMainBundleName(command.PackageName, command.UniqueBundleName);
 		}
-
 		public void SetCollectAssets(List<CollectAssetInfo> collectAssets)
 		{
 			CollectAssets = collectAssets;

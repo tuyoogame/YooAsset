@@ -37,7 +37,7 @@ namespace YooAsset.Editor
 			string[] unityCreateBundles = unityManifest.GetAllAssetBundles();
 
 			// 1. 过滤掉原生Bundle
-			string[] mapBundles = buildMapContext.BundleInfos.Where(t => t.IsRawFile == false).Select(t => t.BundleName).ToArray();
+			string[] mapBundles = buildMapContext.Collection.Where(t => t.IsRawFile == false).Select(t => t.BundleName).ToArray();
 
 			// 2. 验证Bundle
 			List<string> exceptBundleList1 = unityCreateBundles.Except(mapBundles).ToList();

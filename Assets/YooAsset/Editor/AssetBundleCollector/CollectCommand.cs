@@ -23,12 +23,22 @@ namespace YooAsset.Editor
 		/// </summary>
 		public bool UniqueBundleName { private set; get; }
 
+		/// <summary>
+		/// 着色器统一全名称
+		/// </summary>
+		public string ShadersBundleName { private set; get; }
+
+
 		public CollectCommand(EBuildMode buildMode, string packageName, bool enableAddressable, bool uniqueBundleName)
 		{
 			BuildMode = buildMode;
 			PackageName = packageName;
 			EnableAddressable = enableAddressable;
 			UniqueBundleName = uniqueBundleName;
+
+			// 着色器统一全名称
+			var packRuleResult = DefaultPackRule.CreateShadersPackRuleResult();
+			ShadersBundleName = packRuleResult.GetMainBundleName(packageName, uniqueBundleName);
 		}
 	}
 }
