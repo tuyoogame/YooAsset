@@ -1,9 +1,8 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
     <ui:VisualElement name="CollectContainer">
+        <uie:Toolbar name="Toolbar" style="display: flex; flex-direction: row-reverse;" />
         <ui:TextField picking-mode="Ignore" label="文件保存路径" name="CollectOutput" style="height: 22px;" />
-        <ui:VisualElement name="PackageContainer" style="height: 24px;">
-            <uie:Toolbar name="Toolbar" style="display: flex; flex-direction: row-reverse;" />
-        </ui:VisualElement>
+        <ui:VisualElement name="PackageContainer" style="height: 24px;" />
         <ui:Label text="Current Shader Count" display-tooltip-when-elided="true" name="CurrentShaderCount" style="height: 20px; padding-left: 4px;" />
         <ui:Label text="Current Variant Count" display-tooltip-when-elided="true" name="CurrentVariantCount" style="height: 20px; padding-left: 4px;" />
         <ui:SliderInt picking-mode="Ignore" label="Capacity" value="9999" high-value="1000" name="ProcessCapacity" low-value="10" show-input-field="true" />
