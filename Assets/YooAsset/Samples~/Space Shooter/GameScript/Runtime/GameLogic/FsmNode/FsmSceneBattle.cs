@@ -5,7 +5,7 @@ using UnityEngine;
 using UniFramework.Window;
 using UniFramework.Event;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
 internal class FsmSceneBattle : IStateNode
@@ -17,7 +17,7 @@ internal class FsmSceneBattle : IStateNode
 	}
 	void IStateNode.OnEnter()
 	{
-		UniModule.StartCoroutine(Prepare());
+		UniSingleton.StartCoroutine(Prepare());
 	}
 	void IStateNode.OnUpdate()
 	{

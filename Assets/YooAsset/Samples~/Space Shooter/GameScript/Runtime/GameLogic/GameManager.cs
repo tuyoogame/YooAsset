@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Event;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 
-public class GameManager : ModuleSingleton<GameManager>, IModule
+public class GameManager : SingletonInstance<GameManager>, ISingleton
 {
 	private bool _isRun = false;
 	private EventGroup _eventGroup = new EventGroup();
 	private StateMachine _machine;
 
-	void IModule.OnCreate(object createParam)
+	void ISingleton.OnCreate(object createParam)
 	{
 	}
-	void IModule.OnDestroy()
+	void ISingleton.OnDestroy()
 	{
 		_eventGroup.RemoveAllListener();
 	}
-	void IModule.OnUpdate()
+	void ISingleton.OnUpdate()
 	{
 		if (_machine != null)
 			_machine.Update();

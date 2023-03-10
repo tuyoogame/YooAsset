@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
 /// <summary>
@@ -21,7 +21,7 @@ internal class FsmInitialize : IStateNode
 	void IStateNode.OnEnter()
 	{
 		PatchEventDefine.PatchStatesChange.SendEventMessage("初始化资源包！");
-		UniModule.StartCoroutine(InitPackage());
+		UniSingleton.StartCoroutine(InitPackage());
 	}
 	void IStateNode.OnUpdate()
 	{

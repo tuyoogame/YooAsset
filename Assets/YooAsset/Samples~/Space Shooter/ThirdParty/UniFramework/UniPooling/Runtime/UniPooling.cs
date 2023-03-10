@@ -76,7 +76,7 @@ namespace UniFramework.Pooling
 		public static Spawner CreateSpawner(string packageName)
 		{
 			// 获取资源包
-			var assetPackage = YooAssets.GetAssetsPackage(packageName);
+			var assetPackage = YooAssets.GetPackage(packageName);
 			if (assetPackage == null)
 				throw new Exception($"Not found asset package : {packageName}");
 

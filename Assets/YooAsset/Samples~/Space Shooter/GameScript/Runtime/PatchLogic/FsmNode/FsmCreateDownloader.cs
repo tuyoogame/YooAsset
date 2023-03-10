@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
 /// <summary>
@@ -19,7 +19,7 @@ public class FsmCreateDownloader : IStateNode
 	void IStateNode.OnEnter()
 	{
 		PatchEventDefine.PatchStatesChange.SendEventMessage("创建补丁下载器！");
-		UniModule.StartCoroutine(CreateDownloader());
+		UniSingleton.StartCoroutine(CreateDownloader());
 	}
 	void IStateNode.OnUpdate()
 	{

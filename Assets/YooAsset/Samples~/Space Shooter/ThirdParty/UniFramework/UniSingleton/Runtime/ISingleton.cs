@@ -1,20 +1,20 @@
 ﻿
-namespace UniFramework.Module
+namespace UniFramework.Singleton
 {
-	public interface IModule
+	public interface ISingleton
 	{
 		/// <summary>
-		/// 创建模块
+		/// 创建单例
 		/// </summary>
 		void OnCreate(System.Object createParam);
 
 		/// <summary>
-		/// 更新模块
+		/// 更新单例
 		/// </summary>
 		void OnUpdate();
 
 		/// <summary>
-		/// 销毁模块
+		/// 销毁单例
 		/// </summary>
 		void OnDestroy();
 	}

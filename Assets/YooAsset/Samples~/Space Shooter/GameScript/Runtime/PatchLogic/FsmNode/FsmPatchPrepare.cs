@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 
 /// <summary>
 /// 流程准备工作

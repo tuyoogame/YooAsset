@@ -3,18 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UniFramework.Module
+namespace UniFramework.Singleton
 {
-	public static class UniModule
+	public static class UniSingleton
 	{
 		private class Wrapper
 		{
 			public int Priority { private set; get; }
-			public IModule Module { private set; get; }
+			public ISingleton Singleton { private set; get; }
 
-			public Wrapper(IModule module, int priority)
+			public Wrapper(ISingleton module, int priority)
 			{
-				Module = module;
+				Singleton = module;
 				Priority = priority;
 			}
 		}
@@ -26,26 +26,26 @@ namespace UniFramework.Module
 		private static bool _isDirty = false;
 
 		/// <summary>
-		/// 初始化模块系统
+		/// 初始化单例系统
 		/// </summary>
 		public static void Initialize()
 		{
 			if (_isInitialize)
-				throw new Exception($"{nameof(UniModule)} is initialized !");
+				throw new Exception($"{nameof(UniSingleton)} is initialized !");
 
 			if (_isInitialize == false)
 			{
 				// 创建驱动器
 				_isInitialize = true;
-				_driver = new UnityEngine.GameObject($"[{nameof(UniModule)}]");
-				_behaviour = _driver.AddComponent<UniModuleDriver>();
+				_driver = new UnityEngine.GameObject($"[{nameof(UniSingleton)}]");
+				_behaviour = _driver.AddComponent<UniSingletonDriver>();
 				UnityEngine.Object.DontDestroyOnLoad(_driver);
-				UniLogger.Log($"{nameof(UniModule)} initalize !");
+				UniLogger.Log($"{nameof(UniSingleton)} initalize !");
 			}
 		}
 
 		/// <summary>
-		/// 销毁模块系统
+		/// 销毁单例系统
 		/// </summary>
 		public static void Destroy()
 		{
@@ -56,12 +56,12 @@ namespace UniFramework.Module
 				_isInitialize = false;
 				if (_driver != null)
 					GameObject.Destroy(_driver);
-				UniLogger.Log($"{nameof(UniModule)} destroy all !");
+				UniLogger.Log($"{nameof(UniSingleton)} destroy all !");
 			}
 		}
 
 		/// <summary>
-		/// 更新模块系统
+		/// 更新单例系统
 		/// </summary>
 		internal static void Update()
 		{
@@ -83,20 +83,20 @@ namespace UniFramework.Module
 			// 轮询所有模块
 			for (int i = 0; i < _wrappers.Count; i++)
 			{
-				_wrappers[i].Module.OnUpdate();
+				_wrappers[i].Singleton.OnUpdate();
 			}
 		}
 
 		/// <summary>
-		/// 获取模块
+		/// 获取单例
 		/// </summary>
-		public static T GetModule<T>() where T : class, IModule
+		public static T GetSingleton<T>() where T : class, ISingleton
 		{
 			System.Type type = typeof(T);
 			for (int i = 0; i < _wrappers.Count; i++)
 			{
-				if (_wrappers[i].Module.GetType() == type)
-					return _wrappers[i].Module as T;
+				if (_wrappers[i].Singleton.GetType() == type)
+					return _wrappers[i].Singleton as T;
 			}
 
 			UniLogger.Error($"Not found manager : {type}");
@@ -104,34 +104,34 @@ namespace UniFramework.Module
 		}
 
 		/// <summary>
-		/// 查询模块是否存在
+		/// 查询单例是否存在
 		/// </summary>
-		public static bool Contains<T>() where T : class, IModule
+		public static bool Contains<T>() where T : class, ISingleton
 		{
 			System.Type type = typeof(T);
 			for (int i = 0; i < _wrappers.Count; i++)
 			{
-				if (_wrappers[i].Module.GetType() == type)
+				if (_wrappers[i].Singleton.GetType() == type)
 					return true;
 			}
 			return false;
 		}
 
 		/// <summary>
-		/// 创建模块
+		/// 创建单例
 		/// </summary>
 		/// <param name="priority">运行时的优先级，优先级越大越早执行。如果没有设置优先级，那么会按照添加顺序执行</param>
-		public static T CreateModule<T>(int priority = 0) where T : class, IModule
+		public static T CreateSingleton<T>(int priority = 0) where T : class, ISingleton
 		{
-			return CreateModule<T>(null, priority);
+			return CreateSingleton<T>(null, priority);
 		}
 
 		/// <summary>
-		/// 创建模块
+		/// 创建单例
 		/// </summary>
 		/// <param name="createParam">附加参数</param>
 		/// <param name="priority">运行时的优先级，优先级越大越早执行。如果没有设置优先级，那么会按照添加顺序执行</param>
-		public static T CreateModule<T>(System.Object createParam, int priority = 0) where T : class, IModule
+		public static T CreateSingleton<T>(System.Object createParam, int priority = 0) where T : class, ISingleton
 		{
 			if (priority < 0)
 				throw new Exception("The priority can not be negative");
@@ -148,23 +148,23 @@ namespace UniFramework.Module
 
 			T module = Activator.CreateInstance<T>();
 			Wrapper wrapper = new Wrapper(module, priority);
-			wrapper.Module.OnCreate(createParam);
+			wrapper.Singleton.OnCreate(createParam);
 			_wrappers.Add(wrapper);
 			_isDirty = true;
 			return module;
 		}
 
 		/// <summary>
-		/// 销毁模块
+		/// 销毁单例
 		/// </summary>
-		public static bool DestroyModule<T>() where T : class, IModule
+		public static bool DestroySingleton<T>() where T : class, ISingleton
 		{
 			var type = typeof(T);
 			for (int i = 0; i < _wrappers.Count; i++)
 			{
-				if (_wrappers[i].Module.GetType() == type)
+				if (_wrappers[i].Singleton.GetType() == type)
 				{
-					_wrappers[i].Module.OnDestroy();
+					_wrappers[i].Singleton.OnDestroy();
 					_wrappers.RemoveAt(i);
 					return true;
 				}
@@ -218,7 +218,7 @@ namespace UniFramework.Module
 		{
 			for (int i = 0; i < _wrappers.Count; i++)
 			{
-				_wrappers[i].Module.OnDestroy();
+				_wrappers[i].Singleton.OnDestroy();
 			}
 			_wrappers.Clear();
 		}

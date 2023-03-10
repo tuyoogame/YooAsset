@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UniFramework.Event;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
 public class Boot : MonoBehaviour
@@ -21,15 +21,15 @@ public class Boot : MonoBehaviour
 		// 初始化事件系统
 		UniEvent.Initalize();
 
-		// 初始化管理系统
-		UniModule.Initialize();
+		// 初始化单例系统
+		UniSingleton.Initialize();
 
 		// 初始化资源系统
 		YooAssets.Initialize();
 		YooAssets.SetOperationSystemMaxTimeSlice(30);
 
 		// 创建补丁管理器
-		UniModule.CreateModule<PatchManager>();
+		UniSingleton.CreateSingleton<PatchManager>();
 
 		// 开始补丁更新流程
 		PatchManager.Instance.Run(PlayMode);

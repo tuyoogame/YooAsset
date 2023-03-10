@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
 using UniFramework.Window;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
 internal class FsmSceneHome : IStateNode
@@ -16,7 +16,7 @@ internal class FsmSceneHome : IStateNode
 	}
 	void IStateNode.OnEnter()
 	{
-		UniModule.StartCoroutine(Prepare());
+		UniSingleton.StartCoroutine(Prepare());
 	}
 	void IStateNode.OnUpdate()
 	{
