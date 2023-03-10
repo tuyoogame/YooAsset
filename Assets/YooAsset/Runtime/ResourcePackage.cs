@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace YooAsset
 {
-	public class AssetsPackage
+	public class ResourcePackage
 	{
 		private bool _isInitialize = false;
 		private string _initializeError = string.Empty;
@@ -30,10 +30,10 @@ namespace YooAsset
 		}
 
 
-		private AssetsPackage()
+		private ResourcePackage()
 		{
 		}
-		internal AssetsPackage(string packageName)
+		internal ResourcePackage(string packageName)
 		{
 			PackageName = packageName;
 		}
@@ -90,7 +90,7 @@ namespace YooAsset
 				_assetSystemImpl.Initialize(PackageName, true, parameters.AssetLoadingMaxNumber, parameters.DecryptionServices, _bundleServices);
 
 				var initializeParameters = parameters as EditorSimulateModeParameters;
-				initializeOperation = editorSimulateModeImpl.InitializeAsync(initializeParameters.LocationToLower, initializeParameters.SimulatePatchManifestPath);
+				initializeOperation = editorSimulateModeImpl.InitializeAsync(initializeParameters.LocationToLower, initializeParameters.SimulateManifestFilePath);
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
@@ -143,10 +143,10 @@ namespace YooAsset
 		private void CheckInitializeParameters(InitializeParameters parameters)
 		{
 			if (_isInitialize)
-				throw new Exception($"{nameof(AssetsPackage)} is initialized yet.");
+				throw new Exception($"{nameof(ResourcePackage)} is initialized yet.");
 
 			if (parameters == null)
-				throw new Exception($"{nameof(AssetsPackage)} create parameters is null.");
+				throw new Exception($"{nameof(ResourcePackage)} create parameters is null.");
 
 #if !UNITY_EDITOR
 			if (parameters is EditorSimulateModeParameters)
@@ -156,8 +156,8 @@ namespace YooAsset
 			if (parameters is EditorSimulateModeParameters)
 			{
 				var editorSimulateModeParameters = parameters as EditorSimulateModeParameters;
-				if (string.IsNullOrEmpty(editorSimulateModeParameters.SimulatePatchManifestPath))
-					throw new Exception($"{nameof(editorSimulateModeParameters.SimulatePatchManifestPath)} is null or empty.");
+				if (string.IsNullOrEmpty(editorSimulateModeParameters.SimulateManifestFilePath))
+					throw new Exception($"{nameof(editorSimulateModeParameters.SimulateManifestFilePath)} is null or empty.");
 			}
 
 			if (parameters is HostPlayModeParameters)
@@ -206,7 +206,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 向网络端请求并更新补丁清单
+		/// 向网络端请求并更新清单
 		/// </summary>
 		/// <param name="packageVersion">更新的包裹版本</param>
 		/// <param name="autoActiveManifest">自动激活清单</param>
@@ -223,12 +223,12 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="packageVersion">下载的包裹版本</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public PreDownloadPackageOperation PreDownloadPackageAsync(string packageVersion, int timeout = 60)
+		public PreDownloadContentOperation PreDownloadContentAsync(string packageVersion, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			return _playModeServices.PreDownloadPackageAsync(packageVersion, timeout);
+			return _playModeServices.PreDownloadContentAsync(packageVersion, timeout);
 		}
-
+		
 		/// <summary>
 		/// 清理包裹未使用的缓存文件
 		/// </summary>
@@ -630,91 +630,139 @@ namespace YooAsset
 
 		#region 资源下载
 		/// <summary>
-		/// 创建补丁下载器，用于下载更新资源标签指定的资源包文件
+		/// 创建资源下载器，用于下载当前资源版本所有的资源包文件
+		/// </summary>
+		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
+		/// <param name="failedTryAgain">下载失败的重试次数</param>
+		/// <param name="timeout">超时时间</param>
+		public ResourceDownloaderOperation CreateResourceDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		{
+			DebugCheckInitialize();
+			return _playModeServices.CreateResourceDownloaderByAll(downloadingMaxNumber, failedTryAgain, timeout);
+		}
+
+		/// <summary>
+		/// 创建资源下载器，用于下载指定的资源标签关联的资源包文件
 		/// </summary>
 		/// <param name="tag">资源标签</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		/// <param name="timeout">超时时间</param>
-		public PatchDownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			return _playModeServices.CreatePatchDownloaderByTags(new string[] { tag }, downloadingMaxNumber, failedTryAgain, timeout);
+			return _playModeServices.CreateResourceDownloaderByTags(new string[] { tag }, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		/// <summary>
-		/// 创建补丁下载器，用于下载更新资源标签指定的资源包文件
+		/// 创建资源下载器，用于下载指定的资源标签列表关联的资源包文件
 		/// </summary>
 		/// <param name="tags">资源标签列表</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		/// <param name="timeout">超时时间</param>
-		public PatchDownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			return _playModeServices.CreatePatchDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain, timeout);
+			return _playModeServices.CreateResourceDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		/// <summary>
-		/// 创建补丁下载器，用于下载更新当前资源版本所有的资源包文件
+		/// 创建资源下载器，用于下载指定的资源依赖的资源包文件
 		/// </summary>
+		/// <param name="location">资源的定位地址</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		/// <param name="timeout">超时时间</param>
-		public PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public ResourceDownloaderOperation CreateBundleDownloader(string location, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			return _playModeServices.CreatePatchDownloaderByAll(downloadingMaxNumber, failedTryAgain, timeout);
+			var assetInfo = ConvertLocationToAssetInfo(location, null);
+			AssetInfo[] assetInfos = new AssetInfo[] { assetInfo };
+			return _playModeServices.CreateResourceDownloaderByPaths(assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		/// <summary>
-		/// 创建补丁下载器，用于下载更新指定的资源列表依赖的资源包文件
+		/// 创建资源下载器，用于下载指定的资源列表依赖的资源包文件
+		/// </summary>
+		/// <param name="locations">资源的定位地址列表</param>
+		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
+		/// <param name="failedTryAgain">下载失败的重试次数</param>
+		/// <param name="timeout">超时时间</param>
+		public ResourceDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		{
+			DebugCheckInitialize();
+			List<AssetInfo> assetInfos = new List<AssetInfo>(locations.Length);
+			foreach (var location in locations)
+			{
+				var assetInfo = ConvertLocationToAssetInfo(location, null);
+				assetInfos.Add(assetInfo);
+			}
+			return _playModeServices.CreateResourceDownloaderByPaths(assetInfos.ToArray(), downloadingMaxNumber, failedTryAgain, timeout);
+		}
+
+		/// <summary>
+		/// 创建资源下载器，用于下载指定的资源依赖的资源包文件
+		/// </summary>
+		/// <param name="assetInfo">资源信息</param>
+		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
+		/// <param name="failedTryAgain">下载失败的重试次数</param>
+		/// <param name="timeout">超时时间</param>
+		public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo assetInfo, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		{
+			DebugCheckInitialize();
+			AssetInfo[] assetInfos = new AssetInfo[] { assetInfo };
+			return _playModeServices.CreateResourceDownloaderByPaths(assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
+		}
+
+		/// <summary>
+		/// 创建资源下载器，用于下载指定的资源列表依赖的资源包文件
 		/// </summary>
 		/// <param name="assetInfos">资源信息列表</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		/// <param name="timeout">超时时间</param>
-		public PatchDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			DebugCheckInitialize();
-			return _playModeServices.CreatePatchDownloaderByPaths(assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
+			return _playModeServices.CreateResourceDownloaderByPaths(assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 		#endregion
 
 		#region 资源解压
 		/// <summary>
-		/// 创建补丁解压器
+		/// 创建内置资源解压器
 		/// </summary>
 		/// <param name="tag">资源标签</param>
 		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
 		/// <param name="failedTryAgain">解压失败的重试次数</param>
-		public PatchUnpackerOperation CreatePatchUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
+		public ResourceUnpackerOperation CreateResourceUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			return _playModeServices.CreatePatchUnpackerByTags(new string[] { tag }, unpackingMaxNumber, failedTryAgain, int.MaxValue);
+			return _playModeServices.CreateResourceUnpackerByTags(new string[] { tag }, unpackingMaxNumber, failedTryAgain, int.MaxValue);
 		}
 
 		/// <summary>
-		/// 创建补丁解压器
+		/// 创建内置资源解压器
 		/// </summary>
 		/// <param name="tags">资源标签列表</param>
 		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
 		/// <param name="failedTryAgain">解压失败的重试次数</param>
-		public PatchUnpackerOperation CreatePatchUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
+		public ResourceUnpackerOperation CreateResourceUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			return _playModeServices.CreatePatchUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain, int.MaxValue);
+			return _playModeServices.CreateResourceUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain, int.MaxValue);
 		}
 
 		/// <summary>
-		/// 创建补丁解压器
+		/// 创建内置资源解压器
 		/// </summary>
 		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
 		/// <param name="failedTryAgain">解压失败的重试次数</param>
-		public PatchUnpackerOperation CreatePatchUnpacker(int unpackingMaxNumber, int failedTryAgain)
+		public ResourceUnpackerOperation CreateResourceUnpacker(int unpackingMaxNumber, int failedTryAgain)
 		{
 			DebugCheckInitialize();
-			return _playModeServices.CreatePatchUnpackerByAll(unpackingMaxNumber, failedTryAgain, int.MaxValue);
+			return _playModeServices.CreateResourceUnpackerByAll(unpackingMaxNumber, failedTryAgain, int.MaxValue);
 		}
 		#endregion
 

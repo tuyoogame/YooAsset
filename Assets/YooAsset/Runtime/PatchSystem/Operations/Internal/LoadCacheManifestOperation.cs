@@ -24,7 +24,7 @@ namespace YooAsset
 		/// <summary>
 		/// 加载的清单实例
 		/// </summary>
-		public PatchManifest Manifest { private set; get; }
+		public PackageManifest Manifest { private set; get; }
 
 
 		public LoadCacheManifestOperation(string packageName, string packageVersion)

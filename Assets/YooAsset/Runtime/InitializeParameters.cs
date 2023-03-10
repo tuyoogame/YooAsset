@@ -53,7 +53,7 @@ namespace YooAsset
 		/// <summary>
 		/// 用于模拟运行的资源清单路径
 		/// </summary>
-		public string SimulatePatchManifestPath = string.Empty;
+		public string SimulateManifestFilePath = string.Empty;
 	}
 
 	/// <summary>

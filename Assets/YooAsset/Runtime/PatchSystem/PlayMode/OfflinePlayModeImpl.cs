@@ -6,7 +6,7 @@ namespace YooAsset
 {
 	internal class OfflinePlayModeImpl : IPlayModeServices, IBundleServices
 	{
-		private PatchManifest _activeManifest;
+		private PackageManifest _activeManifest;
 		private bool _locationToLower;
 
 		/// <summary>
@@ -21,7 +21,7 @@ namespace YooAsset
 		}
 
 		#region IPlayModeServices接口
-		public PatchManifest ActiveManifest
+		public PackageManifest ActiveManifest
 		{
 			set
 			{
@@ -33,7 +33,7 @@ namespace YooAsset
 				return _activeManifest;
 			}
 		}
-		public bool IsBuildinPatchBundle(PatchBundle patchBundle)
+		public bool IsBuildinPackageBundle(PackageBundle packageBundle)
 		{
 			return true;
 		}
@@ -50,52 +50,52 @@ namespace YooAsset
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		PreDownloadPackageOperation IPlayModeServices.PreDownloadPackageAsync(string packageVersion, int timeout)
+		PreDownloadContentOperation IPlayModeServices.PreDownloadContentAsync(string packageVersion, int timeout)
 		{
-			var operation = new OfflinePlayModePreDownloadPackageOperation();
+			var operation = new OfflinePlayModePreDownloadContentOperation();
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
 
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
+		ResourceDownloaderOperation IPlayModeServices.CreateResourceDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		ResourceDownloaderOperation IPlayModeServices.CreateResourceDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
-		PatchDownloaderOperation IPlayModeServices.CreatePatchDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		ResourceDownloaderOperation IPlayModeServices.CreateResourceDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
-		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
+		ResourceUnpackerOperation IPlayModeServices.CreateResourceUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return PatchUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
+			return ResourceUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
 		}
-		PatchUnpackerOperation IPlayModeServices.CreatePatchUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
+		ResourceUnpackerOperation IPlayModeServices.CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return PatchUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
+			return ResourceUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
 		}
 		#endregion
 
 		#region IBundleServices接口
-		private BundleInfo CreateBundleInfo(PatchBundle patchBundle)
+		private BundleInfo CreateBundleInfo(PackageBundle packageBundle)
 		{
-			if (patchBundle == null)
+			if (packageBundle == null)
 				throw new Exception("Should never get here !");
 
 			// 查询沙盒资源
-			if (CacheSystem.IsCached(patchBundle.PackageName, patchBundle.CacheGUID))
+			if (CacheSystem.IsCached(packageBundle.PackageName, packageBundle.CacheGUID))
 			{
-				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromCache);
+				BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromCache);
 				return bundleInfo;
 			}
 
 			// 查询APP资源
 			{
-				BundleInfo bundleInfo = new BundleInfo(patchBundle, BundleInfo.ELoadMode.LoadFromStreaming);
+				BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromStreaming);
 				return bundleInfo;
 			}
 		}
@@ -104,21 +104,21 @@ namespace YooAsset
 			if (assetInfo.IsInvalid)
 				throw new Exception("Should never get here !");
 
-			// 注意：如果补丁清单里未找到资源包会抛出异常！
-			var patchBundle = _activeManifest.GetMainPatchBundle(assetInfo.AssetPath);
-			return CreateBundleInfo(patchBundle);
+			// 注意：如果清单里未找到资源包会抛出异常！
+			var packageBundle = _activeManifest.GetMainPackageBundle(assetInfo.AssetPath);
+			return CreateBundleInfo(packageBundle);
 		}
 		BundleInfo[] IBundleServices.GetAllDependBundleInfos(AssetInfo assetInfo)
 		{
 			if (assetInfo.IsInvalid)
 				throw new Exception("Should never get here !");
 
-			// 注意：如果补丁清单里未找到资源包会抛出异常！
+			// 注意：如果清单里未找到资源包会抛出异常！
 			var depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
 			List<BundleInfo> result = new List<BundleInfo>(depends.Length);
-			foreach (var patchBundle in depends)
+			foreach (var packageBundle in depends)
 			{
-				BundleInfo bundleInfo = CreateBundleInfo(patchBundle);
+				BundleInfo bundleInfo = CreateBundleInfo(packageBundle);
 				result.Add(bundleInfo);
 			}
 			return result.ToArray();

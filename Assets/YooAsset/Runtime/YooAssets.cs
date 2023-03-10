@@ -10,7 +10,7 @@ namespace YooAsset
 	{
 		private static bool _isInitialize = false;
 		private static GameObject _driver = null;
-		private static readonly List<AssetsPackage> _packages = new List<AssetsPackage>();
+		private static readonly List<ResourcePackage> _packages = new List<ResourcePackage>();
 
 		/// <summary>
 		/// 初始化资源系统
@@ -88,7 +88,7 @@ namespace YooAsset
 		/// 创建资源包
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static AssetsPackage CreateAssetsPackage(string packageName)
+		public static ResourcePackage CreatePackage(string packageName)
 		{
 			if (_isInitialize == false)
 				throw new Exception($"{nameof(YooAssets)} not initialize !");
@@ -96,23 +96,23 @@ namespace YooAsset
 			if (string.IsNullOrEmpty(packageName))
 				throw new Exception("Package name is null or empty !");
 
-			if (HasAssetsPackage(packageName))
+			if (HasPackage(packageName))
 				throw new Exception($"Package {packageName} already existed !");
 
-			AssetsPackage assetsPackage = new AssetsPackage(packageName);
-			_packages.Add(assetsPackage);
-			return assetsPackage;
+			ResourcePackage package = new ResourcePackage(packageName);
+			_packages.Add(package);
+			return package;
 		}
 
 		/// <summary>
 		/// 获取资源包
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static AssetsPackage GetAssetsPackage(string packageName)
+		public static ResourcePackage GetPackage(string packageName)
 		{
-			var package = TryGetAssetsPackage(packageName);
+			var package = TryGetPackage(packageName);
 			if (package == null)
-				YooLogger.Warning($"Not found assets package : {packageName}");
+				YooLogger.Error($"Not found assets package : {packageName}");
 			return package;
 		}
 
@@ -120,7 +120,7 @@ namespace YooAsset
 		/// 尝试获取资源包
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static AssetsPackage TryGetAssetsPackage(string packageName)
+		public static ResourcePackage TryGetPackage(string packageName)
 		{
 			if (_isInitialize == false)
 				throw new Exception($"{nameof(YooAssets)} not initialize !");
@@ -140,7 +140,7 @@ namespace YooAsset
 		/// 检测资源包是否存在
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static bool HasAssetsPackage(string packageName)
+		public static bool HasPackage(string packageName)
 		{
 			if (_isInitialize == false)
 				throw new Exception($"{nameof(YooAssets)} not initialize !");

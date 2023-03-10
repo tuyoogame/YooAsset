@@ -17,12 +17,12 @@ namespace YooAsset
 			Done,
 		}
 
-		private readonly AssetsPackage _package;
+		private readonly ResourcePackage _package;
 		private List<string> _unusedCacheGUIDs;
 		private int _unusedFileTotalCount = 0;
 		private ESteps _steps = ESteps.None;
 
-		internal ClearUnusedCacheFilesOperation(AssetsPackage package)
+		internal ClearUnusedCacheFilesOperation(ResourcePackage package)
 		{
 			_package = package;
 		}

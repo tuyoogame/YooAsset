@@ -45,7 +45,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetManifestBinaryFileName(string packageName, string packageVersion)
 		{
-			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.bytes";
+			return $"{Setting.ManifestFileName}_{packageName}_{packageVersion}.bytes";
 		}
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetManifestJsonFileName(string packageName, string packageVersion)
 		{
-			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.json";
+			return $"{Setting.ManifestFileName}_{packageName}_{packageVersion}.json";
 		}
 
 		/// <summary>
@@ -61,7 +61,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetPackageHashFileName(string packageName, string packageVersion)
 		{
-			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.hash";
+			return $"{Setting.ManifestFileName}_{packageName}_{packageVersion}.hash";
 		}
 
 		/// <summary>
@@ -69,7 +69,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetPackageVersionFileName(string packageName)
 		{
-			return $"{Setting.PatchManifestFileName}_{packageName}.version";
+			return $"{Setting.ManifestFileName}_{packageName}.version";
 		}
 	}
 }

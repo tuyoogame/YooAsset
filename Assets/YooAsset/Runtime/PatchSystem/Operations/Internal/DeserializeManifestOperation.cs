@@ -18,15 +18,15 @@ namespace YooAsset
 		}
 	
 		private readonly BufferReader _buffer;
-		private int _patchAssetCount;
-		private int _patchBundleCount;
+		private int _packageAssetCount;
+		private int _packageBundleCount;
 		private int _progressTotalValue;
 		private ESteps _steps = ESteps.None;
 
 		/// <summary>
 		/// 解析的清单实例
 		/// </summary>
-		public PatchManifest Manifest { private set; get; }
+		public PackageManifest Manifest { private set; get; }
 
 		public DeserializeManifestOperation(byte[] binaryData)
 		{
@@ -55,7 +55,7 @@ namespace YooAsset
 
 					// 读取文件标记
 					uint fileSign = _buffer.ReadUInt32();
-					if (fileSign != YooAssetSettings.PatchManifestFileSign)
+					if (fileSign != YooAssetSettings.ManifestFileSign)
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
@@ -65,16 +65,16 @@ namespace YooAsset
 
 					// 读取文件版本
 					string fileVersion = _buffer.ReadUTF8();
-					if (fileVersion != YooAssetSettings.PatchManifestFileVersion)
+					if (fileVersion != YooAssetSettings.ManifestFileVersion)
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
-						Error = $"The manifest file version are not compatible : {fileVersion} != {YooAssetSettings.PatchManifestFileVersion}";
+						Error = $"The manifest file version are not compatible : {fileVersion} != {YooAssetSettings.ManifestFileVersion}";
 						return;
 					}
 
 					// 读取文件头信息
-					Manifest = new PatchManifest();
+					Manifest = new PackageManifest();
 					Manifest.FileVersion = fileVersion;
 					Manifest.EnableAddressable = _buffer.ReadBool();
 					Manifest.OutputNameStyle = _buffer.ReadInt32();
@@ -86,38 +86,38 @@ namespace YooAsset
 
 				if (_steps == ESteps.PrepareAssetList)
 				{
-					_patchAssetCount = _buffer.ReadInt32();
-					Manifest.AssetList = new List<PatchAsset>(_patchAssetCount);
-					Manifest.AssetDic = new Dictionary<string, PatchAsset>(_patchAssetCount);
-					_progressTotalValue = _patchAssetCount;
+					_packageAssetCount = _buffer.ReadInt32();
+					Manifest.AssetList = new List<PackageAsset>(_packageAssetCount);
+					Manifest.AssetDic = new Dictionary<string, PackageAsset>(_packageAssetCount);
+					_progressTotalValue = _packageAssetCount;
 					_steps = ESteps.DeserializeAssetList;
 				}
 				if (_steps == ESteps.DeserializeAssetList)
 				{
-					while (_patchAssetCount > 0)
+					while (_packageAssetCount > 0)
 					{
-						var patchAsset = new PatchAsset();
-						patchAsset.Address = _buffer.ReadUTF8();
-						patchAsset.AssetPath = _buffer.ReadUTF8();
-						patchAsset.AssetTags = _buffer.ReadUTF8Array();
-						patchAsset.BundleID = _buffer.ReadInt32();
-						patchAsset.DependIDs = _buffer.ReadInt32Array();
-						Manifest.AssetList.Add(patchAsset);
+						var packageAsset = new PackageAsset();
+						packageAsset.Address = _buffer.ReadUTF8();
+						packageAsset.AssetPath = _buffer.ReadUTF8();
+						packageAsset.AssetTags = _buffer.ReadUTF8Array();
+						packageAsset.BundleID = _buffer.ReadInt32();
+						packageAsset.DependIDs = _buffer.ReadInt32Array();
+						Manifest.AssetList.Add(packageAsset);
 
 						// 注意：我们不允许原始路径存在重名
-						string assetPath = patchAsset.AssetPath;
+						string assetPath = packageAsset.AssetPath;
 						if (Manifest.AssetDic.ContainsKey(assetPath))
 							throw new System.Exception($"AssetPath have existed : {assetPath}");
 						else
-							Manifest.AssetDic.Add(assetPath, patchAsset);
+							Manifest.AssetDic.Add(assetPath, packageAsset);
 
-						_patchAssetCount--;
-						Progress = 1f - _patchAssetCount / _progressTotalValue;
+						_packageAssetCount--;
+						Progress = 1f - _packageAssetCount / _progressTotalValue;
 						if (OperationSystem.IsBusy)
 							break;
 					}
 
-					if (_patchAssetCount <= 0)
+					if (_packageAssetCount <= 0)
 					{
 						_steps = ESteps.PrepareBundleList;
 					}
@@ -125,37 +125,37 @@ namespace YooAsset
 
 				if (_steps == ESteps.PrepareBundleList)
 				{
-					_patchBundleCount = _buffer.ReadInt32();
-					Manifest.BundleList = new List<PatchBundle>(_patchBundleCount);
-					Manifest.BundleDic = new Dictionary<string, PatchBundle>(_patchBundleCount);
-					_progressTotalValue = _patchBundleCount;
+					_packageBundleCount = _buffer.ReadInt32();
+					Manifest.BundleList = new List<PackageBundle>(_packageBundleCount);
+					Manifest.BundleDic = new Dictionary<string, PackageBundle>(_packageBundleCount);
+					_progressTotalValue = _packageBundleCount;
 					_steps = ESteps.DeserializeBundleList;
 				}
 				if (_steps == ESteps.DeserializeBundleList)
 				{
-					while (_patchBundleCount > 0)
+					while (_packageBundleCount > 0)
 					{
-						var patchBundle = new PatchBundle();
-						patchBundle.BundleName = _buffer.ReadUTF8();
-						patchBundle.FileHash = _buffer.ReadUTF8();
-						patchBundle.FileCRC = _buffer.ReadUTF8();
-						patchBundle.FileSize = _buffer.ReadInt64();
-						patchBundle.IsRawFile = _buffer.ReadBool();
-						patchBundle.LoadMethod = _buffer.ReadByte();
-						patchBundle.Tags = _buffer.ReadUTF8Array();
-						patchBundle.ReferenceIDs = _buffer.ReadInt32Array();
-						Manifest.BundleList.Add(patchBundle);
+						var packageBundle = new PackageBundle();
+						packageBundle.BundleName = _buffer.ReadUTF8();
+						packageBundle.FileHash = _buffer.ReadUTF8();
+						packageBundle.FileCRC = _buffer.ReadUTF8();
+						packageBundle.FileSize = _buffer.ReadInt64();
+						packageBundle.IsRawFile = _buffer.ReadBool();
+						packageBundle.LoadMethod = _buffer.ReadByte();
+						packageBundle.Tags = _buffer.ReadUTF8Array();
+						packageBundle.ReferenceIDs = _buffer.ReadInt32Array();
+						Manifest.BundleList.Add(packageBundle);
 
-						patchBundle.ParseBundle(Manifest.PackageName, Manifest.OutputNameStyle);
-						Manifest.BundleDic.Add(patchBundle.BundleName, patchBundle);
+						packageBundle.ParseBundle(Manifest.PackageName, Manifest.OutputNameStyle);
+						Manifest.BundleDic.Add(packageBundle.BundleName, packageBundle);
 
-						_patchBundleCount--;
-						Progress = 1f - _patchBundleCount / _progressTotalValue;
+						_packageBundleCount--;
+						Progress = 1f - _packageBundleCount / _progressTotalValue;
 						if (OperationSystem.IsBusy)
 							break;
 					}
 
-					if (_patchBundleCount <= 0)
+					if (_packageBundleCount <= 0)
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Succeed;

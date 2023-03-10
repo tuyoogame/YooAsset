@@ -12,7 +12,7 @@ namespace YooAsset
 			LoadFromEditor,
 		}
 
-		public readonly PatchBundle Bundle;
+		public readonly PackageBundle Bundle;
 		public readonly ELoadMode LoadMode;
 
 		/// <summary>
@@ -34,25 +34,25 @@ namespace YooAsset
 		private BundleInfo()
 		{
 		}
-		public BundleInfo(PatchBundle patchBundle, ELoadMode loadMode, string mainURL, string fallbackURL)
+		public BundleInfo(PackageBundle bundle, ELoadMode loadMode, string mainURL, string fallbackURL)
 		{
-			Bundle = patchBundle;
+			Bundle = bundle;
 			LoadMode = loadMode;
 			RemoteMainURL = mainURL;
 			RemoteFallbackURL = fallbackURL;
 			EditorAssetPath = string.Empty;
 		}
-		public BundleInfo(PatchBundle patchBundle, ELoadMode loadMode, string editorAssetPath)
+		public BundleInfo(PackageBundle bundle, ELoadMode loadMode, string editorAssetPath)
 		{
-			Bundle = patchBundle;
+			Bundle = bundle;
 			LoadMode = loadMode;
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
 			EditorAssetPath = editorAssetPath;
 		}
-		public BundleInfo(PatchBundle patchBundle, ELoadMode loadMode)
+		public BundleInfo(PackageBundle bundle, ELoadMode loadMode)
 		{
-			Bundle = patchBundle;
+			Bundle = bundle;
 			LoadMode = loadMode;
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;

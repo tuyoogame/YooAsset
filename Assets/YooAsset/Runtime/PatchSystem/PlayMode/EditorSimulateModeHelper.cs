@@ -8,7 +8,7 @@ namespace YooAsset
 		private static System.Type _classType;
 
 		/// <summary>
-		/// 编辑器下模拟构建补丁清单
+		/// 编辑器下模拟构建清单
 		/// </summary>
 		public static string SimulateBuild(string packageName)
 		{
@@ -37,7 +37,7 @@ namespace YooAsset
 	public static class EditorSimulateModeHelper
 	{
 		/// <summary>
-		/// 编辑器下模拟构建补丁清单
+		/// 编辑器下模拟构建清单
 		/// </summary>
 		public static string SimulateBuild(string packageName) { throw new System.Exception("Only support in unity editor !"); }
 	}

@@ -26,14 +26,14 @@ namespace YooAsset
 		}
 
 		private readonly EditorSimulateModeImpl _impl;
-		private readonly string _simulateManifestPath;
+		private readonly string _simulateManifestFilePath;
 		private LoadEditorManifestOperation _loadEditorManifestOp;
 		private ESteps _steps = ESteps.None;
 
-		internal EditorSimulateModeInitializationOperation(EditorSimulateModeImpl impl, string simulateManifestPath)
+		internal EditorSimulateModeInitializationOperation(EditorSimulateModeImpl impl, string simulateManifestFilePath)
 		{
 			_impl = impl;
-			_simulateManifestPath = simulateManifestPath;
+			_simulateManifestFilePath = simulateManifestFilePath;
 		}
 		internal override void Start()
 		{
@@ -45,7 +45,7 @@ namespace YooAsset
 			{
 				if (_loadEditorManifestOp == null)
 				{
-					_loadEditorManifestOp = new LoadEditorManifestOperation(_simulateManifestPath);
+					_loadEditorManifestOp = new LoadEditorManifestOperation(_simulateManifestFilePath);
 					OperationSystem.StartOperation(_loadEditorManifestOp);
 				}
 

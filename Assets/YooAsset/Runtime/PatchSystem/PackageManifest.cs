@@ -7,10 +7,10 @@ using System.Collections.Generic;
 namespace YooAsset
 {
 	/// <summary>
-	/// 补丁清单文件
+	/// 清单文件
 	/// </summary>
 	[Serializable]
-	internal class PatchManifest
+	internal class PackageManifest
 	{
 		/// <summary>
 		/// 文件版本
@@ -40,25 +40,25 @@ namespace YooAsset
 		/// <summary>
 		/// 资源列表（主动收集的资源列表）
 		/// </summary>
-		public List<PatchAsset> AssetList = new List<PatchAsset>();
+		public List<PackageAsset> AssetList = new List<PackageAsset>();
 
 		/// <summary>
 		/// 资源包列表
 		/// </summary>
-		public List<PatchBundle> BundleList = new List<PatchBundle>();
+		public List<PackageBundle> BundleList = new List<PackageBundle>();
 
 
 		/// <summary>
-		/// 资源包集合（提供BundleName获取PatchBundle）
+		/// 资源包集合（提供BundleName获取PackageBundle）
 		/// </summary>
 		[NonSerialized]
-		public Dictionary<string, PatchBundle> BundleDic;
+		public Dictionary<string, PackageBundle> BundleDic;
 
 		/// <summary>
-		/// 资源映射集合（提供AssetPath获取PatchAsset）
+		/// 资源映射集合（提供AssetPath获取PackageAsset）
 		/// </summary>
 		[NonSerialized]
-		public Dictionary<string, PatchAsset> AssetDic;
+		public Dictionary<string, PackageAsset> AssetDic;
 
 		/// <summary>
 		/// 资源路径映射集合
@@ -86,22 +86,22 @@ namespace YooAsset
 					YooLogger.Error("Addressable not support location to lower !");
 
 				AssetPathMapping = new Dictionary<string, string>(AssetList.Count);
-				foreach (var patchAsset in AssetList)
+				foreach (var packageAsset in AssetList)
 				{
-					string location = patchAsset.Address;
+					string location = packageAsset.Address;
 					if (AssetPathMapping.ContainsKey(location))
 						throw new Exception($"Address have existed : {location}");
 					else
-						AssetPathMapping.Add(location, patchAsset.AssetPath);
+						AssetPathMapping.Add(location, packageAsset.AssetPath);
 				}
 			}
 			else
 			{
 				_locationToLower = locationToLower;
 				AssetPathMapping = new Dictionary<string, string>(AssetList.Count * 2);
-				foreach (var patchAsset in AssetList)
+				foreach (var packageAsset in AssetList)
 				{
-					string location = patchAsset.AssetPath;
+					string location = packageAsset.AssetPath;
 					if (locationToLower)
 						location = location.ToLower();
 
@@ -109,7 +109,7 @@ namespace YooAsset
 					if (AssetPathMapping.ContainsKey(location))
 						throw new Exception($"AssetPath have existed : {location}");
 					else
-						AssetPathMapping.Add(location, patchAsset.AssetPath);
+						AssetPathMapping.Add(location, packageAsset.AssetPath);
 
 					// 添加无后缀名路径的映射
 					if (Path.HasExtension(location))
@@ -118,7 +118,7 @@ namespace YooAsset
 						if (AssetPathMapping.ContainsKey(locationWithoutExtension))
 							YooLogger.Warning($"AssetPath have existed : {locationWithoutExtension}");
 						else
-							AssetPathMapping.Add(locationWithoutExtension, patchAsset.AssetPath);
+							AssetPathMapping.Add(locationWithoutExtension, packageAsset.AssetPath);
 					}
 				}
 			}
@@ -170,15 +170,15 @@ namespace YooAsset
 		/// 获取主资源包
 		/// 注意：传入的资源路径一定合法有效！
 		/// </summary>
-		public PatchBundle GetMainPatchBundle(string assetPath)
+		public PackageBundle GetMainPackageBundle(string assetPath)
 		{
-			if (AssetDic.TryGetValue(assetPath, out PatchAsset patchAsset))
+			if (AssetDic.TryGetValue(assetPath, out PackageAsset packageAsset))
 			{
-				int bundleID = patchAsset.BundleID;
+				int bundleID = packageAsset.BundleID;
 				if (bundleID >= 0 && bundleID < BundleList.Count)
 				{
-					var patchBundle = BundleList[bundleID];
-					return patchBundle;
+					var packageBundle = BundleList[bundleID];
+					return packageBundle;
 				}
 				else
 				{
@@ -195,17 +195,17 @@ namespace YooAsset
 		/// 获取资源依赖列表
 		/// 注意：传入的资源路径一定合法有效！
 		/// </summary>
-		public PatchBundle[] GetAllDependencies(string assetPath)
+		public PackageBundle[] GetAllDependencies(string assetPath)
 		{
-			if (AssetDic.TryGetValue(assetPath, out PatchAsset patchAsset))
+			if (AssetDic.TryGetValue(assetPath, out PackageAsset packageAsset))
 			{
-				List<PatchBundle> result = new List<PatchBundle>(patchAsset.DependIDs.Length);
-				foreach (var dependID in patchAsset.DependIDs)
+				List<PackageBundle> result = new List<PackageBundle>(packageAsset.DependIDs.Length);
+				foreach (var dependID in packageAsset.DependIDs)
 				{
 					if (dependID >= 0 && dependID < BundleList.Count)
 					{
-						var dependPatchBundle = BundleList[dependID];
-						result.Add(dependPatchBundle);
+						var dependBundle = BundleList[dependID];
+						result.Add(dependBundle);
 					}
 					else
 					{
@@ -227,8 +227,8 @@ namespace YooAsset
 		{
 			if (bundleID >= 0 && bundleID < BundleList.Count)
 			{
-				var patchBundle = BundleList[bundleID];
-				return patchBundle.BundleName;
+				var packageBundle = BundleList[bundleID];
+				return packageBundle.BundleName;
 			}
 			else
 			{
@@ -237,17 +237,17 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 尝试获取补丁资源
+		/// 尝试获取包裹的资源
 		/// </summary>
-		public bool TryGetPatchAsset(string assetPath, out PatchAsset result)
+		public bool TryGetPackageAsset(string assetPath, out PackageAsset result)
 		{
 			return AssetDic.TryGetValue(assetPath, out result);
 		}
 
 		/// <summary>
-		/// 尝试获取补丁资源包
+		/// 尝试获取包裹的资源包
 		/// </summary>
-		public bool TryGetPatchBundle(string bundleName, out PatchBundle result)
+		public bool TryGetPackageBundle(string bundleName, out PackageBundle result)
 		{
 			return BundleDic.TryGetValue(bundleName, out result);
 		}
@@ -257,9 +257,9 @@ namespace YooAsset
 		/// </summary>
 		public bool IsIncludeBundleFile(string cacheGUID)
 		{
-			foreach (var patchBundle in BundleList)
+			foreach (var packageBundle in BundleList)
 			{
-				if (patchBundle.CacheGUID == cacheGUID)
+				if (packageBundle.CacheGUID == cacheGUID)
 					return true;
 			}
 			return false;
@@ -271,11 +271,11 @@ namespace YooAsset
 		public AssetInfo[] GetAssetsInfoByTags(string[] tags)
 		{
 			List<AssetInfo> result = new List<AssetInfo>(100);
-			foreach (var patchAsset in AssetList)
+			foreach (var packageAsset in AssetList)
 			{
-				if (patchAsset.HasTag(tags))
+				if (packageAsset.HasTag(tags))
 				{
-					AssetInfo assetInfo = new AssetInfo(patchAsset);
+					AssetInfo assetInfo = new AssetInfo(packageAsset);
 					result.Add(assetInfo);
 				}
 			}
@@ -291,9 +291,9 @@ namespace YooAsset
 			DebugCheckLocation(location);
 
 			string assetPath = MappingToAssetPath(location);
-			if (TryGetPatchAsset(assetPath, out PatchAsset patchAsset))
+			if (TryGetPackageAsset(assetPath, out PackageAsset packageAsset))
 			{
-				AssetInfo assetInfo = new AssetInfo(patchAsset, assetType);
+				AssetInfo assetInfo = new AssetInfo(packageAsset, assetType);
 				return assetInfo;
 			}
 			else

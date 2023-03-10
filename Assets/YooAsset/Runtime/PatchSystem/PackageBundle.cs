@@ -4,7 +4,7 @@ using System.Linq;
 namespace YooAsset
 {
 	[Serializable]
-	internal class PatchBundle
+	internal class PackageBundle
 	{
 		/// <summary>
 		/// 资源包名称
@@ -173,7 +173,7 @@ namespace YooAsset
 		}
 
 
-		public PatchBundle()
+		public PackageBundle()
 		{
 		}
 
@@ -183,8 +183,8 @@ namespace YooAsset
 		public void ParseBundle(string packageName, int nameStype)
 		{
 			PackageName = packageName;
-			_fileExtension = PatchManifestTools.GetRemoteBundleFileExtension(BundleName);
-			_fileName = PatchManifestTools.GetRemoteBundleFileName(nameStype, BundleName, _fileExtension, FileHash);
+			_fileExtension = ManifestTools.GetRemoteBundleFileExtension(BundleName);
+			_fileName = ManifestTools.GetRemoteBundleFileName(nameStype, BundleName, _fileExtension, FileHash);
 		}
 
 		/// <summary>
@@ -219,7 +219,7 @@ namespace YooAsset
 		/// <summary>
 		/// 检测资源包文件内容是否相同
 		/// </summary>
-		public bool Equals(PatchBundle otherBundle)
+		public bool Equals(PackageBundle otherBundle)
 		{
 			if (FileHash == otherBundle.FileHash)
 				return true;

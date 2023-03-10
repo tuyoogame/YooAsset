@@ -133,7 +133,7 @@ namespace YooAsset
 		/// <summary>
 		/// 获取未被使用的缓存文件
 		/// </summary>
-		public static List<string> GetUnusedCacheGUIDs(AssetsPackage package)
+		public static List<string> GetUnusedCacheGUIDs(ResourcePackage package)
 		{
 			var cache = GetOrCreateCache(package.PackageName);
 			var keys = cache.GetAllKeys();

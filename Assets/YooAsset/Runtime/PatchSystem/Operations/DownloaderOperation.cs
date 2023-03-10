@@ -94,9 +94,9 @@ namespace YooAsset
 			if (downloadList != null)
 			{
 				TotalDownloadCount = downloadList.Count;
-				foreach (var patchBundle in downloadList)
+				foreach (var packageBundle in downloadList)
 				{
-					TotalDownloadBytes += patchBundle.Bundle.FileSize;
+					TotalDownloadBytes += packageBundle.Bundle.FileSize;
 				}
 			}
 		}
@@ -249,9 +249,9 @@ namespace YooAsset
 		}
 	}
 
-	public sealed class PatchDownloaderOperation : DownloaderOperation
+	public sealed class ResourceDownloaderOperation : DownloaderOperation
 	{
-		internal PatchDownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		internal ResourceDownloaderOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
 			: base(downloadList, downloadingMaxNumber, failedTryAgain, timeout)
 		{
 		}
@@ -259,16 +259,16 @@ namespace YooAsset
 		/// <summary>
 		/// 创建空的下载器
 		/// </summary>
-		internal static PatchDownloaderOperation CreateEmptyDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout)
+		internal static ResourceDownloaderOperation CreateEmptyDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = new List<BundleInfo>();
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 	}
-	public sealed class PatchUnpackerOperation : DownloaderOperation
+	public sealed class ResourceUnpackerOperation : DownloaderOperation
 	{
-		internal PatchUnpackerOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
+		internal ResourceUnpackerOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
 			: base(downloadList, downloadingMaxNumber, failedTryAgain, timeout)
 		{
 		}
@@ -276,10 +276,10 @@ namespace YooAsset
 		/// <summary>
 		/// 创建空的解压器
 		/// </summary>
-		internal static PatchUnpackerOperation CreateEmptyUnpacker(int upackingMaxNumber, int failedTryAgain, int timeout)
+		internal static ResourceUnpackerOperation CreateEmptyUnpacker(int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = new List<BundleInfo>();
-			var operation = new PatchUnpackerOperation(downloadList, upackingMaxNumber, failedTryAgain, int.MaxValue);
+			var operation = new ResourceUnpackerOperation(downloadList, upackingMaxNumber, failedTryAgain, int.MaxValue);
 			return operation;
 		}
 	}

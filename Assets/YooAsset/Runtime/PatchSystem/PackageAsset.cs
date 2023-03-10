@@ -4,7 +4,7 @@ using System.Linq;
 namespace YooAsset
 {
 	[Serializable]
-	internal class PatchAsset
+	internal class PackageAsset
 	{
 		/// <summary>
 		/// 可寻址地址

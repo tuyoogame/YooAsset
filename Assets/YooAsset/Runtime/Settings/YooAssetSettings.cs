@@ -8,23 +8,23 @@ namespace YooAsset
 		/// <summary>
 		/// 清单文件名称
 		/// </summary>
-		public string PatchManifestFileName = "PatchManifest";
+		public string ManifestFileName = "PackageManifest";
 
 
 		/// <summary>
 		/// 清单文件头标记
 		/// </summary>
-		public const uint PatchManifestFileSign = 0x594F4F;
+		public const uint ManifestFileSign = 0x594F4F;
 
 		/// <summary>
 		/// 清单文件极限大小（100MB）
 		/// </summary>
-		public const int PatchManifestFileMaxSize = 104857600;
+		public const int ManifestFileMaxSize = 104857600;
 
 		/// <summary>
 		/// 清单文件格式版本
 		/// </summary>
-		public const string PatchManifestFileVersion = "1.4.6";
+		public const string ManifestFileVersion = "1.4.6";
 
 
 		/// <summary>

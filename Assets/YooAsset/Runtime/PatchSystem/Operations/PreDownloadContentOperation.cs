@@ -4,57 +4,69 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	public abstract class PreDownloadPackageOperation : AsyncOperationBase
+	public abstract class PreDownloadContentOperation : AsyncOperationBase
 	{
 		/// <summary>
-		/// 创建补丁下载器，用于下载更新指定资源版本所有的资源包文件
+		/// 创建资源下载器，用于下载当前资源版本所有的资源包文件
 		/// </summary>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		/// <param name="timeout">超时时间</param>
-		public virtual PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public virtual ResourceDownloaderOperation CreateResourceDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
-			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		/// <summary>
-		/// 创建补丁下载器，用于下载更新资源标签指定的资源包文件
+		/// 创建资源下载器，用于下载指定的资源标签关联的资源包文件
 		/// </summary>
 		/// <param name="tag">资源标签</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		/// <param name="timeout">超时时间</param>
-		public virtual PatchDownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public virtual ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
-			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		/// <summary>
-		/// 创建补丁下载器，用于下载更新资源标签指定的资源包文件
+		/// 创建资源下载器，用于下载指定的资源标签列表关联的资源包文件
 		/// </summary>
 		/// <param name="tags">资源标签列表</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		/// <param name="timeout">超时时间</param>
-		public virtual PatchDownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public virtual ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
-			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		/// <summary>
-		/// 创建补丁下载器，用于下载更新指定的资源列表依赖的资源包文件
+		/// 创建资源下载器，用于下载指定的资源依赖的资源包文件
 		/// </summary>
-		/// <param name="locations">资源定位列表</param>
+		/// <param name="location">资源定位地址</param>
 		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
 		/// <param name="failedTryAgain">下载失败的重试次数</param>
 		/// <param name="timeout">超时时间</param>
-		public virtual PatchDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public virtual ResourceDownloaderOperation CreateBundleDownloader(string location, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
-			return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+		}
+
+		/// <summary>
+		/// 创建资源下载器，用于下载指定的资源列表依赖的资源包文件
+		/// </summary>
+		/// <param name="locations">资源定位地址列表</param>
+		/// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
+		/// <param name="failedTryAgain">下载失败的重试次数</param>
+		/// <param name="timeout">超时时间</param>
+		public virtual ResourceDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		{
+			return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 		}
 	}
 
-	public class EditorPlayModePreDownloadPackageOperation : PreDownloadPackageOperation
+	internal class EditorPlayModePreDownloadContentOperation : PreDownloadContentOperation
 	{
 		internal override void Start()
 		{
@@ -64,7 +76,7 @@ namespace YooAsset
 		{
 		}
 	}
-	public class OfflinePlayModePreDownloadPackageOperation : PreDownloadPackageOperation
+	internal class OfflinePlayModePreDownloadContentOperation : PreDownloadContentOperation
 	{
 		internal override void Start()
 		{
@@ -74,7 +86,7 @@ namespace YooAsset
 		{
 		}
 	}
-	public class HostPlayModePreDownloadPackageOperation : PreDownloadPackageOperation
+	internal class HostPlayModePreDownloadContentOperation : PreDownloadContentOperation
 	{
 		private enum ESteps
 		{
@@ -94,11 +106,11 @@ namespace YooAsset
 		private LoadCacheManifestOperation _tryLoadCacheManifestOp;
 		private LoadCacheManifestOperation _loadCacheManifestOp;
 		private DownloadManifestOperation _downloadManifestOp;
-		private PatchManifest _manifest;
+		private PackageManifest _manifest;
 		private ESteps _steps = ESteps.None;
 
 
-		internal HostPlayModePreDownloadPackageOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
+		internal HostPlayModePreDownloadContentOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
 		{
 			_impl = impl;
 			_packageName = packageName;
@@ -202,48 +214,64 @@ namespace YooAsset
 			}
 		}
 
-		public override PatchDownloaderOperation CreatePatchDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public override ResourceDownloaderOperation CreateResourceDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			if (Status != EOperationStatus.Succeed)
 			{
-				YooLogger.Warning($"{nameof(PreDownloadPackageOperation)} status is not succeed !");
-				return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+				YooLogger.Warning($"{nameof(PreDownloadContentOperation)} status is not succeed !");
+				return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 			}
 
 			List<BundleInfo> downloadList = _impl.GetDownloadListByAll(_manifest);
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
-		public override PatchDownloaderOperation CreatePatchDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public override ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			if (Status != EOperationStatus.Succeed)
 			{
-				YooLogger.Warning($"{nameof(PreDownloadPackageOperation)} status is not succeed !");
-				return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+				YooLogger.Warning($"{nameof(PreDownloadContentOperation)} status is not succeed !");
+				return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 			}
 
 			List<BundleInfo> downloadList = _impl.GetDownloadListByTags(_manifest, new string[] { tag });
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
-		public override PatchDownloaderOperation CreatePatchDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public override ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			if (Status != EOperationStatus.Succeed)
 			{
-				YooLogger.Warning($"{nameof(PreDownloadPackageOperation)} status is not succeed !");
-				return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+				YooLogger.Warning($"{nameof(PreDownloadContentOperation)} status is not succeed !");
+				return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 			}
 
 			List<BundleInfo> downloadList = _impl.GetDownloadListByTags(_manifest, tags);
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
-		public override PatchDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		public override ResourceDownloaderOperation CreateBundleDownloader(string location, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
 		{
 			if (Status != EOperationStatus.Succeed)
 			{
-				YooLogger.Warning($"{nameof(PreDownloadPackageOperation)} status is not succeed !");
-				return PatchDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+				YooLogger.Warning($"{nameof(PreDownloadContentOperation)} status is not succeed !");
+				return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+			}
+
+			List<AssetInfo> assetInfos = new List<AssetInfo>();
+			var assetInfo = _manifest.ConvertLocationToAssetInfo(location, null);
+			assetInfos.Add(assetInfo);
+
+			List<BundleInfo> downloadList = _impl.GetDownloadListByPaths(_manifest, assetInfos.ToArray());
+			var operation = new ResourceDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		public override ResourceDownloaderOperation CreateBundleDownloader(string[] locations, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+		{
+			if (Status != EOperationStatus.Succeed)
+			{
+				YooLogger.Warning($"{nameof(PreDownloadContentOperation)} status is not succeed !");
+				return ResourceDownloaderOperation.CreateEmptyDownloader(downloadingMaxNumber, failedTryAgain, timeout);
 			}
 
 			List<AssetInfo> assetInfos = new List<AssetInfo>(locations.Length);
@@ -254,7 +282,7 @@ namespace YooAsset
 			}
 
 			List<BundleInfo> downloadList = _impl.GetDownloadListByPaths(_manifest, assetInfos.ToArray());
-			var operation = new PatchDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceDownloaderOperation(downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 	}

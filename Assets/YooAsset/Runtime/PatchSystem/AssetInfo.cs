@@ -3,7 +3,7 @@ namespace YooAsset
 {
 	public class AssetInfo
 	{
-		private readonly PatchAsset _patchAsset;
+		private readonly PackageAsset _packageAsset;
 		private string _providerGUID;
 
 		/// <summary>
@@ -42,7 +42,7 @@ namespace YooAsset
 		{
 			get
 			{
-				return _patchAsset == null;
+				return _packageAsset == null;
 			}
 		}
 
@@ -53,9 +53,9 @@ namespace YooAsset
 		{
 			get
 			{
-				if (_patchAsset == null)
+				if (_packageAsset == null)
 					return string.Empty;
-				return _patchAsset.Address;
+				return _packageAsset.Address;
 			}
 		}
 
@@ -66,9 +66,9 @@ namespace YooAsset
 		{
 			get
 			{
-				if (_patchAsset == null)
+				if (_packageAsset == null)
 					return string.Empty;
-				return _patchAsset.AssetPath;
+				return _packageAsset.AssetPath;
 			}
 		}
 
@@ -77,30 +77,30 @@ namespace YooAsset
 		{
 			// 注意：禁止从外部创建该类
 		}
-		internal AssetInfo(PatchAsset patchAsset, System.Type assetType)
+		internal AssetInfo(PackageAsset packageAsset, System.Type assetType)
 		{
-			if (patchAsset == null)
+			if (packageAsset == null)
 				throw new System.Exception("Should never get here !");
 
 			_providerGUID = string.Empty;
-			_patchAsset = patchAsset;
+			_packageAsset = packageAsset;
 			AssetType = assetType;
 			Error = string.Empty;
 		}
-		internal AssetInfo(PatchAsset patchAsset)
+		internal AssetInfo(PackageAsset packageAsset)
 		{
-			if (patchAsset == null)
+			if (packageAsset == null)
 				throw new System.Exception("Should never get here !");
 
 			_providerGUID = string.Empty;
-			_patchAsset = patchAsset;
+			_packageAsset = packageAsset;
 			AssetType = null;
 			Error = string.Empty;
 		}
 		internal AssetInfo(string error)
 		{
 			_providerGUID = string.Empty;
-			_patchAsset = null;
+			_packageAsset = null;
 			AssetType = null;
 			Error = error;
 		}
