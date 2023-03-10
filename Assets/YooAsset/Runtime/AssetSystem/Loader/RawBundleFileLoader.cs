@@ -124,13 +124,14 @@ namespace YooAsset
 				DownloadProgress = 1f;
 				DownloadedBytes = (ulong)MainBundleInfo.Bundle.FileSize;
 
-				_steps = ESteps.Done;
 				if (File.Exists(FileLoadPath))
 				{
+					_steps = ESteps.Done;
 					Status = EStatus.Succeed;
 				}
 				else
 				{
+					_steps = ESteps.Done;
 					Status = EStatus.Failed;
 					LastError = $"Raw file not found : {FileLoadPath}";
 				}
@@ -148,10 +149,12 @@ namespace YooAsset
 				// 文件解压
 				if (_unpacker != null)
 				{
-					_unpacker.WaitForAsyncComplete = true;
-					_unpacker.Update();
 					if (_unpacker.IsDone() == false)
+					{
+						_unpacker.WaitForAsyncComplete = true;
+						_unpacker.Update();
 						continue;
+					}
 				}
 
 				// 保险机制

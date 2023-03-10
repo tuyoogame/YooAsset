@@ -286,10 +286,12 @@ namespace YooAsset
 				// 文件解压
 				if (_unpacker != null)
 				{
-					_unpacker.WaitForAsyncComplete = true;
-					_unpacker.Update();
 					if (_unpacker.IsDone() == false)
+					{
+						_unpacker.WaitForAsyncComplete = true;
+						_unpacker.Update();
 						continue;
+					}
 				}
 
 				// 保险机制
