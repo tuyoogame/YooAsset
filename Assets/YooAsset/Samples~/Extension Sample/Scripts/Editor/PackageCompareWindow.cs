@@ -6,25 +6,25 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	public class PatchCompareWindow : EditorWindow
+	public class PackageCompareWindow : EditorWindow
 	{
-		static PatchCompareWindow _thisInstance;
+		static PackageCompareWindow _thisInstance;
 		
 		[MenuItem("YooAsset/补丁包比对工具", false, 302)]
 		static void ShowWindow()
 		{
 			if (_thisInstance == null)
 			{
-				_thisInstance = EditorWindow.GetWindow(typeof(PatchCompareWindow), false, "补丁包比对工具", true) as PatchCompareWindow;
+				_thisInstance = EditorWindow.GetWindow(typeof(PackageCompareWindow), false, "补丁包比对工具", true) as PackageCompareWindow;
 				_thisInstance.minSize = new Vector2(800, 600);
 			}
 			_thisInstance.Show();
 		}
 
-		private string _patchManifestPath1 = string.Empty;
-		private string _patchManifestPath2 = string.Empty;
-		private readonly List<PatchBundle> _changeList = new List<PatchBundle>();
-		private readonly List<PatchBundle> _newList = new List<PatchBundle>();
+		private string _manifestPath1 = string.Empty;
+		private string _manifestPath2 = string.Empty;
+		private readonly List<PackageBundle> _changeList = new List<PackageBundle>();
+		private readonly List<PackageBundle> _newList = new List<PackageBundle>();
 		private Vector2 _scrollPos1;
 		private Vector2 _scrollPos2;
 
@@ -37,9 +37,9 @@ namespace YooAsset.Editor
 				string resultPath = EditorUtility.OpenFilePanel("Find", "Assets/", "bytes");
 				if (string.IsNullOrEmpty(resultPath))
 					return;
-				_patchManifestPath1 = resultPath;
+				_manifestPath1 = resultPath;
 			}
-			EditorGUILayout.LabelField(_patchManifestPath1);
+			EditorGUILayout.LabelField(_manifestPath1);
 			EditorGUILayout.EndHorizontal();
 
 			GUILayout.Space(10);
@@ -49,16 +49,16 @@ namespace YooAsset.Editor
 				string resultPath = EditorUtility.OpenFilePanel("Find", "Assets/", "bytes");
 				if (string.IsNullOrEmpty(resultPath))
 					return;
-				_patchManifestPath2 = resultPath;
+				_manifestPath2 = resultPath;
 			}
-			EditorGUILayout.LabelField(_patchManifestPath2);
+			EditorGUILayout.LabelField(_manifestPath2);
 			EditorGUILayout.EndHorizontal();
 
-			if (string.IsNullOrEmpty(_patchManifestPath1) == false && string.IsNullOrEmpty(_patchManifestPath2) == false)
+			if (string.IsNullOrEmpty(_manifestPath1) == false && string.IsNullOrEmpty(_manifestPath2) == false)
 			{
 				if (GUILayout.Button("比对差异", GUILayout.MaxWidth(150)))
 				{
-					ComparePatch(_changeList, _newList);
+					ComparePackage(_changeList, _newList);
 				}
 			}
 
@@ -99,32 +99,32 @@ namespace YooAsset.Editor
 			}
 		}
 
-		private void ComparePatch(List<PatchBundle> changeList, List<PatchBundle> newList)
+		private void ComparePackage(List<PackageBundle> changeList, List<PackageBundle> newList)
 		{
 			changeList.Clear();
 			newList.Clear();
 
 			// 加载补丁清单1
-			byte[] bytesData1 = FileUtility.ReadAllBytes(_patchManifestPath1);
-			PatchManifest patchManifest1 = PatchManifestTools.DeserializeFromBinary(bytesData1);
+			byte[] bytesData1 = FileUtility.ReadAllBytes(_manifestPath1);
+			PackageManifest manifest1 = ManifestTools.DeserializeFromBinary(bytesData1);
 
 			// 加载补丁清单1
-			byte[] bytesData2 = FileUtility.ReadAllBytes(_patchManifestPath2);
-			PatchManifest patchManifest2 = PatchManifestTools.DeserializeFromBinary(bytesData2);
+			byte[] bytesData2 = FileUtility.ReadAllBytes(_manifestPath2);
+			PackageManifest manifest2 = ManifestTools.DeserializeFromBinary(bytesData2);
 
 			// 拷贝文件列表
-			foreach (var patchBundle2 in patchManifest2.BundleList)
+			foreach (var bundle2 in manifest2.BundleList)
 			{
-				if (patchManifest1.TryGetPatchBundle(patchBundle2.BundleName, out PatchBundle patchBundle1))
+				if (manifest1.TryGetPackageBundle(bundle2.BundleName, out PackageBundle bundle1))
 				{
-					if (patchBundle2.FileHash != patchBundle1.FileHash)
+					if (bundle2.FileHash != bundle1.FileHash)
 					{
-						changeList.Add(patchBundle2);
+						changeList.Add(bundle2);
 					}
 				}
 				else
 				{
-					newList.Add(patchBundle2);
+					newList.Add(bundle2);
 				}
 			}
 
