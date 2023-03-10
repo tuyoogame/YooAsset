@@ -22,7 +22,7 @@ public class PatchManager : ModuleSingleton<PatchManager>, IModule
 	/// <summary>
 	/// 下载器
 	/// </summary>
-	public PatchDownloaderOperation Downloader { set; get; }
+	public ResourceDownloaderOperation Downloader { set; get; }
 
 
 	private bool _isRun = false;

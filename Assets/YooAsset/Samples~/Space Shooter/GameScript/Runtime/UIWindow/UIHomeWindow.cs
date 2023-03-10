@@ -24,7 +24,7 @@ public class UIHomeWindow : UIWindow
 	}
 	public override void OnRefresh()
 	{
-		var package = YooAsset.YooAssets.GetAssetsPackage("DefaultPackage");
+		var package = YooAsset.YooAssets.GetPackage("DefaultPackage");
 		_version.text = "Ver : " + package.GetPackageVersion();
 	}
 	public override void OnUpdate()

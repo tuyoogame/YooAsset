@@ -38,11 +38,11 @@ internal class FsmInitialize : IStateNode
 
 		// 创建默认的资源包
 		string packageName = "DefaultPackage";
-		var package = YooAssets.TryGetAssetsPackage(packageName);
+		var package = YooAssets.TryGetPackage(packageName);
 		if (package == null)
 		{
-			package = YooAssets.CreateAssetsPackage(packageName);
-			YooAssets.SetDefaultAssetsPackage(package);
+			package = YooAssets.CreatePackage(packageName);
+			YooAssets.SetDefaultPackage(package);
 		}
 
 		// 编辑器下的模拟模式
@@ -50,7 +50,7 @@ internal class FsmInitialize : IStateNode
 		if (playMode == EPlayMode.EditorSimulateMode)
 		{
 			var createParameters = new EditorSimulateModeParameters();
-			createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild(packageName);
+			createParameters.SimulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild(packageName);
 			initializationOperation = package.InitializeAsync(createParameters);
 		}
 

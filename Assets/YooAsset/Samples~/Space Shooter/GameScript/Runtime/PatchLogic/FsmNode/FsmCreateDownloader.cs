@@ -34,7 +34,7 @@ public class FsmCreateDownloader : IStateNode
 
 		int downloadingMaxNum = 10;
 		int failedTryAgain = 3;
-		var downloader = YooAssets.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
+		var downloader = YooAssets.CreateResourceDownloader(downloadingMaxNum, failedTryAgain);
 		PatchManager.Instance.Downloader = downloader;
 
 		if (downloader.TotalDownloadCount == 0)
