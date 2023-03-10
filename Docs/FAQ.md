@@ -4,6 +4,8 @@
 
 如果在打AssetBundle的时候，选定的构建目标是安卓。那么在windows操作系统下，编辑器的默认渲染模式为DX11，我们需要修改编辑器的渲染模式，可以通过UnityHub来修改启动项目的编辑器渲染模式，[参考官方文档](https://docs.unity3d.com/cn/2019.4/Manual/CommandLineArguments.html)。
 
+在Vulkan下打包的编辑器需要加个command -force-vulkan
+
 windows平台添加命令: **-force-gles**
 
 #### 问题：Unity2021编辑器运行游戏提示YooAssets is initialized !
