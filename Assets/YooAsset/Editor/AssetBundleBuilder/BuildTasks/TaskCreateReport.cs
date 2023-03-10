@@ -12,21 +12,21 @@ namespace YooAsset.Editor
 		{
 			var buildParameters = context.GetContextObject<BuildParametersContext>();
 			var buildMapContext = context.GetContextObject<BuildMapContext>();
-			var patchManifestContext = context.GetContextObject<PatchManifestContext>();
+			var manifestContext = context.GetContextObject<ManifestContext>();
 
 			var buildMode = buildParameters.Parameters.BuildMode;
 			if (buildMode != EBuildMode.SimulateBuild)
 			{
-				CreateReportFile(buildParameters, buildMapContext, patchManifestContext);
+				CreateReportFile(buildParameters, buildMapContext, manifestContext);
 			}
 		}
 
-		private void CreateReportFile(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext, PatchManifestContext patchManifestContext)
+		private void CreateReportFile(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext, ManifestContext manifestContext)
 		{
 			var buildParameters = buildParametersContext.Parameters;
 
 			string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
-			PatchManifest patchManifest = patchManifestContext.Manifest;
+			PackageManifest manifest = manifestContext.Manifest;
 			BuildReport buildReport = new BuildReport();
 
 			// 概述信息
@@ -57,46 +57,46 @@ namespace YooAsset.Editor
 
 				// 构建结果
 				buildReport.Summary.AssetFileTotalCount = buildMapContext.AssetFileCount;
-				buildReport.Summary.MainAssetTotalCount = GetMainAssetCount(patchManifest);
-				buildReport.Summary.AllBundleTotalCount = GetAllBundleCount(patchManifest);
-				buildReport.Summary.AllBundleTotalSize = GetAllBundleSize(patchManifest);
-				buildReport.Summary.EncryptedBundleTotalCount = GetEncryptedBundleCount(patchManifest);
-				buildReport.Summary.EncryptedBundleTotalSize = GetEncryptedBundleSize(patchManifest);
-				buildReport.Summary.RawBundleTotalCount = GetRawBundleCount(patchManifest);
-				buildReport.Summary.RawBundleTotalSize = GetRawBundleSize(patchManifest);
+				buildReport.Summary.MainAssetTotalCount = GetMainAssetCount(manifest);
+				buildReport.Summary.AllBundleTotalCount = GetAllBundleCount(manifest);
+				buildReport.Summary.AllBundleTotalSize = GetAllBundleSize(manifest);
+				buildReport.Summary.EncryptedBundleTotalCount = GetEncryptedBundleCount(manifest);
+				buildReport.Summary.EncryptedBundleTotalSize = GetEncryptedBundleSize(manifest);
+				buildReport.Summary.RawBundleTotalCount = GetRawBundleCount(manifest);
+				buildReport.Summary.RawBundleTotalSize = GetRawBundleSize(manifest);
 			}
 
 			// 资源对象列表
-			buildReport.AssetInfos = new List<ReportAssetInfo>(patchManifest.AssetList.Count);
-			foreach (var patchAsset in patchManifest.AssetList)
+			buildReport.AssetInfos = new List<ReportAssetInfo>(manifest.AssetList.Count);
+			foreach (var packageAsset in manifest.AssetList)
 			{
-				var mainBundle = patchManifest.BundleList[patchAsset.BundleID];
+				var mainBundle = manifest.BundleList[packageAsset.BundleID];
 				ReportAssetInfo reportAssetInfo = new ReportAssetInfo();
-				reportAssetInfo.Address = patchAsset.Address;
-				reportAssetInfo.AssetPath = patchAsset.AssetPath;
-				reportAssetInfo.AssetTags = patchAsset.AssetTags;
-				reportAssetInfo.AssetGUID = AssetDatabase.AssetPathToGUID(patchAsset.AssetPath);
+				reportAssetInfo.Address = packageAsset.Address;
+				reportAssetInfo.AssetPath = packageAsset.AssetPath;
+				reportAssetInfo.AssetTags = packageAsset.AssetTags;
+				reportAssetInfo.AssetGUID = AssetDatabase.AssetPathToGUID(packageAsset.AssetPath);
 				reportAssetInfo.MainBundleName = mainBundle.BundleName;
 				reportAssetInfo.MainBundleSize = mainBundle.FileSize;
-				reportAssetInfo.DependBundles = GetDependBundles(patchManifest, patchAsset);
-				reportAssetInfo.DependAssets = GetDependAssets(buildMapContext, mainBundle.BundleName, patchAsset.AssetPath);
+				reportAssetInfo.DependBundles = GetDependBundles(manifest, packageAsset);
+				reportAssetInfo.DependAssets = GetDependAssets(buildMapContext, mainBundle.BundleName, packageAsset.AssetPath);
 				buildReport.AssetInfos.Add(reportAssetInfo);
 			}
 
 			// 资源包列表
-			buildReport.BundleInfos = new List<ReportBundleInfo>(patchManifest.BundleList.Count);
-			foreach (var patchBundle in patchManifest.BundleList)
+			buildReport.BundleInfos = new List<ReportBundleInfo>(manifest.BundleList.Count);
+			foreach (var packageBundle in manifest.BundleList)
 			{
 				ReportBundleInfo reportBundleInfo = new ReportBundleInfo();
-				reportBundleInfo.BundleName = patchBundle.BundleName;
-				reportBundleInfo.FileName = patchBundle.FileName;
-				reportBundleInfo.FileHash = patchBundle.FileHash;
-				reportBundleInfo.FileCRC = patchBundle.FileCRC;
-				reportBundleInfo.FileSize = patchBundle.FileSize;
-				reportBundleInfo.Tags = patchBundle.Tags;
-				reportBundleInfo.ReferenceIDs = patchBundle.ReferenceIDs;
-				reportBundleInfo.IsRawFile = patchBundle.IsRawFile;
-				reportBundleInfo.LoadMethod = (EBundleLoadMethod)patchBundle.LoadMethod;
+				reportBundleInfo.BundleName = packageBundle.BundleName;
+				reportBundleInfo.FileName = packageBundle.FileName;
+				reportBundleInfo.FileHash = packageBundle.FileHash;
+				reportBundleInfo.FileCRC = packageBundle.FileCRC;
+				reportBundleInfo.FileSize = packageBundle.FileSize;
+				reportBundleInfo.Tags = packageBundle.Tags;
+				reportBundleInfo.ReferenceIDs = packageBundle.ReferenceIDs;
+				reportBundleInfo.IsRawFile = packageBundle.IsRawFile;
+				reportBundleInfo.LoadMethod = (EBundleLoadMethod)packageBundle.LoadMethod;
 				buildReport.BundleInfos.Add(reportBundleInfo);
 			}
 
@@ -110,12 +110,12 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取资源对象依赖的所有资源包
 		/// </summary>
-		private List<string> GetDependBundles(PatchManifest patchManifest, PatchAsset patchAsset)
+		private List<string> GetDependBundles(PackageManifest manifest, PackageAsset packageAsset)
 		{
-			List<string> dependBundles = new List<string>(patchAsset.DependIDs.Length);
-			foreach (int index in patchAsset.DependIDs)
+			List<string> dependBundles = new List<string>(packageAsset.DependIDs.Length);
+			foreach (int index in packageAsset.DependIDs)
 			{
-				string dependBundleName = patchManifest.BundleList[index].BundleName;
+				string dependBundleName = manifest.BundleList[index].BundleName;
 				dependBundles.Add(dependBundleName);
 			}
 			return dependBundles;
@@ -150,60 +150,60 @@ namespace YooAsset.Editor
 			return result;
 		}
 
-		private int GetMainAssetCount(PatchManifest patchManifest)
+		private int GetMainAssetCount(PackageManifest manifest)
 		{
-			return patchManifest.AssetList.Count;
+			return manifest.AssetList.Count;
 		}
-		private int GetAllBundleCount(PatchManifest patchManifest)
+		private int GetAllBundleCount(PackageManifest manifest)
 		{
-			return patchManifest.BundleList.Count;
+			return manifest.BundleList.Count;
 		}
-		private long GetAllBundleSize(PatchManifest patchManifest)
+		private long GetAllBundleSize(PackageManifest manifest)
 		{
 			long fileBytes = 0;
-			foreach (var patchBundle in patchManifest.BundleList)
+			foreach (var packageBundle in manifest.BundleList)
 			{
-				fileBytes += patchBundle.FileSize;
+				fileBytes += packageBundle.FileSize;
 			}
 			return fileBytes;
 		}
-		private int GetEncryptedBundleCount(PatchManifest patchManifest)
+		private int GetEncryptedBundleCount(PackageManifest manifest)
 		{
 			int fileCount = 0;
-			foreach (var patchBundle in patchManifest.BundleList)
+			foreach (var packageBundle in manifest.BundleList)
 			{
-				if (patchBundle.LoadMethod != (byte)EBundleLoadMethod.Normal)
+				if (packageBundle.LoadMethod != (byte)EBundleLoadMethod.Normal)
 					fileCount++;
 			}
 			return fileCount;
 		}
-		private long GetEncryptedBundleSize(PatchManifest patchManifest)
+		private long GetEncryptedBundleSize(PackageManifest manifest)
 		{
 			long fileBytes = 0;
-			foreach (var patchBundle in patchManifest.BundleList)
+			foreach (var packageBundle in manifest.BundleList)
 			{
-				if (patchBundle.LoadMethod != (byte)EBundleLoadMethod.Normal)
-					fileBytes += patchBundle.FileSize;
+				if (packageBundle.LoadMethod != (byte)EBundleLoadMethod.Normal)
+					fileBytes += packageBundle.FileSize;
 			}
 			return fileBytes;
 		}
-		private int GetRawBundleCount(PatchManifest patchManifest)
+		private int GetRawBundleCount(PackageManifest manifest)
 		{
 			int fileCount = 0;
-			foreach (var patchBundle in patchManifest.BundleList)
+			foreach (var packageBundle in manifest.BundleList)
 			{
-				if (patchBundle.IsRawFile)
+				if (packageBundle.IsRawFile)
 					fileCount++;
 			}
 			return fileCount;
 		}
-		private long GetRawBundleSize(PatchManifest patchManifest)
+		private long GetRawBundleSize(PackageManifest manifest)
 		{
 			long fileBytes = 0;
-			foreach (var patchBundle in patchManifest.BundleList)
+			foreach (var packageBundle in manifest.BundleList)
 			{
-				if (patchBundle.IsRawFile)
-					fileBytes += patchBundle.FileSize;
+				if (packageBundle.IsRawFile)
+					fileBytes += packageBundle.FileSize;
 			}
 			return fileBytes;
 		}

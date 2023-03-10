@@ -6,8 +6,8 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("更新补丁信息")]
-	public class TaskUpdatePatchInfo : IBuildTask
+	[TaskAttribute("更新资源包信息")]
+	public class TaskUpdateBundleInfo : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
 		{
@@ -30,27 +30,27 @@ namespace YooAsset.Editor
 			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				if (bundleInfo.IsEncryptedFile)
-					bundleInfo.PatchInfo.BuildOutputFilePath = bundleInfo.EncryptedFilePath;
+					bundleInfo.BundleInfo.BuildOutputFilePath = bundleInfo.EncryptedFilePath;
 				else
-					bundleInfo.PatchInfo.BuildOutputFilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
+					bundleInfo.BundleInfo.BuildOutputFilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
 			}
 
 			// 3.更新文件其它信息
 			foreach (var bundleInfo in buildMapContext.Collection)
 			{
-				string buildOutputFilePath = bundleInfo.PatchInfo.BuildOutputFilePath;
-				bundleInfo.PatchInfo.ContentHash = GetBundleContentHash(bundleInfo, context);
-				bundleInfo.PatchInfo.PatchFileHash = GetBundleFileHash(buildOutputFilePath, buildParametersContext);
-				bundleInfo.PatchInfo.PatchFileCRC = GetBundleFileCRC(buildOutputFilePath, buildParametersContext);
-				bundleInfo.PatchInfo.PatchFileSize = GetBundleFileSize(buildOutputFilePath, buildParametersContext);
+				string buildOutputFilePath = bundleInfo.BundleInfo.BuildOutputFilePath;
+				bundleInfo.BundleInfo.ContentHash = GetBundleContentHash(bundleInfo, context);
+				bundleInfo.BundleInfo.FileHash = GetBundleFileHash(buildOutputFilePath, buildParametersContext);
+				bundleInfo.BundleInfo.FileCRC = GetBundleFileCRC(buildOutputFilePath, buildParametersContext);
+				bundleInfo.BundleInfo.FileSize = GetBundleFileSize(buildOutputFilePath, buildParametersContext);
 			}
 
 			// 4.更新补丁包输出的文件路径
 			foreach (var bundleInfo in buildMapContext.Collection)
 			{
-				string patchFileExtension = PatchManifestTools.GetRemoteBundleFileExtension(bundleInfo.BundleName);
-				string patchFileName = PatchManifestTools.GetRemoteBundleFileName(outputNameStyle, bundleInfo.BundleName, patchFileExtension, bundleInfo.PatchInfo.PatchFileHash);
-				bundleInfo.PatchInfo.PatchOutputFilePath = $"{packageOutputDirectory}/{patchFileName}";
+				string fileExtension = ManifestTools.GetRemoteBundleFileExtension(bundleInfo.BundleName);
+				string fileName = ManifestTools.GetRemoteBundleFileName(outputNameStyle, bundleInfo.BundleName, fileExtension, bundleInfo.BundleInfo.FileHash);
+				bundleInfo.BundleInfo.PackageOutputFilePath = $"{packageOutputDirectory}/{fileName}";
 			}
 		}
 
@@ -64,7 +64,7 @@ namespace YooAsset.Editor
 
 			if (bundleInfo.IsRawFile)
 			{
-				string filePath = bundleInfo.PatchInfo.BuildOutputFilePath;
+				string filePath = bundleInfo.BundleInfo.BuildOutputFilePath;
 				return HashUtility.FileMD5(filePath);
 			}
 

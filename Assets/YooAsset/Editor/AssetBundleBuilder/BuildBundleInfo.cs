@@ -8,7 +8,7 @@ namespace YooAsset.Editor
 {
 	public class BuildBundleInfo
 	{
-		public class BuildPatchInfo
+		public class InfoWrapper
 		{
 			/// <summary>
 			/// 构建内容的哈希值
@@ -18,17 +18,17 @@ namespace YooAsset.Editor
 			/// <summary>
 			/// 文件哈希值
 			/// </summary>
-			public string PatchFileHash { set; get; }
+			public string FileHash { set; get; }
 
 			/// <summary>
 			/// 文件哈希值
 			/// </summary>
-			public string PatchFileCRC { set; get; }
+			public string FileCRC { set; get; }
 
 			/// <summary>
 			/// 文件哈希值
 			/// </summary>
-			public long PatchFileSize { set; get; }
+			public long FileSize { set; get; }
 
 
 			/// <summary>
@@ -39,7 +39,7 @@ namespace YooAsset.Editor
 			/// <summary>
 			/// 补丁包输出文件路径
 			/// </summary>
-			public string PatchOutputFilePath { set; get; }
+			public string PackageOutputFilePath { set; get; }
 		}
 
 		/// <summary>
@@ -56,7 +56,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 补丁文件信息
 		/// </summary>
-		public readonly BuildPatchInfo PatchInfo = new BuildPatchInfo();
+		public readonly InfoWrapper BundleInfo = new InfoWrapper();
 
 		/// <summary>
 		/// Bundle文件的加载方法
@@ -159,7 +159,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取所有写入补丁清单的资源
 		/// </summary>
-		public BuildAssetInfo[] GetAllPatchAssetInfos()
+		public BuildAssetInfo[] GetAllBuildAssetInfos()
 		{
 			return BuildinAssets.Where(t => t.CollectorType == ECollectorType.MainAssetCollector).ToArray();
 		}
@@ -178,19 +178,19 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 创建PatchBundle类
+		/// 创建PackageBundle类
 		/// </summary>
-		internal PatchBundle CreatePatchBundle()
+		internal PackageBundle CreatePackageBundle()
 		{
-			PatchBundle patchBundle = new PatchBundle();
-			patchBundle.BundleName = BundleName;
-			patchBundle.FileHash = PatchInfo.PatchFileHash;
-			patchBundle.FileCRC = PatchInfo.PatchFileCRC;
-			patchBundle.FileSize = PatchInfo.PatchFileSize;
-			patchBundle.IsRawFile = IsRawFile;
-			patchBundle.LoadMethod = (byte)LoadMethod;
-			patchBundle.Tags = GetBundleTags();
-			return patchBundle;
+			PackageBundle packageBundle = new PackageBundle();
+			packageBundle.BundleName = BundleName;
+			packageBundle.FileHash = BundleInfo.FileHash;
+			packageBundle.FileCRC = BundleInfo.FileCRC;
+			packageBundle.FileSize = BundleInfo.FileSize;
+			packageBundle.IsRawFile = IsRawFile;
+			packageBundle.LoadMethod = (byte)LoadMethod;
+			packageBundle.Tags = GetBundleTags();
+			return packageBundle;
 		}
 	}
 }

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("制作补丁包")]
-	public class TaskCreatePatchPackage : IBuildTask
+	[TaskAttribute("制作包裹")]
+	public class TaskCreatePackage : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
 		{
@@ -13,14 +13,14 @@ namespace YooAsset.Editor
 			var buildMode = buildParameters.Parameters.BuildMode;
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
-				CopyPatchFiles(buildParameters, buildMapContext);
+				CopyPackageFiles(buildParameters, buildMapContext);
 			}
 		}
 
 		/// <summary>
 		/// 拷贝补丁文件到补丁包目录
 		/// </summary>
-		private void CopyPatchFiles(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext)
+		private void CopyPackageFiles(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext)
 		{
 			var buildParameters = buildParametersContext.Parameters;
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
@@ -67,11 +67,11 @@ namespace YooAsset.Editor
 
 			// 拷贝所有补丁文件
 			int progressValue = 0;
-			int patchFileTotalCount = buildMapContext.Collection.Count;
+			int fileTotalCount = buildMapContext.Collection.Count;
 			foreach (var bundleInfo in buildMapContext.Collection)
 			{
-				EditorTools.CopyFile(bundleInfo.PatchInfo.BuildOutputFilePath, bundleInfo.PatchInfo.PatchOutputFilePath, true);
-				EditorTools.DisplayProgressBar("拷贝补丁文件", ++progressValue, patchFileTotalCount);
+				EditorTools.CopyFile(bundleInfo.BundleInfo.BuildOutputFilePath, bundleInfo.BundleInfo.PackageOutputFilePath, true);
+				EditorTools.DisplayProgressBar("拷贝补丁文件", ++progressValue, fileTotalCount);
 			}
 			EditorTools.ClearProgressBar();
 		}
