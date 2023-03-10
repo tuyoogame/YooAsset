@@ -2,6 +2,31 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.8] - 2023-03-10
+
+### Fixed
+
+- 修复了同步加载原生文件，程序卡死的问题。
+- 修复了可编程构建管线，当项目里没有着色器，如果有引用内置着色器会导致打包失败的问题。
+- 修复了在Unity2021.3版本下着色器收集界面错乱的问题。
+
+### Changed
+
+- 优化了打包逻辑，提高构建速度。
+
+- 支持自定义日志处理，方便收集线上问题。
+
+  ```c#
+  public class YooAssets
+  {
+      /// <summary>
+      /// 初始化资源系统
+      /// </summary>
+      /// <param name="logger">自定义日志处理</param>
+      public static void Initialize(ILogger logger = null)
+  }
+  ```
+
 ## [1.4.7] - 2023-03-03
 
 ### Fixed
