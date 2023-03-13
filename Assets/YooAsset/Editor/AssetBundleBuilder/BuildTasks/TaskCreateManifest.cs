@@ -137,7 +137,7 @@ namespace YooAsset.Editor
 			List<PackageAsset> result = new List<PackageAsset>(1000);
 			foreach (var bundleInfo in buildMapContext.Collection)
 			{
-				var assetInfos = bundleInfo.GetAllBuildAssetInfos();
+				var assetInfos = bundleInfo.GetAllMainAssetInfos();
 				foreach (var assetInfo in assetInfos)
 				{
 					PackageAsset packageAsset = new PackageAsset();

@@ -93,10 +93,11 @@ namespace YooAsset.Editor
 				reportBundleInfo.FileHash = packageBundle.FileHash;
 				reportBundleInfo.FileCRC = packageBundle.FileCRC;
 				reportBundleInfo.FileSize = packageBundle.FileSize;
-				reportBundleInfo.Tags = packageBundle.Tags;
-				reportBundleInfo.ReferenceIDs = packageBundle.ReferenceIDs;
 				reportBundleInfo.IsRawFile = packageBundle.IsRawFile;
 				reportBundleInfo.LoadMethod = (EBundleLoadMethod)packageBundle.LoadMethod;
+				reportBundleInfo.Tags = packageBundle.Tags;
+				reportBundleInfo.ReferenceIDs = packageBundle.ReferenceIDs;
+				reportBundleInfo.AllBuiltinAssets = GetAllBuiltinAssets(buildMapContext, packageBundle.BundleName);
 				buildReport.BundleInfos.Add(reportBundleInfo);
 			}
 
@@ -130,11 +131,11 @@ namespace YooAsset.Editor
 			var bundleInfo = buildMapContext.GetBundleInfo(bundleName);
 			{
 				BuildAssetInfo findAssetInfo = null;
-				foreach (var buildinAsset in bundleInfo.BuildinAssets)
+				foreach (var assetInfo in bundleInfo.AllMainAssets)
 				{
-					if (buildinAsset.AssetPath == assetPath)
+					if (assetInfo.AssetPath == assetPath)
 					{
-						findAssetInfo = buildinAsset;
+						findAssetInfo = assetInfo;
 						break;
 					}
 				}
@@ -148,6 +149,15 @@ namespace YooAsset.Editor
 				}
 			}
 			return result;
+		}
+
+		/// <summary>
+		/// 获取该资源包内的所有资源（包括零依赖资源）
+		/// </summary>
+		private List<string> GetAllBuiltinAssets(BuildMapContext buildMapContext, string bundleName)
+		{
+			var bundleInfo = buildMapContext.GetBundleInfo(bundleName);
+			return bundleInfo.GetAllBuiltinAssetPaths();
 		}
 
 		private int GetMainAssetCount(PackageManifest manifest)

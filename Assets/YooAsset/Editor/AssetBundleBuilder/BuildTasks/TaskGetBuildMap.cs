@@ -131,10 +131,10 @@ namespace YooAsset.Editor
 			}
 
 			// 10. 构建资源包
-			var allBuildinAssets = buildAssetInfoDic.Values.ToList();
-			if (allBuildinAssets.Count == 0)
+			var allPackAssets = buildAssetInfoDic.Values.ToList();
+			if (allPackAssets.Count == 0)
 				throw new Exception("构建的资源列表不能为空");
-			foreach (var assetInfo in allBuildinAssets)
+			foreach (var assetInfo in allPackAssets)
 			{
 				context.PackAsset(assetInfo);
 			}
@@ -167,13 +167,13 @@ namespace YooAsset.Editor
 				bool isRawFile = bundleInfo.IsRawFile;
 				if (isRawFile)
 				{
-					if (bundleInfo.BuildinAssets.Count != 1)
+					if (bundleInfo.AllMainAssets.Count != 1)
 						throw new Exception($"The bundle does not support multiple raw asset : {bundleInfo.BundleName}");
 					continue;
 				}
 
 				// 注意：原生文件不能被其它资源文件依赖
-				foreach (var assetInfo in bundleInfo.BuildinAssets)
+				foreach (var assetInfo in bundleInfo.AllMainAssets)
 				{
 					if (assetInfo.AllDependAssetInfos != null)
 					{

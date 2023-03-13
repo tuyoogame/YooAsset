@@ -32,10 +32,10 @@ namespace YooAsset.Editor
 				if (bundleInfo.IsRawFile)
 				{
 					string dest = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
-					foreach (var buildAsset in bundleInfo.BuildinAssets)
+					foreach (var assetInfo in bundleInfo.AllMainAssets)
 					{
-						if (buildAsset.IsRawAsset)
-							EditorTools.CopyFile(buildAsset.AssetPath, dest, true);
+						if (assetInfo.IsRawAsset)
+							EditorTools.CopyFile(assetInfo.AssetPath, dest, true);
 					}
 				}
 			}
