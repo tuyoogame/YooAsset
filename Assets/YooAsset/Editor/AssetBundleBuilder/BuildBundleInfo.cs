@@ -159,12 +159,12 @@ namespace YooAsset.Editor
 			{
 				if (assetInfo.AllDependAssetInfos == null)
 					continue;
-				foreach (var depend in assetInfo.AllDependAssetInfos)
+				foreach (var dependAssetInfo in assetInfo.AllDependAssetInfos)
 				{
-					if (depend.HasBundleName() == false)
+					if (dependAssetInfo.HasBundleName() == false)
 					{
-						if (result.Contains(depend.AssetPath) == false)
-							result.Add(depend.AssetPath);
+						if (result.Contains(dependAssetInfo.AssetPath) == false)
+							result.Add(dependAssetInfo.AssetPath);
 					}
 				}
 			}
