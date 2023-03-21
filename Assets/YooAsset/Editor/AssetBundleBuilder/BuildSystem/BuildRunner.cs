@@ -37,14 +37,16 @@ namespace YooAsset.Editor
 				{
 					_buildWatch = Stopwatch.StartNew();
 					var taskAttribute = task.GetType().GetCustomAttribute<TaskAttribute>();
-					BuildLogger.Log($"---------------------------------------->{taskAttribute.Desc}<---------------------------------------");
+					if (taskAttribute != null)
+						BuildLogger.Log($"---------------------------------------->{taskAttribute.Desc}<---------------------------------------");
 					task.Run(context);
 					_buildWatch.Stop();
 
 					// 统计耗时
 					int seconds = GetBuildSeconds();
 					TotalSeconds += seconds;
-					BuildLogger.Log($"{taskAttribute.Desc}耗时：{seconds}秒");
+					if (taskAttribute != null)
+						BuildLogger.Log($"{taskAttribute.Desc}耗时：{seconds}秒");
 				}
 				catch (Exception e)
 				{

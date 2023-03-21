@@ -582,7 +582,7 @@ namespace YooAsset.Editor
 		/// <param name="key">关键字</param>
 		/// <param name="includeKey">分割的结果里是否包含关键字</param>
 		/// <param name="searchBegin">是否使用初始匹配的位置，否则使用末尾匹配的位置</param>
-		private static string Substring(string content, string key, bool includeKey, bool firstMatch = true)
+		public static string Substring(string content, string key, bool includeKey, bool firstMatch = true)
 		{
 			if (string.IsNullOrEmpty(key))
 				return content;
