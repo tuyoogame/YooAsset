@@ -35,26 +35,7 @@ private void ReleaseHandles()
 
 ### UniTask支持解决方案
 
-[仓库链接](https://github.com/Cysharp/UniTask) 
-
-- 请去下载对应的源码，并删除此目录最后的波浪线
-- 在项目的 `asmdef` 文件中添加对 `UniTask.YooAsset` 的引用
-- 在 UniTask `_InternalVisibleTo.cs` 文件中增加 `[assembly: InternalsVisibleTo("UniTask.YooAsset")]` 后即可使用
-
-代码示例
-
-```csharp
-var assetPackage = YooAssets.GetAssetsPackage("DefaultPackage");
-var handle = assetPackage.LoadAssetAsync<GameObject>("Assets/Res/Prefabs/TestImg.prefab");
-
-await handle.ToUniTask();
-
-var obj = handle.AssetObject as GameObject;
-var go  = Instantiate(obj, transform);
-
-go.transform.localPosition = Vector3.zero;
-go.transform.localScale    = Vector3.one;
-```
+详情参考 [UniTask 配置教程](../Assets/YooAsset/Samples~/UniTask%20Sample/README.md)
 
 ### 分布式构建解决方案
 
