@@ -17,13 +17,13 @@ namespace YooAsset.Editor
 			string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
 			int outputNameStyle = (int)buildParametersContext.Parameters.OutputNameStyle;
 
-			// 1.检测路径长度
+			// 1.检测文件名长度
 			foreach (var bundleInfo in buildMapContext.Collection)
 			{
-				// NOTE：检测路径长度不要超过260字符。
-				string filePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
-				if (filePath.Length >= 260)
-					throw new Exception($"The output bundle name is too long {filePath.Length} chars : {filePath}");
+				// NOTE：检测文件名长度不要超过260字符。
+				string fileName = bundleInfo.BundleName;
+				if (fileName.Length >= 260)
+					throw new Exception($"The output bundle name is too long {fileName.Length} chars : {fileName}");
 			}
 
 			// 2.更新构建输出的文件路径
