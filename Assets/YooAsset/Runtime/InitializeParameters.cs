@@ -43,6 +43,11 @@ namespace YooAsset
 		/// 注意：默认值为MaxValue
 		/// </summary>
 		public int AssetLoadingMaxNumber = int.MaxValue;
+
+		/// <summary>
+		/// 下载失败尝试次数
+		/// </summary>
+		public int DownloadFailedTryAgain = int.MaxValue;
 	}
 
 	/// <summary>

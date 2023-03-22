@@ -75,6 +75,14 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 反序列化（JSON文件）
+		/// </summary>
+		public static PackageManifest DeserializeFromJson(string jsonContent)
+		{
+			return JsonUtility.FromJson<PackageManifest>(jsonContent);
+		}
+
+		/// <summary>
 		/// 反序列化（二进制文件）
 		/// </summary>
 		public static PackageManifest DeserializeFromBinary(byte[] binaryData)

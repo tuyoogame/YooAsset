@@ -70,7 +70,7 @@ namespace YooAsset
 			// 1. 从服务器下载
 			if (_steps == ESteps.Download)
 			{
-				int failedTryAgain = int.MaxValue;
+				int failedTryAgain = Impl.DownloadFailedTryAgain;
 				_downloader = DownloadSystem.BeginDownload(MainBundleInfo, failedTryAgain);
 				_steps = ESteps.CheckDownload;
 			}

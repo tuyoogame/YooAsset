@@ -20,7 +20,8 @@ namespace YooAsset
 		private bool _isUnloadSafe = true;
 		private string _packageName;
 		private bool _simulationOnEditor;
-		private int _loadingMaxNumber;
+		public int LoadingMaxNumber { private set; get; }
+		public int DownloadFailedTryAgain { private set; get; }
 		public IDecryptionServices DecryptionServices { private set; get; }
 		public IBundleServices BundleServices { private set; get; }
 
@@ -29,11 +30,13 @@ namespace YooAsset
 		/// 初始化
 		/// 注意：在使用AssetSystem之前需要初始化
 		/// </summary>
-		public void Initialize(string packageName, bool simulationOnEditor, int loadingMaxNumber, IDecryptionServices decryptionServices, IBundleServices bundleServices)
+		public void Initialize(string packageName, bool simulationOnEditor, int loadingMaxNumber, int downloadFailedTryAgain,
+			IDecryptionServices decryptionServices, IBundleServices bundleServices)
 		{
 			_packageName = packageName;
 			_simulationOnEditor = simulationOnEditor;
-			_loadingMaxNumber = loadingMaxNumber;
+			LoadingMaxNumber = loadingMaxNumber;
+			DownloadFailedTryAgain = downloadFailedTryAgain;
 			DecryptionServices = decryptionServices;
 			BundleServices = bundleServices;
 		}
@@ -63,7 +66,7 @@ namespace YooAsset
 				}
 				else
 				{
-					if (loadingCount < _loadingMaxNumber)
+					if (loadingCount < LoadingMaxNumber)
 						provider.Update();
 
 					if (provider.IsDone == false)
