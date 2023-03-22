@@ -38,7 +38,7 @@ public class FsmUpdateManifest : IStateNode
 
 		if(operation.Status == EOperationStatus.Succeed)
 		{
-			operation.SaveManifestVersion();
+			operation.SavePackageVersion();
 			_machine.ChangeState<FsmCreateDownloader>();
 		}
 		else
