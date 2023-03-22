@@ -12,7 +12,7 @@ namespace YooAsset
 		/// <summary>
 		/// 保存当前清单的版本，用于下次启动时自动加载的版本。
 		/// </summary>
-		public virtual void SaveManifestVersion() { }
+		public virtual void SavePackageVersion() { }
 	}
 
 	/// <summary>
@@ -178,7 +178,7 @@ namespace YooAsset
 			}
 		}
 
-		public override void SaveManifestVersion() 
+		public override void SavePackageVersion() 
 		{
 			_impl.FlushManifestVersionFile();
 		}
