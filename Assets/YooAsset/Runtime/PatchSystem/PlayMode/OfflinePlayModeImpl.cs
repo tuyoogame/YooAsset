@@ -33,9 +33,8 @@ namespace YooAsset
 				return _activeManifest;
 			}
 		}
-		public bool IsBuildinPackageBundle(PackageBundle packageBundle)
+		public void FlushManifestVersionFile()
 		{
-			return true;
 		}
 
 		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)

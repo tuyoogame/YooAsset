@@ -7,11 +7,11 @@ namespace YooAsset
 		/// 激活的清单
 		/// </summary>
 		PackageManifest ActiveManifest { set; get; }
-
+		
 		/// <summary>
-		/// 是否为内置资源文件
+		/// 保存清单版本文件到沙盒
 		/// </summary>
-		bool IsBuildinPackageBundle(PackageBundle packageBundle);
+		void FlushManifestVersionFile();
 
 		/// <summary>
 		/// 向网络端请求最新的资源版本

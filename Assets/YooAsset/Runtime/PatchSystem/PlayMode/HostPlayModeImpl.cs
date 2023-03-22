@@ -84,22 +84,27 @@ namespace YooAsset
 			{
 				_activeManifest = value;
 				_activeManifest.InitAssetPathMapping(_locationToLower);
-				PersistentHelper.SaveCachePackageVersionFile(_packageName, _activeManifest.PackageVersion);
 			}
 			get
 			{
 				return _activeManifest;
 			}
 		}
-		public bool IsBuildinPackageBundle(PackageBundle packageBundle)
+		public void FlushManifestVersionFile()
+		{
+			if (_activeManifest != null)
+				PersistentHelper.SaveCachePackageVersionFile(_packageName, _activeManifest.PackageVersion);
+		}
+
+		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
 		{
 			return _queryServices.QueryStreamingAssets(packageBundle.FileName);
 		}
-		public bool IsCachedPackageBundle(PackageBundle packageBundle)
+		private bool IsCachedPackageBundle(PackageBundle packageBundle)
 		{
 			return CacheSystem.IsCached(packageBundle.PackageName, packageBundle.CacheGUID);
 		}
-		
+
 		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)
 		{
 			var operation = new HostPlayModeUpdatePackageVersionOperation(this, _packageName, appendTimeTicks, timeout);

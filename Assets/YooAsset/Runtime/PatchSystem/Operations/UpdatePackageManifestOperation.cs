@@ -9,6 +9,10 @@ namespace YooAsset
 	/// </summary>
 	public abstract class UpdatePackageManifestOperation : AsyncOperationBase
 	{
+		/// <summary>
+		/// 保存清单版本文件到沙盒
+		/// </summary>
+		public virtual void FlushManifestVersionFile() { }
 	}
 
 	/// <summary>
@@ -172,6 +176,11 @@ namespace YooAsset
 					Error = _loadCacheManifestOp.Error;
 				}
 			}
+		}
+
+		public override void FlushManifestVersionFile() 
+		{
+			_impl.FlushManifestVersionFile();
 		}
 	}
 }
