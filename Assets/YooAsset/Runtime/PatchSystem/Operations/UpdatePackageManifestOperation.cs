@@ -10,9 +10,9 @@ namespace YooAsset
 	public abstract class UpdatePackageManifestOperation : AsyncOperationBase
 	{
 		/// <summary>
-		/// 保存清单版本文件到沙盒
+		/// 保存当前清单的版本，用于下次启动时自动加载的版本。
 		/// </summary>
-		public virtual void FlushManifestVersionFile() { }
+		public virtual void SaveManifestVersion() { }
 	}
 
 	/// <summary>
@@ -178,7 +178,7 @@ namespace YooAsset
 			}
 		}
 
-		public override void FlushManifestVersionFile() 
+		public override void SaveManifestVersion() 
 		{
 			_impl.FlushManifestVersionFile();
 		}
