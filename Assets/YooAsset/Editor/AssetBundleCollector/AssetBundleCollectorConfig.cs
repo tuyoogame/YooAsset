@@ -161,6 +161,12 @@ namespace YooAsset.Editor
 				}
 			}
 
+			// 检测配置错误
+			foreach(var package in packages)
+			{
+				package.CheckConfigError();
+			}
+
 			// 保存配置数据
 			AssetBundleCollectorSettingData.ClearAll();
 			AssetBundleCollectorSettingData.Setting.EnableAddressable = enableAddressable;
