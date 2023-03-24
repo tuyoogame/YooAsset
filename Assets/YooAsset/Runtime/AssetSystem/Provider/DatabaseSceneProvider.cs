@@ -24,10 +24,32 @@ namespace YooAsset
 
 			if (Status == EStatus.None)
 			{
+				Status = EStatus.CheckBundle;
+			}
+
+			// 1. 检测资源包
+			if (Status == EStatus.CheckBundle)
+			{
+				if (IsWaitForAsyncComplete)
+				{
+					OwnerBundle.WaitForAsyncComplete();
+				}
+
+				if (OwnerBundle.IsDone() == false)
+					return;
+
+				if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
+				{
+					Status = EStatus.Failed;
+					LastError = OwnerBundle.LastError;
+					InvokeCompletion();
+					return;
+				}
+
 				Status = EStatus.Loading;
 			}
 
-			// 1. 加载资源对象
+			// 2. 加载资源对象
 			if (Status == EStatus.Loading)
 			{
 				LoadSceneParameters loadSceneParameters = new LoadSceneParameters();
@@ -49,7 +71,7 @@ namespace YooAsset
 				}
 			}
 
-			// 2. 检测加载结果
+			// 3. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
 				Progress = _asyncOp.progress;

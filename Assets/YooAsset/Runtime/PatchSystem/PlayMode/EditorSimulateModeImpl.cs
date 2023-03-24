@@ -80,6 +80,14 @@ namespace YooAsset
 		#endregion
 
 		#region IBundleServices接口
+		private BundleInfo CreateBundleInfo(PackageBundle packageBundle, AssetInfo assetInfo)
+		{
+			if (packageBundle == null)
+				throw new Exception("Should never get here !");
+
+			BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromEditor, assetInfo.AssetPath);
+			return bundleInfo;
+		}
 		BundleInfo IBundleServices.GetBundleInfo(AssetInfo assetInfo)
 		{
 			if (assetInfo.IsInvalid)
@@ -87,16 +95,26 @@ namespace YooAsset
 
 			// 注意：如果清单里未找到资源包会抛出异常！
 			var packageBundle = _activeManifest.GetMainPackageBundle(assetInfo.AssetPath);
-			BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromEditor, assetInfo.AssetPath);
-			return bundleInfo;
+			return CreateBundleInfo(packageBundle, assetInfo);
 		}
 		BundleInfo[] IBundleServices.GetAllDependBundleInfos(AssetInfo assetInfo)
 		{
-			throw new NotImplementedException();
+			if (assetInfo.IsInvalid)
+				throw new Exception("Should never get here !");
+
+			// 注意：如果清单里未找到资源包会抛出异常！
+			var depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
+			List<BundleInfo> result = new List<BundleInfo>(depends.Length);
+			foreach (var packageBundle in depends)
+			{
+				BundleInfo bundleInfo = CreateBundleInfo(packageBundle, assetInfo);
+				result.Add(bundleInfo);
+			}
+			return result.ToArray();
 		}
 		string IBundleServices.GetBundleName(int bundleID)
 		{
-			throw new NotImplementedException();
+			return _activeManifest.GetBundleName(bundleID);
 		}
 		bool IBundleServices.IsServicesValid()
 		{

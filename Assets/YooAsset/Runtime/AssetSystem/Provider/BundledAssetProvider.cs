@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace YooAsset
 {
-	internal sealed class BundledAssetProvider : BundledProvider
+	internal sealed class BundledAssetProvider : ProviderBase
 	{
 		private AssetBundleRequest _cacheRequest;
 

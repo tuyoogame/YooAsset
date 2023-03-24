@@ -90,6 +90,8 @@ namespace YooAsset
 		}
 
 
+		protected BundleLoaderBase OwnerBundle { private set; get; }
+		protected DependAssetBundleGroup DependBundleGroup { private set; get; }
 		protected bool IsWaitForAsyncComplete { private set; get; } = false;
 		private readonly List<OperationHandleBase> _handles = new List<OperationHandleBase>();
 
@@ -99,6 +101,15 @@ namespace YooAsset
 			Impl = impl;
 			ProviderGUID = providerGUID;
 			MainAssetInfo = assetInfo;
+
+			// 创建资源包加载器
+			OwnerBundle = impl.CreateOwnerAssetBundleLoader(assetInfo);
+			OwnerBundle.Reference();
+			OwnerBundle.AddProvider(this);
+
+			var dependBundles = impl.CreateDependAssetBundleLoaders(assetInfo);
+			DependBundleGroup = new DependAssetBundleGroup(dependBundles);
+			DependBundleGroup.Reference();
 		}
 
 		/// <summary>
@@ -112,14 +123,18 @@ namespace YooAsset
 		public virtual void Destroy()
 		{
 			IsDestroyed = true;
-		}
 
-		/// <summary>
-		/// 获取下载进度
-		/// </summary>
-		public virtual DownloadReport GetDownloadReport()
-		{
-			return DownloadReport.CreateDefaultReport();
+			// 释放资源包加载器
+			if (OwnerBundle != null)
+			{
+				OwnerBundle.Release();
+				OwnerBundle = null;
+			}
+			if (DependBundleGroup != null)
+			{
+				DependBundleGroup.Release();
+				DependBundleGroup = null;
+			}
 		}
 
 		/// <summary>
@@ -291,6 +306,37 @@ namespace YooAsset
 				LoadingTime = _watch.ElapsedMilliseconds;
 				_watch = null;
 			}
+		}
+
+		/// <summary>
+		/// 获取下载报告
+		/// </summary>
+		internal DownloadReport GetDownloadReport()
+		{
+			DownloadReport result = new DownloadReport();
+			result.TotalSize = (ulong)OwnerBundle.MainBundleInfo.Bundle.FileSize;
+			result.DownloadedBytes = OwnerBundle.DownloadedBytes;
+			foreach (var dependBundle in DependBundleGroup.DependBundles)
+			{
+				result.TotalSize += (ulong)dependBundle.MainBundleInfo.Bundle.FileSize;
+				result.DownloadedBytes += dependBundle.DownloadedBytes;
+			}
+			result.Progress = (float)result.DownloadedBytes / result.TotalSize;
+			return result;
+		}
+
+		/// <summary>
+		/// 获取资源包的调试信息列表
+		/// </summary>
+		internal void GetBundleDebugInfos(List<DebugBundleInfo> output)
+		{
+			var bundleInfo = new DebugBundleInfo();
+			bundleInfo.BundleName = OwnerBundle.MainBundleInfo.Bundle.BundleName;
+			bundleInfo.RefCount = OwnerBundle.RefCount;
+			bundleInfo.Status = OwnerBundle.Status.ToString();
+			output.Add(bundleInfo);
+
+			DependBundleGroup.GetBundleDebugInfos(output);
 		}
 		#endregion
 	}

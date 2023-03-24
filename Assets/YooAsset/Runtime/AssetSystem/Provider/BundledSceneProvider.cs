@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace YooAsset
 {
-	internal sealed class BundledSceneProvider : BundledProvider
+	internal sealed class BundledSceneProvider : ProviderBase
 	{
 		public readonly LoadSceneMode SceneMode;
 		private readonly string _sceneName;
