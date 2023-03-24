@@ -88,7 +88,7 @@ namespace YooAsset
 				_bundleServices = editorSimulateModeImpl;
 				_playModeServices = editorSimulateModeImpl;
 				_assetSystemImpl.Initialize(PackageName, true,
-					parameters.AssetLoadingMaxNumber, parameters.DownloadFailedTryAgain,
+					parameters.LoadingMaxTimeSlice, parameters.DownloadFailedTryAgain,
 					parameters.DecryptionServices, _bundleServices);
 
 				var initializeParameters = parameters as EditorSimulateModeParameters;
@@ -100,7 +100,7 @@ namespace YooAsset
 				_bundleServices = offlinePlayModeImpl;
 				_playModeServices = offlinePlayModeImpl;
 				_assetSystemImpl.Initialize(PackageName, false,
-					parameters.AssetLoadingMaxNumber, parameters.DownloadFailedTryAgain,
+					parameters.LoadingMaxTimeSlice, parameters.DownloadFailedTryAgain,
 					parameters.DecryptionServices, _bundleServices);
 
 				var initializeParameters = parameters as OfflinePlayModeParameters;
@@ -112,7 +112,7 @@ namespace YooAsset
 				_bundleServices = hostPlayModeImpl;
 				_playModeServices = hostPlayModeImpl;
 				_assetSystemImpl.Initialize(PackageName, false,
-					parameters.AssetLoadingMaxNumber, parameters.DownloadFailedTryAgain,
+					parameters.LoadingMaxTimeSlice, parameters.DownloadFailedTryAgain,
 					parameters.DecryptionServices, _bundleServices);
 
 				var initializeParameters = parameters as HostPlayModeParameters;
@@ -188,10 +188,10 @@ namespace YooAsset
 				throw new NotImplementedException();
 
 			// 检测参数范围
-			if (parameters.AssetLoadingMaxNumber < 1)
+			if (parameters.LoadingMaxTimeSlice < 10)
 			{
-				parameters.AssetLoadingMaxNumber = 1;
-				YooLogger.Warning($"{nameof(parameters.AssetLoadingMaxNumber)} minimum value is 1");
+				parameters.LoadingMaxTimeSlice = 10;
+				YooLogger.Warning($"{nameof(parameters.LoadingMaxTimeSlice)} minimum value is 10 milliseconds.");
 			}
 			if (parameters.DownloadFailedTryAgain < 1)
 			{

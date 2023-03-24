@@ -39,13 +39,14 @@ namespace YooAsset
 		public IDecryptionServices DecryptionServices = null;
 
 		/// <summary>
-		/// 资源加载的最大数量
+		/// 资源加载每帧处理的最大时间片段
 		/// 注意：默认值为MaxValue
 		/// </summary>
-		public int AssetLoadingMaxNumber = int.MaxValue;
-
+		public long LoadingMaxTimeSlice = long.MaxValue;
+		
 		/// <summary>
 		/// 下载失败尝试次数
+		/// 注意：默认值为MaxValue
 		/// </summary>
 		public int DownloadFailedTryAgain = int.MaxValue;
 	}
