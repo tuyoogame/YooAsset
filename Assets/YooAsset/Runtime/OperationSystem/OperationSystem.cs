@@ -61,7 +61,7 @@ namespace YooAsset
 			foreach (var operation in _operations)
 			{
 				if (IsBusy)
-					return;
+					break;
 
 				operation.Update();
 				if (operation.IsDone)
