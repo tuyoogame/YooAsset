@@ -7,7 +7,7 @@
 ```csharp
 public async UniTask Example(IProgress<float> progress = null, PlayerLoopTiming timing = PlayerLoopTiming.Update)
 {
-    var handle = YooAssets.LoadAssetAsync<GameObject>("Assets/Res/Prefabs/  TestImg.prefab");
+    var handle = YooAssets.LoadAssetAsync<GameObject>("Assets/Res/Prefabs/TestImg.prefab");
 
     await handle.ToUniTask(progress, timing);
 
@@ -36,3 +36,22 @@ public async UniTask Example(IProgress<float> progress = null, PlayerLoopTiming 
 - 添加 `UniTask` 和 `YooAsset` 的引用 
 - 在 UniTask `_InternalVisibleTo.cs` 文件中增加 `[assembly: InternalsVisibleTo("UniTask.YooAsset")]` 后即可使用
 
+## 有效性检查
+
+一般使用项目定制时, 会出现如下警告, 这说明项目没有配置正确, 建议使用 **初学者定制的** 版本
+
+```
+yield BundledSceneProvider is not supported on await IEnumerator or Enumerator. ToUniTaskO, please use ToUniTask MonoBehaviou
+coroutine Runner) instead
+```
+
+- 在 IDE 中点击 ToUniTask 跳转代码, 看是否可以正确跳转到 `UniTask/Runtime/External/YooAsset` 文件夹中
+- 增加 `handle.ToUniTask(progress, timing)` 参数, 看是否有编译错误
+
+如果不正确, 需要检查业务逻辑的 `asmdef` 是否引用正确, 假设你项目业务逻辑的 `asmdef` 名为 `View.asmdef`, 那么在 `View` 中, 要包含如下引用
+
+- YooAsset
+- UniTask
+- UniTask.YooAsset
+
+如果引用正确, 依然还有报错, 说明定制流程有问题, 请检查定制内容是否正确, 或者使用 **初学者定制的** 版本
