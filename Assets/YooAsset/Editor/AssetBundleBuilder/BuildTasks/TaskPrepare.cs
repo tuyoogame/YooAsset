@@ -51,8 +51,8 @@ namespace YooAsset.Editor
 
 			if (buildParameters.BuildMode == EBuildMode.ForceRebuild)
 			{
-				// 删除平台总目录
-				string platformDirectory = $"{buildParameters.OutputRoot}/{buildParameters.PackageName}/{buildParameters.BuildTarget}";
+				// 删除总目录
+				string platformDirectory = $"{buildParameters.OutputRoot}/{buildParameters.BuildTarget}/{buildParameters.PackageName}";
 				if (EditorTools.DeleteDirectory(platformDirectory))
 				{
 					BuildLogger.Log($"删除平台总目录：{platformDirectory}");
