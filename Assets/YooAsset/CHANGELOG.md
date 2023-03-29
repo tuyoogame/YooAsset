@@ -2,6 +2,95 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.9] - 2023-03-29
+
+### Fixed
+
+- 修复了资源配置界面的GroupActiveRule保存无效的问题。
+
+### Changed
+
+- 优化了资源配置导入逻辑，增加了对XML配置文件的合法性检测。
+
+- 优化了UniTask的说明文档。
+
+- 调整构建的输出目录结构。
+
+- 调试窗口增加分屏功能。（Unity2020.3+起效）
+
+- 报告窗口增加分屏功能。（Unity2020.3+起效）
+
+- 编辑器模拟模式支持了虚拟资源包。
+
+- 扩展了Instantiate方法。
+
+  ```c#
+  public sealed class AssetOperationHandle
+  {
+      public GameObject InstantiateSync();
+      public GameObject InstantiateSync(Transform parent);
+      public GameObject InstantiateSync(Transform parent, bool worldPositionStays);
+      public GameObject InstantiateSync(Vector3 position, Quaternion rotation);
+      public GameObject InstantiateSync(Vector3 position, Quaternion rotation, Transform parent);
+  }
+  ```
+
+### Added
+
+- 优化了报告文件内容，增加了资源包内嵌的资源列表。
+
+- 可寻址规则增加了AddressByFilePath类。
+
+- 新增了新方法。
+
+  ```c#
+  /// <summary>
+  /// 向远端请求并更新清单
+  /// </summary>
+  public class UpdatePackageManifestOperation : AsyncOperationBase
+  {
+  	/// <summary>
+  	/// 保存当前清单的版本，用于下次启动时自动加载的版本。
+  	/// </summary>
+  	public void SavePackageVersion();
+  }
+  ```
+
+- 新增了初始化参数。
+
+  ```c#
+  /// <summary>
+  /// 下载失败尝试次数
+  /// 注意：默认值为MaxValue
+  /// </summary>
+  public int DownloadFailedTryAgain = int.MaxValue;
+  ```
+
+- 新增了初始化参数。
+
+  ```c#
+  /// <summary>
+  /// 资源加载每帧处理的最大时间片段
+  /// 注意：默认值为MaxValue
+  /// </summary>
+  public long LoadingMaxTimeSlice = long.MaxValue;
+  ```
+
+### Removed
+
+- 移除了代码里的Patch敏感字。
+
+  ```c#
+  //PatchManifest.cs重命名为PackageManifest.cs
+  //AssetsPackage.cs重命名为ResourcePackage.cs
+  //YooAssets.CreateAssetsPackage()重命名为YooAssets.CreatePackage()
+  //YooAssets.GetAssetsPackage()重命名为YooAssets.GetPackage()
+  //YooAssets.TryGetAssetsPackage()重命名为YooAssets.TryGetPackage()
+  //YooAssets.HasAssetsPackage()重命名为YooAssets.HasPackage()
+  ```
+
+- 移除了初始化参数：AssetLoadingMaxNumber
+
 ## [1.4.8] - 2023-03-10
 
 ### Fixed
