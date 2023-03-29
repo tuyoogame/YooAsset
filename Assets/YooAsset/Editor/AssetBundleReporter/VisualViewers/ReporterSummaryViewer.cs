@@ -36,7 +36,7 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件
-			_visualAsset = EditorHelper.LoadWindowUXML<ReporterSummaryViewer>();
+			_visualAsset = UxmlLoader.LoadWindowUXML<ReporterSummaryViewer>();
 			if (_visualAsset == null)
 				return;
 

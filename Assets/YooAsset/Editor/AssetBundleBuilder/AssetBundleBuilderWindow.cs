@@ -14,7 +14,7 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/AssetBundle Builder", false, 102)]
 		public static void ShowExample()
 		{
-			AssetBundleBuilderWindow window = GetWindow<AssetBundleBuilderWindow>("资源包构建工具", true, EditorDefine.DockedWindowTypes);
+			AssetBundleBuilderWindow window = GetWindow<AssetBundleBuilderWindow>("资源包构建工具", true, WindowsDefine.DockedWindowTypes);
 			window.minSize = new Vector2(800, 600);
 		}
 
@@ -42,7 +42,7 @@ namespace YooAsset.Editor
 				VisualElement root = this.rootVisualElement;
 
 				// 加载布局文件
-				var visualAsset = EditorHelper.LoadWindowUXML<AssetBundleBuilderWindow>();
+				var visualAsset = UxmlLoader.LoadWindowUXML<AssetBundleBuilderWindow>();
 				if (visualAsset == null)
 					return;
 

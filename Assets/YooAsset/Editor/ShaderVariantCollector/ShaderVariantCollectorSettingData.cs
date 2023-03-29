@@ -25,7 +25,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		private static void LoadSettingData()
 		{
-			_setting = EditorHelper.LoadSettingData<ShaderVariantCollectorSetting>();
+			_setting = SettingLoader.LoadSettingData<ShaderVariantCollectorSetting>();
 		}
 
 		/// <summary>

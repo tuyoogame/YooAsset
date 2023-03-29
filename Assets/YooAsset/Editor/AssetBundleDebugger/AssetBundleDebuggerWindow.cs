@@ -15,7 +15,7 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/AssetBundle Debugger", false, 104)]
 		public static void ShowExample()
 		{
-			AssetBundleDebuggerWindow wnd = GetWindow<AssetBundleDebuggerWindow>("资源包调试工具", true, EditorDefine.DockedWindowTypes);
+			AssetBundleDebuggerWindow wnd = GetWindow<AssetBundleDebuggerWindow>("资源包调试工具", true, WindowsDefine.DockedWindowTypes);
 			wnd.minSize = new Vector2(800, 600);
 		}
 
@@ -63,7 +63,7 @@ namespace YooAsset.Editor
 				VisualElement root = rootVisualElement;
 
 				// 加载布局文件
-				var visualAsset = EditorHelper.LoadWindowUXML<AssetBundleDebuggerWindow>();
+				var visualAsset = UxmlLoader.LoadWindowUXML<AssetBundleDebuggerWindow>();
 				if (visualAsset == null)
 					return;
 

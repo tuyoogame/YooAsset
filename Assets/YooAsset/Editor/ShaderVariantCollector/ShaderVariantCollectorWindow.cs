@@ -14,7 +14,7 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/ShaderVariant Collector", false, 201)]
 		public static void ShowExample()
 		{
-			ShaderVariantCollectorWindow window = GetWindow<ShaderVariantCollectorWindow>("着色器变种收集工具", true, EditorDefine.DockedWindowTypes);
+			ShaderVariantCollectorWindow window = GetWindow<ShaderVariantCollectorWindow>("着色器变种收集工具", true, WindowsDefine.DockedWindowTypes);
 			window.minSize = new Vector2(800, 600);
 		}
 
@@ -34,7 +34,7 @@ namespace YooAsset.Editor
 				VisualElement root = this.rootVisualElement;
 
 				// 加载布局文件
-				var visualAsset = EditorHelper.LoadWindowUXML<ShaderVariantCollectorWindow>();
+				var visualAsset = UxmlLoader.LoadWindowUXML<ShaderVariantCollectorWindow>();
 				if (visualAsset == null)
 					return;
 

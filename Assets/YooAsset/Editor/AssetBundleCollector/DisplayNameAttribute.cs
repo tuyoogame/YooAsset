@@ -16,7 +16,7 @@ namespace YooAsset.Editor
 		}
 	}
 
-	public static class EditorAttribute
+	public static class DisplayNameAttributeHelper
 	{
 		internal static T GetAttribute<T>(Type type) where T : Attribute
 		{

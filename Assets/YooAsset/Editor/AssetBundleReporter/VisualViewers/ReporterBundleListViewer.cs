@@ -42,7 +42,7 @@ namespace YooAsset.Editor
 		public void InitViewer()
 		{
 			// 加载布局文件
-			_visualAsset = EditorHelper.LoadWindowUXML<ReporterBundleListViewer>();
+			_visualAsset = UxmlLoader.LoadWindowUXML<ReporterBundleListViewer>();
 			if (_visualAsset == null)
 				return;
 
@@ -76,6 +76,10 @@ namespace YooAsset.Editor
 			_includeListView = _root.Q<ListView>("BottomListView");
 			_includeListView.makeItem = MakeIncludeListViewItem;
 			_includeListView.bindItem = BindIncludeListViewItem;
+
+#if UNITY_2020_3_OR_NEWER
+			SplitView.Adjuster(_root);
+#endif
 		}
 
 		/// <summary>
