@@ -2,12 +2,11 @@
 
 **加载方法**
 
+- LoadSceneAsync() 异步加载场景
 - LoadAssetSync() 同步加载资源对象
 - LoadAssetAsync() 异步加载资源对象
 - LoadSubAssetsSync() 同步加载子资源对象
 - LoadSubAssetsAsync() 异步加载子资源对象
-- LoadSceneSync() 同步加载场景
-- LoadSceneAsync() 异步加载场景
 - LoadRawFileSync() 同步获取原生文件
 - LoadRawFileAsync() 异步获取原生文件
 

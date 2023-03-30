@@ -90,11 +90,10 @@
   可寻址规则，规则可以自定义扩展。下面是内置规则：
 
   - AddressByFileName 以文件名为定位地址。
-
+  - AddressByFilePath 以文件路径为定位地址。
   - AddressByGrouperAndFileName 以分组名+文件名为定位地址。
-
   - AddressByFolderAndFileName 以文件夹名+文件名为定位地址。
-
+  
   ````c#
   //自定义扩展范例
   public class AddressByFileName : IAddressRule
@@ -105,7 +104,7 @@
       }
   }
   ````
-
+  
 - **PackRule**
 
   打包规则，规则可以自定义扩展。下面是内置规则：

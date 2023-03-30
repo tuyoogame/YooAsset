@@ -13,8 +13,8 @@ private object LoadFunc(string name, string extension, System.Type type, out Des
 {
     method = DestroyMethod.None; //注意：这里一定要设置为None
     string location = $"Assets/FairyRes/{name}{extension}";
-    var assetPackage = YooAssets.GetAssetsPackage("DefaultPackage");
-    var handle = assetPackage.LoadAssetSync(location , type);
+    var package = YooAssets.GetPackage("DefaultPackage");
+    var handle = package.LoadAssetSync(location , type);
     _handles.Add(handle);
     return handle.AssetObject;
 }
@@ -54,7 +54,7 @@ IEnumerator Start()
     YooAssets.Initialize();
     
     // 创建资源包实例
-    var package = YooAssets.CreateAssetPackage("DefaultPackage");
+    var package = YooAssets.CreatePackage("DefaultPackage");
     
     // 初始化资源包
     ......

@@ -26,15 +26,15 @@ v1.0 代表的是APP版本，不是资源版本。在没有更换安装包的情
 
 例如：我们游戏的当前APP版本是v1.0，那么每次生成的补丁文件全部覆盖到v1.0的目录下即可。
 
-下面的示例里一共上传过2次补丁包。第二次上传的补丁包会把第一次的版本记录文件（PatchManifest_DefaultPackage.version）覆盖掉。当我们想回退资源版本的时候，把第一次生成的版本记录文件覆盖到同目录下即可。
+下面的示例里一共上传过2次补丁包。第二次上传的补丁包会把第一次的版本记录文件（PackageManifest_DefaultPackage.version）覆盖掉。当我们想回退资源版本的时候，把第一次生成的版本记录文件覆盖到同目录下即可。
 
 ````
 v1.0（游戏版本）
-├─PatchManifest_DefaultPackage.version
-├─PatchManifest_DefaultPackage_2023-02-01-654.hash
-├─PatchManifest_DefaultPackage_2023-02-01-654.bytes
-├─PatchManifest_DefaultPackage_2023-02-12-789.hash
-├─PatchManifest_DefaultPackage_2023-02-12-789.bytes
+├─PackageManifest_DefaultPackage.version
+├─PackageManifest_DefaultPackage_2023-02-01-654.hash
+├─PackageManifest_DefaultPackage_2023-02-01-654.bytes
+├─PackageManifest_DefaultPackage_2023-02-12-789.hash
+├─PackageManifest_DefaultPackage_2023-02-12-789.bytes
 ├─2bb5a28d37dabf27df8bc6a4706b8f80.bundle
 ├─2dbea9c3056c8839bc03d80a2aebd105.bundle
 ├─6e8c3003a64ead36a0bd2d5cdebfbcf4.bundle

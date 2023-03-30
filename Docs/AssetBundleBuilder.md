@@ -80,17 +80,17 @@
 
 ### 补丁清单
 
-补丁清单文件是上图中以PatchManifest开头命名的文件。
+补丁清单文件是上图中以PackageManifest开头命名的文件。
 
-- PatchManifest_DefaultPackage_xxxxxx.hash
+- PackageManifest_DefaultPackage_xxxxxx.hash
 
   记录了补丁清单文件的哈希值。
 
-- PatchManifest_DefaultPackage_xxxxxx.json
+- PackageManifest_DefaultPackage_xxxxxx.json
 
   该文件为Json文本格式，主要用于开发者预览信息。
 
-- PatchManifest_DefaultPackage_xxxxxx.bytes
+- PackageManifest_DefaultPackage_xxxxxx.bytes
 
   该文件为二进制格式，主要用于程序内读取加载。
 

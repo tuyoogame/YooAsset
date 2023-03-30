@@ -8,5 +8,5 @@
 
 配置说明：
 
-- **Patch Manifest File Name** : 补丁清单文件名称
+- **Manifest File Name** : 补丁清单文件名称
 

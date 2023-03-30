@@ -7,10 +7,10 @@
 YooAssets.Initialize();
 
 // 创建默认的资源包
-var package = YooAssets.CreateAssetsPackage("DefaultPackage");
+var package = YooAssets.CreatePackage("DefaultPackage");
 
 // 设置该资源包为默认的资源包，可以使用YooAssets相关加载接口加载该资源包内容。
-YooAssets.SetDefaultAssetsPackage(package);
+YooAssets.SetDefaultPackage(package);
 ```
 
 资源系统的运行模式支持三种：编辑器模拟模式，单机运行模式，联机运行模式。
@@ -26,7 +26,7 @@ private IEnumerator InitializeYooAsset()
 {
     var initParameters = new EditorSimulateModeParameters();
     initParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild("DefaultPackage");
-    yield return defaultPackage.InitializeAsync(initParameters);
+    yield return package.InitializeAsync(initParameters);
 }
 ````
 
@@ -40,7 +40,7 @@ private IEnumerator InitializeYooAsset()
 private IEnumerator InitializeYooAsset()
 {
     var initParameters = new OfflinePlayModeParameters();
-    yield return defaultPackage.InitializeAsync(initParameters);
+    yield return package.InitializeAsync(initParameters);
 }
 ````
 
@@ -65,7 +65,7 @@ private IEnumerator InitializeYooAsset()
     initParameters.QueryServices = new QueryStreamingAssetsFileServices();
     initParameters.DefaultHostServer = "http://127.0.0.1/CDN1/Android/v1.0";
     initParameters.FallbackHostServer = "http://127.0.0.1/CDN2/Android/v1.0";
-    yield return defaultPackage.InitializeAsync(initParameters);
+    yield return package.InitializeAsync(initParameters);
 }
 
 // 内置文件查询服务类
