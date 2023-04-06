@@ -103,13 +103,16 @@ namespace YooAsset
 			MainAssetInfo = assetInfo;
 
 			// 创建资源包加载器
-			OwnerBundle = impl.CreateOwnerAssetBundleLoader(assetInfo);
-			OwnerBundle.Reference();
-			OwnerBundle.AddProvider(this);
+			if (impl != null)
+			{
+				OwnerBundle = impl.CreateOwnerAssetBundleLoader(assetInfo);
+				OwnerBundle.Reference();
+				OwnerBundle.AddProvider(this);
 
-			var dependBundles = impl.CreateDependAssetBundleLoaders(assetInfo);
-			DependBundleGroup = new DependAssetBundleGroup(dependBundles);
-			DependBundleGroup.Reference();
+				var dependBundles = impl.CreateDependAssetBundleLoaders(assetInfo);
+				DependBundleGroup = new DependAssetBundleGroup(dependBundles);
+				DependBundleGroup.Reference();
+			}
 		}
 
 		/// <summary>
