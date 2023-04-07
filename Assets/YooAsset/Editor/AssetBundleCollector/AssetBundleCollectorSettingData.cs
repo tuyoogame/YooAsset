@@ -27,24 +27,8 @@ namespace YooAsset.Editor
 		public static bool IsDirty { private set; get; } = false;
 
 
-		private static AssetBundleCollectorSetting _setting = null;
-		public static AssetBundleCollectorSetting Setting
+		static AssetBundleCollectorSettingData()
 		{
-			get
-			{
-				if (_setting == null)
-					LoadSettingData();
-				return _setting;
-			}
-		}
-
-		/// <summary>
-		/// 加载配置文件
-		/// </summary>
-		private static void LoadSettingData()
-		{
-			_setting = SettingLoader.LoadSettingData<AssetBundleCollectorSetting>();
-
 			// IPackRule
 			{
 				// 清空缓存集合
@@ -147,6 +131,17 @@ namespace YooAsset.Editor
 			}
 		}
 
+		private static AssetBundleCollectorSetting _setting = null;
+		public static AssetBundleCollectorSetting Setting
+		{
+			get
+			{
+				if (_setting == null)
+					_setting = SettingLoader.LoadSettingData<AssetBundleCollectorSetting>();
+				return _setting;
+			}
+		}
+
 		/// <summary>
 		/// 存储配置文件
 		/// </summary>
@@ -184,9 +179,6 @@ namespace YooAsset.Editor
 
 		public static List<RuleDisplayName> GetActiveRuleNames()
 		{
-			if (_setting == null)
-				LoadSettingData();
-
 			List<RuleDisplayName> names = new List<RuleDisplayName>();
 			foreach (var pair in _cacheActiveRuleTypes)
 			{
@@ -199,9 +191,6 @@ namespace YooAsset.Editor
 		}
 		public static List<RuleDisplayName> GetAddressRuleNames()
 		{
-			if (_setting == null)
-				LoadSettingData();
-
 			List<RuleDisplayName> names = new List<RuleDisplayName>();
 			foreach (var pair in _cacheAddressRuleTypes)
 			{
@@ -214,9 +203,6 @@ namespace YooAsset.Editor
 		}
 		public static List<RuleDisplayName> GetPackRuleNames()
 		{
-			if (_setting == null)
-				LoadSettingData();
-
 			List<RuleDisplayName> names = new List<RuleDisplayName>();
 			foreach (var pair in _cachePackRuleTypes)
 			{
@@ -229,9 +215,6 @@ namespace YooAsset.Editor
 		}
 		public static List<RuleDisplayName> GetFilterRuleNames()
 		{
-			if (_setting == null)
-				LoadSettingData();
-
 			List<RuleDisplayName> names = new List<RuleDisplayName>();
 			foreach (var pair in _cacheFilterRuleTypes)
 			{
