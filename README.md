@@ -1,5 +1,3 @@
-![image](./Docs/Image/LOGO.png)
-
 # YooAsset
 
 [![License](https://img.shields.io/github/license/tuyoogame/YooAsset)](https://github.com/tuyoogame/YooAsset/blob/master/LICENSE)[![openupm](https://img.shields.io/npm/v/com.tuyoogame.yooasset?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.cn/packages/com.tuyoogame.yooasset/)
@@ -8,9 +6,7 @@
 
 它可以满足商业化游戏的各类需求，并且经历多款百万DAU游戏产品的验证。
 
-### 介绍
-
-YooAsset可以满足以下任何需求：
+**YooAsset可以满足以下任何需求：**
 
 - 我想发布一个不包含任何游戏资源的安装包，然后玩家边玩边下载。
 - 我想发布一个可以保证前期体验的安装包，然后玩家自己选择下载关卡内容。
