@@ -2,6 +2,14 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.10] - 2023-04-08
+
+### Fixed
+
+- 修复了资源文件路径无效导致异常的问题。
+- 修复了原生文件不支持ini格式文件的问题。
+- 修复了通过代码途径导入XML配置的报错问题。
+
 ## [1.4.9] - 2023-03-29
 
 ### Fixed
