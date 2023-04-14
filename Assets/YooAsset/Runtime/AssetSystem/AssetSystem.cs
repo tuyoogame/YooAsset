@@ -297,9 +297,6 @@ namespace YooAsset
 			// 释放子场景句柄
 			_sceneHandles[providerGUID].ReleaseInternal();
 			_sceneHandles.Remove(providerGUID);
-
-			// 卸载未被使用的资源（包括场景）
-			UnloadUnusedAssets();
 		}
 		internal void UnloadAllScene()
 		{
@@ -309,9 +306,6 @@ namespace YooAsset
 				valuePair.Value.ReleaseInternal();
 			}
 			_sceneHandles.Clear();
-
-			// 卸载未被使用的资源（包括场景）
-			UnloadUnusedAssets();
 		}
 		internal void ClearSceneHandle()
 		{
