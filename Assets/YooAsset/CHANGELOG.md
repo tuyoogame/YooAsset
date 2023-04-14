@@ -2,6 +2,23 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.11] - 2023-04-14
+
+### Fixed
+
+- (#97)修复了着色器变种收集配置无法保存的问题。
+- (#83)修复了资源收集界面Package列表没有实时刷新的问题。
+- (#48)优化了场景卸载机制，在切换场景的时候不在主动卸载资源。
+
+### Changed
+
+- 增加了扩展属性
+
+  ```c#
+  [assembly: InternalsVisibleTo("YooAsset.EditorExtension")]
+  [assembly: InternalsVisibleTo("YooAsset.RuntimeExtension")]
+  ```
+
 ## [1.4.10] - 2023-04-08
 
 ### Fixed
