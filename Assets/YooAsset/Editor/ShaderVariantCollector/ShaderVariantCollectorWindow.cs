@@ -20,6 +20,7 @@ namespace YooAsset.Editor
 
 		private List<string> _packageNames;
 
+		private Button _saveButton;
 		private Button _collectButton;
 		private TextField _collectOutputField;
 		private Label _currentShaderCountField;
@@ -40,6 +41,10 @@ namespace YooAsset.Editor
 
 				visualAsset.CloneTree(root);
 
+				// 配置保存按钮
+				_saveButton = root.Q<Button>("SaveButton");
+				_saveButton.clicked += SaveBtn_clicked;
+
 				// 包裹名称列表
 				_packageNames = GetBuildPackageNames();
 
@@ -48,6 +53,7 @@ namespace YooAsset.Editor
 				_collectOutputField.SetValueWithoutNotify(ShaderVariantCollectorSettingData.Setting.SavePath);
 				_collectOutputField.RegisterValueChangedCallback(evt =>
 				{
+					ShaderVariantCollectorSettingData.IsDirty = true;
 					ShaderVariantCollectorSettingData.Setting.SavePath = _collectOutputField.value;
 				});
 
@@ -61,6 +67,7 @@ namespace YooAsset.Editor
 					_packageField.style.width = 350;
 					_packageField.RegisterValueChangedCallback(evt =>
 					{
+						ShaderVariantCollectorSettingData.IsDirty = true;
 						ShaderVariantCollectorSettingData.Setting.CollectPackage = _packageField.value;
 					});
 					packageContainer.Add(_packageField);
@@ -80,12 +87,14 @@ namespace YooAsset.Editor
 				_processCapacitySlider.label = $"Capacity ({_processCapacitySlider.value})";
 				_processCapacitySlider.RegisterValueChangedCallback(evt =>
 				{
+					ShaderVariantCollectorSettingData.IsDirty = true;
 					ShaderVariantCollectorSettingData.Setting.ProcessCapacity = _processCapacitySlider.value;
 					_processCapacitySlider.label = $"Capacity ({_processCapacitySlider.value})";
 				});
 #else
 				_processCapacitySlider.RegisterValueChangedCallback(evt =>
 				{
+					ShaderVariantCollectorSettingData.IsDirty = true;
 					ShaderVariantCollectorSettingData.Setting.ProcessCapacity = _processCapacitySlider.value;
 				});
 #endif
@@ -102,8 +111,27 @@ namespace YooAsset.Editor
 				Debug.LogError(e.ToString());
 			}
 		}
+		public void OnDestroy()
+		{
+			if (ShaderVariantCollectorSettingData.IsDirty)
+				ShaderVariantCollectorSettingData.SaveFile();
+		}
 		private void Update()
 		{
+			if (_saveButton != null)
+			{
+				if (ShaderVariantCollectorSettingData.IsDirty)
+				{
+					if (_saveButton.enabledSelf == false)
+						_saveButton.SetEnabled(true);
+				}
+				else
+				{
+					if (_saveButton.enabledSelf)
+						_saveButton.SetEnabled(false);
+				}
+			}
+
 			if (_currentShaderCountField != null)
 			{
 				int currentShaderCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionShaderCount();
@@ -117,6 +145,10 @@ namespace YooAsset.Editor
 			}
 		}
 
+		private void SaveBtn_clicked()
+		{
+			ShaderVariantCollectorSettingData.SaveFile();
+		}
 		private void CollectButton_clicked()
 		{
 			string savePath = ShaderVariantCollectorSettingData.Setting.SavePath;
