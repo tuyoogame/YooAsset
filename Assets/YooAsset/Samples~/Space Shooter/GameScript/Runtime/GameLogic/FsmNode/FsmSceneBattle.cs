@@ -35,13 +35,13 @@ internal class FsmSceneBattle : IStateNode
 
 	private IEnumerator Prepare()
 	{
-		yield return UniWindow.OpenWindowAsync<UILoadingWindow>("UILoading");
 		yield return YooAssets.LoadSceneAsync("scene_battle");
 
 		_battleRoom = new BattleRoom();
 		yield return _battleRoom.LoadRoom();
 
-		// 等所有数据准备完毕后，关闭加载界面。
-		UniWindow.CloseWindow<UILoadingWindow>();
+		// 释放资源
+		var package = YooAssets.GetPackage("DefaultPackage");
+		package.UnloadUnusedAssets();
 	}
 }

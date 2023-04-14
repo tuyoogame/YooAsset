@@ -28,14 +28,11 @@ internal class FsmSceneHome : IStateNode
 
 	private IEnumerator Prepare()
 	{
-		if (_machine.PreviousNode != typeof(FsmInitGame).FullName)
-			yield return  UniWindow.OpenWindowAsync<UILoadingWindow>("UILoading");
-
 		yield return YooAssets.LoadSceneAsync("scene_home");	
 		yield return UniWindow.OpenWindowAsync<UIHomeWindow>("UIHome");
-		yield return new WaitForSeconds(0.5f);
-		
-		// 等所有数据准备完毕后，关闭加载界面。
-		UniWindow.CloseWindow<UILoadingWindow>();
+
+		// 释放资源
+		var package = YooAssets.GetPackage("DefaultPackage");
+		package.UnloadUnusedAssets();
 	}
 }
