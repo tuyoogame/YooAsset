@@ -148,6 +148,7 @@ namespace YooAsset.Editor
 					{
 						selectPackage.PackageName = evt.newValue;
 						AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
+						FillPackageViewData();
 					}
 				});
 
@@ -160,6 +161,7 @@ namespace YooAsset.Editor
 					{
 						selectPackage.PackageDesc = evt.newValue;
 						AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
+						FillPackageViewData();
 					}
 				});
 
