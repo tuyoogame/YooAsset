@@ -5,7 +5,7 @@ using UnityEngine;
 using UniFramework.Window;
 using UniFramework.Event;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
 internal class FsmSceneBattle : IStateNode
@@ -17,7 +17,7 @@ internal class FsmSceneBattle : IStateNode
 	}
 	void IStateNode.OnEnter()
 	{
-		UniModule.StartCoroutine(Prepare());
+		UniSingleton.StartCoroutine(Prepare());
 	}
 	void IStateNode.OnUpdate()
 	{
@@ -35,13 +35,13 @@ internal class FsmSceneBattle : IStateNode
 
 	private IEnumerator Prepare()
 	{
-		yield return UniWindow.OpenWindowAsync<UILoadingWindow>("UILoading");
 		yield return YooAssets.LoadSceneAsync("scene_battle");
 
 		_battleRoom = new BattleRoom();
 		yield return _battleRoom.LoadRoom();
 
-		// 等所有数据准备完毕后，关闭加载界面。
-		UniWindow.CloseWindow<UILoadingWindow>();
+		// 释放资源
+		var package = YooAssets.GetPackage("DefaultPackage");
+		package.UnloadUnusedAssets();
 	}
 }

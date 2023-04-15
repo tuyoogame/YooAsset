@@ -7,6 +7,9 @@ using UnityEngine.Networking;
 
 namespace YooAsset
 {
+	/// <summary>
+	/// WebGL平台加载器
+	/// </summary>
 	internal sealed class AssetBundleWebLoader : BundleLoaderBase
 	{
 		private enum ESteps
@@ -24,7 +27,6 @@ namespace YooAsset
 
 		private ESteps _steps = ESteps.None;
 		private float _tryTimer = 0;
-		private bool _isShowWaitForAsyncError = false;
 		private DownloaderBase _downloader;
 		private UnityWebRequest _webRequest;
 		private AssetBundleCreateRequest _createRequest;
@@ -47,7 +49,7 @@ namespace YooAsset
 				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
 					_steps = ESteps.Download;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
@@ -57,7 +59,7 @@ namespace YooAsset
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
 					_steps = ESteps.LoadCacheFile;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else
 				{
@@ -68,7 +70,7 @@ namespace YooAsset
 			// 1. 从服务器下载
 			if (_steps == ESteps.Download)
 			{
-				int failedTryAgain = int.MaxValue;
+				int failedTryAgain = Impl.DownloadFailedTryAgain;
 				_downloader = DownloadSystem.BeginDownload(MainBundleInfo, failedTryAgain);
 				_steps = ESteps.CheckDownload;
 			}
@@ -147,14 +149,11 @@ namespace YooAsset
 					// 在AssetBundle文件加载失败的情况下，我们需要重新验证文件的完整性！
 					if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 					{
-						string cacheLoadPath = MainBundleInfo.Bundle.CachedFilePath;
-						if (CacheSystem.VerifyBundle(MainBundleInfo.Bundle, EVerifyLevel.High) != EVerifyResult.Succeed)
+						var result = CacheSystem.VerifyingRecordFile(MainBundleInfo.Bundle.PackageName, MainBundleInfo.Bundle.CacheGUID);
+						if (result != EVerifyResult.Succeed)
 						{
-							if (File.Exists(cacheLoadPath))
-							{
-								YooLogger.Error($"Delete the invalid cache file : {cacheLoadPath}");
-								File.Delete(cacheLoadPath);
-							}
+							YooLogger.Error($"Found possibly corrupt file ! {MainBundleInfo.Bundle.CacheGUID}");
+							CacheSystem.DiscardFile(MainBundleInfo.Bundle.PackageName, MainBundleInfo.Bundle.CacheGUID);
 						}
 					}
 				}
@@ -228,10 +227,11 @@ namespace YooAsset
 		/// </summary>
 		public override void WaitForAsyncComplete()
 		{
-			if (_isShowWaitForAsyncError == false)
+			if (IsDone() == false)
 			{
-				_isShowWaitForAsyncError = true;
-				YooLogger.Error($"WebGL platform not support {nameof(WaitForAsyncComplete)} ! Use the async load method instead of the sync load method !");
+				Status = EStatus.Failed;
+				LastError = $"{nameof(WaitForAsyncComplete)} failed ! WebGL platform not support sync load method !";
+				YooLogger.Error(LastError);
 			}
 		}
 	}

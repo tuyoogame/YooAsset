@@ -19,25 +19,27 @@ public class EntityBullet : MonoBehaviour
 
 	void Awake()
 	{
-		_rigidbody = this.transform.GetComponent<Rigidbody>();	
+		_rigidbody = this.transform.GetComponent<Rigidbody>();
 	}
 	void OnTriggerEnter(Collider other)
 	{
-		if (other.CompareTag("Boundary"))
+		var name = other.gameObject.name;
+		if (name.StartsWith("Boundary"))
 			return;
 
-		if (this.gameObject.CompareTag("EnemyBullet"))
+		var goName = this.gameObject.name;
+		if (goName.StartsWith("enemy_bullet"))
 		{
-			if (other.CompareTag("Enemy") == false)
+			if (name.StartsWith("enemy") == false)
 			{
 				_handle.Restore();
 				_handle = null;
 			}
 		}
 
-		if (this.gameObject.CompareTag("PlayerBullet"))
+		if (goName.StartsWith("player_bullet"))
 		{
-			if (other.CompareTag("Player") == false)
+			if (name.StartsWith("player") == false)
 			{
 				_handle.Restore();
 				_handle = null;
@@ -46,7 +48,8 @@ public class EntityBullet : MonoBehaviour
 	}
 	void OnTriggerExit(Collider other)
 	{
-		if (other.CompareTag("Boundary"))
+		var name = other.gameObject.name;
+		if (name.StartsWith("Boundary"))
 		{
 			_handle.Restore();
 			_handle = null;

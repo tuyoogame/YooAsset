@@ -1,14 +1,14 @@
 ﻿
 namespace YooAsset
 {
-	internal class BundledRawFileProvider : BundledProvider
+	internal class BundledRawFileProvider : ProviderBase
 	{
 		public BundledRawFileProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo) : base(impl, providerGUID, assetInfo)
 		{
 		}
 		public override void Update()
 		{
-			DebugRecording();
+			DebugBeginRecording();
 
 			if (IsDone)
 				return;
@@ -18,6 +18,7 @@ namespace YooAsset
 				Status = EStatus.CheckBundle;
 			}
 
+			// 1. 检测资源包
 			if (Status == EStatus.CheckBundle)
 			{
 				if (IsWaitForAsyncComplete)
@@ -39,6 +40,7 @@ namespace YooAsset
 				Status = EStatus.Checking;
 			}
 
+			// 2. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
 				RawFilePath = OwnerBundle.FileLoadPath;

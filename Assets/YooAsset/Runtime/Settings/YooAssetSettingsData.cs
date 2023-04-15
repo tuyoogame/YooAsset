@@ -45,7 +45,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetManifestBinaryFileName(string packageName, string packageVersion)
 		{
-			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.bytes";
+			return $"{Setting.ManifestFileName}_{packageName}_{packageVersion}.bytes";
 		}
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetManifestJsonFileName(string packageName, string packageVersion)
 		{
-			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.json";
+			return $"{Setting.ManifestFileName}_{packageName}_{packageVersion}.json";
 		}
 
 		/// <summary>
@@ -61,7 +61,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetPackageHashFileName(string packageName, string packageVersion)
 		{
-			return $"{Setting.PatchManifestFileName}_{packageName}_{packageVersion}.hash";
+			return $"{Setting.ManifestFileName}_{packageName}_{packageVersion}.hash";
 		}
 
 		/// <summary>
@@ -69,20 +69,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetPackageVersionFileName(string packageName)
 		{
-			return $"{Setting.PatchManifestFileName}_{packageName}.version";
-		}
-
-		/// <summary>
-		/// 获取着色器资源包全名称（包含后缀名）
-		/// </summary>
-		public static string GetUnityShadersBundleFullName(bool uniqueBundleName, string packageName)
-		{
-			string shareBundleName;
-			if (uniqueBundleName)
-				shareBundleName = $"{packageName.ToLower()}_{YooAssetSettings.UnityShadersBundleName}.{Setting.AssetBundleFileVariant}";
-			else
-				shareBundleName = $"{YooAssetSettings.UnityShadersBundleName}.{Setting.AssetBundleFileVariant}";
-			return shareBundleName.ToLower();
+			return $"{Setting.ManifestFileName}_{packageName}.version";
 		}
 	}
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
 /// <summary>
@@ -19,7 +19,7 @@ internal class FsmUpdateVersion : IStateNode
 	void IStateNode.OnEnter()
 	{
 		PatchEventDefine.PatchStatesChange.SendEventMessage("获取最新的资源版本 !");
-		UniModule.StartCoroutine(GetStaticVersion());
+		UniSingleton.StartCoroutine(GetStaticVersion());
 	}
 	void IStateNode.OnUpdate()
 	{
@@ -32,8 +32,8 @@ internal class FsmUpdateVersion : IStateNode
 	{
 		yield return new WaitForSecondsRealtime(0.5f);
 
-		//TODO wht real 以下代码全拿
-		var package = YooAssets.GetAssetsPackage("DefaultPackage");
+    //TODO wht real 以下代码全拿
+		var package = YooAssets.GetPackage("DefaultPackage");
 		var operation = package.UpdatePackageVersionAsync();
 		yield return operation;
 

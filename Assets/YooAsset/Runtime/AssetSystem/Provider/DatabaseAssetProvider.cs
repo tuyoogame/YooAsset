@@ -28,14 +28,36 @@ namespace YooAsset
 					return;
 				}
 
-				Status = EStatus.Loading;
+				Status = EStatus.CheckBundle;
 
 				// 注意：模拟异步加载效果提前返回
 				if (IsWaitForAsyncComplete == false)
 					return;
 			}
 
-			// 1. 加载资源对象
+			// 1. 检测资源包
+			if (Status == EStatus.CheckBundle)
+			{
+				if (IsWaitForAsyncComplete)
+				{
+					OwnerBundle.WaitForAsyncComplete();
+				}
+
+				if (OwnerBundle.IsDone() == false)
+					return;
+
+				if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
+				{
+					Status = EStatus.Failed;
+					LastError = OwnerBundle.LastError;
+					InvokeCompletion();
+					return;
+				}
+
+				Status = EStatus.Loading;
+			}
+
+			// 2. 加载资源对象
 			if (Status == EStatus.Loading)
 			{
 				if (MainAssetInfo.AssetType == null)
@@ -45,7 +67,7 @@ namespace YooAsset
 				Status = EStatus.Checking;
 			}
 
-			// 2. 检测加载结果
+			// 3. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
 				Status = AssetObject == null ? EStatus.Failed : EStatus.Succeed;

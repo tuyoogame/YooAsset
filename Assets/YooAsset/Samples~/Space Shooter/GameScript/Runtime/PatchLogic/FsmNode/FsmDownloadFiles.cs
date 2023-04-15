@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
 /// <summary>
@@ -18,7 +18,7 @@ public class FsmDownloadFiles : IStateNode
 	void IStateNode.OnEnter()
 	{
 		PatchEventDefine.PatchStatesChange.SendEventMessage("开始下载补丁文件！");
-		UniModule.StartCoroutine(BeginDownload());
+		UniSingleton.StartCoroutine(BeginDownload());
 	}
 	void IStateNode.OnUpdate()
 	{

@@ -39,10 +39,16 @@ namespace YooAsset
 		public IDecryptionServices DecryptionServices = null;
 
 		/// <summary>
-		/// 资源加载的最大数量
+		/// 资源加载每帧处理的最大时间片段
 		/// 注意：默认值为MaxValue
 		/// </summary>
-		public int AssetLoadingMaxNumber = int.MaxValue;
+		public long LoadingMaxTimeSlice = long.MaxValue;
+		
+		/// <summary>
+		/// 下载失败尝试次数
+		/// 注意：默认值为MaxValue
+		/// </summary>
+		public int DownloadFailedTryAgain = int.MaxValue;
 	}
 
 	/// <summary>
@@ -53,7 +59,7 @@ namespace YooAsset
 		/// <summary>
 		/// 用于模拟运行的资源清单路径
 		/// </summary>
-		public string SimulatePatchManifestPath = string.Empty;
+		public string SimulateManifestFilePath = string.Empty;
 	}
 
 	/// <summary>

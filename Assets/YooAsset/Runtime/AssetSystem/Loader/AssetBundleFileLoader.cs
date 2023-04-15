@@ -26,7 +26,7 @@ namespace YooAsset
 		private DownloaderBase _unpacker;
 		private DownloaderBase _downloader;
 		private AssetBundleCreateRequest _createRequest;
-		private FileStream _fileStream;
+		private Stream _stream;
 
 
 		public AssetBundleFileLoader(AssetSystemImpl impl, BundleInfo bundleInfo) : base(impl, bundleInfo)
@@ -46,7 +46,7 @@ namespace YooAsset
 				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
 					_steps = ESteps.Download;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
@@ -55,7 +55,7 @@ namespace YooAsset
 					if (loadMethod == EBundleLoadMethod.LoadFromMemory || loadMethod == EBundleLoadMethod.LoadFromStream)
 					{
 						_steps = ESteps.Unpack;
-						FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+						FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 					}
 					else
 					{
@@ -70,7 +70,7 @@ namespace YooAsset
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
 					_steps = ESteps.LoadFile;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else
 				{
@@ -81,7 +81,7 @@ namespace YooAsset
 			// 1. 从服务器下载
 			if (_steps == ESteps.Download)
 			{
-				int failedTryAgain = int.MaxValue;
+				int failedTryAgain = Impl.DownloadFailedTryAgain;
 				_downloader = DownloadSystem.BeginDownload(MainBundleInfo, failedTryAgain);
 				_steps = ESteps.CheckDownload;
 			}
@@ -110,7 +110,7 @@ namespace YooAsset
 			if (_steps == ESteps.Unpack)
 			{
 				int failedTryAgain = 1;
-				var bundleInfo = PatchManifestTools.GetUnpackInfo(MainBundleInfo.Bundle);
+				var bundleInfo = ManifestTools.GetUnpackInfo(MainBundleInfo.Bundle);
 				_unpacker = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
 				_steps = ESteps.CheckUnpack;
 			}
@@ -196,12 +196,12 @@ namespace YooAsset
 					}
 					else if (loadMethod == EBundleLoadMethod.LoadFromStream)
 					{
-						_fileStream = Impl.DecryptionServices.LoadFromStream(fileInfo);
+						_stream = Impl.DecryptionServices.LoadFromStream(fileInfo);
 						uint managedReadBufferSize = Impl.DecryptionServices.GetManagedReadBufferSize();
 						if (_isWaitForAsyncComplete)
-							CacheBundle = AssetBundle.LoadFromStream(_fileStream, 0, managedReadBufferSize);
+							CacheBundle = AssetBundle.LoadFromStream(_stream, 0, managedReadBufferSize);
 						else
-							_createRequest = AssetBundle.LoadFromStreamAsync(_fileStream, 0, managedReadBufferSize);
+							_createRequest = AssetBundle.LoadFromStreamAsync(_stream, 0, managedReadBufferSize);
 					}
 					else
 					{
@@ -242,14 +242,11 @@ namespace YooAsset
 					// 在AssetBundle文件加载失败的情况下，我们需要重新验证文件的完整性！
 					if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 					{
-						string cacheLoadPath = MainBundleInfo.Bundle.CachedFilePath;
-						if (CacheSystem.VerifyBundle(MainBundleInfo.Bundle, EVerifyLevel.High) != EVerifyResult.Succeed)
+						var result = CacheSystem.VerifyingRecordFile(MainBundleInfo.Bundle.PackageName, MainBundleInfo.Bundle.CacheGUID);
+						if (result != EVerifyResult.Succeed)
 						{
-							if (File.Exists(cacheLoadPath))
-							{
-								YooLogger.Error($"Delete the invalid cache file : {cacheLoadPath}");
-								File.Delete(cacheLoadPath);
-							}
+							YooLogger.Error($"Found possibly corrupt file ! {MainBundleInfo.Bundle.CacheGUID}");
+							CacheSystem.DiscardFile(MainBundleInfo.Bundle.PackageName, MainBundleInfo.Bundle.CacheGUID);
 						}
 					}
 				}
@@ -268,11 +265,11 @@ namespace YooAsset
 		{
 			base.Destroy(forceDestroy);
 
-			if (_fileStream != null)
+			if (_stream != null)
 			{
-				_fileStream.Close();
-				_fileStream.Dispose();
-				_fileStream = null;
+				_stream.Close();
+				_stream.Dispose();
+				_stream = null;
 			}
 		}
 
@@ -289,9 +286,12 @@ namespace YooAsset
 				// 文件解压
 				if (_unpacker != null)
 				{
-					_unpacker.Update();
 					if (_unpacker.IsDone() == false)
+					{
+						_unpacker.WaitForAsyncComplete = true;
+						_unpacker.Update();
 						continue;
+					}
 				}
 
 				// 保险机制
@@ -302,7 +302,7 @@ namespace YooAsset
 					if (_isShowWaitForAsyncError == false)
 					{
 						_isShowWaitForAsyncError = true;
-						YooLogger.Error($"WaitForAsyncComplete failed ! Try load bundle : {MainBundleInfo.Bundle.BundleName} from remote with sync load method !");
+						YooLogger.Error($"{nameof(WaitForAsyncComplete)} failed ! Try load bundle : {MainBundleInfo.Bundle.BundleName} from remote with sync load method !");
 					}
 					break;
 				}

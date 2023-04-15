@@ -29,6 +29,14 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 清空缓冲区
+		/// </summary>
+		public void Clear()
+		{
+			_index = 0;
+		}
+
+		/// <summary>
 		/// 将有效数据写入文件流
 		/// </summary>
 		public void WriteToStream(FileStream fileStream)

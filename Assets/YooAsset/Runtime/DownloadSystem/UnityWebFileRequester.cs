@@ -39,7 +39,7 @@ namespace YooAsset
 				_latestDownloadBytes = 0;
 				_latestDownloadRealtime = Time.realtimeSinceStartup;
 
-				_webRequest = new UnityWebRequest(URL, UnityWebRequest.kHttpVerbGET);
+				_webRequest = DownloadSystem.NewRequest(URL);
 				DownloadHandlerFile handler = new DownloadHandlerFile(savePath);
 				handler.removeFileOnAbort = true;
 				_webRequest.downloadHandler = handler;

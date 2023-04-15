@@ -65,10 +65,10 @@ namespace UniFramework.Pooling
 		/// <summary>
 		/// 创建对象池
 		/// </summary>
-		public void CreatePool(AssetsPackage assetPackage)
+		public void CreatePool(ResourcePackage package)
 		{
 			// 加载游戏对象
-			AssetHandle = assetPackage.LoadAssetAsync<GameObject>(Location);
+			AssetHandle = package.LoadAssetAsync<GameObject>(Location);
 
 			// 创建初始对象
 			for (int i = 0; i < _initCapacity; i++)

@@ -100,30 +100,14 @@ namespace YooAsset.Editor
 			{
 				if (package.PackageName == packageName)
 				{
-					CollectCommand command = new CollectCommand(buildMode, EnableAddressable);
-					CollectResult collectResult = new CollectResult(package.PackageName, EnableAddressable, UniqueBundleName);
+					CollectCommand command = new CollectCommand(buildMode, packageName, EnableAddressable, UniqueBundleName);
+					CollectResult collectResult = new CollectResult(command);
 					collectResult.SetCollectAssets(package.GetAllCollectAssets(command));
 					return collectResult;
 				}
 			}
 
 			throw new Exception($"Not found collector pacakge : {packageName}");
-		}
-
-		/// <summary>
-		/// 获取所有包裹收集的资源文件
-		/// </summary>
-		public List<CollectResult> GetAllPackageAssets(EBuildMode buildMode)
-		{
-			List<CollectResult> collectResultList = new List<CollectResult>(1000);
-			foreach (var package in Packages)
-			{
-				CollectCommand command = new CollectCommand(buildMode, EnableAddressable);
-				CollectResult collectResult = new CollectResult(package.PackageName, EnableAddressable, UniqueBundleName);
-				collectResult.SetCollectAssets(package.GetAllCollectAssets(command));
-				collectResultList.Add(collectResult);
-			}
-			return collectResultList;
 		}
 	}
 }

@@ -7,6 +7,8 @@ namespace YooAsset
 	internal class OperationSystem
 	{
 		private static readonly List<AsyncOperationBase> _operations = new List<AsyncOperationBase>(100);
+		private static readonly List<AsyncOperationBase> _addList = new List<AsyncOperationBase>(100);
+		private static readonly List<AsyncOperationBase> _removeList = new List<AsyncOperationBase>(100);
 
 		// 计时器相关
 		private static Stopwatch _watch;
@@ -44,18 +46,39 @@ namespace YooAsset
 		{
 			_frameTime = _watch.ElapsedMilliseconds;
 
-			for (int i = _operations.Count - 1; i >= 0; i--)
+			// 添加新的异步操作
+			if (_addList.Count > 0)
+			{
+				for (int i = 0; i < _addList.Count; i++)
+				{
+					var operation = _addList[i];
+					_operations.Add(operation);
+				}
+				_addList.Clear();
+			}
+
+			// 更新所有的异步操作
+			foreach (var operation in _operations)
 			{
 				if (IsBusy)
-					return;
+					break;
 
-				var operation = _operations[i];
 				operation.Update();
 				if (operation.IsDone)
 				{
-					_operations.RemoveAt(i);
+					_removeList.Add(operation);
 					operation.Finish();
 				}
+			}
+
+			// 移除已经完成的异步操作
+			if (_removeList.Count > 0)
+			{
+				foreach (var operation in _removeList)
+				{
+					_operations.Remove(operation);
+				}
+				_removeList.Clear();
 			}
 		}
 
@@ -65,6 +88,8 @@ namespace YooAsset
 		public static void DestroyAll()
 		{
 			_operations.Clear();
+			_addList.Clear();
+			_removeList.Clear();
 			_watch = null;
 			_frameTime = 0;
 			MaxTimeSlice = long.MaxValue;
@@ -73,10 +98,10 @@ namespace YooAsset
 		/// <summary>
 		/// 开始处理异步操作类
 		/// </summary>
-		public static void StartOperation(AsyncOperationBase operationBase)
+		public static void StartOperation(AsyncOperationBase operation)
 		{
-			_operations.Add(operationBase);
-			operationBase.Start();
+			_addList.Add(operation);
+			operation.Start();
 		}
 	}
 }

@@ -10,18 +10,21 @@ namespace YooAsset
 	{
 		private static bool _isInitialize = false;
 		private static GameObject _driver = null;
-		private static readonly List<AssetsPackage> _packages = new List<AssetsPackage>();
+		private static readonly List<ResourcePackage> _packages = new List<ResourcePackage>();
 
 		/// <summary>
 		/// 初始化资源系统
 		/// </summary>
-		public static void Initialize()
+		/// <param name="logger">自定义日志处理</param>
+		public static void Initialize(ILogger logger = null)
 		{
 			if (_isInitialize)
 				throw new Exception($"{nameof(YooAssets)} is initialized !");
 
 			if (_isInitialize == false)
 			{
+				YooLogger.Logger = logger;
+
 				// 创建驱动器
 				_isInitialize = true;
 				_driver = new UnityEngine.GameObject($"[{nameof(YooAssets)}]");
@@ -34,8 +37,8 @@ namespace YooAsset
 				_driver.AddComponent<RemoteDebuggerInRuntime>();
 #endif
 
-				// 初始化异步系统
 				OperationSystem.Initialize();
+				DownloadSystem.Initialize();
 			}
 		}
 
@@ -85,7 +88,7 @@ namespace YooAsset
 		/// 创建资源包
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static AssetsPackage CreateAssetsPackage(string packageName)
+		public static ResourcePackage CreatePackage(string packageName)
 		{
 			if (_isInitialize == false)
 				throw new Exception($"{nameof(YooAssets)} not initialize !");
@@ -93,23 +96,23 @@ namespace YooAsset
 			if (string.IsNullOrEmpty(packageName))
 				throw new Exception("Package name is null or empty !");
 
-			if (HasAssetsPackage(packageName))
+			if (HasPackage(packageName))
 				throw new Exception($"Package {packageName} already existed !");
 
-			AssetsPackage assetsPackage = new AssetsPackage(packageName);
-			_packages.Add(assetsPackage);
-			return assetsPackage;
+			ResourcePackage package = new ResourcePackage(packageName);
+			_packages.Add(package);
+			return package;
 		}
 
 		/// <summary>
 		/// 获取资源包
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static AssetsPackage GetAssetsPackage(string packageName)
+		public static ResourcePackage GetPackage(string packageName)
 		{
-			var package = TryGetAssetsPackage(packageName);
+			var package = TryGetPackage(packageName);
 			if (package == null)
-				YooLogger.Warning($"Not found assets package : {packageName}");
+				YooLogger.Error($"Not found assets package : {packageName}");
 			return package;
 		}
 
@@ -117,7 +120,7 @@ namespace YooAsset
 		/// 尝试获取资源包
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static AssetsPackage TryGetAssetsPackage(string packageName)
+		public static ResourcePackage TryGetPackage(string packageName)
 		{
 			if (_isInitialize == false)
 				throw new Exception($"{nameof(YooAssets)} not initialize !");
@@ -137,7 +140,7 @@ namespace YooAsset
 		/// 检测资源包是否存在
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static bool HasAssetsPackage(string packageName)
+		public static bool HasPackage(string packageName)
 		{
 			if (_isInitialize == false)
 				throw new Exception($"{nameof(YooAssets)} not initialize !");
@@ -185,14 +188,22 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 设置下载系统参数，自定义下载请求
+		/// </summary>
+		public static void SetDownloadSystemUnityWebRequest(DownloadRequestDelegate requestDelegate)
+		{
+			DownloadSystem.RequestDelegate = requestDelegate;
+		}
+
+		/// <summary>
 		/// 设置异步系统参数，每帧执行消耗的最大时间切片（单位：毫秒）
 		/// </summary>
 		public static void SetOperationSystemMaxTimeSlice(long milliseconds)
 		{
-			if (milliseconds < 30)
+			if (milliseconds < 10)
 			{
-				milliseconds = 30;
-				YooLogger.Warning($"MaxTimeSlice minimum value is 30 milliseconds.");
+				milliseconds = 10;
+				YooLogger.Warning($"MaxTimeSlice minimum value is 10 milliseconds.");
 			}
 			OperationSystem.MaxTimeSlice = milliseconds;
 		}

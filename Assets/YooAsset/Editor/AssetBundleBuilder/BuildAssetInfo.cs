@@ -7,8 +7,6 @@ namespace YooAsset.Editor
 {
 	public class BuildAssetInfo
 	{
-		private string _mainBundleName;
-		private string _shareBundleName;
 		private bool _isAddAssetTags = false;
 		private readonly HashSet<string> _referenceBundleNames = new HashSet<string>();
 
@@ -16,6 +14,11 @@ namespace YooAsset.Editor
 		/// 收集器类型
 		/// </summary>
 		public ECollectorType CollectorType { private set; get; }
+
+		/// <summary>
+		/// 资源包完整名称
+		/// </summary>
+		public string BundleName { private set; get; }
 
 		/// <summary>
 		/// 可寻址地址
@@ -54,10 +57,10 @@ namespace YooAsset.Editor
 		public List<BuildAssetInfo> AllDependAssetInfos { private set; get; }
 
 
-		public BuildAssetInfo(ECollectorType collectorType, string mainBundleName, string address, string assetPath, bool isRawAsset)
+		public BuildAssetInfo(ECollectorType collectorType, string bundleName, string address, string assetPath, bool isRawAsset)
 		{
-			_mainBundleName = mainBundleName;
 			CollectorType = collectorType;
+			BundleName = bundleName;
 			Address = address;
 			AssetPath = assetPath;
 			IsRawAsset = isRawAsset;
@@ -133,22 +136,10 @@ namespace YooAsset.Editor
 		/// </summary>
 		public bool HasBundleName()
 		{
-			string bundleName = GetBundleName();
-			if (string.IsNullOrEmpty(bundleName))
+			if (string.IsNullOrEmpty(BundleName))
 				return false;
 			else
 				return true;
-		}
-
-		/// <summary>
-		/// 获取资源包名称
-		/// </summary>
-		public string GetBundleName()
-		{
-			if (CollectorType == ECollectorType.None)
-				return _shareBundleName;
-			else
-				return _mainBundleName;
 		}
 
 		/// <summary>
@@ -164,53 +155,32 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 计算主资源或共享资源的完整包名
+		/// 计算共享资源包的完整包名
 		/// </summary>
-		public void CalculateFullBundleName(bool uniqueBundleName, string packageName)
+		public void CalculateShareBundleName(bool uniqueBundleName, string packageName, string shadersBundleName)
 		{
-			if (CollectorType == ECollectorType.None)
+			if (CollectorType != ECollectorType.None)
+				return;
+
+			if (IsRawAsset)
+				throw new Exception("Should never get here !");
+
+			if (IsShaderAsset)
 			{
-				if (IsRawAsset)
-					throw new Exception("Should never get here !");
-
-				if (IsShaderAsset)
-				{
-					_shareBundleName = YooAssetSettingsData.GetUnityShadersBundleFullName(uniqueBundleName, packageName);
-				}
-				else
-				{
-					if (_referenceBundleNames.Count > 1)
-					{
-						IPackRule packRule = PackDirectory.StaticPackRule;
-						var bundleName = packRule.GetBundleName(new PackRuleData(AssetPath));
-						if (YooAssetSettingsData.Setting.RegularBundleName)
-							bundleName = EditorTools.GetRegularPath(bundleName).Replace('/', '_').Replace('.', '_').ToLower();
-						else
-							bundleName = EditorTools.GetRegularPath(bundleName).ToLower();
-
-						if (uniqueBundleName)
-							_shareBundleName = $"{packageName.ToLower()}_share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-						else
-							_shareBundleName = $"share_{bundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-					}
-				}
+				BundleName = shadersBundleName;
 			}
 			else
 			{
-				if (IsRawAsset)
+				if (_referenceBundleNames.Count > 1)
 				{
-					string mainBundleName = $"{_mainBundleName}.{YooAssetSettingsData.Setting.RawFileVariant}";
-					_mainBundleName = mainBundleName.ToLower();
+					IPackRule packRule = PackDirectory.StaticPackRule;
+					PackRuleResult packRuleResult = packRule.GetPackRuleResult(new PackRuleData(AssetPath));
+					BundleName = packRuleResult.GetShareBundleName(packageName, uniqueBundleName);
 				}
 				else
 				{
-					string mainBundleName = $"{_mainBundleName}.{YooAssetSettingsData.Setting.AssetBundleFileVariant}";
-					_mainBundleName = mainBundleName.ToLower(); ;
-				}
-
-				if (uniqueBundleName)
-				{
-					_mainBundleName = $"{packageName.ToLower()}_{_mainBundleName}";
+					// 注意：被引用次数小于1的资源不需要设置资源包名称
+					BundleName = string.Empty;
 				}
 			}
 		}

@@ -49,6 +49,16 @@ namespace YooAsset.Editor
 		public string[] Tags;
 
 		/// <summary>
+		/// 引用该资源包的ID列表
+		/// </summary>
+		public int[] ReferenceIDs;
+
+		/// <summary>
+		/// 该资源包内包含的所有资源
+		/// </summary>
+		public List<string> AllBuiltinAssets = new List<string>();
+
+		/// <summary>
 		/// 获取资源分类标签的字符串
 		/// </summary>
 		public string GetTagsString()

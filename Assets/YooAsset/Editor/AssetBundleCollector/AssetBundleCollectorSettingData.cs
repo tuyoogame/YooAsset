@@ -27,24 +27,8 @@ namespace YooAsset.Editor
 		public static bool IsDirty { private set; get; } = false;
 
 
-		private static AssetBundleCollectorSetting _setting = null;
-		public static AssetBundleCollectorSetting Setting
+		static AssetBundleCollectorSettingData()
 		{
-			get
-			{
-				if (_setting == null)
-					LoadSettingData();
-				return _setting;
-			}
-		}
-
-		/// <summary>
-		/// 加载配置文件
-		/// </summary>
-		private static void LoadSettingData()
-		{
-			_setting = EditorHelper.LoadSettingData<AssetBundleCollectorSetting>();
-
 			// IPackRule
 			{
 				// 清空缓存集合
@@ -108,7 +92,8 @@ namespace YooAsset.Editor
 				List<Type> types = new List<Type>(100)
 				{
 					typeof(AddressByFileName),
-					typeof(AddressByCollectorAndFileName),
+					typeof(AddressByFilePath),
+					typeof(AddressByFolderAndFileName),
 					typeof(AddressByGroupAndFileName)
 				};
 
@@ -143,6 +128,17 @@ namespace YooAsset.Editor
 					if (_cacheActiveRuleTypes.ContainsKey(type.Name) == false)
 						_cacheActiveRuleTypes.Add(type.Name, type);
 				}
+			}
+		}
+
+		private static AssetBundleCollectorSetting _setting = null;
+		public static AssetBundleCollectorSetting Setting
+		{
+			get
+			{
+				if (_setting == null)
+					_setting = SettingLoader.LoadSettingData<AssetBundleCollectorSetting>();
+				return _setting;
 			}
 		}
 
@@ -183,9 +179,6 @@ namespace YooAsset.Editor
 
 		public static List<RuleDisplayName> GetActiveRuleNames()
 		{
-			if (_setting == null)
-				LoadSettingData();
-
 			List<RuleDisplayName> names = new List<RuleDisplayName>();
 			foreach (var pair in _cacheActiveRuleTypes)
 			{
@@ -198,9 +191,6 @@ namespace YooAsset.Editor
 		}
 		public static List<RuleDisplayName> GetAddressRuleNames()
 		{
-			if (_setting == null)
-				LoadSettingData();
-
 			List<RuleDisplayName> names = new List<RuleDisplayName>();
 			foreach (var pair in _cacheAddressRuleTypes)
 			{
@@ -213,9 +203,6 @@ namespace YooAsset.Editor
 		}
 		public static List<RuleDisplayName> GetPackRuleNames()
 		{
-			if (_setting == null)
-				LoadSettingData();
-
 			List<RuleDisplayName> names = new List<RuleDisplayName>();
 			foreach (var pair in _cachePackRuleTypes)
 			{
@@ -228,9 +215,6 @@ namespace YooAsset.Editor
 		}
 		public static List<RuleDisplayName> GetFilterRuleNames()
 		{
-			if (_setting == null)
-				LoadSettingData();
-
 			List<RuleDisplayName> names = new List<RuleDisplayName>();
 			foreach (var pair in _cacheFilterRuleTypes)
 			{
@@ -243,7 +227,7 @@ namespace YooAsset.Editor
 		}
 		private static string GetRuleDisplayName(string name, Type type)
 		{
-			var attribute = EditorAttribute.GetAttribute<DisplayNameAttribute>(type);
+			var attribute = DisplayNameAttributeHelper.GetAttribute<DisplayNameAttribute>(type);
 			if (attribute != null && string.IsNullOrEmpty(attribute.DisplayName) == false)
 				return attribute.DisplayName;
 			else

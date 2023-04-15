@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
 using UniFramework.Event;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
-public class PatchManager : ModuleSingleton<PatchManager>, IModule
+public class PatchManager : SingletonInstance<PatchManager>, ISingleton
 {
 	/// <summary>
 	/// 运行模式
@@ -22,21 +22,21 @@ public class PatchManager : ModuleSingleton<PatchManager>, IModule
 	/// <summary>
 	/// 下载器
 	/// </summary>
-	public PatchDownloaderOperation Downloader { set; get; }
+	public ResourceDownloaderOperation Downloader { set; get; }
 
 
 	private bool _isRun = false;
 	private EventGroup _eventGroup = new EventGroup();
 	private StateMachine _machine;
 
-	void IModule.OnCreate(object createParam)
+	void ISingleton.OnCreate(object createParam)
 	{
 	}
-	void IModule.OnDestroy()
+	void ISingleton.OnDestroy()
 	{
 		_eventGroup.RemoveAllListener();
 	}
-	void IModule.OnUpdate()
+	void ISingleton.OnUpdate()
 	{
 		if (_machine != null)
 			_machine.Update();

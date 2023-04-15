@@ -4,7 +4,7 @@ using UnityEngine;
 using UniFramework.Pooling;
 using UniFramework.Window;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
 internal class FsmInitGame : IStateNode
@@ -17,7 +17,7 @@ internal class FsmInitGame : IStateNode
 	}
 	void IStateNode.OnEnter()
 	{
-		UniModule.StartCoroutine(Prepare());
+		UniSingleton.StartCoroutine(Prepare());
 	}
 	void IStateNode.OnUpdate()
 	{

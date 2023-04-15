@@ -11,13 +11,13 @@ namespace UniFramework.Pooling
 		private readonly List<GameObjectPool> _gameObjectPools = new List<GameObjectPool>(100);
 		private readonly List<GameObjectPool> _removeList = new List<GameObjectPool>(100);
 		private readonly GameObject _spawnerRoot;
-		private readonly AssetsPackage _assetPackage;
+		private readonly ResourcePackage _package;
 
 		public string PackageName
 		{
 			get
 			{
-				return _assetPackage.PackageName;
+				return _package.PackageName;
 			}
 		}
 
@@ -25,11 +25,11 @@ namespace UniFramework.Pooling
 		private Spawner()
 		{
 		}
-		internal Spawner(GameObject poolingRoot, AssetsPackage assetPackage)
+		internal Spawner(GameObject poolingRoot, ResourcePackage package)
 		{
-			_spawnerRoot = new GameObject($"{assetPackage.PackageName}");
+			_spawnerRoot = new GameObject($"{package.PackageName}");
 			_spawnerRoot.transform.SetParent(poolingRoot.transform);
-			_assetPackage = assetPackage;
+			_package = package;
 		}
 
 		/// <summary>
@@ -137,7 +137,7 @@ namespace UniFramework.Pooling
 			else
 			{
 				pool = new GameObjectPool(_spawnerRoot, location, dontDestroy, initCapacity, maxCapacity, destroyTime);
-				pool.CreatePool(_assetPackage);
+				pool.CreatePool(_package);
 				_gameObjectPools.Add(pool);
 
 				var operation = new CreatePoolOperation(pool.AssetHandle);
@@ -240,7 +240,7 @@ namespace UniFramework.Pooling
 
 			// 如果不存在创建游戏对象池
 			pool = new GameObjectPool(_spawnerRoot, location, false, 0, int.MaxValue, -1f);
-			pool.CreatePool(_assetPackage);
+			pool.CreatePool(_package);
 			_gameObjectPools.Add(pool);
 			return pool.Spawn(parent, position, rotation, forceClone, userDatas);
 		}

@@ -8,6 +8,8 @@ namespace YooAsset.Editor
 {
 	public class BuildMapContext : IContextObject
 	{
+		private readonly Dictionary<string, BuildBundleInfo> _bundleInfoDic = new Dictionary<string, BuildBundleInfo>(10000);
+
 		/// <summary>
 		/// 参与构建的资源总数
 		/// 说明：包括主动收集的资源以及其依赖的所有资源
@@ -25,9 +27,20 @@ namespace YooAsset.Editor
 		public bool UniqueBundleName;
 
 		/// <summary>
-		/// 资源包列表
+		/// 着色器统一的全名称
 		/// </summary>
-		public readonly List<BuildBundleInfo> BundleInfos = new List<BuildBundleInfo>(1000);
+		public string ShadersBundleName;
+
+		/// <summary>
+		/// 资源包信息列表
+		/// </summary>
+		public Dictionary<string, BuildBundleInfo>.ValueCollection Collection
+		{
+			get
+			{
+				return _bundleInfoDic.Values;
+			}
+		}
 
 
 		/// <summary>
@@ -35,11 +48,11 @@ namespace YooAsset.Editor
 		/// </summary>
 		public void PackAsset(BuildAssetInfo assetInfo)
 		{
-			string bundleName = assetInfo.GetBundleName();
+			string bundleName = assetInfo.BundleName;
 			if (string.IsNullOrEmpty(bundleName))
 				throw new Exception("Should never get here !");
 
-			if (TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))
+			if (_bundleInfoDic.TryGetValue(bundleName, out BuildBundleInfo bundleInfo))
 			{
 				bundleInfo.PackAsset(assetInfo);
 			}
@@ -47,33 +60,28 @@ namespace YooAsset.Editor
 			{
 				BuildBundleInfo newBundleInfo = new BuildBundleInfo(bundleName);
 				newBundleInfo.PackAsset(assetInfo);
-				BundleInfos.Add(newBundleInfo);
+				_bundleInfoDic.Add(bundleName, newBundleInfo);
 			}
 		}
 
 		/// <summary>
-		/// 获取所有的打包资源
+		/// 是否包含资源包
 		/// </summary>
-		public List<BuildAssetInfo> GetAllAssets()
+		public bool IsContainsBundle(string bundleName)
 		{
-			List<BuildAssetInfo> result = new List<BuildAssetInfo>(BundleInfos.Count);
-			foreach (var bundleInfo in BundleInfos)
-			{
-				result.AddRange(bundleInfo.BuildinAssets);
-			}
-			return result;
+			return _bundleInfoDic.ContainsKey(bundleName);
 		}
 
 		/// <summary>
-		/// 获取AssetBundle内构建的资源路径列表
+		/// 获取资源包信息，如果没找到返回NULL
 		/// </summary>
-		public string[] GetBuildinAssetPaths(string bundleName)
+		public BuildBundleInfo GetBundleInfo(string bundleName)
 		{
-			if (TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo))
+			if (_bundleInfoDic.TryGetValue(bundleName, out BuildBundleInfo result))
 			{
-				return bundleInfo.GetBuildinAssetPaths();
+				return result;
 			}
-			throw new Exception($"Not found {nameof(BuildBundleInfo)} : {bundleName}");
+			throw new Exception($"Not found bundle : {bundleName}");
 		}
 
 		/// <summary>
@@ -81,8 +89,8 @@ namespace YooAsset.Editor
 		/// </summary>
 		public UnityEditor.AssetBundleBuild[] GetPipelineBuilds()
 		{
-			List<UnityEditor.AssetBundleBuild> builds = new List<UnityEditor.AssetBundleBuild>(BundleInfos.Count);
-			foreach (var bundleInfo in BundleInfos)
+			List<UnityEditor.AssetBundleBuild> builds = new List<UnityEditor.AssetBundleBuild>(_bundleInfoDic.Count);
+			foreach (var bundleInfo in _bundleInfoDic.Values)
 			{
 				if (bundleInfo.IsRawFile == false)
 					builds.Add(bundleInfo.CreatePipelineBuild());
@@ -91,25 +99,15 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 是否包含资源包
+		/// 创建着色器信息类
 		/// </summary>
-		public bool IsContainsBundle(string bundleName)
+		public void CreateShadersBundleInfo(string shadersBundleName)
 		{
-			return TryGetBundleInfo(bundleName, out BuildBundleInfo bundleInfo);
-		}
-
-		public bool TryGetBundleInfo(string bundleName, out BuildBundleInfo result)
-		{
-			foreach (var bundleInfo in BundleInfos)
+			if (IsContainsBundle(shadersBundleName) == false)
 			{
-				if (bundleInfo.BundleName == bundleName)
-				{
-					result = bundleInfo;
-					return true;
-				}
+				var shaderBundleInfo = new BuildBundleInfo(shadersBundleName);
+				_bundleInfoDic.Add(shadersBundleName, shaderBundleInfo);
 			}
-			result = null;
-			return false;
 		}
 	}
 }

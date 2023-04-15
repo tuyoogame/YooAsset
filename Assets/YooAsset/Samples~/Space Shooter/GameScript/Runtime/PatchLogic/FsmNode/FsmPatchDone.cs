@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 
 /// <summary>
 /// 流程更新完毕
@@ -17,7 +17,7 @@ internal class FsmPatchDone : IStateNode
 		PatchEventDefine.PatchStatesChange.SendEventMessage("开始游戏！");
 
 		// 创建游戏管理器
-		UniModule.CreateModule<GameManager>();
+		UniSingleton.CreateSingleton<GameManager>();
 
 		// 开启游戏流程
 		GameManager.Instance.Run();

@@ -1,5 +1,3 @@
-![image](./Docs/Image/LOGO.png)
-
 # YooAsset
 
 [![License](https://img.shields.io/github/license/tuyoogame/YooAsset)](https://github.com/tuyoogame/YooAsset/blob/master/LICENSE)[![openupm](https://img.shields.io/npm/v/com.tuyoogame.yooasset?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.cn/packages/com.tuyoogame.yooasset/)
@@ -8,9 +6,7 @@
 
 它可以满足商业化游戏的各类需求，并且经历多款百万DAU游戏产品的验证。
 
-## 介绍
-
-YooAsset可以满足以下任何需求：
+**YooAsset可以满足以下任何需求：**
 
 - 我想发布一个不包含任何游戏资源的安装包，然后玩家边玩边下载。
 - 我想发布一个可以保证前期体验的安装包，然后玩家自己选择下载关卡内容。
@@ -19,7 +15,7 @@ YooAsset可以满足以下任何需求：
 - 我想发布一个MOD游戏安装包，玩家可以把自己制作的MOD内容上传到服务器，其它玩家可以下载游玩。
 - 我们在制作一个超大体量的项目，有上百GB的资源内容，每次构建都花费大量时间，是否可以分工程构建？
 
-## 系统特点
+### 系统特点
 
 - **构建管线无缝切换**
 
@@ -31,7 +27,7 @@ YooAsset可以满足以下任何需求：
 
 - **支持可寻址资源定位**
 
-  默认支持相对路径的资源定位，也支持可寻址资源定位，不需要繁琐的过程即可高效的配置寻址路径。
+  默认支持完整路径的资源定位，也支持可寻址资源定位，不需要繁琐的过程即可高效的配置寻址路径。
 
 - **安全高效的分包方案**
 
@@ -65,38 +61,7 @@ YooAsset可以满足以下任何需求：
   
   支持线上版本快速回退，支持区分审核版本，测试版本，线上版本，支持灰度更新及测试。
 
-## 入门教程
-1. [快速开始](./Docs/QuickStart.md)
-2. [全局配置](./Docs/GlobalSettings.md)
-3. [资源配置](./Docs/AssetBundleCollector.md)
-4. [资源打包](./Docs/AssetBundleBuilder.md)
-5. [资源部署](./Docs/AssetBundleDeployer.md)
-5. [构建报告](./Docs/AssetBundleReporter.md)
-5. [调试器](./Docs/AssetBundleDebugger.md)
-5. [着色器](./Docs/ShaderVariantCollector.md)
-5. [常见问题](./Docs/FAQ.md)
+### 官方主页（教程文档）
 
-## 代码教程
-1. [初始化](./Docs/CodeTutorial1.md)
-2. [资源更新](./Docs/CodeTutorial2.md)
-3. [资源加载](./Docs/CodeTutorial3.md)
-3. [解决方案](./Docs/CodeTutorial4.md)
-
-## 其它教程
-
-[视频教程](https://space.bilibili.com/328590743/channel/seriesdetail?sid=2207858)
-
-[示例教程](./Docs/Samples.md)
-
-## 社区
-
-QQ群：**963240451**
-
-[致谢名单](./Docs/Contributor.md)👯
-
-[代码贡献](./Docs/CodeStyle.md)
-
-## 友情链接
-[ET Framework](https://github.com/wqaetly/ET/tree/et7_fgui_yooasset_luban_huatuo): ET 7.0 + FGUI + luban + huatuo + YooAsset + NKGMoba + UniTask，并提供常用的编辑器工具。  
-[YooAssetEx](https://gitee.com/liu_zhongxiu/yoo-asset-ex/tree/master): YooAsset Odin扩展工具，用于支持Unity2017和Unity2018版本。
+https://www.yooasset.com/
 

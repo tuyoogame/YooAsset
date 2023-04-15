@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
-using UniFramework.Module;
+using UniFramework.Singleton;
 using YooAsset;
 
 /// <summary>
@@ -19,7 +19,7 @@ public class FsmCreateDownloader : IStateNode
 	void IStateNode.OnEnter()
 	{
 		PatchEventDefine.PatchStatesChange.SendEventMessage("创建补丁下载器！");
-		UniModule.StartCoroutine(CreateDownloader());
+		UniSingleton.StartCoroutine(CreateDownloader());
 	}
 	void IStateNode.OnUpdate()
 	{
@@ -35,7 +35,7 @@ public class FsmCreateDownloader : IStateNode
 		//TODO wht real 以下代码全拿
 		int downloadingMaxNum = 10;
 		int failedTryAgain = 3;
-		var downloader = YooAssets.CreatePatchDownloader(downloadingMaxNum, failedTryAgain);
+		var downloader = YooAssets.CreateResourceDownloader(downloadingMaxNum, failedTryAgain);
 		PatchManager.Instance.Downloader = downloader;
 
 		if (downloader.TotalDownloadCount == 0)		//没有需要下载的资源

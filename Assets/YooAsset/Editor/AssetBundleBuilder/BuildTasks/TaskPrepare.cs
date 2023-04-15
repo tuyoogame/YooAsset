@@ -12,8 +12,6 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
-			buildParametersContext.BeginWatch();
-
 			var buildParameters = buildParametersContext.Parameters;
 
 			// 检测构建参数合法性
@@ -21,7 +19,7 @@ namespace YooAsset.Editor
 				throw new Exception("请选择目标平台");
 			if (string.IsNullOrEmpty(buildParameters.PackageName))
 				throw new Exception("包裹名称不能为空");
-			if(string.IsNullOrEmpty(buildParameters.PackageVersion))
+			if (string.IsNullOrEmpty(buildParameters.PackageVersion))
 				throw new Exception("包裹版本不能为空");
 
 			if (buildParameters.BuildMode != EBuildMode.SimulateBuild)
@@ -53,11 +51,11 @@ namespace YooAsset.Editor
 
 			if (buildParameters.BuildMode == EBuildMode.ForceRebuild)
 			{
-				// 删除平台总目录
-				string platformDirectory = $"{buildParameters.OutputRoot}/{buildParameters.PackageName}/{buildParameters.BuildTarget}";
+				// 删除总目录
+				string platformDirectory = $"{buildParameters.OutputRoot}/{buildParameters.BuildTarget}/{buildParameters.PackageName}";
 				if (EditorTools.DeleteDirectory(platformDirectory))
 				{
-					BuildRunner.Log($"删除平台总目录：{platformDirectory}");
+					BuildLogger.Log($"删除平台总目录：{platformDirectory}");
 				}
 			}
 
@@ -65,7 +63,7 @@ namespace YooAsset.Editor
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
 			if (EditorTools.CreateDirectory(pipelineOutputDirectory))
 			{
-				BuildRunner.Log($"创建输出目录：{pipelineOutputDirectory}");
+				BuildLogger.Log($"创建输出目录：{pipelineOutputDirectory}");
 			}
 		}
 	}

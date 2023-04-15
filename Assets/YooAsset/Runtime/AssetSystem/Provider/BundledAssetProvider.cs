@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace YooAsset
 {
-	internal sealed class BundledAssetProvider : BundledProvider
+	internal sealed class BundledAssetProvider : ProviderBase
 	{
 		private AssetBundleRequest _cacheRequest;
 
@@ -13,7 +13,7 @@ namespace YooAsset
 		}
 		public override void Update()
 		{
-			DebugRecording();
+			DebugBeginRecording();
 
 			if (IsDone)
 				return;

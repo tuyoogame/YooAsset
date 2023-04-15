@@ -16,7 +16,7 @@ MonoBehaviour:
   BuildMode: 0
   BuildPackage: DefaultPackage
   CompressOption: 2
-  OutputNameStyle: 4
+  OutputNameStyle: 1
   CopyBuildinFileOption: 1
   CopyBuildinFileTags: 
   EncyptionClassName: FileStreamEncryption

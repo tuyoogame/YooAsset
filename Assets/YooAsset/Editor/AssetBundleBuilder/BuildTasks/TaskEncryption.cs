@@ -27,17 +27,16 @@ namespace YooAsset.Editor
 		private void EncryptingBundleFiles(BuildParametersContext buildParametersContext, BuildMapContext buildMapContext)
 		{
 			var encryptionServices = buildParametersContext.Parameters.EncryptionServices;
-
-			// 如果没有设置加密类
 			if (encryptionServices == null)
+				return;
+
+			if (encryptionServices.GetType() == typeof(EncryptionNone))
 				return;
 
 			int progressValue = 0;
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
-			foreach (var bundleInfo in buildMapContext.BundleInfos)
+			foreach (var bundleInfo in buildMapContext.Collection)
 			{
-				bundleInfo.LoadMethod = EBundleLoadMethod.Normal;
-
 				EncryptFileInfo fileInfo = new EncryptFileInfo();
 				fileInfo.BundleName = bundleInfo.BundleName;
 				fileInfo.FilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
@@ -48,7 +47,7 @@ namespace YooAsset.Editor
 					// 注意：原生文件不支持加密
 					if (bundleInfo.IsRawFile)
 					{
-						UnityEngine.Debug.LogWarning($"Encryption not support raw file : {bundleInfo.BundleName}");
+						BuildLogger.Warning($"Encryption not support raw file : {bundleInfo.BundleName}");
 						continue;
 					}
 
@@ -56,11 +55,11 @@ namespace YooAsset.Editor
 					FileUtility.CreateFile(filePath, encryptResult.EncryptedData);
 					bundleInfo.EncryptedFilePath = filePath;
 					bundleInfo.LoadMethod = encryptResult.LoadMethod;
-					BuildRunner.Log($"Bundle文件加密完成：{filePath}");
+					BuildLogger.Log($"Bundle文件加密完成：{filePath}");
 				}
 
 				// 进度条
-				EditorTools.DisplayProgressBar("加密资源包", ++progressValue, buildMapContext.BundleInfos.Count);
+				EditorTools.DisplayProgressBar("加密资源包", ++progressValue, buildMapContext.Collection.Count);
 			}
 			EditorTools.ClearProgressBar();
 		}

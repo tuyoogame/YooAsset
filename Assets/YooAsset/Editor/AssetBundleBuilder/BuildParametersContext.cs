@@ -7,8 +7,6 @@ namespace YooAsset.Editor
 {
 	public class BuildParametersContext : IContextObject
 	{
-		private readonly System.Diagnostics.Stopwatch _buildWatch = new System.Diagnostics.Stopwatch();
-
 		private string _pipelineOutputDirectory = string.Empty;
 		private string _packageOutputDirectory = string.Empty;
 
@@ -31,7 +29,7 @@ namespace YooAsset.Editor
 		{
 			if (string.IsNullOrEmpty(_pipelineOutputDirectory))
 			{
-				_pipelineOutputDirectory = AssetBundleBuilderHelper.MakePipelineOutputDirectory(Parameters.OutputRoot, Parameters.PackageName, Parameters.BuildTarget, Parameters.BuildMode);
+				_pipelineOutputDirectory = $"{Parameters.OutputRoot}/{Parameters.BuildTarget}/{Parameters.PackageName}/{YooAssetSettings.OutputFolderName}";
 			}
 			return _pipelineOutputDirectory;
 		}
@@ -43,7 +41,7 @@ namespace YooAsset.Editor
 		{
 			if (string.IsNullOrEmpty(_packageOutputDirectory))
 			{
-				_packageOutputDirectory = $"{Parameters.OutputRoot}/{Parameters.PackageName}/{Parameters.BuildTarget}/{Parameters.PackageVersion}";
+				_packageOutputDirectory = $"{Parameters.OutputRoot}/{Parameters.BuildTarget}/{Parameters.PackageName}/{Parameters.PackageVersion}";
 			}
 			return _packageOutputDirectory;
 		}
@@ -116,23 +114,6 @@ namespace YooAsset.Editor
 			buildParams.WriteLinkXML = Parameters.SBPParameters.WriteLinkXML;
 
 			return buildParams;
-		}
-
-		/// <summary>
-		/// 获取构建的耗时（单位：秒）
-		/// </summary>
-		public float GetBuildingSeconds()
-		{
-			float seconds = _buildWatch.ElapsedMilliseconds / 1000f;
-			return seconds;
-		}
-		public void BeginWatch()
-		{
-			_buildWatch.Start();
-		}
-		public void StopWatch()
-		{
-			_buildWatch.Stop();
 		}
 	}
 }

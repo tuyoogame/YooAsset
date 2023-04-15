@@ -16,7 +16,6 @@ namespace YooAsset
 		}
 
 		private ESteps _steps = ESteps.None;
-		private bool _isShowWaitForAsyncError = false;
 		private DownloaderBase _unpacker;
 		private DownloaderBase _downloader;
 
@@ -38,13 +37,13 @@ namespace YooAsset
 				if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
 				{
 					_steps = ESteps.Download;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
 				{
-#if UNITY_ANDROID || UNITY_WEBGL
+#if UNITY_ANDROID
 					_steps = ESteps.Unpack;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 #else
 					_steps = ESteps.CheckFile;
 					FileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
@@ -53,7 +52,7 @@ namespace YooAsset
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
 					_steps = ESteps.CheckFile;
-					FileLoadPath = MainBundleInfo.Bundle.CachedFilePath;
+					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else
 				{
@@ -64,7 +63,7 @@ namespace YooAsset
 			// 1. 下载远端文件
 			if (_steps == ESteps.Download)
 			{
-				int failedTryAgain = int.MaxValue;
+				int failedTryAgain = Impl.DownloadFailedTryAgain;
 				_downloader = DownloadSystem.BeginDownload(MainBundleInfo, failedTryAgain);
 				_steps = ESteps.CheckDownload;
 			}
@@ -93,7 +92,7 @@ namespace YooAsset
 			if (_steps == ESteps.Unpack)
 			{
 				int failedTryAgain = 1;
-				var bundleInfo = PatchManifestTools.GetUnpackInfo(MainBundleInfo.Bundle);
+				var bundleInfo = ManifestTools.GetUnpackInfo(MainBundleInfo.Bundle);
 				_unpacker = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
 				_steps = ESteps.CheckUnpack;
 			}
@@ -125,13 +124,14 @@ namespace YooAsset
 				DownloadProgress = 1f;
 				DownloadedBytes = (ulong)MainBundleInfo.Bundle.FileSize;
 
-				_steps = ESteps.Done;
 				if (File.Exists(FileLoadPath))
 				{
+					_steps = ESteps.Done;
 					Status = EStatus.Succeed;
 				}
 				else
 				{
+					_steps = ESteps.Done;
 					Status = EStatus.Failed;
 					LastError = $"Raw file not found : {FileLoadPath}";
 				}
@@ -149,20 +149,24 @@ namespace YooAsset
 				// 文件解压
 				if (_unpacker != null)
 				{
-					_unpacker.Update();
 					if (_unpacker.IsDone() == false)
+					{
+						_unpacker.WaitForAsyncComplete = true;
+						_unpacker.Update();
 						continue;
+					}
 				}
 
 				// 保险机制
-				// 注意：如果需要从WEB端下载资源，可能会触发保险机制！
+				// 注意：如果需要从远端下载资源，可能会触发保险机制！
 				frame--;
 				if (frame == 0)
 				{
-					if (_isShowWaitForAsyncError == false)
+					if (IsDone() == false)
 					{
-						_isShowWaitForAsyncError = true;
-						YooLogger.Error($"WaitForAsyncComplete failed ! Try load bundle : {MainBundleInfo.Bundle.BundleName} from remote with sync load method !");
+						Status = EStatus.Failed;
+						LastError = $"WaitForAsyncComplete failed ! Try load bundle : {MainBundleInfo.Bundle.BundleName} from remote with sync load method !";
+						YooLogger.Error(LastError);
 					}
 					break;
 				}

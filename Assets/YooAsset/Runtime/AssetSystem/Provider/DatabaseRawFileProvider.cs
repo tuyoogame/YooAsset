@@ -25,14 +25,37 @@ namespace YooAsset
 					return;
 				}
 
-				Status = EStatus.Checking;
+				Status = EStatus.CheckBundle;
 
 				// 注意：模拟异步加载效果提前返回
 				if (IsWaitForAsyncComplete == false)
 					return;
 			}
 
-			if(Status == EStatus.Checking)
+			// 1. 检测资源包
+			if (Status == EStatus.CheckBundle)
+			{
+				if (IsWaitForAsyncComplete)
+				{
+					OwnerBundle.WaitForAsyncComplete();
+				}
+
+				if (OwnerBundle.IsDone() == false)
+					return;
+
+				if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
+				{
+					Status = EStatus.Failed;
+					LastError = OwnerBundle.LastError;
+					InvokeCompletion();
+					return;
+				}
+
+				Status = EStatus.Checking;
+			}
+
+			// 2. 检测加载结果
+			if (Status == EStatus.Checking)
 			{
 				RawFilePath = MainAssetInfo.AssetPath;
 				Status = EStatus.Succeed;
