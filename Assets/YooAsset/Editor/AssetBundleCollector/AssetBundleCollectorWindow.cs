@@ -12,7 +12,7 @@ namespace YooAsset.Editor
 	public class AssetBundleCollectorWindow : EditorWindow
 	{
 		[MenuItem("YooAsset/AssetBundle Collector", false, 101)]
-		public static void ShowExample()
+		public static void OpenWindow()
 		{
 			AssetBundleCollectorWindow window = GetWindow<AssetBundleCollectorWindow>("资源包收集工具", true, WindowsDefine.DockedWindowTypes);
 			window.minSize = new Vector2(800, 600);
