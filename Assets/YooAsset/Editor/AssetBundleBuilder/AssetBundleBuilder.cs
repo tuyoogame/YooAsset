@@ -94,7 +94,7 @@ namespace YooAsset.Editor
 			{
 				BuildLogger.Warning($"{buildParameters.BuildMode} pipeline build failed !");
 				BuildLogger.Error($"Build task failed : {buildResult.FailedTask}");
-				BuildLogger.Error($"Build task error : {buildResult.FailedInfo}");
+				BuildLogger.Error(buildResult.ErrorInfo);
 			}
 
 			return buildResult;

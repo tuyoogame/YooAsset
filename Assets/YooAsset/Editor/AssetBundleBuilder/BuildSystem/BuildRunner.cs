@@ -52,7 +52,7 @@ namespace YooAsset.Editor
 				{
 					EditorTools.ClearProgressBar();
 					buildResult.FailedTask = task.GetType().Name;
-					buildResult.FailedInfo = e.ToString();
+					buildResult.ErrorInfo = e.ToString();
 					buildResult.Success = false;
 					break;
 				}
