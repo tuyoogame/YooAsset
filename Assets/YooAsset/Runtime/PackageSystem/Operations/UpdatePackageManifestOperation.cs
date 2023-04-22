@@ -69,6 +69,7 @@ namespace YooAsset
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
 		private readonly string _packageVersion;
+		private readonly bool _autoSaveVersion;
 		private readonly int _timeout;
 		private LoadCacheManifestOperation _tryLoadCacheManifestOp;
 		private LoadCacheManifestOperation _loadCacheManifestOp;
@@ -76,11 +77,12 @@ namespace YooAsset
 		private ESteps _steps = ESteps.None;
 
 
-		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
+		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, bool autoSaveVersion, int timeout)
 		{
 			_impl = impl;
 			_packageName = packageName;
 			_packageVersion = packageVersion;
+			_autoSaveVersion = autoSaveVersion;
 			_timeout = timeout;
 		}
 		internal override void Start()
@@ -120,6 +122,8 @@ namespace YooAsset
 				if (_tryLoadCacheManifestOp.Status == EOperationStatus.Succeed)
 				{
 					_impl.ActiveManifest = _tryLoadCacheManifestOp.Manifest;
+					if (_autoSaveVersion)
+						SavePackageVersion();
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
 				}
@@ -166,6 +170,8 @@ namespace YooAsset
 				if (_loadCacheManifestOp.Status == EOperationStatus.Succeed)
 				{
 					_impl.ActiveManifest = _loadCacheManifestOp.Manifest;
+					if (_autoSaveVersion)
+						SavePackageVersion();
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Succeed;
 				}

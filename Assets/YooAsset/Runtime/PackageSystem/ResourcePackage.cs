@@ -220,13 +220,13 @@ namespace YooAsset
 		/// 向网络端请求并更新清单
 		/// </summary>
 		/// <param name="packageVersion">更新的包裹版本</param>
-		/// <param name="autoActiveManifest">自动激活清单</param>
+		/// <param name="autoSaveVersion">更新成功后自动保存版本号，作为下次初始化的版本。</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, int timeout = 60)
+		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion = true, int timeout = 60)
 		{
 			DebugCheckInitialize();
 			DebugCheckUpdateManifest();
-			return _playModeServices.UpdatePackageManifestAsync(packageVersion, timeout);
+			return _playModeServices.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
 		}
 
 		/// <summary>
