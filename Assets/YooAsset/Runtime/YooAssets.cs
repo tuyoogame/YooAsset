@@ -140,7 +140,7 @@ namespace YooAsset
 		/// <summary>
 		/// 销毁资源包
 		/// </summary>
-		/// <param name="package">资源包对象</param>
+		/// <param name="packageName">资源包名称</param>
 		public static void DestroyPackage(string packageName)
 		{
 			ResourcePackage package = GetPackage(packageName);
