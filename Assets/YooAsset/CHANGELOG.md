@@ -2,6 +2,58 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.12] - 2023-04-22
+
+### Changed
+
+- 增加了对WEBGL平台加密选项的检测。
+
+- 增加了YooAsset/Home Page菜单栏。
+
+- 增加了鼠标右键创建配置的菜单。
+
+- 增加了YooAssets.DestroyPackage()方法。
+
+  ```c#
+  class YooAssets
+  {
+      /// <summary>
+      /// 销毁资源包
+      /// </summary>
+      /// <param name="package">资源包对象</param>
+      public static void DestroyPackage(string packageName);
+  }
+  ```
+
+- UpdatePackageManifestAsync方法增加了新参数autoSaveVersion
+
+  ```c#
+  class ResourcePackage
+  {
+      /// <summary>
+      /// 向网络端请求并更新清单
+      /// </summary>
+      /// <param name="packageVersion">更新的包裹版本</param>
+      /// <param name="autoSaveVersion">更新成功后自动保存版本号，作为下次初始化的版本。</param>
+      /// <param name="timeout">超时时间（默认值：60秒）</param>
+      public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion = true, int timeout = 60)   
+  }
+  ```
+
+- BuildParameters类增加了新字段。
+
+  可以自定义共享资源文件的打包规则。
+
+  ```c#
+  class BuildParameters
+  {
+      /// <summary>
+      /// 共享资源的打包规则
+      /// </summary>
+      public IShareAssetPackRule ShareAssetPackRule = null;
+  }
+  ```
+
 ## [1.4.11] - 2023-04-14
 
 ### Fixed
