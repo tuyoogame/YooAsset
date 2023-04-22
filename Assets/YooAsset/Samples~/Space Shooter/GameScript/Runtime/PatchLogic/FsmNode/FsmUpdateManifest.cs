@@ -32,13 +32,13 @@ public class FsmUpdateManifest : IStateNode
 	{
 		yield return new WaitForSecondsRealtime(0.5f);
 
+		bool savePackageVersion = true;
 		var package = YooAssets.GetPackage("DefaultPackage");
-		var operation = package.UpdatePackageManifestAsync(PatchManager.Instance.PackageVersion);
+		var operation = package.UpdatePackageManifestAsync(PatchManager.Instance.PackageVersion, savePackageVersion);
 		yield return operation;
 
 		if(operation.Status == EOperationStatus.Succeed)
 		{
-			operation.SavePackageVersion();
 			_machine.ChangeState<FsmCreateDownloader>();
 		}
 		else
