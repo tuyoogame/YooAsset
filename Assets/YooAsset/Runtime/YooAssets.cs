@@ -251,10 +251,11 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 清空沙盒目录
+		/// 清空沙盒目录（需要重启APP）
 		/// </summary>
 		public static void ClearSandbox()
 		{
+			YooLogger.Warning("Clear sandbox folder files, Finally, restart the application !");
 			PersistentHelper.DeleteSandbox();
 		}
 		#endregion
