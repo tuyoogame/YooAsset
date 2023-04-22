@@ -2,6 +2,7 @@
 
 namespace YooAsset.Editor
 {
+	[CreateAssetMenu(fileName = "ShaderVariantCollectorSetting", menuName = "YooAsset/Create ShaderVariant Collector Settings")]
 	public class ShaderVariantCollectorSetting : ScriptableObject
 	{
 		/// <summary>
