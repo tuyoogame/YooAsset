@@ -13,7 +13,8 @@ namespace YooAsset.Editor
 		void IBuildTask.Run(BuildContext context)
 		{
 			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
-			var buildMapContext = CreateBuildMap(buildParametersContext.Parameters.BuildMode, buildParametersContext.Parameters.PackageName);
+			var buildParameters = buildParametersContext.Parameters;
+			var buildMapContext = CreateBuildMap(buildParameters.BuildMode, buildParameters.ShareAssetPackRule, buildParameters.PackageName);
 			context.SetContextObject(buildMapContext);
 			BuildLogger.Log("构建内容准备完毕！");
 
@@ -24,7 +25,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 资源构建上下文
 		/// </summary>
-		public BuildMapContext CreateBuildMap(EBuildMode buildMode, string packageName)
+		public BuildMapContext CreateBuildMap(EBuildMode buildMode, IShareAssetPackRule packRule, string packageName)
 		{
 			Dictionary<string, BuildAssetInfo> allBuildAssetInfoDic = new Dictionary<string, BuildAssetInfo>(1000);
 
@@ -101,7 +102,7 @@ namespace YooAsset.Editor
 			var command = collectResult.Command;
 			foreach (var buildAssetInfo in allBuildAssetInfoDic.Values)
 			{
-				buildAssetInfo.CalculateShareBundleName(command.UniqueBundleName, command.PackageName, command.ShadersBundleName);
+				buildAssetInfo.CalculateShareBundleName(packRule, command.UniqueBundleName, command.PackageName, command.ShadersBundleName);
 			}
 
 			// 9. 移除不参与构建的资源

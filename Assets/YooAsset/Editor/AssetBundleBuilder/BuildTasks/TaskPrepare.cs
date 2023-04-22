@@ -40,6 +40,10 @@ namespace YooAsset.Editor
 						throw new Exception("首包资源标签不能为空！");
 				}
 
+				// 检测共享资源打包规则
+				if (buildParameters.ShareAssetPackRule == null)
+					throw new Exception("共享资源打包规则不能为空！");
+
 #if UNITY_WEBGL
 				if (buildParameters.EncryptionServices != null)
 				{

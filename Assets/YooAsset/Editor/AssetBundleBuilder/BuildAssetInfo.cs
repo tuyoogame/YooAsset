@@ -157,7 +157,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 计算共享资源包的完整包名
 		/// </summary>
-		public void CalculateShareBundleName(bool uniqueBundleName, string packageName, string shadersBundleName)
+		public void CalculateShareBundleName(IShareAssetPackRule packRule, bool uniqueBundleName, string packageName, string shadersBundleName)
 		{
 			if (CollectorType != ECollectorType.None)
 				return;
@@ -173,8 +173,7 @@ namespace YooAsset.Editor
 			{
 				if (_referenceBundleNames.Count > 1)
 				{
-					IPackRule packRule = PackDirectory.StaticPackRule;
-					PackRuleResult packRuleResult = packRule.GetPackRuleResult(new PackRuleData(AssetPath));
+					PackRuleResult packRuleResult = packRule.GetPackRuleResult(AssetPath);
 					BundleName = packRuleResult.GetShareBundleName(packageName, uniqueBundleName);
 				}
 				else

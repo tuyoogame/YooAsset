@@ -60,8 +60,6 @@ namespace YooAsset.Editor
 	[DisplayName("资源包名: 父类文件夹路径")]
 	public class PackDirectory : IPackRule
 	{
-		public static PackDirectory StaticPackRule = new PackDirectory();
-
 		PackRuleResult IPackRule.GetPackRuleResult(PackRuleData data)
 		{
 			string bundleName = Path.GetDirectoryName(data.AssetPath);
