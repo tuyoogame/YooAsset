@@ -197,16 +197,17 @@ namespace YooAsset.Editor
 			// 检测可寻址地址是否重复
 			if (command.EnableAddressable)
 			{
-				HashSet<string> adressTemper = new HashSet<string>();
+				var addressTemper = new Dictionary<string, string>();
 				foreach (var collectInfoPair in result)
 				{
 					if (collectInfoPair.Value.CollectorType == ECollectorType.MainAssetCollector)
 					{
 						string address = collectInfoPair.Value.Address;
-						if (adressTemper.Contains(address) == false)
-							adressTemper.Add(address);
+						string assetPath = collectInfoPair.Value.AssetPath;
+						if (addressTemper.TryGetValue(address, out var existed) == false)
+							addressTemper.Add(address, assetPath);
 						else
-							throw new Exception($"The address is existed : {address} in collector : {CollectPath}");
+							throw new Exception($"The address is existed : {address} in collector : {CollectPath}.\nAssetPath:\n    {existed}\n    {assetPath}");
 					}
 				}
 			}
