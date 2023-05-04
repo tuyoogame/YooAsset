@@ -106,7 +106,7 @@ namespace YooAsset.Editor
 						if (addressTemper.TryGetValue(address, out var existed) == false)
 							addressTemper.Add(address, assetPath);
 						else
-							throw new Exception($"The address is existed : {address} in group : {GroupName}.\nAssetPath:\n{existed}\n{assetPath}");
+							throw new Exception($"The address is existed : {address} in group : {GroupName} \nAssetPath:\n     {existed}\n     {assetPath}");
 					}
 				}
 			}
