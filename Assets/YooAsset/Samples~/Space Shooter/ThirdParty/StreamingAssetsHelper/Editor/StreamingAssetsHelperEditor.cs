@@ -30,7 +30,6 @@ internal class AndroidPost : UnityEditor.Android.IPostGenerateGradleAndroidProje
 			"        } \n" +
 			"        catch(java.io.IOException e) \n" +
 			"        { \n" +
-			"            e.printStackTrace(); \n" +
 			"        } \n" +
 			"        return false; \n" +
 			"    } \n" +
