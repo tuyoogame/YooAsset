@@ -150,6 +150,9 @@ namespace YooAsset
 			YooLogger.Log($"Destroy resource package : {packageName}");
 			_packages.Remove(package);
 			package.DestroyPackage();
+
+			// 清空缓存
+			CacheSystem.ClearPackage(packageName);
 		}
 
 		/// <summary>

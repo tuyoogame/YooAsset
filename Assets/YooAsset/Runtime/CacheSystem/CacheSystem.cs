@@ -24,6 +24,15 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 清空指定包裹的所有缓存数据
+		/// </summary>
+		public static void ClearPackage(string packageName)
+		{
+			var cache = GetOrCreateCache(packageName);
+			cache.ClearAll();
+		}
+
+		/// <summary>
 		/// 获取缓存文件总数
 		/// </summary>
 		public static int GetCachedFilesCount(string packageName)
@@ -115,7 +124,7 @@ namespace YooAsset
 		{
 			return VerifyingInternal(element.TempDataFilePath, element.FileSize, element.FileCRC, EVerifyLevel.High);
 		}
-		
+
 		/// <summary>
 		/// 验证记录文件（主线程内操作）
 		/// </summary>
