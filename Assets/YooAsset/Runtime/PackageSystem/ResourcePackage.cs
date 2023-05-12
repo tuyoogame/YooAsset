@@ -252,6 +252,17 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 清理包裹本地所有的缓存文件
+		/// </summary>
+		public ClearAllCacheFilesOperation ClearAllCacheFilesAsync()
+		{
+			DebugCheckInitialize();
+			var operation = new ClearAllCacheFilesOperation(this);
+			OperationSystem.StartOperation(operation);
+			return operation;
+		}
+
+		/// <summary>
 		/// 获取本地包裹的版本信息
 		/// </summary>
 		public string GetPackageVersion()

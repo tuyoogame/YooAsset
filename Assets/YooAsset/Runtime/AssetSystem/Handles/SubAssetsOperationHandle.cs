@@ -112,8 +112,6 @@ namespace YooAsset
 				var retObject = assetObject as TObject;
 				if (retObject != null)
 					ret.Add(retObject);
-				else
-					YooLogger.Warning($"The type conversion failed : {assetObject.name}");
 			}
 			return ret.ToArray();
 		}

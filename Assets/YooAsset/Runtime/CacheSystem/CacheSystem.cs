@@ -157,6 +157,14 @@ namespace YooAsset
 			return result;
 		}
 
+		/// <summary>
+		/// 获取所有的缓存文件
+		/// </summary>
+		public static List<string> GetAllCacheGUIDs(ResourcePackage package)
+		{
+			var cache = GetOrCreateCache(package.PackageName);
+			return cache.GetAllKeys();
+		}
 
 		private static EVerifyResult VerifyingInternal(string filePath, long fileSize, string fileCRC, EVerifyLevel verifyLevel)
 		{
