@@ -41,7 +41,7 @@ namespace YooAsset
 			{
 				if (_downloader1 == null)
 				{
-					string savePath = PersistentHelper.GetCachePackageHashFilePath(_packageName, _packageVersion);
+					string savePath = PersistentTools.GetCachePackageHashFilePath(_packageName, _packageVersion);
 					string fileName = YooAssetSettingsData.GetPackageHashFileName(_packageName, _packageVersion);
 					string webURL = GetDownloadRequestURL(fileName);
 					YooLogger.Log($"Beginning to download package hash file : {webURL}");
@@ -71,7 +71,7 @@ namespace YooAsset
 			{
 				if (_downloader2 == null)
 				{
-					string savePath = PersistentHelper.GetCacheManifestFilePath(_packageName, _packageVersion);
+					string savePath = PersistentTools.GetCacheManifestFilePath(_packageName, _packageVersion);
 					string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_packageName, _packageVersion);
 					string webURL = GetDownloadRequestURL(fileName);
 					YooLogger.Log($"Beginning to download manifest file : {webURL}");

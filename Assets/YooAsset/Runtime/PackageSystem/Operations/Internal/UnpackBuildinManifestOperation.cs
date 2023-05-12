@@ -35,10 +35,10 @@ namespace YooAsset
 			{
 				if (_downloader1 == null)
 				{
-					string savePath = PersistentHelper.GetCachePackageHashFilePath(_buildinPackageName, _buildinPackageVersion);
+					string savePath = PersistentTools.GetCachePackageHashFilePath(_buildinPackageName, _buildinPackageVersion);
 					string fileName = YooAssetSettingsData.GetPackageHashFileName(_buildinPackageName, _buildinPackageVersion);
-					string filePath = PathHelper.MakeStreamingLoadPath(fileName);
-					string url = PathHelper.ConvertToWWWPath(filePath);
+					string filePath = PersistentTools.MakeStreamingLoadPath(fileName);
+					string url = PersistentTools.ConvertToWWWPath(filePath);
 					_downloader1 = new UnityWebFileRequester();
 					_downloader1.SendRequest(url, savePath);
 				}
@@ -64,10 +64,10 @@ namespace YooAsset
 			{
 				if (_downloader2 == null)
 				{
-					string savePath = PersistentHelper.GetCacheManifestFilePath(_buildinPackageName, _buildinPackageVersion);
+					string savePath = PersistentTools.GetCacheManifestFilePath(_buildinPackageName, _buildinPackageVersion);
 					string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_buildinPackageName, _buildinPackageVersion);
-					string filePath = PathHelper.MakeStreamingLoadPath(fileName);
-					string url = PathHelper.ConvertToWWWPath(filePath);
+					string filePath = PersistentTools.MakeStreamingLoadPath(fileName);
+					string url = PersistentTools.ConvertToWWWPath(filePath);
 					_downloader2 = new UnityWebFileRequester();
 					_downloader2.SendRequest(url, savePath);
 				}

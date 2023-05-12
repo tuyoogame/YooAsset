@@ -35,7 +35,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.LoadCachePackageVersionFile)
 			{
-				string filePath = PersistentHelper.GetCachePackageVersionFilePath(_packageName);
+				string filePath = PersistentTools.GetCachePackageVersionFilePath(_packageName);
 				if (File.Exists(filePath) == false)
 				{
 					_steps = ESteps.Done;

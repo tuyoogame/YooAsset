@@ -234,6 +234,27 @@ namespace YooAsset
 		{
 			CacheSystem.InitVerifyLevel = verifyLevel;
 		}
+
+		/// <summary>
+		/// 设置缓存系统参数，沙盒目录的存储路径
+		/// </summary>
+		public static void SetCacheSystemSandboxPath(string sandboxPath)
+		{
+			if (string.IsNullOrEmpty(sandboxPath))
+			{
+				YooLogger.Error($"Sandbox path is null or empty !");
+				return;
+			}
+
+			// 注意：需要确保没有任何资源系统起效之前才可以设置沙盒目录！
+			if (_packages.Count > 0)
+			{
+				YooLogger.Error($"Please call this method {nameof(SetCacheSystemSandboxPath)} before the package is created !");
+				return;
+			}
+
+			PersistentTools.OverwriteSandboxPath(sandboxPath);
+		}
 		#endregion
 
 		#region 沙盒相关
@@ -250,7 +271,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetSandboxRoot()
 		{
-			return PathHelper.GetPersistentRootPath();
+			return PersistentTools.GetPersistentRootPath();
 		}
 
 		/// <summary>
@@ -259,7 +280,7 @@ namespace YooAsset
 		public static void ClearSandbox()
 		{
 			YooLogger.Warning("Clear sandbox folder files, Finally, restart the application !");
-			PersistentHelper.DeleteSandbox();
+			PersistentTools.DeleteSandbox();
 		}
 		#endregion
 

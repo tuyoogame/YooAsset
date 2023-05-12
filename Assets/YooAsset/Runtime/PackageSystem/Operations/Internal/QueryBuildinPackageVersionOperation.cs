@@ -38,8 +38,8 @@ namespace YooAsset
 				if (_downloader == null)
 				{
 					string fileName = YooAssetSettingsData.GetPackageVersionFileName(_packageName);
-					string filePath = PathHelper.MakeStreamingLoadPath(fileName);
-					string url = PathHelper.ConvertToWWWPath(filePath);
+					string filePath = PersistentTools.MakeStreamingLoadPath(fileName);
+					string url = PersistentTools.ConvertToWWWPath(filePath);
 					_downloader = new UnityWebDataRequester();
 					_downloader.SendRequest(url);
 				}

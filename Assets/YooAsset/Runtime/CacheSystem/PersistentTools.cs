@@ -3,13 +3,58 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	/// <summary>
-	/// 资源路径帮助类
-	/// </summary>
-	internal static class PathHelper
+	internal static class PersistentTools
 	{
+		private const string CacheFolderName = "CacheFiles";
+		private const string CachedBundleFileFolder = "BundleFiles";
+		private const string CachedRawFileFolder = "RawFiles";
+		private const string ManifestFolderName = "ManifestFiles";
+		private const string AppFootPrintFileName = "ApplicationFootPrint.bytes";
+
 		private static string _buildinPath;
 		private static string _sandboxPath;
+
+
+		/// <summary>
+		/// 重写沙盒跟路径
+		/// </summary>
+		public static void OverwriteSandboxPath(string sandboxPath)
+		{
+			_sandboxPath = sandboxPath;
+		}
+
+		/// <summary>
+		/// 获取沙盒文件夹路径
+		/// </summary>
+		public static string GetPersistentRootPath()
+		{
+#if UNITY_EDITOR
+			// 注意：为了方便调试查看，编辑器下把存储目录放到项目里
+			if (string.IsNullOrEmpty(_sandboxPath))
+			{
+				string directory = Path.GetDirectoryName(UnityEngine.Application.dataPath);
+				string projectPath = GetRegularPath(directory);
+				_sandboxPath = StringUtility.Format("{0}/Sandbox", projectPath);
+			}
+#elif UNITY_STANDALONE
+			if (string.IsNullOrEmpty(_sandboxPath))
+			{
+				_sandboxPath = StringUtility.Format("{0}/Sandbox", UnityEngine.Application.dataPath);
+			}
+#else
+			if (string.IsNullOrEmpty(_sandboxPath))
+			{
+				_sandboxPath = StringUtility.Format("{0}/Sandbox", UnityEngine.Application.persistentDataPath);
+			}
+#endif
+
+			return _sandboxPath;
+		}
+		private static string GetRegularPath(string path)
+		{
+			return path.Replace('\\', '/').Replace("\\", "/"); //替换为Linux路径格式
+		}
+
 
 		/// <summary>
 		/// 获取基于流文件夹的加载路径
@@ -33,33 +78,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取沙盒文件夹路径
-		/// </summary>
-		public static string GetPersistentRootPath()
-		{
-#if UNITY_EDITOR
-			// 注意：为了方便调试查看，编辑器下把存储目录放到项目里
-			if (string.IsNullOrEmpty(_sandboxPath))
-			{
-				string directory = Path.GetDirectoryName(UnityEngine.Application.dataPath);
-				string projectPath = GetRegularPath(directory);
-				_sandboxPath = StringUtility.Format("{0}/Sandbox", projectPath);
-			}
-			return _sandboxPath;
-#else
-			if (string.IsNullOrEmpty(_sandboxPath))
-			{
-				_sandboxPath = StringUtility.Format("{0}/Sandbox", UnityEngine.Application.persistentDataPath);
-			}
-			return _sandboxPath;
-#endif
-		}
-		private static string GetRegularPath(string path)
-		{
-			return path.Replace('\\', '/').Replace("\\", "/"); //替换为Linux路径格式
-		}
-
-		/// <summary>
 		/// 获取WWW加载本地资源的路径
 		/// </summary>
 		public static string ConvertToWWWPath(string path)
@@ -76,18 +94,6 @@ namespace YooAsset
 			return path;
 #endif
 		}
-	}
-
-	/// <summary>
-	/// 持久化目录帮助类
-	/// </summary>
-	internal static class PersistentHelper
-	{
-		private const string CacheFolderName = "CacheFiles";
-		private const string CachedBundleFileFolder = "BundleFiles";
-		private const string CachedRawFileFolder = "RawFiles";
-		private const string ManifestFolderName = "ManifestFiles";
-		private const string AppFootPrintFileName = "ApplicationFootPrint.bytes";
 
 
 		/// <summary>
@@ -95,7 +101,7 @@ namespace YooAsset
 		/// </summary>
 		public static void DeleteSandbox()
 		{
-			string directoryPath = PathHelper.MakePersistentLoadPath(string.Empty);
+			string directoryPath = MakePersistentLoadPath(string.Empty);
 			if (Directory.Exists(directoryPath))
 				Directory.Delete(directoryPath, true);
 		}
@@ -105,7 +111,7 @@ namespace YooAsset
 		/// </summary>
 		public static void DeleteCacheFolder()
 		{
-			string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
+			string root = MakePersistentLoadPath(CacheFolderName);
 			if (Directory.Exists(root))
 				Directory.Delete(root, true);
 		}
@@ -115,7 +121,7 @@ namespace YooAsset
 		/// </summary>
 		public static void DeleteManifestFolder()
 		{
-			string root = PathHelper.MakePersistentLoadPath(ManifestFolderName);
+			string root = MakePersistentLoadPath(ManifestFolderName);
 			if (Directory.Exists(root))
 				Directory.Delete(root, true);
 		}
@@ -129,7 +135,7 @@ namespace YooAsset
 		{
 			if (_cachedBundleFileFolder.TryGetValue(packageName, out string value) == false)
 			{
-				string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
+				string root = MakePersistentLoadPath(CacheFolderName);
 				value = $"{root}/{packageName}/{CachedBundleFileFolder}";
 				_cachedBundleFileFolder.Add(packageName, value);
 			}
@@ -144,7 +150,7 @@ namespace YooAsset
 		{
 			if (_cachedRawFileFolder.TryGetValue(packageName, out string value) == false)
 			{
-				string root = PathHelper.MakePersistentLoadPath(CacheFolderName);
+				string root = MakePersistentLoadPath(CacheFolderName);
 				value = $"{root}/{packageName}/{CachedRawFileFolder}";
 				_cachedRawFileFolder.Add(packageName, value);
 			}
@@ -156,7 +162,7 @@ namespace YooAsset
 		/// </summary>
 		public static string GetAppFootPrintFilePath()
 		{
-			return PathHelper.MakePersistentLoadPath(AppFootPrintFileName);
+			return MakePersistentLoadPath(AppFootPrintFileName);
 		}
 
 		/// <summary>
@@ -165,7 +171,7 @@ namespace YooAsset
 		public static string GetCacheManifestFilePath(string packageName, string packageVersion)
 		{
 			string fileName = YooAssetSettingsData.GetManifestBinaryFileName(packageName, packageVersion);
-			return PathHelper.MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
+			return MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
 		}
 
 		/// <summary>
@@ -174,7 +180,7 @@ namespace YooAsset
 		public static string GetCachePackageHashFilePath(string packageName, string packageVersion)
 		{
 			string fileName = YooAssetSettingsData.GetPackageHashFileName(packageName, packageVersion);
-			return PathHelper.MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
+			return MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
 		}
 
 		/// <summary>
@@ -183,7 +189,7 @@ namespace YooAsset
 		public static string GetCachePackageVersionFilePath(string packageName)
 		{
 			string fileName = YooAssetSettingsData.GetPackageVersionFileName(packageName);
-			return PathHelper.MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
+			return MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
 		}
 
 		/// <summary>

@@ -222,7 +222,7 @@ namespace YooAsset
 				// 如果水印发生变化，则说明覆盖安装后首次打开游戏
 				if (appFootPrint.IsDirty())
 				{
-					PersistentHelper.DeleteManifestFolder();
+					PersistentTools.DeleteManifestFolder();
 					appFootPrint.Coverage();
 					YooLogger.Log("Delete manifest files when application foot print dirty !");
 				}
@@ -376,7 +376,7 @@ namespace YooAsset
 		/// </summary>
 		public void Load()
 		{
-			string footPrintFilePath = PersistentHelper.GetAppFootPrintFilePath();
+			string footPrintFilePath = PersistentTools.GetAppFootPrintFilePath();
 			if (File.Exists(footPrintFilePath))
 			{
 				_footPrint = FileUtility.ReadAllText(footPrintFilePath);
@@ -409,7 +409,7 @@ namespace YooAsset
 #else
 			_footPrint = Application.buildGUID;
 #endif
-			string footPrintFilePath = PersistentHelper.GetAppFootPrintFilePath();
+			string footPrintFilePath = PersistentTools.GetAppFootPrintFilePath();
 			FileUtility.CreateFile(footPrintFilePath, _footPrint);
 			YooLogger.Log($"Save application foot print : {_footPrint}");
 		}

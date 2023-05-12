@@ -193,7 +193,7 @@ namespace YooAsset
 		public static BundleInfo GetUnpackInfo(PackageBundle packageBundle)
 		{
 			// 注意：我们把流加载路径指定为远端下载地址
-			string streamingPath = PathHelper.ConvertToWWWPath(packageBundle.StreamingFilePath);
+			string streamingPath = PersistentTools.ConvertToWWWPath(packageBundle.StreamingFilePath);
 			BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromStreaming, streamingPath, streamingPath);
 			return bundleInfo;
 		}

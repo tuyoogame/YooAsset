@@ -45,7 +45,7 @@ namespace YooAsset
 			{
 				// BundleFiles
 				{
-					string rootPath = PersistentHelper.GetCachedBundleFileFolderPath(_packageName);
+					string rootPath = PersistentTools.GetCachedBundleFileFolderPath(_packageName);
 					DirectoryInfo rootDirectory = new DirectoryInfo(rootPath);
 					if (rootDirectory.Exists)
 					{
@@ -56,7 +56,7 @@ namespace YooAsset
 
 				// RawFiles
 				{
-					string rootPath = PersistentHelper.GetCachedRawFileFolderPath(_packageName);
+					string rootPath = PersistentTools.GetCachedRawFileFolderPath(_packageName);
 					DirectoryInfo rootDirectory = new DirectoryInfo(rootPath);
 					if (rootDirectory.Exists)
 					{
