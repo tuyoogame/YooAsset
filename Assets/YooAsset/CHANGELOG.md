@@ -2,6 +2,38 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.13] - 2023-05-12
+
+### Changed
+
+- 可寻址地址冲突时，打印冲突地址的资源路径。
+
+- 销毁Package的时候清空该Package的缓存记录。
+
+- 新增方法ResoucePackage.ClearAllCacheFilesAsync()
+
+  ```c#
+  public class ResoucePackage
+  {
+      /// <summary>
+      /// 清理包裹本地所有的缓存文件
+      /// </summary>
+      public ClearAllCacheFilesOperation ClearAllCacheFilesAsync();   
+  }
+  ```
+
+- 新增方法YooAssets.SetCacheSystemSandboxPath()
+
+  ```c#
+  public class YooAssets
+  {
+      /// <summary>
+      /// 设置缓存系统参数，沙盒目录的存储路径
+      /// </summary>
+      public static void SetCacheSystemSandboxPath(string sandboxPath);
+  }
+  ```
+
 ## [1.4.12] - 2023-04-22
 
 ### Changed
