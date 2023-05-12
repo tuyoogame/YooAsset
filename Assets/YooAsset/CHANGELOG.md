@@ -7,8 +7,9 @@ All notable changes to this package will be documented in this file.
 ### Changed
 
 - 可寻址地址冲突时，打印冲突地址的资源路径。
-
 - 销毁Package的时候清空该Package的缓存记录。
+
+### Added
 
 - 新增方法ResoucePackage.ClearAllCacheFilesAsync()
 
