@@ -92,6 +92,7 @@ namespace YooAsset
 				else
 				{
 					_steps = ESteps.LoadCacheFile;
+					return; //下载完毕等待一帧再去加载！
 				}
 			}
 

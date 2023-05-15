@@ -103,6 +103,7 @@ namespace YooAsset
 				else
 				{
 					_steps = ESteps.LoadFile;
+					return; //下载完毕等待一帧再去加载！
 				}
 			}
 
