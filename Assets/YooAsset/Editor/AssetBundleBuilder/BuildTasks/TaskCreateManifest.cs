@@ -205,6 +205,7 @@ namespace YooAsset.Editor
 				throw new Exception("没有发现着色器资源包！");
 
 			// 检测依赖交集并更新依赖ID
+			HashSet<string> tagTemps = new HashSet<string>();
 			foreach (var packageAsset in manifest.AssetList)
 			{
 				List<string> dependBundles = GetPackageAssetAllDependBundles(manifest, packageAsset);
@@ -215,8 +216,23 @@ namespace YooAsset.Editor
 					if (newDependIDs.Contains(shaderBundleId) == false)
 						newDependIDs.Add(shaderBundleId);
 					packageAsset.DependIDs = newDependIDs.ToArray();
+					foreach (var tag in packageAsset.AssetTags)
+					{
+						if (tagTemps.Contains(tag) == false)
+							tagTemps.Add(tag);
+					}
 				}
 			}
+
+			// 更新资源包标签
+			var packageBundle = manifest.BundleList[shaderBundleId];
+			List<string> newTags = new List<string>(packageBundle.Tags);
+			foreach (var tag in tagTemps)
+			{
+				if (newTags.Contains(tag) == false)
+					newTags.Add(tag);
+			}
+			packageBundle.Tags = newTags.ToArray();
 		}
 		private List<string> GetPackageAssetAllDependBundles(PackageManifest manifest, PackageAsset packageAsset)
 		{
@@ -302,7 +318,7 @@ namespace YooAsset.Editor
 			{
 				if (packageBundle.IsRawFile)
 				{
-					_cachedBundleDepends.Add(packageBundle.BundleName, new string[] { } );
+					_cachedBundleDepends.Add(packageBundle.BundleName, new string[] { });
 					continue;
 				}
 
@@ -321,7 +337,7 @@ namespace YooAsset.Editor
 			}
 			EditorTools.ClearProgressBar();
 		}
-		
+
 		private int[] GetBundleRefrenceIDs(PackageManifest manifest, PackageBundle targetBundle)
 		{
 			List<string> referenceList = new List<string>();
