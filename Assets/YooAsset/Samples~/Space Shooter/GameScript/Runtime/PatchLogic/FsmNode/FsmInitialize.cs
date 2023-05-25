@@ -74,7 +74,7 @@ internal class FsmInitialize : IStateNode
 		}
 
 		yield return initializationOperation;
-		if (package.InitializeStatus == EOperationStatus.Succeed)
+		if (initializationOperation.Status == EOperationStatus.Succeed)
 		{
 			_machine.ChangeState<FsmUpdateVersion>();
 		}
