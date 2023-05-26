@@ -2,6 +2,17 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.14] - 2023-05-26
+
+### Fixed
+
+- 修复了收集器对着色器未过滤的问题。
+- 修复了内置着色器Tag特殊情况下未正确传染给依赖资源包的问题。
+
+### Changed
+
+- Unity2021版本及以上推荐使用可编程构建管线（SBP）
+
 ## [1.4.13] - 2023-05-12
 
 ### Changed
