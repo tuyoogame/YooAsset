@@ -24,6 +24,13 @@ namespace YooAsset.Editor
 
 			if (buildParameters.BuildMode != EBuildMode.SimulateBuild)
 			{
+#if UNITY_2021_3_OR_NEWER
+				if (buildParameters.BuildPipeline == EBuildPipeline.BuiltinBuildPipeline)
+				{
+					BuildLogger.Warning("推荐使用可编程构建管线（SBP）！");
+				}
+#endif
+
 				// 检测当前是否正在构建资源包
 				if (BuildPipeline.isBuildingPlayer)
 					throw new Exception("当前正在构建资源包，请结束后再试");
