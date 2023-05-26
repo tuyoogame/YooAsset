@@ -1,5 +1,5 @@
 {
-    "name": "UniEvent",
+    "name": "UniFramework.Event",
     "rootNamespace": "",
     "references": [
         "GUID:e34a5702dd353724aa315fb8011f08c3"

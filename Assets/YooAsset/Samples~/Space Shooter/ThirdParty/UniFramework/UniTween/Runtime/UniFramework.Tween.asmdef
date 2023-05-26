@@ -1,12 +1,10 @@
 {
-    "name": "UniPooling",
+    "name": "UniFramework.Tween",
     "rootNamespace": "",
-    "references": [
-        "GUID:e34a5702dd353724aa315fb8011f08c3"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": true,
+    "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,

@@ -8,7 +8,7 @@ namespace UniFramework.Pooling
 {
 	internal class GameObjectPool
 	{
-		private readonly Transform _poolRoot;
+		private readonly GameObject _root;
 		private readonly Queue<InstantiateOperation> _cacheOperations;
 		private readonly bool _dontDestroy;
 		private readonly int _initCapacity;
@@ -48,9 +48,10 @@ namespace UniFramework.Pooling
 		}
 
 
-		public GameObjectPool(GameObject poolRoot, string location, bool dontDestroy, int initCapacity, int maxCapacity, float destroyTime)
+		public GameObjectPool(GameObject poolingRoot, string location, bool dontDestroy, int initCapacity, int maxCapacity, float destroyTime)
 		{
-			_poolRoot = poolRoot.transform;
+			_root = new GameObject(location);
+			_root.transform.parent = poolingRoot.transform;
 			Location = location;
 
 			_dontDestroy = dontDestroy;
@@ -73,7 +74,7 @@ namespace UniFramework.Pooling
 			// 创建初始对象
 			for (int i = 0; i < _initCapacity; i++)
 			{
-				var operation = AssetHandle.InstantiateAsync(_poolRoot);
+				var operation = AssetHandle.InstantiateAsync(_root.transform);
 				_cacheOperations.Enqueue(operation);
 			}
 		}
@@ -88,11 +89,7 @@ namespace UniFramework.Pooling
 			AssetHandle = null;
 
 			// 销毁游戏对象
-			foreach (var operation in _cacheOperations)
-			{
-				if (operation.Result != null)
-					GameObject.Destroy(operation.Result);
-			}
+			GameObject.Destroy(_root);
 			_cacheOperations.Clear();
 
 			SpawnCount = 0;
@@ -207,7 +204,7 @@ namespace UniFramework.Pooling
 			if (gameObj != null)
 			{
 				gameObj.SetActive(false);
-				gameObj.transform.SetParent(_poolRoot);
+				gameObj.transform.SetParent(_root.transform);
 				gameObj.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 			}
 		}
