@@ -49,8 +49,7 @@ namespace YooAsset
 		public string FileCRC { private set; get; }
 		public long FileSize { private set; get; }
 
-		public bool IsDone = false;
-		public EVerifyResult Result;
+		public int Result = 0; // 注意：原子操作对象
 
 		public VerifyTempElement(string tempDataFilePath, string fileCRC, long fileSize)
 		{

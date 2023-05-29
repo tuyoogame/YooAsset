@@ -7,6 +7,11 @@ namespace YooAsset
 	internal enum EVerifyResult
 	{
 		/// <summary>
+		/// 验证异常
+		/// </summary>
+		Exception = -7,
+
+		/// <summary>
 		/// 未找到缓存信息
 		/// </summary>
 		CacheNotFound = -6,
@@ -37,9 +42,9 @@ namespace YooAsset
 		FileCrcError = -1,
 
 		/// <summary>
-		/// 验证异常
+		/// 默认状态（校验未完成）
 		/// </summary>
-		Exception = 0,
+		None = 0,
 
 		/// <summary>
 		/// 验证成功
