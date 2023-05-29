@@ -110,7 +110,7 @@ namespace YooAsset
 			// 3. 内置文件解压
 			if (_steps == ESteps.Unpack)
 			{
-				int failedTryAgain = 1;
+				int failedTryAgain = Impl.DownloadFailedTryAgain;
 				var bundleInfo = ManifestTools.GetUnpackInfo(MainBundleInfo.Bundle);
 				_unpacker = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
 				_steps = ESteps.CheckUnpack;
