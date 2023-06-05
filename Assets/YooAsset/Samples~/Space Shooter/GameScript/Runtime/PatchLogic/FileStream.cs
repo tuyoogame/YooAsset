@@ -8,7 +8,7 @@ public class BundleStream : FileStream
 {
     public const byte KEY = 64;
     
-    public BundleStream(string path, FileMode mode, FileAccess access, FileShare share, int bufferSize, bool useAsync) : base(path, mode, access, share, bufferSize, useAsync)
+    public BundleStream(string path, FileMode mode, FileAccess access, FileShare share) : base(path, mode, access, share)
     {
     }
     public BundleStream(string path, FileMode mode) : base(path, mode)

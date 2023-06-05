@@ -144,7 +144,7 @@ internal class FsmInitialize : IStateNode
 
 		public Stream LoadFromStream(DecryptFileInfo fileInfo)
 		{
-			BundleStream bundleStream = new BundleStream(fileInfo.FilePath, FileMode.Open);
+			BundleStream bundleStream = new BundleStream(fileInfo.FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 			return bundleStream;
 		}
 
