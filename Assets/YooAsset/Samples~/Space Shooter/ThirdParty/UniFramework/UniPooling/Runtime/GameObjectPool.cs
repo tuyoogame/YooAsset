@@ -75,7 +75,17 @@ namespace UniFramework.Pooling
 			for (int i = 0; i < _initCapacity; i++)
 			{
 				var operation = AssetHandle.InstantiateAsync(_root.transform);
+				operation.Completed += Operation_Completed;
 				_cacheOperations.Enqueue(operation);
+			}
+		}
+		private void Operation_Completed(AsyncOperationBase obj)
+		{
+			if (obj.Status == EOperationStatus.Succeed)
+			{
+				var op = obj as InstantiateOperation;
+				if (op.Result != null)
+					op.Result.SetActive(false);
 			}
 		}
 
