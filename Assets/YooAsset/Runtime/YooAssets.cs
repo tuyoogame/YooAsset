@@ -116,7 +116,7 @@ namespace YooAsset
 		{
 			var package = TryGetPackage(packageName);
 			if (package == null)
-				YooLogger.Error($"Not found assets package : {packageName}");
+				YooLogger.Error($"Not found resource package : {packageName}");
 			return package;
 		}
 
