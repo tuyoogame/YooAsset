@@ -32,19 +32,18 @@ namespace YooAsset
 			// 注意：为了方便调试查看，编辑器下把存储目录放到项目里
 			if (string.IsNullOrEmpty(_sandboxPath))
 			{
-				string directory = Path.GetDirectoryName(UnityEngine.Application.dataPath);
-				string projectPath = GetRegularPath(directory);
-				_sandboxPath = StringUtility.Format("{0}/Sandbox", projectPath);
+				string projectPath = Path.GetDirectoryName(UnityEngine.Application.dataPath);
+				_sandboxPath = Path.Combine(projectPath, "Sandbox");
 			}
 #elif UNITY_STANDALONE
 			if (string.IsNullOrEmpty(_sandboxPath))
 			{
-				_sandboxPath = StringUtility.Format("{0}/Sandbox", UnityEngine.Application.dataPath);
+				_sandboxPath = Path.Combine(UnityEngine.Application.dataPath, "Sandbox");
 			}
 #else
 			if (string.IsNullOrEmpty(_sandboxPath))
 			{
-				_sandboxPath = StringUtility.Format("{0}/Sandbox", UnityEngine.Application.persistentDataPath);
+				_sandboxPath = Path.Combine(UnityEngine.Application.persistentDataPath, "Sandbox");
 			}
 #endif
 
@@ -63,9 +62,9 @@ namespace YooAsset
 		{
 			if (string.IsNullOrEmpty(_buildinPath))
 			{
-				_buildinPath = StringUtility.Format("{0}/{1}", UnityEngine.Application.streamingAssetsPath, YooAssetSettings.StreamingAssetsBuildinFolder);
+				_buildinPath = Path.Combine(UnityEngine.Application.streamingAssetsPath, YooAssetSettings.StreamingAssetsBuildinFolder);
 			}
-			return StringUtility.Format("{0}/{1}", _buildinPath, path);
+			return Path.Combine(_buildinPath, path);
 		}
 
 		/// <summary>
@@ -74,7 +73,17 @@ namespace YooAsset
 		public static string MakePersistentLoadPath(string path)
 		{
 			string root = GetPersistentRootPath();
-			return StringUtility.Format("{0}/{1}", root, path);
+			return Path.Combine(root, path);
+		}
+		public static string MakePersistentLoadPath(string path1, string path2)
+		{
+			string root = GetPersistentRootPath();
+			return Path.Combine(root, path1, path2);
+		}
+		public static string MakePersistentLoadPath(string path1, string path2, string path3)
+		{
+			string root = GetPersistentRootPath();
+			return Path.Combine(root, path1, path2, path3);
 		}
 
 		/// <summary>
@@ -101,7 +110,7 @@ namespace YooAsset
 		/// </summary>
 		public static void DeleteSandbox()
 		{
-			string directoryPath = MakePersistentLoadPath(string.Empty);
+			string directoryPath = GetPersistentRootPath();
 			if (Directory.Exists(directoryPath))
 				Directory.Delete(directoryPath, true);
 		}
@@ -135,8 +144,7 @@ namespace YooAsset
 		{
 			if (_cachedBundleFileFolder.TryGetValue(packageName, out string value) == false)
 			{
-				string root = MakePersistentLoadPath(CacheFolderName);
-				value = $"{root}/{packageName}/{CachedBundleFileFolder}";
+				value = MakePersistentLoadPath(CacheFolderName, packageName, CachedBundleFileFolder);
 				_cachedBundleFileFolder.Add(packageName, value);
 			}
 			return value;
@@ -150,8 +158,7 @@ namespace YooAsset
 		{
 			if (_cachedRawFileFolder.TryGetValue(packageName, out string value) == false)
 			{
-				string root = MakePersistentLoadPath(CacheFolderName);
-				value = $"{root}/{packageName}/{CachedRawFileFolder}";
+				value = MakePersistentLoadPath(CacheFolderName, packageName, CachedRawFileFolder);
 				_cachedRawFileFolder.Add(packageName, value);
 			}
 			return value;
@@ -171,7 +178,7 @@ namespace YooAsset
 		public static string GetCacheManifestFilePath(string packageName, string packageVersion)
 		{
 			string fileName = YooAssetSettingsData.GetManifestBinaryFileName(packageName, packageVersion);
-			return MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
+			return MakePersistentLoadPath(ManifestFolderName, fileName);
 		}
 
 		/// <summary>
@@ -180,7 +187,7 @@ namespace YooAsset
 		public static string GetCachePackageHashFilePath(string packageName, string packageVersion)
 		{
 			string fileName = YooAssetSettingsData.GetPackageHashFileName(packageName, packageVersion);
-			return MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
+			return MakePersistentLoadPath(ManifestFolderName, fileName);
 		}
 
 		/// <summary>
@@ -189,7 +196,7 @@ namespace YooAsset
 		public static string GetCachePackageVersionFilePath(string packageName)
 		{
 			string fileName = YooAssetSettingsData.GetPackageVersionFileName(packageName);
-			return MakePersistentLoadPath($"{ManifestFolderName}/{fileName}");
+			return MakePersistentLoadPath(ManifestFolderName, fileName);
 		}
 
 		/// <summary>
@@ -198,7 +205,7 @@ namespace YooAsset
 		public static void SaveCachePackageVersionFile(string packageName, string version)
 		{
 			string filePath = GetCachePackageVersionFilePath(packageName);
-			FileUtility.CreateFile(filePath, version);
+			FileUtility.WriteAllText(filePath, version);
 		}
 	}
 }

@@ -75,12 +75,13 @@ namespace YooAsset
 				if (IsRawFile)
 				{
 					string cacheRoot = PersistentTools.GetCachedRawFileFolderPath(PackageName);
-					_cachedDataFilePath = $"{cacheRoot}/{folderName}/{CacheGUID}/{YooAssetSettings.CacheBundleDataFileName}{_fileExtension}";
+					_cachedDataFilePath = System.IO.Path.Combine(cacheRoot, folderName, CacheGUID, YooAssetSettings.CacheBundleDataFileName);
+					_cachedDataFilePath += _fileExtension;
 				}
 				else
 				{
 					string cacheRoot = PersistentTools.GetCachedBundleFileFolderPath(PackageName);
-					_cachedDataFilePath = $"{cacheRoot}/{folderName}/{CacheGUID}/{YooAssetSettings.CacheBundleDataFileName}";
+					_cachedDataFilePath = System.IO.Path.Combine(cacheRoot, folderName, CacheGUID, YooAssetSettings.CacheBundleDataFileName);
 				}
 				return _cachedDataFilePath;
 			}
@@ -101,12 +102,12 @@ namespace YooAsset
 				if (IsRawFile)
 				{
 					string cacheRoot = PersistentTools.GetCachedRawFileFolderPath(PackageName);
-					_cachedInfoFilePath = $"{cacheRoot}/{folderName}/{CacheGUID}/{YooAssetSettings.CacheBundleInfoFileName}";
+					_cachedInfoFilePath = System.IO.Path.Combine(cacheRoot, folderName, CacheGUID, YooAssetSettings.CacheBundleInfoFileName);
 				}
 				else
 				{
 					string cacheRoot = PersistentTools.GetCachedBundleFileFolderPath(PackageName);
-					_cachedInfoFilePath = $"{cacheRoot}/{folderName}/{CacheGUID}/{YooAssetSettings.CacheBundleInfoFileName}";
+					_cachedInfoFilePath = System.IO.Path.Combine(cacheRoot, folderName, CacheGUID, YooAssetSettings.CacheBundleInfoFileName);
 				}
 				return _cachedInfoFilePath;
 			}
