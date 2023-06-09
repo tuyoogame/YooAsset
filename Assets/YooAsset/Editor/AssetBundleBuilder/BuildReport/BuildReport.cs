@@ -61,7 +61,7 @@ namespace YooAsset.Editor
 				File.Delete(savePath);
 
 			string json = JsonUtility.ToJson(buildReport, true);
-			FileUtility.CreateFile(savePath, json);
+			FileUtility.WriteAllText(savePath, json);
 		}
 		public static BuildReport Deserialize(string jsonData)
 		{

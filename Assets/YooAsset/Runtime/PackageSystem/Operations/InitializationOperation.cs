@@ -410,7 +410,7 @@ namespace YooAsset
 			_footPrint = Application.buildGUID;
 #endif
 			string footPrintFilePath = PersistentTools.GetAppFootPrintFilePath();
-			FileUtility.CreateFile(footPrintFilePath, _footPrint);
+			FileUtility.WriteAllText(footPrintFilePath, _footPrint);
 			YooLogger.Log($"Save application foot print : {_footPrint}");
 		}
 	}

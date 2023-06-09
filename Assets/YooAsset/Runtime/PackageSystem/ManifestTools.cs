@@ -16,7 +16,7 @@ namespace YooAsset
 		public static void SerializeToJson(string savePath, PackageManifest manifest)
 		{
 			string json = JsonUtility.ToJson(manifest, true);
-			FileUtility.CreateFile(savePath, json);
+			FileUtility.WriteAllText(savePath, json);
 		}
 
 		/// <summary>

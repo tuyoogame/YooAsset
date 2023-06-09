@@ -52,7 +52,7 @@ namespace YooAsset.Editor
 					}
 
 					string filePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}.encrypt";
-					FileUtility.CreateFile(filePath, encryptResult.EncryptedData);
+					FileUtility.WriteAllBytes(filePath, encryptResult.EncryptedData);
 					bundleInfo.EncryptedFilePath = filePath;
 					bundleInfo.LoadMethod = encryptResult.LoadMethod;
 					BuildLogger.Log($"Bundle文件加密完成：{filePath}");

@@ -13,7 +13,7 @@ namespace YooAsset
 	internal static class StringUtility
 	{
 		[ThreadStatic]
-		private static StringBuilder _cacheBuilder = new StringBuilder(1024);
+		private static StringBuilder _cacheBuilder = new StringBuilder(2048);
 
 		public static string Format(string format, object arg0)
 		{
@@ -106,46 +106,26 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 创建文件（如果已经存在则删除旧文件）
+		/// 写入文本数据（会覆盖指定路径的文件）
 		/// </summary>
-		public static void CreateFile(string filePath, string content)
+		public static void WriteAllText(string filePath, string content)
 		{
-			// 删除旧文件
-			if (File.Exists(filePath))
-				File.Delete(filePath);
-
 			// 创建文件夹路径
 			CreateFileDirectory(filePath);
 
-			// 创建新文件
 			byte[] bytes = Encoding.UTF8.GetBytes(content);
-			using (FileStream fs = File.Create(filePath))
-			{
-				fs.Write(bytes, 0, bytes.Length);
-				fs.Flush();
-				fs.Close();
-			}
+			File.WriteAllBytes(filePath, bytes); //避免写入BOM标记
 		}
 
 		/// <summary>
-		/// 创建文件（如果已经存在则删除旧文件）
+		/// 写入字节数据（会覆盖指定路径的文件）
 		/// </summary>
-		public static void CreateFile(string filePath, byte[] data)
+		public static void WriteAllBytes(string filePath, byte[] data)
 		{
-			// 删除旧文件
-			if (File.Exists(filePath))
-				File.Delete(filePath);
-
 			// 创建文件夹路径
 			CreateFileDirectory(filePath);
 
-			// 创建新文件
-			using (FileStream fs = File.Create(filePath))
-			{
-				fs.Write(data, 0, data.Length);
-				fs.Flush();
-				fs.Close();
-			}
+			File.WriteAllBytes(filePath, data);
 		}
 
 		/// <summary>

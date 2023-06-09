@@ -98,7 +98,7 @@ namespace YooAsset.Editor
 			{
 				string fileName = YooAssetSettingsData.GetPackageHashFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
-				FileUtility.CreateFile(filePath, packageHash);
+				FileUtility.WriteAllText(filePath, packageHash);
 				BuildLogger.Log($"创建补丁清单哈希文件：{filePath}");
 			}
 
@@ -106,7 +106,7 @@ namespace YooAsset.Editor
 			{
 				string fileName = YooAssetSettingsData.GetPackageVersionFileName(buildParameters.PackageName);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
-				FileUtility.CreateFile(filePath, buildParameters.PackageVersion);
+				FileUtility.WriteAllText(filePath, buildParameters.PackageVersion);
 				BuildLogger.Log($"创建补丁清单版本文件：{filePath}");
 			}
 		}

@@ -278,7 +278,7 @@ namespace YooAsset.Editor
 
 				string filePath = $"{resultPath}/{nameof(DebugReport)}_{_currentReport.FrameCount}.json";
 				string fileContent = JsonUtility.ToJson(_currentReport, true);
-				FileUtility.CreateFile(filePath, fileContent);
+				FileUtility.WriteAllText(filePath, fileContent);
 			}
 		}
 		private void OnSearchKeyWordChange(ChangeEvent<string> e)
