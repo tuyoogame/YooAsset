@@ -286,6 +286,18 @@ namespace YooAsset.Editor
 		#endregion
 
 		#region StringUtility
+		public static string RemoveFirstChar(string str)
+		{
+			if (string.IsNullOrEmpty(str))
+				return str;
+			return str.Substring(1);
+		}
+		public static string RemoveLastChar(string str)
+		{
+			if (string.IsNullOrEmpty(str))
+				return str;
+			return str.Substring(0, str.Length - 1);
+		}
 		public static List<string> StringToStringList(string str, char separator)
 		{
 			List<string> result = new List<string>();
@@ -303,7 +315,6 @@ namespace YooAsset.Editor
 			}
 			return result;
 		}
-
 		public static T NameToEnum<T>(string name)
 		{
 			if (Enum.IsDefined(typeof(T), name) == false)

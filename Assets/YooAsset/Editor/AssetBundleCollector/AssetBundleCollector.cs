@@ -251,7 +251,7 @@ namespace YooAsset.Editor
 			// 检测原生文件是否合规
 			if (isRawFilePackRule)
 			{
-				string extension = StringUtility.RemoveFirstChar(System.IO.Path.GetExtension(assetPath));
+				string extension = EditorTools.RemoveFirstChar(System.IO.Path.GetExtension(assetPath));
 				if (extension == EAssetFileExtension.unity.ToString() || extension == EAssetFileExtension.prefab.ToString() ||
 					extension == EAssetFileExtension.fbx.ToString() || extension == EAssetFileExtension.mat.ToString() ||
 					extension == EAssetFileExtension.controller.ToString() || extension == EAssetFileExtension.anim.ToString() ||
