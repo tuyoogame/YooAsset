@@ -5,6 +5,7 @@ namespace YooAsset
 {
 	internal static class PersistentTools
 	{
+		private const string SandboxFolderName = "Sandbox";
 		private const string CacheFolderName = "CacheFiles";
 		private const string CachedBundleFileFolder = "BundleFiles";
 		private const string CachedRawFileFolder = "RawFiles";
@@ -33,27 +34,23 @@ namespace YooAsset
 			if (string.IsNullOrEmpty(_sandboxPath))
 			{
 				string projectPath = Path.GetDirectoryName(UnityEngine.Application.dataPath);
-				_sandboxPath = Path.Combine(projectPath, "Sandbox");
+				projectPath = PathUtility.RegularPath(projectPath);
+				_sandboxPath = PathUtility.Combine(projectPath, SandboxFolderName);
 			}
 #elif UNITY_STANDALONE
 			if (string.IsNullOrEmpty(_sandboxPath))
 			{
-				_sandboxPath = Path.Combine(UnityEngine.Application.dataPath, "Sandbox");
+				_sandboxPath = PathUtility.Combine(UnityEngine.Application.dataPath, SandboxFolderName);
 			}
 #else
 			if (string.IsNullOrEmpty(_sandboxPath))
 			{
-				_sandboxPath = Path.Combine(UnityEngine.Application.persistentDataPath, "Sandbox");
+				_sandboxPath = PathUtility.Combine(UnityEngine.Application.persistentDataPath, SandboxFolderName);
 			}
 #endif
 
 			return _sandboxPath;
 		}
-		private static string GetRegularPath(string path)
-		{
-			return path.Replace('\\', '/').Replace("\\", "/"); //替换为Linux路径格式
-		}
-
 
 		/// <summary>
 		/// 获取基于流文件夹的加载路径
@@ -62,9 +59,9 @@ namespace YooAsset
 		{
 			if (string.IsNullOrEmpty(_buildinPath))
 			{
-				_buildinPath = Path.Combine(UnityEngine.Application.streamingAssetsPath, YooAssetSettings.StreamingAssetsBuildinFolder);
+				_buildinPath = PathUtility.Combine(UnityEngine.Application.streamingAssetsPath, YooAssetSettings.StreamingAssetsBuildinFolder);
 			}
-			return Path.Combine(_buildinPath, path);
+			return PathUtility.Combine(_buildinPath, path);
 		}
 
 		/// <summary>
@@ -73,17 +70,17 @@ namespace YooAsset
 		public static string MakePersistentLoadPath(string path)
 		{
 			string root = GetPersistentRootPath();
-			return Path.Combine(root, path);
+			return PathUtility.Combine(root, path);
 		}
 		public static string MakePersistentLoadPath(string path1, string path2)
 		{
 			string root = GetPersistentRootPath();
-			return Path.Combine(root, path1, path2);
+			return PathUtility.Combine(root, path1, path2);
 		}
 		public static string MakePersistentLoadPath(string path1, string path2, string path3)
 		{
 			string root = GetPersistentRootPath();
-			return Path.Combine(root, path1, path2, path3);
+			return PathUtility.Combine(root, path1, path2, path3);
 		}
 
 		/// <summary>

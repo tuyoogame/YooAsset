@@ -114,7 +114,7 @@ namespace YooAsset
 					// 添加无后缀名路径的映射
 					if (Path.HasExtension(location))
 					{
-						string locationWithoutExtension = StringUtility.RemoveExtension(location);
+						string locationWithoutExtension = PathUtility.RemoveExtension(location);
 						if (AssetPathMapping.ContainsKey(locationWithoutExtension))
 							YooLogger.Warning($"AssetPath have existed : {locationWithoutExtension}");
 						else

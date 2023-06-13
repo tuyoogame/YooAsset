@@ -8,6 +8,60 @@ using System.Security.Cryptography;
 namespace YooAsset
 {
 	/// <summary>
+	/// 路径工具类
+	/// </summary>
+	internal static class PathUtility
+	{
+		/// <summary>
+		/// 路径归一化
+		/// 注意：替换为Linux路径格式
+		/// </summary>
+		public static string RegularPath(string path)
+		{
+			return path.Replace('\\', '/').Replace("\\", "/");
+		}
+		
+		/// <summary>
+		/// 移除路径里的后缀名
+		/// </summary>
+		public static string RemoveExtension(string str)
+		{
+			if (string.IsNullOrEmpty(str))
+				return str;
+
+			int index = str.LastIndexOf(".");
+			if (index == -1)
+				return str;
+			else
+				return str.Remove(index); //"assets/config/test.unity3d" --> "assets/config/test"
+		}
+
+		/// <summary>
+		/// 合并路径
+		/// </summary>
+		public static string Combine(string path1, string path2)
+		{		
+			return StringUtility.Format("{0}/{1}", path1, path2);
+		}
+
+		/// <summary>
+		/// 合并路径
+		/// </summary>
+		public static string Combine(string path1, string path2, string path3)
+		{
+			return StringUtility.Format("{0}/{1}/{2}", path1, path2, path3);
+		}
+
+		/// <summary>
+		/// 合并路径
+		/// </summary>
+		public static string Combine(string path1, string path2, string path3, string path4)
+		{
+			return StringUtility.Format("{0}/{1}/{2}/{3}", path1, path2, path3, path4);
+		}
+	}
+
+	/// <summary>
 	/// 字符串工具类
 	/// </summary>
 	internal static class StringUtility
@@ -53,30 +107,6 @@ namespace YooAsset
 			_cacheBuilder.Length = 0;
 			_cacheBuilder.AppendFormat(format, args);
 			return _cacheBuilder.ToString();
-		}
-
-		public static string RemoveFirstChar(string str)
-		{
-			if (string.IsNullOrEmpty(str))
-				return str;
-			return str.Substring(1);
-		}
-		public static string RemoveLastChar(string str)
-		{
-			if (string.IsNullOrEmpty(str))
-				return str;
-			return str.Substring(0, str.Length - 1);
-		}
-		public static string RemoveExtension(string str)
-		{
-			if (string.IsNullOrEmpty(str))
-				return str;
-
-			int index = str.LastIndexOf(".");
-			if (index == -1)
-				return str;
-			else
-				return str.Remove(index); //"assets/config/test.unity3d" --> "assets/config/test"
 		}
 	}
 
