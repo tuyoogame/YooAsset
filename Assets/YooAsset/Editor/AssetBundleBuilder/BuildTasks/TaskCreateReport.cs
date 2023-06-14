@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 
 namespace YooAsset.Editor
@@ -46,6 +47,9 @@ namespace YooAsset.Editor
 				buildReport.Summary.BuildPackageVersion = buildParameters.PackageVersion;
 				buildReport.Summary.EnableAddressable = buildMapContext.EnableAddressable;
 				buildReport.Summary.UniqueBundleName = buildMapContext.UniqueBundleName;
+				buildReport.Summary.AutoAnalyzeRedundancy = buildParameters.AutoAnalyzeRedundancy;
+				buildReport.Summary.ShareAssetPackRuleClassName = buildParameters.ShareAssetPackRule == null ?
+					"null" : buildParameters.ShareAssetPackRule.GetType().FullName;
 				buildReport.Summary.EncryptionServicesClassName = buildParameters.EncryptionServices == null ?
 					"null" : buildParameters.EncryptionServices.GetType().FullName;
 
@@ -100,6 +104,9 @@ namespace YooAsset.Editor
 				reportBundleInfo.AllBuiltinAssets = GetAllBuiltinAssets(buildMapContext, packageBundle.BundleName);
 				buildReport.BundleInfos.Add(reportBundleInfo);
 			}
+
+			// 冗余资源列表
+			buildReport.RedundancyInfos = new List<ReportRedundancyInfo>(buildMapContext.RedundancyInfos);
 
 			// 序列化文件
 			string fileName = YooAssetSettingsData.GetReportFileName(buildParameters.PackageName, buildParameters.PackageVersion);

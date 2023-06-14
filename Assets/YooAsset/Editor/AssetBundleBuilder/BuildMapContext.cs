@@ -11,6 +11,11 @@ namespace YooAsset.Editor
 		private readonly Dictionary<string, BuildBundleInfo> _bundleInfoDic = new Dictionary<string, BuildBundleInfo>(10000);
 
 		/// <summary>
+		/// 冗余的资源列表
+		/// </summary>
+		public readonly List<ReportRedundancyInfo> RedundancyInfos= new List<ReportRedundancyInfo>(1000);
+		
+		/// <summary>
 		/// 参与构建的资源总数
 		/// 说明：包括主动收集的资源以及其依赖的所有资源
 		/// </summary>

@@ -22,7 +22,7 @@ namespace YooAsset.Editor
 		/// 构建时间
 		/// </summary>
 		public string BuildDate;
-		
+
 		/// <summary>
 		/// 构建耗时（单位：秒）
 		/// </summary>
@@ -62,6 +62,16 @@ namespace YooAsset.Editor
 		/// 资源包名唯一化
 		/// </summary>
 		public bool UniqueBundleName;
+
+		/// <summary>
+		/// 自动分析冗余
+		/// </summary>
+		public bool AutoAnalyzeRedundancy;
+
+		/// <summary>
+		/// 共享资源的打包类名称
+		/// </summary>
+		public string ShareAssetPackRuleClassName;
 
 		/// <summary>
 		/// 加密服务类名称

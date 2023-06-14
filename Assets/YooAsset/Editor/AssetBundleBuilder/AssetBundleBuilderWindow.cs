@@ -275,6 +275,7 @@ namespace YooAsset.Editor
 			buildParameters.PackageName = AssetBundleBuilderSettingData.Setting.BuildPackage;
 			buildParameters.PackageVersion = _buildVersionField.value;
 			buildParameters.VerifyBuildingResult = true;
+			buildParameters.AutoAnalyzeRedundancy = true;
 			buildParameters.ShareAssetPackRule = new DefaultShareAssetPackRule();
 			buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
 			buildParameters.CompressOption = AssetBundleBuilderSettingData.Setting.CompressOption;

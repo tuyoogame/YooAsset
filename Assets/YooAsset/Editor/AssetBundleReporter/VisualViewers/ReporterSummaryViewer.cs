@@ -68,7 +68,9 @@ namespace YooAsset.Editor
 
 			_items.Add(new ItemWrapper("启用可寻址资源定位", $"{buildReport.Summary.EnableAddressable}"));
 			_items.Add(new ItemWrapper("资源包名唯一化", $"{buildReport.Summary.UniqueBundleName}"));
-			_items.Add(new ItemWrapper("加密服务类名称", $"{buildReport.Summary.EncryptionServicesClassName}"));
+			_items.Add(new ItemWrapper("自动分析冗余资源", $"{buildReport.Summary.AutoAnalyzeRedundancy}"));
+			_items.Add(new ItemWrapper("共享资源的打包类名称", buildReport.Summary.ShareAssetPackRuleClassName));
+			_items.Add(new ItemWrapper("加密服务类名称", buildReport.Summary.EncryptionServicesClassName));
 
 			_items.Add(new ItemWrapper(string.Empty, string.Empty));
 			_items.Add(new ItemWrapper("构建参数", string.Empty));

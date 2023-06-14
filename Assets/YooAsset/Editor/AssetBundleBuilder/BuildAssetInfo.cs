@@ -183,5 +183,27 @@ namespace YooAsset.Editor
 				}
 			}
 		}
+
+		/// <summary>
+		/// 判断是否为冗余资源
+		/// </summary>
+		public bool IsRedundancyAsset()
+		{
+			if (CollectorType != ECollectorType.None)
+				return false;
+
+			if (IsRawAsset)
+				throw new Exception("Should never get here !");
+
+			return _referenceBundleNames.Count > 1;
+		}
+
+		/// <summary>
+		/// 获取关联资源包的数量
+		/// </summary>
+		public int GetReferenceBundleCount()
+		{
+			return _referenceBundleNames.Count;
+		}
 	}
 }

@@ -35,12 +35,18 @@ namespace YooAsset.Editor
 			/// 资源包视图
 			/// </summary>
 			BundleView,
+
+			/// <summary>
+			/// 冗余资源试图
+			/// </summary>
+			Redundancy,
 		}
 
 		private ToolbarMenu _viewModeMenu;
 		private ReporterSummaryViewer _summaryViewer;
 		private ReporterAssetListViewer _assetListViewer;
 		private ReporterBundleListViewer _bundleListViewer;
+		private ReporterRedundancyListViewer _redundancyListViewer;
 
 		private EViewMode _viewMode;
 		private BuildReport _buildReport;
@@ -70,6 +76,7 @@ namespace YooAsset.Editor
 				_viewModeMenu.menu.AppendAction(EViewMode.Summary.ToString(), ViewModeMenuAction0, ViewModeMenuFun0);
 				_viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction1, ViewModeMenuFun1);
 				_viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction2, ViewModeMenuFun2);
+				_viewModeMenu.menu.AppendAction(EViewMode.Redundancy.ToString(), ViewModeMenuAction3, ViewModeMenuFun3);
 
 				// 搜索栏
 				var searchField = root.Q<ToolbarSearchField>("SearchField");
@@ -86,6 +93,10 @@ namespace YooAsset.Editor
 				// 加载视图
 				_bundleListViewer = new ReporterBundleListViewer();
 				_bundleListViewer.InitViewer();
+
+				// 加载试图
+				_redundancyListViewer = new ReporterRedundancyListViewer();
+				_redundancyListViewer.InitViewer();
 
 				// 显示视图
 				_viewMode = EViewMode.Summary;
@@ -111,9 +122,10 @@ namespace YooAsset.Editor
 			_reportFilePath = selectFilePath;
 			string jsonData = FileUtility.ReadAllText(_reportFilePath);
 			_buildReport = BuildReport.Deserialize(jsonData);
+			_summaryViewer.FillViewData(_buildReport);
 			_assetListViewer.FillViewData(_buildReport, _searchKeyWord);
 			_bundleListViewer.FillViewData(_buildReport, _reportFilePath, _searchKeyWord);
-			_summaryViewer.FillViewData(_buildReport);
+			_redundancyListViewer.FillViewData(_buildReport, _searchKeyWord);
 		}
 		private void OnSearchKeyWordChange(ChangeEvent<string> e)
 		{
@@ -134,6 +146,7 @@ namespace YooAsset.Editor
 				_summaryViewer.AttachParent(root);
 				_assetListViewer.DetachParent();
 				_bundleListViewer.DetachParent();
+				_redundancyListViewer.DetachParent();
 			}
 		}
 		private void ViewModeMenuAction1(DropdownMenuAction action)
@@ -146,6 +159,7 @@ namespace YooAsset.Editor
 				_summaryViewer.DetachParent();
 				_assetListViewer.AttachParent(root);
 				_bundleListViewer.DetachParent();
+				_redundancyListViewer.DetachParent();
 			}
 		}
 		private void ViewModeMenuAction2(DropdownMenuAction action)
@@ -158,6 +172,20 @@ namespace YooAsset.Editor
 				_summaryViewer.DetachParent();
 				_assetListViewer.DetachParent();
 				_bundleListViewer.AttachParent(root);
+				_redundancyListViewer.DetachParent();
+			}
+		}
+		private void ViewModeMenuAction3(DropdownMenuAction action)
+		{
+			if (_viewMode != EViewMode.Redundancy)
+			{
+				_viewMode = EViewMode.Redundancy;
+				VisualElement root = this.rootVisualElement;
+				_viewModeMenu.text = EViewMode.Redundancy.ToString();
+				_summaryViewer.DetachParent();
+				_assetListViewer.DetachParent();
+				_bundleListViewer.DetachParent();
+				_redundancyListViewer.AttachParent(root);
 			}
 		}
 		private DropdownMenuAction.Status ViewModeMenuFun0(DropdownMenuAction action)
@@ -177,6 +205,13 @@ namespace YooAsset.Editor
 		private DropdownMenuAction.Status ViewModeMenuFun2(DropdownMenuAction action)
 		{
 			if (_viewMode == EViewMode.BundleView)
+				return DropdownMenuAction.Status.Checked;
+			else
+				return DropdownMenuAction.Status.Normal;
+		}
+		private DropdownMenuAction.Status ViewModeMenuFun3(DropdownMenuAction action)
+		{
+			if (_viewMode == EViewMode.Redundancy)
 				return DropdownMenuAction.Status.Checked;
 			else
 				return DropdownMenuAction.Status.Normal;
