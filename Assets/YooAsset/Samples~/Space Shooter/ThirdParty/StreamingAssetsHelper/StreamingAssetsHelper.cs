@@ -1,134 +1,89 @@
-//-------------------------------------
-// 作者：Stark
-//-------------------------------------
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using YooAsset;
+
+/// <summary>
+/// 内置文件查询服务类
+/// </summary>
+public class GameQueryServices : IQueryServices
+{
+	public bool QueryStreamingAssets(string fileName)
+	{
+		// 注意：fileName包含文件格式
+		return StreamingAssetsHelper.FileExists(fileName);
+	}
+}
 
 /// <summary>
 /// StreamingAssets目录下资源查询帮助类
 /// </summary>
 public sealed class StreamingAssetsHelper
 {
-	private static readonly Dictionary<string, bool> _cacheData = new Dictionary<string, bool>(1000);
+	private static bool _isInit = false;
+	private static readonly HashSet<string> _cacheData = new HashSet<string>();
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-	private static AndroidJavaClass _unityPlayerClass;
-	public static AndroidJavaClass UnityPlayerClass
+	/// <summary>
+	/// 初始化
+	/// </summary>
+	public static void Init()
 	{
-		get
+		if (_isInit == false)
 		{
-			if (_unityPlayerClass == null)
-				_unityPlayerClass = new UnityEngine.AndroidJavaClass("com.unity3d.player.UnityPlayer");
-			return _unityPlayerClass;
-		}
-	}
-
-	private static AndroidJavaObject _currentActivity;
-	public static AndroidJavaObject CurrentActivity
-	{
-		get
-		{
-			if (_currentActivity == null)
-				_currentActivity = UnityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
-			return _currentActivity;
+			_isInit = true;
+			var manifest = Resources.Load<BuildinFileManifest>("BuildinFileManifest");
+			foreach (string fileName in manifest.BuildinFiles)
+			{
+				_cacheData.Add(fileName);
+			}
 		}
 	}
 
 	/// <summary>
-	/// 利用安卓原生接口查询内置文件是否存在
+	/// 内置文件查询方法
 	/// </summary>
-	public static bool FileExists(string filePath)
+	public static bool FileExists(string fileName)
 	{
-		if (_cacheData.TryGetValue(filePath, out bool result) == false)
-		{
-			result = CurrentActivity.Call<bool>("CheckAssetExist", filePath);
-			_cacheData.Add(filePath, result);
-		}
-		return result;
+		if (_isInit == false)
+			Init();
+
+		return _cacheData.Contains(fileName);
 	}
-#else
-	public static bool FileExists(string filePath)
-	{
-		if (_cacheData.TryGetValue(filePath, out bool result) == false)
-		{
-			result = System.IO.File.Exists(System.IO.Path.Combine(Application.streamingAssetsPath, filePath));
-			_cacheData.Add(filePath, result);
-		}
-		return result;
-	}
-#endif
 }
 
-
-#if UNITY_ANDROID && UNITY_EDITOR
-/// <summary>
-/// 为Github对开发者的友好，采用自动补充UnityPlayerActivity.java文件的通用姿势满足各个开发者
-/// </summary>
-internal class AndroidPost : UnityEditor.Android.IPostGenerateGradleAndroidProject
+#if UNITY_EDITOR
+internal class PreprocessBuild : UnityEditor.Build.IPreprocessBuildWithReport
 {
-	public int callbackOrder => 99;
-	public void OnPostGenerateGradleAndroidProject(string path)
-	{
-		path = path.Replace("\\", "/");
-		string untityActivityFilePath = $"{path}/src/main/java/com/unity3d/player/UnityPlayerActivity.java";
-		var readContent = System.IO.File.ReadAllLines(untityActivityFilePath);
-		string postContent =
-			"    //auto-gen-function \n" +
-			"    public boolean CheckAssetExist(String filePath) \n" +
-			"    { \n" +
-			"        android.content.res.AssetManager assetManager = getAssets(); \n" +
-			"        try \n" +
-			"        { \n" +
-			"            java.io.InputStream inputStream = assetManager.open(filePath); \n" +
-			"            if (null != inputStream) \n" +
-			"            { \n" +
-			"                 inputStream.close(); \n" +
-			"                 return true; \n" +
-			"            } \n" +
-			"        } \n" +
-			"        catch(java.io.IOException e) \n" +
-			"        { \n" +
-			"        } \n" +
-			"        return false; \n" +
-			"    } \n" +
-			"}";
+	public int callbackOrder { get { return 0; } }
 
-		if (CheckFunctionExist(readContent) == false)
-			readContent[readContent.Length - 1] = postContent;
-		System.IO.File.WriteAllLines(untityActivityFilePath, readContent);
-	}
-	private bool CheckFunctionExist(string[] contents)
+	/// <summary>
+	/// 在构建应用程序前处理
+	/// </summary>
+	public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report)
 	{
-		for (int i = 0; i < contents.Length; i++)
+		var manifest = ScriptableObject.CreateInstance<BuildinFileManifest>();
+
+		string folderPath = $"{Application.dataPath}/StreamingAssets/BuildinFiles";
+		DirectoryInfo root = new DirectoryInfo(folderPath);
+		FileInfo[] files = root.GetFiles();
+		foreach (var fileInfo in files)
 		{
-			if (contents[i].Contains("CheckAssetExist"))
-			{
-				return true;
-			}
+			if (fileInfo.Extension == ".meta")
+				continue;
+			if (fileInfo.Name.StartsWith("PackageManifest_"))
+				continue;
+			manifest.BuildinFiles.Add(fileInfo.Name);
 		}
-		return false;
+
+		string saveFilePath = "Assets/Resources/BuildinFileManifest.asset";
+		if (File.Exists(saveFilePath))
+			File.Delete(saveFilePath);
+		if (Directory.Exists("Assets/Resources") == false)
+			Directory.CreateDirectory("Assets/Resources");
+		UnityEditor.AssetDatabase.CreateAsset(manifest, saveFilePath);
+		UnityEditor.AssetDatabase.SaveAssets();
+		UnityEditor.AssetDatabase.Refresh();
+		Debug.Log($"内置资源清单保存成功 : {saveFilePath}");
 	}
 }
 #endif
-
-/*
-//auto-gen-function
-public boolean CheckAssetExist(String filePath)
-{
-	android.content.res.AssetManager assetManager = getAssets();
-	try
-	{
-		java.io.InputStream inputStream = assetManager.open(filePath);
-		if(null != inputStream)
-		{
-			inputStream.close();
-			return true;
-		}
-	}
-	catch(java.io.IOException e)
-	{
-		//e.printStackTrace();
-	}
-	return false;
-}
-*/
