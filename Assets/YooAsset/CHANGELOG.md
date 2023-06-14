@@ -2,6 +2,27 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.16] - 2023-06-14
+
+### Changed
+
+- 增加了自动分析冗余资源的开关
+
+  ```c#
+  /// <summary>
+  /// 构建参数
+  /// </summary>
+  public class BuildParameters
+  {
+      /// <summary>
+      /// 自动分析冗余资源
+      /// </summary>
+      public bool AutoAnalyzeRedundancy = true;
+  }
+  ```
+
+- 太空战机DEMO启用了新的内置资源查询机制。
+
 ## [1.4.15] - 2023-06-09
 
 ### Fixed
