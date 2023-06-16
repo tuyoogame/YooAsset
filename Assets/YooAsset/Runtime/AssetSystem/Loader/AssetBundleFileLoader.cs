@@ -246,7 +246,7 @@ namespace YooAsset
 						var result = CacheSystem.VerifyingRecordFile(MainBundleInfo.Bundle.PackageName, MainBundleInfo.Bundle.CacheGUID);
 						if (result != EVerifyResult.Succeed)
 						{
-							YooLogger.Error($"Found possibly corrupt file ! {MainBundleInfo.Bundle.CacheGUID}");
+							YooLogger.Error($"Found possibly corrupt file ! {MainBundleInfo.Bundle.CacheGUID} Verify result : {result}");
 							CacheSystem.DiscardFile(MainBundleInfo.Bundle.PackageName, MainBundleInfo.Bundle.CacheGUID);
 						}
 					}
