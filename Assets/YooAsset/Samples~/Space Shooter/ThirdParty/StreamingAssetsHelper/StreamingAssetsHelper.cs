@@ -23,6 +23,13 @@ public sealed class StreamingAssetsHelper
 	private static bool _isInit = false;
 	private static readonly HashSet<string> _cacheData = new HashSet<string>();
 
+#if UNITY_EDITOR
+	public static void Init() { _isInit = true; }
+	public static bool FileExists(string fileName)
+	{
+		return File.Exists(System.IO.Path.Combine(Application.streamingAssetsPath, "BuildinFiles", fileName));
+	}
+#else
 	/// <summary>
 	/// 初始化
 	/// </summary>
@@ -49,6 +56,7 @@ public sealed class StreamingAssetsHelper
 
 		return _cacheData.Contains(fileName);
 	}
+#endif
 }
 
 #if UNITY_EDITOR
