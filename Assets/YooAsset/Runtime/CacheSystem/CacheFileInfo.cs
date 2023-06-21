@@ -12,7 +12,7 @@ namespace YooAsset
 		/// </summary>
 		public static void WriteInfoToFile(string filePath, string dataFileCRC, long dataFileSize)
 		{
-			using (FileStream fs = new FileStream(filePath, FileMode.Create))
+			using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
 			{
 				SharedBuffer.Clear();
 				SharedBuffer.WriteUTF8(dataFileCRC);
