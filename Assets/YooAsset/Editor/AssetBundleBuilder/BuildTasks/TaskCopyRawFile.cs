@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("拷贝原生文件")]
+	[TaskAttribute(ETaskPipeline.AllPipeline, 400, "拷贝原生文件")]
 	public class TaskCopyRawFile : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

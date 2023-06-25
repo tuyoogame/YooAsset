@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("拷贝内置文件到流目录")]
+	[TaskAttribute(ETaskPipeline.AllPipeline, 1100, "拷贝内置文件到流目录")]
 	public class TaskCopyBuildinFiles : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
@@ -69,7 +69,7 @@ namespace YooAsset.Editor
 
 			// 拷贝文件列表（所有文件）
 			if (option == ECopyBuildinFileOption.ClearAndCopyAll || option == ECopyBuildinFileOption.OnlyCopyAll)
-			{		
+			{
 				foreach (var packageBundle in manifest.BundleList)
 				{
 					string sourcePath = $"{packageOutputDirectory}/{packageBundle.FileName}";

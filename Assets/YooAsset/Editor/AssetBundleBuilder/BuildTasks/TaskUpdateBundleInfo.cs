@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("更新资源包信息")]
+	[TaskAttribute(ETaskPipeline.AllPipeline, 700, "更新资源包信息")]
 	public class TaskUpdateBundleInfo : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

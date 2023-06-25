@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("资源构建内容打包")]
+	[TaskAttribute(ETaskPipeline.BuiltinBuildPipeline, 300, "资源构建内容打包")]
 	public class TaskBuilding : IBuildTask
 	{
 		public class BuildResultContext : IContextObject

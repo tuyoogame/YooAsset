@@ -9,7 +9,7 @@ using UnityEditor.Build.Pipeline.Interfaces;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("验证构建结果")]
+	[TaskAttribute(ETaskPipeline.ScriptableBuildPipeline, 500, "验证构建结果")]
 	public class TaskVerifyBuildResult_SBP : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("获取资源构建内容")]
+	[TaskAttribute(ETaskPipeline.AllPipeline, 200, "获取资源构建内容")]
 	public class TaskGetBuildMap : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
