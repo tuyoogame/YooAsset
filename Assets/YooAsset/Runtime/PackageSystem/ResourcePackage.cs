@@ -650,6 +650,95 @@ namespace YooAsset
 		}
 		#endregion
 
+		#region 资源加载
+		/// <summary>
+		/// 同步加载资源包内所有资源对象
+		/// </summary>
+		/// <param name="assetInfo">资源信息</param>
+		public AllAssetsOperationHandle LoadAllAssetsSync(AssetInfo assetInfo)
+		{
+			DebugCheckInitialize();
+			return LoadAllAssetsInternal(assetInfo, true);
+		}
+
+		/// <summary>
+		/// 同步加载资源包内所有资源对象
+		/// </summary>
+		/// <typeparam name="TObject">资源类型</typeparam>
+		/// <param name="location">资源的定位地址</param>
+		public AllAssetsOperationHandle LoadAllAssetsSync<TObject>(string location) where TObject : UnityEngine.Object
+		{
+			DebugCheckInitialize();
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
+			return LoadAllAssetsInternal(assetInfo, true);
+		}
+
+		/// <summary>
+		/// 同步加载资源包内所有资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		/// <param name="type">子对象类型</param>
+		public AllAssetsOperationHandle LoadAllAssetsSync(string location, System.Type type)
+		{
+			DebugCheckInitialize();
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadAllAssetsInternal(assetInfo, true);
+		}
+
+
+		/// <summary>
+		/// 异步加载资源包内所有资源对象
+		/// </summary>
+		/// <param name="assetInfo">资源信息</param>
+		public AllAssetsOperationHandle LoadAllAssetsAsync(AssetInfo assetInfo)
+		{
+			DebugCheckInitialize();
+			return LoadAllAssetsInternal(assetInfo, false);
+		}
+
+		/// <summary>
+		/// 异步加载资源包内所有资源对象
+		/// </summary>
+		/// <typeparam name="TObject">资源类型</typeparam>
+		/// <param name="location">资源的定位地址</param>
+		public AllAssetsOperationHandle LoadAllAssetsAsync<TObject>(string location) where TObject : UnityEngine.Object
+		{
+			DebugCheckInitialize();
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, typeof(TObject));
+			return LoadAllAssetsInternal(assetInfo, false);
+		}
+
+		/// <summary>
+		/// 异步加载资源包内所有资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		/// <param name="type">子对象类型</param>
+		public AllAssetsOperationHandle LoadAllAssetsAsync(string location, System.Type type)
+		{
+			DebugCheckInitialize();
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadAllAssetsInternal(assetInfo, false);
+		}
+		
+
+		private AllAssetsOperationHandle LoadAllAssetsInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
+		{
+#if UNITY_EDITOR
+			if (assetInfo.IsInvalid == false)
+			{
+				BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+				if (bundleInfo.Bundle.IsRawFile)
+					throw new Exception($"Cannot load raw file using {nameof(LoadAllAssetsAsync)} method !");
+			}
+#endif
+
+			var handle = _assetSystemImpl.LoadAllAssetsAsync(assetInfo);
+			if (waitForAsyncComplete)
+				handle.WaitForAsyncComplete();
+			return handle;
+		}
+		#endregion
+
 		#region 资源下载
 		/// <summary>
 		/// 创建资源下载器，用于下载当前资源版本所有的资源包文件

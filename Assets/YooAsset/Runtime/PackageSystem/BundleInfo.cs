@@ -26,9 +26,9 @@ namespace YooAsset
 		public string RemoteFallbackURL { private set; get; }
 
 		/// <summary>
-		/// 编辑器资源路径
+		/// 注意：该字段只用于帮助编辑器下的模拟模式。
 		/// </summary>
-		public string EditorAssetPath { private set; get; }
+		public string[] IncludeAssets;
 
 
 		private BundleInfo()
@@ -40,15 +40,6 @@ namespace YooAsset
 			LoadMode = loadMode;
 			RemoteMainURL = mainURL;
 			RemoteFallbackURL = fallbackURL;
-			EditorAssetPath = string.Empty;
-		}
-		public BundleInfo(PackageBundle bundle, ELoadMode loadMode, string editorAssetPath)
-		{
-			Bundle = bundle;
-			LoadMode = loadMode;
-			RemoteMainURL = string.Empty;
-			RemoteFallbackURL = string.Empty;
-			EditorAssetPath = editorAssetPath;
 		}
 		public BundleInfo(PackageBundle bundle, ELoadMode loadMode)
 		{
@@ -56,9 +47,7 @@ namespace YooAsset
 			LoadMode = loadMode;
 			RemoteMainURL = string.Empty;
 			RemoteFallbackURL = string.Empty;
-			EditorAssetPath = string.Empty;
 		}
-
 
 		/// <summary>
 		/// 是否为JAR包内文件

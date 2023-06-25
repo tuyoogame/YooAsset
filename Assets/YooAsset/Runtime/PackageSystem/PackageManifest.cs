@@ -308,6 +308,25 @@ namespace YooAsset
 			}
 		}
 
+		/// <summary>
+		/// 获取资源包内的主资源列表
+		/// </summary>
+		public string[] GetBundleIncludeAssets(string assetPath)
+		{
+			List<string> assetList = new List<string>();
+			if (TryGetPackageAsset(assetPath, out PackageAsset result))
+			{
+				foreach (var packageAsset in AssetList)
+				{
+					if (packageAsset.BundleID == result.BundleID)
+					{
+						assetList.Add(packageAsset.AssetPath);
+					}
+				}
+			}
+			return assetList.ToArray();
+		}
+
 		#region 调试方法
 		[Conditional("DEBUG")]
 		private void DebugCheckLocation(string location)

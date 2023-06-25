@@ -284,6 +284,73 @@ namespace YooAsset
 		}
 		#endregion
 
+		#region 资源加载
+		/// <summary>
+		/// 同步加载资源包内所有资源对象
+		/// </summary>
+		/// <param name="assetInfo">资源信息</param>
+		public static AllAssetsOperationHandle LoadAllAssetsSync(AssetInfo assetInfo)
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAllAssetsSync(assetInfo);
+		}
+
+		/// <summary>
+		/// 同步加载资源包内所有资源对象
+		/// </summary>
+		/// <typeparam name="TObject">资源类型</typeparam>
+		/// <param name="location">资源的定位地址</param>
+		public static AllAssetsOperationHandle LoadAllAssetsSync<TObject>(string location) where TObject : UnityEngine.Object
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAllAssetsSync<TObject>(location);
+		}
+
+		/// <summary>
+		/// 同步加载资源包内所有资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		/// <param name="type">子对象类型</param>
+		public static AllAssetsOperationHandle LoadAllAssetsSync(string location, System.Type type)
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAllAssetsSync(location, type);
+		}
+
+
+		/// <summary>
+		/// 异步加载资源包内所有资源对象
+		/// </summary>
+		/// <param name="assetInfo">资源信息</param>
+		public static AllAssetsOperationHandle LoadAllAssetsAsync(AssetInfo assetInfo)
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAllAssetsAsync(assetInfo);
+		}
+
+		/// <summary>
+		/// 异步加载资源包内所有资源对象
+		/// </summary>
+		/// <typeparam name="TObject">资源类型</typeparam>
+		/// <param name="location">资源的定位地址</param>
+		public static AllAssetsOperationHandle LoadAllAssetsAsync<TObject>(string location) where TObject : UnityEngine.Object
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAllAssetsAsync<TObject>(location);
+		}
+
+		/// <summary>
+		/// 异步加载资源包内所有资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		/// <param name="type">子对象类型</param>
+		public static AllAssetsOperationHandle LoadAllAssetsAsync(string location, System.Type type)
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.LoadAllAssetsAsync(location, type);
+		}
+		#endregion
+
 		#region 资源下载
 		/// <summary>
 		/// 创建资源下载器，用于下载当前资源版本所有的资源包文件

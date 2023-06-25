@@ -261,6 +261,34 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 加载所有资源对象
+		/// </summary>
+		public AllAssetsOperationHandle LoadAllAssetsAsync(AssetInfo assetInfo)
+		{
+			if (assetInfo.IsInvalid)
+			{
+				YooLogger.Error($"Failed to load all assets ! {assetInfo.Error}");
+				CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+				completedProvider.SetCompleted(assetInfo.Error);
+				return completedProvider.CreateHandle<AllAssetsOperationHandle>();
+			}
+
+			string providerGUID = assetInfo.GUID;
+			ProviderBase provider = TryGetProvider(providerGUID);
+			if (provider == null)
+			{
+				if (_simulationOnEditor)
+					provider = new DatabaseAllAssetsProvider(this, providerGUID, assetInfo);
+				else
+					provider = new BundledAllAssetsProvider(this, providerGUID, assetInfo);
+				provider.InitSpawnDebugInfo();
+				_providerList.Add(provider);
+				_providerDic.Add(providerGUID, provider);
+			}
+			return provider.CreateHandle<AllAssetsOperationHandle>();
+		}
+
+		/// <summary>
 		/// 加载原生文件
 		/// </summary>
 		public RawFileOperationHandle LoadRawFileAsync(AssetInfo assetInfo)
@@ -377,10 +405,10 @@ namespace YooAsset
 			else
 			{
 #if UNITY_WEBGL
-			if (bundleInfo.Bundle.IsRawFile)
-				loader = new RawBundleWebLoader(this, bundleInfo);
-			else
-				loader = new AssetBundleWebLoader(this, bundleInfo);
+				if (bundleInfo.Bundle.IsRawFile)
+					loader = new RawBundleWebLoader(this, bundleInfo);
+				else
+					loader = new AssetBundleWebLoader(this, bundleInfo);
 #else
 				if (bundleInfo.Bundle.IsRawFile)
 					loader = new RawBundleFileLoader(this, bundleInfo);

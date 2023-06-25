@@ -177,6 +177,8 @@ namespace YooAsset
 				handle = new SceneOperationHandle(this);
 			else if (typeof(T) == typeof(SubAssetsOperationHandle))
 				handle = new SubAssetsOperationHandle(this);
+			else if (typeof(T) == typeof(AllAssetsOperationHandle))
+				handle = new AllAssetsOperationHandle(this);
 			else if (typeof(T) == typeof(RawFileOperationHandle))
 				handle = new RawFileOperationHandle(this);
 			else
