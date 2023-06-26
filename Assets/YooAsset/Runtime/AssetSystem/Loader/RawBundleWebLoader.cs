@@ -90,7 +90,7 @@ namespace YooAsset
 			if (_steps == ESteps.Website)
 			{
 				int failedTryAgain = Impl.DownloadFailedTryAgain;
-				var bundleInfo = ManifestTools.GetUnpackInfo(MainBundleInfo.Bundle);
+				var bundleInfo = ManifestTools.ConvertToUnpackInfo(MainBundleInfo.Bundle);
 				_website = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
 				_steps = ESteps.CheckWebsite;
 			}

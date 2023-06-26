@@ -8,7 +8,6 @@ namespace YooAsset
 {
 	internal static class ManifestTools
 	{
-
 #if UNITY_EDITOR
 		/// <summary>
 		/// 序列化（JSON文件）
@@ -188,14 +187,28 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 获取解压BundleInfo
+		/// 转换为解压BundleInfo
 		/// </summary>
-		public static BundleInfo GetUnpackInfo(PackageBundle packageBundle)
+		public static BundleInfo ConvertToUnpackInfo(PackageBundle packageBundle)
 		{
 			// 注意：我们把流加载路径指定为远端下载地址
 			string streamingPath = PersistentTools.ConvertToWWWPath(packageBundle.StreamingFilePath);
 			BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromStreaming, streamingPath, streamingPath);
 			return bundleInfo;
+		}
+
+		/// <summary>
+		/// 批量转换解压为BundleInfo
+		/// </summary>
+		public static List<BundleInfo> ConvertToUnpackInfos(List<PackageBundle> unpackList)
+		{
+			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
+			foreach (var packageBundle in unpackList)
+			{
+				var bundleInfo = ConvertToUnpackInfo(packageBundle);
+				result.Add(bundleInfo);
+			}
+			return result;
 		}
 	}
 }
