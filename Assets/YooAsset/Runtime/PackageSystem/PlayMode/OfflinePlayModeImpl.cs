@@ -20,6 +20,22 @@ namespace YooAsset
 			return operation;
 		}
 
+		// 解压相关
+		private List<BundleInfo> ConvertToUnpackList(List<PackageBundle> unpackList)
+		{
+			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
+			foreach (var packageBundle in unpackList)
+			{
+				var bundleInfo = ConvertToUnpackInfo(packageBundle);
+				result.Add(bundleInfo);
+			}
+			return result;
+		}
+		private BundleInfo ConvertToUnpackInfo(PackageBundle packageBundle)
+		{
+			return ManifestTools.GetUnpackInfo(packageBundle);
+		}
+
 		#region IPlayModeServices接口
 		public PackageManifest ActiveManifest
 		{
@@ -35,6 +51,11 @@ namespace YooAsset
 		}
 		public void FlushManifestVersionFile()
 		{
+		}
+
+		private bool IsCachedPackageBundle(PackageBundle packageBundle)
+		{
+			return CacheSystem.IsCached(packageBundle.PackageName, packageBundle.CacheGUID);
 		}
 
 		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)
@@ -71,11 +92,48 @@ namespace YooAsset
 
 		ResourceUnpackerOperation IPlayModeServices.CreateResourceUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
+			List<BundleInfo> unpcakList = GetUnpackListByAll(_activeManifest);
+			var operation = new ResourceUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
+			return operation;
 		}
+		private List<BundleInfo> GetUnpackListByAll(PackageManifest manifest)
+		{
+			List<PackageBundle> downloadList = new List<PackageBundle>(1000);
+			foreach (var packageBundle in manifest.BundleList)
+			{
+				// 忽略缓存文件
+				if (IsCachedPackageBundle(packageBundle))
+					continue;
+
+				downloadList.Add(packageBundle);
+			}
+
+			return ConvertToUnpackList(downloadList);
+		}
+
 		ResourceUnpackerOperation IPlayModeServices.CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceUnpackerOperation.CreateEmptyUnpacker(upackingMaxNumber, failedTryAgain, timeout);
+			List<BundleInfo> unpcakList = GetUnpackListByTags(_activeManifest, tags);
+			var operation = new ResourceUnpackerOperation(unpcakList, upackingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		private List<BundleInfo> GetUnpackListByTags(PackageManifest manifest, string[] tags)
+		{
+			List<PackageBundle> downloadList = new List<PackageBundle>(1000);
+			foreach (var packageBundle in manifest.BundleList)
+			{
+				// 忽略缓存文件
+				if (IsCachedPackageBundle(packageBundle))
+					continue;
+
+				// 查询DLC资源
+				if (packageBundle.HasTag(tags))
+				{
+					downloadList.Add(packageBundle);
+				}
+			}
+
+			return ConvertToUnpackList(downloadList);
 		}
 		#endregion
 
