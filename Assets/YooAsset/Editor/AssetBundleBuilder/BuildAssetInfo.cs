@@ -31,6 +31,11 @@ namespace YooAsset.Editor
 		public string AssetPath { private set; get; }
 
 		/// <summary>
+		/// 资源GUID
+		/// </summary>
+		public string AssetGUID { private set; get; }
+
+		/// <summary>
 		/// 是否为原生资源
 		/// </summary>
 		public bool IsRawAsset { private set; get; }
@@ -65,6 +70,7 @@ namespace YooAsset.Editor
 			AssetPath = assetPath;
 			IsRawAsset = isRawAsset;
 
+			AssetGUID = UnityEditor.AssetDatabase.AssetPathToGUID(assetPath);
 			System.Type assetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
 			if (assetType == typeof(UnityEngine.Shader) || assetType == typeof(UnityEngine.ShaderVariantCollection))
 				IsShaderAsset = true;
@@ -78,6 +84,7 @@ namespace YooAsset.Editor
 			AssetPath = assetPath;
 			IsRawAsset = false;
 
+			AssetGUID = UnityEditor.AssetDatabase.AssetPathToGUID(assetPath);
 			System.Type assetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
 			if (assetType == typeof(UnityEngine.Shader) || assetType == typeof(UnityEngine.ShaderVariantCollection))
 				IsShaderAsset = true;

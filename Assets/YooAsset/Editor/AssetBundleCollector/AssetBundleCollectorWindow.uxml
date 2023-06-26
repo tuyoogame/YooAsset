@@ -1,15 +1,22 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <uie:Toolbar name="Toolbar" style="display: flex; flex-direction: row-reverse;">
         <ui:Button text="Save" display-tooltip-when-elided="true" name="SaveButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
         <ui:Button text="导出" display-tooltip-when-elided="true" name="ExportButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
         <ui:Button text="导入" display-tooltip-when-elided="true" name="ImportButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
         <ui:Button text="修复" display-tooltip-when-elided="true" name="FixButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
     </uie:Toolbar>
-    <ui:VisualElement name="PublicContainer" style="height: 30px; background-color: rgb(67, 67, 67); flex-direction: row; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">
-        <ui:Toggle label="Show Packages" name="ShowPackages" style="width: 196px; -unity-text-align: middle-left;" />
-        <ui:Toggle label="Show Editor Alias" name="ShowEditorAlias" style="width: 196px; -unity-text-align: middle-left;" />
-        <ui:Toggle label="Enable Addressable" name="EnableAddressable" style="width: 196px; -unity-text-align: middle-left;" />
-        <ui:Toggle label="Unique Bundle Name" name="UniqueBundleName" style="width: 196px; -unity-text-align: middle-left;" />
+    <ui:VisualElement name="PublicContainer" style="background-color: rgb(79, 79, 79); flex-direction: column; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">
+        <ui:Button text="Settings" display-tooltip-when-elided="true" name="SettingsButton" />
+        <ui:VisualElement name="PublicContainer1" style="flex-direction: row; flex-wrap: nowrap; height: 28px;">
+            <ui:Toggle label="Show Packages" name="ShowPackages" style="width: 196px; -unity-text-align: middle-left;" />
+            <ui:Toggle label="Show Editor Alias" name="ShowEditorAlias" style="width: 196px; -unity-text-align: middle-left;" />
+            <ui:Toggle label="Enable Addressable" name="EnableAddressable" style="width: 196px; -unity-text-align: middle-left;" />
+            <ui:Toggle label="Unique Bundle Name" name="UniqueBundleName" style="width: 196px; -unity-text-align: middle-left;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="PublicContainer2" style="flex-direction: row; flex-wrap: nowrap; height: 28px;">
+            <ui:Toggle label="Location To Lower" name="LocationToLower" style="width: 196px; -unity-text-align: middle-left;" />
+            <ui:Toggle label="Include Asset GUID" name="IncludeAssetGUID" style="width: 196px; -unity-text-align: middle-left;" />
+        </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="ContentContainer" style="flex-grow: 1; flex-direction: row;">
         <ui:VisualElement name="PackageContainer" style="width: 200px; flex-grow: 0; background-color: rgb(67, 67, 67); border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">

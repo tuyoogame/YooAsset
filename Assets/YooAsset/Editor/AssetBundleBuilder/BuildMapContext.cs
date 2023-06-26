@@ -22,19 +22,9 @@ namespace YooAsset.Editor
 		public int AssetFileCount;
 
 		/// <summary>
-		/// 是否启用可寻址资源定位
+		/// 收集命令
 		/// </summary>
-		public bool EnableAddressable;
-
-		/// <summary>
-		/// 资源包名唯一化
-		/// </summary>
-		public bool UniqueBundleName;
-
-		/// <summary>
-		/// 着色器统一的全名称
-		/// </summary>
-		public string ShadersBundleName;
+		public CollectCommand Command { set; get; }
 
 		/// <summary>
 		/// 资源包信息列表

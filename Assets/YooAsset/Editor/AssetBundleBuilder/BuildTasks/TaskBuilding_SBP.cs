@@ -33,7 +33,7 @@ namespace YooAsset.Editor
 			// 开始构建
 			IBundleBuildResults buildResults;
 			var buildParameters = buildParametersContext.GetSBPBuildParameters();
-			var taskList = SBPBuildTasks.Create(buildMapContext.ShadersBundleName);
+			var taskList = SBPBuildTasks.Create(buildMapContext.Command.ShadersBundleName);
 			ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out buildResults, taskList);
 			if (exitCode < 0)
 			{
@@ -43,7 +43,7 @@ namespace YooAsset.Editor
 			// 创建着色器信息
 			// 说明：解决因为着色器资源包导致验证失败。
 			// 例如：当项目里没有着色器，如果有依赖内置着色器就会验证失败。
-			string shadersBundleName = buildMapContext.ShadersBundleName;
+			string shadersBundleName = buildMapContext.Command.ShadersBundleName;
 			if (buildResults.BundleInfos.ContainsKey(shadersBundleName))
 			{
 				buildMapContext.CreateShadersBundleInfo(shadersBundleName);

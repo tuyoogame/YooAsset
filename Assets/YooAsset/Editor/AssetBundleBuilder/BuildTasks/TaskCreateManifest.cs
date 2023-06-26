@@ -34,7 +34,9 @@ namespace YooAsset.Editor
 			// 创建新补丁清单
 			PackageManifest manifest = new PackageManifest();
 			manifest.FileVersion = YooAssetSettings.ManifestFileVersion;
-			manifest.EnableAddressable = buildMapContext.EnableAddressable;
+			manifest.EnableAddressable = buildMapContext.Command.EnableAddressable;
+			manifest.LocationToLower = buildMapContext.Command.LocationToLower;
+			manifest.IncludeAssetGUID = buildMapContext.Command.IncludeAssetGUID;
 			manifest.OutputNameStyle = (int)buildParameters.OutputNameStyle;
 			manifest.PackageName = buildParameters.PackageName;
 			manifest.PackageVersion = buildParameters.PackageVersion;
@@ -47,7 +49,7 @@ namespace YooAsset.Editor
 				if (buildParameters.BuildMode == EBuildMode.IncrementalBuild)
 				{
 					var buildResultContext = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
-					UpdateBuiltInBundleReference(manifest, buildResultContext, buildMapContext.ShadersBundleName);
+					UpdateBuiltInBundleReference(manifest, buildResultContext, buildMapContext.Command.ShadersBundleName);
 				}
 			}
 
@@ -141,11 +143,9 @@ namespace YooAsset.Editor
 				foreach (var assetInfo in assetInfos)
 				{
 					PackageAsset packageAsset = new PackageAsset();
-					if (buildMapContext.EnableAddressable)
-						packageAsset.Address = assetInfo.Address;
-					else
-						packageAsset.Address = string.Empty;
+					packageAsset.Address = buildMapContext.Command.EnableAddressable ? assetInfo.Address : string.Empty;
 					packageAsset.AssetPath = assetInfo.AssetPath;
+					packageAsset.AssetGUID = buildMapContext.Command.IncludeAssetGUID ? assetInfo.AssetGUID : string.Empty;
 					packageAsset.AssetTags = assetInfo.AssetTags.ToArray();
 					packageAsset.BundleID = GetAssetBundleID(assetInfo.BundleName, manifest);
 					packageAsset.DependIDs = GetAssetBundleDependIDs(packageAsset.BundleID, assetInfo, manifest);

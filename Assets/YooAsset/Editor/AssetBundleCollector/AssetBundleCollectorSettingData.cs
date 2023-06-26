@@ -331,6 +331,16 @@ namespace YooAsset.Editor
 			Setting.EnableAddressable = enableAddressable;
 			IsDirty = true;
 		}
+		public static void ModifyLocationToLower(bool locationToLower)
+		{
+			Setting.LocationToLower = locationToLower;
+			IsDirty = true;
+		}
+		public static void ModifyIncludeAssetGUID(bool includeAssetGUID)
+		{
+			Setting.IncludeAssetGUID = includeAssetGUID;
+			IsDirty = true;
+		}
 		public static void ModifyUniqueBundleName(bool uniqueBundleName)
 		{
 			Setting.UniqueBundleName = uniqueBundleName;

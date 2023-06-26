@@ -25,8 +25,13 @@ namespace YooAsset.Editor
 		private List<RuleDisplayName> _packRuleList;
 		private List<RuleDisplayName> _filterRuleList;
 
+		private Button _settingsButton;
+		private VisualElement _setting1Container;
+		private VisualElement _setting2Container;
 		private Toggle _showPackageToogle;
 		private Toggle _enableAddressableToogle;
+		private Toggle _locationToLowerToogle;
+		private Toggle _includeAssetGUIDToogle;
 		private Toggle _uniqueBundleNameToogle;
 		private Toggle _showEditorAliasToggle;
 
@@ -47,6 +52,7 @@ namespace YooAsset.Editor
 
 		private int _lastModifyPackageIndex = 0;
 		private int _lastModifyGroupIndex = 0;
+		private bool _showSettings = false;
 
 
 		public void CreateGUI()
@@ -77,6 +83,10 @@ namespace YooAsset.Editor
 				visualAsset.CloneTree(root);
 
 				// 公共设置相关
+				_settingsButton = root.Q<Button>("SettingsButton");
+				_settingsButton.clicked += SettingsBtn_clicked;
+				_setting1Container = root.Q("PublicContainer1");
+				_setting2Container = root.Q("PublicContainer2");
 				_showPackageToogle = root.Q<Toggle>("ShowPackages");
 				_showPackageToogle.RegisterValueChangedCallback(evt =>
 				{
@@ -89,13 +99,24 @@ namespace YooAsset.Editor
 					AssetBundleCollectorSettingData.ModifyAddressable(evt.newValue);
 					RefreshWindow();
 				});
+				_locationToLowerToogle = root.Q<Toggle>("LocationToLower");
+				_locationToLowerToogle.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleCollectorSettingData.ModifyLocationToLower(evt.newValue);
+					RefreshWindow();
+				});
+				_includeAssetGUIDToogle = root.Q<Toggle>("IncludeAssetGUID");
+				_includeAssetGUIDToogle.RegisterValueChangedCallback(evt =>
+				{
+					AssetBundleCollectorSettingData.ModifyIncludeAssetGUID(evt.newValue);
+					RefreshWindow();
+				});
 				_uniqueBundleNameToogle = root.Q<Toggle>("UniqueBundleName");
 				_uniqueBundleNameToogle.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleCollectorSettingData.ModifyUniqueBundleName(evt.newValue);
 					RefreshWindow();
 				});
-
 				_showEditorAliasToggle = root.Q<Toggle>("ShowEditorAlias");
 				_showEditorAliasToggle.RegisterValueChangedCallback(evt =>
 				{
@@ -302,8 +323,21 @@ namespace YooAsset.Editor
 		{
 			_showPackageToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowPackageView);
 			_enableAddressableToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.EnableAddressable);
+			_locationToLowerToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.LocationToLower);
+			_includeAssetGUIDToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.IncludeAssetGUID);
 			_uniqueBundleNameToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.UniqueBundleName);
 			_showEditorAliasToggle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowEditorAlias);
+
+			if (_showSettings)
+			{
+				_setting1Container.style.display = DisplayStyle.Flex;
+				_setting2Container.style.display = DisplayStyle.Flex;
+			}
+			else
+			{
+				_setting1Container.style.display = DisplayStyle.None;
+				_setting2Container.style.display = DisplayStyle.None;
+			}
 
 			_groupContainer.visible = false;
 			_collectorContainer.visible = false;
@@ -335,6 +369,11 @@ namespace YooAsset.Editor
 		private void SaveBtn_clicked()
 		{
 			AssetBundleCollectorSettingData.SaveFile();
+		}
+		private void SettingsBtn_clicked()
+		{
+			_showSettings = !_showSettings;
+			RefreshWindow();
 		}
 		private string FormatListItemCallback(RuleDisplayName ruleDisplayName)
 		{
@@ -796,7 +835,8 @@ namespace YooAsset.Editor
 
 				try
 				{
-					CollectCommand command = new CollectCommand(EBuildMode.SimulateBuild, _packageNameTxt.value, _enableAddressableToogle.value, _uniqueBundleNameToogle.value);
+					CollectCommand command = new CollectCommand(EBuildMode.SimulateBuild, _packageNameTxt.value,
+						_enableAddressableToogle.value, _locationToLowerToogle.value, _includeAssetGUIDToogle.value, _uniqueBundleNameToogle.value);
 					collectAssetInfos = collector.GetAllCollectAssets(command, group);
 				}
 				catch (System.Exception e)

@@ -98,9 +98,7 @@ namespace YooAsset.Editor
 			// 7. 记录关键信息
 			BuildMapContext context = new BuildMapContext();
 			context.AssetFileCount = allBuildAssetInfoDic.Count;
-			context.EnableAddressable = collectResult.Command.EnableAddressable;
-			context.UniqueBundleName = collectResult.Command.UniqueBundleName;
-			context.ShadersBundleName = collectResult.Command.ShadersBundleName;
+			context.Command = collectResult.Command;
 
 			// 8. 计算共享的资源包名
 			if (autoAnalyzeRedundancy)
