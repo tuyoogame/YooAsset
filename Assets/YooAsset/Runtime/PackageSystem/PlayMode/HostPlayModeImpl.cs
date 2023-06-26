@@ -10,7 +10,6 @@ namespace YooAsset
 
 		// 参数相关
 		private string _packageName;
-		private bool _locationToLower;
 		private string _defaultHostServer;
 		private string _fallbackHostServer;
 		private IQueryServices _queryServices;
@@ -18,10 +17,9 @@ namespace YooAsset
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(string packageName, bool locationToLower, string defaultHostServer, string fallbackHostServer, IQueryServices queryServices)
+		public InitializationOperation InitializeAsync(string packageName, string defaultHostServer, string fallbackHostServer, IQueryServices queryServices)
 		{
 			_packageName = packageName;
-			_locationToLower = locationToLower;
 			_defaultHostServer = defaultHostServer;
 			_fallbackHostServer = fallbackHostServer;
 			_queryServices = queryServices;
@@ -67,7 +65,6 @@ namespace YooAsset
 			set
 			{
 				_activeManifest = value;
-				_activeManifest.InitAssetPathMapping(_locationToLower);
 			}
 			get
 			{

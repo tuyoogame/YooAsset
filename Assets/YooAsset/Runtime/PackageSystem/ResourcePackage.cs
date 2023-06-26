@@ -92,7 +92,7 @@ namespace YooAsset
 					parameters.DecryptionServices, _bundleServices);
 
 				var initializeParameters = parameters as EditorSimulateModeParameters;
-				initializeOperation = editorSimulateModeImpl.InitializeAsync(initializeParameters.LocationToLower, initializeParameters.SimulateManifestFilePath);
+				initializeOperation = editorSimulateModeImpl.InitializeAsync(initializeParameters.SimulateManifestFilePath);
 			}
 			else if (_playMode == EPlayMode.OfflinePlayMode)
 			{
@@ -104,7 +104,7 @@ namespace YooAsset
 					parameters.DecryptionServices, _bundleServices);
 
 				var initializeParameters = parameters as OfflinePlayModeParameters;
-				initializeOperation = offlinePlayModeImpl.InitializeAsync(PackageName, initializeParameters.LocationToLower);
+				initializeOperation = offlinePlayModeImpl.InitializeAsync(PackageName);
 			}
 			else if (_playMode == EPlayMode.HostPlayMode)
 			{
@@ -118,7 +118,6 @@ namespace YooAsset
 				var initializeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = hostPlayModeImpl.InitializeAsync(
 					PackageName,
-					initializeParameters.LocationToLower,
 					initializeParameters.DefaultHostServer,
 					initializeParameters.FallbackHostServer,
 					initializeParameters.QueryServices
@@ -363,8 +362,17 @@ namespace YooAsset
 		public AssetInfo GetAssetInfo(string location)
 		{
 			DebugCheckInitialize();
-			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-			return assetInfo;
+			return ConvertLocationToAssetInfo(location, null);
+		}
+
+		/// <summary>
+		/// 获取资源信息
+		/// </summary>
+		/// <param name="assetGUID">资源GUID</param>
+		public AssetInfo GetAssetInfoByGUID(string assetGUID)
+		{
+			DebugCheckInitialize();
+			return ConvertAssetGUIDToAssetInfo(assetGUID, null);
 		}
 
 		/// <summary>
@@ -889,12 +897,13 @@ namespace YooAsset
 			return _playModeServices.ActiveManifest.IsIncludeBundleFile(cacheGUID);
 		}
 
-		/// <summary>
-		/// 资源定位地址转换为资源信息类
-		/// </summary>
 		private AssetInfo ConvertLocationToAssetInfo(string location, System.Type assetType)
 		{
 			return _playModeServices.ActiveManifest.ConvertLocationToAssetInfo(location, assetType);
+		}
+		private AssetInfo ConvertAssetGUIDToAssetInfo(string assetGUID, System.Type assetType)
+		{
+			return _playModeServices.ActiveManifest.ConvertAssetGUIDToAssetInfo(assetGUID, assetType);
 		}
 		#endregion
 

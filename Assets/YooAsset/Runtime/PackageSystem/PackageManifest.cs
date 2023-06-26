@@ -23,6 +23,16 @@ namespace YooAsset
 		public bool EnableAddressable;
 
 		/// <summary>
+		/// 资源定位地址大小写不敏感
+		/// </summary>
+		public bool LocationToLower;
+
+		/// <summary>
+		/// 包含资源GUID数据
+		/// </summary>
+		public bool IncludeAssetGUID;
+
+		/// <summary>
 		/// 文件名称样式
 		/// </summary>
 		public int OutputNameStyle;
@@ -61,93 +71,17 @@ namespace YooAsset
 		public Dictionary<string, PackageAsset> AssetDic;
 
 		/// <summary>
-		/// 资源路径映射集合
+		/// 资源路径映射集合（提供Location获取AssetPath）
 		/// </summary>
 		[NonSerialized]
-		public Dictionary<string, string> AssetPathMapping;
-
-		// 资源路径映射相关
-		private bool _isInitAssetPathMapping = false;
-		private bool _locationToLower = false;
-
+		public Dictionary<string, string> AssetPathMapping1;
 
 		/// <summary>
-		/// 初始化资源路径映射
+		/// 资源路径映射集合（提供AssetGUID获取AssetPath）
 		/// </summary>
-		public void InitAssetPathMapping(bool locationToLower)
-		{
-			if (_isInitAssetPathMapping)
-				return;
-			_isInitAssetPathMapping = true;
+		[NonSerialized]
+		public Dictionary<string, string> AssetPathMapping2;
 
-			if (EnableAddressable)
-			{
-				if (locationToLower)
-					YooLogger.Error("Addressable not support location to lower !");
-
-				AssetPathMapping = new Dictionary<string, string>(AssetList.Count);
-				foreach (var packageAsset in AssetList)
-				{
-					string location = packageAsset.Address;
-					if (AssetPathMapping.ContainsKey(location))
-						throw new Exception($"Address have existed : {location}");
-					else
-						AssetPathMapping.Add(location, packageAsset.AssetPath);
-				}
-			}
-			else
-			{
-				_locationToLower = locationToLower;
-				AssetPathMapping = new Dictionary<string, string>(AssetList.Count * 2);
-				foreach (var packageAsset in AssetList)
-				{
-					string location = packageAsset.AssetPath;
-					if (locationToLower)
-						location = location.ToLower();
-
-					// 添加原生路径的映射
-					if (AssetPathMapping.ContainsKey(location))
-						throw new Exception($"AssetPath have existed : {location}");
-					else
-						AssetPathMapping.Add(location, packageAsset.AssetPath);
-
-					// 添加无后缀名路径的映射
-					if (Path.HasExtension(location))
-					{
-						string locationWithoutExtension = PathUtility.RemoveExtension(location);
-						if (AssetPathMapping.ContainsKey(locationWithoutExtension))
-							YooLogger.Warning($"AssetPath have existed : {locationWithoutExtension}");
-						else
-							AssetPathMapping.Add(locationWithoutExtension, packageAsset.AssetPath);
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// 映射为资源路径
-		/// </summary>
-		public string MappingToAssetPath(string location)
-		{
-			if (string.IsNullOrEmpty(location))
-			{
-				YooLogger.Error("Failed to mapping location to asset path, The location is null or empty.");
-				return string.Empty;
-			}
-
-			if (_locationToLower)
-				location = location.ToLower();
-
-			if (AssetPathMapping.TryGetValue(location, out string assetPath))
-			{
-				return assetPath;
-			}
-			else
-			{
-				YooLogger.Warning($"Failed to mapping location to asset path : {location}");
-				return string.Empty;
-			}
-		}
 
 		/// <summary>
 		/// 尝试映射为资源路径
@@ -157,10 +91,10 @@ namespace YooAsset
 			if (string.IsNullOrEmpty(location))
 				return string.Empty;
 
-			if (_locationToLower)
+			if (LocationToLower)
 				location = location.ToLower();
 
-			if (AssetPathMapping.TryGetValue(location, out string assetPath))
+			if (AssetPathMapping1.TryGetValue(location, out string assetPath))
 				return assetPath;
 			else
 				return string.Empty;
@@ -283,14 +217,14 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 资源定位地址转换为资源信息类，失败时内部会发出错误日志。
+		/// 资源定位地址转换为资源信息。
 		/// </summary>
 		/// <returns>如果转换失败会返回一个无效的资源信息类</returns>
 		public AssetInfo ConvertLocationToAssetInfo(string location, System.Type assetType)
 		{
 			DebugCheckLocation(location);
 
-			string assetPath = MappingToAssetPath(location);
+			string assetPath = ConvertLocationToAssetInfoMapping(location);
 			if (TryGetPackageAsset(assetPath, out PackageAsset packageAsset))
 			{
 				AssetInfo assetInfo = new AssetInfo(packageAsset, assetType);
@@ -305,6 +239,76 @@ namespace YooAsset
 					error = $"The location is invalid : {location}";
 				AssetInfo assetInfo = new AssetInfo(error);
 				return assetInfo;
+			}
+		}
+		private string ConvertLocationToAssetInfoMapping(string location)
+		{
+			if (string.IsNullOrEmpty(location))
+			{
+				YooLogger.Error("Failed to mapping location to asset path, The location is null or empty.");
+				return string.Empty;
+			}
+
+			if (LocationToLower)
+				location = location.ToLower();
+
+			if (AssetPathMapping1.TryGetValue(location, out string assetPath))
+			{
+				return assetPath;
+			}
+			else
+			{
+				YooLogger.Warning($"Failed to mapping location to asset path : {location}");
+				return string.Empty;
+			}
+		}
+
+		/// <summary>
+		/// 资源GUID转换为资源信息。
+		/// </summary>
+		/// <returns>如果转换失败会返回一个无效的资源信息类</returns>
+		public AssetInfo ConvertAssetGUIDToAssetInfo(string assetGUID, System.Type assetType)
+		{
+			if (IncludeAssetGUID == false)
+			{
+				YooLogger.Warning("Package manifest not include asset guid ! Please check asset bundle collector settings.");
+				AssetInfo assetInfo = new AssetInfo("AssetGUID data is empty !");
+				return assetInfo;
+			}
+
+			string assetPath = ConvertAssetGUIDToAssetInfoMapping(assetGUID);
+			if (TryGetPackageAsset(assetPath, out PackageAsset packageAsset))
+			{
+				AssetInfo assetInfo = new AssetInfo(packageAsset, assetType);
+				return assetInfo;
+			}
+			else
+			{
+				string error;
+				if (string.IsNullOrEmpty(assetGUID))
+					error = $"The assetGUID is null or empty !";
+				else
+					error = $"The assetGUID is invalid : {assetGUID}";
+				AssetInfo assetInfo = new AssetInfo(error);
+				return assetInfo;
+			}
+		}
+		private string ConvertAssetGUIDToAssetInfoMapping(string assetGUID)
+		{
+			if (string.IsNullOrEmpty(assetGUID))
+			{
+				YooLogger.Error("Failed to mapping assetGUID to asset path, The assetGUID is null or empty.");
+				return string.Empty;
+			}
+
+			if (AssetPathMapping2.TryGetValue(assetGUID, out string assetPath))
+			{
+				return assetPath;
+			}
+			else
+			{
+				YooLogger.Warning($"Failed to mapping assetGUID to asset path : {assetGUID}");
+				return string.Empty;
 			}
 		}
 

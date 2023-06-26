@@ -17,6 +17,11 @@ namespace YooAsset
 		public string AssetPath;
 
 		/// <summary>
+		/// 资源GUID
+		/// </summary>
+		public string AssetGUID;
+
+		/// <summary>
 		/// 资源的分类标签
 		/// </summary>
 		public string[] AssetTags;

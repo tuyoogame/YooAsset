@@ -7,14 +7,12 @@ namespace YooAsset
 	internal class EditorSimulateModeImpl : IPlayModeServices, IBundleServices
 	{
 		private PackageManifest _activeManifest;
-		private bool _locationToLower;
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(bool locationToLower, string simulateManifestFilePath)
+		public InitializationOperation InitializeAsync(string simulateManifestFilePath)
 		{
-			_locationToLower = locationToLower;
 			var operation = new EditorSimulateModeInitializationOperation(this, simulateManifestFilePath);
 			OperationSystem.StartOperation(operation);
 			return operation;
@@ -26,7 +24,6 @@ namespace YooAsset
 			set
 			{
 				_activeManifest = value;
-				_activeManifest.InitAssetPathMapping(_locationToLower);
 			}
 			get
 			{

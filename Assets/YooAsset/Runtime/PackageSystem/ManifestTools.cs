@@ -36,6 +36,8 @@ namespace YooAsset
 
 				// 写入文件头信息
 				buffer.WriteBool(manifest.EnableAddressable);
+				buffer.WriteBool(manifest.LocationToLower);
+				buffer.WriteBool(manifest.IncludeAssetGUID);
 				buffer.WriteInt32(manifest.OutputNameStyle);
 				buffer.WriteUTF8(manifest.PackageName);
 				buffer.WriteUTF8(manifest.PackageVersion);
@@ -47,6 +49,7 @@ namespace YooAsset
 					var packageAsset = manifest.AssetList[i];
 					buffer.WriteUTF8(packageAsset.Address);
 					buffer.WriteUTF8(packageAsset.AssetPath);
+					buffer.WriteUTF8(packageAsset.AssetGUID);
 					buffer.WriteUTF8Array(packageAsset.AssetTags);
 					buffer.WriteInt32(packageAsset.BundleID);
 					buffer.WriteInt32Array(packageAsset.DependIDs);
@@ -104,9 +107,15 @@ namespace YooAsset
 				// 读取文件头信息
 				manifest.FileVersion = fileVersion;
 				manifest.EnableAddressable = buffer.ReadBool();
+				manifest.LocationToLower = buffer.ReadBool();
+				manifest.IncludeAssetGUID = buffer.ReadBool();
 				manifest.OutputNameStyle = buffer.ReadInt32();
 				manifest.PackageName = buffer.ReadUTF8();
 				manifest.PackageVersion = buffer.ReadUTF8();
+
+				// 检测配置
+				if (manifest.EnableAddressable && manifest.LocationToLower)
+					throw new Exception("Addressable not support location to lower !");
 
 				// 读取资源列表
 				int packageAssetCount = buffer.ReadInt32();
@@ -116,6 +125,7 @@ namespace YooAsset
 					var packageAsset = new PackageAsset();
 					packageAsset.Address = buffer.ReadUTF8();
 					packageAsset.AssetPath = buffer.ReadUTF8();
+					packageAsset.AssetGUID = buffer.ReadUTF8();
 					packageAsset.AssetTags = buffer.ReadUTF8Array();
 					packageAsset.BundleID = buffer.ReadInt32();
 					packageAsset.DependIDs = buffer.ReadInt32Array();
@@ -140,7 +150,7 @@ namespace YooAsset
 				}
 			}
 
-			// BundleDic
+			// 填充BundleDic
 			manifest.BundleDic = new Dictionary<string, PackageBundle>(manifest.BundleList.Count);
 			foreach (var packageBundle in manifest.BundleList)
 			{
@@ -148,7 +158,7 @@ namespace YooAsset
 				manifest.BundleDic.Add(packageBundle.BundleName, packageBundle);
 			}
 
-			// AssetDic
+			// 填充AssetDic
 			manifest.AssetDic = new Dictionary<string, PackageAsset>(manifest.AssetList.Count);
 			foreach (var packageAsset in manifest.AssetList)
 			{

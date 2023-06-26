@@ -28,12 +28,6 @@ namespace YooAsset
 	public abstract class InitializeParameters
 	{
 		/// <summary>
-		/// 资源定位地址大小写不敏感
-		/// 注意：默认值为False
-		/// </summary>
-		public bool LocationToLower = false;
-
-		/// <summary>
 		/// 文件解密服务接口
 		/// </summary>
 		public IDecryptionServices DecryptionServices = null;

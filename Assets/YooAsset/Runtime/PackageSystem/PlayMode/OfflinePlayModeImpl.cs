@@ -7,14 +7,12 @@ namespace YooAsset
 	internal class OfflinePlayModeImpl : IPlayModeServices, IBundleServices
 	{
 		private PackageManifest _activeManifest;
-		private bool _locationToLower;
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(string packageName, bool locationToLower)
+		public InitializationOperation InitializeAsync(string packageName)
 		{
-			_locationToLower = locationToLower;
 			var operation = new OfflinePlayModeInitializationOperation(this, packageName);
 			OperationSystem.StartOperation(operation);
 			return operation;
@@ -26,7 +24,6 @@ namespace YooAsset
 			set
 			{
 				_activeManifest = value;
-				_activeManifest.InitAssetPathMapping(_locationToLower);
 			}
 			get
 			{
