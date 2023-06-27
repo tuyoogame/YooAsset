@@ -36,15 +36,15 @@ namespace YooAsset
 			// 1. 检测资源包
 			if (Status == EStatus.CheckBundle)
 			{
-				if (DependBundleGroup.IsDone() == false)
+				if (DependBundles.IsDone() == false)
 					return;
 				if (OwnerBundle.IsDone() == false)
 					return;
 
-				if (DependBundleGroup.IsSucceed() == false)
+				if (DependBundles.IsSucceed() == false)
 				{
 					Status = EStatus.Failed;
-					LastError = DependBundleGroup.GetLastError();
+					LastError = DependBundles.GetLastError();
 					InvokeCompletion();
 					return;
 				}

@@ -4,17 +4,17 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	internal class DependAssetBundleGroup
+	internal class DependAssetBundles
 	{
 		/// <summary>
 		/// 依赖的资源包加载器列表
 		/// </summary>
-		internal readonly List<BundleLoaderBase> DependBundles;
+		internal readonly List<BundleLoaderBase> DependList;
 
 
-		public DependAssetBundleGroup(List<BundleLoaderBase> dpendBundles)
+		public DependAssetBundles(List<BundleLoaderBase> dpendList)
 		{
-			DependBundles = dpendBundles;
+			DependList = dpendList;
 		}
 
 		/// <summary>
@@ -22,7 +22,7 @@ namespace YooAsset
 		/// </summary>
 		public bool IsDone()
 		{
-			foreach (var loader in DependBundles)
+			foreach (var loader in DependList)
 			{
 				if (loader.IsDone() == false)
 					return false;
@@ -35,7 +35,7 @@ namespace YooAsset
 		/// </summary>
 		public bool IsSucceed()
 		{
-			foreach (var loader in DependBundles)
+			foreach (var loader in DependList)
 			{
 				if (loader.Status != BundleLoaderBase.EStatus.Succeed)
 				{
@@ -50,7 +50,7 @@ namespace YooAsset
 		/// </summary>
 		public string GetLastError()
 		{
-			foreach (var loader in DependBundles)
+			foreach (var loader in DependList)
 			{
 				if (loader.Status != BundleLoaderBase.EStatus.Succeed)
 				{
@@ -65,7 +65,7 @@ namespace YooAsset
 		/// </summary>
 		public void WaitForAsyncComplete()
 		{
-			foreach (var loader in DependBundles)
+			foreach (var loader in DependList)
 			{
 				if (loader.IsDone() == false)
 					loader.WaitForAsyncComplete();
@@ -77,7 +77,7 @@ namespace YooAsset
 		/// </summary>
 		public void Reference()
 		{
-			foreach (var loader in DependBundles)
+			foreach (var loader in DependList)
 			{
 				loader.Reference();
 			}
@@ -88,7 +88,7 @@ namespace YooAsset
 		/// </summary>
 		public void Release()
 		{
-			foreach (var loader in DependBundles)
+			foreach (var loader in DependList)
 			{
 				loader.Release();
 			}
@@ -99,7 +99,7 @@ namespace YooAsset
 		/// </summary>
 		internal void GetBundleDebugInfos(List<DebugBundleInfo> output)
 		{
-			foreach (var loader in DependBundles)
+			foreach (var loader in DependList)
 			{
 				var bundleInfo = new DebugBundleInfo();
 				bundleInfo.BundleName = loader.MainBundleInfo.Bundle.BundleName;

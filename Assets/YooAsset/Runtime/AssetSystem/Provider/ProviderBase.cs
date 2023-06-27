@@ -91,7 +91,7 @@ namespace YooAsset
 
 
 		protected BundleLoaderBase OwnerBundle { private set; get; }
-		protected DependAssetBundleGroup DependBundleGroup { private set; get; }
+		protected DependAssetBundles DependBundles { private set; get; }
 		protected bool IsWaitForAsyncComplete { private set; get; } = false;
 		private readonly List<OperationHandleBase> _handles = new List<OperationHandleBase>();
 
@@ -109,9 +109,9 @@ namespace YooAsset
 				OwnerBundle.Reference();
 				OwnerBundle.AddProvider(this);
 
-				var dependBundles = impl.CreateDependAssetBundleLoaders(assetInfo);
-				DependBundleGroup = new DependAssetBundleGroup(dependBundles);
-				DependBundleGroup.Reference();
+				var dependList = impl.CreateDependAssetBundleLoaders(assetInfo);
+				DependBundles = new DependAssetBundles(dependList);
+				DependBundles.Reference();
 			}
 		}
 
@@ -133,10 +133,10 @@ namespace YooAsset
 				OwnerBundle.Release();
 				OwnerBundle = null;
 			}
-			if (DependBundleGroup != null)
+			if (DependBundles != null)
 			{
-				DependBundleGroup.Release();
-				DependBundleGroup = null;
+				DependBundles.Release();
+				DependBundles = null;
 			}
 		}
 
@@ -322,7 +322,7 @@ namespace YooAsset
 			DownloadReport result = new DownloadReport();
 			result.TotalSize = (ulong)OwnerBundle.MainBundleInfo.Bundle.FileSize;
 			result.DownloadedBytes = OwnerBundle.DownloadedBytes;
-			foreach (var dependBundle in DependBundleGroup.DependBundles)
+			foreach (var dependBundle in DependBundles.DependList)
 			{
 				result.TotalSize += (ulong)dependBundle.MainBundleInfo.Bundle.FileSize;
 				result.DownloadedBytes += dependBundle.DownloadedBytes;
@@ -342,7 +342,7 @@ namespace YooAsset
 			bundleInfo.Status = OwnerBundle.Status.ToString();
 			output.Add(bundleInfo);
 
-			DependBundleGroup.GetBundleDebugInfos(output);
+			DependBundles.GetBundleDebugInfos(output);
 		}
 		#endregion
 	}
