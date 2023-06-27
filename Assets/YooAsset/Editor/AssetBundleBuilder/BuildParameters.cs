@@ -85,7 +85,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 共享资源的打包规则
 		/// </summary>
-		public IShareAssetPackRule ShareAssetPackRule = null;
+		public ISharedPackRule SharedPackRule = null;
 
 		/// <summary>
 		/// 资源的加密接口

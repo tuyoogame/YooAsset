@@ -26,10 +26,10 @@ namespace YooAsset.Editor
 		/// </summary>
 		public BuildMapContext CreateBuildMap(BuildParameters buildParameters)
 		{
-			EBuildMode buildMode = buildParameters.BuildMode;
-			string packageName = buildParameters.PackageName;
-			IShareAssetPackRule sharePackRule = buildParameters.ShareAssetPackRule;
-			bool autoAnalyzeRedundancy = buildParameters.AutoAnalyzeRedundancy;
+			var buildMode = buildParameters.BuildMode;
+			var packageName = buildParameters.PackageName;
+			var sharedPackRule = buildParameters.SharedPackRule;
+			var autoAnalyzeRedundancy = buildParameters.AutoAnalyzeRedundancy;
 
 			Dictionary<string, BuildAssetInfo> allBuildAssetInfoDic = new Dictionary<string, BuildAssetInfo>(1000);
 
@@ -106,7 +106,7 @@ namespace YooAsset.Editor
 				var command = collectResult.Command;
 				foreach (var buildAssetInfo in allBuildAssetInfoDic.Values)
 				{
-					buildAssetInfo.CalculateShareBundleName(sharePackRule, command.UniqueBundleName, command.PackageName, command.ShadersBundleName);
+					buildAssetInfo.CalculateShareBundleName(sharedPackRule, command.UniqueBundleName, command.PackageName, command.ShadersBundleName);
 				}
 			}
 			else

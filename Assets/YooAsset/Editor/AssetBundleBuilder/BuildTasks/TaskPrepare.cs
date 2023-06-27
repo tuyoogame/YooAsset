@@ -48,7 +48,7 @@ namespace YooAsset.Editor
 				}
 
 				// 检测共享资源打包规则
-				if (buildParameters.ShareAssetPackRule == null)
+				if (buildParameters.SharedPackRule == null)
 					throw new Exception("共享资源打包规则不能为空！");
 
 #if UNITY_WEBGL

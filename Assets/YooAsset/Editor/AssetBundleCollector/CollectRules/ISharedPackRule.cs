@@ -4,7 +4,7 @@ namespace YooAsset.Editor
 	/// <summary>
 	/// 共享资源的打包规则
 	/// </summary>
-	public interface IShareAssetPackRule
+	public interface ISharedPackRule
 	{
 		/// <summary>
 		/// 获取打包规则结果

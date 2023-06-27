@@ -79,9 +79,9 @@ namespace YooAsset.Editor
 		public bool AutoAnalyzeRedundancy;
 
 		/// <summary>
-		/// 共享资源的打包类名称
+		/// 共享资源的打包规则类名
 		/// </summary>
-		public string ShareAssetPackRuleClassName;
+		public string SharedPackRuleClassName;
 
 		/// <summary>
 		/// 加密服务类名称

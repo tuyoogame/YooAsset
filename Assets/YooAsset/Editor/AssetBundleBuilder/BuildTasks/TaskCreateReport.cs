@@ -50,8 +50,8 @@ namespace YooAsset.Editor
 				buildReport.Summary.IncludeAssetGUID = buildMapContext.Command.IncludeAssetGUID;
 				buildReport.Summary.UniqueBundleName = buildMapContext.Command.UniqueBundleName;
 				buildReport.Summary.AutoAnalyzeRedundancy = buildParameters.AutoAnalyzeRedundancy;
-				buildReport.Summary.ShareAssetPackRuleClassName = buildParameters.ShareAssetPackRule == null ?
-					"null" : buildParameters.ShareAssetPackRule.GetType().FullName;
+				buildReport.Summary.SharedPackRuleClassName = buildParameters.SharedPackRule == null ?
+					"null" : buildParameters.SharedPackRule.GetType().FullName;
 				buildReport.Summary.EncryptionServicesClassName = buildParameters.EncryptionServices == null ?
 					"null" : buildParameters.EncryptionServices.GetType().FullName;
 

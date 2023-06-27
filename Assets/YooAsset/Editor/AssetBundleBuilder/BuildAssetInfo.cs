@@ -164,7 +164,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 计算共享资源包的完整包名
 		/// </summary>
-		public void CalculateShareBundleName(IShareAssetPackRule packRule, bool uniqueBundleName, string packageName, string shadersBundleName)
+		public void CalculateShareBundleName(ISharedPackRule packRule, bool uniqueBundleName, string packageName, string shadersBundleName)
 		{
 			if (CollectorType != ECollectorType.None)
 				return;
