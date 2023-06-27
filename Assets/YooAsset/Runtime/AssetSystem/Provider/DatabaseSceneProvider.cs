@@ -6,14 +6,12 @@ namespace YooAsset
 	internal sealed class DatabaseSceneProvider : ProviderBase
 	{
 		public readonly LoadSceneMode SceneMode;
-		private readonly bool _activateOnLoad;
 		private readonly int _priority;
 		private AsyncOperation _asyncOp;
 
-		public DatabaseSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool activateOnLoad, int priority) : base(impl, providerGUID, assetInfo)
+		public DatabaseSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, int priority) : base(impl, providerGUID, assetInfo)
 		{
 			SceneMode = sceneMode;
-			_activateOnLoad = activateOnLoad;
 			_priority = priority;
 		}
 		public override void Update()
@@ -76,10 +74,7 @@ namespace YooAsset
 			{
 				Progress = _asyncOp.progress;
 				if (_asyncOp.isDone)
-				{				
-					if (SceneObject.IsValid() && _activateOnLoad)
-						SceneManager.SetActiveScene(SceneObject);
-
+				{
 					Status = SceneObject.IsValid() ? EStatus.Succeed : EStatus.Failed;
 					if (Status == EStatus.Failed)
 					{

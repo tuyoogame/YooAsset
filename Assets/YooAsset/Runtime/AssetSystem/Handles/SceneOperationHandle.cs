@@ -3,7 +3,7 @@
 namespace YooAsset
 {
 	public class SceneOperationHandle : OperationHandleBase
-	{	
+	{
 		private System.Action<SceneOperationHandle> _callback;
 		internal string PackageName { set; get; }
 
@@ -51,7 +51,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 激活场景
+		/// 激活场景（当同时存在多个场景时用于切换激活场景）
 		/// </summary>
 		public bool ActivateScene()
 		{

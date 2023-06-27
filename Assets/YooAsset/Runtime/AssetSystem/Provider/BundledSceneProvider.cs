@@ -10,15 +10,13 @@ namespace YooAsset
 	{
 		public readonly LoadSceneMode SceneMode;
 		private readonly string _sceneName;
-		private readonly bool _activateOnLoad;
 		private readonly int _priority;
 		private AsyncOperation _asyncOp;
 
-		public BundledSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool activateOnLoad, int priority) : base(impl, providerGUID, assetInfo)
+		public BundledSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, int priority) : base(impl, providerGUID, assetInfo)
 		{
 			SceneMode = sceneMode;
 			_sceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
-			_activateOnLoad = activateOnLoad;
 			_priority = priority;
 		}
 		public override void Update()
@@ -87,9 +85,6 @@ namespace YooAsset
 				Progress = _asyncOp.progress;
 				if (_asyncOp.isDone)
 				{
-					if (SceneObject.IsValid() && _activateOnLoad)
-						SceneManager.SetActiveScene(SceneObject);
-
 					Status = SceneObject.IsValid() ? EStatus.Succeed : EStatus.Failed;
 					if (Status == EStatus.Failed)
 					{
