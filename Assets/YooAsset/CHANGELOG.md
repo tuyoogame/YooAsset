@@ -2,6 +2,79 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.17] - 2023-06-27
+
+### Changed
+
+- 优化了缓存的信息文件写入方式
+
+- 离线模式支持内置资源解压到沙盒
+
+- 资源包构建流程任务节点支持可扩展
+
+  ```c#
+  using YooAsset.Editor
+  
+  [TaskAttribute(ETaskPipeline.AllPipeline, 100, "自定义任务节点")]
+  public class CustomTask : IBuildTask
+  ```
+
+- 资源收集界面增加了LocationToLower选项
+
+- 资源收集界面增加了IncludeAssetGUID选项
+
+- IShareAssetPackRule 重命名为 ISharedPackRule
+
+- 
+
+### Added
+
+- 新增了ResourcePackage.LoadAllAssetsAsync方法
+
+  ```c#
+  /// <summary>
+  /// 异步加载资源包内所有资源对象
+  /// </summary>
+  /// <param name="assetInfo">资源信息</param>
+  public AllAssetsOperationHandle LoadAllAssetsAsync(AssetInfo assetInfo)
+  ```
+
+- 新增了ResourcePackage.GetAssetInfoByGUID()方法
+
+  ```c#
+  /// <summary>
+  /// 获取资源信息
+  /// </summary>
+  /// <param name="assetGUID">资源GUID</param>
+  public AssetInfo GetAssetInfoByGUID(string assetGUID)
+  ```
+
+- 新增了场景加载参数suspendLoad
+
+  ```c#
+  /// <summary>
+  /// 异步加载场景
+  /// </summary>
+  /// <param name="location">场景的定位地址</param>
+  /// <param name="sceneMode">场景加载模式</param>
+  /// <param name="suspendLoad">场景加载到90%自动挂起</param>
+  /// <param name="priority">优先级</param>
+  public SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, int priority = 100)
+  ```
+
+- Extension Sample 增加了GameObjectAssetReference示例脚本
+
+- 新增加了ZeroRedundancySharedPackRule类（零冗余的共享资源打包规则）
+
+- 新增加了FullRedundancySharedPackRule类（全部冗余的共享资源打包规则）
+
+### Removed
+
+- 移除了InitializeParameters.LocationToLower成员字段
+- 移除了LoadSceneAsync方法里的activateOnLoad形参参数
+- 移除了BuildParameters.AutoAnalyzeRedundancy成员字段
+- 移除了DefaultShareAssetPackRule编辑器类
+
 ## [1.4.16] - 2023-06-14
 
 ### Changed
