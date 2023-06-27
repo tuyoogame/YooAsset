@@ -455,12 +455,13 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="location">场景的定位地址</param>
 		/// <param name="sceneMode">场景加载模式</param>
+		/// <param name="allowSceneActivation">场景加载后自动激活</param>
 		/// <param name="priority">优先级</param>
-		public SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, int priority = 100)
+		public SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool allowSceneActivation = true, int priority = 100)
 		{
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-			var handle = _assetSystemImpl.LoadSceneAsync(assetInfo, sceneMode, priority);
+			var handle = _assetSystemImpl.LoadSceneAsync(assetInfo, sceneMode,allowSceneActivation, priority);
 			return handle;
 		}
 
@@ -469,11 +470,12 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="assetInfo">场景的资源信息</param>
 		/// <param name="sceneMode">场景加载模式</param>
+		/// <param name="allowSceneActivation">场景加载后自动激活</param>
 		/// <param name="priority">优先级</param>
-		public SceneOperationHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, int priority = 100)
+		public SceneOperationHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool allowSceneActivation = true, int priority = 100)
 		{
 			DebugCheckInitialize();
-			var handle = _assetSystemImpl.LoadSceneAsync(assetInfo, sceneMode, priority);
+			var handle = _assetSystemImpl.LoadSceneAsync(assetInfo, sceneMode,allowSceneActivation, priority);
 			return handle;
 		}
 		#endregion

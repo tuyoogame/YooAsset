@@ -7,12 +7,14 @@ namespace YooAsset
 	{
 		public readonly LoadSceneMode SceneMode;
 		private readonly int _priority;
-		private AsyncOperation _asyncOp;
+		private readonly  bool _allowSceneActivation;
+		public AsyncOperation AsyncOp { private set; get; }
 
-		public DatabaseSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, int priority) : base(impl, providerGUID, assetInfo)
+		public DatabaseSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool allowSceneActivation, int priority) : base(impl, providerGUID, assetInfo)
 		{
 			SceneMode = sceneMode;
 			_priority = priority;
+			_allowSceneActivation = allowSceneActivation;
 		}
 		public override void Update()
 		{
@@ -52,11 +54,11 @@ namespace YooAsset
 			{
 				LoadSceneParameters loadSceneParameters = new LoadSceneParameters();
 				loadSceneParameters.loadSceneMode = SceneMode;
-				_asyncOp = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(MainAssetInfo.AssetPath, loadSceneParameters);
-				if (_asyncOp != null)
+				AsyncOp = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(MainAssetInfo.AssetPath, loadSceneParameters);
+				if (AsyncOp != null)
 				{
-					_asyncOp.allowSceneActivation = true;
-					_asyncOp.priority = _priority;
+					AsyncOp.allowSceneActivation = _allowSceneActivation;
+					AsyncOp.priority = _priority;
 					SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
 					Status = EStatus.Checking;
 				}
@@ -72,8 +74,8 @@ namespace YooAsset
 			// 3. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
-				Progress = _asyncOp.progress;
-				if (_asyncOp.isDone)
+				Progress = AsyncOp.progress;
+				if (AsyncOp.isDone)
 				{
 					Status = SceneObject.IsValid() ? EStatus.Succeed : EStatus.Failed;
 					if (Status == EStatus.Failed)

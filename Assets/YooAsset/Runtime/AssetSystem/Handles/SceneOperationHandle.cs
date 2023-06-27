@@ -6,9 +6,10 @@ namespace YooAsset
 	{
 		private System.Action<SceneOperationHandle> _callback;
 		internal string PackageName { set; get; }
-
+		private ProviderBase _providerBase;
 		internal SceneOperationHandle(ProviderBase provider) : base(provider)
 		{
+			_providerBase = provider;
 		}
 		internal override void InvokeCallback()
 		{
@@ -58,9 +59,23 @@ namespace YooAsset
 			if (IsValidWithWarning == false)
 				return false;
 
-			if (SceneObject.IsValid() && SceneObject.isLoaded)
+			if (SceneObject.IsValid())
 			{
-				return SceneManager.SetActiveScene(SceneObject);
+				var isChangeState = false;
+#if UNITY_EDITOR
+				if (_providerBase is DatabaseSceneProvider dsp)
+				{
+					dsp.AsyncOp.allowSceneActivation = true;
+					isChangeState = true;
+				}
+#endif
+				if (_providerBase is BundledSceneProvider bsp)
+				{
+					bsp.AsyncOp.allowSceneActivation = true;
+					isChangeState = true;
+				}
+				
+				return isChangeState;
 			}
 			else
 			{
