@@ -10,16 +10,16 @@ namespace YooAsset
 	{
 		public readonly LoadSceneMode SceneMode;
 		private readonly string _sceneName;
+		private readonly bool _suspendLoad;
 		private readonly int _priority;
-		private readonly bool _allowSceneActivation;
-		public AsyncOperation AsyncOp { private set; get; }
+		private AsyncOperation _asyncOperation;
 
-		public BundledSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool allowSceneActivation, int priority) : base(impl, providerGUID, assetInfo)
+		public BundledSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad, int priority) : base(impl, providerGUID, assetInfo)
 		{
 			SceneMode = sceneMode;
 			_sceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
+			_suspendLoad = suspendLoad;
 			_priority = priority;
-			_allowSceneActivation = allowSceneActivation;
 		}
 		public override void Update()
 		{
@@ -64,11 +64,11 @@ namespace YooAsset
 			if (Status == EStatus.Loading)
 			{
 				// 注意：如果场景不存在则返回NULL
-				AsyncOp = SceneManager.LoadSceneAsync(MainAssetInfo.AssetPath, SceneMode);
-				if (AsyncOp != null)
+				_asyncOperation = SceneManager.LoadSceneAsync(MainAssetInfo.AssetPath, SceneMode);
+				if (_asyncOperation != null)
 				{
-					AsyncOp.allowSceneActivation = _allowSceneActivation;
-					AsyncOp.priority = _priority;
+					_asyncOperation.allowSceneActivation = !_suspendLoad;
+					_asyncOperation.priority = _priority;
 					SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
 					Status = EStatus.Checking;
 				}
@@ -84,8 +84,8 @@ namespace YooAsset
 			// 3. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
-				Progress = AsyncOp.progress;
-				if (AsyncOp.isDone)
+				Progress = _asyncOperation.progress;
+				if (_asyncOperation.isDone)
 				{
 					Status = SceneObject.IsValid() ? EStatus.Succeed : EStatus.Failed;
 					if (Status == EStatus.Failed)
@@ -96,6 +96,18 @@ namespace YooAsset
 					InvokeCompletion();
 				}
 			}
+		}
+
+		/// <summary>
+		/// 解除场景加载挂起操作
+		/// </summary>
+		public bool UnSuspendLoad()
+		{
+			if (_asyncOperation == null)
+				return false;
+
+			_asyncOperation.allowSceneActivation = true;
+			return true;
 		}
 	}
 }

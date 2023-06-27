@@ -128,12 +128,12 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="location">场景的定位地址</param>
 		/// <param name="sceneMode">场景加载模式</param>
-		/// <param name="allowSceneActivation">场景加载后自动激活</param>
+		/// <param name="suspendLoad">场景加载到90%自动挂起</param>
 		/// <param name="priority">优先级</param>
-		public static SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single,bool allowSceneActivation = true, int priority = 100)
+		public static SceneOperationHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, int priority = 100)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadSceneAsync(location, sceneMode, allowSceneActivation, priority);
+			return _defaultPackage.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
 		}
 
 		/// <summary>
@@ -141,12 +141,12 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="assetInfo">场景的资源信息</param>
 		/// <param name="sceneMode">场景加载模式</param>
-		/// <param name="allowSceneActivation">场景加载后自动激活</param>
+		/// <param name="suspendLoad">场景加载到90%自动挂起</param>
 		/// <param name="priority">优先级</param>
-		public static SceneOperationHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool allowSceneActivation = true, int priority = 100)
+		public static SceneOperationHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, int priority = 100)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadSceneAsync(assetInfo, sceneMode, allowSceneActivation, priority);
+			return _defaultPackage.LoadSceneAsync(assetInfo, sceneMode, suspendLoad, priority);
 		}
 		#endregion
 

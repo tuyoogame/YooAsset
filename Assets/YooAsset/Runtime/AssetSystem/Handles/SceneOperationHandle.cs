@@ -6,10 +6,9 @@ namespace YooAsset
 	{
 		private System.Action<SceneOperationHandle> _callback;
 		internal string PackageName { set; get; }
-		private ProviderBase _providerBase;
+
 		internal SceneOperationHandle(ProviderBase provider) : base(provider)
 		{
-			_providerBase = provider;
 		}
 		internal override void InvokeCallback()
 		{
@@ -59,27 +58,45 @@ namespace YooAsset
 			if (IsValidWithWarning == false)
 				return false;
 
-			if (SceneObject.IsValid())
+			if (SceneObject.IsValid() && SceneObject.isLoaded)
 			{
-				var isChangeState = false;
-#if UNITY_EDITOR
-				if (_providerBase is DatabaseSceneProvider dsp)
-				{
-					dsp.AsyncOp.allowSceneActivation = true;
-					isChangeState = true;
-				}
-#endif
-				if (_providerBase is BundledSceneProvider bsp)
-				{
-					bsp.AsyncOp.allowSceneActivation = true;
-					isChangeState = true;
-				}
-				
-				return isChangeState;
+				return SceneManager.SetActiveScene(SceneObject);
 			}
 			else
 			{
 				YooLogger.Warning($"Scene is invalid or not loaded : {SceneObject.name}");
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// 解除场景加载挂起操作
+		/// </summary>
+		public bool UnSuspend()
+		{
+			if (IsValidWithWarning == false)
+				return false;
+
+			if (SceneObject.IsValid())
+			{
+				if (Provider is DatabaseSceneProvider)
+				{
+					var temp = Provider as DatabaseSceneProvider;
+					return temp.UnSuspendLoad();
+				}
+				else if (Provider is BundledSceneProvider)
+				{
+					var temp = Provider as BundledSceneProvider;
+					return temp.UnSuspendLoad();
+				}
+				else
+				{
+					throw new System.NotImplementedException();
+				}
+			}
+			else
+			{
+				YooLogger.Warning($"Scene is invalid : {SceneObject.name}");
 				return false;
 			}
 		}
