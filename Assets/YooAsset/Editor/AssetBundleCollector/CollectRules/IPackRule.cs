@@ -48,12 +48,16 @@ namespace YooAsset.Editor
 				fullName = $"{bundleName}.{_bundleExtension}";
 			return fullName.ToLower();
 		}
-		
+
 		/// <summary>
 		/// 获取共享资源包全名称
 		/// </summary>
 		public string GetShareBundleName(string packageName, bool uniqueBundleName)
 		{
+			// 注意：冗余的共享资源包名返回空
+			if (string.IsNullOrEmpty(_bundleName) && string.IsNullOrEmpty(_bundleExtension))
+				return string.Empty;
+
 			string fullName;
 			string bundleName = EditorTools.GetRegularPath(_bundleName).Replace('/', '_').Replace('.', '_').ToLower();
 			if (uniqueBundleName)

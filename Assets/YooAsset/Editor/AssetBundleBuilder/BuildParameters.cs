@@ -76,11 +76,6 @@ namespace YooAsset.Editor
 		/// 验证构建结果
 		/// </summary>
 		public bool VerifyBuildingResult = false;
-
-		/// <summary>
-		/// 自动分析冗余资源
-		/// </summary>
-		public bool AutoAnalyzeRedundancy = true;
 		
 		/// <summary>
 		/// 共享资源的打包规则

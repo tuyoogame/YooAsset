@@ -29,7 +29,6 @@ namespace YooAsset.Editor
 			var buildMode = buildParameters.BuildMode;
 			var packageName = buildParameters.PackageName;
 			var sharedPackRule = buildParameters.SharedPackRule;
-			var autoAnalyzeRedundancy = buildParameters.AutoAnalyzeRedundancy;
 
 			Dictionary<string, BuildAssetInfo> allBuildAssetInfoDic = new Dictionary<string, BuildAssetInfo>(1000);
 
@@ -100,34 +99,29 @@ namespace YooAsset.Editor
 			context.AssetFileCount = allBuildAssetInfoDic.Count;
 			context.Command = collectResult.Command;
 
-			// 8. 计算共享的资源包名
-			if (autoAnalyzeRedundancy)
+			// 8. 计算共享资源的包名		
+			var command = collectResult.Command;
+			foreach (var buildAssetInfo in allBuildAssetInfoDic.Values)
 			{
-				var command = collectResult.Command;
-				foreach (var buildAssetInfo in allBuildAssetInfoDic.Values)
-				{
-					buildAssetInfo.CalculateShareBundleName(sharedPackRule, command.UniqueBundleName, command.PackageName, command.ShadersBundleName);
-				}
+				buildAssetInfo.CalculateShareBundleName(sharedPackRule, command.UniqueBundleName, command.PackageName, command.ShadersBundleName);
 			}
-			else
+
+			// 9. 记录冗余资源
+			foreach (var buildAssetInfo in allBuildAssetInfoDic.Values)
 			{
-				// 记录冗余资源
-				foreach (var buildAssetInfo in allBuildAssetInfoDic.Values)
+				if (buildAssetInfo.IsRedundancyAsset())
 				{
-					if (buildAssetInfo.IsRedundancyAsset())
-					{
-						var redundancyInfo = new ReportRedundancyInfo();
-						redundancyInfo.AssetPath = buildAssetInfo.AssetPath;
-						redundancyInfo.AssetType = AssetDatabase.GetMainAssetTypeAtPath(buildAssetInfo.AssetPath).Name;
-						redundancyInfo.AssetGUID = AssetDatabase.AssetPathToGUID(buildAssetInfo.AssetPath);
-						redundancyInfo.FileSize = FileUtility.GetFileSize(buildAssetInfo.AssetPath);
-						redundancyInfo.Number = buildAssetInfo.GetReferenceBundleCount();
-						context.RedundancyInfos.Add(redundancyInfo);
-					}
+					var redundancyInfo = new ReportRedundancyInfo();
+					redundancyInfo.AssetPath = buildAssetInfo.AssetPath;
+					redundancyInfo.AssetType = AssetDatabase.GetMainAssetTypeAtPath(buildAssetInfo.AssetPath).Name;
+					redundancyInfo.AssetGUID = AssetDatabase.AssetPathToGUID(buildAssetInfo.AssetPath);
+					redundancyInfo.FileSize = FileUtility.GetFileSize(buildAssetInfo.AssetPath);
+					redundancyInfo.Number = buildAssetInfo.GetReferenceBundleCount();
+					context.RedundancyInfos.Add(redundancyInfo);
 				}
 			}
 
-			// 9. 移除不参与构建的资源
+			// 10. 移除不参与构建的资源
 			List<BuildAssetInfo> removeBuildList = new List<BuildAssetInfo>();
 			foreach (var buildAssetInfo in allBuildAssetInfoDic.Values)
 			{
@@ -139,7 +133,7 @@ namespace YooAsset.Editor
 				allBuildAssetInfoDic.Remove(removeValue.AssetPath);
 			}
 
-			// 10. 构建资源包
+			// 11. 构建资源列表
 			var allPackAssets = allBuildAssetInfoDic.Values.ToList();
 			if (allPackAssets.Count == 0)
 				throw new Exception("构建的资源列表不能为空");
@@ -147,6 +141,7 @@ namespace YooAsset.Editor
 			{
 				context.PackAsset(assetInfo);
 			}
+
 			return context;
 		}
 		private void RemoveZeroReferenceAssets(List<CollectAssetInfo> allCollectAssetInfos)

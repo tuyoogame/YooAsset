@@ -164,7 +164,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 计算共享资源包的完整包名
 		/// </summary>
-		public void CalculateShareBundleName(ISharedPackRule packRule, bool uniqueBundleName, string packageName, string shadersBundleName)
+		public void CalculateShareBundleName(ISharedPackRule sharedPackRule, bool uniqueBundleName, string packageName, string shadersBundleName)
 		{
 			if (CollectorType != ECollectorType.None)
 				return;
@@ -180,7 +180,7 @@ namespace YooAsset.Editor
 			{
 				if (_referenceBundleNames.Count > 1)
 				{
-					PackRuleResult packRuleResult = packRule.GetPackRuleResult(AssetPath);
+					PackRuleResult packRuleResult = sharedPackRule.GetPackRuleResult(AssetPath);
 					BundleName = packRuleResult.GetShareBundleName(packageName, uniqueBundleName);
 				}
 				else
@@ -196,11 +196,8 @@ namespace YooAsset.Editor
 		/// </summary>
 		public bool IsRedundancyAsset()
 		{
-			if (CollectorType != ECollectorType.None)
+			if (HasBundleName())
 				return false;
-
-			if (IsRawAsset)
-				throw new Exception("Should never get here !");
 
 			return _referenceBundleNames.Count > 1;
 		}

@@ -49,7 +49,6 @@ namespace YooAsset.Editor
 				buildReport.Summary.LocationToLower = buildMapContext.Command.LocationToLower;
 				buildReport.Summary.IncludeAssetGUID = buildMapContext.Command.IncludeAssetGUID;
 				buildReport.Summary.UniqueBundleName = buildMapContext.Command.UniqueBundleName;
-				buildReport.Summary.AutoAnalyzeRedundancy = buildParameters.AutoAnalyzeRedundancy;
 				buildReport.Summary.SharedPackRuleClassName = buildParameters.SharedPackRule == null ?
 					"null" : buildParameters.SharedPackRule.GetType().FullName;
 				buildReport.Summary.EncryptionServicesClassName = buildParameters.EncryptionServices == null ?
@@ -161,7 +160,7 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 获取该资源包内的所有资源（包括零依赖资源）
+		/// 获取该资源包内的所有资源
 		/// </summary>
 		private List<string> GetAllBuiltinAssets(BuildMapContext buildMapContext, string bundleName)
 		{

@@ -74,11 +74,6 @@ namespace YooAsset.Editor
 		public bool UniqueBundleName;
 
 		/// <summary>
-		/// 自动分析冗余
-		/// </summary>
-		public bool AutoAnalyzeRedundancy;
-
-		/// <summary>
 		/// 共享资源的打包规则类名
 		/// </summary>
 		public string SharedPackRuleClassName;
