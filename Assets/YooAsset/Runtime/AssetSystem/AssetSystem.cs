@@ -169,7 +169,7 @@ namespace YooAsset
 		/// <summary>
 		/// 加载场景
 		/// </summary>
-		public SceneOperationHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode, int priority)
+		public SceneOperationHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode, bool allowSceneActivation ,int priority)
 		{
 			if (assetInfo.IsInvalid)
 			{
@@ -190,9 +190,9 @@ namespace YooAsset
 			ProviderBase provider;
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseSceneProvider(this, providerGUID, assetInfo, sceneMode, priority);
+					provider = new DatabaseSceneProvider(this, providerGUID, assetInfo, sceneMode,allowSceneActivation, priority);
 				else
-					provider = new BundledSceneProvider(this, providerGUID, assetInfo, sceneMode, priority);
+					provider = new BundledSceneProvider(this, providerGUID, assetInfo, sceneMode,allowSceneActivation, priority);
 				provider.InitSpawnDebugInfo();
 				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);

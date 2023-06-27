@@ -11,13 +11,15 @@ namespace YooAsset
 		public readonly LoadSceneMode SceneMode;
 		private readonly string _sceneName;
 		private readonly int _priority;
-		private AsyncOperation _asyncOp;
+		private readonly bool _allowSceneActivation;
+		public AsyncOperation AsyncOp { private set; get; }
 
-		public BundledSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, int priority) : base(impl, providerGUID, assetInfo)
+		public BundledSceneProvider(AssetSystemImpl impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool allowSceneActivation, int priority) : base(impl, providerGUID, assetInfo)
 		{
 			SceneMode = sceneMode;
 			_sceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
 			_priority = priority;
+			_allowSceneActivation = allowSceneActivation;
 		}
 		public override void Update()
 		{
@@ -62,11 +64,11 @@ namespace YooAsset
 			if (Status == EStatus.Loading)
 			{
 				// 注意：如果场景不存在则返回NULL
-				_asyncOp = SceneManager.LoadSceneAsync(MainAssetInfo.AssetPath, SceneMode);
-				if (_asyncOp != null)
+				AsyncOp = SceneManager.LoadSceneAsync(MainAssetInfo.AssetPath, SceneMode);
+				if (AsyncOp != null)
 				{
-					_asyncOp.allowSceneActivation = true;
-					_asyncOp.priority = _priority;
+					AsyncOp.allowSceneActivation = _allowSceneActivation;
+					AsyncOp.priority = _priority;
 					SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
 					Status = EStatus.Checking;
 				}
@@ -82,8 +84,8 @@ namespace YooAsset
 			// 3. 检测加载结果
 			if (Status == EStatus.Checking)
 			{
-				Progress = _asyncOp.progress;
-				if (_asyncOp.isDone)
+				Progress = AsyncOp.progress;
+				if (AsyncOp.isDone)
 				{
 					Status = SceneObject.IsValid() ? EStatus.Succeed : EStatus.Failed;
 					if (Status == EStatus.Failed)
