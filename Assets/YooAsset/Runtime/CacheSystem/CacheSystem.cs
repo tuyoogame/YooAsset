@@ -11,6 +11,11 @@ namespace YooAsset
 		private readonly static Dictionary<string, PackageCache> _cachedDic = new Dictionary<string, PackageCache>(1000);
 
 		/// <summary>
+		/// 禁用Unity缓存系统在WebGL平台
+		/// </summary>
+		public static bool DisableUnityCacheOnWebGL = false;
+
+		/// <summary>
 		/// 初始化时的验证级别
 		/// </summary>
 		public static EVerifyLevel InitVerifyLevel { set; get; } = EVerifyLevel.Middle;

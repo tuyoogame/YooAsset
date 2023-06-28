@@ -168,10 +168,19 @@ namespace YooAsset
 			// 5. 从WEB网站获取AssetBundle文件
 			if (_steps == ESteps.LoadWebFile)
 			{
-				var hash = Hash128.Parse(MainBundleInfo.Bundle.FileHash);
-				_webRequest = UnityWebRequestAssetBundle.GetAssetBundle(FileLoadPath, hash);
-				_webRequest.SendWebRequest();
-				_steps = ESteps.CheckLoadWebFile;
+				if (CacheSystem.DisableUnityCacheOnWebGL)
+				{
+					_webRequest = UnityWebRequestAssetBundle.GetAssetBundle(FileLoadPath);
+					_webRequest.SendWebRequest();
+					_steps = ESteps.CheckLoadWebFile;
+				}
+				else
+				{
+					var hash = Hash128.Parse(MainBundleInfo.Bundle.FileHash);
+					_webRequest = UnityWebRequestAssetBundle.GetAssetBundle(FileLoadPath, hash);
+					_webRequest.SendWebRequest();
+					_steps = ESteps.CheckLoadWebFile;
+				}
 			}
 
 			// 6. 检测AssetBundle加载结果

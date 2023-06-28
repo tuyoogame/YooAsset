@@ -258,6 +258,14 @@ namespace YooAsset
 
 			PersistentTools.OverwriteSandboxPath(sandboxPath);
 		}
+
+		/// <summary>
+		/// 设置缓存系统参数，禁用缓存在WebGL平台
+		/// </summary>
+		public static void SetCacheSystemDisableCacheOnWebGL()
+		{
+			CacheSystem.DisableUnityCacheOnWebGL = true;
+		}
 		#endregion
 
 		#region 沙盒相关
