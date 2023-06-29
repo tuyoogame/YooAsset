@@ -33,6 +33,11 @@ namespace YooAsset
 		public static CertificateHandler CertificateHandlerInstance = null;
 
 		/// <summary>
+		/// 网络重定向次数
+		/// </summary>
+		public static int RedirectLimit { set; get; } = -1;
+
+		/// <summary>
 		/// 启用断点续传功能文件的最小字节数
 		/// </summary>
 		public static int BreakpointResumeFileSize { set; get; } = int.MaxValue;
@@ -128,11 +133,29 @@ namespace YooAsset
 		/// </summary>
 		public static UnityWebRequest NewRequest(string requestURL)
 		{
+			UnityWebRequest webRequest;
 			if (RequestDelegate != null)
-				return RequestDelegate.Invoke(requestURL);
+				webRequest = RequestDelegate.Invoke(requestURL);
+			else
+				webRequest = new UnityWebRequest(requestURL, UnityWebRequest.kHttpVerbGET);
 
-			var request = new UnityWebRequest(requestURL, UnityWebRequest.kHttpVerbGET);
-			return request;
+			SetUnityWebRequest(webRequest);
+			return webRequest;
+		}
+
+		/// <summary>
+		/// 设置网络请求的自定义参数
+		/// </summary>
+		public static void SetUnityWebRequest(UnityWebRequest webRequest)
+		{
+			if (RedirectLimit >= 0)
+				webRequest.redirectLimit = RedirectLimit;
+
+			if (CertificateHandlerInstance != null)
+			{
+				webRequest.certificateHandler = CertificateHandlerInstance;
+				webRequest.disposeCertificateHandlerOnDispose = false;
+			}
 		}
 
 		/// <summary>

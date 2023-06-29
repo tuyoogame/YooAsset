@@ -218,6 +218,21 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 设置下载系统参数，网络重定向次数（Unity引擎默认值32）
+		/// 注意：不支持设置为负值
+		/// </summary>
+		public static void SetDownloadSystemRedirectLimit(int redirectLimit)
+		{
+			if (redirectLimit < 0)
+			{
+				YooLogger.Warning($"Invalid param value : {redirectLimit}");
+				return;
+			}
+
+			DownloadSystem.RedirectLimit = redirectLimit;
+		}
+
+		/// <summary>
 		/// 设置异步系统参数，每帧执行消耗的最大时间切片（单位：毫秒）
 		/// </summary>
 		public static void SetOperationSystemMaxTimeSlice(long milliseconds)

@@ -101,13 +101,6 @@ namespace YooAsset
 				handler.removeFileOnAbort = true;
 				_webRequest.downloadHandler = handler;
 				_webRequest.disposeDownloadHandlerOnDispose = true;
-
-				if (DownloadSystem.CertificateHandlerInstance != null)
-				{
-					_webRequest.certificateHandler = DownloadSystem.CertificateHandlerInstance;
-					_webRequest.disposeCertificateHandlerOnDispose = false;
-				}
-
 				_webRequest.SendWebRequest();
 				_steps = ESteps.CheckDownload;
 			}
@@ -137,13 +130,6 @@ namespace YooAsset
 				_webRequest.disposeDownloadHandlerOnDispose = true;
 				if (fileLength > 0)
 					_webRequest.SetRequestHeader("Range", $"bytes={fileLength}-");
-
-				if (DownloadSystem.CertificateHandlerInstance != null)
-				{
-					_webRequest.certificateHandler = DownloadSystem.CertificateHandlerInstance;
-					_webRequest.disposeCertificateHandlerOnDispose = false;
-				}
-
 				_webRequest.SendWebRequest();
 				_steps = ESteps.CheckDownload;
 			}

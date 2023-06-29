@@ -171,16 +171,16 @@ namespace YooAsset
 				if (CacheSystem.DisableUnityCacheOnWebGL)
 				{
 					_webRequest = UnityWebRequestAssetBundle.GetAssetBundle(FileLoadPath);
-					_webRequest.SendWebRequest();
-					_steps = ESteps.CheckLoadWebFile;
 				}
 				else
 				{
 					var hash = Hash128.Parse(MainBundleInfo.Bundle.FileHash);
 					_webRequest = UnityWebRequestAssetBundle.GetAssetBundle(FileLoadPath, hash);
-					_webRequest.SendWebRequest();
-					_steps = ESteps.CheckLoadWebFile;
 				}
+
+				DownloadSystem.SetUnityWebRequest(_webRequest);
+				_webRequest.SendWebRequest();
+				_steps = ESteps.CheckLoadWebFile;
 			}
 
 			// 6. 检测AssetBundle加载结果
