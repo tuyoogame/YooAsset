@@ -9,7 +9,7 @@ using UnityEditor.Build.Pipeline.Tasks;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute(ETaskPipeline.ScriptableBuildPipeline, 300, "资源构建内容打包")]
+	[TaskAttribute("资源构建内容打包")]
 	public class TaskBuilding_SBP : IBuildTask
 	{
 		public class BuildResultContext : IContextObject

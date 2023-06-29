@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute(ETaskPipeline.AllPipeline, 100, "资源构建准备工作")]
+	[TaskAttribute("资源构建准备工作")]
 	public class TaskPrepare : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

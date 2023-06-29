@@ -13,16 +13,17 @@ namespace YooAsset.Editor
 		private readonly BuildContext _buildContext = new BuildContext();
 
 		/// <summary>
-		/// 开始构建
+		/// 构建资源包
 		/// </summary>
-		public BuildResult Run(BuildParameters buildParameters)
+		public BuildResult Run(BuildParameters buildParameters, List<IBuildTask> buildPipeline)
 		{
-			// 清空旧数据
-			_buildContext.ClearAllContext();
-
 			// 检测构建参数是否为空
 			if (buildParameters == null)
 				throw new Exception($"{nameof(buildParameters)} is null !");
+
+			// 检测构建参数是否为空
+			if (buildPipeline.Count == 0)
+				throw new Exception($"Build pipeline is empty !");
 
 			// 检测可编程构建管线参数
 			if (buildParameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
@@ -37,6 +38,9 @@ namespace YooAsset.Editor
 					throw new Exception($"{nameof(EBuildPipeline.ScriptableBuildPipeline)} not support {nameof(EBuildMode.ForceRebuild)} build mode !");
 			}
 
+			// 清空旧数据
+			_buildContext.ClearAllContext();
+
 			// 构建参数
 			var buildParametersContext = new BuildParametersContext(buildParameters);
 			_buildContext.SetContextObject(buildParametersContext);
@@ -45,8 +49,7 @@ namespace YooAsset.Editor
 			BuildLogger.InitLogger(buildParameters.EnableLog);
 
 			// 执行构建流程
-			var pipeline = GetBuildTasks(buildParameters.BuildPipeline);
-			var buildResult = BuildRunner.Run(pipeline, _buildContext);
+			var buildResult = BuildRunner.Run(buildPipeline, _buildContext);
 			if (buildResult.Success)
 			{
 				buildResult.OutputPackageDirectory = buildParametersContext.GetPackageOutputDirectory();
@@ -62,13 +65,23 @@ namespace YooAsset.Editor
 			return buildResult;
 		}
 
-		private List<IBuildTask> GetBuildTasks(EBuildPipeline buildPipeline)
+		/// <summary>
+		/// 构建资源包
+		/// </summary>
+		public BuildResult Run(BuildParameters buildParameters)
+		{
+			var buildPipeline = GetDefaultBuildPipeline(buildParameters.BuildPipeline);
+			return Run(buildParameters, buildPipeline);
+		}
+
+		/// <summary>
+		/// 获取默认的构建流程
+		/// </summary>
+		private List<IBuildTask> GetDefaultBuildPipeline(EBuildPipeline buildPipeline)
 		{
 			// 获取任务节点的属性集合
-			List<TaskAttribute> attrList = new List<TaskAttribute>();
 			if (buildPipeline == EBuildPipeline.BuiltinBuildPipeline)
 			{
-				/*
 				List<IBuildTask> pipeline = new List<IBuildTask>
 				{
 					new TaskPrepare(), //前期准备工作
@@ -83,23 +96,10 @@ namespace YooAsset.Editor
 					new TaskCreatePackage(), //制作包裹
 					new TaskCopyBuildinFiles(), //拷贝内置文件
 				};
-				*/
-
-				var classTypes = EditorTools.GetAssignableTypes(typeof(IBuildTask));
-				foreach (var classType in classTypes)
-				{
-					var attribute = classType.GetCustomAttribute<TaskAttribute>();
-					if (attribute == null)
-						throw new Exception($"Not found {nameof(TaskAttribute)} int type : {classType.FullName}");
-
-					attribute.ClassType = classType;
-					if (attribute.Pipeline == ETaskPipeline.AllPipeline || attribute.Pipeline == ETaskPipeline.BuiltinBuildPipeline)
-						attrList.Add(attribute);
-				}
+				return pipeline;
 			}
 			else if (buildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
-				/*
 				List<IBuildTask> pipeline = new List<IBuildTask>
 				{
 					new TaskPrepare(), //前期准备工作
@@ -114,42 +114,12 @@ namespace YooAsset.Editor
 					new TaskCreatePackage(), //制作补丁包
 					new TaskCopyBuildinFiles(), //拷贝内置文件
 				};
-				*/
-
-				var classTypes = EditorTools.GetAssignableTypes(typeof(IBuildTask));
-				foreach (var classType in classTypes)
-				{
-					var attribute = classType.GetCustomAttribute<TaskAttribute>();
-					if (attribute == null)
-						throw new Exception($"Not found {nameof(TaskAttribute)} int type : {classType.FullName}");
-
-					attribute.ClassType = classType;
-					if (attribute.Pipeline == ETaskPipeline.AllPipeline || attribute.Pipeline == ETaskPipeline.ScriptableBuildPipeline)
-						attrList.Add(attribute);
-				}
+				return pipeline;
 			}
 			else
 			{
 				throw new NotImplementedException();
 			}
-
-			// 对任务节点进行排序
-			attrList.Sort((a, b) =>
-			{
-				if (a.TaskOrder > b.TaskOrder) { return 1; }
-				else if (a.TaskOrder < b.TaskOrder) { return -1; }
-				else { return 0; }
-			});
-
-			// 创建任务节点实例
-			List<IBuildTask> pipeline = new List<IBuildTask>(attrList.Count);
-			foreach (var taskAttr in attrList)
-			{
-				var task = Activator.CreateInstance(taskAttr.ClassType) as IBuildTask;
-				pipeline.Add(task);
-			}
-
-			return pipeline;
 		}
 	}
 }

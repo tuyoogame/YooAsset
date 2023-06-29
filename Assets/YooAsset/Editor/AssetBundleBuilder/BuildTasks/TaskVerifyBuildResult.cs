@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute(ETaskPipeline.BuiltinBuildPipeline, 500, "验证构建结果")]
+	[TaskAttribute("验证构建结果")]
 	public class TaskVerifyBuildResult : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

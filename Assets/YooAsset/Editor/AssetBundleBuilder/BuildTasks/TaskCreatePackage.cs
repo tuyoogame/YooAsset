@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute(ETaskPipeline.AllPipeline, 1000, "制作包裹")]
+	[TaskAttribute("制作包裹")]
 	public class TaskCreatePackage : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

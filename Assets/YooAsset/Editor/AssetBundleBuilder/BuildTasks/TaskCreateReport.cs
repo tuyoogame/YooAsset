@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute(ETaskPipeline.AllPipeline, 900, "创建构建报告文件")]
+	[TaskAttribute("创建构建报告文件")]
 	public class TaskCreateReport : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

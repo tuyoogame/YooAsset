@@ -13,7 +13,7 @@ namespace YooAsset.Editor
 		internal PackageManifest Manifest;
 	}
 
-	[TaskAttribute(ETaskPipeline.AllPipeline, 800, "创建清单文件")]
+	[TaskAttribute("创建清单文件")]
 	public class TaskCreateManifest : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
