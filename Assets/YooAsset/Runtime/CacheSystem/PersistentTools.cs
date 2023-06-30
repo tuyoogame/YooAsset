@@ -17,11 +17,19 @@ namespace YooAsset
 
 
 		/// <summary>
+		/// 重写内置跟路径
+		/// </summary>
+		public static void OverwriteBuildinPath(string path)
+		{
+			_buildinPath = path;
+		}
+
+		/// <summary>
 		/// 重写沙盒跟路径
 		/// </summary>
-		public static void OverwriteSandboxPath(string sandboxPath)
+		public static void OverwriteSandboxPath(string path)
 		{
-			_sandboxPath = sandboxPath;
+			_sandboxPath = path;
 		}
 
 		/// <summary>

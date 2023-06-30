@@ -256,6 +256,27 @@ namespace YooAsset
 		/// <summary>
 		/// 设置缓存系统参数，沙盒目录的存储路径
 		/// </summary>
+		public static void SetCacheSystemBuildinPath(string buildinPath)
+		{
+			if (string.IsNullOrEmpty(buildinPath))
+			{
+				YooLogger.Error($"Buildin path is null or empty !");
+				return;
+			}
+
+			// 注意：需要确保没有任何资源系统起效之前才可以设置！
+			if (_packages.Count > 0)
+			{
+				YooLogger.Error($"Please call this method {nameof(SetCacheSystemBuildinPath)} before the package is created !");
+				return;
+			}
+
+			PersistentTools.OverwriteBuildinPath(buildinPath);
+		}
+
+		/// <summary>
+		/// 设置缓存系统参数，沙盒目录的存储路径
+		/// </summary>
 		public static void SetCacheSystemSandboxPath(string sandboxPath)
 		{
 			if (string.IsNullOrEmpty(sandboxPath))
@@ -264,7 +285,7 @@ namespace YooAsset
 				return;
 			}
 
-			// 注意：需要确保没有任何资源系统起效之前才可以设置沙盒目录！
+			// 注意：需要确保没有任何资源系统起效之前才可以设置！
 			if (_packages.Count > 0)
 			{
 				YooLogger.Error($"Please call this method {nameof(SetCacheSystemSandboxPath)} before the package is created !");
