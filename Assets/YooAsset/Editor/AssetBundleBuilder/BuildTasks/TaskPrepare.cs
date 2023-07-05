@@ -16,11 +16,27 @@ namespace YooAsset.Editor
 
 			// 检测构建参数合法性
 			if (buildParameters.BuildTarget == BuildTarget.NoTarget)
-				throw new Exception("请选择目标平台");
+				throw new Exception("请选择目标平台！");
 			if (string.IsNullOrEmpty(buildParameters.PackageName))
-				throw new Exception("包裹名称不能为空");
+				throw new Exception("包裹名称不能为空！");
 			if (string.IsNullOrEmpty(buildParameters.PackageVersion))
-				throw new Exception("包裹版本不能为空");
+				throw new Exception("包裹版本不能为空！");
+			if (string.IsNullOrEmpty(buildParameters.BuildOutputRoot))
+				throw new Exception("构建输出的根目录为空！");
+			if (string.IsNullOrEmpty(buildParameters.StreamingAssetsRoot))
+				throw new Exception("内置资源根目录为空！");
+
+			if (buildParameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
+			{
+				if (buildParameters.SBPParameters == null)
+					throw new Exception($"{nameof(BuildParameters.SBPParameters)} is null !");
+
+				if (buildParameters.BuildMode == EBuildMode.DryRunBuild)
+					throw new Exception($"{nameof(EBuildPipeline.ScriptableBuildPipeline)} not support {nameof(EBuildMode.DryRunBuild)} build mode !");
+
+				if (buildParameters.BuildMode == EBuildMode.ForceRebuild)
+					throw new Exception($"{nameof(EBuildPipeline.ScriptableBuildPipeline)} not support {nameof(EBuildMode.ForceRebuild)} build mode !");
+			}
 
 			if (buildParameters.BuildMode != EBuildMode.SimulateBuild)
 			{
@@ -72,11 +88,10 @@ namespace YooAsset.Editor
 
 			if (buildParameters.BuildMode == EBuildMode.ForceRebuild)
 			{
-				// 删除总目录
-				string platformDirectory = $"{buildParameters.OutputRoot}/{buildParameters.BuildTarget}/{buildParameters.PackageName}";
-				if (EditorTools.DeleteDirectory(platformDirectory))
+				string packageRootDirectory = buildParametersContext.GetPackageRootDirectory();
+				if (EditorTools.DeleteDirectory(packageRootDirectory))
 				{
-					BuildLogger.Log($"删除平台总目录：{platformDirectory}");
+					BuildLogger.Log($"删除包裹目录：{packageRootDirectory}");
 				}
 			}
 

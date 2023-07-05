@@ -9,6 +9,8 @@ namespace YooAsset.Editor
 	{
 		private string _pipelineOutputDirectory = string.Empty;
 		private string _packageOutputDirectory = string.Empty;
+		private string _packageRootDirectory = string.Empty;
+		private string _streamingAssetsDirectory = string.Empty;
 
 		/// <summary>
 		/// 构建参数
@@ -29,21 +31,45 @@ namespace YooAsset.Editor
 		{
 			if (string.IsNullOrEmpty(_pipelineOutputDirectory))
 			{
-				_pipelineOutputDirectory = $"{Parameters.OutputRoot}/{Parameters.BuildTarget}/{Parameters.PackageName}/{YooAssetSettings.OutputFolderName}";
+				_pipelineOutputDirectory = $"{Parameters.BuildOutputRoot}/{Parameters.BuildTarget}/{Parameters.PackageName}/{YooAssetSettings.OutputFolderName}";
 			}
 			return _pipelineOutputDirectory;
 		}
 
 		/// <summary>
-		/// 获取本次构建的补丁目录
+		/// 获取本次构建的补丁输出目录
 		/// </summary>
 		public string GetPackageOutputDirectory()
 		{
 			if (string.IsNullOrEmpty(_packageOutputDirectory))
 			{
-				_packageOutputDirectory = $"{Parameters.OutputRoot}/{Parameters.BuildTarget}/{Parameters.PackageName}/{Parameters.PackageVersion}";
+				_packageOutputDirectory = $"{Parameters.BuildOutputRoot}/{Parameters.BuildTarget}/{Parameters.PackageName}/{Parameters.PackageVersion}";
 			}
 			return _packageOutputDirectory;
+		}
+
+		/// <summary>
+		/// 获取本次构建的补丁根目录
+		/// </summary>
+		public string GetPackageRootDirectory()
+		{
+			if (string.IsNullOrEmpty(_packageRootDirectory))
+			{
+				_packageRootDirectory = $"{Parameters.BuildOutputRoot}/{Parameters.BuildTarget}/{Parameters.PackageName}";
+			}
+			return _packageRootDirectory;
+		}
+
+		/// <summary>
+		/// 获取内置资源的目录
+		/// </summary>
+		public string GetStreamingAssetsDirectory()
+		{
+			if (string.IsNullOrEmpty(_streamingAssetsDirectory))
+			{
+				_streamingAssetsDirectory = $"{Parameters.StreamingAssetsRoot}/{Parameters.PackageName}";
+			}
+			return _streamingAssetsDirectory;
 		}
 
 		/// <summary>

@@ -11,9 +11,9 @@ namespace YooAsset.Editor
 		public static string SimulateBuild(string packageName)
 		{
 			Debug.Log($"Begin to create simulate package : {packageName}");
-			string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultOutputRoot();
 			BuildParameters buildParameters = new BuildParameters();
-			buildParameters.OutputRoot = defaultOutputRoot;
+			buildParameters.StreamingAssetsRoot = AssetBundleBuilderHelper.GetDefaultStreamingAssetsRoot();
+			buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
 			buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
 			buildParameters.BuildMode = EBuildMode.SimulateBuild;
 			buildParameters.PackageName = packageName;

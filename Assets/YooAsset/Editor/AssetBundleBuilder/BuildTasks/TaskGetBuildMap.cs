@@ -147,17 +147,17 @@ namespace YooAsset.Editor
 		private void RemoveZeroReferenceAssets(List<CollectAssetInfo> allCollectAssetInfos)
 		{
 			// 1. 检测是否任何存在依赖资源
-			bool hasAnyDependAsset = false;
+			bool hasAnyDependCollector = false;
 			foreach (var collectAssetInfo in allCollectAssetInfos)
 			{
 				var collectorType = collectAssetInfo.CollectorType;
 				if (collectorType == ECollectorType.DependAssetCollector)
 				{
-					hasAnyDependAsset = true;
+					hasAnyDependCollector = true;
 					break;
 				}
 			}
-			if (hasAnyDependAsset == false)
+			if (hasAnyDependCollector == false)
 				return;
 
 			// 2. 获取所有主资源的依赖资源集合

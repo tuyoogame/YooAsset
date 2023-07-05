@@ -37,9 +37,14 @@ namespace YooAsset.Editor
 
 
 		/// <summary>
-		/// 输出的根目录
+		/// 内置资源的根目录
 		/// </summary>
-		public string OutputRoot;
+		public string StreamingAssetsRoot;
+
+		/// <summary>
+		/// 构建输出的根目录
+		/// </summary>
+		public string BuildOutputRoot;
 
 		/// <summary>
 		/// 构建的平台
