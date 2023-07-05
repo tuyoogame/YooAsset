@@ -79,6 +79,10 @@ namespace YooAsset
 			// 检测初始化参数合法性
 			CheckInitializeParameters(parameters);
 
+			// 重写持久化根目录
+			var persistent = PersistentTools.GetOrCreatePersistent(PackageName);
+			persistent.OverwriteRootDirectory(parameters.BuildinRootDirectory, parameters.SandboxRootDirectory);
+
 			// 初始化资源系统
 			InitializationOperation initializeOperation;
 			_assetSystemImpl = new AssetSystemImpl();
@@ -291,6 +295,37 @@ namespace YooAsset
 			_assetSystemImpl.ForceUnloadAllAssets();
 		}
 
+		#region 沙盒相关
+		/// <summary>
+		/// 获取包裹的内置文件根路径
+		/// </summary>
+		public string GetPackageBuildinRootDirectory()
+		{
+			DebugCheckInitialize();
+			var persistent = PersistentTools.GetPersistent(PackageName);
+			return persistent.BuildinRoot;
+		}
+
+		/// <summary>
+		/// 获取包裹的沙盒文件根路径
+		/// </summary>
+		public string GetPackageSandboxRootDirectory()
+		{
+			DebugCheckInitialize();
+			var persistent = PersistentTools.GetPersistent(PackageName);
+			return persistent.SandboxRoot;
+		}
+
+		/// <summary>
+		/// 清空包裹的沙盒目录
+		/// </summary>
+		public void ClearPackageSandbox()
+		{
+			DebugCheckInitialize();
+			var persistent = PersistentTools.GetPersistent(PackageName);
+			persistent.DeleteSandboxPackageFolder();
+		}
+		#endregion
 
 		#region 资源信息
 		/// <summary>
