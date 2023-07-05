@@ -254,80 +254,11 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 设置缓存系统参数，沙盒目录的存储路径
-		/// </summary>
-		public static void SetCacheSystemBuildinPath(string buildinPath)
-		{
-			if (string.IsNullOrEmpty(buildinPath))
-			{
-				YooLogger.Error($"Buildin path is null or empty !");
-				return;
-			}
-
-			// 注意：需要确保没有任何资源系统起效之前才可以设置！
-			if (_packages.Count > 0)
-			{
-				YooLogger.Error($"Please call this method {nameof(SetCacheSystemBuildinPath)} before the package is created !");
-				return;
-			}
-
-			PersistentTools.OverwriteBuildinPath(buildinPath);
-		}
-
-		/// <summary>
-		/// 设置缓存系统参数，沙盒目录的存储路径
-		/// </summary>
-		public static void SetCacheSystemSandboxPath(string sandboxPath)
-		{
-			if (string.IsNullOrEmpty(sandboxPath))
-			{
-				YooLogger.Error($"Sandbox path is null or empty !");
-				return;
-			}
-
-			// 注意：需要确保没有任何资源系统起效之前才可以设置！
-			if (_packages.Count > 0)
-			{
-				YooLogger.Error($"Please call this method {nameof(SetCacheSystemSandboxPath)} before the package is created !");
-				return;
-			}
-
-			PersistentTools.OverwriteSandboxPath(sandboxPath);
-		}
-
-		/// <summary>
 		/// 设置缓存系统参数，禁用缓存在WebGL平台
 		/// </summary>
 		public static void SetCacheSystemDisableCacheOnWebGL()
 		{
 			CacheSystem.DisableUnityCacheOnWebGL = true;
-		}
-		#endregion
-
-		#region 沙盒相关
-		/// <summary>
-		/// 获取内置文件夹名称
-		/// </summary>
-		public static string GetStreamingAssetBuildinFolderName()
-		{
-			return YooAssetSettings.StreamingAssetsBuildinFolder;
-		}
-
-		/// <summary>
-		/// 获取沙盒的根路径
-		/// </summary>
-		public static string GetSandboxRoot()
-		{
-			return PersistentTools.GetPersistentRootPath();
-		}
-
-		/// <summary>
-		/// 清空沙盒目录（需要重启APP）
-		/// </summary>
-		public static void ClearSandbox()
-		{
-			YooLogger.Warning("Clear sandbox folder files, Finally, restart the application !");
-			PersistentTools.DeleteSandbox();
 		}
 		#endregion
 
