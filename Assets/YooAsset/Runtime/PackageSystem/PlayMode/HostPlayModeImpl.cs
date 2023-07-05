@@ -74,7 +74,9 @@ namespace YooAsset
 		public void FlushManifestVersionFile()
 		{
 			if (_activeManifest != null)
-				PersistentTools.SaveCachePackageVersionFile(_packageName, _activeManifest.PackageVersion);
+			{
+				PersistentTools.GetPersistent(_packageName).SaveSandboxPackageVersionFile(_activeManifest.PackageVersion);
+			}			
 		}
 
 		private bool IsBuildinPackageBundle(PackageBundle packageBundle)

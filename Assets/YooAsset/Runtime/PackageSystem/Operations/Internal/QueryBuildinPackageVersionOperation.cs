@@ -37,8 +37,7 @@ namespace YooAsset
 			{
 				if (_downloader == null)
 				{
-					string fileName = YooAssetSettingsData.GetPackageVersionFileName(_packageName);
-					string filePath = PersistentTools.MakeStreamingLoadPath(fileName);
+					string filePath = PersistentTools.GetPersistent(_packageName).GetBuildinPackageVersionFilePath();
 					string url = PersistentTools.ConvertToWWWPath(filePath);
 					_downloader = new UnityWebDataRequester();
 					_downloader.SendRequest(url);
