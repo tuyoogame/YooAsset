@@ -2,6 +2,119 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.5.0] - 2023-07-05
+
+该版本重构了Persistent类，导致沙盒目录和内置目录的存储结构发生了变化。
+
+该版本支持按照Package自定义沙盒存储目录和内置存储目录。
+
+**注意：低版本升级用户，请使用Space Shooter目录下的StreamingAssetsHelper插件覆盖到本地工程！**
+
+### Changed
+
+- BuildParameters.OutputRoot重命名为BuildOutputRoot
+- 变更了IQueryServices.QueryStreamingAssets(string packageName, string fileName)方法
+
+### Added
+
+- 新增了YooAssets.SetCacheSystemDisableCacheOnWebGL()方法
+
+  ```c#
+  /// <summary>
+  /// 设置缓存系统参数，禁用缓存在WebGL平台
+  /// </summary>
+  public static void SetCacheSystemDisableCacheOnWebGL()
+  ```
+
+- 新增了YooAssets.SetDownloadSystemRedirectLimit()方法
+
+  ```c#
+  /// <summary>
+  /// 设置下载系统参数，网络重定向次数（Unity引擎默认值32）
+  /// 注意：不支持设置为负值
+  /// </summary>
+  public static void SetDownloadSystemRedirectLimit(int redirectLimit)
+  ```
+
+- 新增了构建流程可扩展的方法。
+
+  ```c#
+  public class AssetBundleBuilder
+  {
+      /// <summary>
+      /// 构建资源包
+      /// </summary>
+      public BuildResult Run(BuildParameters buildParameters, List<IBuildTask> buildPipeline)
+  }
+  ```
+
+- 新增了BuildParameters.StreamingAssetsRoot字段
+
+  ```c#
+  public class BuildParameters
+  {
+      /// <summary>
+      /// 内置资源的根目录
+      /// </summary>
+      public string StreamingAssetsRoot;
+  }
+  ```
+
+- 新增了InitializeParameters.BuildinRootDirectory字段
+
+  ```c#
+  /// <summary>
+  /// 内置文件的根路径
+  /// 注意：当参数为空的时候会使用默认的根目录。
+  /// </summary>
+  public string BuildinRootDirectory = string.Empty;
+  ```
+
+- 新增了InitializeParameters.SandboxRootDirectory字段
+
+  ```c#
+  /// <summary>
+  /// 沙盒文件的根路径
+  /// 注意：当参数为空的时候会使用默认的根目录。
+  /// </summary>
+  public string SandboxRootDirectory = string.Empty;
+  ```
+
+- 新增了ResourcePackage.GetPackageBuildinRootDirectory()方法
+
+  ```c#
+  /// <summary>
+  /// 获取包裹的内置文件根路径
+  /// </summary>
+  public string GetPackageBuildinRootDirectory()
+  ```
+
+- 新增了ResourcePackage.GetPackageSandboxRootDirectory()方法
+
+  ```c#
+  /// <summary>
+  /// 获取包裹的沙盒文件根路径
+  /// </summary>
+  public string GetPackageSandboxRootDirectory()
+  ```
+
+- 新增了ResourcePackage.ClearPackageSandbox()方法
+
+  ```c#
+  /// <summary>
+  /// 清空包裹的沙盒目录
+  /// </summary>
+  public void ClearPackageSandbox()
+  ```
+
+### Removed
+
+- 移除了资源包构建流程任务节点可扩展功能。
+- 移除了YooAssets.SetCacheSystemSandboxPath()方法
+- 移除了YooAssets.GetStreamingAssetBuildinFolderName()方法
+- 移除了YooAssets.GetSandboxRoot()方法
+- 移除了YooAssets.ClearSandbox()方法
+
 ## [1.4.17] - 2023-06-27
 
 ### Changed
@@ -24,8 +137,6 @@ All notable changes to this package will be documented in this file.
 - 资源收集界面增加了IncludeAssetGUID选项
 
 - IShareAssetPackRule 重命名为 ISharedPackRule
-
-- 
 
 ### Added
 
