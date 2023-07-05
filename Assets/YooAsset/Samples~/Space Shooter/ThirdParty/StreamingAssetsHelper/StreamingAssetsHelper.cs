@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
 
+public class StreamingAssetsDefine
+{
+	public const string RootFolderName = "yoo";
+}
+
 /// <summary>
 /// 内置文件查询服务类
 /// </summary>
 public class GameQueryServices : IQueryServices
 {
-	public bool QueryStreamingAssets(string fileName)
+	public bool QueryStreamingAssets(string packageName, string fileName)
 	{
 		// 注意：fileName包含文件格式
-		return StreamingAssetsHelper.FileExists(fileName);
+		return StreamingAssetsHelper.FileExists(packageName, fileName);
 	}
 }
 
@@ -22,9 +27,10 @@ public class GameQueryServices : IQueryServices
 public sealed class StreamingAssetsHelper
 {
 	public static void Init() { }
-	public static bool FileExists(string fileName)
+	public static bool FileExists(string packageName, string fileName)
 	{
-		return File.Exists(Path.Combine(Application.streamingAssetsPath, "BuildinFiles", fileName));
+		string filePath = Path.Combine(Application.streamingAssetsPath, StreamingAssetsDefine.RootFolderName, packageName, fileName);
+		return File.Exists(filePath);
 	}
 }
 #else
@@ -55,7 +61,7 @@ public sealed class StreamingAssetsHelper
 	/// <summary>
 	/// 内置文件查询方法
 	/// </summary>
-	public static bool FileExists(string fileName)
+	public static bool FileExists(string packageName, string fileName)
 	{
 		if (_isInit == false)
 			Init();
@@ -77,9 +83,9 @@ internal class PreprocessBuild : UnityEditor.Build.IPreprocessBuildWithReport
 	{
 		var manifest = ScriptableObject.CreateInstance<BuildinFileManifest>();
 
-		string folderPath = $"{Application.dataPath}/StreamingAssets/BuildinFiles";
+		string folderPath = $"{Application.dataPath}/StreamingAssets/{StreamingAssetsDefine.RootFolderName}";
 		DirectoryInfo root = new DirectoryInfo(folderPath);
-		FileInfo[] files = root.GetFiles();
+		FileInfo[] files = root.GetFiles("*", SearchOption.AllDirectories);
 		foreach (var fileInfo in files)
 		{
 			if (fileInfo.Extension == ".meta")
@@ -97,7 +103,7 @@ internal class PreprocessBuild : UnityEditor.Build.IPreprocessBuildWithReport
 		UnityEditor.AssetDatabase.CreateAsset(manifest, saveFilePath);
 		UnityEditor.AssetDatabase.SaveAssets();
 		UnityEditor.AssetDatabase.Refresh();
-		Debug.Log($"内置资源清单保存成功 : {saveFilePath}");
+		Debug.Log($"一共{manifest.BuildinFiles.Count}个内置文件，内置资源清单保存成功 : {saveFilePath}");
 	}
 }
 #endif

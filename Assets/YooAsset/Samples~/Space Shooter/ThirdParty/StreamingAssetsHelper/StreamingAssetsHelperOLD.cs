@@ -6,15 +6,19 @@ using UnityEngine;
 using YooAsset;
 
 /*
+public class StreamingAssetsDefine
+{
+	public const string RootFolderName = "yoo";
+}
+
 /// <summary>
 /// 内置文件查询服务类
 /// </summary>
 public class GameQueryServices : IQueryServices
 {
-	public bool QueryStreamingAssets(string fileName)
+	public bool QueryStreamingAssets(string packageName, string fileName)
 	{
-		string buildinFolderName = YooAssets.GetStreamingAssetBuildinFolderName();
-		return StreamingAssetsHelper.FileExists($"{buildinFolderName}/{fileName}");
+		return StreamingAssetsHelper.FileExists($"{StreamingAssetsDefine.RootFolderName}/{packageName}/{fileName}");
 	}
 }
 
