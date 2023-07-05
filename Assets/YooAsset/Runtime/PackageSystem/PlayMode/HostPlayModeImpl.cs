@@ -81,7 +81,7 @@ namespace YooAsset
 
 		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
 		{
-			return _queryServices.QueryStreamingAssets(packageBundle.FileName);
+			return _queryServices.QueryStreamingAssets(_packageName, packageBundle.FileName);
 		}
 		private bool IsCachedPackageBundle(PackageBundle packageBundle)
 		{
