@@ -221,6 +221,30 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 处理特殊异常
+		/// </summary>
+		protected void ProcessCacheBundleException()
+		{
+			if (OwnerBundle.IsDestroyed)
+				throw new System.Exception("Should never get here !");
+
+			if (OwnerBundle.MainBundleInfo.Bundle.IsRawFile)
+			{
+				Status = EStatus.Failed;
+				LastError = $"Cannot load asset bundle file using {nameof(ResourcePackage.LoadRawFileAsync)} method !";
+				YooLogger.Error(LastError);
+				InvokeCompletion();
+			}
+			else
+			{
+				Status = EStatus.Failed;
+				LastError = $"The bundle {OwnerBundle.MainBundleInfo.Bundle.BundleName} has been destroyed by unity bugs !";
+				YooLogger.Error(LastError);
+				InvokeCompletion();
+			}
+		}
+
+		/// <summary>
 		/// 异步操作任务
 		/// </summary>
 		public Task Task

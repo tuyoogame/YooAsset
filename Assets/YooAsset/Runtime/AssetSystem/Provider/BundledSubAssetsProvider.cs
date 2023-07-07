@@ -53,6 +53,12 @@ namespace YooAsset
 					return;
 				}
 
+				if (OwnerBundle.CacheBundle == null)
+				{
+					ProcessCacheBundleException();
+					return;
+				}
+
 				Status = EStatus.Loading;
 			}
 

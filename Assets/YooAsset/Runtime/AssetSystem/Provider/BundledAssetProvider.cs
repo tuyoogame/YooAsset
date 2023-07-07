@@ -55,12 +55,7 @@ namespace YooAsset
 
 				if (OwnerBundle.CacheBundle == null)
 				{
-					if (OwnerBundle.IsDestroyed)
-						throw new System.Exception("Should never get here !");
-					Status = EStatus.Failed;
-					LastError = $"The bundle {OwnerBundle.MainBundleInfo.Bundle.BundleName} has been destroyed by unity bugs !";
-					YooLogger.Error(LastError);
-					InvokeCompletion();
+					ProcessCacheBundleException();
 					return;
 				}
 
