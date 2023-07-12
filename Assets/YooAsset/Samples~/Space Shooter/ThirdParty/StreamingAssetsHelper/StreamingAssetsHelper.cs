@@ -51,9 +51,12 @@ public sealed class StreamingAssetsHelper
 		{
 			_isInit = true;
 			var manifest = Resources.Load<BuildinFileManifest>("BuildinFileManifest");
-			foreach (string fileName in manifest.BuildinFiles)
+			if (manifest != null)
 			{
-				_cacheData.Add(fileName);
+				foreach (string fileName in manifest.BuildinFiles)
+				{
+					_cacheData.Add(fileName);
+				}
 			}
 		}
 	}
@@ -81,10 +84,19 @@ internal class PreprocessBuild : UnityEditor.Build.IPreprocessBuildWithReport
 	/// </summary>
 	public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report)
 	{
-		var manifest = ScriptableObject.CreateInstance<BuildinFileManifest>();
+		string saveFilePath = "Assets/Resources/BuildinFileManifest.asset";
+		if (File.Exists(saveFilePath))
+			File.Delete(saveFilePath);
 
 		string folderPath = $"{Application.dataPath}/StreamingAssets/{StreamingAssetsDefine.RootFolderName}";
 		DirectoryInfo root = new DirectoryInfo(folderPath);
+		if (root.Exists == false)
+		{
+			Debug.Log($"没有发现YooAsset内置目录 : {folderPath}");
+			return;
+		}
+
+		var manifest = ScriptableObject.CreateInstance<BuildinFileManifest>();
 		FileInfo[] files = root.GetFiles("*", SearchOption.AllDirectories);
 		foreach (var fileInfo in files)
 		{
@@ -95,9 +107,6 @@ internal class PreprocessBuild : UnityEditor.Build.IPreprocessBuildWithReport
 			manifest.BuildinFiles.Add(fileInfo.Name);
 		}
 
-		string saveFilePath = "Assets/Resources/BuildinFileManifest.asset";
-		if (File.Exists(saveFilePath))
-			File.Delete(saveFilePath);
 		if (Directory.Exists("Assets/Resources") == false)
 			Directory.CreateDirectory("Assets/Resources");
 		UnityEditor.AssetDatabase.CreateAsset(manifest, saveFilePath);
