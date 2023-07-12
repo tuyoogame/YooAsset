@@ -82,7 +82,7 @@ namespace YooAsset
 			{
 				if (_queryRemotePackageVersionOp == null)
 				{
-					_queryRemotePackageVersionOp = new QueryRemotePackageVersionOperation(_impl, _packageName, _appendTimeTicks, _timeout);
+					_queryRemotePackageVersionOp = new QueryRemotePackageVersionOperation(_impl.RemoteServices, _packageName, _appendTimeTicks, _timeout);
 					OperationSystem.StartOperation(_queryRemotePackageVersionOp);
 				}
 

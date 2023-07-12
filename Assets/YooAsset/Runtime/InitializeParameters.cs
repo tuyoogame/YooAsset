@@ -81,18 +81,13 @@ namespace YooAsset
 	public class HostPlayModeParameters : InitializeParameters
 	{
 		/// <summary>
-		/// 默认的资源服务器下载地址
-		/// </summary>
-		public string DefaultHostServer = string.Empty;
-
-		/// <summary>
-		/// 备用的资源服务器下载地址
-		/// </summary>
-		public string FallbackHostServer = string.Empty;
-
-		/// <summary>
 		/// 内置资源查询服务接口
 		/// </summary>
 		public IQueryServices QueryServices = null;
+
+		/// <summary>
+		/// 远端资源地址查询服务类
+		/// </summary>
+		public IRemoteServices RemoteServices = null;
 	}
 }

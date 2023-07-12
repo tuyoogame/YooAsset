@@ -73,9 +73,7 @@ namespace YooAsset
 			if (IsValidWithWarning == false)
 				return null;
 			string filePath = Provider.RawFilePath;
-			if (File.Exists(filePath) == false)
-				return null;
-			return File.ReadAllBytes(filePath);
+			return FileUtility.ReadAllBytes(filePath);
 		}
 
 		/// <summary>

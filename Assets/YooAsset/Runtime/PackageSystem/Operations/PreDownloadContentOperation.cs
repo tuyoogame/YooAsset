@@ -169,7 +169,7 @@ namespace YooAsset
 			{
 				if (_downloadManifestOp == null)
 				{
-					_downloadManifestOp = new DownloadManifestOperation(_impl, _packageName, _packageVersion, _timeout);
+					_downloadManifestOp = new DownloadManifestOperation(_impl.RemoteServices, _packageName, _packageVersion, _timeout);
 					OperationSystem.StartOperation(_downloadManifestOp);
 				}
 

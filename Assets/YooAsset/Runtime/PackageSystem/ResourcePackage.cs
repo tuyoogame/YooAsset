@@ -122,9 +122,8 @@ namespace YooAsset
 				var initializeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = hostPlayModeImpl.InitializeAsync(
 					PackageName,
-					initializeParameters.DefaultHostServer,
-					initializeParameters.FallbackHostServer,
-					initializeParameters.QueryServices
+					initializeParameters.QueryServices,
+					initializeParameters.RemoteServices
 					);
 			}
 			else
@@ -172,12 +171,10 @@ namespace YooAsset
 			if (parameters is HostPlayModeParameters)
 			{
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
-				if (string.IsNullOrEmpty(hostPlayModeParameters.DefaultHostServer))
-					throw new Exception($"${hostPlayModeParameters.DefaultHostServer} is null or empty.");
-				if (string.IsNullOrEmpty(hostPlayModeParameters.FallbackHostServer))
-					throw new Exception($"${hostPlayModeParameters.FallbackHostServer} is null or empty.");
 				if (hostPlayModeParameters.QueryServices == null)
 					throw new Exception($"{nameof(IQueryServices)} is null.");
+				if (hostPlayModeParameters.RemoteServices == null)
+					throw new Exception($"{nameof(IRemoteServices)} is null.");
 			}
 
 			// 鉴定运行模式

@@ -4,25 +4,28 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	internal class HostPlayModeImpl : IPlayModeServices, IBundleServices, IRemoteServices
+	internal class HostPlayModeImpl : IPlayModeServices, IBundleServices
 	{
 		private PackageManifest _activeManifest;
 
 		// 参数相关
 		private string _packageName;
-		private string _defaultHostServer;
-		private string _fallbackHostServer;
 		private IQueryServices _queryServices;
+		private IRemoteServices _remoteServices;
+
+		public IRemoteServices RemoteServices
+		{
+			get { return _remoteServices; }
+		}
 
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(string packageName, string defaultHostServer, string fallbackHostServer, IQueryServices queryServices)
+		public InitializationOperation InitializeAsync(string packageName, IQueryServices queryServices, IRemoteServices remoteServices)
 		{
 			_packageName = packageName;
-			_defaultHostServer = defaultHostServer;
-			_fallbackHostServer = fallbackHostServer;
 			_queryServices = queryServices;
+			_remoteServices = remoteServices;
 
 			var operation = new HostPlayModeInitializationOperation(this, packageName);
 			OperationSystem.StartOperation(operation);
@@ -42,22 +45,11 @@ namespace YooAsset
 		}
 		private BundleInfo ConvertToDownloadInfo(PackageBundle packageBundle)
 		{
-			string remoteMainURL = GetRemoteMainURL(packageBundle.FileName);
-			string remoteFallbackURL = GetRemoteFallbackURL(packageBundle.FileName);
+			string remoteMainURL = _remoteServices.GetRemoteMainURL(packageBundle.FileName);
+			string remoteFallbackURL = _remoteServices.GetRemoteFallbackURL(packageBundle.FileName);
 			BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromRemote, remoteMainURL, remoteFallbackURL);
 			return bundleInfo;
 		}
-
-		#region IRemoteServices接口
-		public string GetRemoteMainURL(string fileName)
-		{
-			return $"{_defaultHostServer}/{fileName}";
-		}
-		public string GetRemoteFallbackURL(string fileName)
-		{
-			return $"{_fallbackHostServer}/{fileName}";
-		}
-		#endregion
 
 		#region IPlayModeServices接口
 		public PackageManifest ActiveManifest
@@ -76,7 +68,7 @@ namespace YooAsset
 			if (_activeManifest != null)
 			{
 				PersistentTools.GetPersistent(_packageName).SaveSandboxPackageVersionFile(_activeManifest.PackageVersion);
-			}			
+			}
 		}
 
 		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
