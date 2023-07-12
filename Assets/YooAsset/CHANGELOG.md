@@ -2,6 +2,33 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.5.1] - 2023-07-12
+
+### Fixed
+
+- 修复了太空战机DEMO在生成内置文件清单的时候，目录不存在引发的异常。
+- 修复了在销毁Package时，如果存在正在加载的bundle，会导致后续加载该bundle报错的问题。
+
+### Changed
+
+- 真机上使用错误方法加载原生文件的时候给予正确的错误提示。
+
+### Added
+
+- 新增了HostPlayModeParameters.RemoteServices字段
+
+  ```c#
+  /// <summary>
+  /// 远端资源地址查询服务类
+  /// </summary>
+  public IRemoteServices RemoteServices = null;
+  ```
+
+### Removed
+
+- 移除了HostPlayModeParameters.DefaultHostServer字段
+- 移除了HostPlayModeParameters.FallbackHostServer字段
+
 ## [1.5.0] - 2023-07-05
 
 该版本重构了Persistent类，导致沙盒目录和内置目录的存储结构发生了变化。
