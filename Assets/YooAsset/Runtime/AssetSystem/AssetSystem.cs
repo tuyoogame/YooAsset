@@ -80,30 +80,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 销毁
-		/// </summary>
-		public void DestroyAll()
-		{
-			foreach (var provider in _providerList)
-			{
-				provider.Destroy();
-			}
-			_providerList.Clear();
-			_providerDic.Clear();
-
-			foreach (var loader in _loaderList)
-			{
-				loader.Destroy(true);
-			}
-			_loaderList.Clear();
-			_loaderDic.Clear();
-
-			ClearSceneHandle();
-			DecryptionServices = null;
-			BundleServices = null;
-		}
-
-		/// <summary>
 		/// 资源回收（卸载引用计数为零的资源）
 		/// </summary>
 		public void UnloadUnusedAssets()
@@ -149,10 +125,12 @@ namespace YooAsset
 		{
 			foreach (var provider in _providerList)
 			{
+				provider.WaitForAsyncComplete();
 				provider.Destroy();
 			}
 			foreach (var loader in _loaderList)
 			{
+				loader.WaitForAsyncComplete();
 				loader.Destroy(true);
 			}
 

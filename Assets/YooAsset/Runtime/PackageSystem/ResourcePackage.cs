@@ -62,7 +62,7 @@ namespace YooAsset
 
 				if (_assetSystemImpl != null)
 				{
-					_assetSystemImpl.DestroyAll();
+					_assetSystemImpl.ForceUnloadAllAssets();
 					_assetSystemImpl = null;
 				}
 			}
