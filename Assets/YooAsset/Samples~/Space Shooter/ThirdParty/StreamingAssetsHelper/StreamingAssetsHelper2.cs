@@ -6,26 +6,21 @@ using UnityEngine;
 using YooAsset;
 
 /*
-public class StreamingAssetsDefine
-{
-	public const string RootFolderName = "yoo";
-}
-
 /// <summary>
 /// 内置文件查询服务类
 /// </summary>
-public class GameQueryServices : IQueryServices
+public class GameQueryServices2 : IQueryServices
 {
 	public bool QueryStreamingAssets(string packageName, string fileName)
 	{
-		return StreamingAssetsHelper.FileExists($"{StreamingAssetsDefine.RootFolderName}/{packageName}/{fileName}");
+		return StreamingAssetsHelper2.FileExists($"{StreamingAssetsDefine.RootFolderName}/{packageName}/{fileName}");
 	}
 }
 
 /// <summary>
 /// StreamingAssets目录下资源查询帮助类
 /// </summary>
-public sealed class StreamingAssetsHelper
+public sealed class StreamingAssetsHelper2
 {
 	private static readonly Dictionary<string, bool> _cacheData = new Dictionary<string, bool>(1000);
 
@@ -131,7 +126,9 @@ internal class AndroidPost : UnityEditor.Android.IPostGenerateGradleAndroidProje
 */
 
 
+
 /*
+// 以下代码为安卓原生代码，不需要解除注释
 //auto-gen-function
 public boolean CheckAssetExist(String filePath)
 {

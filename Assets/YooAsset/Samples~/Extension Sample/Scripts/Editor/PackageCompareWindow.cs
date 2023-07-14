@@ -10,7 +10,7 @@ namespace YooAsset.Editor
 	{
 		static PackageCompareWindow _thisInstance;
 		
-		[MenuItem("YooAsset/补丁包比对工具", false, 302)]
+		[MenuItem("Tools/补丁包比对工具", false, 102)]
 		static void ShowWindow()
 		{
 			if (_thisInstance == null)

@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
 
-public class StreamingAssetsDefine
-{
-	public const string RootFolderName = "yoo";
-}
-
 /// <summary>
 /// 内置文件查询服务类
 /// </summary>
