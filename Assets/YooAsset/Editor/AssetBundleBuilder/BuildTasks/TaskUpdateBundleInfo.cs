@@ -29,32 +29,35 @@ namespace YooAsset.Editor
 			// 2.更新构建输出的文件路径
 			foreach (var bundleInfo in buildMapContext.Collection)
 			{
+				bundleInfo.BuildOutputFilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
 				if (bundleInfo.IsEncryptedFile)
-					bundleInfo.BundleInfo.BuildOutputFilePath = bundleInfo.EncryptedFilePath;
+					bundleInfo.PackageSourceFilePath = bundleInfo.EncryptedFilePath;
 				else
-					bundleInfo.BundleInfo.BuildOutputFilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
+					bundleInfo.PackageSourceFilePath = bundleInfo.BuildOutputFilePath;
 			}
 
 			// 3.更新文件其它信息
 			foreach (var bundleInfo in buildMapContext.Collection)
 			{
-				string buildOutputFilePath = bundleInfo.BundleInfo.BuildOutputFilePath;
-				bundleInfo.BundleInfo.ContentHash = GetBundleContentHash(bundleInfo, context);
-				bundleInfo.BundleInfo.FileHash = GetBundleFileHash(buildOutputFilePath, buildParametersContext);
-				bundleInfo.BundleInfo.FileCRC = GetBundleFileCRC(buildOutputFilePath, buildParametersContext);
-				bundleInfo.BundleInfo.FileSize = GetBundleFileSize(buildOutputFilePath, buildParametersContext);
+				bundleInfo.PackageUnityHash = GetUnityHash(bundleInfo, context);
+				bundleInfo.PackageUnityCRC = GetUnityCRC(bundleInfo, context);
+				bundleInfo.PackageFileHash = GetBundleFileHash(bundleInfo.PackageSourceFilePath, buildParametersContext);
+				bundleInfo.PackageFileCRC = GetBundleFileCRC(bundleInfo.PackageSourceFilePath, buildParametersContext);
+				bundleInfo.PackageFileSize = GetBundleFileSize(bundleInfo.PackageSourceFilePath, buildParametersContext);
 			}
 
 			// 4.更新补丁包输出的文件路径
 			foreach (var bundleInfo in buildMapContext.Collection)
 			{
-				string fileExtension = ManifestTools.GetRemoteBundleFileExtension(bundleInfo.BundleName);
-				string fileName = ManifestTools.GetRemoteBundleFileName(outputNameStyle, bundleInfo.BundleName, fileExtension, bundleInfo.BundleInfo.FileHash);
-				bundleInfo.BundleInfo.PackageOutputFilePath = $"{packageOutputDirectory}/{fileName}";
+				string bundleName = bundleInfo.BundleName;
+				string fileHash = bundleInfo.PackageFileHash;
+				string fileExtension = ManifestTools.GetRemoteBundleFileExtension(bundleName);
+				string fileName = ManifestTools.GetRemoteBundleFileName(outputNameStyle, bundleName, fileExtension, fileHash);
+				bundleInfo.PackageDestFilePath = $"{packageOutputDirectory}/{fileName}";
 			}
 		}
 
-		private string GetBundleContentHash(BuildBundleInfo bundleInfo, BuildContext context)
+		private string GetUnityHash(BuildBundleInfo bundleInfo, BuildContext context)
 		{
 			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
 			var parameters = buildParametersContext.Parameters;
@@ -64,7 +67,7 @@ namespace YooAsset.Editor
 
 			if (bundleInfo.IsRawFile)
 			{
-				string filePath = bundleInfo.BundleInfo.BuildOutputFilePath;
+				string filePath = bundleInfo.PackageSourceFilePath;
 				return HashUtility.FileMD5(filePath);
 			}
 
@@ -75,7 +78,7 @@ namespace YooAsset.Editor
 				if (hash.isValid)
 					return hash.ToString();
 				else
-					throw new Exception($"Not found bundle in build result : {bundleInfo.BundleName}");
+					throw new Exception($"Not found bundle hash in build result : {bundleInfo.BundleName}");
 			}
 			else if (parameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
 			{
@@ -84,7 +87,39 @@ namespace YooAsset.Editor
 				if (buildResult.Results.BundleInfos.TryGetValue(bundleInfo.BundleName, out var value))
 					return value.Hash.ToString();
 				else
-					throw new Exception($"Not found bundle in build result : {bundleInfo.BundleName}");
+					throw new Exception($"Not found bundle hash in build result : {bundleInfo.BundleName}");
+			}
+			else
+			{
+				throw new System.NotImplementedException();
+			}
+		}
+		private uint GetUnityCRC(BuildBundleInfo bundleInfo, BuildContext context)
+		{
+			var buildParametersContext = context.GetContextObject<BuildParametersContext>();
+			var parameters = buildParametersContext.Parameters;
+			var buildMode = parameters.BuildMode;
+			if (buildMode == EBuildMode.DryRunBuild || buildMode == EBuildMode.SimulateBuild)
+				return 0;
+
+			if (bundleInfo.IsRawFile)
+				return 0;
+
+			if (parameters.BuildPipeline == EBuildPipeline.BuiltinBuildPipeline)
+			{
+				string filePath = bundleInfo.BuildOutputFilePath;
+				if (BuildPipeline.GetCRCForAssetBundle(filePath, out uint crc))
+					return crc;
+				else
+					throw new Exception($"Not found bundle crc in build result : {bundleInfo.BundleName}");
+			}
+			else if (parameters.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
+			{
+				var buildResult = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
+				if (buildResult.Results.BundleInfos.TryGetValue(bundleInfo.BundleName, out var value))
+					return value.Crc;
+				else
+					throw new Exception($"Not found bundle crc in build result : {bundleInfo.BundleName}");
 			}
 			else
 			{
