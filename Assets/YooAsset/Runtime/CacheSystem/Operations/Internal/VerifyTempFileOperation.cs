@@ -10,7 +10,7 @@ namespace YooAsset
 	{
 		public EVerifyResult VerifyResult { protected set; get; }
 
-		public static VerifyTempFileOperation CreateOperation(VerifyTempElement element)
+		public static VerifyTempFileOperation CreateOperation(VerifyTempFileElement element)
 		{
 #if UNITY_WEBGL
 			var operation = new VerifyTempFileWithoutThreadOperation(element);
@@ -34,10 +34,10 @@ namespace YooAsset
 			Done,
 		}
 
-		private readonly VerifyTempElement _element;
+		private readonly VerifyTempFileElement _element;
 		private ESteps _steps = ESteps.None;
 
-		public VerifyTempFileWithThreadOperation(VerifyTempElement element)
+		public VerifyTempFileWithThreadOperation(VerifyTempFileElement element)
 		{
 			_element = element;
 		}
@@ -79,13 +79,13 @@ namespace YooAsset
 			}
 		}
 
-		private bool BeginVerifyFileWithThread(VerifyTempElement element)
+		private bool BeginVerifyFileWithThread(VerifyTempFileElement element)
 		{
 			return ThreadPool.QueueUserWorkItem(new WaitCallback(VerifyInThread), element);
 		}
 		private void VerifyInThread(object obj)
 		{
-			VerifyTempElement element = (VerifyTempElement)obj;
+			VerifyTempFileElement element = (VerifyTempFileElement)obj;
 			int result = (int)CacheSystem.VerifyingTempFile(element);
 			element.Result = result;
 		}
@@ -103,10 +103,10 @@ namespace YooAsset
 			Done,
 		}
 
-		private readonly VerifyTempElement _element;
+		private readonly VerifyTempFileElement _element;
 		private ESteps _steps = ESteps.None;
 
-		public VerifyTempFileWithoutThreadOperation(VerifyTempElement element)
+		public VerifyTempFileWithoutThreadOperation(VerifyTempFileElement element)
 		{
 			_element = element;
 		}

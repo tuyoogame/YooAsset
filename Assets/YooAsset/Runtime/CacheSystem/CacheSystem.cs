@@ -93,7 +93,7 @@ namespace YooAsset
 		/// <summary>
 		/// 验证缓存文件（子线程内操作）
 		/// </summary>
-		public static EVerifyResult VerifyingCacheFile(VerifyCacheElement element)
+		public static EVerifyResult VerifyingCacheFile(VerifyCacheFileElement element)
 		{
 			try
 			{
@@ -125,7 +125,7 @@ namespace YooAsset
 		/// <summary>
 		/// 验证下载文件（子线程内操作）
 		/// </summary>
-		public static EVerifyResult VerifyingTempFile(VerifyTempElement element)
+		public static EVerifyResult VerifyingTempFile(VerifyTempFileElement element)
 		{
 			return VerifyingInternal(element.TempDataFilePath, element.FileSize, element.FileCRC, EVerifyLevel.High);
 		}
