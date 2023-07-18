@@ -39,6 +39,7 @@ internal class FsmUpdateVersion : IStateNode
 		if (operation.Status == EOperationStatus.Succeed)
 		{
 			PatchManager.Instance.PackageVersion = operation.PackageVersion;
+			Debug.Log($"远端最新版本为: {operation.PackageVersion}");
 			_machine.ChangeState<FsmUpdateManifest>();
 		}
 		else

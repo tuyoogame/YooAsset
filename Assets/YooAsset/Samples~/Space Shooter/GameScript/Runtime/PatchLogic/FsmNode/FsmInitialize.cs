@@ -74,6 +74,18 @@ internal class FsmInitialize : IStateNode
 			initializationOperation = package.InitializeAsync(createParameters);
 		}
 
+		// WebGL运行模式
+		if(playMode == EPlayMode.WebPlayMode)
+		{
+			string defaultHostServer = GetHostServerURL();
+			string fallbackHostServer = GetHostServerURL();
+			var createParameters = new WebPlayModeParameters();
+			createParameters.DecryptionServices = new GameDecryptionServices();
+			createParameters.QueryServices = new GameQueryServices();
+			createParameters.RemoteServices = new RemoteServices(defaultHostServer, fallbackHostServer);
+			initializationOperation = package.InitializeAsync(createParameters);
+		}
+
 		yield return initializationOperation;
 		if (initializationOperation.Status == EOperationStatus.Succeed)
 		{
