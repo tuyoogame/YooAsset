@@ -2,6 +2,10 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.5.2-preview] - 2023-07-18
+
+重新设计了对WebGL平台的支持，新增加了专属模式：WebPlayMode
+
 ## [1.5.1] - 2023-07-12
 
 ### Fixed
