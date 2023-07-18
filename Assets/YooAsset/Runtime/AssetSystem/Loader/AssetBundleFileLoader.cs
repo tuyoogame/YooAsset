@@ -82,7 +82,8 @@ namespace YooAsset
 			if (_steps == ESteps.Download)
 			{
 				int failedTryAgain = Impl.DownloadFailedTryAgain;
-				_downloader = DownloadSystem.BeginDownload(MainBundleInfo, failedTryAgain);
+				_downloader = DownloadSystem.CreateDownload(MainBundleInfo, failedTryAgain);
+				_downloader.SendRequest();
 				_steps = ESteps.CheckDownload;
 			}
 
@@ -112,7 +113,8 @@ namespace YooAsset
 			{
 				int failedTryAgain = Impl.DownloadFailedTryAgain;
 				var bundleInfo = ManifestTools.ConvertToUnpackInfo(MainBundleInfo.Bundle);
-				_unpacker = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
+				_unpacker = DownloadSystem.CreateDownload(bundleInfo, failedTryAgain);
+				_unpacker.SendRequest();
 				_steps = ESteps.CheckUnpack;
 			}
 
@@ -262,9 +264,9 @@ namespace YooAsset
 		/// <summary>
 		/// 销毁
 		/// </summary>
-		public override void Destroy(bool forceDestroy)
+		public override void Destroy()
 		{
-			base.Destroy(forceDestroy);
+			base.Destroy();
 
 			if (_stream != null)
 			{

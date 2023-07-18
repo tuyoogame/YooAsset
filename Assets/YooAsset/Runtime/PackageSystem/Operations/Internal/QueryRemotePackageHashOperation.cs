@@ -1,53 +1,53 @@
 ﻿
 namespace YooAsset
 {
-	internal class QueryRemotePackageVersionOperation : AsyncOperationBase
+	internal class QueryRemotePackageHashOperation : AsyncOperationBase
 	{
 		private enum ESteps
 		{
 			None,
-			DownloadPackageVersion,
+			DownloadPackageHash,
 			Done,
 		}
-
+		
 		private static int RequestCount = 0;
 		private readonly IRemoteServices _remoteServices;
 		private readonly string _packageName;
-		private readonly bool _appendTimeTicks;
+		private readonly string _packageVersion;
 		private readonly int _timeout;
 		private UnityWebDataRequester _downloader;
 		private ESteps _steps = ESteps.None;
 
 		/// <summary>
-		/// 包裹版本
+		/// 包裹哈希值
 		/// </summary>
-		public string PackageVersion { private set; get; }
-		
+		public string PackageHash { private set; get; }
 
-		public QueryRemotePackageVersionOperation(IRemoteServices remoteServices, string packageName, bool appendTimeTicks, int timeout)
+
+		public QueryRemotePackageHashOperation(IRemoteServices remoteServices, string packageName, string packageVersion, int timeout)
 		{
 			_remoteServices = remoteServices;
 			_packageName = packageName;
-			_appendTimeTicks = appendTimeTicks;
+			_packageVersion = packageVersion;
 			_timeout = timeout;
 		}
 		internal override void Start()
 		{
 			RequestCount++;
-			_steps = ESteps.DownloadPackageVersion;
+			_steps = ESteps.DownloadPackageHash;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
 
-			if (_steps == ESteps.DownloadPackageVersion)
+			if (_steps == ESteps.DownloadPackageHash)
 			{
 				if (_downloader == null)
 				{
-					string fileName = YooAssetSettingsData.GetPackageVersionFileName(_packageName);
-					string webURL = GetPackageVersionRequestURL(fileName);
-					YooLogger.Log($"Beginning to request package version : {webURL}");
+					string fileName = YooAssetSettingsData.GetPackageHashFileName(_packageName, _packageVersion);
+					string webURL = GetPackageHashRequestURL(fileName);
+					YooLogger.Log($"Beginning to request package hash : {webURL}");
 					_downloader = new UnityWebDataRequester();
 					_downloader.SendRequest(webURL, _timeout);
 				}
@@ -65,12 +65,12 @@ namespace YooAsset
 				}
 				else
 				{
-					PackageVersion = _downloader.GetText();
-					if (string.IsNullOrEmpty(PackageVersion))
+					PackageHash = _downloader.GetText();
+					if (string.IsNullOrEmpty(PackageHash))
 					{
 						_steps = ESteps.Done;
 						Status = EOperationStatus.Failed;
-						Error = $"Remote package version is empty : {_downloader.URL}";
+						Error = $"Remote package hash is empty : {_downloader.URL}";
 					}
 					else
 					{
@@ -83,7 +83,7 @@ namespace YooAsset
 			}
 		}
 
-		private string GetPackageVersionRequestURL(string fileName)
+		private string GetPackageHashRequestURL(string fileName)
 		{
 			string url;
 
@@ -93,11 +93,7 @@ namespace YooAsset
 			else
 				url = _remoteServices.GetRemoteMainURL(fileName);
 
-			// 在URL末尾添加时间戳
-			if (_appendTimeTicks)
-				return $"{url}?{System.DateTime.UtcNow.Ticks}";
-			else
-				return url;
+			return url;
 		}
 	}
 }

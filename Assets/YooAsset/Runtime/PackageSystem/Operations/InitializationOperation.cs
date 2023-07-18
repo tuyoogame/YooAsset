@@ -365,6 +365,93 @@ namespace YooAsset
 	}
 
 	/// <summary>
+	/// WebGL运行模式的初始化操作
+	/// </summary>
+	internal sealed class WebPlayModeInitializationOperation : InitializationOperation
+	{
+		private enum ESteps
+		{
+			None,
+			QueryWebPackageVersion,
+			LoadWebManifest,
+			Done,
+		}
+
+		private readonly WebPlayModeImpl _impl;
+		private readonly string _packageName;
+		private QueryBuildinPackageVersionOperation _queryWebPackageVersionOp;
+		private LoadBuildinManifestOperation _loadWebManifestOp;
+		private ESteps _steps = ESteps.None;
+
+		internal WebPlayModeInitializationOperation(WebPlayModeImpl impl, string packageName)
+		{
+			_impl = impl;
+			_packageName = packageName;
+		}
+		internal override void Start()
+		{
+			_steps = ESteps.QueryWebPackageVersion;
+		}
+		internal override void Update()
+		{
+			if (_steps == ESteps.None || _steps == ESteps.Done)
+				return;
+
+			if (_steps == ESteps.QueryWebPackageVersion)
+			{
+				if (_queryWebPackageVersionOp == null)
+				{
+					_queryWebPackageVersionOp = new QueryBuildinPackageVersionOperation(_packageName);
+					OperationSystem.StartOperation(_queryWebPackageVersionOp);
+				}
+
+				if (_queryWebPackageVersionOp.IsDone == false)
+					return;
+
+				if (_queryWebPackageVersionOp.Status == EOperationStatus.Succeed)
+				{
+					_steps = ESteps.LoadWebManifest;
+				}
+				else
+				{
+					// 注意：WebGL平台可能因为网络的原因会导致请求失败。如果内置清单不存在或者超时也不需要报错！
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
+					string error = _queryWebPackageVersionOp.Error;
+					YooLogger.Log($"Failed to load web package version file : {error}");
+				}
+			}
+
+			if (_steps == ESteps.LoadWebManifest)
+			{
+				if (_loadWebManifestOp == null)
+				{
+					_loadWebManifestOp = new LoadBuildinManifestOperation(_packageName, _queryWebPackageVersionOp.PackageVersion);
+					OperationSystem.StartOperation(_loadWebManifestOp);
+				}
+
+				Progress = _loadWebManifestOp.Progress;
+				if (_loadWebManifestOp.IsDone == false)
+					return;
+
+				if (_loadWebManifestOp.Status == EOperationStatus.Succeed)
+				{
+					PackageVersion = _loadWebManifestOp.Manifest.PackageVersion;
+					_impl.ActiveManifest = _loadWebManifestOp.Manifest;
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
+				}
+				else
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = _loadWebManifestOp.Error;
+				}
+			}
+		}
+	}
+
+	/// <summary>
 	/// 应用程序水印
 	/// </summary>
 	internal class AppFootPrint

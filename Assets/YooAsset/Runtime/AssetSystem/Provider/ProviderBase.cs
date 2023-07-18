@@ -123,7 +123,7 @@ namespace YooAsset
 		/// <summary>
 		/// 销毁资源对象
 		/// </summary>
-		public virtual void Destroy()
+		public void Destroy()
 		{
 			IsDestroyed = true;
 
@@ -137,6 +137,22 @@ namespace YooAsset
 			{
 				DependBundles.Release();
 				DependBundles = null;
+			}
+		}
+
+		/// <summary>
+		/// 销毁资源对象（安全模式）
+		/// </summary>
+		public void DestroySafely()
+		{
+			if (Status == EStatus.Loading || Status == EStatus.Checking)
+			{
+				WaitForAsyncComplete();
+				Destroy();
+			}
+			else
+			{
+				Destroy();
 			}
 		}
 

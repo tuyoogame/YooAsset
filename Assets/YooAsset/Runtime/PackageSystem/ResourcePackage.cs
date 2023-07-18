@@ -126,6 +126,22 @@ namespace YooAsset
 					initializeParameters.RemoteServices
 					);
 			}
+			else if (_playMode == EPlayMode.WebPlayMode)
+			{
+				var webPlayModeImpl = new WebPlayModeImpl();
+				_bundleServices = webPlayModeImpl;
+				_playModeServices = webPlayModeImpl;
+				_assetSystemImpl.Initialize(PackageName, false,
+					parameters.LoadingMaxTimeSlice, parameters.DownloadFailedTryAgain,
+					parameters.DecryptionServices, _bundleServices);
+
+				var initializeParameters = parameters as WebPlayModeParameters;
+				initializeOperation = webPlayModeImpl.InitializeAsync(
+					PackageName,
+					initializeParameters.QueryServices,
+					initializeParameters.RemoteServices
+					);
+			}
 			else
 			{
 				throw new NotImplementedException();
@@ -184,8 +200,18 @@ namespace YooAsset
 				_playMode = EPlayMode.OfflinePlayMode;
 			else if (parameters is HostPlayModeParameters)
 				_playMode = EPlayMode.HostPlayMode;
+			else if (parameters is WebPlayModeParameters)
+				_playMode = EPlayMode.WebPlayMode;
 			else
 				throw new NotImplementedException();
+
+			// 检测运行平台
+			if (_playMode == EPlayMode.HostPlayMode || _playMode == EPlayMode.OfflinePlayMode)
+			{
+#if UNITY_WEBGL
+				throw new Exception($"WebGL plateform not support : {_playMode} ! Please use {nameof(EPlayMode.WebPlayMode)}");
+#endif
+			}
 
 			// 检测参数范围
 			if (parameters.LoadingMaxTimeSlice < 10)

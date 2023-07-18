@@ -104,4 +104,66 @@ namespace YooAsset
 			}
 		}
 	}
+	
+	/// <summary>
+	/// WebGL模式的请求远端包裹的最新版本
+	/// </summary>
+	internal sealed class WebPlayModeUpdatePackageVersionOperation : UpdatePackageVersionOperation
+	{
+		private enum ESteps
+		{
+			None,
+			QueryRemotePackageVersion,
+			Done,
+		}
+
+		private readonly WebPlayModeImpl _impl;
+		private readonly string _packageName;
+		private readonly bool _appendTimeTicks;
+		private readonly int _timeout;
+		private QueryRemotePackageVersionOperation _queryRemotePackageVersionOp;
+		private ESteps _steps = ESteps.None;
+		
+		internal WebPlayModeUpdatePackageVersionOperation(WebPlayModeImpl impl, string packageName, bool appendTimeTicks, int timeout)
+		{
+			_impl = impl;
+			_packageName = packageName;
+			_appendTimeTicks = appendTimeTicks;
+			_timeout = timeout;
+		}
+		internal override void Start()
+		{
+			_steps = ESteps.QueryRemotePackageVersion;
+		}
+		internal override void Update()
+		{
+			if (_steps == ESteps.None || _steps == ESteps.Done)
+				return;
+
+			if (_steps == ESteps.QueryRemotePackageVersion)
+			{
+				if (_queryRemotePackageVersionOp == null)
+				{
+					_queryRemotePackageVersionOp = new QueryRemotePackageVersionOperation(_impl.RemoteServices, _packageName, _appendTimeTicks, _timeout);
+					OperationSystem.StartOperation(_queryRemotePackageVersionOp);
+				}
+
+				if (_queryRemotePackageVersionOp.IsDone == false)
+					return;
+
+				if (_queryRemotePackageVersionOp.Status == EOperationStatus.Succeed)
+				{
+					PackageVersion = _queryRemotePackageVersionOp.PackageVersion;
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Succeed;
+				}
+				else
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = _queryRemotePackageVersionOp.Error;
+				}
+			}
+		}
+	}
 }

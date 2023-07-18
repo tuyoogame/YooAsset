@@ -98,34 +98,49 @@ namespace YooAsset
 
 
 		/// <summary>
-		/// 开始下载资源文件
-		/// 注意：只有第一次请求的参数才是有效的
+		/// 创建下载器
+		/// 注意：只有第一次请求的参数才有效
 		/// </summary>
-		public static DownloaderBase BeginDownload(BundleInfo bundleInfo, int failedTryAgain, int timeout = 60)
+		public static DownloaderBase CreateDownload(BundleInfo bundleInfo, int failedTryAgain, int timeout = 60)
 		{
 			// 查询存在的下载器
 			if (_downloaderDic.TryGetValue(bundleInfo.Bundle.CachedDataFilePath, out var downloader))
-			{
 				return downloader;
-			}
 
 			// 如果资源已经缓存
 			if (CacheSystem.IsCached(bundleInfo.Bundle.PackageName, bundleInfo.Bundle.CacheGUID))
 			{
-				var tempDownloader = new TempDownloader(bundleInfo);
-				return tempDownloader;
+				var completedDownloader = new CompletedDownloader(bundleInfo);
+				return completedDownloader;
 			}
 
 			// 创建新的下载器	
+			YooLogger.Log($"Beginning to download bundle : {bundleInfo.Bundle.BundleName} URL : {bundleInfo.RemoteMainURL}");
+#if UNITY_WEBGL
+			if (bundleInfo.Bundle.IsRawFile)
 			{
-				YooLogger.Log($"Beginning to download file : {bundleInfo.Bundle.FileName} URL : {bundleInfo.RemoteMainURL}");
 				FileUtility.CreateFileDirectory(bundleInfo.Bundle.CachedDataFilePath);
-				bool breakDownload = bundleInfo.Bundle.FileSize >= BreakpointResumeFileSize;
-				DownloaderBase newDownloader = new FileDownloader(bundleInfo, breakDownload);
-				newDownloader.SendRequest(failedTryAgain, timeout);
+				DownloaderBase newDownloader = new FileGeneralDownloader(bundleInfo, failedTryAgain, timeout);
 				_downloaderDic.Add(bundleInfo.Bundle.CachedDataFilePath, newDownloader);
 				return newDownloader;
 			}
+			else
+			{
+				WebDownloader newDownloader = new WebDownloader(bundleInfo, failedTryAgain, timeout);
+				_downloaderDic.Add(bundleInfo.Bundle.CachedDataFilePath, newDownloader);
+				return newDownloader;
+			}
+#else
+			FileUtility.CreateFileDirectory(bundleInfo.Bundle.CachedDataFilePath);
+			bool resumeDownload = bundleInfo.Bundle.FileSize >= BreakpointResumeFileSize;
+			DownloaderBase newDownloader;
+			if (resumeDownload)
+				newDownloader = new FileResumeDownloader(bundleInfo, failedTryAgain, timeout);
+			else
+				newDownloader = new FileGeneralDownloader(bundleInfo, failedTryAgain, timeout);
+			_downloaderDic.Add(bundleInfo.Bundle.CachedDataFilePath, newDownloader);
+			return newDownloader;
+#endif
 		}
 
 		/// <summary>
@@ -139,14 +154,14 @@ namespace YooAsset
 			else
 				webRequest = new UnityWebRequest(requestURL, UnityWebRequest.kHttpVerbGET);
 
-			SetUnityWebRequest(webRequest);
+			SetUnityWebRequestParam(webRequest);
 			return webRequest;
 		}
 
 		/// <summary>
 		/// 设置网络请求的自定义参数
 		/// </summary>
-		public static void SetUnityWebRequest(UnityWebRequest webRequest)
+		private static void SetUnityWebRequestParam(UnityWebRequest webRequest)
 		{
 			if (RedirectLimit >= 0)
 				webRequest.redirectLimit = RedirectLimit;

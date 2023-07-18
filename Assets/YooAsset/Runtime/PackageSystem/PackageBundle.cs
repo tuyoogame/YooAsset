@@ -12,6 +12,11 @@ namespace YooAsset
 		public string BundleName;
 
 		/// <summary>
+		/// Unity引擎生成的CRC
+		/// </summary>
+		public uint UnityCRC;
+
+		/// <summary>
 		/// 文件哈希值
 		/// </summary>
 		public string FileHash;

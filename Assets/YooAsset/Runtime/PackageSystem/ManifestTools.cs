@@ -61,6 +61,7 @@ namespace YooAsset
 				{
 					var packageBundle = manifest.BundleList[i];
 					buffer.WriteUTF8(packageBundle.BundleName);
+					buffer.WriteUInt32(packageBundle.UnityCRC);
 					buffer.WriteUTF8(packageBundle.FileHash);
 					buffer.WriteUTF8(packageBundle.FileCRC);
 					buffer.WriteInt64(packageBundle.FileSize);
@@ -139,6 +140,7 @@ namespace YooAsset
 				{
 					var packageBundle = new PackageBundle();
 					packageBundle.BundleName = buffer.ReadUTF8();
+					packageBundle.UnityCRC = buffer.ReadUInt32();
 					packageBundle.FileHash = buffer.ReadUTF8();
 					packageBundle.FileCRC = buffer.ReadUTF8();
 					packageBundle.FileSize = buffer.ReadInt64();
@@ -208,7 +210,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 批量转换解压为BundleInfo
+		/// 批量转换为解压BundleInfo
 		/// </summary>
 		public static List<BundleInfo> ConvertToUnpackInfos(List<PackageBundle> unpackList)
 		{

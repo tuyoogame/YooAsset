@@ -286,4 +286,14 @@ namespace YooAsset
 			return operation;
 		}
 	}
+	internal class WebPlayModePreDownloadContentOperation : PreDownloadContentOperation
+	{
+		internal override void Start()
+		{
+			Status = EOperationStatus.Succeed;
+		}
+		internal override void Update()
+		{
+		}
+	}
 }

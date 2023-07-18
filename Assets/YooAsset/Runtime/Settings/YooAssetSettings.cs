@@ -24,7 +24,7 @@ namespace YooAsset
 		/// <summary>
 		/// 清单文件格式版本
 		/// </summary>
-		public const string ManifestFileVersion = "1.4.17";
+		public const string ManifestFileVersion = "1.5.2";
 
 
 		/// <summary>

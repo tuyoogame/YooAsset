@@ -47,11 +47,6 @@ namespace YooAsset
 					_steps = ESteps.Website;
 					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
-				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
-				{
-					_steps = ESteps.CheckFile;
-					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
-				}
 				else
 				{
 					throw new System.NotImplementedException(MainBundleInfo.LoadMode.ToString());
@@ -62,7 +57,8 @@ namespace YooAsset
 			if (_steps == ESteps.Download)
 			{
 				int failedTryAgain = Impl.DownloadFailedTryAgain;
-				_downloader = DownloadSystem.BeginDownload(MainBundleInfo, failedTryAgain);
+				_downloader = DownloadSystem.CreateDownload(MainBundleInfo, failedTryAgain);
+				_downloader.SendRequest();
 				_steps = ESteps.CheckDownload;
 			}
 
@@ -91,7 +87,8 @@ namespace YooAsset
 			{
 				int failedTryAgain = Impl.DownloadFailedTryAgain;
 				var bundleInfo = ManifestTools.ConvertToUnpackInfo(MainBundleInfo.Bundle);
-				_website = DownloadSystem.BeginDownload(bundleInfo, failedTryAgain);
+				_website = DownloadSystem.CreateDownload(bundleInfo, failedTryAgain);
+				_website.SendRequest();
 				_steps = ESteps.CheckWebsite;
 			}
 
