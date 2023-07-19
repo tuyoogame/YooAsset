@@ -58,6 +58,7 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
+			CheckParams,
 			CheckActiveManifest,
 			TryLoadCacheManifest,
 			DownloadManifest,
@@ -87,12 +88,33 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.CheckActiveManifest;
+			_steps = ESteps.CheckParams;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
+
+			if (_steps == ESteps.CheckParams)
+			{
+				if (string.IsNullOrEmpty(_packageName))
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = "Package name is null or empty.";
+					return;
+				}
+
+				if (string.IsNullOrEmpty(_packageVersion))
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = "Package version is null or empty.";
+					return;
+				}
+
+				_steps = ESteps.CheckActiveManifest;
+			}
 
 			if (_steps == ESteps.CheckActiveManifest)
 			{
@@ -198,6 +220,7 @@ namespace YooAsset
 		private enum ESteps
 		{
 			None,
+			CheckParams,
 			CheckActiveManifest,
 			LoadRemoteManifest,
 			Done,
@@ -220,12 +243,33 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			_steps = ESteps.CheckActiveManifest;
+			_steps = ESteps.CheckParams;
 		}
 		internal override void Update()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
+
+			if (_steps == ESteps.CheckParams)
+			{
+				if (string.IsNullOrEmpty(_packageName))
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = "Package name is null or empty.";
+					return;
+				}
+
+				if (string.IsNullOrEmpty(_packageVersion))
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = "Package version is null or empty.";
+					return;
+				}
+
+				_steps = ESteps.CheckActiveManifest;
+			}
 
 			if (_steps == ESteps.CheckActiveManifest)
 			{
