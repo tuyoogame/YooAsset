@@ -54,6 +54,11 @@ namespace YooAsset
 					_steps = ESteps.CheckFile;
 					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
+				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromDelivery)
+				{
+					_steps = ESteps.CheckFile;
+					FileLoadPath = MainBundleInfo.DeliveryFilePath;
+				}
 				else
 				{
 					throw new System.NotImplementedException(MainBundleInfo.LoadMode.ToString());
