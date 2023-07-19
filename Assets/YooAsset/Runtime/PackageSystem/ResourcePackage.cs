@@ -238,7 +238,7 @@ namespace YooAsset
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
 		public UpdatePackageVersionOperation UpdatePackageVersionAsync(bool appendTimeTicks = true, int timeout = 60)
 		{
-			DebugCheckInitialize();
+			DebugCheckInitialize(false);
 			return _playModeServices.UpdatePackageVersionAsync(appendTimeTicks, timeout);
 		}
 
@@ -250,7 +250,7 @@ namespace YooAsset
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
 		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion = true, int timeout = 60)
 		{
-			DebugCheckInitialize();
+			DebugCheckInitialize(false);
 			DebugCheckUpdateManifest();
 			return _playModeServices.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
 		}
@@ -262,7 +262,7 @@ namespace YooAsset
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
 		public PreDownloadContentOperation PreDownloadContentAsync(string packageVersion, int timeout = 60)
 		{
-			DebugCheckInitialize();
+			DebugCheckInitialize(false);
 			return _playModeServices.PreDownloadContentAsync(packageVersion, timeout);
 		}
 
@@ -294,8 +294,6 @@ namespace YooAsset
 		public string GetPackageVersion()
 		{
 			DebugCheckInitialize();
-			if (_playModeServices.ActiveManifest == null)
-				return string.Empty;
 			return _playModeServices.ActiveManifest.PackageVersion;
 		}
 
@@ -967,12 +965,18 @@ namespace YooAsset
 
 		#region 调试方法
 		[Conditional("DEBUG")]
-		private void DebugCheckInitialize()
+		private void DebugCheckInitialize(bool checkActiveManifest = true)
 		{
 			if (_initializeStatus == EOperationStatus.None)
 				throw new Exception("Package initialize not completed !");
 			else if (_initializeStatus == EOperationStatus.Failed)
 				throw new Exception($"Package initialize failed ! {_initializeError}");
+
+			if (checkActiveManifest)
+			{
+				if (_playModeServices.ActiveManifest == null)
+					throw new Exception("Not found active manifest !");
+			}
 		}
 
 		[Conditional("DEBUG")]
