@@ -142,11 +142,11 @@ internal class FsmInitialize : IStateNode
 			_defaultHostServer = defaultHostServer;
 			_fallbackHostServer = fallbackHostServer;
 		}
-		string IRemoteServices.GetRemoteFallbackURL(string fileName)
+		string IRemoteServices.GetRemoteMainURL(string fileName)
 		{
 			return $"{_defaultHostServer}/{fileName}";
 		}
-		string IRemoteServices.GetRemoteMainURL(string fileName)
+		string IRemoteServices.GetRemoteFallbackURL(string fileName)
 		{
 			return $"{_fallbackHostServer}/{fileName}";
 		}
