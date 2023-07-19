@@ -60,6 +60,14 @@ namespace YooAsset
 		{
 			return CacheSystem.IsCached(packageBundle.PackageName, packageBundle.CacheGUID);
 		}
+		private bool IsDeliveryPackageBundle(PackageBundle packageBundle, out string deliveryFilePath)
+		{
+			deliveryFilePath = _queryServices.QueryDeliveryFiles(_packageName, packageBundle.FileName);
+			if (string.IsNullOrEmpty(deliveryFilePath))
+				return false;
+			else
+				return true;
+		}
 
 		#region IPlayModeServices接口
 		public PackageManifest ActiveManifest
@@ -269,6 +277,13 @@ namespace YooAsset
 		{
 			if (packageBundle == null)
 				throw new Exception("Should never get here !");
+
+			// 查询分发资源
+			if (IsDeliveryPackageBundle(packageBundle, out string deliveryFilePath))
+			{
+				BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromDelivery, deliveryFilePath);
+				return bundleInfo;
+			}
 
 			// 查询沙盒资源
 			if (IsCachedPackageBundle(packageBundle))
