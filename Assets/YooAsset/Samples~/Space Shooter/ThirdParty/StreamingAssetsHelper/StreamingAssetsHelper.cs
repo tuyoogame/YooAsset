@@ -8,6 +8,11 @@ using YooAsset;
 /// </summary>
 public class GameQueryServices : IQueryServices
 {
+	public string QueryDeliveryFiles(string packageName, string fileName)
+	{
+		return null;
+	}
+
 	public bool QueryStreamingAssets(string packageName, string fileName)
 	{
 		// 注意：fileName包含文件格式

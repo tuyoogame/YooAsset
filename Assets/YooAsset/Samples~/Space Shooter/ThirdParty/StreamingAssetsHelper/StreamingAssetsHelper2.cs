@@ -11,6 +11,11 @@ using YooAsset;
 /// </summary>
 public class GameQueryServices2 : IQueryServices
 {
+	public string QueryDeliveryFiles(string packageName, string fileName)
+	{
+		return null;
+	}
+
 	public bool QueryStreamingAssets(string packageName, string fileName)
 	{
 		return StreamingAssetsHelper2.FileExists($"{StreamingAssetsDefine.RootFolderName}/{packageName}/{fileName}");
