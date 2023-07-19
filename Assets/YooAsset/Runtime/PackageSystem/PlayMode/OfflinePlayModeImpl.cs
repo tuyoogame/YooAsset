@@ -18,6 +18,12 @@ namespace YooAsset
 			return operation;
 		}
 
+		// 查询相关
+		private bool IsCachedPackageBundle(PackageBundle packageBundle)
+		{
+			return CacheSystem.IsCached(packageBundle.PackageName, packageBundle.CacheGUID);
+		}
+
 		#region IPlayModeServices接口
 		public PackageManifest ActiveManifest
 		{
@@ -32,11 +38,6 @@ namespace YooAsset
 		}
 		public void FlushManifestVersionFile()
 		{
-		}
-
-		private bool IsCachedPackageBundle(PackageBundle packageBundle)
-		{
-			return CacheSystem.IsCached(packageBundle.PackageName, packageBundle.CacheGUID);
 		}
 
 		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)

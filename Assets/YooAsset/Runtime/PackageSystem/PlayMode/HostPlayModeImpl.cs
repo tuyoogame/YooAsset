@@ -51,6 +51,16 @@ namespace YooAsset
 			return bundleInfo;
 		}
 
+		// 查询相关
+		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
+		{
+			return _queryServices.QueryStreamingAssets(_packageName, packageBundle.FileName);
+		}
+		private bool IsCachedPackageBundle(PackageBundle packageBundle)
+		{
+			return CacheSystem.IsCached(packageBundle.PackageName, packageBundle.CacheGUID);
+		}
+
 		#region IPlayModeServices接口
 		public PackageManifest ActiveManifest
 		{
@@ -69,15 +79,6 @@ namespace YooAsset
 			{
 				PersistentTools.GetPersistent(_packageName).SaveSandboxPackageVersionFile(_activeManifest.PackageVersion);
 			}
-		}
-
-		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
-		{
-			return _queryServices.QueryStreamingAssets(_packageName, packageBundle.FileName);
-		}
-		private bool IsCachedPackageBundle(PackageBundle packageBundle)
-		{
-			return CacheSystem.IsCached(packageBundle.PackageName, packageBundle.CacheGUID);
 		}
 
 		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)

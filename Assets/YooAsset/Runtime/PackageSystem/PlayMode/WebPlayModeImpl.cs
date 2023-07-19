@@ -41,6 +41,12 @@ namespace YooAsset
 			return bundleInfo;
 		}
 
+		// 查询相关
+		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
+		{
+			return _queryServices.QueryStreamingAssets(_packageName, packageBundle.FileName);
+		}
+
 		#region IPlayModeServices接口
 		public PackageManifest ActiveManifest
 		{
@@ -55,11 +61,6 @@ namespace YooAsset
 		}
 		public void FlushManifestVersionFile()
 		{
-		}
-
-		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
-		{
-			return _queryServices.QueryStreamingAssets(_packageName, packageBundle.FileName);
 		}
 
 		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)
