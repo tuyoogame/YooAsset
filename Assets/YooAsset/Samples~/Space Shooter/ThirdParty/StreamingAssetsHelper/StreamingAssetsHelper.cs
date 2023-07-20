@@ -8,9 +8,14 @@ using YooAsset;
 /// </summary>
 public class GameQueryServices : IQueryServices
 {
-	public string QueryDeliveryFiles(string packageName, string fileName)
+	public DeliveryFileInfo GetDeliveryFileInfo(string packageName, string fileName)
 	{
-		return null;
+		throw new System.NotImplementedException();
+	}
+
+	public bool QueryDeliveryFiles(string packageName, string fileName)
+	{
+		return false;
 	}
 
 	public bool QueryStreamingAssets(string packageName, string fileName)
