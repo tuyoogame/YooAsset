@@ -205,11 +205,19 @@ namespace YooAsset
 			else
 				throw new NotImplementedException();
 
-			// 检测运行平台
-			if (_playMode == EPlayMode.HostPlayMode || _playMode == EPlayMode.OfflinePlayMode)
+			// 检测运行时平台
+			if (_playMode != EPlayMode.EditorSimulateMode)
 			{
 #if UNITY_WEBGL
-				throw new Exception($"WebGL plateform not support : {_playMode} ! Please use {nameof(EPlayMode.WebPlayMode)}");
+				if (_playMode != EPlayMode.WebPlayMode)
+				{
+					throw new Exception($"{_playMode} can not support WebGL plateform ! Please use {nameof(EPlayMode.WebPlayMode)}");
+				}
+#else
+				if (_playMode == EPlayMode.WebPlayMode)
+				{
+					throw new Exception($"{nameof(EPlayMode.WebPlayMode)} only support WebGL plateform !");
+				}
 #endif
 			}
 
