@@ -571,6 +571,18 @@ namespace YooAsset
 			return LoadAssetInternal(assetInfo, true);
 		}
 
+		/// <summary>
+		/// 同步加载资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		public AssetOperationHandle LoadAssetSync(string location)
+		{
+			DebugCheckInitialize();
+			Type type = typeof(UnityEngine.Object);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadAssetInternal(assetInfo, true);
+		}
+
 
 		/// <summary>
 		/// 异步加载资源对象
@@ -602,6 +614,18 @@ namespace YooAsset
 		public AssetOperationHandle LoadAssetAsync(string location, System.Type type)
 		{
 			DebugCheckInitialize();
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadAssetInternal(assetInfo, false);
+		}
+
+		/// <summary>
+		/// 异步加载资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		public AssetOperationHandle LoadAssetAsync(string location)
+		{
+			DebugCheckInitialize();
+			Type type = typeof(UnityEngine.Object);
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
 			return LoadAssetInternal(assetInfo, false);
 		}
@@ -660,6 +684,18 @@ namespace YooAsset
 			return LoadSubAssetsInternal(assetInfo, true);
 		}
 
+		/// <summary>
+		/// 同步加载子资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		public SubAssetsOperationHandle LoadSubAssetsSync(string location)
+		{
+			DebugCheckInitialize();
+			Type type = typeof(UnityEngine.Object);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadSubAssetsInternal(assetInfo, true);
+		}
+
 
 		/// <summary>
 		/// 异步加载子资源对象
@@ -691,6 +727,18 @@ namespace YooAsset
 		public SubAssetsOperationHandle LoadSubAssetsAsync(string location, System.Type type)
 		{
 			DebugCheckInitialize();
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadSubAssetsInternal(assetInfo, false);
+		}
+
+		/// <summary>
+		/// 异步加载子资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		public SubAssetsOperationHandle LoadSubAssetsAsync(string location)
+		{
+			DebugCheckInitialize();
+			Type type = typeof(UnityEngine.Object);
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
 			return LoadSubAssetsInternal(assetInfo, false);
 		}
@@ -749,6 +797,18 @@ namespace YooAsset
 			return LoadAllAssetsInternal(assetInfo, true);
 		}
 
+		/// <summary>
+		/// 同步加载资源包内所有资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		public AllAssetsOperationHandle LoadAllAssetsSync(string location)
+		{
+			DebugCheckInitialize();
+			Type type = typeof(UnityEngine.Object);
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadAllAssetsInternal(assetInfo, true);
+		}
+
 
 		/// <summary>
 		/// 异步加载资源包内所有资源对象
@@ -780,6 +840,18 @@ namespace YooAsset
 		public AllAssetsOperationHandle LoadAllAssetsAsync(string location, System.Type type)
 		{
 			DebugCheckInitialize();
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
+			return LoadAllAssetsInternal(assetInfo, false);
+		}
+
+		/// <summary>
+		/// 异步加载资源包内所有资源对象
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		public AllAssetsOperationHandle LoadAllAssetsAsync(string location)
+		{
+			DebugCheckInitialize();
+			Type type = typeof(UnityEngine.Object);
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, type);
 			return LoadAllAssetsInternal(assetInfo, false);
 		}
