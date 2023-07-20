@@ -15,7 +15,8 @@ namespace YooAsset
 			CheckDownload,
 			Unpack,
 			CheckUnpack,
-			LoadFile,
+			LoadBundleFile,
+			LoadDeliveryFile,
 			CheckLoadFile,
 			Done,
 		}
@@ -59,22 +60,22 @@ namespace YooAsset
 					}
 					else
 					{
-						_steps = ESteps.LoadFile;
+						_steps = ESteps.LoadBundleFile;
 						FileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
 					}
 #else
-					_steps = ESteps.LoadFile;
+					_steps = ESteps.LoadBundleFile;
 					FileLoadPath = MainBundleInfo.Bundle.StreamingFilePath;
 #endif
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
-					_steps = ESteps.LoadFile;
+					_steps = ESteps.LoadBundleFile;
 					FileLoadPath = MainBundleInfo.Bundle.CachedDataFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromDelivery)
 				{
-					_steps = ESteps.LoadFile;
+					_steps = ESteps.LoadDeliveryFile;
 					FileLoadPath = MainBundleInfo.DeliveryFilePath;
 				}
 				else
@@ -108,7 +109,7 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.LoadFile;
+					_steps = ESteps.LoadBundleFile;
 					return; //下载完毕等待一帧再去加载！
 				}
 			}
@@ -139,12 +140,12 @@ namespace YooAsset
 				}
 				else
 				{
-					_steps = ESteps.LoadFile;
+					_steps = ESteps.LoadBundleFile;
 				}
 			}
 
 			// 5. 加载AssetBundle
-			if (_steps == ESteps.LoadFile)
+			if (_steps == ESteps.LoadBundleFile)
 			{
 #if UNITY_EDITOR
 				// 注意：Unity2017.4编辑器模式下，如果AssetBundle文件不存在会导致编辑器崩溃，这里做了预判。
@@ -219,7 +220,35 @@ namespace YooAsset
 				_steps = ESteps.CheckLoadFile;
 			}
 
-			// 6. 检测AssetBundle加载结果
+			// 6. 加载AssetBundle
+			if (_steps == ESteps.LoadDeliveryFile)
+			{
+				// 设置下载进度
+				DownloadProgress = 1f;
+				DownloadedBytes = (ulong)MainBundleInfo.Bundle.FileSize;
+
+				// Load assetBundle file
+				var loadMethod = (EBundleLoadMethod)MainBundleInfo.Bundle.LoadMethod;
+				if (loadMethod == EBundleLoadMethod.Normal)
+				{
+					ulong offset = MainBundleInfo.DeliveryFileOffset;
+					if (_isWaitForAsyncComplete)
+						CacheBundle = AssetBundle.LoadFromFile(FileLoadPath, 0, offset);
+					else
+						_createRequest = AssetBundle.LoadFromFileAsync(FileLoadPath, 0, offset);
+				}
+				else
+				{
+					_steps = ESteps.Done;
+					Status = EStatus.Failed;
+					LastError = $"Delivery file not support encryption : {MainBundleInfo.Bundle.BundleName}";
+					YooLogger.Error(LastError);
+					return;
+				}
+				_steps = ESteps.CheckLoadFile;
+			}
+
+			// 7. 检测AssetBundle加载结果
 			if (_steps == ESteps.CheckLoadFile)
 			{
 				if (_createRequest != null)
