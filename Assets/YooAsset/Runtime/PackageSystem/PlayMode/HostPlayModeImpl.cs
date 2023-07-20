@@ -60,13 +60,13 @@ namespace YooAsset
 		{
 			return CacheSystem.IsCached(packageBundle.PackageName, packageBundle.CacheGUID);
 		}
-		private bool IsDeliveryPackageBundle(PackageBundle packageBundle, out string deliveryFilePath)
+		private bool IsDeliveryPackageBundle(PackageBundle packageBundle)
 		{
-			deliveryFilePath = _queryServices.QueryDeliveryFiles(_packageName, packageBundle.FileName);
-			if (string.IsNullOrEmpty(deliveryFilePath))
-				return false;
-			else
-				return true;
+			return _queryServices.QueryDeliveryFiles(_packageName, packageBundle.FileName);
+		}
+		private DeliveryFileInfo GetDeiveryFileInfo(PackageBundle packageBundle)
+		{
+			return _queryServices.GetDeliveryFileInfo(_packageName, packageBundle.FileName);
 		}
 
 		#region IPlayModeServices接口
@@ -119,6 +119,10 @@ namespace YooAsset
 			List<PackageBundle> downloadList = new List<PackageBundle>(1000);
 			foreach (var packageBundle in manifest.BundleList)
 			{
+				// 忽略分发文件
+				if (IsDeliveryPackageBundle(packageBundle))
+					continue;
+
 				// 忽略缓存文件
 				if (IsCachedPackageBundle(packageBundle))
 					continue;
@@ -144,6 +148,10 @@ namespace YooAsset
 			List<PackageBundle> downloadList = new List<PackageBundle>(1000);
 			foreach (var packageBundle in manifest.BundleList)
 			{
+				// 忽略分发文件
+				if (IsDeliveryPackageBundle(packageBundle))
+					continue;
+
 				// 忽略缓存文件
 				if (IsCachedPackageBundle(packageBundle))
 					continue;
@@ -205,6 +213,10 @@ namespace YooAsset
 			List<PackageBundle> downloadList = new List<PackageBundle>(1000);
 			foreach (var packageBundle in checkList)
 			{
+				// 忽略分发文件
+				if (IsDeliveryPackageBundle(packageBundle))
+					continue;
+
 				// 忽略缓存文件
 				if (IsCachedPackageBundle(packageBundle))
 					continue;
@@ -279,9 +291,10 @@ namespace YooAsset
 				throw new Exception("Should never get here !");
 
 			// 查询分发资源
-			if (IsDeliveryPackageBundle(packageBundle, out string deliveryFilePath))
+			if (IsDeliveryPackageBundle(packageBundle))
 			{
-				BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromDelivery, deliveryFilePath);
+				DeliveryFileInfo deliveryFileInfo = GetDeiveryFileInfo(packageBundle);
+				BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromDelivery, deliveryFileInfo.DeliveryFilePath, deliveryFileInfo.DeliveryFileOffset);
 				return bundleInfo;
 			}
 
