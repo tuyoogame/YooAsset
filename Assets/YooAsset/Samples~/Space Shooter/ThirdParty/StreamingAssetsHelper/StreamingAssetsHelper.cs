@@ -4,7 +4,7 @@ using UnityEngine;
 using YooAsset;
 
 /// <summary>
-/// 内置文件查询服务类
+/// 资源文件查询服务类
 /// </summary>
 public class GameQueryServices : IQueryServices
 {
