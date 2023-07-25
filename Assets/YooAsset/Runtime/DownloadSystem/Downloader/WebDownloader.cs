@@ -72,14 +72,18 @@ namespace YooAsset
 				{
 					uint crc = _bundleInfo.Bundle.UnityCRC;
 					_downloadhandler = new DownloadHandlerAssetBundle(_requestURL, crc);
+#if UNITY_2020_3_OR_NEWER
 					_downloadhandler.autoLoadAssetBundle = false;
+#endif
 				}
 				else
 				{
 					uint crc = _bundleInfo.Bundle.UnityCRC;
 					var hash = Hash128.Parse(_bundleInfo.Bundle.FileHash);
 					_downloadhandler = new DownloadHandlerAssetBundle(_requestURL, hash, crc);
+#if UNITY_2020_3_OR_NEWER
 					_downloadhandler.autoLoadAssetBundle = false;
+#endif
 				}
 
 				_webRequest.downloadHandler = _downloadhandler;
@@ -169,7 +173,7 @@ namespace YooAsset
 				_steps = ESteps.Done;
 				_lastError = "user abort";
 				_lastCode = 0;
-	
+
 				DisposeRequest();
 				DisposeHandler();
 			}
