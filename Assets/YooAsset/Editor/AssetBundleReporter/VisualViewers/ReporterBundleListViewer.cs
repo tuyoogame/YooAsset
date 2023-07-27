@@ -12,29 +12,29 @@ namespace YooAsset.Editor
 {
 	internal class ReporterBundleListViewer
 	{
-		protected enum ESortMode
+		private enum ESortMode
 		{
 			BundleName,
 			BundleSize,
 			BundleTags
 		}
 
-		protected VisualTreeAsset _visualAsset;
-		protected TemplateContainer _root;
+		private VisualTreeAsset _visualAsset;
+		private TemplateContainer _root;
 
-		protected ToolbarButton _topBar1;
-		protected ToolbarButton _topBar2;
-		protected ToolbarButton _topBar3;
-		protected ToolbarButton _topBar5;
-		protected ToolbarButton _bottomBar1;
-		protected ListView _bundleListView;
-		protected ListView _includeListView;
+		private ToolbarButton _topBar1;
+		private ToolbarButton _topBar2;
+		private ToolbarButton _topBar3;
+		private ToolbarButton _topBar5;
+		private ToolbarButton _bottomBar1;
+		private ListView _bundleListView;
+		private ListView _includeListView;
 
-		protected BuildReport _buildReport;
-		protected string _reportFilePath;
-		protected string _searchKeyWord;
-		protected ESortMode _sortMode = ESortMode.BundleName;
-		protected bool _descendingSort = false;
+		private BuildReport _buildReport;
+		private string _reportFilePath;
+		private string _searchKeyWord;
+		private ESortMode _sortMode = ESortMode.BundleName;
+		private bool _descendingSort = false;
 
 		/// <summary>
 		/// 初始化页面
