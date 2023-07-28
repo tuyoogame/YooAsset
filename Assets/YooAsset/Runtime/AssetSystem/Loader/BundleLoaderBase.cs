@@ -144,15 +144,6 @@ namespace YooAsset
 			}
 		}
 
-		/// <summary>
-		/// 销毁资源包（安全模式）
-		/// </summary>
-		public void DestroySafely()
-		{
-			WaitForAsyncComplete();
-			Destroy();
-		}
-
 
 		/// <summary>
 		/// 轮询更新

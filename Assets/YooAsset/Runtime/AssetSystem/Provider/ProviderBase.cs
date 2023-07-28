@@ -141,22 +141,6 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 销毁资源对象（安全模式）
-		/// </summary>
-		public void DestroySafely()
-		{
-			if (Status == EStatus.Loading || Status == EStatus.Checking)
-			{
-				WaitForAsyncComplete();
-				Destroy();
-			}
-			else
-			{
-				Destroy();
-			}
-		}
-
-		/// <summary>
 		/// 是否可以销毁
 		/// </summary>
 		public bool CanDestroy()

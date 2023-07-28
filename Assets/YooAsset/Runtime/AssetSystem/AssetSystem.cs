@@ -128,11 +128,13 @@ namespace YooAsset
 #else
 			foreach (var provider in _providerList)
 			{
-				provider.DestroySafely();
+				provider.WaitForAsyncComplete();
+				provider.Destroy();
 			}
 			foreach (var loader in _loaderList)
 			{
-				loader.DestroySafely();
+				loader.WaitForAsyncComplete();
+				loader.Destroy();
 			}
 
 			_providerList.Clear();
@@ -416,7 +418,7 @@ namespace YooAsset
 				return null;
 		}
 
-#region 调试信息
+		#region 调试信息
 		internal List<DebugProviderInfo> GetDebugReportInfos()
 		{
 			List<DebugProviderInfo> result = new List<DebugProviderInfo>(_providerList.Count);
@@ -444,6 +446,6 @@ namespace YooAsset
 			}
 			return result;
 		}
-#endregion
+		#endregion
 	}
 }
