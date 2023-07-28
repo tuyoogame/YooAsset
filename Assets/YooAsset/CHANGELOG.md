@@ -2,6 +2,41 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.5.3-preview] - 2023-07-28
+
+### Fixed
+
+- 修复了Unity2020以下版本的编辑器提示找不到"autoLoadAssetBundle"的编译错误。
+
+### Added
+
+- 新增了支持开发者分发资源的功能。
+
+  ```c#
+  public interface IQueryServices
+  {
+      /// <summary>
+      /// 查询应用程序里的内置资源是否存在
+      /// </summary>
+      bool QueryStreamingAssets(string packageName, string fileName);
+  
+      /// <summary>
+      /// 查询是否为开发者分发的资源
+      /// </summary>
+      bool QueryDeliveryFiles(string packageName, string fileName);
+  
+      /// <summary>
+      /// 获取开发者分发的资源信息
+      /// </summary>
+      DeliveryFileInfo GetDeliveryFileInfo(string packageName, string fileName);
+  }
+  ```
+
+### Changed
+
+- 针对资源清单更新方法传入参数的合法性检测。
+- 编辑器下针对激活的资源清单有效性的检测。
+
 ## [1.5.2-preview] - 2023-07-18
 
 重新设计了对WebGL平台的支持，新增加了专属模式：WebPlayMode
