@@ -16,7 +16,7 @@ namespace YooAsset.Editor
 	{
 		string IAddressRule.GetAssetAddress(AddressRuleData data)
 		{
-			return data.AssetPath;
+			throw new System.Exception("可寻址模式下已经默认支持通过资源路径加载！");
 		}
 	}
 
