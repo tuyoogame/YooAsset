@@ -73,12 +73,17 @@ namespace YooAsset
 
 		internal abstract void Start();
 		internal abstract void Update();
-		internal void Finish()
+
+		internal void OnFinish()
 		{
 			Progress = 1f;
 			_callback?.Invoke(this);
 			if (_taskCompletionSource != null)
 				_taskCompletionSource.TrySetResult(null);
+		}
+		internal void OnStart()
+		{
+			Status = EOperationStatus.Processing;
 		}
 
 		/// <summary>

@@ -67,7 +67,7 @@ namespace YooAsset
 				if (operation.IsDone)
 				{
 					_removeList.Add(operation);
-					operation.Finish();
+					operation.OnFinish();
 				}
 			}
 
@@ -101,6 +101,7 @@ namespace YooAsset
 		public static void StartOperation(AsyncOperationBase operation)
 		{
 			_addList.Add(operation);
+			operation.OnStart();
 			operation.Start();
 		}
 	}

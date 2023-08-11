@@ -44,12 +44,16 @@ namespace YooAsset
 			{
 				if (IsValidWithWarning == false)
 					return EOperationStatus.None;
-				if (Provider.Status == ProviderBase.EStatus.Failed)
-					return EOperationStatus.Failed;
-				else if (Provider.Status == ProviderBase.EStatus.Succeed)
-					return EOperationStatus.Succeed;
-				else
+
+				var status = Provider.Status;
+				if (status == ProviderBase.EStatus.None)
 					return EOperationStatus.None;
+				else if (status == ProviderBase.EStatus.Succeed)
+					return EOperationStatus.Succeed;
+				else if (status == ProviderBase.EStatus.Failed)
+					return EOperationStatus.Failed;
+				else
+					return EOperationStatus.Processing;
 			}
 		}
 
