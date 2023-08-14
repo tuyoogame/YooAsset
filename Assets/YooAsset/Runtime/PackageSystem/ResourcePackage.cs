@@ -122,7 +122,8 @@ namespace YooAsset
 				var initializeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = hostPlayModeImpl.InitializeAsync(
 					PackageName,
-					initializeParameters.QueryServices,
+					initializeParameters.BuildinQueryServices,
+					initializeParameters.DeliveryQueryServices,
 					initializeParameters.RemoteServices
 					);
 			}
@@ -138,7 +139,7 @@ namespace YooAsset
 				var initializeParameters = parameters as WebPlayModeParameters;
 				initializeOperation = webPlayModeImpl.InitializeAsync(
 					PackageName,
-					initializeParameters.QueryServices,
+					initializeParameters.BuildinQueryServices,
 					initializeParameters.RemoteServices
 					);
 			}
@@ -187,8 +188,10 @@ namespace YooAsset
 			if (parameters is HostPlayModeParameters)
 			{
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
-				if (hostPlayModeParameters.QueryServices == null)
-					throw new Exception($"{nameof(IQueryServices)} is null.");
+				if (hostPlayModeParameters.BuildinQueryServices == null)
+					throw new Exception($"{nameof(IBuildinQueryServices)} is null.");
+				if (hostPlayModeParameters.DeliveryQueryServices == null)
+					throw new Exception($"{nameof(IDeliveryQueryServices)} is null.");
 				if (hostPlayModeParameters.RemoteServices == null)
 					throw new Exception($"{nameof(IRemoteServices)} is null.");
 			}

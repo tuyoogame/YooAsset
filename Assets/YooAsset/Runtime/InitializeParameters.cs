@@ -88,7 +88,12 @@ namespace YooAsset
 		/// <summary>
 		/// 内置资源查询服务接口
 		/// </summary>
-		public IQueryServices QueryServices = null;
+		public IBuildinQueryServices BuildinQueryServices = null;
+
+		/// <summary>
+		/// 分发资源查询服务接口
+		/// </summary>
+		public IDeliveryQueryServices DeliveryQueryServices = null;
 
 		/// <summary>
 		/// 远端资源地址查询服务类
@@ -104,7 +109,7 @@ namespace YooAsset
 		/// <summary>
 		/// 内置资源查询服务接口
 		/// </summary>
-		public IQueryServices QueryServices = null;
+		public IBuildinQueryServices BuildinQueryServices = null;
 
 		/// <summary>
 		/// 远端资源地址查询服务类

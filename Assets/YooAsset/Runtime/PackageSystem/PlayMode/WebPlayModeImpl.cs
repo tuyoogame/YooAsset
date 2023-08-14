@@ -10,7 +10,7 @@ namespace YooAsset
 
 		// 参数相关
 		private string _packageName;
-		private IQueryServices _queryServices;
+		private IBuildinQueryServices _buildinQueryServices;
 		private IRemoteServices _remoteServices;
 
 		public IRemoteServices RemoteServices
@@ -21,10 +21,10 @@ namespace YooAsset
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(string packageName, IQueryServices queryServices, IRemoteServices remoteServices)
+		public InitializationOperation InitializeAsync(string packageName, IBuildinQueryServices buildinQueryServices, IRemoteServices remoteServices)
 		{
 			_packageName = packageName;
-			_queryServices = queryServices;
+			_buildinQueryServices = buildinQueryServices;
 			_remoteServices = remoteServices;
 
 			var operation = new WebPlayModeInitializationOperation(this, packageName);
@@ -44,7 +44,7 @@ namespace YooAsset
 		// 查询相关
 		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
 		{
-			return _queryServices.QueryStreamingAssets(_packageName, packageBundle.FileName);
+			return _buildinQueryServices.QueryStreamingAssets(_packageName, packageBundle.FileName);
 		}
 
 		#region IPlayModeServices接口
