@@ -69,19 +69,20 @@ internal class FsmInitialize : IStateNode
 			string fallbackHostServer = GetHostServerURL();
 			var createParameters = new HostPlayModeParameters();
 			createParameters.DecryptionServices = new GameDecryptionServices();
-			createParameters.QueryServices = new GameQueryServices();
+			createParameters.BuildinQueryServices = new GameQueryServices();
+			createParameters.DeliveryQueryServices = new DefaultDeliveryQueryServices();
 			createParameters.RemoteServices = new RemoteServices(defaultHostServer, fallbackHostServer);
 			initializationOperation = package.InitializeAsync(createParameters);
 		}
 
 		// WebGL运行模式
-		if(playMode == EPlayMode.WebPlayMode)
+		if (playMode == EPlayMode.WebPlayMode)
 		{
 			string defaultHostServer = GetHostServerURL();
 			string fallbackHostServer = GetHostServerURL();
 			var createParameters = new WebPlayModeParameters();
 			createParameters.DecryptionServices = new GameDecryptionServices();
-			createParameters.QueryServices = new GameQueryServices();
+			createParameters.BuildinQueryServices = new GameQueryServices();
 			createParameters.RemoteServices = new RemoteServices(defaultHostServer, fallbackHostServer);
 			initializationOperation = package.InitializeAsync(createParameters);
 		}
@@ -176,6 +177,21 @@ internal class FsmInitialize : IStateNode
 		public uint GetManagedReadBufferSize()
 		{
 			return 1024;
+		}
+	}
+
+	/// <summary>
+	/// 默认的分发资源查询服务类
+	/// </summary>
+	private class DefaultDeliveryQueryServices : IDeliveryQueryServices
+	{
+		public DeliveryFileInfo GetDeliveryFileInfo(string packageName, string fileName)
+		{
+			throw new NotImplementedException();
+		}
+		public bool QueryDeliveryFiles(string packageName, string fileName)
+		{
+			return false;
 		}
 	}
 }
