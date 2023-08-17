@@ -26,6 +26,7 @@ namespace YooAsset.Editor
 		private List<RuleDisplayName> _filterRuleList;
 
 		private Button _settingsButton;
+		private VisualElement _helpBoxContainer;
 		private VisualElement _setting1Container;
 		private VisualElement _setting2Container;
 		private Toggle _showPackageToogle;
@@ -34,6 +35,7 @@ namespace YooAsset.Editor
 		private Toggle _includeAssetGUIDToogle;
 		private Toggle _uniqueBundleNameToogle;
 		private Toggle _showEditorAliasToggle;
+		private HelpBox _helpBox;
 
 		private VisualElement _packageContainer;
 		private ListView _packageListView;
@@ -123,6 +125,11 @@ namespace YooAsset.Editor
 					AssetBundleCollectorSettingData.ModifyShowEditorAlias(evt.newValue);
 					RefreshWindow();
 				});
+
+				// 警示栏
+				_helpBox = new HelpBox("无法同时开启[Enable Addressable]选项和[Location To Lower]选项", HelpBoxMessageType.Error);
+				_helpBoxContainer = root.Q("HelpBoxContainer");
+				_helpBoxContainer.Add(_helpBox);
 
 				// 配置修复按钮
 				var fixBtn = root.Q<Button>("FixButton");
@@ -328,6 +335,17 @@ namespace YooAsset.Editor
 			_uniqueBundleNameToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.UniqueBundleName);
 			_showEditorAliasToggle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowEditorAlias);
 
+			// 警示框
+			if(_enableAddressableToogle.value && _locationToLowerToogle.value)
+			{
+				_helpBoxContainer.style.display = DisplayStyle.Flex;
+			}
+			else
+			{
+				_helpBoxContainer.style.display = DisplayStyle.None;
+			}
+
+			// 设置栏
 			if (_showSettings)
 			{
 				_setting1Container.style.display = DisplayStyle.Flex;
