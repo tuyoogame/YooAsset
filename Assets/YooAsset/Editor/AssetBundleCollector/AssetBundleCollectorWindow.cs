@@ -35,7 +35,6 @@ namespace YooAsset.Editor
 		private Toggle _includeAssetGUIDToogle;
 		private Toggle _uniqueBundleNameToogle;
 		private Toggle _showEditorAliasToggle;
-		private HelpBox _helpBox;
 
 		private VisualElement _packageContainer;
 		private ListView _packageListView;
@@ -84,6 +83,9 @@ namespace YooAsset.Editor
 
 				visualAsset.CloneTree(root);
 
+				// 警示栏
+				_helpBoxContainer = root.Q("HelpBoxContainer");
+
 				// 公共设置相关
 				_settingsButton = root.Q<Button>("SettingsButton");
 				_settingsButton.clicked += SettingsBtn_clicked;
@@ -125,11 +127,6 @@ namespace YooAsset.Editor
 					AssetBundleCollectorSettingData.ModifyShowEditorAlias(evt.newValue);
 					RefreshWindow();
 				});
-
-				// 警示栏
-				_helpBox = new HelpBox("无法同时开启[Enable Addressable]选项和[Location To Lower]选项", HelpBoxMessageType.Error);
-				_helpBoxContainer = root.Q("HelpBoxContainer");
-				_helpBoxContainer.Add(_helpBox);
 
 				// 配置修复按钮
 				var fixBtn = root.Q<Button>("FixButton");
@@ -336,14 +333,21 @@ namespace YooAsset.Editor
 			_showEditorAliasToggle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowEditorAlias);
 
 			// 警示框
-			if(_enableAddressableToogle.value && _locationToLowerToogle.value)
+			_helpBoxContainer.Clear();
+			if (_enableAddressableToogle.value && _locationToLowerToogle.value)
 			{
+				var helpBox = new HelpBox("无法同时开启[Enable Addressable]选项和[Location To Lower]选项", HelpBoxMessageType.Error);
+				_helpBoxContainer.Add(helpBox);
+			}
+			if (AssetBundleCollectorSettingData.Setting.Packages.Count > 1 && _uniqueBundleNameToogle.value == false)
+			{
+				var helpBox = new HelpBox("检测到当前配置存在多个Package，建议开启[Unique Bundle Name]选项", HelpBoxMessageType.Warning);
+				_helpBoxContainer.Add(helpBox);
+			}
+			if (_helpBoxContainer.childCount > 0)
 				_helpBoxContainer.style.display = DisplayStyle.Flex;
-			}
 			else
-			{
 				_helpBoxContainer.style.display = DisplayStyle.None;
-			}
 
 			// 设置栏
 			if (_showSettings)
