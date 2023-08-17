@@ -161,7 +161,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public static void FixFile()
 		{
-			bool isFixed = Setting.FixConfigError();
+			bool isFixed = Setting.FixAllPackageConfigError();
 			if (isFixed)
 			{
 				IsDirty = true;
