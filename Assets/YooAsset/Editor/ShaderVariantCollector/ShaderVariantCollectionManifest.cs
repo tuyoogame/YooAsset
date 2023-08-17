@@ -30,17 +30,22 @@ namespace YooAsset.Editor
 		public class ShaderVariantInfo
 		{
 			/// <summary>
-			/// Shader asset path in editor.
+			/// 着色器资源路径.
 			/// </summary>
 			public string AssetPath;
 
 			/// <summary>
-			/// Shader name.
+			/// 着色器名称
 			/// </summary>
 			public string ShaderName;
 
 			/// <summary>
-			/// Shader variants elements list.
+			/// 着色器变种总数
+			/// </summary>
+			public int ShaderVariantCount = 0;
+
+			/// <summary>
+			/// 着色器变种列表
 			/// </summary>
 			public List<ShaderVariantElement> ShaderVariantElements = new List<ShaderVariantElement>(1000);
 		}
@@ -71,6 +76,7 @@ namespace YooAsset.Editor
 			element.PassType = passType;
 			element.Keywords = keywords;
 			info.ShaderVariantElements.Add(element);
+			info.ShaderVariantCount++;
 		}
 		private ShaderVariantInfo GetOrCreateShaderVariantInfo(string assetPath, string shaderName)
 		{
