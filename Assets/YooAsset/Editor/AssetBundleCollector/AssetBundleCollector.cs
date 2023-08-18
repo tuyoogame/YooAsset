@@ -340,11 +340,13 @@ namespace YooAsset.Editor
 			List<string> result = new List<string>(depends.Length);
 			foreach (string assetPath in depends)
 			{
+				// 注意：排除主资源对象
+				if (assetPath == mainAssetPath)
+					continue;
+
 				if (IsValidateAsset(assetPath, false))
 				{
-					// 注意：排除主资源对象
-					if (assetPath != mainAssetPath)
-						result.Add(assetPath);
+					result.Add(assetPath);
 				}
 			}
 			return result;
