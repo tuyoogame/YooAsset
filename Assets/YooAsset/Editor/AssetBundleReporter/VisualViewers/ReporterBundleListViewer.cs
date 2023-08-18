@@ -349,24 +349,24 @@ namespace YooAsset.Editor
 		private void FillIncludeListView(ReportBundleInfo bundleInfo)
 		{
 			List<ReportAssetInfo> containsList = new List<ReportAssetInfo>();
-			Dictionary<string, int> tempAssetDict = new Dictionary<string, int>();
+			HashSet<string> mainAssetDic = new HashSet<string>();
 			foreach (var assetInfo in _buildReport.AssetInfos)
 			{
 				if (assetInfo.MainBundleName == bundleInfo.BundleName)
 				{
-					tempAssetDict.Add(assetInfo.AssetPath, 1);
+					mainAssetDic.Add(assetInfo.AssetPath);
 					containsList.Add(assetInfo);
-				} 	
+				}
 			}
-			foreach (string includeInAsset in bundleInfo.AllBuiltinAssets)
+			foreach (string assetPath in bundleInfo.AllBuiltinAssets)
 			{
-				if (!tempAssetDict.ContainsKey(includeInAsset))
+				if (mainAssetDic.Contains(assetPath) == false)
 				{
 					var assetInfo = new ReportAssetInfo();
-					assetInfo.AssetPath = includeInAsset;
+					assetInfo.AssetPath = assetPath;
 					assetInfo.AssetGUID = "--";
 					containsList.Add(assetInfo);
-				} 
+				}
 			}
 
 			_includeListView.Clear();
@@ -396,7 +396,7 @@ namespace YooAsset.Editor
 				label.style.unityTextAlign = TextAnchor.MiddleLeft;
 				label.style.marginLeft = 3f;
 				//label.style.flexGrow = 1f;
-				label.style.width = 200;
+				label.style.width = 100;
 				element.Add(label);
 			}
 
@@ -423,7 +423,7 @@ namespace YooAsset.Editor
 
 			// Asset Source
 			var label3 = element.Q<Label>("Label3");
-			label3.text = assetInfo.AssetGUID != "--" ? "Main Asset" : "Include Asset";
+			label3.text = assetInfo.AssetGUID != "--" ? "Main Asset" : "Builtin Asset";
 
 			// GUID
 			var label2 = element.Q<Label>("Label2");
