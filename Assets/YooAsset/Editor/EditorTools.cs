@@ -153,7 +153,7 @@ namespace YooAsset.Editor
 				guids = AssetDatabase.FindAssets($"t:{searchType}", searchInFolders);
 
 			// 注意：AssetDatabase.FindAssets()可能会获取到重复的资源
-			List<string> result = new List<string>();
+			HashSet<string> result = new HashSet<string>();
 			for (int i = 0; i < guids.Length; i++)
 			{
 				string guid = guids[i];

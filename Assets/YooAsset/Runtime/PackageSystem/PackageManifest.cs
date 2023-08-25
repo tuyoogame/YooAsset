@@ -57,6 +57,8 @@ namespace YooAsset
 		/// </summary>
 		public List<PackageBundle> BundleList = new List<PackageBundle>();
 
+		public Dictionary<string, int> BundleListMap;
+
 
 		/// <summary>
 		/// 资源包集合（提供BundleName获取PackageBundle）

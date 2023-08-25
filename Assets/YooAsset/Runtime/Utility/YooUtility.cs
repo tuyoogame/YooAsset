@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using Standart.Hash.xxHash;
 
 namespace YooAsset
 {
@@ -272,6 +273,28 @@ namespace YooAsset
 				using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
 				{
 					return StreamMD5(fs);
+				}
+			}
+			catch (Exception e)
+			{
+				YooLogger.Exception(e);
+				return string.Empty;
+			}
+		}
+		
+		
+		/// <summary>
+		/// 获取文件的XXXhash32
+		/// </summary>
+		/// <param name="filePath"></param>
+		/// <returns></returns>
+		public static string FileXXhash(string filePath)
+		{
+			try
+			{
+				using (var fs = new  FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+				{
+					return xxHash32.ComputeHash(fs).ToString("x8");
 				}
 			}
 			catch (Exception e)

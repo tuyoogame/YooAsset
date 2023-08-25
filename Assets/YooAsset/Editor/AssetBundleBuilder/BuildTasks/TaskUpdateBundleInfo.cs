@@ -68,7 +68,7 @@ namespace YooAsset.Editor
 			if (bundleInfo.IsRawFile)
 			{
 				string filePath = bundleInfo.PackageSourceFilePath;
-				return HashUtility.FileMD5(filePath);
+				return HashUtility.FileXXhash(filePath);
 			}
 
 			if (parameters.BuildPipeline == EBuildPipeline.BuiltinBuildPipeline)
@@ -132,7 +132,7 @@ namespace YooAsset.Editor
 			if (buildMode == EBuildMode.DryRunBuild || buildMode == EBuildMode.SimulateBuild)
 				return "00000000000000000000000000000000"; //32位
 			else
-				return HashUtility.FileMD5(filePath);
+				return HashUtility.FileXXhash(filePath);
 		}
 		private string GetBundleFileCRC(string filePath, BuildParametersContext buildParametersContext)
 		{
