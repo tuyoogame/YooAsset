@@ -208,6 +208,10 @@ namespace YooAsset
 						packageBundle.ParseBundle(Manifest.PackageName, Manifest.OutputNameStyle);
 						Manifest.BundleDic.Add(packageBundle.BundleName, packageBundle);
 
+						// 注意：原始文件可能存在相同的CacheGUID
+						if (Manifest.CacheGUIDs.Contains(packageBundle.CacheGUID) == false)
+							Manifest.CacheGUIDs.Add(packageBundle.CacheGUID);
+
 						_packageBundleCount--;
 						Progress = 1f - _packageBundleCount / _progressTotalValue;
 						if (OperationSystem.IsBusy)

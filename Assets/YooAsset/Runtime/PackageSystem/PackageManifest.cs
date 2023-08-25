@@ -57,8 +57,6 @@ namespace YooAsset
 		/// </summary>
 		public List<PackageBundle> BundleList = new List<PackageBundle>();
 
-		public Dictionary<string, int> BundleListMap;
-
 
 		/// <summary>
 		/// 资源包集合（提供BundleName获取PackageBundle）
@@ -83,6 +81,12 @@ namespace YooAsset
 		/// </summary>
 		[NonSerialized]
 		public Dictionary<string, string> AssetPathMapping2;
+
+		/// <summary>
+		/// 该资源清单所有文件的缓存GUID集合
+		/// </summary>
+		[NonSerialized]
+		public HashSet<string> CacheGUIDs = new HashSet<string>();
 
 
 		/// <summary>
@@ -193,12 +197,7 @@ namespace YooAsset
 		/// </summary>
 		public bool IsIncludeBundleFile(string cacheGUID)
 		{
-			foreach (var packageBundle in BundleList)
-			{
-				if (packageBundle.CacheGUID == cacheGUID)
-					return true;
-			}
-			return false;
+			return CacheGUIDs.Contains(cacheGUID);
 		}
 
 		/// <summary>
