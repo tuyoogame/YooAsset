@@ -2,6 +2,41 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.5.4-preview] - 2023-08-25
+
+优化了资源清单文件构建速度（极大提升构建体验）（感谢yingnierxiao同学）。
+
+### Fixed
+
+- (#130) 修复了打包路径无效问题bug
+- (#138) 修复了Unity不支持的格式的原生文件会报warning
+
+### Added
+
+- 新增了IBuildinQueryServices 接口。
+
+### Changed
+
+- 在开启可寻址模式下，默认支持通过资源路径加载资源对象。
+
+- 优化了资源收集界面，增加了配置相关的警示提示。
+
+- 优化了资源报告界面，增加了BundleView界面里的builtin资源的列表显示。
+
+- IQueryServices接口变更为IBuildinQueryServices接口
+
+- EOperationStatus增加了正在处理的状态。
+
+  ```c#
+  public enum EOperationStatus
+  {
+      None,
+      Processing,
+      Succeed,
+      Failed
+  }
+  ```
+
 ## [1.5.3-preview] - 2023-07-28
 
 ### Fixed
