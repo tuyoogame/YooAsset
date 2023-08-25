@@ -249,7 +249,7 @@ namespace YooAsset.Editor
 		
 		private void CacheBundleIDs(PackageManifest manifest)
 		{
-			UnityEngine.Debug.Assert(manifest.BundleList.Count == 0);
+			UnityEngine.Debug.Assert(manifest.BundleList.Count != 0, "Manifest bundle list is empty !");
 			for (int index = 0; index < manifest.BundleList.Count; index++)
 			{
 				string bundleName = manifest.BundleList[index].BundleName;
@@ -261,21 +261,6 @@ namespace YooAsset.Editor
 		{
 			int progressValue;
 			int totalCount = manifest.BundleList.Count;
-
-			// 缓存资源包ID
-			_cachedBundleID.Clear();
-			progressValue = 0;
-			foreach (var packageBundle in manifest.BundleList)
-			{
-				int bundleID = GetCachedBundleID(packageBundle.BundleName);
-				_cachedBundleID.Add(packageBundle.BundleName, bundleID);
-				int pro = ++progressValue;
-				if (pro % 100 == 0)
-				{
-					EditorTools.DisplayProgressBar("缓存资源包索引", pro, totalCount);
-				}
-			}
-			EditorTools.ClearProgressBar();
 
 			// 缓存资源包依赖
 			_cachedBundleDepends.Clear();
@@ -317,21 +302,6 @@ namespace YooAsset.Editor
 		{
 			int progressValue;
 			int totalCount = manifest.BundleList.Count;
-
-			// 缓存资源包ID
-			_cachedBundleID.Clear();
-			progressValue = 0;
-			foreach (var packageBundle in manifest.BundleList)
-			{
-				int bundleID = GetCachedBundleID(packageBundle.BundleName);
-				_cachedBundleID.Add(packageBundle.BundleName, bundleID);
-				int pro = ++progressValue;
-				if (pro % 100 == 0)
-				{
-					EditorTools.DisplayProgressBar("缓存资源包索引", pro, totalCount);
-				}
-			}
-			EditorTools.ClearProgressBar();
 
 			// 缓存资源包依赖
 			_cachedBundleDepends.Clear();
