@@ -111,7 +111,7 @@ namespace YooAsset.Editor
 		public CollectResult GetPackageAssets(EBuildMode buildMode, string packageName)
 		{
 			if (string.IsNullOrEmpty(packageName))
-				throw new Exception("Build package name is null or mepty !");
+				throw new Exception("Build package name is null or empty !");
 
 			var package = GetPackage(packageName);
 			CollectCommand command = new CollectCommand(buildMode, packageName,
@@ -131,7 +131,7 @@ namespace YooAsset.Editor
 				if (package.PackageName == packageName)
 					return package;
 			}
-			throw new Exception($"Not found pacakge : {packageName}");
+			throw new Exception($"Not found package : {packageName}");
 		}
 	}
 }
