@@ -43,7 +43,10 @@ namespace YooAsset.Editor
 		{
 			if (AssetBundleCollectorSettingData.HasActiveRuleName(ActiveRuleName) == false)
 				throw new Exception($"Invalid {nameof(IActiveRule)} class type : {ActiveRuleName} in group : {GroupName}");
-
+			
+			// 当分组不是激活状态时，直接不进行检测
+			if (ActiveRuleName == nameof(DisableGroup)) return;
+			
 			foreach (var collector in Collectors)
 			{
 				collector.CheckConfigError();
