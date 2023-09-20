@@ -71,20 +71,24 @@ namespace YooAsset
 		private readonly string _packageName;
 		private readonly string _packageVersion;
 		private readonly bool _autoSaveVersion;
+		private readonly bool _appendTimeTicks;
 		private readonly int _timeout;
+		private readonly int _failedTryAgain;
 		private LoadCacheManifestOperation _tryLoadCacheManifestOp;
 		private LoadCacheManifestOperation _loadCacheManifestOp;
 		private DownloadManifestOperation _downloadManifestOp;
 		private ESteps _steps = ESteps.None;
 
 
-		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, bool autoSaveVersion, int timeout)
+		internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageName, string packageVersion, bool autoSaveVersion, bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
 			_impl = impl;
 			_packageName = packageName;
 			_packageVersion = packageVersion;
 			_autoSaveVersion = autoSaveVersion;
+			_appendTimeTicks = appendTimeTicks;
 			_timeout = timeout;
+			_failedTryAgain = downloadFailedTryAgain;
 		}
 		internal override void Start()
 		{
@@ -159,7 +163,7 @@ namespace YooAsset
 			{
 				if (_downloadManifestOp == null)
 				{
-					_downloadManifestOp = new DownloadManifestOperation(_impl.RemoteServices, _packageName, _packageVersion, _timeout);
+					_downloadManifestOp = new DownloadManifestOperation(_impl.RemoteServices, _packageName, _packageVersion, _appendTimeTicks, _timeout, _failedTryAgain);
 					OperationSystem.StartOperation(_downloadManifestOp);
 				}
 
@@ -229,17 +233,21 @@ namespace YooAsset
 		private readonly WebPlayModeImpl _impl;
 		private readonly string _packageName;
 		private readonly string _packageVersion;
+		private readonly bool _appendTimeTicks;
 		private readonly int _timeout;
+		private readonly int _failedTryAgain;
 		private LoadRemoteManifestOperation _loadCacheManifestOp;
 		private ESteps _steps = ESteps.None;
 
 
-		internal WebPlayModeUpdatePackageManifestOperation(WebPlayModeImpl impl, string packageName, string packageVersion, int timeout)
+		internal WebPlayModeUpdatePackageManifestOperation(WebPlayModeImpl impl, string packageName, string packageVersion, bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
 			_impl = impl;
 			_packageName = packageName;
 			_packageVersion = packageVersion;
+			_appendTimeTicks = appendTimeTicks;
 			_timeout = timeout;
+			_failedTryAgain = downloadFailedTryAgain;
 		}
 		internal override void Start()
 		{
@@ -289,7 +297,7 @@ namespace YooAsset
 			{
 				if (_loadCacheManifestOp == null)
 				{
-					_loadCacheManifestOp = new LoadRemoteManifestOperation(_impl.RemoteServices, _packageName, _packageVersion, _timeout);
+					_loadCacheManifestOp = new LoadRemoteManifestOperation(_impl.RemoteServices, _packageName, _packageVersion, _appendTimeTicks, _timeout, _failedTryAgain);
 					OperationSystem.StartOperation(_loadCacheManifestOp);
 				}
 

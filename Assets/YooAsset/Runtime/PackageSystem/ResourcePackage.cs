@@ -247,10 +247,11 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdatePackageVersionOperation UpdatePackageVersionAsync(bool appendTimeTicks = true, int timeout = 60)
+		/// <param name="downloadFailedTryAgain">下载失败重试次数（默认值：3次）</param>
+		public UpdatePackageVersionOperation UpdatePackageVersionAsync(bool appendTimeTicks = true, int timeout = 60, int downloadFailedTryAgain = int.MaxValue)
 		{
 			DebugCheckInitialize(false);
-			return _playModeServices.UpdatePackageVersionAsync(appendTimeTicks, timeout);
+			return _playModeServices.UpdatePackageVersionAsync(appendTimeTicks, timeout, downloadFailedTryAgain);
 		}
 
 		/// <summary>
@@ -258,23 +259,27 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="packageVersion">更新的包裹版本</param>
 		/// <param name="autoSaveVersion">更新成功后自动保存版本号，作为下次初始化的版本。</param>
+		/// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion = true, int timeout = 60)
+		/// <param name="downloadFailedTryAgain">下载失败重试次数（默认值：3次）</param>
+		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion = true, bool appendTimeTicks = true, int timeout = 60, int downloadFailedTryAgain = int.MaxValue)
 		{
 			DebugCheckInitialize(false);
 			DebugCheckUpdateManifest();
-			return _playModeServices.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
+			return _playModeServices.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, appendTimeTicks, timeout, downloadFailedTryAgain);
 		}
 
 		/// <summary>
 		/// 预下载指定版本的包裹资源
 		/// </summary>
 		/// <param name="packageVersion">下载的包裹版本</param>
+		/// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
 		/// <param name="timeout">超时时间（默认值：60秒）</param>
-		public PreDownloadContentOperation PreDownloadContentAsync(string packageVersion, int timeout = 60)
+		/// <param name="downloadFailedTryAgain">下载失败重试次数（默认值：int.MaxValue）</param>
+		public PreDownloadContentOperation PreDownloadContentAsync(string packageVersion, bool appendTimeTicks = true, int timeout = 60, int downloadFailedTryAgain = int.MaxValue)
 		{
 			DebugCheckInitialize(false);
-			return _playModeServices.PreDownloadContentAsync(packageVersion, timeout);
+			return _playModeServices.PreDownloadContentAsync(packageVersion, appendTimeTicks, timeout, downloadFailedTryAgain);
 		}
 
 		/// <summary>

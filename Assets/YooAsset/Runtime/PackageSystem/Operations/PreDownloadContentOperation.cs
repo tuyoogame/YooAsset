@@ -102,7 +102,9 @@ namespace YooAsset
 		private readonly HostPlayModeImpl _impl;
 		private readonly string _packageName;
 		private readonly string _packageVersion;
+		private readonly bool _appendTimeTicks;
 		private readonly int _timeout;
+		private readonly int _failedTryAgain;
 		private LoadCacheManifestOperation _tryLoadCacheManifestOp;
 		private LoadCacheManifestOperation _loadCacheManifestOp;
 		private DownloadManifestOperation _downloadManifestOp;
@@ -110,12 +112,14 @@ namespace YooAsset
 		private ESteps _steps = ESteps.None;
 
 
-		internal HostPlayModePreDownloadContentOperation(HostPlayModeImpl impl, string packageName, string packageVersion, int timeout)
+		internal HostPlayModePreDownloadContentOperation(HostPlayModeImpl impl, string packageName, string packageVersion, bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
 			_impl = impl;
 			_packageName = packageName;
 			_packageVersion = packageVersion;
+			_appendTimeTicks = appendTimeTicks;
 			_timeout = timeout;
+			_failedTryAgain = downloadFailedTryAgain;
 		}
 		internal override void Start()
 		{
@@ -169,7 +173,7 @@ namespace YooAsset
 			{
 				if (_downloadManifestOp == null)
 				{
-					_downloadManifestOp = new DownloadManifestOperation(_impl.RemoteServices, _packageName, _packageVersion, _timeout);
+					_downloadManifestOp = new DownloadManifestOperation(_impl.RemoteServices, _packageName, _packageVersion, _appendTimeTicks, _timeout, _failedTryAgain);
 					OperationSystem.StartOperation(_downloadManifestOp);
 				}
 

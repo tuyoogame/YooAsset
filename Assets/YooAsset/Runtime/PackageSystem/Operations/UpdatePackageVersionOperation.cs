@@ -59,15 +59,18 @@ namespace YooAsset
 		private readonly string _packageName;
 		private readonly bool _appendTimeTicks;
 		private readonly int _timeout;
+		private readonly int _downloadFailedTryAgain;
+		
 		private QueryRemotePackageVersionOperation _queryRemotePackageVersionOp;
 		private ESteps _steps = ESteps.None;
 
-		internal HostPlayModeUpdatePackageVersionOperation(HostPlayModeImpl impl, string packageName, bool appendTimeTicks, int timeout)
+		internal HostPlayModeUpdatePackageVersionOperation(HostPlayModeImpl impl, string packageName, bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
 			_impl = impl;
 			_packageName = packageName;
 			_appendTimeTicks = appendTimeTicks;
 			_timeout = timeout;
+			_downloadFailedTryAgain = downloadFailedTryAgain;
 		}
 		internal override void Start()
 		{
@@ -82,7 +85,7 @@ namespace YooAsset
 			{
 				if (_queryRemotePackageVersionOp == null)
 				{
-					_queryRemotePackageVersionOp = new QueryRemotePackageVersionOperation(_impl.RemoteServices, _packageName, _appendTimeTicks, _timeout);
+					_queryRemotePackageVersionOp = new QueryRemotePackageVersionOperation(_impl.RemoteServices, _packageName, _appendTimeTicks, _timeout, _downloadFailedTryAgain);
 					OperationSystem.StartOperation(_queryRemotePackageVersionOp);
 				}
 
@@ -121,15 +124,17 @@ namespace YooAsset
 		private readonly string _packageName;
 		private readonly bool _appendTimeTicks;
 		private readonly int _timeout;
+		private readonly int _failedTryAgain;
 		private QueryRemotePackageVersionOperation _queryRemotePackageVersionOp;
 		private ESteps _steps = ESteps.None;
 		
-		internal WebPlayModeUpdatePackageVersionOperation(WebPlayModeImpl impl, string packageName, bool appendTimeTicks, int timeout)
+		internal WebPlayModeUpdatePackageVersionOperation(WebPlayModeImpl impl, string packageName, bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
 			_impl = impl;
 			_packageName = packageName;
 			_appendTimeTicks = appendTimeTicks;
 			_timeout = timeout;
+			_failedTryAgain = downloadFailedTryAgain;
 		}
 		internal override void Start()
 		{
@@ -144,7 +149,7 @@ namespace YooAsset
 			{
 				if (_queryRemotePackageVersionOp == null)
 				{
-					_queryRemotePackageVersionOp = new QueryRemotePackageVersionOperation(_impl.RemoteServices, _packageName, _appendTimeTicks, _timeout);
+					_queryRemotePackageVersionOp = new QueryRemotePackageVersionOperation(_impl.RemoteServices, _packageName, _appendTimeTicks, _timeout, _failedTryAgain);
 					OperationSystem.StartOperation(_queryRemotePackageVersionOp);
 				}
 

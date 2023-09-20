@@ -40,19 +40,19 @@ namespace YooAsset
 		{
 		}
 
-		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)
+		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
 			var operation = new OfflinePlayModeUpdatePackageVersionOperation();
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion, int timeout)
+		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion, bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
 			var operation = new OfflinePlayModeUpdatePackageManifestOperation();
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		PreDownloadContentOperation IPlayModeServices.PreDownloadContentAsync(string packageVersion, int timeout)
+		PreDownloadContentOperation IPlayModeServices.PreDownloadContentAsync(string packageVersion, bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
 			var operation = new OfflinePlayModePreDownloadContentOperation();
 			OperationSystem.StartOperation(operation);

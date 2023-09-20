@@ -16,17 +16,17 @@ namespace YooAsset
 		/// <summary>
 		/// 向网络端请求最新的资源版本
 		/// </summary>
-		UpdatePackageVersionOperation UpdatePackageVersionAsync(bool appendTimeTicks, int timeout);
+		UpdatePackageVersionOperation UpdatePackageVersionAsync(bool appendTimeTicks, int timeout, int downloadFailedTryAgain);
 
 		/// <summary>
 		/// 向网络端请求并更新清单
 		/// </summary>
-		UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion, int timeout);
+		UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion, bool appendTimeTicks, int timeout, int downloadFailedTryAgain);
 
 		/// <summary>
 		/// 预下载指定版本的包裹内容
 		/// </summary>
-		PreDownloadContentOperation PreDownloadContentAsync(string packageVersion, int timeout);
+		PreDownloadContentOperation PreDownloadContentAsync(string packageVersion, bool appendTimeTicks, int timeout, int downloadFailedTryAgain);
 
 		// 下载相关
 		ResourceDownloaderOperation CreateResourceDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout);

@@ -66,7 +66,7 @@ namespace YooAsset
 		{
 			return _deliveryQueryServices.QueryDeliveryFiles(_packageName, packageBundle.FileName);
 		}
-		private DeliveryFileInfo GetDeiveryFileInfo(PackageBundle packageBundle)
+		private DeliveryFileInfo GetDeliveryFileInfo(PackageBundle packageBundle)
 		{
 			return _deliveryQueryServices.GetDeliveryFileInfo(_packageName, packageBundle.FileName);
 		}
@@ -91,21 +91,21 @@ namespace YooAsset
 			}
 		}
 
-		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)
+		UpdatePackageVersionOperation IPlayModeServices.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
-			var operation = new HostPlayModeUpdatePackageVersionOperation(this, _packageName, appendTimeTicks, timeout);
+			var operation = new HostPlayModeUpdatePackageVersionOperation(this, _packageName, appendTimeTicks, timeout, downloadFailedTryAgain);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion, int timeout)
+		UpdatePackageManifestOperation IPlayModeServices.UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion, bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
-			var operation = new HostPlayModeUpdatePackageManifestOperation(this, _packageName, packageVersion, autoSaveVersion, timeout);
+			var operation = new HostPlayModeUpdatePackageManifestOperation(this, _packageName, packageVersion, autoSaveVersion, appendTimeTicks, timeout, downloadFailedTryAgain);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
-		PreDownloadContentOperation IPlayModeServices.PreDownloadContentAsync(string packageVersion, int timeout)
+		PreDownloadContentOperation IPlayModeServices.PreDownloadContentAsync(string packageVersion, bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
-			var operation = new HostPlayModePreDownloadContentOperation(this, _packageName, packageVersion, timeout);
+			var operation = new HostPlayModePreDownloadContentOperation(this, _packageName, packageVersion, appendTimeTicks, timeout, downloadFailedTryAgain);
 			OperationSystem.StartOperation(operation);
 			return operation;
 		}
@@ -295,7 +295,7 @@ namespace YooAsset
 			// 查询分发资源
 			if (IsDeliveryPackageBundle(packageBundle))
 			{
-				DeliveryFileInfo deliveryFileInfo = GetDeiveryFileInfo(packageBundle);
+				DeliveryFileInfo deliveryFileInfo = GetDeliveryFileInfo(packageBundle);
 				BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.LoadFromDelivery, deliveryFileInfo.DeliveryFilePath, deliveryFileInfo.DeliveryFileOffset);
 				return bundleInfo;
 			}

@@ -1,4 +1,6 @@
 ﻿
+using UnityEngine;
+
 namespace YooAsset
 {
 	internal class LoadRemoteManifestOperation : AsyncOperationBase
@@ -8,16 +10,20 @@ namespace YooAsset
 			None,
 			DownloadPackageHashFile,
 			DownloadManifestFile,
+			TryAgain,
 			VerifyFileHash,
 			CheckDeserializeManifest,
 			Done,
 		}
 
-		private static int RequestCount = 0;
+		private int _requestCount = 0;
+		private float _tryAgainTimer;
 		private readonly IRemoteServices _remoteServices;
 		private readonly string _packageName;
 		private readonly string _packageVersion;
+		private readonly bool _appendTimeTicks;
 		private readonly int _timeout;
+		private readonly int _failedTryAgain;
 		private QueryRemotePackageHashOperation _queryRemotePackageHashOp;
 		private UnityWebDataRequester _downloader;
 		private DeserializeManifestOperation _deserializer;
@@ -30,16 +36,17 @@ namespace YooAsset
 		public PackageManifest Manifest { private set; get; }
 
 
-		internal LoadRemoteManifestOperation(IRemoteServices remoteServices, string packageName, string packageVersion, int timeout)
+		internal LoadRemoteManifestOperation(IRemoteServices remoteServices, string packageName, string packageVersion, bool appendTimeTicks, int timeout, int downloadFailedTryAgain)
 		{
 			_remoteServices = remoteServices;
 			_packageName = packageName;
 			_packageVersion = packageVersion;
+			_appendTimeTicks = appendTimeTicks;
 			_timeout = timeout;
+			_failedTryAgain = downloadFailedTryAgain;
 		}
 		internal override void Start()
 		{
-			RequestCount++;
 			_steps = ESteps.DownloadPackageHashFile;
 		}
 		internal override void Update()
@@ -51,7 +58,7 @@ namespace YooAsset
 			{
 				if (_queryRemotePackageHashOp == null)
 				{
-					_queryRemotePackageHashOp = new QueryRemotePackageHashOperation(_remoteServices, _packageName, _packageVersion, _timeout);
+					_queryRemotePackageHashOp = new QueryRemotePackageHashOperation(_remoteServices, _packageName, _packageVersion, _appendTimeTicks, _timeout, _failedTryAgain);
 					OperationSystem.StartOperation(_queryRemotePackageHashOp);
 				}
 
@@ -87,9 +94,9 @@ namespace YooAsset
 
 				if (_downloader.HasError())
 				{
-					_steps = ESteps.Done;
-					Status = EOperationStatus.Failed;
-					Error = _downloader.GetError();
+					_steps = ESteps.TryAgain;
+					_requestCount++;
+					YooLogger.Warning($"Request download manifest file failed : {_downloader.URL}, {_downloader.GetError()}");
 				}
 				else
 				{
@@ -98,6 +105,27 @@ namespace YooAsset
 				}
 
 				_downloader.Dispose();
+				_downloader = null;
+			}
+
+			if (_steps == ESteps.TryAgain)
+			{
+				if (_requestCount <= _failedTryAgain)
+				{
+					_tryAgainTimer += Time.unscaledDeltaTime;
+					if (_tryAgainTimer > 1f)
+					{
+						_steps = ESteps.DownloadManifestFile;
+						Error = string.Empty;
+						_tryAgainTimer = 0f;
+					}
+				}
+				else
+				{
+					_steps = ESteps.Done;
+					Status = EOperationStatus.Failed;
+					Error = $"Request download manifest file failed : reach max try again count : {_requestCount}";
+				}
 			}
 
 			if (_steps == ESteps.VerifyFileHash)
@@ -140,11 +168,19 @@ namespace YooAsset
 
 		private string GetDownloadRequestURL(string fileName)
 		{
+			string url;
+
 			// 轮流返回请求地址
-			if (RequestCount % 2 == 0)
-				return _remoteServices.GetRemoteFallbackURL(fileName);
+			if (_requestCount % 2 == 0)
+				url = _remoteServices.GetRemoteMainURL(fileName);
 			else
-				return _remoteServices.GetRemoteMainURL(fileName);
+				url = _remoteServices.GetRemoteFallbackURL(fileName);
+
+			// 在URL末尾添加时间戳
+			if (_appendTimeTicks)
+				return $"{url}?{System.DateTime.UtcNow.Ticks}";
+			else
+				return url;
 		}
 	}
 }
