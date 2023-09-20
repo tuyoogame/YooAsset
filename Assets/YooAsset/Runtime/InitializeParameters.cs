@@ -2,6 +2,16 @@
 namespace YooAsset
 {
 	/// <summary>
+	/// 默认的构建管线
+	/// </summary>
+	public class DefaultBuildPipeline
+	{
+		public const string BuiltinBuildPipelineName = "BuiltinBuildPipeline";
+		public const string ScriptableBuildPipelineName = "ScriptableBuildPipeline";
+		public const string RawFileBuildPipelineName = "RawFileBuildPipeline";
+	}
+
+	/// <summary>
 	/// 运行模式
 	/// </summary>
 	public enum EPlayMode
@@ -33,11 +43,6 @@ namespace YooAsset
 	public abstract class InitializeParameters
 	{
 		/// <summary>
-		/// 文件解密服务接口
-		/// </summary>
-		public IDecryptionServices DecryptionServices = null;
-
-		/// <summary>
 		/// 内置文件的根路径
 		/// 注意：当参数为空的时候会使用默认的根目录。
 		/// </summary>
@@ -48,18 +53,33 @@ namespace YooAsset
 		/// 注意：当参数为空的时候会使用默认的根目录。
 		/// </summary>
 		public string SandboxRootDirectory = string.Empty;
-		
+
+		/// <summary>
+		/// 缓存文件追加原始后缀格式
+		/// </summary>
+		public bool CacheFileAppendExtension = false;
+
+		/// <summary>
+		/// 缓存系统启动时的验证级别
+		/// </summary>
+		public EVerifyLevel CacheBootVerifyLevel = EVerifyLevel.Middle;
+
 		/// <summary>
 		/// 资源加载每帧处理的最大时间片段
 		/// 注意：默认值为MaxValue
 		/// </summary>
 		public long LoadingMaxTimeSlice = long.MaxValue;
-		
+
 		/// <summary>
-		/// 下载失败尝试次数
-		/// 注意：默认值为MaxValue
+		/// 启用断点续传参数
+		/// 说明：当文件的大小大于设置的字节数时启用断点续传下载器
 		/// </summary>
-		public int DownloadFailedTryAgain = int.MaxValue;
+		public uint BreakpointResumeFileSize = int.MaxValue;
+
+		/// <summary>
+		/// 文件解密服务接口
+		/// </summary>
+		public IDecryptionServices DecryptionServices = null;
 	}
 
 	/// <summary>
@@ -86,6 +106,11 @@ namespace YooAsset
 	public class HostPlayModeParameters : InitializeParameters
 	{
 		/// <summary>
+		/// 远端资源地址查询服务类
+		/// </summary>
+		public IRemoteServices RemoteServices = null;
+
+		/// <summary>
 		/// 内置资源查询服务接口
 		/// </summary>
 		public IBuildinQueryServices BuildinQueryServices = null;
@@ -96,9 +121,9 @@ namespace YooAsset
 		public IDeliveryQueryServices DeliveryQueryServices = null;
 
 		/// <summary>
-		/// 远端资源地址查询服务类
+		/// 分发资源加载服务接口
 		/// </summary>
-		public IRemoteServices RemoteServices = null;
+		public IDeliveryLoadServices DeliveryLoadServices = null;
 	}
 
 	/// <summary>
@@ -107,13 +132,13 @@ namespace YooAsset
 	public class WebPlayModeParameters : InitializeParameters
 	{
 		/// <summary>
-		/// 内置资源查询服务接口
-		/// </summary>
-		public IBuildinQueryServices BuildinQueryServices = null;
-
-		/// <summary>
 		/// 远端资源地址查询服务类
 		/// </summary>
 		public IRemoteServices RemoteServices = null;
+
+		/// <summary>
+		/// 内置资源查询服务接口
+		/// </summary>
+		public IBuildinQueryServices BuildinQueryServices = null;
 	}
 }

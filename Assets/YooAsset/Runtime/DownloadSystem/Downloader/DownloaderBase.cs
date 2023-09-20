@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -14,21 +14,18 @@ namespace YooAsset
 		}
 
 		protected readonly BundleInfo _bundleInfo;
+		protected readonly System.Type _requesterType;
 		protected readonly int _timeout;
 		protected int _failedTryAgain;
 
-		protected UnityWebRequest _webRequest;
+		protected IWebRequester _requester;
 		protected EStatus _status = EStatus.None;
-		protected string _lastError = string.Empty;
-		protected long _lastCode = 0;
+		protected string _lastestNetError = string.Empty;
+		protected long _lastestHttpCode = 0;
 
 		// 请求次数
 		protected int _requestCount = 0;
 		protected string _requestURL;
-
-		// 下载进度
-		protected float _downloadProgress = 0f;
-		protected ulong _downloadedBytes = 0;
 
 		// 超时相关
 		protected bool _isAbort = false;
@@ -45,29 +42,25 @@ namespace YooAsset
 		/// <summary>
 		/// 下载进度（0f~1f）
 		/// </summary>
-		public float DownloadProgress
-		{
-			get { return _downloadProgress; }
-		}
+		public float DownloadProgress { protected set; get; }
 
 		/// <summary>
 		/// 已经下载的总字节数
 		/// </summary>
-		public ulong DownloadedBytes
-		{
-			get { return _downloadedBytes; }
-		}
+		public ulong DownloadedBytes { protected set; get; }
 
 
-		public DownloaderBase(BundleInfo bundleInfo, int failedTryAgain, int timeout)
+		public DownloaderBase(BundleInfo bundleInfo, System.Type requesterType, int failedTryAgain, int timeout)
 		{
 			_bundleInfo = bundleInfo;
+			_requesterType = requesterType;
 			_failedTryAgain = failedTryAgain;
 			_timeout = timeout;
 		}
-		public abstract void SendRequest(params object[] param);
+		public abstract void SendRequest(params object[] args);
 		public abstract void Update();
 		public abstract void Abort();
+		public abstract AssetBundle GetAssetBundle();
 
 		/// <summary>
 		/// 获取下载文件的大小
@@ -123,7 +116,7 @@ namespace YooAsset
 		/// </summary>
 		public string GetLastError()
 		{
-			return $"Failed to download : {_requestURL} Error : {_lastError} Code : {_lastCode}";
+			return $"Failed to download : {_requestURL} Error : {_lastestNetError} Code : {_lastestHttpCode}";
 		}
 
 
@@ -158,36 +151,11 @@ namespace YooAsset
 				if (offset > _timeout)
 				{
 					YooLogger.Warning($"Web file request timeout : {_requestURL}");
-					_webRequest.Abort();
+					if(_requester != null)
+						_requester.Abort();
 					_isAbort = true;
 				}
 			}
-		}
-
-		/// <summary>
-		/// 缓存下载文件
-		/// </summary>
-		protected void CachingFile(string tempFilePath)
-		{
-			string infoFilePath = _bundleInfo.Bundle.CachedInfoFilePath;
-			string dataFilePath = _bundleInfo.Bundle.CachedDataFilePath;
-			string dataFileCRC = _bundleInfo.Bundle.FileCRC;
-			long dataFileSize = _bundleInfo.Bundle.FileSize;
-
-			if (File.Exists(infoFilePath))
-				File.Delete(infoFilePath);
-			if (File.Exists(dataFilePath))
-				File.Delete(dataFilePath);
-
-			FileInfo fileInfo = new FileInfo(tempFilePath);
-			fileInfo.MoveTo(dataFilePath);
-
-			// 写入信息文件记录验证数据
-			CacheFileInfo.WriteInfoToFile(infoFilePath, dataFileCRC, dataFileSize);
-
-			// 记录缓存文件
-			var wrapper = new PackageCache.RecordWrapper(infoFilePath, dataFilePath, dataFileCRC, dataFileSize);
-			CacheSystem.RecordFile(_bundleInfo.Bundle.PackageName, _bundleInfo.Bundle.CacheGUID, wrapper);
 		}
 	}
 }

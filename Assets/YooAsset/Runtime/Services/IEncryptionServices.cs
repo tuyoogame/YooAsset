@@ -4,9 +4,9 @@ namespace YooAsset
 	public struct EncryptResult
 	{
 		/// <summary>
-		/// 加密后的Bunlde文件加载方法
+		/// 文件是否加密
 		/// </summary>
-		public EBundleLoadMethod LoadMethod;
+		public bool Encrypted;
 		
 		/// <summary>
 		/// 加密后的文件数据

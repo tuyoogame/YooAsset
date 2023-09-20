@@ -269,9 +269,9 @@ namespace YooAsset.Editor
 			var label3 = element.Q<Label>("Label3");
 			label3.text = bundleInfo.FileHash;
 
-			// LoadMethod
+			// Encrypted
 			var label5 = element.Q<Label>("Label5");
-			label5.text = bundleInfo.LoadMethod.ToString();
+			label5.text = bundleInfo.Encrypted.ToString();
 
 			// Tags
 			var label6 = element.Q<Label>("Label6");
@@ -289,7 +289,7 @@ namespace YooAsset.Editor
 		}
 		private void ShowAssetBundleInspector(ReportBundleInfo bundleInfo)
 		{
-			if (bundleInfo.IsRawFile)
+			if (_buildReport.Summary.BuildPipeline == nameof(EBuildPipeline.RawFileBuildPipeline))
 				return;
 
 			string rootDirectory = Path.GetDirectoryName(_reportFilePath);

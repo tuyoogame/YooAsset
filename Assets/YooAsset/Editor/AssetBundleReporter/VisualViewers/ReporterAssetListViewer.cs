@@ -254,7 +254,7 @@ namespace YooAsset.Editor
 			List<ReportBundleInfo> bundles = new List<ReportBundleInfo>();
 			var mainBundle = _buildReport.GetBundleInfo(assetInfo.MainBundleName);
 			bundles.Add(mainBundle);
-			foreach (string dependBundleName in assetInfo.DependBundles)
+			foreach (string dependBundleName in mainBundle.DependBundles)
 			{
 				var dependBundle = _buildReport.GetBundleInfo(dependBundleName);
 				bundles.Add(dependBundle);

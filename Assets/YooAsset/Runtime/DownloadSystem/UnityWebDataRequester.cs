@@ -18,7 +18,7 @@ namespace YooAsset
 				URL = url;
 				ResetTimeout(timeout);
 
-				_webRequest = DownloadSystem.NewRequest(URL);
+				_webRequest = DownloadHelper.NewRequest(URL);
 				DownloadHandlerBuffer handler = new DownloadHandlerBuffer();
 				_webRequest.downloadHandler = handler;
 				_webRequest.disposeDownloadHandlerOnDispose = true;

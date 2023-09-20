@@ -1,6 +1,11 @@
-﻿
+﻿using System.IO;
+using UnityEngine;
+
 namespace YooAsset
 {
+	/// <summary>
+	/// 解密文件的信息
+	/// </summary>
 	public struct DecryptFileInfo
 	{
 		/// <summary>
@@ -9,9 +14,14 @@ namespace YooAsset
 		public string BundleName;
 
 		/// <summary>
-		/// 文件路径
+		/// 文件加载路径
 		/// </summary>
-		public string FilePath;
+		public string FileLoadPath;
+
+		/// <summary>
+		/// Unity引擎用于内容校验的CRC
+		/// </summary>
+		public uint ConentCRC;
 	}
 
 	/// <summary>
@@ -20,23 +30,15 @@ namespace YooAsset
 	public interface IDecryptionServices
 	{
 		/// <summary>
-		/// 文件偏移解密方法
+		/// 同步方式获取解密的资源包对象
+		/// 注意：加载流对象在资源包对象释放的时候会自动释放
 		/// </summary>
-		ulong LoadFromFileOffset(DecryptFileInfo fileInfo);
+		AssetBundle LoadAssetBundle(DecryptFileInfo fileInfo, out Stream managedStream);
 
 		/// <summary>
-		/// 文件内存解密方法
+		/// 异步方式获取解密的资源包对象
+		/// 注意：加载流对象在资源包对象释放的时候会自动释放
 		/// </summary>
-		byte[] LoadFromMemory(DecryptFileInfo fileInfo);
-
-		/// <summary>
-		/// 文件流解密方法
-		/// </summary>
-		System.IO.Stream LoadFromStream(DecryptFileInfo fileInfo);
-
-		/// <summary>
-		/// 文件流解密的托管缓存大小
-		/// </summary>
-		uint GetManagedReadBufferSize();
+		AssetBundleCreateRequest LoadAssetBundleAsync(DecryptFileInfo fileInfo, out Stream managedStream);
 	}
 }

@@ -8,13 +8,17 @@ namespace YooAsset.Editor
 {
 	public class BuildMapContext : IContextObject
 	{
+		/// <summary>
+		/// 资源包集合
+		/// </summary>
 		private readonly Dictionary<string, BuildBundleInfo> _bundleInfoDic = new Dictionary<string, BuildBundleInfo>(10000);
 
 		/// <summary>
 		/// 冗余的资源列表
 		/// </summary>
-		public readonly List<ReportRedundancyInfo> RedundancyInfos= new List<ReportRedundancyInfo>(1000);
-		
+		public readonly List<ReportRedundancyInfo> RedundancyInfos = new List<ReportRedundancyInfo>(1000);
+
+
 		/// <summary>
 		/// 参与构建的资源总数
 		/// 说明：包括主动收集的资源以及其依赖的所有资源
@@ -22,7 +26,7 @@ namespace YooAsset.Editor
 		public int AssetFileCount;
 
 		/// <summary>
-		/// 收集命令
+		/// 资源收集命令
 		/// </summary>
 		public CollectCommand Command { set; get; }
 
@@ -87,8 +91,7 @@ namespace YooAsset.Editor
 			List<UnityEditor.AssetBundleBuild> builds = new List<UnityEditor.AssetBundleBuild>(_bundleInfoDic.Count);
 			foreach (var bundleInfo in _bundleInfoDic.Values)
 			{
-				if (bundleInfo.IsRawFile == false)
-					builds.Add(bundleInfo.CreatePipelineBuild());
+				builds.Add(bundleInfo.CreatePipelineBuild());
 			}
 			return builds.ToArray();
 		}

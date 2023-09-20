@@ -21,6 +21,26 @@ namespace YooAsset.Editor
 		public string PackageDesc = string.Empty;
 
 		/// <summary>
+		/// 启用可寻址资源定位
+		/// </summary>
+		public bool EnableAddressable = false;
+
+		/// <summary>
+		/// 资源定位地址大小写不敏感
+		/// </summary>
+		public bool LocationToLower = false;
+
+		/// <summary>
+		/// 包含资源GUID数据
+		/// </summary>
+		public bool IncludeAssetGUID = false;
+
+		/// <summary>
+		/// 忽略Unity引擎无法识别的文件
+		/// </summary>
+		public bool IgnoreDefaultType = true;
+
+		/// <summary>
 		/// 分组列表
 		/// </summary>
 		public List<AssetBundleCollectorGroup> Groups = new List<AssetBundleCollectorGroup>();

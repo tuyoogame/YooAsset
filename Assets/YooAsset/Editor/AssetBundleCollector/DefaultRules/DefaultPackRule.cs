@@ -44,11 +44,6 @@ namespace YooAsset.Editor
 			PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
 			return result;
 		}
-
-		bool IPackRule.IsRawFilePackRule()
-		{
-			return false;
-		}
 	}
 
 	/// <summary>
@@ -65,11 +60,6 @@ namespace YooAsset.Editor
 			string bundleName = Path.GetDirectoryName(data.AssetPath);
 			PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
 			return result;
-		}
-
-		bool IPackRule.IsRawFilePackRule()
-		{
-			return false;
 		}
 	}
 
@@ -101,11 +91,6 @@ namespace YooAsset.Editor
 				throw new Exception($"Not found root directory : {assetPath}");
 			}
 		}
-
-		bool IPackRule.IsRawFilePackRule()
-		{
-			return false;
-		}
 	}
 
 	/// <summary>
@@ -131,11 +116,6 @@ namespace YooAsset.Editor
 			PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
 			return result;
 		}
-
-		bool IPackRule.IsRawFilePackRule()
-		{
-			return false;
-		}
 	}
 
 	/// <summary>
@@ -151,11 +131,6 @@ namespace YooAsset.Editor
 			PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
 			return result;
 		}
-
-		bool IPackRule.IsRawFilePackRule()
-		{
-			return false;
-		}
 	}
 
 	/// <summary>
@@ -170,11 +145,6 @@ namespace YooAsset.Editor
 			PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.RawFileExtension);
 			return result;
 		}
-
-		bool IPackRule.IsRawFilePackRule()
-		{
-			return true;
-		}
 	}
 
 	/// <summary>
@@ -186,11 +156,6 @@ namespace YooAsset.Editor
 		public PackRuleResult GetPackRuleResult(PackRuleData data)
 		{
 			return DefaultPackRule.CreateShadersPackRuleResult();
-		}
-
-		bool IPackRule.IsRawFilePackRule()
-		{
-			return false;
 		}
 	}
 }

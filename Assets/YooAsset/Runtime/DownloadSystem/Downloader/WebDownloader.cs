@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace YooAsset
 {
@@ -15,26 +14,21 @@ namespace YooAsset
 			PrepareDownload,
 			CreateDownloader,
 			CheckDownload,
-			VerifyTempFile,
-			WaitingVerifyTempFile,
-			CachingFile,
 			TryAgain,
 			Done,
 		}
 
-		private bool _keepDownloadHandleLife = false;
-		private DownloadHandlerAssetBundle _downloadhandler;
 		private ESteps _steps = ESteps.None;
+		private bool _getAssetBundle;
 
-
-		public WebDownloader(BundleInfo bundleInfo, int failedTryAgain, int timeout) : base(bundleInfo, failedTryAgain, timeout)
+		public WebDownloader(BundleInfo bundleInfo, System.Type requesterType, int failedTryAgain, int timeout) : base(bundleInfo, requesterType, failedTryAgain, timeout)
 		{
 		}
-		public override void SendRequest(params object[] param)
+		public override void SendRequest(params object[] args)
 		{
 			if (_steps == ESteps.None)
 			{
-				_keepDownloadHandleLife = (bool)param[0];
+				_getAssetBundle = (bool)args[0];
 				_steps = ESteps.PrepareDownload;
 			}
 		}
@@ -48,82 +42,49 @@ namespace YooAsset
 			// 创建下载器
 			if (_steps == ESteps.PrepareDownload)
 			{
+				// 获取请求地址
+				_requestURL = GetRequestURL();
+
 				// 重置变量
-				_downloadProgress = 0f;
-				_downloadedBytes = 0;
+				DownloadProgress = 0f;
+				DownloadedBytes = 0;
 
 				// 重置变量
 				_isAbort = false;
 				_latestDownloadBytes = 0;
 				_latestDownloadRealtime = Time.realtimeSinceStartup;
+
+				// 重置计时器
+				if (_tryAgainTimer > 0f)
+					YooLogger.Warning($"Try again download : {_requestURL}");
 				_tryAgainTimer = 0f;
 
-				// 获取请求地址
-				_requestURL = GetRequestURL();
 				_steps = ESteps.CreateDownloader;
 			}
 
 			// 创建下载器
 			if (_steps == ESteps.CreateDownloader)
 			{
-				_webRequest = DownloadSystem.NewRequest(_requestURL);
-
-				if (CacheSystem.DisableUnityCacheOnWebGL)
-				{
-					uint crc = _bundleInfo.Bundle.UnityCRC;
-					_downloadhandler = new DownloadHandlerAssetBundle(_requestURL, crc);
-#if UNITY_2020_3_OR_NEWER
-					_downloadhandler.autoLoadAssetBundle = false;
-#endif
-				}
-				else
-				{
-					uint crc = _bundleInfo.Bundle.UnityCRC;
-					var hash = Hash128.Parse(_bundleInfo.Bundle.FileHash);
-					_downloadhandler = new DownloadHandlerAssetBundle(_requestURL, hash, crc);
-#if UNITY_2020_3_OR_NEWER
-					_downloadhandler.autoLoadAssetBundle = false;
-#endif
-				}
-
-				_webRequest.downloadHandler = _downloadhandler;
-				_webRequest.disposeDownloadHandlerOnDispose = false;
-				_webRequest.SendWebRequest();
+				_requester = (IWebRequester)Activator.CreateInstance(_requesterType);
+				_requester.Create(_requestURL, _bundleInfo, _getAssetBundle);
 				_steps = ESteps.CheckDownload;
 			}
 
 			// 检测下载结果
 			if (_steps == ESteps.CheckDownload)
 			{
-				_downloadProgress = _webRequest.downloadProgress;
-				_downloadedBytes = _webRequest.downloadedBytes;
-				if (_webRequest.isDone == false)
+				_requester.Update();
+				DownloadedBytes = _requester.DownloadedBytes;
+				DownloadProgress = _requester.DownloadProgress;
+				if (_requester.IsDone() == false)
 				{
 					CheckTimeout();
 					return;
 				}
 
-				bool hasError = false;
-
-				// 检查网络错误
-#if UNITY_2020_3_OR_NEWER
-				if (_webRequest.result != UnityWebRequest.Result.Success)
-				{
-					hasError = true;
-					_lastError = _webRequest.error;
-					_lastCode = _webRequest.responseCode;
-				}
-#else
-				if (_webRequest.isNetworkError || _webRequest.isHttpError)
-				{
-					hasError = true;
-					_lastError = _webRequest.error;
-					_lastCode = _webRequest.responseCode;
-				}
-#endif
-
-				// 如果网络异常
-				if (hasError)
+				_lastestNetError = _requester.RequestNetError;
+				_lastestHttpCode = _requester.RequestHttpCode;
+				if (_requester.Status != ERequestStatus.Success)
 				{
 					_steps = ESteps.TryAgain;
 				}
@@ -131,15 +92,7 @@ namespace YooAsset
 				{
 					_status = EStatus.Succeed;
 					_steps = ESteps.Done;
-					_lastError = string.Empty;
-					_lastCode = 0;
 				}
-
-				// 最终释放请求
-				DisposeRequest();
-
-				if (_keepDownloadHandleLife == false)
-					DisposeHandler();
 			}
 
 			// 重新尝试下载
@@ -147,8 +100,6 @@ namespace YooAsset
 			{
 				if (_failedTryAgain <= 0)
 				{
-					DisposeRequest();
-					DisposeHandler();
 					ReportError();
 					_status = EStatus.Failed;
 					_steps = ESteps.Done;
@@ -167,47 +118,20 @@ namespace YooAsset
 		}
 		public override void Abort()
 		{
+			if (_requester != null)
+				_requester.Abort();
+
 			if (IsDone() == false)
 			{
 				_status = EStatus.Failed;
 				_steps = ESteps.Done;
-				_lastError = "user abort";
-				_lastCode = 0;
-
-				DisposeRequest();
-				DisposeHandler();
+				_lastestNetError = "user abort";
+				_lastestHttpCode = 0;
 			}
 		}
-		private void DisposeRequest()
+		public override AssetBundle GetAssetBundle()
 		{
-			if (_webRequest != null)
-			{
-				_webRequest.Dispose();
-				_webRequest = null;
-			}
-		}
-
-		/// <summary>
-		/// 获取资源包
-		/// </summary>
-		public AssetBundle GetAssetBundle()
-		{
-			if (_downloadhandler != null)
-				return _downloadhandler.assetBundle;
-
-			return null;
-		}
-
-		/// <summary>
-		/// 释放下载句柄
-		/// </summary>
-		public void DisposeHandler()
-		{
-			if (_downloadhandler != null)
-			{
-				_downloadhandler.Dispose();
-				_downloadhandler = null;
-			}
+			return (AssetBundle)_requester.GetRequestObject();
 		}
 	}
 }

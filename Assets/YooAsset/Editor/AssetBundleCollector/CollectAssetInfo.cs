@@ -14,7 +14,7 @@ namespace YooAsset.Editor
 		/// 资源包名称
 		/// </summary>
 		public string BundleName { private set; get; }
-		
+
 		/// <summary>
 		/// 可寻址地址
 		/// </summary>
@@ -24,11 +24,6 @@ namespace YooAsset.Editor
 		/// 资源路径
 		/// </summary>
 		public string AssetPath { private set; get; }
-
-		/// <summary>
-		/// 是否为原生资源
-		/// </summary>
-		public bool IsRawAsset { private set; get; }
 
 		/// <summary>
 		/// 资源分类标签
@@ -41,14 +36,13 @@ namespace YooAsset.Editor
 		public List<string> DependAssets = new List<string>();
 
 
-		public CollectAssetInfo(ECollectorType collectorType, string bundleName, string address, string assetPath, bool isRawAsset, List<string> assetTags)
+		public CollectAssetInfo(ECollectorType collectorType, string bundleName, string address, string assetPath, List<string> assetTags)
 		{
 			CollectorType = collectorType;
 			BundleName = bundleName;
 			Address = address;
 			AssetPath = assetPath;
-			IsRawAsset = isRawAsset;
-			AssetTags = assetTags;		
+			AssetTags = assetTags;
 		}
 	}
 }

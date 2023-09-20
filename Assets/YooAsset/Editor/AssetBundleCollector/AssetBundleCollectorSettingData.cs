@@ -321,34 +321,19 @@ namespace YooAsset.Editor
 		}
 
 		// 公共参数编辑相关
-		public static void ModifyPackageView(bool showPackageView)
+		public static void ModifyShowPackageView(bool showPackageView)
 		{
 			Setting.ShowPackageView = showPackageView;
-			IsDirty = true;
-		}
-		public static void ModifyAddressable(bool enableAddressable)
-		{
-			Setting.EnableAddressable = enableAddressable;
-			IsDirty = true;
-		}
-		public static void ModifyLocationToLower(bool locationToLower)
-		{
-			Setting.LocationToLower = locationToLower;
-			IsDirty = true;
-		}
-		public static void ModifyIncludeAssetGUID(bool includeAssetGUID)
-		{
-			Setting.IncludeAssetGUID = includeAssetGUID;
-			IsDirty = true;
-		}
-		public static void ModifyUniqueBundleName(bool uniqueBundleName)
-		{
-			Setting.UniqueBundleName = uniqueBundleName;
 			IsDirty = true;
 		}
 		public static void ModifyShowEditorAlias(bool showAlias)
 		{
 			Setting.ShowEditorAlias = showAlias;
+			IsDirty = true;
+		}
+		public static void ModifyUniqueBundleName(bool uniqueBundleName)
+		{
+			Setting.UniqueBundleName = uniqueBundleName;
 			IsDirty = true;
 		}
 

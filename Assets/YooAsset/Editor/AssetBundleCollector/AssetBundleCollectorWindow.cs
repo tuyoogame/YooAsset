@@ -25,16 +25,20 @@ namespace YooAsset.Editor
 		private List<RuleDisplayName> _packRuleList;
 		private List<RuleDisplayName> _filterRuleList;
 
-		private Button _settingsButton;
 		private VisualElement _helpBoxContainer;
+
 		private VisualElement _setting1Container;
-		private VisualElement _setting2Container;
+		private Button _globalSettingsButton;
 		private Toggle _showPackageToogle;
+		private Toggle _showEditorAliasToggle;
+		private Toggle _uniqueBundleNameToogle;
+
+		private VisualElement _setting3Container;
+		private Button _packageSettingsButton;
 		private Toggle _enableAddressableToogle;
 		private Toggle _locationToLowerToogle;
 		private Toggle _includeAssetGUIDToogle;
-		private Toggle _uniqueBundleNameToogle;
-		private Toggle _showEditorAliasToggle;
+		private Toggle _ignoreDefaultTypeToogle;
 
 		private VisualElement _packageContainer;
 		private ListView _packageListView;
@@ -53,7 +57,8 @@ namespace YooAsset.Editor
 
 		private int _lastModifyPackageIndex = 0;
 		private int _lastModifyGroupIndex = 0;
-		private bool _showSettings = false;
+		private bool _showGlobalSettings = false;
+		private bool _showPackageSettings = false;
 
 
 		public void CreateGUI()
@@ -87,32 +92,19 @@ namespace YooAsset.Editor
 				_helpBoxContainer = root.Q("HelpBoxContainer");
 
 				// 公共设置相关
-				_settingsButton = root.Q<Button>("SettingsButton");
-				_settingsButton.clicked += SettingsBtn_clicked;
 				_setting1Container = root.Q("PublicContainer1");
-				_setting2Container = root.Q("PublicContainer2");
+				_globalSettingsButton = root.Q<Button>("GlobalSettingsButton");
+				_globalSettingsButton.clicked += GlobalSettingsBtn_clicked;
 				_showPackageToogle = root.Q<Toggle>("ShowPackages");
 				_showPackageToogle.RegisterValueChangedCallback(evt =>
 				{
-					AssetBundleCollectorSettingData.ModifyPackageView(evt.newValue);
+					AssetBundleCollectorSettingData.ModifyShowPackageView(evt.newValue);
 					RefreshWindow();
 				});
-				_enableAddressableToogle = root.Q<Toggle>("EnableAddressable");
-				_enableAddressableToogle.RegisterValueChangedCallback(evt =>
+				_showEditorAliasToggle = root.Q<Toggle>("ShowEditorAlias");
+				_showEditorAliasToggle.RegisterValueChangedCallback(evt =>
 				{
-					AssetBundleCollectorSettingData.ModifyAddressable(evt.newValue);
-					RefreshWindow();
-				});
-				_locationToLowerToogle = root.Q<Toggle>("LocationToLower");
-				_locationToLowerToogle.RegisterValueChangedCallback(evt =>
-				{
-					AssetBundleCollectorSettingData.ModifyLocationToLower(evt.newValue);
-					RefreshWindow();
-				});
-				_includeAssetGUIDToogle = root.Q<Toggle>("IncludeAssetGUID");
-				_includeAssetGUIDToogle.RegisterValueChangedCallback(evt =>
-				{
-					AssetBundleCollectorSettingData.ModifyIncludeAssetGUID(evt.newValue);
+					AssetBundleCollectorSettingData.ModifyShowEditorAlias(evt.newValue);
 					RefreshWindow();
 				});
 				_uniqueBundleNameToogle = root.Q<Toggle>("UniqueBundleName");
@@ -121,11 +113,54 @@ namespace YooAsset.Editor
 					AssetBundleCollectorSettingData.ModifyUniqueBundleName(evt.newValue);
 					RefreshWindow();
 				});
-				_showEditorAliasToggle = root.Q<Toggle>("ShowEditorAlias");
-				_showEditorAliasToggle.RegisterValueChangedCallback(evt =>
+
+				// 包裹设置相关
+				_setting3Container = root.Q("PublicContainer3");
+				_packageSettingsButton = root.Q<Button>("PackageSettingsButton");
+				_packageSettingsButton.clicked += PackageSettingsBtn_clicked;
+				_enableAddressableToogle = root.Q<Toggle>("EnableAddressable");
+				_enableAddressableToogle.RegisterValueChangedCallback(evt =>
 				{
-					AssetBundleCollectorSettingData.ModifyShowEditorAlias(evt.newValue);
-					RefreshWindow();
+					var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
+					if (selectPackage != null)
+					{
+						selectPackage.EnableAddressable = evt.newValue;
+						AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
+						RefreshWindow();
+					}
+				});
+				_locationToLowerToogle = root.Q<Toggle>("LocationToLower");
+				_locationToLowerToogle.RegisterValueChangedCallback(evt =>
+				{
+					var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
+					if (selectPackage != null)
+					{
+						selectPackage.LocationToLower = evt.newValue;
+						AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
+						RefreshWindow();
+					}
+				});
+				_includeAssetGUIDToogle = root.Q<Toggle>("IncludeAssetGUID");
+				_includeAssetGUIDToogle.RegisterValueChangedCallback(evt =>
+				{
+					var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
+					if (selectPackage != null)
+					{
+						selectPackage.IncludeAssetGUID = evt.newValue;
+						AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
+						RefreshWindow();
+					}
+				});
+				_ignoreDefaultTypeToogle = root.Q<Toggle>("IgnoreDefaultType");
+				_ignoreDefaultTypeToogle.RegisterValueChangedCallback(evt =>
+				{
+					var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
+					if (selectPackage != null)
+					{
+						selectPackage.IgnoreDefaultType = evt.newValue;
+						AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
+						RefreshWindow();
+					}
 				});
 
 				// 配置修复按钮
@@ -325,46 +360,11 @@ namespace YooAsset.Editor
 
 		private void RefreshWindow()
 		{
-			_showPackageToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowPackageView);
-			_enableAddressableToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.EnableAddressable);
-			_locationToLowerToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.LocationToLower);
-			_includeAssetGUIDToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.IncludeAssetGUID);
-			_uniqueBundleNameToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.UniqueBundleName);
-			_showEditorAliasToggle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowEditorAlias);
-
-			// 警示框
-			_helpBoxContainer.Clear();
-			if (_enableAddressableToogle.value && _locationToLowerToogle.value)
-			{
-				var helpBox = new HelpBox("无法同时开启[Enable Addressable]选项和[Location To Lower]选项", HelpBoxMessageType.Error);
-				_helpBoxContainer.Add(helpBox);
-			}
-			if (AssetBundleCollectorSettingData.Setting.Packages.Count > 1 && _uniqueBundleNameToogle.value == false)
-			{
-				var helpBox = new HelpBox("检测到当前配置存在多个Package，建议开启[Unique Bundle Name]选项", HelpBoxMessageType.Warning);
-				_helpBoxContainer.Add(helpBox);
-			}
-			if (_helpBoxContainer.childCount > 0)
-				_helpBoxContainer.style.display = DisplayStyle.Flex;
-			else
-				_helpBoxContainer.style.display = DisplayStyle.None;
-
-			// 设置栏
-			if (_showSettings)
-			{
-				_setting1Container.style.display = DisplayStyle.Flex;
-				_setting2Container.style.display = DisplayStyle.Flex;
-			}
-			else
-			{
-				_setting1Container.style.display = DisplayStyle.None;
-				_setting2Container.style.display = DisplayStyle.None;
-			}
-
 			_groupContainer.visible = false;
 			_collectorContainer.visible = false;
 
 			FillPackageViewData();
+			RefreshSettings();
 		}
 		private void FixBtn_clicked()
 		{
@@ -392,10 +392,15 @@ namespace YooAsset.Editor
 		{
 			AssetBundleCollectorSettingData.SaveFile();
 		}
-		private void SettingsBtn_clicked()
+		private void GlobalSettingsBtn_clicked()
 		{
-			_showSettings = !_showSettings;
-			RefreshWindow();
+			_showGlobalSettings = !_showGlobalSettings;
+			RefreshGlobalSetting();
+		}
+		private void PackageSettingsBtn_clicked()
+		{
+			_showPackageSettings = !_showPackageSettings;
+			RefreshPackageSetting();
 		}
 		private string FormatListItemCallback(RuleDisplayName ruleDisplayName)
 		{
@@ -412,6 +417,81 @@ namespace YooAsset.Editor
 				return ruleDisplayName.ClassName;
 		}
 
+		// 设置栏相关
+		private void RefreshSettings()
+		{
+			RefreshGlobalSetting();
+			RefreshPackageSetting();
+			RefreshHelpBoxTips();
+		}
+		private void RefreshGlobalSetting()
+		{
+			_showPackageToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowPackageView);
+			_showEditorAliasToggle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowEditorAlias);
+			_uniqueBundleNameToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.UniqueBundleName);
+
+			if (_showGlobalSettings)
+			{
+				_setting1Container.style.display = DisplayStyle.Flex;
+			}
+			else
+			{
+				_setting1Container.style.display = DisplayStyle.None;
+			}
+
+			if (_showPackageToogle.value)
+				_packageContainer.style.display = DisplayStyle.Flex;
+			else
+				_packageContainer.style.display = DisplayStyle.None;
+		}
+		private void RefreshPackageSetting()
+		{
+			var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
+			if (selectPackage != null)
+			{
+				_packageSettingsButton.SetEnabled(true);
+				_packageSettingsButton.text = $"Package Setting ({selectPackage.PackageName})";
+				_enableAddressableToogle.SetValueWithoutNotify(selectPackage.EnableAddressable);
+				_locationToLowerToogle.SetValueWithoutNotify(selectPackage.LocationToLower);
+				_includeAssetGUIDToogle.SetValueWithoutNotify(selectPackage.IncludeAssetGUID);
+				_ignoreDefaultTypeToogle.SetValueWithoutNotify(selectPackage.IgnoreDefaultType);
+			}
+			else
+			{
+				_packageSettingsButton.SetEnabled(false);
+				if(_packageListView.itemsSource.Count == 0)
+					_packageSettingsButton.text = $"Not Found Any Package !";
+				else
+					_packageSettingsButton.text = $"Package Setting";
+			}
+
+			if (_showPackageSettings)
+				_setting3Container.style.display = DisplayStyle.Flex;
+			else
+				_setting3Container.style.display = DisplayStyle.None;
+		}
+		private void RefreshHelpBoxTips()
+		{
+			_helpBoxContainer.Clear();
+
+			if (_enableAddressableToogle.value && _locationToLowerToogle.value)
+			{
+				var helpBox = new HelpBox("无法同时开启[Enable Addressable]选项和[Location To Lower]选项", HelpBoxMessageType.Error);
+				_helpBoxContainer.Add(helpBox);
+			}
+
+			if (AssetBundleCollectorSettingData.Setting.Packages.Count > 1 && _uniqueBundleNameToogle.value == false)
+			{
+				var helpBox = new HelpBox("检测到当前配置存在多个Package，建议开启[Unique Bundle Name]选项", HelpBoxMessageType.Warning);
+				_helpBoxContainer.Add(helpBox);
+			}
+
+			if (_helpBoxContainer.childCount > 0)
+				_helpBoxContainer.style.display = DisplayStyle.Flex;
+			else
+				_helpBoxContainer.style.display = DisplayStyle.None;
+		}
+
 		// 包裹列表相关
 		private void FillPackageViewData()
 		{
@@ -424,11 +504,6 @@ namespace YooAsset.Editor
 			{
 				_packageListView.selectedIndex = _lastModifyPackageIndex;
 			}
-
-			if (_showPackageToogle.value)
-				_packageContainer.style.display = DisplayStyle.Flex;
-			else
-				_packageContainer.style.display = DisplayStyle.None;
 		}
 		private VisualElement MakePackageListViewItem()
 		{
@@ -462,20 +537,25 @@ namespace YooAsset.Editor
 			{
 				_groupContainer.visible = false;
 				_collectorContainer.visible = false;
-				return;
+				_showPackageSettings = false;
 			}
+			else
+			{
+				_groupContainer.visible = true;
+				_lastModifyPackageIndex = _packageListView.selectedIndex;
+				_packageNameTxt.SetValueWithoutNotify(selectPackage.PackageName);
+				_packageDescTxt.SetValueWithoutNotify(selectPackage.PackageDesc);
 
-			_groupContainer.visible = true;
-			_lastModifyPackageIndex = _packageListView.selectedIndex;
-			_packageNameTxt.SetValueWithoutNotify(selectPackage.PackageName);
-			_packageDescTxt.SetValueWithoutNotify(selectPackage.PackageDesc);
-			FillGroupViewData();
+				RefreshSettings();
+				FillGroupViewData();
+			}
 		}
 		private void AddPackageBtn_clicked()
 		{
 			Undo.RecordObject(AssetBundleCollectorSettingData.Setting, "YooAsset.AssetBundleCollectorWindow AddPackage");
 			AssetBundleCollectorSettingData.CreatePackage("DefaultPackage");
 			FillPackageViewData();
+			RefreshSettings();
 		}
 		private void RemovePackageBtn_clicked()
 		{
@@ -486,6 +566,7 @@ namespace YooAsset.Editor
 			Undo.RecordObject(AssetBundleCollectorSettingData.Setting, "YooAsset.AssetBundleCollectorWindow RemovePackage");
 			AssetBundleCollectorSettingData.RemovePackage(selectPackage);
 			FillPackageViewData();
+			RefreshSettings();
 		}
 
 		// 分组列表相关
@@ -729,6 +810,13 @@ namespace YooAsset.Editor
 			if (collectObject != null)
 				collectObject.name = collector.CollectPath;
 
+			// 注意：非主资源收集器的标签栏需要被冻结
+			var textTags = element.Q<TextField>("TextField1");
+			if (collector.CollectorType == ECollectorType.MainAssetCollector)
+				textTags.SetEnabled(true);
+			else
+				textTags.SetEnabled(false);
+
 			// Foldout
 			var foldout = element.Q<Foldout>("Foldout1");
 			foldout.RegisterValueChangedCallback(evt =>
@@ -772,6 +860,11 @@ namespace YooAsset.Editor
 				{
 					RefreshFoldout(foldout, selectGroup, collector);
 				}
+
+				if (collector.CollectorType == ECollectorType.MainAssetCollector)
+					textTags.SetEnabled(true);
+				else
+					textTags.SetEnabled(false);
 			});
 
 			// Address Rule
@@ -858,7 +951,8 @@ namespace YooAsset.Editor
 				try
 				{
 					CollectCommand command = new CollectCommand(EBuildMode.SimulateBuild, _packageNameTxt.value,
-						_enableAddressableToogle.value, _locationToLowerToogle.value, _includeAssetGUIDToogle.value, _uniqueBundleNameToogle.value);
+						_enableAddressableToogle.value, _locationToLowerToogle.value, _includeAssetGUIDToogle.value, _ignoreDefaultTypeToogle.value, _uniqueBundleNameToogle.value);
+					collector.CheckConfigError();
 					collectAssetInfos = collector.GetAllCollectAssets(command, group);
 				}
 				catch (System.Exception e)

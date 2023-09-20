@@ -58,50 +58,20 @@ namespace YooAsset.Editor
 
 
 		/// <summary>
+		/// 参与构建的资源列表
+		/// 注意：不包含零依赖资源和冗余资源
+		/// </summary>
+		public readonly List<BuildAssetInfo> MainAssets = new List<BuildAssetInfo>();
+
+		/// <summary>
 		/// 资源包名称
 		/// </summary>
 		public string BundleName { private set; get; }
 
 		/// <summary>
-		/// 参与构建的资源列表
-		/// 注意：不包含零依赖资源和冗余资源
+		/// 加密文件
 		/// </summary>
-		public readonly List<BuildAssetInfo> AllMainAssets = new List<BuildAssetInfo>();
-
-		/// <summary>
-		/// Bundle文件的加载方法
-		/// </summary>
-		public EBundleLoadMethod LoadMethod { set; get; }
-
-		/// <summary>
-		/// 是否为原生文件
-		/// </summary>
-		public bool IsRawFile
-		{
-			get
-			{
-				foreach (var assetInfo in AllMainAssets)
-				{
-					if (assetInfo.IsRawAsset)
-						return true;
-				}
-				return false;
-			}
-		}
-
-		/// <summary>
-		/// 是否为加密文件
-		/// </summary>
-		public bool IsEncryptedFile
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(EncryptedFilePath))
-					return false;
-				else
-					return true;
-			}
-		}
+		public bool Encrypted { set; get; }
 
 
 		public BuildBundleInfo(string bundleName)
@@ -117,7 +87,7 @@ namespace YooAsset.Editor
 			if (IsContainsAsset(assetInfo.AssetPath))
 				throw new System.Exception($"Asset is existed : {assetInfo.AssetPath}");
 
-			AllMainAssets.Add(assetInfo);
+			MainAssets.Add(assetInfo);
 		}
 
 		/// <summary>
@@ -125,7 +95,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public bool IsContainsAsset(string assetPath)
 		{
-			foreach (var assetInfo in AllMainAssets)
+			foreach (var assetInfo in MainAssets)
 			{
 				if (assetInfo.AssetPath == assetPath)
 				{
@@ -136,28 +106,11 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 获取资源包的分类标签列表
-		/// </summary>
-		public string[] GetBundleTags()
-		{
-			List<string> result = new List<string>(AllMainAssets.Count);
-			foreach (var assetInfo in AllMainAssets)
-			{
-				foreach (var assetTag in assetInfo.BundleTags)
-				{
-					if (result.Contains(assetTag) == false)
-						result.Add(assetTag);
-				}
-			}
-			return result.ToArray();
-		}
-
-		/// <summary>
 		/// 获取构建的资源路径列表
 		/// </summary>
 		public string[] GetAllMainAssetPaths()
 		{
-			return AllMainAssets.Select(t => t.AssetPath).ToArray();
+			return MainAssets.Select(t => t.AssetPath).ToArray();
 		}
 
 		/// <summary>
@@ -167,7 +120,7 @@ namespace YooAsset.Editor
 		{
 			var packAssets = GetAllMainAssetPaths();
 			List<string> result = new List<string>(packAssets);
-			foreach (var assetInfo in AllMainAssets)
+			foreach (var assetInfo in MainAssets)
 			{
 				if (assetInfo.AllDependAssetInfos == null)
 					continue;
@@ -202,7 +155,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public BuildAssetInfo[] GetAllManifestAssetInfos()
 		{
-			return AllMainAssets.Where(t => t.CollectorType == ECollectorType.MainAssetCollector).ToArray();
+			return MainAssets.Where(t => t.CollectorType == ECollectorType.MainAssetCollector).ToArray();
 		}
 
 		/// <summary>
@@ -216,9 +169,7 @@ namespace YooAsset.Editor
 			packageBundle.FileCRC = PackageFileCRC;
 			packageBundle.FileSize = PackageFileSize;
 			packageBundle.UnityCRC = PackageUnityCRC;
-			packageBundle.IsRawFile = IsRawFile;
-			packageBundle.LoadMethod = (byte)LoadMethod;
-			packageBundle.Tags = GetBundleTags();
+			packageBundle.Encrypted = Encrypted;
 			return packageBundle;
 		}
 	}

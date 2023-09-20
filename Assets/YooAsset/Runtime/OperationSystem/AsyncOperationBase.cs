@@ -11,6 +11,11 @@ namespace YooAsset
 		private Action<AsyncOperationBase> _callback;
 
 		/// <summary>
+		/// 所属包裹
+		/// </summary>
+		public string PackageName { private set; get; }
+
+		/// <summary>
 		/// 状态
 		/// </summary>
 		public EOperationStatus Status { get; protected set; } = EOperationStatus.None;
@@ -74,6 +79,20 @@ namespace YooAsset
 		internal abstract void Start();
 		internal abstract void Update();
 
+		internal void SetPackageName(string packageName)
+		{
+			PackageName = packageName;
+		}
+		internal void SetAbort()
+		{
+			if (IsDone == false)
+			{
+				Status = EOperationStatus.Failed;
+				Error = "user abort";
+				YooLogger.Warning($"Async operaiton has been abort : {this.GetType().Name}");
+				SetFinish();
+			}
+		}
 		internal void SetFinish()
 		{
 			Progress = 1f;

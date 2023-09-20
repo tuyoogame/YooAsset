@@ -41,7 +41,6 @@ namespace YooAsset
 #endif
 
 				OperationSystem.Initialize();
-				DownloadSystem.Initialize();
 			}
 		}
 
@@ -53,8 +52,6 @@ namespace YooAsset
 			if (_isInitialize)
 			{
 				OperationSystem.DestroyAll();
-				DownloadSystem.DestroyAll();
-				CacheSystem.ClearAll();
 
 				foreach (var package in _packages)
 				{
@@ -77,7 +74,6 @@ namespace YooAsset
 			if (_isInitialize)
 			{
 				OperationSystem.Update();
-				DownloadSystem.Update();
 
 				for (int i = 0; i < _packages.Count; i++)
 				{
@@ -93,12 +89,7 @@ namespace YooAsset
 		/// <param name="packageName">资源包名称</param>
 		public static ResourcePackage CreatePackage(string packageName)
 		{
-			if (_isInitialize == false)
-				throw new Exception($"{nameof(YooAssets)} not initialize !");
-
-			if (string.IsNullOrEmpty(packageName))
-				throw new Exception("Package name is null or empty !");
-
+			CheckException(packageName);
 			if (HasPackage(packageName))
 				throw new Exception($"Package {packageName} already existed !");
 
@@ -114,7 +105,8 @@ namespace YooAsset
 		/// <param name="packageName">资源包名称</param>
 		public static ResourcePackage GetPackage(string packageName)
 		{
-			var package = TryGetPackage(packageName);
+			CheckException(packageName);
+			var package = GetPackageInternal(packageName);
 			if (package == null)
 				YooLogger.Error($"Not found resource package : {packageName}");
 			return package;
@@ -126,18 +118,8 @@ namespace YooAsset
 		/// <param name="packageName">资源包名称</param>
 		public static ResourcePackage TryGetPackage(string packageName)
 		{
-			if (_isInitialize == false)
-				throw new Exception($"{nameof(YooAssets)} not initialize !");
-
-			if (string.IsNullOrEmpty(packageName))
-				throw new Exception("Package name is null or empty !");
-
-			foreach (var package in _packages)
-			{
-				if (package.PackageName == packageName)
-					return package;
-			}
-			return null;
+			CheckException(packageName);
+			return GetPackageInternal(packageName);
 		}
 
 		/// <summary>
@@ -146,16 +128,14 @@ namespace YooAsset
 		/// <param name="packageName">资源包名称</param>
 		public static void DestroyPackage(string packageName)
 		{
-			ResourcePackage package = GetPackage(packageName);
+			CheckException(packageName);
+			ResourcePackage package = GetPackageInternal(packageName);
 			if (package == null)
 				return;
 
 			YooLogger.Log($"Destroy resource package : {packageName}");
 			_packages.Remove(package);
 			package.DestroyPackage();
-
-			// 清空缓存
-			CacheSystem.ClearPackage(packageName);
 		}
 
 		/// <summary>
@@ -164,15 +144,9 @@ namespace YooAsset
 		/// <param name="packageName">资源包名称</param>
 		public static bool HasPackage(string packageName)
 		{
-			if (_isInitialize == false)
-				throw new Exception($"{nameof(YooAssets)} not initialize !");
-
-			foreach (var package in _packages)
-			{
-				if (package.PackageName == packageName)
-					return true;
-			}
-			return false;
+			CheckException(packageName);
+			var package = GetPackageInternal(packageName);
+			return package != null;
 		}
 
 		/// <summary>
@@ -181,32 +155,36 @@ namespace YooAsset
 		/// <param name="operation">异步操作对象</param>
 		public static void StartOperation(GameAsyncOperation operation)
 		{
-			OperationSystem.StartOperation(operation);
+			// 注意：游戏业务逻辑的包裹填写为空
+			OperationSystem.StartOperation(string.Empty, operation);
+		}
+
+
+		private static ResourcePackage GetPackageInternal(string packageName)
+		{
+			foreach (var package in _packages)
+			{
+				if (package.PackageName == packageName)
+					return package;
+			}
+			return null;
+		}
+		private static void CheckException(string packageName)
+		{
+			if (_isInitialize == false)
+				throw new Exception($"{nameof(YooAssets)} not initialize !");
+
+			if (string.IsNullOrEmpty(packageName))
+				throw new Exception("Package name is null or empty !");
 		}
 
 		#region 系统参数
-		/// <summary>
-		/// 设置下载系统参数，启用断点续传功能文件的最小字节数
-		/// </summary>
-		public static void SetDownloadSystemBreakpointResumeFileSize(int fileBytes)
-		{
-			DownloadSystem.BreakpointResumeFileSize = fileBytes;
-		}
-
 		/// <summary>
 		/// 设置下载系统参数，下载失败后清理文件的HTTP错误码
 		/// </summary>
 		public static void SetDownloadSystemClearFileResponseCode(List<long> codes)
 		{
-			DownloadSystem.ClearFileResponseCodes = codes;
-		}
-
-		/// <summary>
-		/// 设置下载系统参数，自定义的证书认证实例
-		/// </summary>
-		public static void SetDownloadSystemCertificateHandler(UnityEngine.Networking.CertificateHandler instance)
-		{
-			DownloadSystem.CertificateHandlerInstance = instance;
+			DownloadHelper.ClearFileResponseCodes = codes;
 		}
 
 		/// <summary>
@@ -214,22 +192,7 @@ namespace YooAsset
 		/// </summary>
 		public static void SetDownloadSystemUnityWebRequest(DownloadRequestDelegate requestDelegate)
 		{
-			DownloadSystem.RequestDelegate = requestDelegate;
-		}
-
-		/// <summary>
-		/// 设置下载系统参数，网络重定向次数（Unity引擎默认值32）
-		/// 注意：不支持设置为负值
-		/// </summary>
-		public static void SetDownloadSystemRedirectLimit(int redirectLimit)
-		{
-			if (redirectLimit < 0)
-			{
-				YooLogger.Warning($"Invalid param value : {redirectLimit}");
-				return;
-			}
-
-			DownloadSystem.RedirectLimit = redirectLimit;
+			DownloadHelper.RequestDelegate = requestDelegate;
 		}
 
 		/// <summary>
@@ -246,19 +209,11 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 设置缓存系统参数，已经缓存文件的校验等级
-		/// </summary>
-		public static void SetCacheSystemCachedFileVerifyLevel(EVerifyLevel verifyLevel)
-		{
-			CacheSystem.InitVerifyLevel = verifyLevel;
-		}
-
-		/// <summary>
 		/// 设置缓存系统参数，禁用缓存在WebGL平台
 		/// </summary>
 		public static void SetCacheSystemDisableCacheOnWebGL()
 		{
-			CacheSystem.DisableUnityCacheOnWebGL = true;
+			CacheHelper.DisableUnityCacheOnWebGL = true;
 		}
 		#endregion
 

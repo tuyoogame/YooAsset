@@ -20,7 +20,7 @@ namespace YooAsset.Editor
 		/// <summary>
 		/// 获取流文件夹路径
 		/// </summary>
-		public static string GetDefaultStreamingAssetsRoot()
+		public static string GetStreamingAssetsRoot()
 		{
 			return $"{Application.dataPath}/StreamingAssets/{YooAssetSettings.DefaultYooFolderName}/";
 		}

@@ -15,29 +15,14 @@ namespace YooAsset.Editor
 		public bool ShowPackageView = false;
 
 		/// <summary>
-		/// 启用可寻址资源定位
+		/// 是否显示编辑器别名
 		/// </summary>
-		public bool EnableAddressable = false;
-
-		/// <summary>
-		/// 资源定位地址大小写不敏感
-		/// </summary>
-		public bool LocationToLower = false;
-
-		/// <summary>
-		/// 包含资源GUID数据
-		/// </summary>
-		public bool IncludeAssetGUID = false;
+		public bool ShowEditorAlias = false;
 
 		/// <summary>
 		/// 资源包名唯一化
 		/// </summary>
 		public bool UniqueBundleName = false;
-
-		/// <summary>
-		/// 是否显示编辑器别名
-		/// </summary>
-		public bool ShowEditorAlias = false;
 
 
 		/// <summary>
@@ -52,9 +37,6 @@ namespace YooAsset.Editor
 		public void ClearAll()
 		{
 			ShowPackageView = false;
-			EnableAddressable = false;
-			LocationToLower = false;
-			IncludeAssetGUID = false;
 			UniqueBundleName = false;
 			ShowEditorAlias = false;
 			Packages.Clear();
@@ -113,9 +95,15 @@ namespace YooAsset.Editor
 			if (string.IsNullOrEmpty(packageName))
 				throw new Exception("Build package name is null or empty !");
 
+			// 检测配置合法性
 			var package = GetPackage(packageName);
+			package.CheckConfigError();
+
+			// 创建资源收集命令
 			CollectCommand command = new CollectCommand(buildMode, packageName,
-			EnableAddressable, LocationToLower, IncludeAssetGUID, UniqueBundleName);
+				 package.EnableAddressable, package.LocationToLower, package.IncludeAssetGUID, package.IgnoreDefaultType, UniqueBundleName);
+
+			// 获取收集的资源集合
 			CollectResult collectResult = new CollectResult(command);
 			collectResult.SetCollectAssets(package.GetAllCollectAssets(command));
 			return collectResult;

@@ -34,14 +34,14 @@ namespace YooAsset.Editor
 		public BuildTarget BuildTarget;
 
 		/// <summary>
-		/// 构建管线
-		/// </summary>
-		public EBuildPipeline BuildPipeline;
-
-		/// <summary>
 		/// 构建模式
 		/// </summary>
 		public EBuildMode BuildMode;
+
+		/// <summary>
+		/// 构建管线
+		/// </summary>
+		public string BuildPipeline;
 
 		/// <summary>
 		/// 构建包裹名称
@@ -74,17 +74,12 @@ namespace YooAsset.Editor
 		public bool UniqueBundleName;
 
 		/// <summary>
-		/// 共享资源的打包规则类名
-		/// </summary>
-		public string SharedPackRuleClassName;
-
-		/// <summary>
 		/// 加密服务类名称
 		/// </summary>
 		public string EncryptionServicesClassName;
 
 		// 构建参数
-		public EOutputNameStyle OutputNameStyle;
+		public EFileNameStyle FileNameStyle;
 		public ECompressOption CompressOption;
 		public bool DisableWriteTypeTree;
 		public bool IgnoreTypeTreeChanges;
@@ -96,7 +91,5 @@ namespace YooAsset.Editor
 		public long AllBundleTotalSize;
 		public int EncryptedBundleTotalCount;
 		public long EncryptedBundleTotalSize;
-		public int RawBundleTotalCount;
-		public long RawBundleTotalSize;
 	}
 }

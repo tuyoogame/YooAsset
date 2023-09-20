@@ -7,13 +7,18 @@ namespace YooAsset.Editor
 	public enum EBuildPipeline
 	{
 		/// <summary>
-		/// 传统内置构建管线
+		/// 传统内置构建管线 (BBP)
 		/// </summary>
 		BuiltinBuildPipeline,
 		
 		/// <summary>
-		/// 可编程构建管线
+		/// 可编程构建管线 (SBP)
 		/// </summary>
 		ScriptableBuildPipeline,
+
+		/// <summary>
+		/// 原生文件构建管线 (RFBP)
+		/// </summary>
+		RawFileBuildPipeline,
 	}
 }

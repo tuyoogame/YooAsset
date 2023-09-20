@@ -37,11 +37,6 @@ namespace YooAsset.Editor
 		/// 所属资源包的大小
 		/// </summary>
 		public long MainBundleSize;
-		
-		/// <summary>
-		/// 依赖的资源包名称列表
-		/// </summary>
-		public List<string> DependBundles = new List<string>();
 
 		/// <summary>
 		/// 依赖的资源路径列表

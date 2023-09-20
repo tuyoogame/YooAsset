@@ -1,12 +1,14 @@
 ﻿
+using UnityEngine;
+
 namespace YooAsset
 {
 	internal sealed class CompletedDownloader : DownloaderBase
 	{
-		public CompletedDownloader(BundleInfo bundleInfo) : base(bundleInfo, 0, 0)
+		public CompletedDownloader(BundleInfo bundleInfo) : base(bundleInfo, null, 0, 0)
 		{
-			_downloadProgress = 1f;
-			_downloadedBytes = (ulong)bundleInfo.Bundle.FileSize;
+			DownloadProgress = 1f;
+			DownloadedBytes = (ulong)bundleInfo.Bundle.FileSize;
 			_status = EStatus.Succeed;
 		}
 
@@ -18,6 +20,10 @@ namespace YooAsset
 		}
 		public override void Abort()
 		{
+		}
+		public override AssetBundle GetAssetBundle()
+		{
+			throw new System.NotImplementedException();
 		}
 	}
 }

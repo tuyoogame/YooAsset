@@ -6,9 +6,9 @@ namespace YooAsset
 {
 	internal class OperationSystem
 	{
-		private static readonly List<AsyncOperationBase> _operations = new List<AsyncOperationBase>(100);
-		private static readonly List<AsyncOperationBase> _addList = new List<AsyncOperationBase>(100);
-		private static readonly List<AsyncOperationBase> _removeList = new List<AsyncOperationBase>(100);
+		private static readonly List<AsyncOperationBase> _operations = new List<AsyncOperationBase>(1000);
+		private static readonly List<AsyncOperationBase> _addList = new List<AsyncOperationBase>(1000);
+		private static readonly List<AsyncOperationBase> _removeList = new List<AsyncOperationBase>(1000);
 
 		// 计时器相关
 		private static Stopwatch _watch;
@@ -58,11 +58,12 @@ namespace YooAsset
 			}
 
 			// 更新所有的异步操作
-			foreach (var operation in _operations)
+			for (int i = 0; i < _operations.Count; i++)
 			{
 				if (IsBusy)
 					break;
 
+				var operation = _operations[i];
 				operation.Update();
 				if (operation.IsDone)
 				{
@@ -96,11 +97,40 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 销毁包裹的所有任务
+		/// </summary>
+		public static void ClearPackageOperation(string packageName)
+		{
+			// 移除临时队列里的任务
+			for (int i = _addList.Count - 1; i >= 0; i--)
+			{
+				var operation = _addList[i];
+				if (operation.PackageName == packageName)
+				{
+					operation.SetAbort();
+					_addList.RemoveAt(i);
+				}
+			}
+
+			// 移除正在进行的任务
+			for (int i = _operations.Count - 1; i >= 0; i--)
+			{
+				var operation = _operations[i];
+				if (operation.PackageName == packageName)
+				{
+					operation.SetAbort();
+					_operations.RemoveAt(i);
+				}
+			}
+		}
+
+		/// <summary>
 		/// 开始处理异步操作类
 		/// </summary>
-		public static void StartOperation(AsyncOperationBase operation)
+		public static void StartOperation(string packageName, AsyncOperationBase operation)
 		{
 			_addList.Add(operation);
+			operation.SetPackageName(packageName);
 			operation.SetStart();
 			operation.Start();
 		}

@@ -34,24 +34,19 @@ namespace YooAsset.Editor
 		public long FileSize;
 
 		/// <summary>
-		/// 是否为原生文件
+		/// 加密文件
 		/// </summary>
-		public bool IsRawFile;
+		public bool Encrypted;
 
 		/// <summary>
-		/// 加载方法
-		/// </summary>
-		public EBundleLoadMethod LoadMethod;
-
-		/// <summary>
-		/// Tags
+		/// 资源包标签集合
 		/// </summary>
 		public string[] Tags;
 
 		/// <summary>
-		/// 引用该资源包的ID列表
+		/// 资源包的依赖集合
 		/// </summary>
-		public int[] ReferenceIDs;
+		public List<string> DependBundles;
 
 		/// <summary>
 		/// 该资源包内包含的所有资源
