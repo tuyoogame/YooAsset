@@ -45,7 +45,7 @@ public class GameObjectAssetReference : MonoBehaviour
 	[HideInInspector]
 	public string AssetGUID = "";
 
-	private AssetOperationHandle _handle;
+	private AssetHandle _handle;
 
 	public void Start()
 	{
@@ -63,7 +63,7 @@ public class GameObjectAssetReference : MonoBehaviour
 		}
 	}
 
-	private void Handle_Completed(AssetOperationHandle handle)
+	private void Handle_Completed(AssetHandle handle)
 	{
 		if (handle.Status == EOperationStatus.Succeed)
 		{

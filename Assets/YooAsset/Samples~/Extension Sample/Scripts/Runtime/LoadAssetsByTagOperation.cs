@@ -16,7 +16,7 @@ public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObjec
 
 	private readonly string _tag;
 	private ESteps _steps = ESteps.None;
-	private List<AssetOperationHandle> _handles;
+	private List<AssetHandle> _handles;
 
 	/// <summary>
 	/// 资源对象集合
@@ -40,7 +40,7 @@ public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObjec
 		if (_steps == ESteps.LoadAssets)
 		{
 			AssetInfo[] assetInfos = YooAssets.GetAssetInfos(_tag);
-			_handles = new List<AssetOperationHandle>(assetInfos.Length);
+			_handles = new List<AssetHandle>(assetInfos.Length);
 			foreach (var assetInfo in assetInfos)
 			{
 				var handle = YooAssets.LoadAssetAsync(assetInfo);

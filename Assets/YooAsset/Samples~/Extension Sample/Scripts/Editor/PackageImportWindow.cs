@@ -40,7 +40,7 @@ namespace YooAsset.Editor
 			{
 				if (GUILayout.Button("导入补丁包（全部文件）", GUILayout.MaxWidth(150)))
 				{
-					string streamingAssetsRoot = AssetBundleBuilderHelper.GetDefaultStreamingAssetsRoot();
+					string streamingAssetsRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
 					EditorTools.ClearFolder(streamingAssetsRoot);
 					CopyPackageFiles(_manifestPath);
 				}
@@ -59,18 +59,18 @@ namespace YooAsset.Editor
 			// 拷贝核心文件
 			{
 				string sourcePath = $"{outputDirectory}/{manifestFileName}.bytes";
-				string destPath = $"{AssetBundleBuilderHelper.GetDefaultStreamingAssetsRoot()}/{_packageName}/{manifestFileName}.bytes";
+				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{manifestFileName}.bytes";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 			{
 				string sourcePath = $"{outputDirectory}/{manifestFileName}.hash";
-				string destPath = $"{AssetBundleBuilderHelper.GetDefaultStreamingAssetsRoot()}/{_packageName}/{manifestFileName}.hash";
+				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{manifestFileName}.hash";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 			{
 				string fileName = YooAssetSettingsData.GetPackageVersionFileName(manifest.PackageName);
 				string sourcePath = $"{outputDirectory}/{fileName}";
-				string destPath = $"{AssetBundleBuilderHelper.GetDefaultStreamingAssetsRoot()}/{_packageName}/{fileName}";
+				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{fileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 
@@ -80,7 +80,7 @@ namespace YooAsset.Editor
 			{
 				fileCount++;
 				string sourcePath = $"{outputDirectory}/{packageBundle.FileName}";
-				string destPath = $"{AssetBundleBuilderHelper.GetDefaultStreamingAssetsRoot()}/{_packageName}/{packageBundle.FileName}";
+				string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{packageBundle.FileName}";
 				EditorTools.CopyFile(sourcePath, destPath, true);
 			}
 

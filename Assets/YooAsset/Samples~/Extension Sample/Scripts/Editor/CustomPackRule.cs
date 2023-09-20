@@ -22,11 +22,6 @@ public class PackEffectTexture : IPackRule
 		var packRuleResult = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
 		return packRuleResult;
 	}
-
-	bool IPackRule.IsRawFilePackRule()
-	{
-		return false;
-	}
 }
 
 [DisplayName("打包视频（自定义）")]
@@ -39,11 +34,6 @@ public class PackVideo : IPackRule
 		fileExtension = fileExtension.Remove(0, 1);
 		PackRuleResult result = new PackRuleResult(bundleName, fileExtension);
 		return result;
-	}
-
-	bool IPackRule.IsRawFilePackRule()
-	{
-		return true;
 	}
 
 	private string RemoveExtension(string str)
