@@ -12,13 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 185f6993d5150494d98da50e26cb1c25, type: 3}
   m_Name: AssetBundleCollectorSetting
   m_EditorClassIdentifier: 
-  ShowPackageView: 0
-  EnableAddressable: 1
-  UniqueBundleName: 0
+  ShowPackageView: 1
   ShowEditorAlias: 0
+  UniqueBundleName: 1
   Packages:
   - PackageName: DefaultPackage
     PackageDesc: 
+    EnableAddressable: 1
+    LocationToLower: 0
+    IncludeAssetGUID: 0
+    IgnoreDefaultType: 1
     Groups:
     - GroupName: battle
       GroupDesc: "\u6218\u6597"
@@ -104,8 +107,15 @@ MonoBehaviour:
         FilterRuleName: CollectAll
         AssetTags: 
         UserData: 
+  - PackageName: RawPackage
+    PackageDesc: 
+    EnableAddressable: 1
+    LocationToLower: 0
+    IncludeAssetGUID: 0
+    IgnoreDefaultType: 0
+    Groups:
     - GroupName: config
-      GroupDesc: "\u914D\u7F6E\u8868"
+      GroupDesc: "\u914D\u8868"
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:

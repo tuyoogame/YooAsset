@@ -3,6 +3,9 @@ using System.IO;
 using System.Text;
 using YooAsset;
 
+/// <summary>
+/// 文件偏移加密方式
+/// </summary>
 public class FileOffsetEncryption : IEncryptionServices
 {
 	public EncryptResult Encrypt(EncryptFileInfo fileInfo)
@@ -15,24 +18,26 @@ public class FileOffsetEncryption : IEncryptionServices
 			Buffer.BlockCopy(fileData, 0, encryptedData, offset, fileData.Length);
 
 			EncryptResult result = new EncryptResult();
-			result.LoadMethod = EBundleLoadMethod.LoadFromFileOffset;
+			result.Encrypted = true;
 			result.EncryptedData = encryptedData;
 			return result;
 		}
 		else
 		{
 			EncryptResult result = new EncryptResult();
-			result.LoadMethod = EBundleLoadMethod.Normal;
+			result.Encrypted = false;
 			return result;
 		}
 	}
 }
 
+/// <summary>
+/// 文件流加密方式
+/// </summary>
 public class FileStreamEncryption : IEncryptionServices
 {
 	public EncryptResult Encrypt(EncryptFileInfo fileInfo)
 	{
-		// LoadFromStream
 		if (fileInfo.BundleName.Contains("_gameres_audio"))
 		{
 			var fileData = File.ReadAllBytes(fileInfo.FilePath);
@@ -42,15 +47,14 @@ public class FileStreamEncryption : IEncryptionServices
 			}
 
 			EncryptResult result = new EncryptResult();
-			result.LoadMethod = EBundleLoadMethod.LoadFromStream;
+			result.Encrypted = true;
 			result.EncryptedData = fileData;
 			return result;
 		}
-
-		// Normal
+		else
 		{
 			EncryptResult result = new EncryptResult();
-			result.LoadMethod = EBundleLoadMethod.Normal;
+			result.Encrypted = false;
 			return result;
 		}
 	}

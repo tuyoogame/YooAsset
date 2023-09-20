@@ -6,6 +6,7 @@ namespace UniFramework.Machine
 {
 	public class StateMachine
 	{
+		private readonly Dictionary<string, System.Object> _blackboard = new Dictionary<string, object>(100);
 		private readonly Dictionary<string, IStateNode> _nodes = new Dictionary<string, IStateNode>(100);
 		private IStateNode _curNode;
 		private IStateNode _preNode;
@@ -131,6 +132,35 @@ namespace UniFramework.Machine
 			_curNode.OnExit();
 			_curNode = node;
 			_curNode.OnEnter();
+		}
+
+		/// <summary>
+		/// 设置黑板数据
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="value"></param>
+		public void SetBlackboardValue(string key, System.Object value)
+		{
+			if (_blackboard.ContainsKey(key) == false)
+				_blackboard.Add(key, value);
+			else
+				_blackboard[key] = value;
+		}
+
+		/// <summary>
+		/// 获取黑板数据
+		/// </summary>
+		public System.Object GetBlackboardValue(string key)
+		{
+			if (_blackboard.TryGetValue(key, out System.Object value))
+			{
+				return value;
+			}
+			else
+			{
+				UniLogger.Warning($"Not found blackboard value : {key}");
+				return null;
+			}
 		}
 
 		private IStateNode TryGetNode(string nodeName)
