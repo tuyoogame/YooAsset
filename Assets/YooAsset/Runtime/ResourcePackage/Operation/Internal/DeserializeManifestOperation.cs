@@ -185,7 +185,8 @@ namespace YooAsset
 				{
 					_packageBundleCount = _buffer.ReadInt32();
 					Manifest.BundleList = new List<PackageBundle>(_packageBundleCount);
-					Manifest.BundleDic = new Dictionary<string, PackageBundle>(_packageBundleCount);
+					Manifest.BundleDic1 = new Dictionary<string, PackageBundle>(_packageBundleCount);
+					Manifest.BundleDic2 = new Dictionary<string, PackageBundle>(_packageBundleCount);
 					_progressTotalValue = _packageBundleCount;
 					_steps = ESteps.DeserializeBundleList;
 				}
@@ -203,8 +204,9 @@ namespace YooAsset
 						packageBundle.Tags = _buffer.ReadUTF8Array();
 						packageBundle.DependIDs = _buffer.ReadInt32Array();
 						packageBundle.ParseBundle(Manifest);
-						Manifest.BundleList.Add(packageBundle);				
-						Manifest.BundleDic.Add(packageBundle.BundleName, packageBundle);
+						Manifest.BundleList.Add(packageBundle);
+						Manifest.BundleDic1.Add(packageBundle.BundleName, packageBundle);
+						Manifest.BundleDic2.Add(packageBundle.FileName, packageBundle);
 
 						// 注意：原始文件可能存在相同的CacheGUID
 						if (Manifest.CacheGUIDs.Contains(packageBundle.CacheGUID) == false)

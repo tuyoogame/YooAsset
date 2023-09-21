@@ -67,7 +67,13 @@ namespace YooAsset
 		/// 资源包集合（提供BundleName获取PackageBundle）
 		/// </summary>
 		[NonSerialized]
-		public Dictionary<string, PackageBundle> BundleDic;
+		public Dictionary<string, PackageBundle> BundleDic1;
+
+		/// <summary>
+		/// 资源包集合（提供FileName获取PackageBundle）
+		/// </summary>
+		[NonSerialized]
+		public Dictionary<string, PackageBundle> BundleDic2;
 
 		/// <summary>
 		/// 资源映射集合（提供AssetPath获取PackageAsset）
@@ -170,9 +176,17 @@ namespace YooAsset
 		/// <summary>
 		/// 尝试获取包裹的资源包
 		/// </summary>
-		public bool TryGetPackageBundle(string bundleName, out PackageBundle result)
+		public bool TryGetPackageBundleByBundleName(string bundleName, out PackageBundle result)
 		{
-			return BundleDic.TryGetValue(bundleName, out result);
+			return BundleDic1.TryGetValue(bundleName, out result);
+		}
+
+		/// <summary>
+		/// 尝试获取包裹的资源包
+		/// </summary>
+		public bool TryGetPackageBundleByFileName(string fileName, out PackageBundle result)
+		{
+			return BundleDic2.TryGetValue(fileName, out result);
 		}
 
 		/// <summary>

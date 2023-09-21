@@ -267,7 +267,6 @@ namespace YooAsset
 			return operation;
 		}
 	}
-
 	public sealed class ResourceUnpackerOperation : DownloaderOperation
 	{
 		internal ResourceUnpackerOperation(string packageName, List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
@@ -282,6 +281,23 @@ namespace YooAsset
 		{
 			List<BundleInfo> downloadList = new List<BundleInfo>();
 			var operation = new ResourceUnpackerOperation(packageName, downloadList, upackingMaxNumber, failedTryAgain, int.MaxValue);
+			return operation;
+		}
+	}
+	public sealed class ResourceImporterOperation : DownloaderOperation
+	{
+		internal ResourceImporterOperation(string packageName, List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
+			: base(packageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout)
+		{
+		}
+
+		/// <summary>
+		/// 创建空的导入器
+		/// </summary>
+		internal static ResourceImporterOperation CreateEmptyImporter(string packageName, int upackingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> downloadList = new List<BundleInfo>();
+			var operation = new ResourceImporterOperation(packageName, downloadList, upackingMaxNumber, failedTryAgain, int.MaxValue);
 			return operation;
 		}
 	}

@@ -112,6 +112,11 @@ namespace YooAsset
 		{
 			return ResourceUnpackerOperation.CreateEmptyUnpacker(PackageName, upackingMaxNumber, failedTryAgain, timeout);
 		}
+
+		ResourceImporterOperation IPlayMode.CreateResourceImporterByFilePaths(string[] filePaths, int importerMaxNumber, int failedTryAgain, int timeout)
+		{
+			return ResourceImporterOperation.CreateEmptyImporter(PackageName, importerMaxNumber, failedTryAgain, timeout);
+		}
 		#endregion
 
 		#region IBundleQuery接口

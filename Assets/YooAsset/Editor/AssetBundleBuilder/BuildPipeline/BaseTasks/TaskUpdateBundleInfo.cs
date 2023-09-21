@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -61,5 +62,14 @@ namespace YooAsset.Editor
 		protected abstract string GetBundleFileHash(string filePath, BuildParametersContext buildParametersContext);
 		protected abstract string GetBundleFileCRC(string filePath, BuildParametersContext buildParametersContext);
 		protected abstract long GetBundleFileSize(string filePath, BuildParametersContext buildParametersContext);
+
+		protected string GetFilePathTempHash(string filePath)
+		{
+			byte[] bytes = Encoding.UTF8.GetBytes(filePath);
+			return HashUtility.BytesMD5(bytes);
+
+			// 注意：在文件路径的哈希值冲突的情况下，可以使用下面的方法
+			//return $"{HashUtility.BytesMD5(bytes)}-{Guid.NewGuid():N}";
+		}
 	}
 }

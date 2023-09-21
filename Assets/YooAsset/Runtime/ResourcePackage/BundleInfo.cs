@@ -176,23 +176,34 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 批量转换为解压BundleInfo
+		/// 批量创建解压BundleInfo
 		/// </summary>
-		public static List<BundleInfo> ConvertToUnpackInfos(ResourceAssist assist, List<PackageBundle> unpackList)
+		public static List<BundleInfo> CreateUnpackInfos(ResourceAssist assist, List<PackageBundle> unpackList)
 		{
 			List<BundleInfo> result = new List<BundleInfo>(unpackList.Count);
 			foreach (var packageBundle in unpackList)
 			{
-				var bundleInfo = ConvertToUnpackInfo(assist, packageBundle);
+				var bundleInfo = CreateUnpackInfo(assist, packageBundle);
 				result.Add(bundleInfo);
 			}
 			return result;
 		}
-		private static BundleInfo ConvertToUnpackInfo(ResourceAssist assist, PackageBundle packageBundle)
+		private static BundleInfo CreateUnpackInfo(ResourceAssist assist, PackageBundle packageBundle)
 		{
 			string streamingPath = PersistentHelper.ConvertToWWWPath(assist.Persistent.GetBuildinFilePath(packageBundle));
 			BundleInfo newBundleInfo = new BundleInfo(assist, packageBundle, ELoadMode.LoadFromStreaming, streamingPath, streamingPath);
 			return newBundleInfo;
+		}
+
+		/// <summary>
+		/// 创建导入BundleInfo
+		/// </summary>
+		public static BundleInfo CreateImportInfo(ResourceAssist assist, PackageBundle packageBundle, string filePath)
+		{
+			// 注意：我们把本地文件路径指定为远端下载地址
+			string persistentPath = PersistentHelper.ConvertToWWWPath(filePath);
+			BundleInfo bundleInfo = new BundleInfo(assist, packageBundle, BundleInfo.ELoadMode.None, persistentPath, persistentPath);
+			return bundleInfo;
 		}
 	}
 }

@@ -151,11 +151,13 @@ namespace YooAsset
 			}
 
 			// 填充BundleDic
-			manifest.BundleDic = new Dictionary<string, PackageBundle>(manifest.BundleList.Count);
+			manifest.BundleDic1 = new Dictionary<string, PackageBundle>(manifest.BundleList.Count);
+			manifest.BundleDic2 = new Dictionary<string, PackageBundle>(manifest.BundleList.Count);
 			foreach (var packageBundle in manifest.BundleList)
 			{
 				packageBundle.ParseBundle(manifest);
-				manifest.BundleDic.Add(packageBundle.BundleName, packageBundle);
+				manifest.BundleDic1.Add(packageBundle.BundleName, packageBundle);
+				manifest.BundleDic2.Add(packageBundle.FileName, packageBundle);
 			}
 
 			// 填充AssetDic

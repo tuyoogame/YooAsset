@@ -55,7 +55,7 @@ namespace YooAsset.Editor
 		{
 			var buildMode = buildParametersContext.Parameters.BuildMode;
 			if (buildMode == EBuildMode.DryRunBuild || buildMode == EBuildMode.SimulateBuild)
-				return "00000000000000000000000000000000"; //32位
+				return GetFilePathTempHash(filePath);
 			else
 				return HashUtility.FileMD5(filePath);
 		}

@@ -109,7 +109,7 @@ namespace YooAsset
 				downloadList.Add(packageBundle);
 			}
 
-			return BundleInfo.ConvertToUnpackInfos(_assist, downloadList);
+			return BundleInfo.CreateUnpackInfos(_assist, downloadList);
 		}
 
 		ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
@@ -134,7 +134,36 @@ namespace YooAsset
 				}
 			}
 
-			return BundleInfo.ConvertToUnpackInfos(_assist, downloadList);
+			return BundleInfo.CreateUnpackInfos(_assist, downloadList);
+		}
+
+		ResourceImporterOperation IPlayMode.CreateResourceImporterByFilePaths(string[] filePaths, int importerMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> importerList = GetImporterListByFilePaths(_activeManifest, filePaths);
+			var operation = new ResourceImporterOperation(PackageName, importerList, importerMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		private List<BundleInfo> GetImporterListByFilePaths(PackageManifest manifest, string[] filePaths)
+		{
+			List<BundleInfo> result = new List<BundleInfo>();
+			foreach (var filePath in filePaths)
+			{
+				string fileName = System.IO.Path.GetFileName(filePath);
+				if (manifest.TryGetPackageBundleByFileName(fileName, out PackageBundle packageBundle))
+				{
+					// 忽略缓存文件
+					if (IsCachedPackageBundle(packageBundle))
+						continue;
+
+					var bundleInfo = BundleInfo.CreateImportInfo(_assist, packageBundle, filePath);
+					result.Add(bundleInfo);
+				}
+				else
+				{
+					YooLogger.Warning($"Not found package bundle, importer file path : {filePath}");
+				}
+			}
+			return result;
 		}
 		#endregion
 
