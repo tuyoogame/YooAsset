@@ -115,7 +115,7 @@ namespace YooAsset.Editor
 			// 拷贝文件列表
 			foreach (var bundle2 in manifest2.BundleList)
 			{
-				if (manifest1.TryGetPackageBundle(bundle2.BundleName, out PackageBundle bundle1))
+				if (manifest1.TryGetPackageBundleByBundleName(bundle2.BundleName, out PackageBundle bundle1))
 				{
 					if (bundle2.FileHash != bundle1.FileHash)
 					{

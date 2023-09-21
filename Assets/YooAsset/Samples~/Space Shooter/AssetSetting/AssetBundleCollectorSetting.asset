@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 185f6993d5150494d98da50e26cb1c25, type: 3}
   m_Name: AssetBundleCollectorSetting
   m_EditorClassIdentifier: 
-  ShowPackageView: 1
+  ShowPackageView: 0
   ShowEditorAlias: 0
-  UniqueBundleName: 1
+  UniqueBundleName: 0
   Packages:
   - PackageName: DefaultPackage
     PackageDesc: 
@@ -104,26 +104,6 @@ MonoBehaviour:
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackTopDirectory
-        FilterRuleName: CollectAll
-        AssetTags: 
-        UserData: 
-  - PackageName: RawPackage
-    PackageDesc: 
-    EnableAddressable: 1
-    LocationToLower: 0
-    IncludeAssetGUID: 0
-    IgnoreDefaultType: 0
-    Groups:
-    - GroupName: config
-      GroupDesc: "\u914D\u8868"
-      AssetTags: 
-      ActiveRuleName: EnableGroup
-      Collectors:
-      - CollectPath: Assets/Samples/Space Shooter/GameRes/Config
-        CollectorGUID: 1894d23646ddbf8479e579cc03261dde
-        CollectorType: 0
-        AddressRuleName: AddressByFileName
-        PackRuleName: PackRawFile
         FilterRuleName: CollectAll
         AssetTags: 
         UserData: 

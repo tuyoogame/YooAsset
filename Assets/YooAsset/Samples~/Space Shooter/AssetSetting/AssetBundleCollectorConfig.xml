@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root Version="v2.0.0">
-  <Common ShowPackageView="True" ShowEditorAlias="False" UniqueBundleName="True" />
+  <Common ShowPackageView="False" ShowEditorAlias="False" UniqueBundleName="False" />
   <Package PackageName="DefaultPackage" PackageDesc="" AutoAddressable="True" LocationToLower="False" IncludeAssetGUID="False" IgnoreDefaultType="True">
     <Group GroupActiveRule="EnableGroup" GroupName="battle" GroupDesc="战斗" AssetTags="">
       <Collector CollectPath="Assets/Samples/Space Shooter/GameRes/Effect" CollectGUID="80d76514758554baaa96a9efffe9f3ef" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" UserData="" AssetTags="" />
@@ -17,11 +17,6 @@
       <Collector CollectPath="Assets/Samples/Space Shooter/GameRes/UIImage" CollectGUID="30c57db62bb02a24590e7046d3a9e33a" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" UserData="" AssetTags="" />
       <Collector CollectPath="Assets/Samples/Space Shooter/GameRes/UIPanel" CollectGUID="12d33f33f3a55224c9c747d7bffa1c68" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectAll" UserData="" AssetTags="" />
       <Collector CollectPath="Assets/Samples/Space Shooter/GameRes/UISprite" CollectGUID="01865ad6f7c806147b6cb37f2d83bc96" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackTopDirectory" FilterRule="CollectAll" UserData="" AssetTags="" />
-    </Group>
-  </Package>
-  <Package PackageName="RawPackage" PackageDesc="" AutoAddressable="True" LocationToLower="False" IncludeAssetGUID="False" IgnoreDefaultType="False">
-    <Group GroupActiveRule="EnableGroup" GroupName="config" GroupDesc="配表" AssetTags="">
-      <Collector CollectPath="Assets/Samples/Space Shooter/GameRes/Config" CollectGUID="1894d23646ddbf8479e579cc03261dde" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackRawFile" FilterRule="CollectAll" UserData="" AssetTags="" />
     </Group>
   </Package>
 </root>
