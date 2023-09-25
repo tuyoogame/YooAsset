@@ -33,7 +33,7 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			RequestCount = RemoteTools.GetRequestFailedCount(_packageName, nameof(QueryRemotePackageHashOperation));
+			RequestCount = RequestHelper.GetRequestFailedCount(_packageName, nameof(QueryRemotePackageHashOperation));
 			_steps = ESteps.DownloadPackageHash;
 		}
 		internal override void Update()
@@ -62,7 +62,7 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = _downloader.GetError();
-					RemoteTools.RecordRequestFailed(_packageName, nameof(QueryRemotePackageHashOperation));
+					RequestHelper.RecordRequestFailed(_packageName, nameof(QueryRemotePackageHashOperation));
 				}
 				else
 				{

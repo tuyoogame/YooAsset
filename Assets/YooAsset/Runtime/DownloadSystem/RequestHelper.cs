@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-	public class RemoteTools
+	public class RequestHelper
 	{
 		/// <summary>
 		/// 记录网络请求失败事件的次数
