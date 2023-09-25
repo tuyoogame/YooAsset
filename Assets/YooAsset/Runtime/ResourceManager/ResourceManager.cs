@@ -348,7 +348,7 @@ namespace YooAsset
 		}
 		internal List<BundleLoaderBase> CreateDependAssetBundleLoaders(AssetInfo assetInfo)
 		{
-			BundleInfo[] depends = _bundleQuery.GetAllDependBundleInfos(assetInfo);
+			BundleInfo[] depends = _bundleQuery.GetDependBundleInfos(assetInfo);
 			List<BundleLoaderBase> result = new List<BundleLoaderBase>(depends.Length);
 			foreach (var bundleInfo in depends)
 			{

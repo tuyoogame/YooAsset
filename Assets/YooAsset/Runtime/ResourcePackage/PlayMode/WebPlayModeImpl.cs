@@ -144,7 +144,7 @@ namespace YooAsset
 			var packageBundle = _activeManifest.GetMainPackageBundle(assetInfo.AssetPath);
 			return CreateBundleInfo(packageBundle);
 		}
-		BundleInfo[] IBundleQuery.GetAllDependBundleInfos(AssetInfo assetInfo)
+		BundleInfo[] IBundleQuery.GetDependBundleInfos(AssetInfo assetInfo)
 		{
 			if (assetInfo.IsInvalid)
 				throw new Exception("Should never get here !");

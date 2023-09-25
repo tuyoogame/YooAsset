@@ -11,7 +11,7 @@ namespace YooAsset
 		/// <summary>
 		/// 获取依赖的资源包信息集合
 		/// </summary>
-		BundleInfo[] GetAllDependBundleInfos(AssetInfo assetPath);
+		BundleInfo[] GetDependBundleInfos(AssetInfo assetPath);
 
 		/// <summary>
 		/// 清单是否有效
