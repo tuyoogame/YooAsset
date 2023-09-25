@@ -166,7 +166,7 @@ namespace YooAsset.Editor
 				string[] findAssets = EditorTools.FindAssets(EAssetSearchType.All, collectDirectory);
 				foreach (string assetPath in findAssets)
 				{
-					if (IsValidateAsset(assetPath, isRawFilePackRule) && IsCollectAsset(assetPath))
+					if (IsValidateAsset(assetPath, isRawFilePackRule) && IsCollectAsset(group, assetPath))
 					{
 						if (result.ContainsKey(assetPath) == false)
 						{
@@ -183,7 +183,7 @@ namespace YooAsset.Editor
 			else
 			{
 				string assetPath = CollectPath;
-				if (IsValidateAsset(assetPath, isRawFilePackRule) && IsCollectAsset(assetPath))
+				if (IsValidateAsset(assetPath, isRawFilePackRule) && IsCollectAsset(group, assetPath))
 				{
 					var collectAssetInfo = CreateCollectAssetInfo(command, group, assetPath, isRawFilePackRule);
 					result.Add(assetPath, collectAssetInfo);
@@ -292,11 +292,11 @@ namespace YooAsset.Editor
 
 			return true;
 		}
-		private bool IsCollectAsset(string assetPath)
+		private bool IsCollectAsset(AssetBundleCollectorGroup group, string assetPath)
 		{
 			// 根据规则设置过滤资源文件
 			IFilterRule filterRuleInstance = AssetBundleCollectorSettingData.GetFilterRuleInstance(FilterRuleName);
-			return filterRuleInstance.IsCollectAsset(new FilterRuleData(assetPath));
+			return filterRuleInstance.IsCollectAsset(new FilterRuleData(assetPath, CollectPath, group.GroupName, UserData));
 		}
 		private string GetAddress(CollectCommand command, AssetBundleCollectorGroup group, string assetPath)
 		{

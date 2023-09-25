@@ -4,10 +4,16 @@ namespace YooAsset.Editor
 	public struct FilterRuleData
 	{
 		public string AssetPath;
-
-		public FilterRuleData(string assetPath)
+		public string CollectPath;
+		public string GroupName;
+		public string UserData;
+		
+		public FilterRuleData(string assetPath, string collectPath, string groupName, string userData)
 		{
 			AssetPath = assetPath;
+			CollectPath = collectPath;
+			GroupName = groupName;
+			UserData = userData;
 		}
 	}
 
