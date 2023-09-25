@@ -16,7 +16,7 @@ namespace YooAsset
 		private readonly int _timeout;
 		private UnityWebDataRequester _downloader;
 		private ESteps _steps = ESteps.None;
-		private int RequestCount = 0;
+		private int _requestCount = 0;
 
 		/// <summary>
 		/// 包裹版本
@@ -33,7 +33,7 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			RequestCount = RequestHelper.GetRequestFailedCount(_packageName, nameof(QueryRemotePackageVersionOperation));
+			_requestCount = RequestHelper.GetRequestFailedCount(_packageName, nameof(QueryRemotePackageVersionOperation));
 			_steps = ESteps.DownloadPackageVersion;
 		}
 		internal override void Update()
@@ -89,7 +89,7 @@ namespace YooAsset
 			string url;
 
 			// 轮流返回请求地址
-			if (RequestCount % 2 == 0)
+			if (_requestCount % 2 == 0)
 				url = _remoteServices.GetRemoteMainURL(fileName);
 			else
 				url = _remoteServices.GetRemoteFallbackURL(fileName);

@@ -22,7 +22,7 @@ namespace YooAsset
 		private DeserializeManifestOperation _deserializer;
 		private byte[] _fileData;
 		private ESteps _steps = ESteps.None;
-		private int RequestCount = 0;
+		private int _requestCount = 0;
 
 		/// <summary>
 		/// 加载的清单实例
@@ -39,7 +39,7 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			RequestCount = RequestHelper.GetRequestFailedCount(_packageName, nameof(LoadRemoteManifestOperation));
+			_requestCount = RequestHelper.GetRequestFailedCount(_packageName, nameof(LoadRemoteManifestOperation));
 			_steps = ESteps.DownloadPackageHashFile;
 		}
 		internal override void Update()
@@ -142,7 +142,7 @@ namespace YooAsset
 		private string GetDownloadRequestURL(string fileName)
 		{
 			// 轮流返回请求地址
-			if (RequestCount % 2 == 0)
+			if (_requestCount % 2 == 0)
 				return _remoteServices.GetRemoteMainURL(fileName);
 			else
 				return _remoteServices.GetRemoteFallbackURL(fileName);

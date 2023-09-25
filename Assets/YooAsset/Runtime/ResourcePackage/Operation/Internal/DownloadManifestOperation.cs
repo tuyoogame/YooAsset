@@ -18,7 +18,7 @@ namespace YooAsset
 		private UnityWebFileRequester _downloader1;
 		private UnityWebFileRequester _downloader2;
 		private ESteps _steps = ESteps.None;
-		private int RequestCount = 0;
+		private int _requestCount = 0;
 
 		internal DownloadManifestOperation(PersistentManager persistent, IRemoteServices remoteServices, string packageVersion, int timeout)
 		{
@@ -29,7 +29,7 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			RequestCount = RequestHelper.GetRequestFailedCount(_persistent.PackageName, nameof(DownloadManifestOperation));
+			_requestCount = RequestHelper.GetRequestFailedCount(_persistent.PackageName, nameof(DownloadManifestOperation));
 			_steps = ESteps.DownloadPackageHashFile;
 		}
 		internal override void Update()
@@ -104,7 +104,7 @@ namespace YooAsset
 		private string GetDownloadRequestURL(string fileName)
 		{
 			// 轮流返回请求地址
-			if (RequestCount % 2 == 0)
+			if (_requestCount % 2 == 0)
 				return _remoteServices.GetRemoteMainURL(fileName);
 			else
 				return _remoteServices.GetRemoteFallbackURL(fileName);
