@@ -77,9 +77,9 @@ namespace YooAsset
 		internal void SetFinish()
 		{
 			Progress = 1f;
-			_callback?.Invoke(this);
 			if (_taskCompletionSource != null)
 				_taskCompletionSource.TrySetResult(null);
+			_callback?.Invoke(this);
 		}
 		internal void SetStart()
 		{
