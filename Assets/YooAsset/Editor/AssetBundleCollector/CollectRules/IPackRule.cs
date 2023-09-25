@@ -8,13 +8,6 @@ namespace YooAsset.Editor
 		public string GroupName;
 		public string UserData;
 
-		public PackRuleData(string assetPath)
-		{
-			AssetPath = assetPath;
-			CollectPath = string.Empty;
-			GroupName = string.Empty;
-			UserData = string.Empty;
-		}
 		public PackRuleData(string assetPath, string collectPath, string groupName, string userData)
 		{
 			AssetPath = assetPath;
