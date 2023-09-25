@@ -154,10 +154,13 @@ namespace YooAsset
 						if (Manifest.EnableAddressable)
 						{
 							string location = packageAsset.Address;
-							if (Manifest.AssetPathMapping1.ContainsKey(location))
-								throw new System.Exception($"Location have existed : {location}");
-							else
-								Manifest.AssetPathMapping1.Add(location, packageAsset.AssetPath);
+							if (string.IsNullOrEmpty(location) == false)
+							{
+								if (Manifest.AssetPathMapping1.ContainsKey(location))
+									throw new System.Exception($"Location have existed : {location}");
+								else
+									Manifest.AssetPathMapping1.Add(location, packageAsset.AssetPath);
+							}
 						}
 
 						// 填充AssetPathMapping2
