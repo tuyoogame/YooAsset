@@ -94,7 +94,8 @@ namespace YooAsset.Editor
 					typeof(AddressByFileName),
 					typeof(AddressByFilePath),
 					typeof(AddressByFolderAndFileName),
-					typeof(AddressByGroupAndFileName)
+					typeof(AddressByGroupAndFileName),
+					typeof(AddressDisable)
 				};
 
 				var customTypes = EditorTools.GetAssignableTypes(typeof(IAddressRule));

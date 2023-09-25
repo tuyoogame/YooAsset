@@ -193,6 +193,8 @@ namespace YooAsset.Editor
 					{
 						string address = collectInfoPair.Value.Address;
 						string assetPath = collectInfoPair.Value.AssetPath;
+						if (string.IsNullOrEmpty(address))
+							continue;
 
 						if (address.StartsWith("Assets/") || address.StartsWith("assets/"))
 							throw new Exception($"The address can not set asset path in collector : {CollectPath} \nAssetPath: {assetPath}");

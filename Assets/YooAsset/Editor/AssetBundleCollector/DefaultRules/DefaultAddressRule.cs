@@ -2,6 +2,15 @@
 
 namespace YooAsset.Editor
 {
+	[DisplayName("定位地址: 禁用")]
+	public class AddressDisable : IAddressRule
+	{
+		string IAddressRule.GetAssetAddress(AddressRuleData data)
+		{
+			return string.Empty;
+		}
+	}
+
 	[DisplayName("定位地址: 文件名")]
 	public class AddressByFileName : IAddressRule
 	{
