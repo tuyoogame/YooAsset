@@ -10,13 +10,13 @@ namespace YooAsset
 			Done,
 		}
 
-		private static int RequestCount = 0;
 		private readonly IRemoteServices _remoteServices;
 		private readonly string _packageName;
 		private readonly bool _appendTimeTicks;
 		private readonly int _timeout;
 		private UnityWebDataRequester _downloader;
 		private ESteps _steps = ESteps.None;
+		private int _requestCount = 0;
 
 		/// <summary>
 		/// 包裹版本
@@ -33,7 +33,7 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			RequestCount++;
+			_requestCount = RequestHelper.GetRequestFailedCount(_packageName, nameof(QueryRemotePackageVersionOperation));
 			_steps = ESteps.DownloadPackageVersion;
 		}
 		internal override void Update()
@@ -62,6 +62,7 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = _downloader.GetError();
+					RequestHelper.RecordRequestFailed(_packageName, nameof(QueryRemotePackageVersionOperation));
 				}
 				else
 				{
@@ -88,10 +89,10 @@ namespace YooAsset
 			string url;
 
 			// 轮流返回请求地址
-			if (RequestCount % 2 == 0)
-				url = _remoteServices.GetRemoteFallbackURL(fileName);
-			else
+			if (_requestCount % 2 == 0)
 				url = _remoteServices.GetRemoteMainURL(fileName);
+			else
+				url = _remoteServices.GetRemoteFallbackURL(fileName);
 
 			// 在URL末尾添加时间戳
 			if (_appendTimeTicks)
