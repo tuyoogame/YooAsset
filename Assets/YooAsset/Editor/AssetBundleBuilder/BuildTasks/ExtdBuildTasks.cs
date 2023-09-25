@@ -22,6 +22,7 @@ namespace UnityEditor.Build.Pipeline.Tasks
         /// <inheritdoc />
         public ReturnCode Run()
         {
+#if UNITY_2020_3_OR_NEWER
             BundleWriteData writeData = (BundleWriteData)writeDataParam;
 
             // 所有图集散图的 guid 集合
@@ -63,6 +64,7 @@ namespace UnityEditor.Build.Pipeline.Tasks
                     }
                 }
             }
+#endif
 
             return ReturnCode.Success;
         }

@@ -333,6 +333,7 @@ namespace YooAsset.Editor
 			_showEditorAliasToggle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowEditorAlias);
 
 			// 警示框
+#if UNITY_2020_3_OR_NEWER
 			_helpBoxContainer.Clear();
 			if (_enableAddressableToogle.value && _locationToLowerToogle.value)
 			{
@@ -348,6 +349,7 @@ namespace YooAsset.Editor
 				_helpBoxContainer.style.display = DisplayStyle.Flex;
 			else
 				_helpBoxContainer.style.display = DisplayStyle.None;
+#endif
 
 			// 设置栏
 			if (_showSettings)
