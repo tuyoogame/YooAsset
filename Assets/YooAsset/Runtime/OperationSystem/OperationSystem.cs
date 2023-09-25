@@ -7,8 +7,7 @@ namespace YooAsset
 	internal class OperationSystem
 	{
 		private static readonly List<AsyncOperationBase> _operations = new List<AsyncOperationBase>(1000);
-		private static readonly List<AsyncOperationBase> _addList = new List<AsyncOperationBase>(1000);
-		private static readonly List<AsyncOperationBase> _removeList = new List<AsyncOperationBase>(1000);
+		private static readonly List<AsyncOperationBase> _newList = new List<AsyncOperationBase>(1000);
 
 		// 计时器相关
 		private static Stopwatch _watch;
@@ -47,39 +46,29 @@ namespace YooAsset
 			_frameTime = _watch.ElapsedMilliseconds;
 
 			// 添加新的异步操作
-			if (_addList.Count > 0)
+			if (_newList.Count > 0)
 			{
-				for (int i = 0; i < _addList.Count; i++)
-				{
-					var operation = _addList[i];
-					_operations.Add(operation);
-				}
-				_addList.Clear();
+				_operations.AddRange(_newList);
+				_newList.Clear();
 			}
 
 			// 更新所有的异步操作
-			for (int i = 0; i < _operations.Count; i++)
+			for (int i = _operations.Count - 1; i >= 0; i--)
 			{
 				if (IsBusy)
 					break;
 
 				var operation = _operations[i];
-				operation.Update();
 				if (operation.IsDone)
 				{
-					_removeList.Add(operation);
+					// 注意：如果业务端发生异常，保证异步操作提前移除。
+					_operations.RemoveAt(i);
 					operation.SetFinish();
 				}
-			}
-
-			// 移除已经完成的异步操作
-			if (_removeList.Count > 0)
-			{
-				foreach (var operation in _removeList)
+				else
 				{
-					_operations.Remove(operation);
+					operation.Update();
 				}
-				_removeList.Clear();
 			}
 		}
 
@@ -89,8 +78,7 @@ namespace YooAsset
 		public static void DestroyAll()
 		{
 			_operations.Clear();
-			_addList.Clear();
-			_removeList.Clear();
+			_newList.Clear();
 			_watch = null;
 			_frameTime = 0;
 			MaxTimeSlice = long.MaxValue;
@@ -101,25 +89,21 @@ namespace YooAsset
 		/// </summary>
 		public static void ClearPackageOperation(string packageName)
 		{
-			// 移除临时队列里的任务
-			for (int i = _addList.Count - 1; i >= 0; i--)
+			// 终止临时队列里的任务
+			foreach (var operation in _newList)
 			{
-				var operation = _addList[i];
 				if (operation.PackageName == packageName)
 				{
 					operation.SetAbort();
-					_addList.RemoveAt(i);
 				}
 			}
 
-			// 移除正在进行的任务
-			for (int i = _operations.Count - 1; i >= 0; i--)
+			// 终止正在进行的任务
+			foreach (var operation in _operations)
 			{
-				var operation = _operations[i];
 				if (operation.PackageName == packageName)
 				{
 					operation.SetAbort();
-					_operations.RemoveAt(i);
 				}
 			}
 		}
@@ -129,7 +113,7 @@ namespace YooAsset
 		/// </summary>
 		public static void StartOperation(string packageName, AsyncOperationBase operation)
 		{
-			_addList.Add(operation);
+			_newList.Add(operation);
 			operation.SetPackageName(packageName);
 			operation.SetStart();
 			operation.Start();
