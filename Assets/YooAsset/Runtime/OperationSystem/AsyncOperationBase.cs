@@ -77,9 +77,9 @@ namespace YooAsset
 		internal void SetFinish()
 		{
 			Progress = 1f;
+			_callback?.Invoke(this); //注意：如果完成回调内发生异常，会导致Task无限期等待
 			if (_taskCompletionSource != null)
 				_taskCompletionSource.TrySetResult(null);
-			_callback?.Invoke(this);
 		}
 		internal void SetStart()
 		{
