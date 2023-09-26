@@ -91,6 +91,9 @@ namespace YooAsset
 			// 创建下载器
 			if (_steps == ESteps.PrepareDownload)
 			{
+				// 获取请求地址
+				_requestURL = GetRequestURL();
+
 				// 重置变量
 				_downloadProgress = 0f;
 				_downloadedBytes = 0;
@@ -99,11 +102,13 @@ namespace YooAsset
 				_isAbort = false;
 				_latestDownloadBytes = 0;
 				_latestDownloadRealtime = Time.realtimeSinceStartup;
-				_tryAgainTimer = 0f;
 				_fileOriginLength = 0;
 
-				// 获取请求地址
-				_requestURL = GetRequestURL();
+				// 重置计时器
+				if (_tryAgainTimer > 0f)
+					YooLogger.Warning($"Try again download : {_requestURL}");
+				_tryAgainTimer = 0f;
+
 				_steps = ESteps.CreateDownloader;
 			}
 
@@ -257,7 +262,6 @@ namespace YooAsset
 					_failedTryAgain--;
 					_steps = ESteps.PrepareDownload;
 					ReportWarning();
-					YooLogger.Warning($"Try again download : {_requestURL}");
 				}
 			}
 		}

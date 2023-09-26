@@ -2,6 +2,15 @@
 
 namespace YooAsset.Editor
 {
+	[DisplayName("定位地址: 禁用")]
+	public class AddressDisable : IAddressRule
+	{
+		string IAddressRule.GetAssetAddress(AddressRuleData data)
+		{
+			return string.Empty;
+		}
+	}
+
 	[DisplayName("定位地址: 文件名")]
 	public class AddressByFileName : IAddressRule
 	{
@@ -16,7 +25,7 @@ namespace YooAsset.Editor
 	{
 		string IAddressRule.GetAssetAddress(AddressRuleData data)
 		{
-			return data.AssetPath;
+			throw new System.Exception("可寻址模式下已经默认支持通过资源路径加载！");
 		}
 	}
 

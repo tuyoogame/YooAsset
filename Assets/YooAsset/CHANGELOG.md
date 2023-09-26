@@ -2,6 +2,91 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.5.6-preview] - 2023-09-26
+
+### Fixed
+
+- (#172) 修复包裹初始化后，package的状态不正确的问题。
+
+## [1.5.5-preview] - 2023-09-25
+
+### Fixed
+
+- (#96) 修复了异步操作任务的完成回调在业务层触发异常时无法正常完成的问题。
+- (#156) 修复了多个Package存在时，服务器请求地址请求顺序不对的问题。
+- (#163) 修复了Unity2019版本编译报错的问题。
+- (#167) 修复了初始化时每次都会提示文件验证失败日志。
+- (#171) 修复了IsNeedDownloadFromRemote里缺少判断依赖的资源是否下载 。
+
+### Added
+
+- 资源收集器里增加了AddressDisable规则。
+
+- 资源收集器里FilterRuleData结构体增加了多个备选字段。
+
+  ```c#
+  public struct FilterRuleData
+  {
+      public string AssetPath;
+      public string CollectPath;
+      public string GroupName;
+      public string UserData;
+  }
+  ```
+
+### Changed
+
+- 可以设置自定义参数DefaultYooFolderName。
+
+- 资源配置界面的分组不激活时，不再进行配置检测。
+
+- SBP构建管线增加新构建参数用于修复图集资源冗余问题。
+
+  ```c#
+  public class SBPBuildParameters
+  {
+      /// <summary>
+      /// 修复图集资源冗余问题
+      /// </summary>
+      public bool FixSpriteAtlasRedundancy = false;
+  }
+  ```
+
+## [1.5.4-preview] - 2023-08-25
+
+优化了资源清单文件构建速度（极大提升构建体验）（感谢yingnierxiao同学）。
+
+### Fixed
+
+- (#130) 修复了打包路径无效问题bug
+- (#138) 修复了Unity不支持的格式的原生文件会报warning
+
+### Added
+
+- 新增了IBuildinQueryServices 接口。
+
+### Changed
+
+- 在开启可寻址模式下，默认支持通过资源路径加载资源对象。
+
+- 优化了资源收集界面，增加了配置相关的警示提示。
+
+- 优化了资源报告界面，增加了BundleView界面里的builtin资源的列表显示。
+
+- IQueryServices接口变更为IBuildinQueryServices接口
+
+- EOperationStatus增加了正在处理的状态。
+
+  ```c#
+  public enum EOperationStatus
+  {
+      None,
+      Processing,
+      Succeed,
+      Failed
+  }
+  ```
+
 ## [1.5.3-preview] - 2023-07-28
 
 ### Fixed

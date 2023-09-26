@@ -83,6 +83,9 @@ namespace YooAsset.Editor
 					{
 						string address = collectInfoPair.Value.Address;
 						string assetPath = collectInfoPair.Value.AssetPath;
+						if (string.IsNullOrEmpty(address))
+							continue;
+
 						if (addressTemper.TryGetValue(address, out var existed) == false)
 							addressTemper.Add(address, assetPath);
 						else

@@ -97,7 +97,7 @@ namespace YooAsset
 					Manifest.AssetDic = new Dictionary<string, PackageAsset>(_packageAssetCount);
 
 					if (Manifest.EnableAddressable)
-						Manifest.AssetPathMapping1 = new Dictionary<string, string>(_packageAssetCount);
+						Manifest.AssetPathMapping1 = new Dictionary<string, string>(_packageAssetCount * 3);
 					else
 						Manifest.AssetPathMapping1 = new Dictionary<string, string>(_packageAssetCount * 2);
 
@@ -130,15 +130,6 @@ namespace YooAsset
 							Manifest.AssetDic.Add(assetPath, packageAsset);
 
 						// 填充AssetPathMapping1
-						if (Manifest.EnableAddressable)
-						{
-							string location = packageAsset.Address;
-							if (Manifest.AssetPathMapping1.ContainsKey(location))
-								throw new System.Exception($"Address have existed : {location}");
-							else
-								Manifest.AssetPathMapping1.Add(location, packageAsset.AssetPath);
-						}
-						else
 						{
 							string location = packageAsset.AssetPath;
 							if (Manifest.LocationToLower)
@@ -146,7 +137,7 @@ namespace YooAsset
 
 							// 添加原生路径的映射
 							if (Manifest.AssetPathMapping1.ContainsKey(location))
-								throw new System.Exception($"AssetPath have existed : {location}");
+								throw new System.Exception($"Location have existed : {location}");
 							else
 								Manifest.AssetPathMapping1.Add(location, packageAsset.AssetPath);
 
@@ -155,9 +146,20 @@ namespace YooAsset
 							{
 								string locationWithoutExtension = PathUtility.RemoveExtension(location);
 								if (Manifest.AssetPathMapping1.ContainsKey(locationWithoutExtension))
-									YooLogger.Warning($"AssetPath have existed : {locationWithoutExtension}");
+									YooLogger.Warning($"Location have existed : {locationWithoutExtension}");
 								else
 									Manifest.AssetPathMapping1.Add(locationWithoutExtension, packageAsset.AssetPath);
+							}
+						}
+						if (Manifest.EnableAddressable)
+						{
+							string location = packageAsset.Address;
+							if (string.IsNullOrEmpty(location) == false)
+							{
+								if (Manifest.AssetPathMapping1.ContainsKey(location))
+									throw new System.Exception($"Location have existed : {location}");
+								else
+									Manifest.AssetPathMapping1.Add(location, packageAsset.AssetPath);
 							}
 						}
 
@@ -208,6 +210,10 @@ namespace YooAsset
 
 						packageBundle.ParseBundle(Manifest.PackageName, Manifest.OutputNameStyle);
 						Manifest.BundleDic.Add(packageBundle.BundleName, packageBundle);
+
+						// 注意：原始文件可能存在相同的CacheGUID
+						if (Manifest.CacheGUIDs.Contains(packageBundle.CacheGUID) == false)
+							Manifest.CacheGUIDs.Add(packageBundle.CacheGUID);
 
 						_packageBundleCount--;
 						Progress = 1f - _packageBundleCount / _progressTotalValue;

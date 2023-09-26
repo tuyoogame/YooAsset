@@ -10,7 +10,8 @@ namespace YooAsset
 
 		// 参数相关
 		private string _packageName;
-		private IQueryServices _queryServices;
+		private IBuildinQueryServices _buildinQueryServices;
+		private IDeliveryQueryServices _deliveryQueryServices;
 		private IRemoteServices _remoteServices;
 
 		public IRemoteServices RemoteServices
@@ -21,10 +22,11 @@ namespace YooAsset
 		/// <summary>
 		/// 异步初始化
 		/// </summary>
-		public InitializationOperation InitializeAsync(string packageName, IQueryServices queryServices, IRemoteServices remoteServices)
+		public InitializationOperation InitializeAsync(string packageName, IBuildinQueryServices buildinQueryServices, IDeliveryQueryServices deliveryQueryServices, IRemoteServices remoteServices)
 		{
 			_packageName = packageName;
-			_queryServices = queryServices;
+			_buildinQueryServices = buildinQueryServices;
+			_deliveryQueryServices = deliveryQueryServices;
 			_remoteServices = remoteServices;
 
 			var operation = new HostPlayModeInitializationOperation(this, packageName);
@@ -54,7 +56,7 @@ namespace YooAsset
 		// 查询相关
 		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
 		{
-			return _queryServices.QueryStreamingAssets(_packageName, packageBundle.FileName);
+			return _buildinQueryServices.QueryStreamingAssets(_packageName, packageBundle.FileName);
 		}
 		private bool IsCachedPackageBundle(PackageBundle packageBundle)
 		{
@@ -62,11 +64,11 @@ namespace YooAsset
 		}
 		private bool IsDeliveryPackageBundle(PackageBundle packageBundle)
 		{
-			return _queryServices.QueryDeliveryFiles(_packageName, packageBundle.FileName);
+			return _deliveryQueryServices.QueryDeliveryFiles(_packageName, packageBundle.FileName);
 		}
 		private DeliveryFileInfo GetDeiveryFileInfo(PackageBundle packageBundle)
 		{
-			return _queryServices.GetDeliveryFileInfo(_packageName, packageBundle.FileName);
+			return _deliveryQueryServices.GetDeliveryFileInfo(_packageName, packageBundle.FileName);
 		}
 
 		#region IPlayModeServices接口

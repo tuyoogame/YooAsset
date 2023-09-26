@@ -10,6 +10,10 @@ namespace YooAsset
 		/// </summary>
 		public string ManifestFileName = "PackageManifest";
 
+		/// <summary>
+		/// 默认的YooAsset文件夹名称
+		/// </summary>
+		public string DefaultYooFolderName = "yoo";
 
 		/// <summary>
 		/// 清单文件头标记
@@ -36,11 +40,6 @@ namespace YooAsset
 		/// 缓存的信息文件名称
 		/// </summary>
 		public const string CacheBundleInfoFileName = "__info";
-
-		/// <summary>
-		/// 默认的YooAsset文件夹名称
-		/// </summary>
-		public const string DefaultYooFolderName = "yoo";
 
 		/// <summary>
 		/// 缓存的资源文件的文件夹名称

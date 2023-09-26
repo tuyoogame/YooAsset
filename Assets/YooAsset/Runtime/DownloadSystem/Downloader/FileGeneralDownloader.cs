@@ -51,6 +51,9 @@ namespace YooAsset
 			// 准备下载
 			if (_steps == ESteps.PrepareDownload)
 			{
+				// 获取请求地址
+				_requestURL = GetRequestURL();
+
 				// 重置变量
 				_downloadProgress = 0f;
 				_downloadedBytes = 0;
@@ -59,14 +62,16 @@ namespace YooAsset
 				_isAbort = false;
 				_latestDownloadBytes = 0;
 				_latestDownloadRealtime = Time.realtimeSinceStartup;
+
+				// 重置计时器
+				if(_tryAgainTimer > 0f)
+					YooLogger.Warning($"Try again download : {_requestURL}");
 				_tryAgainTimer = 0f;
 
 				// 删除临时文件
 				if (File.Exists(_tempFilePath))
 					File.Delete(_tempFilePath);
 
-				// 获取请求地址
-				_requestURL = GetRequestURL();
 				_steps = ESteps.CreateDownloader;
 			}
 
@@ -197,7 +202,6 @@ namespace YooAsset
 					_failedTryAgain--;
 					_steps = ESteps.PrepareDownload;
 					ReportWarning();
-					YooLogger.Warning($"Try again download : {_requestURL}");
 				}
 			}
 		}

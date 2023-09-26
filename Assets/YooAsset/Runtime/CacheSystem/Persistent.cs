@@ -46,7 +46,7 @@ namespace YooAsset
 		}
 		private static string CreateDefaultBuildinRoot()
 		{
-			return PathUtility.Combine(UnityEngine.Application.streamingAssetsPath, YooAssetSettings.DefaultYooFolderName);
+			return PathUtility.Combine(UnityEngine.Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
 		}
 		private static string CreateDefaultSandboxRoot()
 		{
@@ -54,11 +54,11 @@ namespace YooAsset
 			// 注意：为了方便调试查看，编辑器下把存储目录放到项目里。
 			string projectPath = Path.GetDirectoryName(UnityEngine.Application.dataPath);
 			projectPath = PathUtility.RegularPath(projectPath);
-			return PathUtility.Combine(projectPath, YooAssetSettings.DefaultYooFolderName);
+			return PathUtility.Combine(projectPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
 #elif UNITY_STANDALONE
-			return PathUtility.Combine(UnityEngine.Application.dataPath, YooAssetSettings.DefaultYooFolderName);
+			return PathUtility.Combine(UnityEngine.Application.dataPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
 #else
-			return PathUtility.Combine(UnityEngine.Application.persistentDataPath, YooAssetSettings.DefaultYooFolderName);	
+			return PathUtility.Combine(UnityEngine.Application.persistentDataPath, YooAssetSettingsData.Setting.DefaultYooFolderName);	
 #endif
 		}
 

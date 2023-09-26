@@ -61,9 +61,18 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 检测配置错误
+		/// 检测包裹配置错误
 		/// </summary>
-		public void CheckConfigError()
+		public void CheckPackageConfigError(string packageName)
+		{
+			var package = GetPackage(packageName);
+			package.CheckConfigError();
+		}
+
+		/// <summary>
+		/// 检测所有配置错误
+		/// </summary>
+		public void CheckAllPackageConfigError()
 		{
 			foreach (var package in Packages)
 			{
@@ -72,9 +81,9 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// 修复配置错误
+		/// 修复所有配置错误
 		/// </summary>
-		public bool FixConfigError()
+		public bool FixAllPackageConfigError()
 		{
 			bool isFixed = false;
 			foreach (var package in Packages)
@@ -92,16 +101,8 @@ namespace YooAsset.Editor
 		/// </summary>
 		public List<string> GetPackageAllTags(string packageName)
 		{
-			foreach (var package in Packages)
-			{
-				if (package.PackageName == packageName)
-				{
-					return package.GetAllTags();
-				}
-			}
-
-			Debug.LogWarning($"Not found package : {packageName}");
-			return new List<string>();
+			var package = GetPackage(packageName);
+			return package.GetAllTags();
 		}
 
 		/// <summary>
@@ -110,21 +111,27 @@ namespace YooAsset.Editor
 		public CollectResult GetPackageAssets(EBuildMode buildMode, string packageName)
 		{
 			if (string.IsNullOrEmpty(packageName))
-				throw new Exception("Build package name is null or mepty !");
+				throw new Exception("Build package name is null or empty !");
 
+			var package = GetPackage(packageName);
+			CollectCommand command = new CollectCommand(buildMode, packageName,
+			EnableAddressable, LocationToLower, IncludeAssetGUID, UniqueBundleName);
+			CollectResult collectResult = new CollectResult(command);
+			collectResult.SetCollectAssets(package.GetAllCollectAssets(command));
+			return collectResult;
+		}
+
+		/// <summary>
+		/// 获取包裹类
+		/// </summary>
+		public AssetBundleCollectorPackage GetPackage(string packageName)
+		{
 			foreach (var package in Packages)
 			{
 				if (package.PackageName == packageName)
-				{
-					CollectCommand command = new CollectCommand(buildMode, packageName,
-						EnableAddressable, LocationToLower, IncludeAssetGUID, UniqueBundleName);
-					CollectResult collectResult = new CollectResult(command);
-					collectResult.SetCollectAssets(package.GetAllCollectAssets(command));
-					return collectResult;
-				}
+					return package;
 			}
-
-			throw new Exception($"Not found collector pacakge : {packageName}");
+			throw new Exception($"Not found package : {packageName}");
 		}
 	}
 }

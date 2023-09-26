@@ -1,4 +1,4 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <uie:Toolbar name="Toolbar" style="display: flex; flex-direction: row-reverse;">
         <ui:Button text="Save" display-tooltip-when-elided="true" name="SaveButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
         <ui:Button text="导出" display-tooltip-when-elided="true" name="ExportButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
@@ -6,6 +6,7 @@
         <ui:Button text="修复" display-tooltip-when-elided="true" name="FixButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
     </uie:Toolbar>
     <ui:VisualElement name="PublicContainer" style="background-color: rgb(79, 79, 79); flex-direction: column; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">
+        <ui:VisualElement name="HelpBoxContainer" style="flex-grow: 1;" />
         <ui:Button text="Settings" display-tooltip-when-elided="true" name="SettingsButton" />
         <ui:VisualElement name="PublicContainer1" style="flex-direction: row; flex-wrap: nowrap; height: 28px;">
             <ui:Toggle label="Show Packages" name="ShowPackages" style="width: 196px; -unity-text-align: middle-left;" />

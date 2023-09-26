@@ -166,7 +166,7 @@ namespace YooAsset.Editor
 				string[] findAssets = EditorTools.FindAssets(EAssetSearchType.All, collectDirectory);
 				foreach (string assetPath in findAssets)
 				{
-					if (IsValidateAsset(assetPath, isRawFilePackRule) && IsCollectAsset(assetPath))
+					if (IsValidateAsset(assetPath, isRawFilePackRule) && IsCollectAsset(group, assetPath))
 					{
 						if (result.ContainsKey(assetPath) == false)
 						{
@@ -183,7 +183,7 @@ namespace YooAsset.Editor
 			else
 			{
 				string assetPath = CollectPath;
-				if (IsValidateAsset(assetPath, isRawFilePackRule) && IsCollectAsset(assetPath))
+				if (IsValidateAsset(assetPath, isRawFilePackRule) && IsCollectAsset(group, assetPath))
 				{
 					var collectAssetInfo = CreateCollectAssetInfo(command, group, assetPath, isRawFilePackRule);
 					result.Add(assetPath, collectAssetInfo);
@@ -204,6 +204,12 @@ namespace YooAsset.Editor
 					{
 						string address = collectInfoPair.Value.Address;
 						string assetPath = collectInfoPair.Value.AssetPath;
+						if (string.IsNullOrEmpty(address))
+							continue;
+
+						if (address.StartsWith("Assets/") || address.StartsWith("assets/"))
+							throw new Exception($"The address can not set asset path in collector : {CollectPath} \nAssetPath: {assetPath}");
+
 						if (addressTemper.TryGetValue(address, out var existed) == false)
 							addressTemper.Add(address, assetPath);
 						else
@@ -288,11 +294,11 @@ namespace YooAsset.Editor
 
 			return true;
 		}
-		private bool IsCollectAsset(string assetPath)
+		private bool IsCollectAsset(AssetBundleCollectorGroup group, string assetPath)
 		{
 			// 根据规则设置过滤资源文件
 			IFilterRule filterRuleInstance = AssetBundleCollectorSettingData.GetFilterRuleInstance(FilterRuleName);
-			return filterRuleInstance.IsCollectAsset(new FilterRuleData(assetPath));
+			return filterRuleInstance.IsCollectAsset(new FilterRuleData(assetPath, CollectPath, group.GroupName, UserData));
 		}
 		private string GetAddress(CollectCommand command, AssetBundleCollectorGroup group, string assetPath)
 		{
@@ -336,11 +342,13 @@ namespace YooAsset.Editor
 			List<string> result = new List<string>(depends.Length);
 			foreach (string assetPath in depends)
 			{
+				// 注意：排除主资源对象
+				if (assetPath == mainAssetPath)
+					continue;
+
 				if (IsValidateAsset(assetPath, false))
 				{
-					// 注意：排除主资源对象
-					if (assetPath != mainAssetPath)
-						result.Add(assetPath);
+					result.Add(assetPath);
 				}
 			}
 			return result;

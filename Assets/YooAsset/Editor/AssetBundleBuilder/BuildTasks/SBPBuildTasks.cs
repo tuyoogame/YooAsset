@@ -9,10 +9,10 @@ namespace UnityEditor.Build.Pipeline.Tasks
 {
 	public static class SBPBuildTasks
 	{
-		public static IList<IBuildTask> Create(string builtInShaderBundleName)
+		public static IList<IBuildTask> Create(bool fixSpriteAtlasRedundancy, string builtInShaderBundleName)
 		{
 			var buildTasks = new List<IBuildTask>();
-			
+
 			// Setup
 			buildTasks.Add(new SwitchToBuildPlatform());
 			buildTasks.Add(new RebuildSpriteAtlasCache());
@@ -33,6 +33,8 @@ namespace UnityEditor.Build.Pipeline.Tasks
 
 			// Packing
 			buildTasks.Add(new GenerateBundlePacking());
+			if (fixSpriteAtlasRedundancy)
+				buildTasks.Add(new RemoveSpriteAtlasRedundancy());
 			buildTasks.Add(new UpdateBundleObjectLayout());
 			buildTasks.Add(new GenerateBundleCommands());
 			buildTasks.Add(new GenerateSubAssetPathMaps());

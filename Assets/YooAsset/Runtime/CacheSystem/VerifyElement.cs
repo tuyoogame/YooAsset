@@ -28,14 +28,13 @@ namespace YooAsset
 
 		public void DeleteFiles()
 		{
-			if (File.Exists(DataFilePath))
+			try
 			{
-				File.Delete(DataFilePath);
+				Directory.Delete(FileRootPath, true);
 			}
-
-			if (File.Exists(InfoFilePath))
+			catch (System.Exception e)
 			{
-				File.Delete(InfoFilePath);
+				YooLogger.Warning($"Failed delete cache bundle folder : {e}");
 			}
 		}
 	}

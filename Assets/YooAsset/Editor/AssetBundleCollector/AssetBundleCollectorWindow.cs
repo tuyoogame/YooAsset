@@ -26,6 +26,7 @@ namespace YooAsset.Editor
 		private List<RuleDisplayName> _filterRuleList;
 
 		private Button _settingsButton;
+		private VisualElement _helpBoxContainer;
 		private VisualElement _setting1Container;
 		private VisualElement _setting2Container;
 		private Toggle _showPackageToogle;
@@ -81,6 +82,9 @@ namespace YooAsset.Editor
 					return;
 
 				visualAsset.CloneTree(root);
+
+				// 警示栏
+				_helpBoxContainer = root.Q("HelpBoxContainer");
 
 				// 公共设置相关
 				_settingsButton = root.Q<Button>("SettingsButton");
@@ -328,6 +332,26 @@ namespace YooAsset.Editor
 			_uniqueBundleNameToogle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.UniqueBundleName);
 			_showEditorAliasToggle.SetValueWithoutNotify(AssetBundleCollectorSettingData.Setting.ShowEditorAlias);
 
+			// 警示框
+#if UNITY_2020_3_OR_NEWER
+			_helpBoxContainer.Clear();
+			if (_enableAddressableToogle.value && _locationToLowerToogle.value)
+			{
+				var helpBox = new HelpBox("无法同时开启[Enable Addressable]选项和[Location To Lower]选项", HelpBoxMessageType.Error);
+				_helpBoxContainer.Add(helpBox);
+			}
+			if (AssetBundleCollectorSettingData.Setting.Packages.Count > 1 && _uniqueBundleNameToogle.value == false)
+			{
+				var helpBox = new HelpBox("检测到当前配置存在多个Package，建议开启[Unique Bundle Name]选项", HelpBoxMessageType.Warning);
+				_helpBoxContainer.Add(helpBox);
+			}
+			if (_helpBoxContainer.childCount > 0)
+				_helpBoxContainer.style.display = DisplayStyle.Flex;
+			else
+				_helpBoxContainer.style.display = DisplayStyle.None;
+#endif
+
+			// 设置栏
 			if (_showSettings)
 			{
 				_setting1Container.style.display = DisplayStyle.Flex;

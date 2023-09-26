@@ -10,8 +10,23 @@
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 
+
+
+/Bundles/
+/ProjectSettings/
+/App/
+/yoo/ 
+/Assets/StreamingAssets
+/Assets/StreamingAssets.meta
+/Assets/Samples
+/Assets/Samples.meta
+/Packages
+/UserSettings
+
+
+
 # Asset meta data should only be ignored when the corresponding asset is also ignored
-!/[Aa]ssets/**/*.meta
+
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # /[Aa]ssets/AssetStoreTools*

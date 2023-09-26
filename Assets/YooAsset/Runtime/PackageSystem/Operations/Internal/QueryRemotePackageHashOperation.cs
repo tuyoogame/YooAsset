@@ -10,13 +10,13 @@ namespace YooAsset
 			Done,
 		}
 		
-		private static int RequestCount = 0;
 		private readonly IRemoteServices _remoteServices;
 		private readonly string _packageName;
 		private readonly string _packageVersion;
 		private readonly int _timeout;
 		private UnityWebDataRequester _downloader;
 		private ESteps _steps = ESteps.None;
+		private int _requestCount = 0;
 
 		/// <summary>
 		/// 包裹哈希值
@@ -33,7 +33,7 @@ namespace YooAsset
 		}
 		internal override void Start()
 		{
-			RequestCount++;
+			_requestCount = RequestHelper.GetRequestFailedCount(_packageName, nameof(QueryRemotePackageHashOperation));
 			_steps = ESteps.DownloadPackageHash;
 		}
 		internal override void Update()
@@ -62,6 +62,7 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
 					Error = _downloader.GetError();
+					RequestHelper.RecordRequestFailed(_packageName, nameof(QueryRemotePackageHashOperation));
 				}
 				else
 				{
@@ -88,10 +89,10 @@ namespace YooAsset
 			string url;
 
 			// 轮流返回请求地址
-			if (RequestCount % 2 == 0)
-				url = _remoteServices.GetRemoteFallbackURL(fileName);
-			else
+			if (_requestCount % 2 == 0)
 				url = _remoteServices.GetRemoteMainURL(fileName);
+			else
+				url = _remoteServices.GetRemoteFallbackURL(fileName);
 
 			return url;
 		}

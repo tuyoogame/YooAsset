@@ -28,6 +28,11 @@ namespace YooAsset.Editor
 			/// 缓存服务器端口
 			/// </summary>
 			public int CacheServerPort;
+
+			/// <summary>
+			/// 修复图集资源冗余问题
+			/// </summary>
+			public bool FixSpriteAtlasRedundancy = false;
 		}
 
 		/// <summary>

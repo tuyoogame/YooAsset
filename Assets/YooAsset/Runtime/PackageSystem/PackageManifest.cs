@@ -82,6 +82,12 @@ namespace YooAsset
 		[NonSerialized]
 		public Dictionary<string, string> AssetPathMapping2;
 
+		/// <summary>
+		/// 该资源清单所有文件的缓存GUID集合
+		/// </summary>
+		[NonSerialized]
+		public HashSet<string> CacheGUIDs = new HashSet<string>();
+
 
 		/// <summary>
 		/// 尝试映射为资源路径
@@ -191,12 +197,7 @@ namespace YooAsset
 		/// </summary>
 		public bool IsIncludeBundleFile(string cacheGUID)
 		{
-			foreach (var packageBundle in BundleList)
-			{
-				if (packageBundle.CacheGUID == cacheGUID)
-					return true;
-			}
-			return false;
+			return CacheGUIDs.Contains(cacheGUID);
 		}
 
 		/// <summary>

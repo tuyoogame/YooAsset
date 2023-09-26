@@ -33,7 +33,7 @@ namespace YooAsset.Editor
 			// 开始构建
 			IBundleBuildResults buildResults;
 			var buildParameters = buildParametersContext.GetSBPBuildParameters();
-			var taskList = SBPBuildTasks.Create(buildMapContext.Command.ShadersBundleName);
+			var taskList = SBPBuildTasks.Create(buildParametersContext.Parameters.SBPParameters.FixSpriteAtlasRedundancy, buildMapContext.Command.ShadersBundleName);
 			ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out buildResults, taskList);
 			if (exitCode < 0)
 			{

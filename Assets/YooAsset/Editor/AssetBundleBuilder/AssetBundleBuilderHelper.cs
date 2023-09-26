@@ -22,7 +22,7 @@ namespace YooAsset.Editor
 		/// </summary>
 		public static string GetDefaultStreamingAssetsRoot()
 		{
-			return $"{Application.dataPath}/StreamingAssets/{YooAssetSettings.DefaultYooFolderName}/";
+			return $"{Application.dataPath}/StreamingAssets/{YooAssetSettingsData.Setting.DefaultYooFolderName}/";
 		}
 	}
 }

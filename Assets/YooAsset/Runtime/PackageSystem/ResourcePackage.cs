@@ -122,7 +122,8 @@ namespace YooAsset
 				var initializeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = hostPlayModeImpl.InitializeAsync(
 					PackageName,
-					initializeParameters.QueryServices,
+					initializeParameters.BuildinQueryServices,
+					initializeParameters.DeliveryQueryServices,
 					initializeParameters.RemoteServices
 					);
 			}
@@ -138,7 +139,7 @@ namespace YooAsset
 				var initializeParameters = parameters as WebPlayModeParameters;
 				initializeOperation = webPlayModeImpl.InitializeAsync(
 					PackageName,
-					initializeParameters.QueryServices,
+					initializeParameters.BuildinQueryServices,
 					initializeParameters.RemoteServices
 					);
 			}
@@ -187,8 +188,10 @@ namespace YooAsset
 			if (parameters is HostPlayModeParameters)
 			{
 				var hostPlayModeParameters = parameters as HostPlayModeParameters;
-				if (hostPlayModeParameters.QueryServices == null)
-					throw new Exception($"{nameof(IQueryServices)} is null.");
+				if (hostPlayModeParameters.BuildinQueryServices == null)
+					throw new Exception($"{nameof(IBuildinQueryServices)} is null.");
+				if (hostPlayModeParameters.DeliveryQueryServices == null)
+					throw new Exception($"{nameof(IDeliveryQueryServices)} is null.");
 				if (hostPlayModeParameters.RemoteServices == null)
 					throw new Exception($"{nameof(IRemoteServices)} is null.");
 			}
@@ -365,17 +368,7 @@ namespace YooAsset
 		{
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-			if (assetInfo.IsInvalid)
-			{
-				YooLogger.Warning(assetInfo.Error);
-				return false;
-			}
-
-			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
-			if (bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
-				return true;
-			else
-				return false;
+			return IsNeedDownloadFromRemoteInternal(assetInfo);
 		}
 
 		/// <summary>
@@ -385,17 +378,7 @@ namespace YooAsset
 		public bool IsNeedDownloadFromRemote(AssetInfo assetInfo)
 		{
 			DebugCheckInitialize();
-			if (assetInfo.IsInvalid)
-			{
-				YooLogger.Warning(assetInfo.Error);
-				return false;
-			}
-
-			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
-			if (bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
-				return true;
-			else
-				return false;
+			return IsNeedDownloadFromRemoteInternal(assetInfo);
 		}
 
 		/// <summary>
@@ -448,6 +431,28 @@ namespace YooAsset
 			DebugCheckInitialize();
 			string assetPath = _playModeServices.ActiveManifest.TryMappingToAssetPath(location);
 			return string.IsNullOrEmpty(assetPath) == false;
+		}
+
+		private bool IsNeedDownloadFromRemoteInternal(AssetInfo assetInfo)
+		{
+			if (assetInfo.IsInvalid)
+			{
+				YooLogger.Warning(assetInfo.Error);
+				return false;
+			}
+
+			BundleInfo bundleInfo = _bundleServices.GetBundleInfo(assetInfo);
+			if (bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
+				return true;
+
+			BundleInfo[] depends = _bundleServices.GetAllDependBundleInfos(assetInfo);
+			foreach (var depend in depends)
+			{
+				if (depend.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
+					return true;
+			}
+
+			return false;
 		}
 		#endregion
 

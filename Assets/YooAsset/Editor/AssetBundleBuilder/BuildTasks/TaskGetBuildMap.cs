@@ -33,7 +33,7 @@ namespace YooAsset.Editor
 			Dictionary<string, BuildAssetInfo> allBuildAssetInfoDic = new Dictionary<string, BuildAssetInfo>(1000);
 
 			// 1. 检测配置合法性
-			AssetBundleCollectorSettingData.Setting.CheckConfigError();
+			AssetBundleCollectorSettingData.Setting.CheckPackageConfigError(packageName);
 
 			// 2. 获取所有收集器收集的资源
 			var collectResult = AssetBundleCollectorSettingData.Setting.GetPackageAssets(buildMode, packageName);
