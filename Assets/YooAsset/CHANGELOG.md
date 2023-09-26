@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.5.6-preview] - 2023-09-26
+
+### Fixed
+
+- (#172) 修复包裹初始化后，package的状态不正确的问题。
+
 ## [1.5.5-preview] - 2023-09-25
 
 ### Fixed
