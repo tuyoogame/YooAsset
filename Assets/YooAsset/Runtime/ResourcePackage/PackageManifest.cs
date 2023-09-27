@@ -207,7 +207,7 @@ namespace YooAsset
 			{
 				if (packageAsset.HasTag(tags))
 				{
-					AssetInfo assetInfo = new AssetInfo(PackageName, packageAsset);
+					AssetInfo assetInfo = new AssetInfo(PackageName, packageAsset, null);
 					result.Add(assetInfo);
 				}
 			}

@@ -93,17 +93,6 @@ namespace YooAsset
 			AssetType = assetType;
 			Error = string.Empty;
 		}
-		internal AssetInfo(string packageName, PackageAsset packageAsset)
-		{
-			if (packageAsset == null)
-				throw new System.Exception("Should never get here !");
-
-			_providerGUID = string.Empty;
-			_packageAsset = packageAsset;
-			PackageName = packageName;
-			AssetType = null;
-			Error = string.Empty;
-		}
 		internal AssetInfo(string packageName, string error)
 		{
 			_providerGUID = string.Empty;

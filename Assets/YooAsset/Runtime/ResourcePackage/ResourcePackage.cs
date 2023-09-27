@@ -450,11 +450,33 @@ namespace YooAsset
 		/// <summary>
 		/// 获取资源信息
 		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		/// <param name="type">资源类型</param>
+		public AssetInfo GetAssetInfo(string location, System.Type type)
+		{
+			DebugCheckInitialize();
+			return ConvertLocationToAssetInfo(location, type);
+		}
+
+		/// <summary>
+		/// 获取资源信息
+		/// </summary>
 		/// <param name="assetGUID">资源GUID</param>
 		public AssetInfo GetAssetInfoByGUID(string assetGUID)
 		{
 			DebugCheckInitialize();
 			return ConvertAssetGUIDToAssetInfo(assetGUID, null);
+		}
+
+		/// <summary>
+		/// 获取资源信息
+		/// </summary>
+		/// <param name="assetGUID">资源GUID</param>
+		/// <param name="type">资源类型</param>
+		public AssetInfo GetAssetInfoByGUID(string assetGUID, System.Type type)
+		{
+			DebugCheckInitialize();
+			return ConvertAssetGUIDToAssetInfo(assetGUID, type);
 		}
 
 		/// <summary>
@@ -674,6 +696,7 @@ namespace YooAsset
 		private AssetHandle LoadAssetInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
 		{
 			DebugCheckAssetLoadMethod(nameof(LoadAssetAsync));
+			DebugCheckAssetLoadType(assetInfo.AssetType);
 			var handle = _resourceMgr.LoadAssetAsync(assetInfo);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
@@ -779,6 +802,7 @@ namespace YooAsset
 		private SubAssetsHandle LoadSubAssetsInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
 		{
 			DebugCheckAssetLoadMethod(nameof(LoadSubAssetsAsync));
+			DebugCheckAssetLoadType(assetInfo.AssetType);
 			var handle = _resourceMgr.LoadSubAssetsAsync(assetInfo);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
@@ -884,6 +908,7 @@ namespace YooAsset
 		private AllAssetsHandle LoadAllAssetsInternal(AssetInfo assetInfo, bool waitForAsyncComplete)
 		{
 			DebugCheckAssetLoadMethod(nameof(LoadAllAssetsAsync));
+			DebugCheckAssetLoadType(assetInfo.AssetType);
 			var handle = _resourceMgr.LoadAllAssetsAsync(assetInfo);
 			if (waitForAsyncComplete)
 				handle.WaitForAsyncComplete();
@@ -1107,6 +1132,18 @@ namespace YooAsset
 			if (_playModeImpl.ActiveManifest.BuildPipeline == DefaultBuildPipeline.RawFileBuildPipelineName)
 			{
 				throw new Exception($"Cannot load raw file using {method} method !");
+			}
+		}
+
+		[Conditional("DEBUG")]
+		private void DebugCheckAssetLoadType(System.Type type)
+		{
+			if (type == null)
+				return;
+
+			if (typeof(UnityEngine.Object).IsAssignableFrom(type) == false)
+			{
+				throw new Exception($"Load asset type is invalid : {type.FullName} !");
 			}
 		}
 		#endregion
