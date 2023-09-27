@@ -19,7 +19,7 @@ namespace YooAsset
 		}
 
 		private ESteps _steps = ESteps.None;
-		private bool _getAssetBundle;
+		private bool _getAssetBundle = false;
 
 		public WebDownloader(BundleInfo bundleInfo, System.Type requesterType, int failedTryAgain, int timeout) : base(bundleInfo, requesterType, failedTryAgain, timeout)
 		{
@@ -28,7 +28,10 @@ namespace YooAsset
 		{
 			if (_steps == ESteps.None)
 			{
-				_getAssetBundle = (bool)args[0];
+				if (args.Length > 0)
+				{
+					_getAssetBundle = (bool)args[0];
+				}
 				_steps = ESteps.PrepareDownload;
 			}
 		}
