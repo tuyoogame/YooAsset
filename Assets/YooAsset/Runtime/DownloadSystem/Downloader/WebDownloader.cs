@@ -22,10 +22,10 @@ namespace YooAsset
 			Done,
 		}
 
-		private bool _keepDownloadHandleLife = false;
 		private DownloadHandlerAssetBundle _downloadhandler;
 		private ESteps _steps = ESteps.None;
-
+		private bool _getAssetBundle = false;
+		private AssetBundle _cacheAssetBundle;
 
 		public WebDownloader(BundleInfo bundleInfo, int failedTryAgain, int timeout) : base(bundleInfo, failedTryAgain, timeout)
 		{
@@ -34,7 +34,10 @@ namespace YooAsset
 		{
 			if (_steps == ESteps.None)
 			{
-				_keepDownloadHandleLife = (bool)param[0];
+				if (param.Length > 0)
+				{
+					_getAssetBundle = (bool)param[0];
+				}
 				_steps = ESteps.PrepareDownload;
 			}
 		}
@@ -135,11 +138,18 @@ namespace YooAsset
 					_lastCode = 0;
 				}
 
-				// 最终释放请求
-				DisposeRequest();
+				if (_getAssetBundle)
+				{
+					_cacheAssetBundle = _downloadhandler.assetBundle;
+					if (_cacheAssetBundle == null)
+					{
+						_lastError = "assetBundle is null";
+						_steps = ESteps.TryAgain;
+					}
+				}
 
-				if (_keepDownloadHandleLife == false)
-					DisposeHandler();
+				// 最终释放请求
+				DisposeRequest();	
 			}
 
 			// 重新尝试下载
@@ -148,7 +158,6 @@ namespace YooAsset
 				if (_failedTryAgain <= 0)
 				{
 					DisposeRequest();
-					DisposeHandler();
 					ReportError();
 					_status = EStatus.Failed;
 					_steps = ESteps.Done;
@@ -175,7 +184,6 @@ namespace YooAsset
 				_lastCode = 0;
 
 				DisposeRequest();
-				DisposeHandler();
 			}
 		}
 		private void DisposeRequest()
@@ -185,6 +193,11 @@ namespace YooAsset
 				_webRequest.Dispose();
 				_webRequest = null;
 			}
+			if (_downloadhandler != null)
+			{
+				_downloadhandler.Dispose();
+				_downloadhandler = null;
+			}
 		}
 
 		/// <summary>
@@ -192,22 +205,7 @@ namespace YooAsset
 		/// </summary>
 		public AssetBundle GetAssetBundle()
 		{
-			if (_downloadhandler != null)
-				return _downloadhandler.assetBundle;
-
-			return null;
-		}
-
-		/// <summary>
-		/// 释放下载句柄
-		/// </summary>
-		public void DisposeHandler()
-		{
-			if (_downloadhandler != null)
-			{
-				_downloadhandler.Dispose();
-				_downloadhandler = null;
-			}
+			return _cacheAssetBundle;
 		}
 	}
 }

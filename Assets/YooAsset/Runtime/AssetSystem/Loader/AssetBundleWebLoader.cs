@@ -95,9 +95,6 @@ namespace YooAsset
 					_steps = ESteps.Done;
 					Status = EStatus.Succeed;
 				}
-
-				// 注意：释放下载句柄
-				_downloader.DisposeHandler();
 			}
 		}
 
