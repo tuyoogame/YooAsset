@@ -43,7 +43,7 @@ namespace YooAsset
 			return _assist.Cache.IsCached(packageBundle.CacheGUID);
 		}
 
-		#region IPlayModeServices接口
+		#region IPlayMode接口
 		public PackageManifest ActiveManifest
 		{
 			set

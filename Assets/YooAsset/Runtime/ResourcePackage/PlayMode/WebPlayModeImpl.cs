@@ -49,6 +49,16 @@ namespace YooAsset
 			BundleInfo bundleInfo = new BundleInfo(_assist, packageBundle, BundleInfo.ELoadMode.LoadFromRemote, remoteMainURL, remoteFallbackURL);
 			return bundleInfo;
 		}
+		private List<BundleInfo> ConvertToDownloadList(List<PackageBundle> downloadList)
+		{
+			List<BundleInfo> result = new List<BundleInfo>(downloadList.Count);
+			foreach (var packageBundle in downloadList)
+			{
+				var bundleInfo = ConvertToDownloadInfo(packageBundle);
+				result.Add(bundleInfo);
+			}
+			return result;
+		}
 
 		// 查询相关
 		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
@@ -56,7 +66,7 @@ namespace YooAsset
 			return _buildinQueryServices.Query(PackageName, packageBundle.FileName);
 		}
 
-		#region IPlayModeServices接口
+		#region IPlayMode接口
 		public PackageManifest ActiveManifest
 		{
 			set
@@ -93,15 +103,101 @@ namespace YooAsset
 
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceDownloaderOperation.CreateEmptyDownloader(PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+			List<BundleInfo> downloadList = GetDownloadListByAll(_activeManifest);
+			var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			return operation;
 		}
+		public List<BundleInfo> GetDownloadListByAll(PackageManifest manifest)
+		{
+			List<PackageBundle> downloadList = new List<PackageBundle>(1000);
+			foreach (var packageBundle in manifest.BundleList)
+			{
+				// 忽略APP资源
+				if (IsBuildinPackageBundle(packageBundle))
+					continue;
+
+				downloadList.Add(packageBundle);
+			}
+
+			return ConvertToDownloadList(downloadList);
+		}
+
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceDownloaderOperation.CreateEmptyDownloader(PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+			List<BundleInfo> downloadList = GetDownloadListByTags(_activeManifest, tags);
+			var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			return operation;
 		}
+		public List<BundleInfo> GetDownloadListByTags(PackageManifest manifest, string[] tags)
+		{
+			List<PackageBundle> downloadList = new List<PackageBundle>(1000);
+			foreach (var packageBundle in manifest.BundleList)
+			{
+				// 忽略APP资源
+				if (IsBuildinPackageBundle(packageBundle))
+					continue;
+
+				// 如果未带任何标记，则统一下载
+				if (packageBundle.HasAnyTags() == false)
+				{
+					downloadList.Add(packageBundle);
+				}
+				else
+				{
+					// 查询DLC资源
+					if (packageBundle.HasTag(tags))
+					{
+						downloadList.Add(packageBundle);
+					}
+				}
+			}
+
+			return ConvertToDownloadList(downloadList);
+		}
+
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceDownloaderOperation.CreateEmptyDownloader(PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+			List<BundleInfo> downloadList = GetDownloadListByPaths(_activeManifest, assetInfos);
+			var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		public List<BundleInfo> GetDownloadListByPaths(PackageManifest manifest, AssetInfo[] assetInfos)
+		{
+			// 获取资源对象的资源包和所有依赖资源包
+			List<PackageBundle> checkList = new List<PackageBundle>();
+			foreach (var assetInfo in assetInfos)
+			{
+				if (assetInfo.IsInvalid)
+				{
+					YooLogger.Warning(assetInfo.Error);
+					continue;
+				}
+
+				// 注意：如果清单里未找到资源包会抛出异常！
+				PackageBundle mainBundle = manifest.GetMainPackageBundle(assetInfo.AssetPath);
+				if (checkList.Contains(mainBundle) == false)
+					checkList.Add(mainBundle);
+
+				// 注意：如果清单里未找到资源包会抛出异常！
+				PackageBundle[] dependBundles = manifest.GetAllDependencies(assetInfo.AssetPath);
+				foreach (var dependBundle in dependBundles)
+				{
+					if (checkList.Contains(dependBundle) == false)
+						checkList.Add(dependBundle);
+				}
+			}
+
+			List<PackageBundle> downloadList = new List<PackageBundle>(1000);
+			foreach (var packageBundle in checkList)
+			{
+				// 忽略APP资源
+				if (IsBuildinPackageBundle(packageBundle))
+					continue;
+
+				downloadList.Add(packageBundle);
+			}
+
+			return ConvertToDownloadList(downloadList);
 		}
 
 		ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)

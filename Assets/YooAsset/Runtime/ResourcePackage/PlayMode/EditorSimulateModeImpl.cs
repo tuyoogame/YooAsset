@@ -29,7 +29,7 @@ namespace YooAsset
 			return operation;
 		}
 
-		#region IPlayModeServices接口
+		#region IPlayMode接口
 		public PackageManifest ActiveManifest
 		{
 			set
