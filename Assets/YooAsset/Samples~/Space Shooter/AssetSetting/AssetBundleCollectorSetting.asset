@@ -22,6 +22,7 @@ MonoBehaviour:
     LocationToLower: 0
     IncludeAssetGUID: 0
     IgnoreDefaultType: 1
+    AutoCollectShaders: 1
     Groups:
     - GroupName: battle
       GroupDesc: "\u6218\u6597"
@@ -40,7 +41,7 @@ MonoBehaviour:
         CollectorGUID: 4d7c84745db8e884f8020a8c5356e67c
         CollectorType: 0
         AddressRuleName: AddressByFileName
-        PackRuleName: PackDirectory
+        PackRuleName: PackSeparately
         FilterRuleName: CollectAll
         AssetTags: 
         UserData: 

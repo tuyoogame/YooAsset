@@ -6,16 +6,16 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	public class PackageCompareWindow : EditorWindow
+	public class PackageComparatorWindow : EditorWindow
 	{
-		static PackageCompareWindow _thisInstance;
+		static PackageComparatorWindow _thisInstance;
 		
 		[MenuItem("Tools/补丁包比对工具", false, 102)]
 		static void ShowWindow()
 		{
 			if (_thisInstance == null)
 			{
-				_thisInstance = EditorWindow.GetWindow(typeof(PackageCompareWindow), false, "补丁包比对工具", true) as PackageCompareWindow;
+				_thisInstance = EditorWindow.GetWindow(typeof(PackageComparatorWindow), false, "补丁包比对工具", true) as PackageComparatorWindow;
 				_thisInstance.minSize = new Vector2(800, 600);
 			}
 			_thisInstance.Show();

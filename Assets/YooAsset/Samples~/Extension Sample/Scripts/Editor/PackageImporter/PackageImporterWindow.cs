@@ -4,16 +4,16 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	public class PackageImportWindow : EditorWindow
+	public class PackageImporterWindow : EditorWindow
 	{
-		static PackageImportWindow _thisInstance;
+		static PackageImporterWindow _thisInstance;
 
 		[MenuItem("Tools/补丁包导入工具", false, 101)]
 		static void ShowWindow()
 		{
 			if (_thisInstance == null)
 			{
-				_thisInstance = EditorWindow.GetWindow(typeof(PackageImportWindow), false, "补丁包导入工具", true) as PackageImportWindow;
+				_thisInstance = EditorWindow.GetWindow(typeof(PackageImporterWindow), false, "补丁包导入工具", true) as PackageImporterWindow;
 				_thisInstance.minSize = new Vector2(800, 600);
 			}
 			_thisInstance.Show();

@@ -13,8 +13,7 @@ namespace YooAsset.Editor
 			typeof(AssetBundleBuilderWindow),
 			typeof(AssetBundleCollectorWindow),
 			typeof(AssetBundleDebuggerWindow),
-			typeof(AssetBundleReporterWindow),
-			typeof(ShaderVariantCollectorWindow)
+			typeof(AssetBundleReporterWindow)
 		};
 #endif
 	}

@@ -1,7 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <uie:Toolbar name="Toolbar" style="display: flex; flex-direction: row-reverse;">
-        <ui:Button text="Save" display-tooltip-when-elided="true" name="SaveButton" style="background-color: rgb(40, 106, 42);" />
-    </uie:Toolbar>
+    <uie:Toolbar name="Toolbar" style="display: flex; flex-direction: row-reverse;" />
     <ui:VisualElement name="CollectContainer">
         <ui:TextField picking-mode="Ignore" label="文件保存路径" name="CollectOutput" style="height: 22px;" />
         <ui:VisualElement name="PackageContainer" style="height: 24px;" />

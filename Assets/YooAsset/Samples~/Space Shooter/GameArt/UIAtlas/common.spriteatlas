@@ -7,7 +7,6 @@ SpriteAtlas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: common
-  serializedVersion: 2
   m_EditorData:
     serializedVersion: 2
     textureSettings:
@@ -29,10 +28,13 @@ SpriteAtlas:
       allowAlphaSplitting: 0
       enableRotation: 0
       enableTightPacking: 0
+    secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
     - {fileID: 102900000, guid: 5338a5ade0415264b976d834237aa226, type: 3}
     bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: 06edc4e02f9c48647adfed0a778cb8aa, type: 3}
@@ -76,6 +78,6 @@ SpriteAtlas:
   - back_arrow
   - button1
   - button_pushed
+  m_RenderDataMap: {}
   m_Tag: common
   m_IsVariant: 0
-  m_IsPlaceholder: 0
