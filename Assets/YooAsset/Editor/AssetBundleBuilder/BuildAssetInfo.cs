@@ -41,11 +41,6 @@ namespace YooAsset.Editor
 		public System.Type AssetType { private set; get; }
 
 		/// <summary>
-		/// 是否为着色器资源
-		/// </summary>
-		public bool IsShaderAsset { private set; get; }
-
-		/// <summary>
 		/// 资源的分类标签
 		/// </summary>
 		public readonly List<string> AssetTags = new List<string>();
@@ -66,10 +61,6 @@ namespace YooAsset.Editor
 
 			AssetGUID = UnityEditor.AssetDatabase.AssetPathToGUID(assetPath);
 			AssetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-			if (AssetType == typeof(UnityEngine.Shader) || AssetType == typeof(UnityEngine.ShaderVariantCollection))
-				IsShaderAsset = true;
-			else
-				IsShaderAsset = false;
 		}
 		public BuildAssetInfo(string assetPath)
 		{
@@ -79,10 +70,6 @@ namespace YooAsset.Editor
 
 			AssetGUID = UnityEditor.AssetDatabase.AssetPathToGUID(assetPath);
 			AssetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-			if (AssetType == typeof(UnityEngine.Shader) || AssetType == typeof(UnityEngine.ShaderVariantCollection))
-				IsShaderAsset = true;
-			else
-				IsShaderAsset = false;
 		}
 
 

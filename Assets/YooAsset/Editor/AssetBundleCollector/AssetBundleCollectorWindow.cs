@@ -27,18 +27,20 @@ namespace YooAsset.Editor
 
 		private VisualElement _helpBoxContainer;
 
-		private VisualElement _setting1Container;
 		private Button _globalSettingsButton;
+		private Button _packageSettingsButton;
+
+		private VisualElement _setting1Container;
 		private Toggle _showPackageToogle;
 		private Toggle _showEditorAliasToggle;
 		private Toggle _uniqueBundleNameToogle;
 
-		private VisualElement _setting3Container;
-		private Button _packageSettingsButton;
+		private VisualElement _setting2Container;
 		private Toggle _enableAddressableToogle;
 		private Toggle _locationToLowerToogle;
 		private Toggle _includeAssetGUIDToogle;
 		private Toggle _ignoreDefaultTypeToogle;
+		private Toggle _autoCollectShadersToogle;
 
 		private VisualElement _packageContainer;
 		private ListView _packageListView;
@@ -91,10 +93,13 @@ namespace YooAsset.Editor
 				// 警示栏
 				_helpBoxContainer = root.Q("HelpBoxContainer");
 
-				// 公共设置相关
-				_setting1Container = root.Q("PublicContainer1");
 				_globalSettingsButton = root.Q<Button>("GlobalSettingsButton");
 				_globalSettingsButton.clicked += GlobalSettingsBtn_clicked;
+				_packageSettingsButton = root.Q<Button>("PackageSettingsButton");
+				_packageSettingsButton.clicked += PackageSettingsBtn_clicked;
+
+				// 公共设置相关
+				_setting1Container = root.Q("PublicContainer1");
 				_showPackageToogle = root.Q<Toggle>("ShowPackages");
 				_showPackageToogle.RegisterValueChangedCallback(evt =>
 				{
@@ -115,9 +120,7 @@ namespace YooAsset.Editor
 				});
 
 				// 包裹设置相关
-				_setting3Container = root.Q("PublicContainer3");
-				_packageSettingsButton = root.Q<Button>("PackageSettingsButton");
-				_packageSettingsButton.clicked += PackageSettingsBtn_clicked;
+				_setting2Container = root.Q("PublicContainer2");
 				_enableAddressableToogle = root.Q<Toggle>("EnableAddressable");
 				_enableAddressableToogle.RegisterValueChangedCallback(evt =>
 				{
@@ -158,6 +161,17 @@ namespace YooAsset.Editor
 					if (selectPackage != null)
 					{
 						selectPackage.IgnoreDefaultType = evt.newValue;
+						AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
+						RefreshWindow();
+					}
+				});
+				_autoCollectShadersToogle = root.Q<Toggle>("AutoCollectShaders");
+				_autoCollectShadersToogle.RegisterValueChangedCallback(evt =>
+				{
+					var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
+					if (selectPackage != null)
+					{
+						selectPackage.AutoCollectShaders = evt.newValue;
 						AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
 						RefreshWindow();
 					}
@@ -458,17 +472,22 @@ namespace YooAsset.Editor
 			}
 			else
 			{
+				_showPackageSettings = false;
 				_packageSettingsButton.SetEnabled(false);
-				if(_packageListView.itemsSource.Count == 0)
+				if (_packageListView.itemsSource.Count == 0)
 					_packageSettingsButton.text = $"Not Found Any Package !";
 				else
 					_packageSettingsButton.text = $"Package Setting";
 			}
 
 			if (_showPackageSettings)
-				_setting3Container.style.display = DisplayStyle.Flex;
+			{
+				_setting2Container.style.display = DisplayStyle.Flex;
+			}
 			else
-				_setting3Container.style.display = DisplayStyle.None;
+			{
+				_setting2Container.style.display = DisplayStyle.None;
+			}
 		}
 		private void RefreshHelpBoxTips()
 		{
@@ -539,7 +558,6 @@ namespace YooAsset.Editor
 			{
 				_groupContainer.visible = false;
 				_collectorContainer.visible = false;
-				_showPackageSettings = false;
 			}
 			else
 			{
@@ -952,8 +970,14 @@ namespace YooAsset.Editor
 
 				try
 				{
-					CollectCommand command = new CollectCommand(EBuildMode.SimulateBuild, _packageNameTxt.value,
-						_enableAddressableToogle.value, _locationToLowerToogle.value, _includeAssetGUIDToogle.value, _ignoreDefaultTypeToogle.value, _uniqueBundleNameToogle.value);
+					CollectCommand command = new CollectCommand(EBuildMode.SimulateBuild,
+						_packageNameTxt.value,
+						_enableAddressableToogle.value,
+						_locationToLowerToogle.value,
+						_includeAssetGUIDToogle.value,
+						_ignoreDefaultTypeToogle.value,
+						_autoCollectShadersToogle.value,
+						_uniqueBundleNameToogle.value);
 					collector.CheckConfigError();
 					collectAssetInfos = collector.GetAllCollectAssets(command, group);
 				}

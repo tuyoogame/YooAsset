@@ -41,6 +41,11 @@ namespace YooAsset.Editor
 		public bool IgnoreDefaultType = true;
 
 		/// <summary>
+		/// 自动收集所有着色器（所有着色器存储在一个资源包内）
+		/// </summary>
+		public bool AutoCollectShaders = true;
+
+		/// <summary>
 		/// 分组列表
 		/// </summary>
 		public List<AssetBundleCollectorGroup> Groups = new List<AssetBundleCollectorGroup>();

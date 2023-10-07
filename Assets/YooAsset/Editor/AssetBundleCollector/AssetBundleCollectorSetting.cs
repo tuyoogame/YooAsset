@@ -101,7 +101,12 @@ namespace YooAsset.Editor
 
 			// 创建资源收集命令
 			CollectCommand command = new CollectCommand(buildMode, packageName,
-				 package.EnableAddressable, package.LocationToLower, package.IncludeAssetGUID, package.IgnoreDefaultType, UniqueBundleName);
+				 package.EnableAddressable,
+				 package.LocationToLower,
+				 package.IncludeAssetGUID,
+				 package.IgnoreDefaultType,
+				 package.AutoCollectShaders,
+				 UniqueBundleName);
 
 			// 获取收集的资源集合
 			CollectResult collectResult = new CollectResult(command);

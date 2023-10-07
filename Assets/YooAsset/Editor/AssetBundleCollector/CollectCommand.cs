@@ -34,6 +34,11 @@ namespace YooAsset.Editor
 		public bool IncludeAssetGUID { private set; get; }
 
 		/// <summary>
+		/// 自动收集所有着色器
+		/// </summary>
+		public bool AutoCollectShaders { private set; get; }
+
+		/// <summary>
 		/// 资源包名唯一化
 		/// </summary>
 		public bool UniqueBundleName { private set; get; }
@@ -44,7 +49,7 @@ namespace YooAsset.Editor
 		public string ShadersBundleName { private set; get; }
 
 
-		public CollectCommand(EBuildMode buildMode, string packageName, bool enableAddressable, bool locationToLower, bool includeAssetGUID, bool ignoreDefaultType, bool uniqueBundleName)
+		public CollectCommand(EBuildMode buildMode, string packageName, bool enableAddressable, bool locationToLower, bool includeAssetGUID, bool ignoreDefaultType, bool autoCollectShaders, bool uniqueBundleName)
 		{
 			BuildMode = buildMode;
 			PackageName = packageName;
@@ -52,6 +57,7 @@ namespace YooAsset.Editor
 			LocationToLower = locationToLower;
 			IncludeAssetGUID = includeAssetGUID;
 			IgnoreDefaultType = ignoreDefaultType;
+			AutoCollectShaders = autoCollectShaders;
 			UniqueBundleName = uniqueBundleName;
 
 			// 着色器统一全名称

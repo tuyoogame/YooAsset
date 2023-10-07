@@ -279,20 +279,21 @@ namespace YooAsset.Editor
 		}
 		private string GetBundleName(CollectCommand command, AssetBundleCollectorGroup group, string assetPath)
 		{
-			System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-			if (assetType == typeof(UnityEngine.Shader) || assetType == typeof(UnityEngine.ShaderVariantCollection))
+			if (command.AutoCollectShaders)
 			{
-				// 获取着色器打包规则结果
-				PackRuleResult packRuleResult = DefaultPackRule.CreateShadersPackRuleResult();
-				return packRuleResult.GetBundleName(command.PackageName, command.UniqueBundleName);
+				System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+				if (assetType == typeof(UnityEngine.Shader) || assetType == typeof(UnityEngine.ShaderVariantCollection))
+				{
+					// 获取着色器打包规则结果
+					PackRuleResult shaderPackRuleResult = DefaultPackRule.CreateShadersPackRuleResult();
+					return shaderPackRuleResult.GetBundleName(command.PackageName, command.UniqueBundleName);
+				}
 			}
-			else
-			{
-				// 获取其它资源打包规则结果
-				IPackRule packRuleInstance = AssetBundleCollectorSettingData.GetPackRuleInstance(PackRuleName);
-				PackRuleResult packRuleResult = packRuleInstance.GetPackRuleResult(new PackRuleData(assetPath, CollectPath, group.GroupName, UserData));
-				return packRuleResult.GetBundleName(command.PackageName, command.UniqueBundleName);
-			}
+
+			// 获取其它资源打包规则结果
+			IPackRule packRuleInstance = AssetBundleCollectorSettingData.GetPackRuleInstance(PackRuleName);
+			PackRuleResult defaultPackRuleResult = packRuleInstance.GetPackRuleResult(new PackRuleData(assetPath, CollectPath, group.GroupName, UserData));
+			return defaultPackRuleResult.GetBundleName(command.PackageName, command.UniqueBundleName);
 		}
 		private List<string> GetAssetTags(AssetBundleCollectorGroup group)
 		{
