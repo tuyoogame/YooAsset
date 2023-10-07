@@ -26,9 +26,4 @@ public class ShaderVariantCollectorSetting : ScriptableObject
 		string key = $"{Application.productName}_{packageName}_GeProcessCapacity";
 		EditorPrefs.SetInt(key, capacity);
 	}
-
-	/// <summary>
-	/// 收集的包裹名称
-	/// </summary>
-	public string CollectPackage = string.Empty;
 }
