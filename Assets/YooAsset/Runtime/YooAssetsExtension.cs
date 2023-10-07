@@ -70,6 +70,38 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取资源信息
+		/// </summary>
+		/// <param name="location">资源的定位地址</param>
+		/// <param name="type">资源类型</param>
+		public static AssetInfo GetAssetInfo(string location, System.Type type)
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.GetAssetInfo(location, type);
+		}
+
+		/// <summary>
+		/// 获取资源信息
+		/// </summary>
+		/// <param name="assetGUID">资源GUID</param>
+		public static AssetInfo GetAssetInfoByGUID(string assetGUID)
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.GetAssetInfoByGUID(assetGUID);
+		}
+
+		/// <summary>
+		/// 获取资源信息
+		/// </summary>
+		/// <param name="assetGUID">资源GUID</param>
+		/// <param name="type">资源类型</param>
+		public static AssetInfo GetAssetInfoByGUID(string assetGUID, System.Type type)
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.GetAssetInfoByGUID(assetGUID, type);
+		}
+
+		/// <summary>
 		/// 检查资源定位地址是否有效
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
@@ -499,7 +531,18 @@ namespace YooAsset
 
 		#region 资源解压
 		/// <summary>
-		/// 创建内置资源解压器
+		/// 创建内置资源解压器，用于解压当前资源版本所有的资源包文件
+		/// </summary>
+		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
+		/// <param name="failedTryAgain">解压失败的重试次数</param>
+		public static ResourceUnpackerOperation CreateResourceUnpacker(int unpackingMaxNumber, int failedTryAgain)
+		{
+			DebugCheckDefaultPackageValid();
+			return _defaultPackage.CreateResourceUnpacker(unpackingMaxNumber, failedTryAgain);
+		}
+
+		/// <summary>
+		/// 创建内置资源解压器，用于解压指定的资源标签关联的资源包文件
 		/// </summary>
 		/// <param name="tag">资源标签</param>
 		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
@@ -511,7 +554,7 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 创建内置资源解压器
+		/// 创建内置资源解压器，用于解压指定的资源标签列表关联的资源包文件
 		/// </summary>
 		/// <param name="tags">资源标签列表</param>
 		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
@@ -521,16 +564,20 @@ namespace YooAsset
 			DebugCheckDefaultPackageValid();
 			return _defaultPackage.CreateResourceUnpacker(tags, unpackingMaxNumber, failedTryAgain);
 		}
+		#endregion
 
+		#region 资源导入
 		/// <summary>
-		/// 创建内置资源解压器
+		/// 创建资源导入器
+		/// 注意：资源文件名称必须和资源服务器部署的文件名称一致！
 		/// </summary>
-		/// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
-		/// <param name="failedTryAgain">解压失败的重试次数</param>
-		public static ResourceUnpackerOperation CreateResourceUnpacker(int unpackingMaxNumber, int failedTryAgain)
+		/// <param name="filePaths">资源路径列表</param>
+		/// <param name="importerMaxNumber">同时导入的最大文件数</param>
+		/// <param name="failedTryAgain">导入失败的重试次数</param>
+		public static ResourceImporterOperation CreateResourceImporter(string[] filePaths, int importerMaxNumber, int failedTryAgain)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.CreateResourceUnpacker(unpackingMaxNumber, failedTryAgain);
+			return _defaultPackage.CreateResourceImporter(filePaths, importerMaxNumber, failedTryAgain);
 		}
 		#endregion
 
