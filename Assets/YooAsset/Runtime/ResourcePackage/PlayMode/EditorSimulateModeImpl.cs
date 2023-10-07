@@ -10,7 +10,10 @@ namespace YooAsset
 		private ResourceAssist _assist;
 
 		public readonly string PackageName;
-
+		public DownloadManager Download
+		{
+			get { return _assist.Download; }
+		}
 
 		public EditorSimulateModeImpl(string packageName)
 		{
@@ -66,29 +69,29 @@ namespace YooAsset
 
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceDownloaderOperation.CreateEmptyDownloader(PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceDownloaderOperation.CreateEmptyDownloader(PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceDownloaderOperation.CreateEmptyDownloader(PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceUnpackerOperation.CreateEmptyUnpacker(PackageName, upackingMaxNumber, failedTryAgain, timeout);
+			return ResourceUnpackerOperation.CreateEmptyUnpacker(Download, PackageName, upackingMaxNumber, failedTryAgain, timeout);
 		}
 		ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceUnpackerOperation.CreateEmptyUnpacker(PackageName, upackingMaxNumber, failedTryAgain, timeout);
+			return ResourceUnpackerOperation.CreateEmptyUnpacker(Download, PackageName, upackingMaxNumber, failedTryAgain, timeout);
 		}
 
 		ResourceImporterOperation IPlayMode.CreateResourceImporterByFilePaths(string[] filePaths, int importerMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceImporterOperation.CreateEmptyImporter(PackageName, importerMaxNumber, failedTryAgain, timeout);
+			return ResourceImporterOperation.CreateEmptyImporter(Download, PackageName, importerMaxNumber, failedTryAgain, timeout);
 		}
 		#endregion
 

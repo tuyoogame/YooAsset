@@ -8,8 +8,12 @@ namespace YooAsset
 	{
 		private PackageManifest _activeManifest;
 		private ResourceAssist _assist;
-		
+
 		public readonly string PackageName;
+		public DownloadManager Download
+		{
+			get { return _assist.Download; }
+		}
 		public PersistentManager Persistent
 		{
 			get { return _assist.Persistent; }
@@ -80,21 +84,21 @@ namespace YooAsset
 
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceDownloaderOperation.CreateEmptyDownloader(PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceDownloaderOperation.CreateEmptyDownloader(PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceDownloaderOperation.CreateEmptyDownloader(PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+			return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
 		}
 
 		ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> unpcakList = GetUnpackListByAll(_activeManifest);
-			var operation = new ResourceUnpackerOperation(PackageName, unpcakList, upackingMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceUnpackerOperation(Download, PackageName, unpcakList, upackingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		private List<BundleInfo> GetUnpackListByAll(PackageManifest manifest)
@@ -115,7 +119,7 @@ namespace YooAsset
 		ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> unpcakList = GetUnpackListByTags(_activeManifest, tags);
-			var operation = new ResourceUnpackerOperation(PackageName, unpcakList, upackingMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceUnpackerOperation(Download, PackageName, unpcakList, upackingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		private List<BundleInfo> GetUnpackListByTags(PackageManifest manifest, string[] tags)
@@ -140,7 +144,7 @@ namespace YooAsset
 		ResourceImporterOperation IPlayMode.CreateResourceImporterByFilePaths(string[] filePaths, int importerMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> importerList = GetImporterListByFilePaths(_activeManifest, filePaths);
-			var operation = new ResourceImporterOperation(PackageName, importerList, importerMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceImporterOperation(Download, PackageName, importerList, importerMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		private List<BundleInfo> GetImporterListByFilePaths(PackageManifest manifest, string[] filePaths)

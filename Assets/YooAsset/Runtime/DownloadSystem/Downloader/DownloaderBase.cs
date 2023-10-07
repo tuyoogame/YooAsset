@@ -49,6 +49,11 @@ namespace YooAsset
 		/// </summary>
 		public ulong DownloadedBytes { protected set; get; }
 
+		/// <summary>
+		/// 引用计数
+		/// </summary>
+		public int RefCount { private set; get; }
+
 
 		public DownloaderBase(BundleInfo bundleInfo, System.Type requesterType, int failedTryAgain, int timeout)
 		{
@@ -63,20 +68,19 @@ namespace YooAsset
 		public abstract AssetBundle GetAssetBundle();
 
 		/// <summary>
-		/// 获取下载文件的大小
+		/// 引用（引用计数递加）
 		/// </summary>
-		/// <returns></returns>
-		public long GetDownloadFileSize()
+		public void Reference()
 		{
-			return _bundleInfo.Bundle.FileSize;
+			RefCount++;
 		}
 
 		/// <summary>
-		/// 获取下载文件的资源包名
+		/// 释放（引用计数递减）
 		/// </summary>
-		public string GetDownloadBundleName()
+		public void Release()
 		{
-			return _bundleInfo.Bundle.BundleName;
+			RefCount--;
 		}
 
 		/// <summary>
@@ -117,6 +121,23 @@ namespace YooAsset
 		public string GetLastError()
 		{
 			return $"Failed to download : {_requestURL} Error : {_lastestNetError} Code : {_lastestHttpCode}";
+		}
+
+		/// <summary>
+		/// 获取下载文件的大小
+		/// </summary>
+		/// <returns></returns>
+		public long GetDownloadFileSize()
+		{
+			return _bundleInfo.Bundle.FileSize;
+		}
+
+		/// <summary>
+		/// 获取下载的资源包名称
+		/// </summary>
+		public string GetDownloadBundleName()
+		{
+			return _bundleInfo.Bundle.BundleName;
 		}
 
 

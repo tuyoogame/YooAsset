@@ -12,6 +12,10 @@ namespace YooAsset
 		private IRemoteServices _remoteServices;
 
 		public readonly string PackageName;
+		public DownloadManager Download
+		{
+			get { return _assist.Download; }
+		}
 		public PersistentManager Persistent
 		{
 			get { return _assist.Persistent; }
@@ -104,7 +108,7 @@ namespace YooAsset
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByAll(_activeManifest);
-			var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceDownloaderOperation(Download, PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		public List<BundleInfo> GetDownloadListByAll(PackageManifest manifest)
@@ -125,7 +129,7 @@ namespace YooAsset
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByTags(_activeManifest, tags);
-			var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceDownloaderOperation(Download, PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		public List<BundleInfo> GetDownloadListByTags(PackageManifest manifest, string[] tags)
@@ -158,7 +162,7 @@ namespace YooAsset
 		ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
 		{
 			List<BundleInfo> downloadList = GetDownloadListByPaths(_activeManifest, assetInfos);
-			var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+			var operation = new ResourceDownloaderOperation(Download, PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
 			return operation;
 		}
 		public List<BundleInfo> GetDownloadListByPaths(PackageManifest manifest, AssetInfo[] assetInfos)
@@ -202,16 +206,16 @@ namespace YooAsset
 
 		ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceUnpackerOperation.CreateEmptyUnpacker(PackageName, upackingMaxNumber, failedTryAgain, timeout);
+			return ResourceUnpackerOperation.CreateEmptyUnpacker(Download, PackageName, upackingMaxNumber, failedTryAgain, timeout);
 		}
 		ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceUnpackerOperation.CreateEmptyUnpacker(PackageName, upackingMaxNumber, failedTryAgain, timeout);
+			return ResourceUnpackerOperation.CreateEmptyUnpacker(Download, PackageName, upackingMaxNumber, failedTryAgain, timeout);
 		}
 
 		ResourceImporterOperation IPlayMode.CreateResourceImporterByFilePaths(string[] filePaths, int importerMaxNumber, int failedTryAgain, int timeout)
 		{
-			return ResourceImporterOperation.CreateEmptyImporter(PackageName, importerMaxNumber, failedTryAgain, timeout);
+			return ResourceImporterOperation.CreateEmptyImporter(Download, PackageName, importerMaxNumber, failedTryAgain, timeout);
 		}
 		#endregion
 

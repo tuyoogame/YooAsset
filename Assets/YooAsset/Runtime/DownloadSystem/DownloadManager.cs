@@ -49,7 +49,9 @@ namespace YooAsset
 				var downloader = valuePair.Value;
 				downloader.Update();
 				if (downloader.IsDone())
+				{
 					_removeList.Add(valuePair.Key);
+				}
 			}
 
 			// 移除下载器
@@ -82,7 +84,10 @@ namespace YooAsset
 		{
 			// 查询存在的下载器
 			if (_downloaders.TryGetValue(bundleInfo.CachedDataFilePath, out var downloader))
+			{
+				downloader.Reference();
 				return downloader;
+			}
 
 			// 如果资源已经缓存
 			if (bundleInfo.IsCached())
@@ -92,22 +97,19 @@ namespace YooAsset
 			}
 
 			// 创建新的下载器	
+			DownloaderBase newDownloader = null;
 			YooLogger.Log($"Beginning to download bundle : {bundleInfo.Bundle.BundleName} URL : {bundleInfo.RemoteMainURL}");
 #if UNITY_WEBGL
 			if (bundleInfo.Bundle.Buildpipeline == DefaultBuildPipeline.RawFileBuildPipelineName)
 			{
 				FileUtility.CreateFileDirectory(bundleInfo.CachedDataFilePath);
 				System.Type requesterType = typeof(FileGeneralRequest);
-				DownloaderBase newDownloader = new FileDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
-				_downloaders.Add(bundleInfo.CachedDataFilePath, newDownloader);
-				return newDownloader;
+				newDownloader = new FileDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
 			}
 			else
 			{
 				System.Type requesterType = typeof(AssetBundleWebRequest);
-				WebDownloader newDownloader = new WebDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
-				_downloaders.Add(bundleInfo.CachedDataFilePath, newDownloader);
-				return newDownloader;
+				newDownloader = new WebDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
 			}
 #else
 			FileUtility.CreateFileDirectory(bundleInfo.CachedDataFilePath);
@@ -115,18 +117,34 @@ namespace YooAsset
 			if (resumeDownload)
 			{
 				System.Type requesterType = typeof(FileResumeRequest);
-				DownloaderBase newDownloader = new FileDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
-				_downloaders.Add(bundleInfo.CachedDataFilePath, newDownloader);
-				return newDownloader;
+				newDownloader = new FileDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
 			}
 			else
 			{
 				System.Type requesterType = typeof(FileGeneralRequest);
-				DownloaderBase newDownloader = new FileDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
-				_downloaders.Add(bundleInfo.CachedDataFilePath, newDownloader);
-				return newDownloader;
+				newDownloader = new FileDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
 			}
 #endif
+
+			// 返回新创建的下载器
+			_downloaders.Add(bundleInfo.CachedDataFilePath, newDownloader);
+			newDownloader.Reference();
+			return newDownloader;
+		}
+
+		/// <summary>
+		/// 停止不再使用的下载器
+		/// </summary>
+		public void AbortUnusedDownloader()
+		{
+			foreach (var valuePair in _downloaders)
+			{
+				var downloader = valuePair.Value;
+				if (downloader.RefCount <= 0)
+				{
+					downloader.Abort();
+				}
+			}
 		}
 	}
 }
