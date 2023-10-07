@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.5.7] - 2023-10-07
+
+### Changed
+
+- WebGL平台支持创建下载器。
+
 ## [1.5.6-preview] - 2023-09-26
 
 ### Fixed
