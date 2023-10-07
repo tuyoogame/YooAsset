@@ -10,13 +10,17 @@ namespace YooAsset
 		{
 #if UNITY_EDITOR
 			return StringUtility.Format("file:///{0}", path);
+#elif UNITY_WEBGL
+			return path;
 #elif UNITY_IPHONE
 			return StringUtility.Format("file://{0}", path);
 #elif UNITY_ANDROID
 			return path;
+#elif UNITY_STANDALONE_OSX
+			return new System.Uri(path).ToString();
 #elif UNITY_STANDALONE
 			return StringUtility.Format("file:///{0}", path);
-#elif UNITY_WEBGL
+#else
 			return path;
 #endif
 		}
