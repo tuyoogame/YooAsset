@@ -95,14 +95,8 @@ namespace YooAsset
 			_failedTryAgain = failedTryAgain;
 			_timeout = timeout;
 
-			if (downloadList != null)
-			{
-				TotalDownloadCount = downloadList.Count;
-				foreach (var packageBundle in downloadList)
-				{
-					TotalDownloadBytes += packageBundle.Bundle.FileSize;
-				}
-			}
+			// 统计下载信息
+			CalculatDownloaderInfo();
 		}
 		internal override void Start()
 		{
@@ -210,7 +204,57 @@ namespace YooAsset
 				}
 			}
 		}
+		private void CalculatDownloaderInfo()
+		{
+			if (_bundleInfoList != null)
+			{
+				TotalDownloadCount = _bundleInfoList.Count;
+				foreach (var packageBundle in _bundleInfoList)
+				{
+					TotalDownloadBytes += packageBundle.Bundle.FileSize;
+				}
+			}
+		}
 
+		/// <summary>
+		/// 合并其它下载器
+		/// </summary>
+		/// <param name="downloader">合并的下载器</param>
+		public void Combine(DownloaderOperation downloader)
+			if (_packageName != downloader._packageName)
+			{
+				YooLogger.Error("The downloaders have different resource packages !");
+				return;
+			}
+
+			if (Status != EOperationStatus.None)
+			{
+				YooLogger.Error("The downloader is running, can not combine with other downloader !");
+				return;
+			}
+
+			HashSet<string> temper = new HashSet<string>();
+			foreach (var bundleInfo in _bundleInfoList)
+			{
+				if (temper.Contains(bundleInfo.CachedDataFilePath) == false)
+				{
+					temper.Add(bundleInfo.CachedDataFilePath);
+				}
+			}
+
+			// 合并下载列表
+			foreach (var bundleInfo in downloader._bundleInfoList)
+			{
+				if (temper.Contains(bundleInfo.CachedDataFilePath) == false)
+				{
+					_bundleInfoList.Add(bundleInfo);
+				}
+			}
+
+			// 重新统计下载信息
+			CalculatDownloaderInfo();
+		}
+		
 		/// <summary>
 		/// 开始下载
 		/// </summary>
