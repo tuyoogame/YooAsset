@@ -202,7 +202,7 @@ namespace YooAsset
 				return completedProvider.CreateHandle<AssetHandle>();
 			}
 
-			string providerGUID = assetInfo.GUID;
+			string providerGUID = nameof(LoadAssetAsync) + assetInfo.GUID;
 			ProviderBase provider = TryGetProvider(providerGUID);
 			if (provider == null)
 			{
@@ -230,7 +230,7 @@ namespace YooAsset
 				return completedProvider.CreateHandle<SubAssetsHandle>();
 			}
 
-			string providerGUID = assetInfo.GUID;
+			string providerGUID = nameof(LoadSubAssetsAsync) + assetInfo.GUID;
 			ProviderBase provider = TryGetProvider(providerGUID);
 			if (provider == null)
 			{
@@ -258,7 +258,7 @@ namespace YooAsset
 				return completedProvider.CreateHandle<AllAssetsHandle>();
 			}
 
-			string providerGUID = assetInfo.GUID;
+			string providerGUID = nameof(LoadAllAssetsAsync) + assetInfo.GUID;
 			ProviderBase provider = TryGetProvider(providerGUID);
 			if (provider == null)
 			{
@@ -286,7 +286,7 @@ namespace YooAsset
 				return completedProvider.CreateHandle<RawFileHandle>();
 			}
 
-			string providerGUID = assetInfo.GUID;
+			string providerGUID = nameof(LoadRawFileAsync) + assetInfo.GUID;
 			ProviderBase provider = TryGetProvider(providerGUID);
 			if (provider == null)
 			{
