@@ -221,6 +221,7 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="downloader">合并的下载器</param>
 		public void Combine(DownloaderOperation downloader)
+		{
 			if (_packageName != downloader._packageName)
 			{
 				YooLogger.Error("The downloaders have different resource packages !");
