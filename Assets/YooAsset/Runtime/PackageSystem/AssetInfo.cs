@@ -28,9 +28,9 @@ namespace YooAsset
 					return _providerGUID;
 
 				if (AssetType == null)
-					_providerGUID = $"{AssetPath}[null]";
+					_providerGUID = $"[{AssetPath}][null]";
 				else
-					_providerGUID = $"{AssetPath}[{AssetType.Name}]";
+					_providerGUID = $"[{AssetPath}][{AssetType.Name}]";
 				return _providerGUID;
 			}
 		}
