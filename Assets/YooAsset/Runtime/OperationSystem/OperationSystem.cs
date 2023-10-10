@@ -59,15 +59,14 @@ namespace YooAsset
 					break;
 
 				var operation = _operations[i];
+				if (operation.IsDone == false)
+					operation.Update();
+
 				if (operation.IsDone)
 				{
 					// 注意：如果业务端发生异常，保证异步操作提前移除。
 					_operations.RemoveAt(i);
 					operation.SetFinish();
-				}
-				else
-				{
-					operation.Update();
 				}
 			}
 		}
@@ -116,7 +115,6 @@ namespace YooAsset
 			_newList.Add(operation);
 			operation.SetPackageName(packageName);
 			operation.SetStart();
-			operation.Start();
 		}
 	}
 }

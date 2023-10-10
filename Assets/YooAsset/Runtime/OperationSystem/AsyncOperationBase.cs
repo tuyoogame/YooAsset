@@ -78,6 +78,7 @@ namespace YooAsset
 
 		internal abstract void Start();
 		internal abstract void Update();
+		internal virtual void Abort() { }
 
 		internal void SetPackageName(string packageName)
 		{
@@ -90,6 +91,7 @@ namespace YooAsset
 				Status = EOperationStatus.Failed;
 				Error = "user abort";
 				YooLogger.Warning($"Async operaiton has been abort : {this.GetType().Name}");
+				Abort();
 			}
 		}
 		internal void SetFinish()
@@ -102,6 +104,7 @@ namespace YooAsset
 		internal void SetStart()
 		{
 			Status = EOperationStatus.Processing;
+			Start();
 		}
 
 		/// <summary>
