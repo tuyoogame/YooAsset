@@ -16,6 +16,7 @@ namespace YooAsset.Editor
 	public abstract class TaskCreateManifest
 	{
 		private readonly Dictionary<string, int> _cachedBundleID = new Dictionary<string, int>(10000);
+		private readonly Dictionary<int, HashSet<string>> _cacheBundleTags = new Dictionary<int, HashSet<string>>(10000);
 
 		/// <summary>
 		/// 创建补丁清单文件到输出目录
@@ -165,36 +166,43 @@ namespace YooAsset.Editor
 		/// </summary>
 		private void ProcessBundleTags(PackageManifest manifest)
 		{
-			Dictionary<int, HashSet<string>> cacheBundleTags = new Dictionary<int, HashSet<string>>(10000);
-
+			// 将主资源的标签信息传染给其依赖的资源包集合
 			foreach (var packageAsset in manifest.AssetList)
 			{
-				// 主资源包
+				var assetTags = packageAsset.AssetTags;
 				int bundleID = packageAsset.BundleID;
-				CacheBundleTags(cacheBundleTags, bundleID, packageAsset.AssetTags);
+				CacheBundleTags(bundleID, assetTags);
 
-				// 依赖资源包
 				var packageBundle = manifest.BundleList[bundleID];
 				foreach (var dependBundleID in packageBundle.DependIDs)
 				{
-					CacheBundleTags(cacheBundleTags, dependBundleID, packageAsset.AssetTags);
+					CacheBundleTags(dependBundleID, assetTags);
 				}
 			}
 
 			for (int index = 0; index < manifest.BundleList.Count; index++)
 			{
-				manifest.BundleList[index].Tags = cacheBundleTags[index].ToArray();
+				var packageBundle = manifest.BundleList[index];
+				if (_cacheBundleTags.ContainsKey(index))
+				{
+					packageBundle.Tags = _cacheBundleTags[index].ToArray();
+				}
+				else
+				{
+					// 注意：SBP构建管线会自动剔除一些冗余资源的引用关系，导致游离资源包没有被任何主资源包引用。
+					UnityEngine.Debug.LogWarning($"发现游离的资源包 {index} ! {packageBundle.BundleName}");
+				}
 			}
 		}
-		private void CacheBundleTags(Dictionary<int, HashSet<string>> cacheBundleTags, int bundleID, string[] assetTags)
+		private void CacheBundleTags(int bundleID, string[] assetTags)
 		{
-			if (cacheBundleTags.ContainsKey(bundleID) == false)
-				cacheBundleTags.Add(bundleID, new HashSet<string>());
+			if (_cacheBundleTags.ContainsKey(bundleID) == false)
+				_cacheBundleTags.Add(bundleID, new HashSet<string>());
 
 			foreach (var assetTag in assetTags)
 			{
-				if (cacheBundleTags[bundleID].Contains(assetTag) == false)
-					cacheBundleTags[bundleID].Add(assetTag);
+				if (_cacheBundleTags[bundleID].Contains(assetTag) == false)
+					_cacheBundleTags[bundleID].Add(assetTag);
 			}
 		}
 

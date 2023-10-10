@@ -162,7 +162,7 @@ namespace YooAsset.Editor
 			// 4. 移除所有零引用的依赖资源
 			foreach (var removeValue in removeList)
 			{
-				BuildLogger.Log($"发现未被依赖的资源并自动移除 : {removeValue.AssetPath}");
+				BuildLogger.Warning($"发现未被依赖的资源并自动移除 : {removeValue.AssetPath}");
 				allCollectAssetInfos.Remove(removeValue);
 			}
 		}
