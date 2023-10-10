@@ -93,6 +93,9 @@ public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObjec
 			SetFinish(true);
 		}
 	}
+	protected override void OnAbort()
+	{
+	}
 	private void SetFinish(bool succeed, string error = "")
 	{
 		Error = error;

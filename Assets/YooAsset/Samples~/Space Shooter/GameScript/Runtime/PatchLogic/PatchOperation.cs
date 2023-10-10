@@ -64,6 +64,9 @@ public class PatchOperation : GameAsyncOperation
 			}
 		}
 	}
+	protected override void OnAbort()
+	{
+	}
 
 	/// <summary>
 	/// 接收事件
