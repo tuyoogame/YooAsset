@@ -37,12 +37,12 @@ namespace YooAsset
 			_packageVersion = packageVersion;
 			_timeout = timeout;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_requestCount = RequestHelper.GetRequestFailedCount(_packageName, nameof(LoadRemoteManifestOperation));
 			_steps = ESteps.DownloadPackageHashFile;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;

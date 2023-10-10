@@ -23,11 +23,11 @@ namespace YooAsset
 		public EditorPlayModeUpdatePackageManifestOperation()
 		{
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			Status = EOperationStatus.Succeed;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 		}
 	}
@@ -40,11 +40,11 @@ namespace YooAsset
 		public OfflinePlayModeUpdatePackageManifestOperation()
 		{
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			Status = EOperationStatus.Succeed;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 		}
 	}
@@ -84,11 +84,11 @@ namespace YooAsset
 			_autoSaveVersion = autoSaveVersion;
 			_timeout = timeout;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.CheckParams;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
@@ -229,11 +229,11 @@ namespace YooAsset
 			_packageVersion = packageVersion;
 			_timeout = timeout;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.CheckParams;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;

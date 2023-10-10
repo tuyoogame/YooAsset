@@ -36,7 +36,7 @@ namespace YooAsset
 			_flag = EFlag.Normal;
 			_scene = scene;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			if (_flag == EFlag.Normal)
 			{
@@ -52,7 +52,7 @@ namespace YooAsset
 				throw new System.NotImplementedException(_flag.ToString());
 			}
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;

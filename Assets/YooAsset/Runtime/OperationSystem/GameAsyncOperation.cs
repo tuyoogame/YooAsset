@@ -3,13 +3,17 @@ namespace YooAsset
 {
 	public abstract class GameAsyncOperation : AsyncOperationBase
 	{
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			OnStart();
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			OnUpdate();
+		}
+		internal override void InternalOnAbort()
+		{
+			OnAbort();
 		}
 
 		/// <summary>
@@ -21,6 +25,11 @@ namespace YooAsset
 		/// 异步操作更新
 		/// </summary>
 		protected abstract void OnUpdate();
+
+		/// <summary>
+		/// 异步操作终止
+		/// </summary>
+		protected abstract void OnAbort();
 
 		/// <summary>
 		/// 异步操作系统是否繁忙

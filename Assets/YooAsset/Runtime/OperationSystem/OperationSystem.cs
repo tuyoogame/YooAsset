@@ -60,7 +60,7 @@ namespace YooAsset
 
 				var operation = _operations[i];
 				if (operation.IsDone == false)
-					operation.Update();
+					operation.InternalOnUpdate();
 
 				if (operation.IsDone)
 				{

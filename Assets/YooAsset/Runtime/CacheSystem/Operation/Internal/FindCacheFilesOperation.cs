@@ -31,12 +31,12 @@ namespace YooAsset
 			_persistent = persistent;
 			_cache = cache;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.Prepare;
 			_verifyStartTime = UnityEngine.Time.realtimeSinceStartup;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;

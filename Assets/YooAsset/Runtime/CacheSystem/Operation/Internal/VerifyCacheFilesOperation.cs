@@ -48,12 +48,12 @@ namespace YooAsset
 			_cache = cache;
 			_waitingList = elements;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.InitVerify;
 			_verifyStartTime = UnityEngine.Time.realtimeSinceStartup;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
@@ -175,12 +175,12 @@ namespace YooAsset
 			_cache = cache;
 			_waitingList = elements;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.InitVerify;
 			_verifyStartTime = UnityEngine.Time.realtimeSinceStartup;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;

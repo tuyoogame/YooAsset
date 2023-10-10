@@ -112,7 +112,7 @@ namespace YooAsset
 			if (_steps == ESteps.WaitingVerifyTempFile)
 			{
 				if (WaitForAsyncComplete)
-					_verifyFileOp.Update();
+					_verifyFileOp.InternalOnUpdate();
 
 				if (_verifyFileOp.IsDone == false)
 					return;

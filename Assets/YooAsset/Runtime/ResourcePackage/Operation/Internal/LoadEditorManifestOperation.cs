@@ -28,11 +28,11 @@ namespace YooAsset
 			_packageName = packageName;
 			_manifestFilePath = manifestFilePath;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.LoadEditorManifest;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;

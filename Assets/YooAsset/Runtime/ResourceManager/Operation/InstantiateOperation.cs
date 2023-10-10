@@ -34,11 +34,11 @@ namespace YooAsset
 			_parent = parent;
 			_worldPositionStays = worldPositionStays;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.Clone;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
@@ -93,7 +93,7 @@ namespace YooAsset
 			if (_steps == ESteps.Done)
 				return;
 			_handle.WaitForAsyncComplete();
-			Update();
+			InternalOnUpdate();
 		}
 
 		internal static GameObject InstantiateInternal(UnityEngine.Object assetObject, bool setPositionAndRotation, Vector3 position, Quaternion rotation, Transform parent, bool worldPositionStays)

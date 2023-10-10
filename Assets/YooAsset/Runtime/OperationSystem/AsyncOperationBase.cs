@@ -76,23 +76,18 @@ namespace YooAsset
 			}
 		}
 
-		internal abstract void Start();
-		internal abstract void Update();
-		internal virtual void Abort() { }
+		internal abstract void InternalOnStart();
+		internal abstract void InternalOnUpdate();
+		internal virtual void InternalOnAbort() { }
 
 		internal void SetPackageName(string packageName)
 		{
 			PackageName = packageName;
 		}
-		internal void SetAbort()
+		internal void SetStart()
 		{
-			if (IsDone == false)
-			{
-				Status = EOperationStatus.Failed;
-				Error = "user abort";
-				YooLogger.Warning($"Async operaiton has been abort : {this.GetType().Name}");
-				Abort();
-			}
+			Status = EOperationStatus.Processing;
+			InternalOnStart();
 		}
 		internal void SetFinish()
 		{
@@ -101,10 +96,15 @@ namespace YooAsset
 			if (_taskCompletionSource != null)
 				_taskCompletionSource.TrySetResult(null);
 		}
-		internal void SetStart()
+		internal void SetAbort()
 		{
-			Status = EOperationStatus.Processing;
-			Start();
+			if (IsDone == false)
+			{
+				Status = EOperationStatus.Failed;
+				Error = "user abort";
+				YooLogger.Warning($"Async operaiton has been abort : {this.GetType().Name}");
+				InternalOnAbort();
+			}
 		}
 
 		/// <summary>

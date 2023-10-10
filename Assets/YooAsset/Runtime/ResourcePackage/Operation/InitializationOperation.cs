@@ -35,11 +35,11 @@ namespace YooAsset
 			_impl = impl;
 			_simulateManifestFilePath = simulateManifestFilePath;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.LoadEditorManifest;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.LoadEditorManifest)
 			{
@@ -93,11 +93,11 @@ namespace YooAsset
 		{
 			_impl = impl;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.QueryBuildinPackageVersion;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
@@ -201,11 +201,11 @@ namespace YooAsset
 		{
 			_impl = impl;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.CheckAppFootPrint;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
@@ -382,11 +382,11 @@ namespace YooAsset
 		{
 			_impl = impl;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.QueryWebPackageVersion;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;

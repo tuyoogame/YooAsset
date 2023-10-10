@@ -28,11 +28,11 @@ namespace YooAsset
 			_package = package;
 			_cache = cache;
 		}
-		internal override void Start()
+		internal override void InternalOnStart()
 		{
 			_steps = ESteps.GetUnusedCacheFiles;
 		}
-		internal override void Update()
+		internal override void InternalOnUpdate()
 		{
 			if (_steps == ESteps.None || _steps == ESteps.Done)
 				return;
