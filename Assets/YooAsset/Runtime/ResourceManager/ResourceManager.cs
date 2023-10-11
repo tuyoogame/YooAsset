@@ -382,12 +382,12 @@ namespace YooAsset
 			else
 			{
 #if UNITY_WEBGL
-				if (bundleInfo.Bundle.Buildpipeline== DefaultBuildPipeline.RawFileBuildPipelineName)
+				if (bundleInfo.Bundle.Buildpipeline== EDefaultBuildPipeline.RawFileBuildPipeline.ToString())
 					loader = new RawBundleWebLoader(this, bundleInfo);
 				else
 					loader = new AssetBundleWebLoader(this, bundleInfo);
 #else
-				if (bundleInfo.Bundle.Buildpipeline == DefaultBuildPipeline.RawFileBuildPipelineName)
+				if (bundleInfo.Bundle.Buildpipeline == EDefaultBuildPipeline.RawFileBuildPipeline.ToString())
 					loader = new RawBundleFileLoader(this, bundleInfo);
 				else
 					loader = new AssetBundleFileLoader(this, bundleInfo);

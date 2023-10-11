@@ -19,6 +19,14 @@ namespace YooAsset
 			return manifestFilePath;
 		}
 
+		/// <summary>
+		/// 编辑器下模拟构建清单
+		/// </summary>
+		public static string SimulateBuild(EDefaultBuildPipeline buildPipeline, string packageName)
+		{
+			return SimulateBuild(buildPipeline.ToString(), packageName);
+		}
+
 		private static object InvokePublicStaticMethod(System.Type type, string method, params object[] parameters)
 		{
 			var methodInfo = type.GetMethod(method, BindingFlags.Public | BindingFlags.Static);

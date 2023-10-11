@@ -4,11 +4,22 @@ namespace YooAsset
 	/// <summary>
 	/// 默认的构建管线
 	/// </summary>
-	public class DefaultBuildPipeline
+	public enum EDefaultBuildPipeline
 	{
-		public const string BuiltinBuildPipelineName = "BuiltinBuildPipeline";
-		public const string ScriptableBuildPipelineName = "ScriptableBuildPipeline";
-		public const string RawFileBuildPipelineName = "RawFileBuildPipeline";
+		/// <summary>
+		/// 内置构建管线
+		/// </summary>
+		BuiltinBuildPipeline,
+
+		/// <summary>
+		/// 可编程构建管线
+		/// </summary>
+		ScriptableBuildPipeline,
+
+		/// <summary>
+		/// 原生文件构建管线
+		/// </summary>
+		RawFileBuildPipeline,
 	}
 
 	/// <summary>
