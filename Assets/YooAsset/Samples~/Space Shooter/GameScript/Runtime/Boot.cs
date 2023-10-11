@@ -35,7 +35,7 @@ public class Boot : MonoBehaviour
 		GameObject.Instantiate(go);
 
 		// 开始补丁更新流程
-		PatchOperation operation = new PatchOperation("DefaultPackage", DefaultBuildPipeline.BuiltinBuildPipelineName, PlayMode);
+		PatchOperation operation = new PatchOperation("DefaultPackage", EDefaultBuildPipeline.BuiltinBuildPipeline.ToString(), PlayMode);
 		YooAssets.StartOperation(operation);
 		yield return operation;
 
