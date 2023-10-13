@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("资源构建内容打包")]
 	public class TaskBuilding_BBP : IBuildTask
 	{
 		public class BuildResultContext : IContextObject
@@ -29,22 +28,26 @@ namespace YooAsset.Editor
 			// 开始构建
 			string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
 			BuildAssetBundleOptions buildOptions = builtinBuildParameters.GetBundleBuildOptions();
-			AssetBundleManifest buildResults = BuildPipeline.BuildAssetBundles(pipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), buildOptions, buildParametersContext.Parameters.BuildTarget);
-			if (buildResults == null)
+			AssetBundleManifest unityManifest = BuildPipeline.BuildAssetBundles(pipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), buildOptions, buildParametersContext.Parameters.BuildTarget);
+			if (unityManifest == null)
 			{
-				throw new Exception("构建过程中发生错误！");
+				string message = BuildLogger.GetErrorMessage(ErrorCode.UnityEngineBuildFailed, "UnityEngine build failed !");
+				throw new Exception(message);
 			}
 
 			if (buildMode == EBuildMode.ForceRebuild || buildMode == EBuildMode.IncrementalBuild)
 			{
 				string unityOutputManifestFilePath = $"{pipelineOutputDirectory}/{YooAssetSettings.OutputFolderName}";
 				if (System.IO.File.Exists(unityOutputManifestFilePath) == false)
-					throw new Exception("构建过程中发生严重错误！请查阅上下文日志！");
+				{
+					string message = BuildLogger.GetErrorMessage(ErrorCode.UnityEngineBuildFatal, $"Not found output {nameof(AssetBundleManifest)} file : {unityOutputManifestFilePath}");
+					throw new Exception(message);
+				}
 			}
 
-			BuildLogger.Log("Unity引擎打包成功！");
+			BuildLogger.Log("UnityEngine build success !");
 			BuildResultContext buildResultContext = new BuildResultContext();
-			buildResultContext.UnityManifest = buildResults;
+			buildResultContext.UnityManifest = unityManifest;
 			context.SetContextObject(buildResultContext);
 		}
 	}

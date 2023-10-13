@@ -20,15 +20,6 @@ namespace YooAsset.Editor
 		}
 	}
 
-	[DisplayName("定位地址: 文件路径")]
-	public class AddressByFilePath : IAddressRule
-	{
-		string IAddressRule.GetAssetAddress(AddressRuleData data)
-		{
-			throw new System.Exception("可寻址模式下已经默认支持通过资源路径加载！");
-		}
-	}
-
 	[DisplayName("定位地址: 分组名_文件名")]
 	public class AddressByGroupAndFileName : IAddressRule
 	{

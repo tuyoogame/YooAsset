@@ -22,15 +22,15 @@ namespace YooAsset.Editor
 		{
 			List<IBuildTask> pipeline = new List<IBuildTask>
 				{
-					new TaskPrepare_BBP(), //前期准备工作
-					new TaskGetBuildMap_BBP(), //获取构建列表
-					new TaskBuilding_BBP(), //开始执行构建
-					new TaskVerifyBuildResult_BBP(), //验证构建结果
-					new TaskUpdateBundleInfo_BBP(), //更新资源包信息
-					new TaskCreateManifest_BBP(), //创建清单文件
-					new TaskCreateReport_BBP(), //创建报告文件
-					new TaskCreatePackage_BBP(), //制作包裹
-					new TaskCopyBuildinFiles_BBP(), //拷贝内置文件
+					new TaskPrepare_BBP(),
+					new TaskGetBuildMap_BBP(),
+					new TaskBuilding_BBP(),
+					new TaskVerifyBuildResult_BBP(),
+					new TaskUpdateBundleInfo_BBP(),
+					new TaskCreateManifest_BBP(),
+					new TaskCreateReport_BBP(),
+					new TaskCreatePackage_BBP(),
+					new TaskCopyBuildinFiles_BBP(),
 				};
 			return pipeline;
 		}

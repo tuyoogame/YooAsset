@@ -3,9 +3,6 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-using UnityEditor.Build.Pipeline;
-using UnityEditor.Build.Pipeline.Interfaces;
-
 namespace YooAsset.Editor
 {
 	public class ManifestContext : IContextObject
@@ -55,7 +52,7 @@ namespace YooAsset.Editor
 				string fileName = YooAssetSettingsData.GetManifestJsonFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				ManifestTools.SerializeToJson(filePath, manifest);
-				BuildLogger.Log($"创建补丁清单文件：{filePath}");
+				BuildLogger.Log($"Create package manifest file: {filePath}");
 			}
 
 			// 创建补丁清单二进制文件
@@ -65,7 +62,7 @@ namespace YooAsset.Editor
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				ManifestTools.SerializeToBinary(filePath, manifest);
 				packageHash = HashUtility.FileMD5(filePath);
-				BuildLogger.Log($"创建补丁清单文件：{filePath}");
+				BuildLogger.Log($"Create package manifest file: {filePath}");
 
 				ManifestContext manifestContext = new ManifestContext();
 				byte[] bytesData = FileUtility.ReadAllBytes(filePath);
@@ -78,7 +75,7 @@ namespace YooAsset.Editor
 				string fileName = YooAssetSettingsData.GetPackageHashFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				FileUtility.WriteAllText(filePath, packageHash);
-				BuildLogger.Log($"创建补丁清单哈希文件：{filePath}");
+				BuildLogger.Log($"Create package manifest hash file: {filePath}");
 			}
 
 			// 创建补丁清单版本文件
@@ -86,7 +83,7 @@ namespace YooAsset.Editor
 				string fileName = YooAssetSettingsData.GetPackageVersionFileName(buildParameters.PackageName);
 				string filePath = $"{packageOutputDirectory}/{fileName}";
 				FileUtility.WriteAllText(filePath, buildParameters.PackageVersion);
-				BuildLogger.Log($"创建补丁清单版本文件：{filePath}");
+				BuildLogger.Log($"Create package manifest version file: {filePath}");
 			}
 		}
 
@@ -190,7 +187,8 @@ namespace YooAsset.Editor
 				else
 				{
 					// 注意：SBP构建管线会自动剔除一些冗余资源的引用关系，导致游离资源包没有被任何主资源包引用。
-					UnityEngine.Debug.LogWarning($"发现游离的资源包 {index} ! {packageBundle.BundleName}");
+					string warning = BuildLogger.GetErrorMessage(ErrorCode.FoundStrayBundle, $"Found stray bundle ! Bundle ID : {index} Bundle name : {packageBundle.BundleName}");
+					BuildLogger.Warning(warning);
 				}
 			}
 		}
@@ -213,7 +211,7 @@ namespace YooAsset.Editor
 		{
 			if (_cachedBundleID.TryGetValue(bundleName, out int value) == false)
 			{
-				throw new Exception($"Not found cached bundle ID : {bundleName}");
+				throw new Exception($"Should never get here ! Not found bundle ID : {bundleName}");
 			}
 			return value;
 		}

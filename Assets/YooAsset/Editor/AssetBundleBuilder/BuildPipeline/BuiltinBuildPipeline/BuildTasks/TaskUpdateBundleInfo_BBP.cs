@@ -6,7 +6,6 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("更新资源包信息")]
 	public class TaskUpdateBundleInfo_BBP : TaskUpdateBundleInfo, IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
@@ -28,9 +27,14 @@ namespace YooAsset.Editor
 				var buildResult = context.GetContextObject<TaskBuilding_BBP.BuildResultContext>();
 				var hash = buildResult.UnityManifest.GetAssetBundleHash(bundleInfo.BundleName);
 				if (hash.isValid)
+				{
 					return hash.ToString();
+				}				
 				else
-					throw new Exception($"Not found bundle hash in build result : {bundleInfo.BundleName}");
+				{
+					string message = BuildLogger.GetErrorMessage(ErrorCode.NotFoundUnityBundleHash, $"Not found unity bundle hash : {bundleInfo.BundleName}");
+					throw new Exception(message);
+				}
 			}
 		}
 		protected override uint GetUnityCRC(BuildBundleInfo bundleInfo, BuildContext context)
@@ -46,9 +50,14 @@ namespace YooAsset.Editor
 			{
 				string filePath = bundleInfo.BuildOutputFilePath;
 				if (BuildPipeline.GetCRCForAssetBundle(filePath, out uint crc))
+				{
 					return crc;
+				}
 				else
-					throw new Exception($"Not found bundle crc in build result : {bundleInfo.BundleName}");
+				{
+					string message = BuildLogger.GetErrorMessage(ErrorCode.NotFoundUnityBundleCRC, $"Not found unity bundle crc : {bundleInfo.BundleName}");
+					throw new Exception(message);
+				}	
 			}
 		}
 		protected override string GetBundleFileHash(string filePath, BuildParametersContext buildParametersContext)

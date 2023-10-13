@@ -1,5 +1,4 @@
-﻿#if UNITY_2019_4_OR_NEWER
-using System;
+﻿using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,4 +13,3 @@ namespace YooAsset.Editor
 		}
 	}
 }
-#endif

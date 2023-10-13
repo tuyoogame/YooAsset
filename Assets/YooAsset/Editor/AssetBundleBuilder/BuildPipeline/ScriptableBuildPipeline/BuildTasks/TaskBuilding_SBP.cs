@@ -8,7 +8,6 @@ using UnityEditor.Build.Pipeline.Tasks;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("资源构建内容打包")]
 	public class TaskBuilding_SBP : IBuildTask
 	{
 		public class BuildResultContext : IContextObject
@@ -37,7 +36,8 @@ namespace YooAsset.Editor
 			ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out buildResults, taskList);
 			if (exitCode < 0)
 			{
-				throw new Exception($"构建过程中发生错误 : {exitCode}");
+				string message = BuildLogger.GetErrorMessage(ErrorCode.UnityEngineBuildFailed, $"UnityEngine build failed ! ReturnCode : {exitCode}");
+				throw new Exception(message);
 			}
 
 			// 创建着色器信息
@@ -49,7 +49,7 @@ namespace YooAsset.Editor
 				buildMapContext.CreateShadersBundleInfo(shadersBundleName);
 			}
 
-			BuildLogger.Log("Unity引擎打包成功！");
+			BuildLogger.Log("UnityEngine build success!");
 			BuildResultContext buildResultContext = new BuildResultContext();
 			buildResultContext.Results = buildResults;
 			context.SetContextObject(buildResultContext);

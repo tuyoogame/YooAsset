@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace YooAsset.Editor
 {
-	public static class BuildLogger
+	internal static class BuildLogger
 	{
 		private static bool _enableLog = true;
 
@@ -28,6 +28,11 @@ namespace YooAsset.Editor
 		public static void Error(string message)
 		{
 			Debug.LogError(message);
+		}
+
+		public static string GetErrorMessage(ErrorCode code, string message)
+		{
+			return $"[ErrorCode{(int)code}] {message}";
 		}
 	}
 }

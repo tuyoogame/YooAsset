@@ -9,7 +9,6 @@ using UnityEditor.Build.Pipeline.Interfaces;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("验证构建结果")]
 	public class TaskVerifyBuildResult_SBP : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
@@ -47,9 +46,12 @@ namespace YooAsset.Editor
 			{
 				foreach (var exceptBundle in exceptBundleList1)
 				{
-					BuildLogger.Warning($"差异资源包: {exceptBundle}");
+					string warning = BuildLogger.GetErrorMessage(ErrorCode.UnintendedBuildBundle, $"Found unintended build bundle : {exceptBundle}");
+					BuildLogger.Warning(warning);
 				}
-				throw new System.Exception("存在差异资源包！请查看警告信息！");
+
+				string exception = BuildLogger.GetErrorMessage(ErrorCode.UnintendedBuildResult, $"Unintended build, See the detailed warnings !");
+				throw new Exception(exception);
 			}
 
 			// 3. 验证Bundle
@@ -58,12 +60,15 @@ namespace YooAsset.Editor
 			{
 				foreach (var exceptBundle in exceptBundleList2)
 				{
-					BuildLogger.Warning($"差异资源包: {exceptBundle}");
+					string warning = BuildLogger.GetErrorMessage(ErrorCode.UnintendedBuildBundle, $"Found unintended build bundle : {exceptBundle}");
+					BuildLogger.Warning(warning);
 				}
-				throw new System.Exception("存在差异资源包！请查看警告信息！");
+
+				string exception = BuildLogger.GetErrorMessage(ErrorCode.UnintendedBuildResult, $"Unintended build, See the detailed warnings !");
+				throw new Exception(exception);
 			}
 
-			BuildLogger.Log("构建结果验证成功！");
+			BuildLogger.Log("Build results verify success!");
 		}
 	}
 }

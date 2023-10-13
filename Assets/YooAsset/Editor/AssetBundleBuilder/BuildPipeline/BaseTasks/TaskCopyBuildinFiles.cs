@@ -76,7 +76,7 @@ namespace YooAsset.Editor
 
 			// 刷新目录
 			AssetDatabase.Refresh();
-			BuildLogger.Log($"内置文件拷贝完成：{buildinRootDirectory}");
+			BuildLogger.Log($"Buildin files copy complete: {buildinRootDirectory}");
 		}
 	}
 }

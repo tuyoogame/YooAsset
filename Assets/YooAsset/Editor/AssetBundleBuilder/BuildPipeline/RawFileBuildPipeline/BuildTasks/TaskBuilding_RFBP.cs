@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("资源构建内容打包")]
 	public class TaskBuilding_RFBP : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

@@ -6,7 +6,6 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("更新资源包信息")]
 	public class TaskUpdateBundleInfo_SBP : TaskUpdateBundleInfo, IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
@@ -28,9 +27,14 @@ namespace YooAsset.Editor
 				// 注意：当资源包的依赖列表发生变化的时候，ContentHash也会发生变化！
 				var buildResult = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
 				if (buildResult.Results.BundleInfos.TryGetValue(bundleInfo.BundleName, out var value))
+				{
 					return value.Hash.ToString();
+				}
 				else
-					throw new Exception($"Not found bundle hash in build result : {bundleInfo.BundleName}");
+				{
+					string message = BuildLogger.GetErrorMessage(ErrorCode.NotFoundUnityBundleHash, $"Not found unity bundle hash : {bundleInfo.BundleName}");
+					throw new Exception(message);
+				}
 			}
 		}
 		protected override uint GetUnityCRC(BuildBundleInfo bundleInfo, BuildContext context)
@@ -46,9 +50,14 @@ namespace YooAsset.Editor
 			{
 				var buildResult = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
 				if (buildResult.Results.BundleInfos.TryGetValue(bundleInfo.BundleName, out var value))
+				{
 					return value.Crc;
+				}
 				else
-					throw new Exception($"Not found bundle crc in build result : {bundleInfo.BundleName}");
+				{
+					string message = BuildLogger.GetErrorMessage(ErrorCode.NotFoundUnityBundleCRC, $"Not found unity bundle crc : {bundleInfo.BundleName}");
+					throw new Exception(message);
+				}
 			}
 		}
 		protected override string GetBundleFileHash(string filePath, BuildParametersContext buildParametersContext)

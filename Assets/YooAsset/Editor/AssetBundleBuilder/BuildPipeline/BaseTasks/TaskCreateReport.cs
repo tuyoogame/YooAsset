@@ -112,7 +112,7 @@ namespace YooAsset.Editor
 			string fileName = YooAssetSettingsData.GetReportFileName(buildParameters.PackageName, buildParameters.PackageVersion);
 			string filePath = $"{packageOutputDirectory}/{fileName}";
 			BuildReport.Serialize(filePath, buildReport);
-			BuildLogger.Log($"资源构建报告文件创建完成：{filePath}");
+			BuildLogger.Log($"Create build report file: {filePath}");
 		}
 
 		/// <summary>
@@ -148,7 +148,7 @@ namespace YooAsset.Editor
 				}
 				if (findAssetInfo == null)
 				{
-					throw new Exception($"Not found asset {assetPath} in bunlde {bundleName}");
+					throw new Exception($"Should never get here ! Not found asset {assetPath} in bunlde {bundleName}");
 				}
 				foreach (var dependAssetInfo in findAssetInfo.AllDependAssetInfos)
 				{

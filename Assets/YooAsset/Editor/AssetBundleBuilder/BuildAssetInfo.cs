@@ -65,6 +65,7 @@ namespace YooAsset.Editor
 		public BuildAssetInfo(string assetPath)
 		{
 			CollectorType = ECollectorType.None;
+			BundleName = string.Empty;
 			Address = string.Empty;
 			AssetPath = assetPath;
 
@@ -82,6 +83,16 @@ namespace YooAsset.Editor
 				throw new System.Exception("Should never get here !");
 
 			AllDependAssetInfos = dependAssetInfos;
+		}
+
+		/// <summary>
+		/// 设置为统一的着色器包名
+		/// </summary>
+		public void SetShaderBundleName(string packageName, bool uniqueBundleName)
+		{
+			// 获取着色器打包规则结果
+			PackRuleResult shaderPackRuleResult = DefaultPackRule.CreateShadersPackRuleResult();
+			BundleName = shaderPackRuleResult.GetBundleName(packageName, uniqueBundleName);		
 		}
 
 		/// <summary>

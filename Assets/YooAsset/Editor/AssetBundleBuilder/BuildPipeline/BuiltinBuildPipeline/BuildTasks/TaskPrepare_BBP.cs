@@ -6,7 +6,6 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("资源构建准备工作")]
 	public class TaskPrepare_BBP : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
@@ -22,7 +21,8 @@ namespace YooAsset.Editor
 #if UNITY_2021_3_OR_NEWER
 			if (buildParameters.BuildMode != EBuildMode.SimulateBuild)
 			{
-				BuildLogger.Warning("Unity2021版本开始内置构建管线不再维护，推荐使用可编程构建管线（SBP）！");
+				string warning = BuildLogger.GetErrorMessage(ErrorCode.RecommendScriptBuildPipeline, $"Starting with UnityEngine2021, recommend use script build pipeline (SBP) !");
+				BuildLogger.Warning(warning);
 			}
 #endif
 		}

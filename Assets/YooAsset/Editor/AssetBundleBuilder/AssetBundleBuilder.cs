@@ -23,7 +23,7 @@ namespace YooAsset.Editor
 
 			// 检测构建参数是否为空
 			if (buildPipeline.Count == 0)
-				throw new Exception($"Build pipeline is empty !");	
+				throw new Exception($"Build pipeline is empty !");
 
 			// 清空旧数据
 			_buildContext.ClearAllContext();
@@ -41,12 +41,12 @@ namespace YooAsset.Editor
 			if (buildResult.Success)
 			{
 				buildResult.OutputPackageDirectory = buildParametersContext.GetPackageOutputDirectory();
-				BuildLogger.Log($"{buildParameters.BuildMode} pipeline build succeed !");
+				BuildLogger.Log("Resource pipeline build success");
 			}
 			else
 			{
-				BuildLogger.Warning($"{buildParameters.BuildMode} pipeline build failed !");
-				BuildLogger.Error($"Build task failed : {buildResult.FailedTask}");
+				BuildLogger.Error($"{buildParameters.BuildPipeline} build failed !");
+				BuildLogger.Error($"An error occurred in build task {buildResult.FailedTask}");
 				BuildLogger.Error(buildResult.ErrorInfo);
 			}
 

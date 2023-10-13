@@ -6,7 +6,6 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("资源构建准备工作")]
 	public class TaskPrepare_RFBP : IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
@@ -19,9 +18,15 @@ namespace YooAsset.Editor
 
 			// 检测不被支持的构建模式
 			if (buildParameters.BuildMode == EBuildMode.DryRunBuild)
-				throw new Exception($"{nameof(EBuildPipeline.ScriptableBuildPipeline)} not support {nameof(EBuildMode.DryRunBuild)} build mode !");
+			{
+				string message = BuildLogger.GetErrorMessage(ErrorCode.BuildPipelineNotSupportBuildMode, $"{nameof(EBuildPipeline.RawFileBuildPipeline)} not support {nameof(EBuildMode.DryRunBuild)} build mode !");
+				throw new Exception(message);
+			}
 			if (buildParameters.BuildMode == EBuildMode.IncrementalBuild)
-				throw new Exception($"{nameof(EBuildPipeline.ScriptableBuildPipeline)} not support {nameof(EBuildMode.IncrementalBuild)} build mode !");
+			{
+				string message = BuildLogger.GetErrorMessage(ErrorCode.BuildPipelineNotSupportBuildMode, $"{nameof(EBuildPipeline.RawFileBuildPipeline)} not support {nameof(EBuildMode.IncrementalBuild)} build mode !");
+				throw new Exception(message);
+			}
 		}
 	}
 }

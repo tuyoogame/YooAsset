@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("拷贝内置文件")]
 	public class TaskCopyBuildinFiles_RFBP : TaskCopyBuildinFiles, IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

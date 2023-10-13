@@ -27,7 +27,6 @@ namespace YooAsset.Editor
 				EncryptFileInfo fileInfo = new EncryptFileInfo();
 				fileInfo.BundleName = bundleInfo.BundleName;
 				fileInfo.FilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
-
 				var encryptResult = encryptionServices.Encrypt(fileInfo);		
 				if (encryptResult.Encrypted)
 				{
@@ -35,7 +34,7 @@ namespace YooAsset.Editor
 					FileUtility.WriteAllBytes(filePath, encryptResult.EncryptedData);
 					bundleInfo.EncryptedFilePath = filePath;
 					bundleInfo.Encrypted = true;
-					BuildLogger.Log($"Bundle文件加密完成：{filePath}");
+					BuildLogger.Log($"Bundle file encryption complete: {filePath}");
 				}
 				else
 				{
@@ -43,7 +42,7 @@ namespace YooAsset.Editor
 				}
 
 				// 进度条
-				EditorTools.DisplayProgressBar("加密资源包", ++progressValue, buildMapContext.Collection.Count);
+				EditorTools.DisplayProgressBar("Encrypting bundle", ++progressValue, buildMapContext.Collection.Count);
 			}
 			EditorTools.ClearProgressBar();
 		}

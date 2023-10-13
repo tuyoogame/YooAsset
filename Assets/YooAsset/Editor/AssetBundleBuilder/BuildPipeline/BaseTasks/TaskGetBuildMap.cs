@@ -26,7 +26,7 @@ namespace YooAsset.Editor
 			// 2. 剔除未被引用的依赖项资源
 			RemoveZeroReferenceAssets(allCollectAssetInfos);
 
-			// 3. 录入所有收集器收集的资源
+			// 3. 录入所有收集器主动收集的资源
 			foreach (var collectAssetInfo in allCollectAssetInfos)
 			{
 				if (allBuildAssetInfos.ContainsKey(collectAssetInfo.AssetPath) == false)
@@ -36,7 +36,8 @@ namespace YooAsset.Editor
 						if (collectAssetInfo.AssetTags.Count > 0)
 						{
 							collectAssetInfo.AssetTags.Clear();
-							BuildLogger.Warning($"The tags has been cleared ! {collectAssetInfo.AssetPath} ");
+							string warning = BuildLogger.GetErrorMessage(ErrorCode.RemoveInvalidTags, $"Remove asset tags that don't work, see the asset collector type : {collectAssetInfo.AssetPath}");
+							BuildLogger.Warning(warning);
 						}
 					}
 
@@ -50,7 +51,7 @@ namespace YooAsset.Editor
 				}
 			}
 
-			// 4. 录入所有收集资源的依赖资源
+			// 4. 录入所有收集资源依赖的其它资源
 			foreach (var collectAssetInfo in allCollectAssetInfos)
 			{
 				string bundleName = collectAssetInfo.BundleName;
@@ -83,12 +84,27 @@ namespace YooAsset.Editor
 				allBuildAssetInfos[collectAssetInfo.AssetPath].SetDependAssetInfos(dependAssetInfos);
 			}
 
-			// 6. 记录关键信息
+			// 6. 自动收集所有依赖的着色器
+			if (collectResult.Command.AutoCollectShaders)
+			{
+				foreach (var buildAssetInfo in allBuildAssetInfos.Values)
+				{
+					if (buildAssetInfo.CollectorType == ECollectorType.None)
+					{
+						if (buildAssetInfo.AssetType == typeof(UnityEngine.Shader) || buildAssetInfo.AssetType == typeof(UnityEngine.ShaderVariantCollection))
+						{
+							buildAssetInfo.SetShaderBundleName(collectResult.Command.PackageName, collectResult.Command.UniqueBundleName);
+						}
+					}
+				}
+			}
+
+			// 7. 记录关键信息
 			BuildMapContext context = new BuildMapContext();
 			context.AssetFileCount = allBuildAssetInfos.Count;
 			context.Command = collectResult.Command;
 
-			// 7. 记录冗余资源
+			// 8. 记录冗余资源
 			foreach (var buildAssetInfo in allBuildAssetInfos.Values)
 			{
 				if (buildAssetInfo.IsRedundancyAsset())
@@ -103,7 +119,7 @@ namespace YooAsset.Editor
 				}
 			}
 
-			// 8. 移除不参与构建的资源
+			// 9. 移除不参与构建的资源
 			List<BuildAssetInfo> removeBuildList = new List<BuildAssetInfo>();
 			foreach (var buildAssetInfo in allBuildAssetInfos.Values)
 			{
@@ -115,10 +131,13 @@ namespace YooAsset.Editor
 				allBuildAssetInfos.Remove(removeValue.AssetPath);
 			}
 
-			// 9. 构建资源列表
+			// 10. 构建资源列表
 			var allPackAssets = allBuildAssetInfos.Values.ToList();
 			if (allPackAssets.Count == 0)
-				throw new Exception("构建的资源列表不能为空");
+			{
+				string message = BuildLogger.GetErrorMessage(ErrorCode.PackAssetListIsEmpty, "The pack asset info is empty !");
+				throw new Exception(message);
+			}
 			foreach (var assetInfo in allPackAssets)
 			{
 				context.PackAsset(assetInfo);
@@ -162,7 +181,8 @@ namespace YooAsset.Editor
 			// 4. 移除所有零引用的依赖资源
 			foreach (var removeValue in removeList)
 			{
-				BuildLogger.Warning($"发现未被依赖的资源并自动移除 : {removeValue.AssetPath}");
+				string warning = BuildLogger.GetErrorMessage(ErrorCode.FoundUndependedAsset, $"Found undepended asset and remove it : {removeValue.AssetPath}");
+				BuildLogger.Warning(warning);
 				allCollectAssetInfos.Remove(removeValue);
 			}
 		}

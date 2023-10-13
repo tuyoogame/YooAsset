@@ -39,7 +39,7 @@ namespace YooAsset.Editor
 		}
 		private void CreateView(VisualElement parent)
 		{
-			// ¼ÓÔØ²¼¾ÖÎÄ¼ş
+			// åŠ è½½å¸ƒå±€æ–‡ä»¶
 			var visualAsset = UxmlLoader.LoadWindowUXML<BuildPipelineViewerBase>();
 			if (visualAsset == null)
 				return;
@@ -48,25 +48,25 @@ namespace YooAsset.Editor
 			Root.style.flexGrow = 1f;
 			parent.Add(Root);
 
-			// Êä³öÄ¿Â¼
+			// è¾“å‡ºç›®å½•
 			string defaultOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
 			_buildOutputField = Root.Q<TextField>("BuildOutput");
 			_buildOutputField.SetValueWithoutNotify(defaultOutputRoot);
 			_buildOutputField.SetEnabled(false);
 
-			// ¹¹½¨°æ±¾
+			// æ„å»ºç‰ˆæœ¬
 			_buildVersionField = Root.Q<TextField>("BuildVersion");
 			_buildVersionField.style.width = StyleWidth;
 			_buildVersionField.SetValueWithoutNotify(GetDefaultPackageVersion());
 
-			// ¹¹½¨Ä£Ê½
+			// æ„å»ºæ¨¡å¼
 			{
 				var buildModeContainer = Root.Q("BuildModeContainer");
 				var buildMode = AssetBundleBuilderSetting.GetPackageBuildMode(PackageName, BuildPipeline);
 				var buildModeList = GetSupportBuildModes();
 				int defaultIndex = buildModeList.FindIndex(x => x.Equals(buildMode));
 				_buildModeField = new PopupField<Enum>(buildModeList, defaultIndex);
-				_buildModeField.label = "BuildMode";
+				_buildModeField.label = "ABB_BuildMode";
 				_buildModeField.style.width = StyleWidth;
 				_buildModeField.RegisterValueChangedCallback(evt =>
 				{
@@ -75,7 +75,7 @@ namespace YooAsset.Editor
 				buildModeContainer.Add(_buildModeField);
 			}
 
-			// ¼ÓÃÜ·½·¨
+			// åŠ å¯†æ–¹æ³•
 			{
 				var encryptionContainer = Root.Q("EncryptionContainer");
 				var encryptionClassTypes = EditorTools.GetAssignableTypes(typeof(IEncryptionServices));
@@ -84,7 +84,7 @@ namespace YooAsset.Editor
 					var encyptionClassName = AssetBundleBuilderSetting.GetPackageEncyptionClassName(PackageName, BuildPipeline);
 					int defaultIndex = encryptionClassTypes.FindIndex(x => x.FullName.Equals(encyptionClassName));
 					_encryptionField = new PopupField<Type>(encryptionClassTypes, defaultIndex);
-					_encryptionField.label = "Encryption";
+					_encryptionField.label = "ABB_Encryption";
 					_encryptionField.style.width = StyleWidth;
 					_encryptionField.RegisterValueChangedCallback(evt =>
 					{
@@ -95,13 +95,13 @@ namespace YooAsset.Editor
 				else
 				{
 					_encryptionField = new PopupField<Type>();
-					_encryptionField.label = "Encryption";
+					_encryptionField.label = "ABB_Encryption";
 					_encryptionField.style.width = StyleWidth;
 					encryptionContainer.Add(_encryptionField);
 				}
 			}
 
-			// Ñ¹Ëõ·½Ê½Ñ¡Ïî
+			// å‹ç¼©æ–¹å¼é€‰é¡¹
 			var compressOption = AssetBundleBuilderSetting.GetPackageCompressOption(PackageName, BuildPipeline);
 			_compressionField = Root.Q<EnumField>("Compression");
 			_compressionField.Init(compressOption);
@@ -112,7 +112,7 @@ namespace YooAsset.Editor
 				AssetBundleBuilderSetting.SetPackageCompressOption(PackageName, BuildPipeline, (ECompressOption)_compressionField.value);
 			});
 
-			// Êä³öÎÄ¼şÃû³ÆÑùÊ½
+			// è¾“å‡ºæ–‡ä»¶åç§°æ ·å¼
 			var fileNameStyle = AssetBundleBuilderSetting.GetPackageFileNameStyle(PackageName, BuildPipeline);
 			_outputNameStyleField = Root.Q<EnumField>("FileNameStyle");
 			_outputNameStyleField.Init(fileNameStyle);
@@ -123,7 +123,7 @@ namespace YooAsset.Editor
 				AssetBundleBuilderSetting.SetPackageFileNameStyle(PackageName, BuildPipeline, (EFileNameStyle)_outputNameStyleField.value);
 			});
 
-			// Ê×°üÎÄ¼ş¿½±´Ñ¡Ïî
+			// é¦–åŒ…æ–‡ä»¶æ‹·è´é€‰é¡¹
 			var buildinFileCopyOption = AssetBundleBuilderSetting.GetPackageBuildinFileCopyOption(PackageName, BuildPipeline);
 			_copyBuildinFileOptionField = Root.Q<EnumField>("CopyBuildinFileOption");
 			_copyBuildinFileOptionField.Init(buildinFileCopyOption);
@@ -135,7 +135,7 @@ namespace YooAsset.Editor
 				RefreshView();
 			});
 
-			// Ê×°üÎÄ¼ş¿½±´²ÎÊı
+			// é¦–åŒ…æ–‡ä»¶æ‹·è´å‚æ•°
 			var buildinFileCopyParams = AssetBundleBuilderSetting.GetPackageBuildinFileCopyParams(PackageName, BuildPipeline);
 			_copyBuildinFileTagsField = Root.Q<TextField>("CopyBuildinFileTags");
 			_copyBuildinFileTagsField.SetValueWithoutNotify(buildinFileCopyParams);
@@ -144,9 +144,20 @@ namespace YooAsset.Editor
 				AssetBundleBuilderSetting.SetPackageBuildinFileCopyParams(PackageName, BuildPipeline, _copyBuildinFileTagsField.value);
 			});
 
-			// ¹¹½¨°´Å¥
+			// æ„å»ºæŒ‰é’®
 			var buildButton = Root.Q<Button>("Build");
 			buildButton.clicked += BuildButton_clicked;
+
+			// æœ¬åœ°åŒ–è®¾ç½®
+			UIElementsLocalize.Localize(_buildOutputField);
+			UIElementsLocalize.Localize(_buildVersionField);
+			UIElementsLocalize.Localize(_buildModeField);
+			UIElementsLocalize.Localize(_encryptionField);
+			UIElementsLocalize.Localize(_compressionField);
+			UIElementsLocalize.Localize(_outputNameStyleField);
+			UIElementsLocalize.Localize(_copyBuildinFileOptionField);
+			UIElementsLocalize.Localize(_copyBuildinFileTagsField);
+			UIElementsLocalize.Localize(buildButton);
 		}
 		private void RefreshView()
 		{
@@ -157,29 +168,29 @@ namespace YooAsset.Editor
 		private void BuildButton_clicked()
 		{
 			var buildMode = AssetBundleBuilderSetting.GetPackageBuildMode(PackageName, BuildPipeline);
-			if (EditorUtility.DisplayDialog("ÌáÊ¾", $"Í¨¹ı¹¹½¨Ä£Ê½¡¾{buildMode}¡¿À´¹¹½¨£¡", "Yes", "No"))
+			if (EditorUtility.DisplayDialog("æç¤º", $"é€šè¿‡æ„å»ºæ¨¡å¼ã€{buildMode}ã€‘æ¥æ„å»ºï¼", "Yes", "No"))
 			{
 				EditorTools.ClearUnityConsole();
 				EditorApplication.delayCall += ExecuteBuild;
 			}
 			else
 			{
-				Debug.LogWarning("[Build] ´ò°üÒÑ¾­È¡Ïû");
+				Debug.LogWarning("[Build] æ‰“åŒ…å·²ç»å–æ¶ˆ");
 			}
 		}
 
 		/// <summary>
-		/// Ö´ĞĞ¹¹½¨ÈÎÎñ
+		/// æ‰§è¡Œæ„å»ºä»»åŠ¡
 		/// </summary>
 		protected abstract void ExecuteBuild();
 
 		/// <summary>
-		/// »ñÈ¡¹¹½¨¹ÜÏßÖ§³ÖµÄ¹¹½¨Ä£Ê½¼¯ºÏ
+		/// è·å–æ„å»ºç®¡çº¿æ”¯æŒçš„æ„å»ºæ¨¡å¼é›†åˆ
 		/// </summary>
 		protected abstract List<Enum> GetSupportBuildModes();
 
 		/// <summary>
-		/// »ñÈ¡¹¹½¨°æ±¾
+		/// è·å–æ„å»ºç‰ˆæœ¬
 		/// </summary>
 		protected string GetPackageVersion()
 		{
@@ -187,7 +198,7 @@ namespace YooAsset.Editor
 		}
 
 		/// <summary>
-		/// ´´½¨¼ÓÃÜÀàÊµÀı
+		/// åˆ›å»ºåŠ å¯†ç±»å®ä¾‹
 		/// </summary>
 		protected IEncryptionServices CreateEncryptionInstance()
 		{

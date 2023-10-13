@@ -71,14 +71,13 @@ namespace YooAsset.Editor
 		/// 资源包加密服务类
 		/// </summary>
 		public IEncryptionServices EncryptionServices;
-		
 
 
 		private string _pipelineOutputDirectory = string.Empty;
 		private string _packageOutputDirectory = string.Empty;
 		private string _packageRootDirectory = string.Empty;
 		private string _buildinRootDirectory = string.Empty;
-		
+
 		/// <summary>
 		/// 检测构建参数是否合法
 		/// </summary>
@@ -86,25 +85,46 @@ namespace YooAsset.Editor
 		{
 			// 检测当前是否正在构建资源包
 			if (UnityEditor.BuildPipeline.isBuildingPlayer)
-				throw new Exception("当前正在构建资源包，请结束后再试");
-
-			// 检测构建参数合法性
-			if (BuildTarget == BuildTarget.NoTarget)
-				throw new Exception("请选择目标平台！");
-			if (string.IsNullOrEmpty(PackageName))
-				throw new Exception("包裹名称不能为空！");
-			if (string.IsNullOrEmpty(PackageVersion))
-				throw new Exception("包裹版本不能为空！");
-			if (string.IsNullOrEmpty(BuildOutputRoot))
-				throw new Exception("构建输出的根目录为空！");
-			if (string.IsNullOrEmpty(BuildinFileRoot))
-				throw new Exception("内置资源根目录为空！");
+			{
+				string message = BuildLogger.GetErrorMessage(ErrorCode.ThePipelineIsBuiding, "The pipeline is buiding, please try again after finish !");
+				throw new Exception(message);
+			}
 
 			// 检测是否有未保存场景
 			if (BuildMode != EBuildMode.SimulateBuild)
 			{
 				if (EditorTools.HasDirtyScenes())
-					throw new Exception("检测到未保存的场景文件");
+				{
+					string message = BuildLogger.GetErrorMessage(ErrorCode.FoundUnsavedScene, "Found unsaved scene !");
+					throw new Exception(message);
+				}
+			}
+
+			// 检测构建参数合法性
+			if (BuildTarget == BuildTarget.NoTarget)
+			{
+				string message = BuildLogger.GetErrorMessage(ErrorCode.NoBuildTarget, "Please select the build target platform !");
+				throw new Exception(message);
+			}
+			if (string.IsNullOrEmpty(PackageName))
+			{
+				string message = BuildLogger.GetErrorMessage(ErrorCode.PackageNameIsNullOrEmpty, "Package name is null or empty !");
+				throw new Exception(message);
+			}
+			if (string.IsNullOrEmpty(PackageVersion))
+			{
+				string message = BuildLogger.GetErrorMessage(ErrorCode.PackageVersionIsNullOrEmpty, "Package version is null or empty !");
+				throw new Exception(message);
+			}
+			if (string.IsNullOrEmpty(BuildOutputRoot))
+			{
+				string message = BuildLogger.GetErrorMessage(ErrorCode.BuildOutputRootIsNullOrEmpty, "Build output root is null or empty !");
+				throw new Exception(message);
+			}
+			if (string.IsNullOrEmpty(BuildinFileRoot))
+			{
+				string message = BuildLogger.GetErrorMessage(ErrorCode.BuildinFileRootIsNullOrEmpty, "Buildin file root is null or empty !");
+				throw new Exception(message);
 			}
 
 			// 强制构建删除包裹目录
@@ -113,7 +133,7 @@ namespace YooAsset.Editor
 				string packageRootDirectory = GetPackageRootDirectory();
 				if (EditorTools.DeleteDirectory(packageRootDirectory))
 				{
-					BuildLogger.Log($"删除包裹目录：{packageRootDirectory}");
+					BuildLogger.Log($"Delete package root directory: {packageRootDirectory}");
 				}
 			}
 
@@ -122,14 +142,17 @@ namespace YooAsset.Editor
 			{
 				string packageOutputDirectory = GetPackageOutputDirectory();
 				if (Directory.Exists(packageOutputDirectory))
-					throw new Exception($"本次构建的补丁目录已经存在：{packageOutputDirectory}");
+				{
+					string message = BuildLogger.GetErrorMessage(ErrorCode.PackageOutputDirectoryExists, $"Package outout directory exists: {packageOutputDirectory}");
+					throw new Exception(message);
+				}
 			}
 
 			// 如果输出目录不存在
 			string pipelineOutputDirectory = GetPipelineOutputDirectory();
 			if (EditorTools.CreateDirectory(pipelineOutputDirectory))
 			{
-				BuildLogger.Log($"创建输出目录：{pipelineOutputDirectory}");
+				BuildLogger.Log($"Create pipeline output directory: {pipelineOutputDirectory}");
 			}
 		}
 

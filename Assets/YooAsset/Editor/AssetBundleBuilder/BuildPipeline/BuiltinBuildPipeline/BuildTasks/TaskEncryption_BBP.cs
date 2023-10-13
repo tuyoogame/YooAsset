@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("资源包加密")]
 	public class TaskEncryption_BBP : TaskEncryption, IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

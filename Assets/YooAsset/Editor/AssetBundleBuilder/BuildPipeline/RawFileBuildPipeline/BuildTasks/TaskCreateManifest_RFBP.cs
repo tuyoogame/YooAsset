@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("创建清单文件")]
 	public class TaskCreateManifest_RFBP : TaskCreateManifest, IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)

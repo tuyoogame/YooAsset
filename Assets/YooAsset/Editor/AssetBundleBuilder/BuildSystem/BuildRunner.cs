@@ -36,17 +36,15 @@ namespace YooAsset.Editor
 				try
 				{
 					_buildWatch = Stopwatch.StartNew();
-					var taskAttribute = task.GetType().GetCustomAttribute<TaskAttribute>();
-					if (taskAttribute != null)
-						BuildLogger.Log($"---------------------------------------->{taskAttribute.TaskDesc}<---------------------------------------");
+					string taskName = task.GetType().Name.Split('_')[0];
+					BuildLogger.Log($"--------------------------------------------->{taskName}<--------------------------------------------");
 					task.Run(context);
 					_buildWatch.Stop();
 
 					// 统计耗时
 					int seconds = GetBuildSeconds();
 					TotalSeconds += seconds;
-					if (taskAttribute != null)
-						BuildLogger.Log($"{taskAttribute.TaskDesc}耗时：{seconds}秒");
+					BuildLogger.Log($"{taskName} It takes {seconds} seconds in total");
 				}
 				catch (Exception e)
 				{
@@ -59,7 +57,7 @@ namespace YooAsset.Editor
 			}
 
 			// 返回运行结果
-			BuildLogger.Log($"构建过程总计耗时：{TotalSeconds}秒");
+			BuildLogger.Log($"Total build process time: {TotalSeconds} seconds");
 			return buildResult;
 		}
 

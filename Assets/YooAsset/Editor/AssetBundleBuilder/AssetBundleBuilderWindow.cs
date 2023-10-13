@@ -14,7 +14,8 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/AssetBundle Builder", false, 102)]
 		public static void OpenWindow()
 		{
-			AssetBundleBuilderWindow window = GetWindow<AssetBundleBuilderWindow>("资源包构建工具", true, WindowsDefine.DockedWindowTypes);
+			string windowName = Localization.Language(ELanguageKey.ABB_WindowTitle);
+			AssetBundleBuilderWindow window = GetWindow<AssetBundleBuilderWindow>(windowName, true, WindowsDefine.DockedWindowTypes);
 			window.minSize = new Vector2(800, 600);
 		}
 
@@ -47,7 +48,7 @@ namespace YooAsset.Editor
 				if (packageNames.Count == 0)
 				{
 					var label = new Label();
-					label.text = "没有发现可构建的资源包";
+					label.text = Localization.Language(ELanguageKey.AAB_NoPackageTips);
 					label.style.width = 100;
 					_toolbar.Add(label);
 					return;

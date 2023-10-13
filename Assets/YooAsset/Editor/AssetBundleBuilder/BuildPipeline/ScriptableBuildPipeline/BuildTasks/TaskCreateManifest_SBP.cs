@@ -7,7 +7,6 @@ using UnityEditor.Build.Pipeline.Interfaces;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("创建清单文件")]
 	public class TaskCreateManifest_SBP : TaskCreateManifest, IBuildTask
 	{
 		private TaskBuilding_SBP.BuildResultContext _buildResultContext = null;
@@ -23,7 +22,10 @@ namespace YooAsset.Editor
 				_buildResultContext = context.GetContextObject<TaskBuilding_SBP.BuildResultContext>();
 
 			if (_buildResultContext.Results.BundleInfos.ContainsKey(bundleName) == false)
-				throw new Exception($"Not found bundle in SBP build results : {bundleName}");
+			{
+				string message = BuildLogger.GetErrorMessage(ErrorCode.NotFoundUnityBundleInBuildResult, $"Not found bundle in engine build result : {bundleName}");
+				throw new Exception(message);
+			}
 			return _buildResultContext.Results.BundleInfos[bundleName].Dependencies;
 		}
 	}

@@ -23,7 +23,10 @@ namespace YooAsset.Editor
 				// NOTE：检测文件名长度不要超过260字符。
 				string fileName = bundleInfo.BundleName;
 				if (fileName.Length >= 260)
-					throw new Exception($"The output bundle name is too long {fileName.Length} chars : {fileName}");
+				{
+					string message = BuildLogger.GetErrorMessage(ErrorCode.CharactersOverTheLimit, $"Bundle file name character count exceeds limit : {fileName}");
+					throw new Exception(message);
+				}
 			}
 
 			// 2.更新构建输出的文件路径

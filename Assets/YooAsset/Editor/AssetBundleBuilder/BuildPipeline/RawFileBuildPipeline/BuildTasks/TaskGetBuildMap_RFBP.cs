@@ -7,7 +7,6 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	[TaskAttribute("获取资源构建内容")]
 	public class TaskGetBuildMap_RFBP : TaskGetBuildMap, IBuildTask
 	{
 		void IBuildTask.Run(BuildContext context)
@@ -29,7 +28,10 @@ namespace YooAsset.Editor
 			foreach (var bundleInfo in buildMapContext.Collection)
 			{
 				if (bundleInfo.MainAssets.Count != 1)
-					throw new Exception($"The bundle does not support multiple raw asset : {bundleInfo.BundleName}");
+				{
+					string message = BuildLogger.GetErrorMessage(ErrorCode.NotSupportMultipleRawAsset, $"The bundle does not support multiple raw asset : {bundleInfo.BundleName}");
+					throw new Exception(message);
+				}
 			}
 		}
 	}
