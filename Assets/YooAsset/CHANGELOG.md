@@ -2,6 +2,17 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.0.2-preview] - 2023-10-17
+
+### Fixed
+
+- Fixed the mistaken code in the build window.
+- Fixed an issue where auto collect shaders was not effective for dependent resources.
+
+### Improvements
+
+- Add error code for exception output during package building.
+
 ## [2.0.1-preview] - 2023-10-11
 
 ### Fixed
