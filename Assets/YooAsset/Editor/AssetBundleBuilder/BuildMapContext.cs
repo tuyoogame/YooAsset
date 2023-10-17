@@ -80,7 +80,7 @@ namespace YooAsset.Editor
 			{
 				return result;
 			}
-			throw new Exception($"Not found bundle : {bundleName}");
+			throw new Exception($"Should never get here ! Not found bundle : {bundleName}");
 		}
 
 		/// <summary>

@@ -137,7 +137,7 @@ namespace YooAsset.Editor
 
 			// 首包文件拷贝参数
 			var buildinFileCopyParams = AssetBundleBuilderSetting.GetPackageBuildinFileCopyParams(PackageName, BuildPipeline);
-			_copyBuildinFileTagsField = Root.Q<TextField>("CopyBuildinFileTags");
+			_copyBuildinFileTagsField = Root.Q<TextField>("CopyBuildinFileParam");
 			_copyBuildinFileTagsField.SetValueWithoutNotify(buildinFileCopyParams);
 			_copyBuildinFileTagsField.RegisterValueChangedCallback(evt =>
 			{

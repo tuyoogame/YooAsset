@@ -9,6 +9,12 @@ namespace YooAsset.Editor
 {
 	public static class UIElementsLocalize
     {
+        public static void Localize(Label element)
+		{
+            ELanguageKey key = Localization.Convert(element.text);
+            element.text = Localization.Language(key);
+        }
+
         public static void Localize(TextField element)
 		{
             ELanguageKey key = Localization.Convert(element.label);
@@ -35,6 +41,18 @@ namespace YooAsset.Editor
 
         public static void Localize(PopupField<Type> element)
         {
+            ELanguageKey key = Localization.Convert(element.label);
+            element.label = Localization.Language(key);
+        }
+
+        public static void Localize(PopupField<RuleDisplayName> element)
+        {
+            ELanguageKey key = Localization.Convert(element.label);
+            element.label = Localization.Language(key);
+        }
+
+        public static void Localize(Toggle element)
+		{
             ELanguageKey key = Localization.Convert(element.label);
             element.label = Localization.Language(key);
         }

@@ -265,7 +265,7 @@ namespace YooAsset.Editor
 			}
 			else
 			{
-				throw new Exception($"{nameof(IActiveRule)}类型无效：{ruleName}");
+				throw new Exception($"{nameof(IActiveRule)} is invalid：{ruleName}");
 			}
 		}
 		public static IAddressRule GetAddressRuleInstance(string ruleName)
@@ -282,7 +282,7 @@ namespace YooAsset.Editor
 			}
 			else
 			{
-				throw new Exception($"{nameof(IAddressRule)}类型无效：{ruleName}");
+				throw new Exception($"{nameof(IAddressRule)} is invalid：{ruleName}");
 			}
 		}
 		public static IPackRule GetPackRuleInstance(string ruleName)
@@ -299,7 +299,7 @@ namespace YooAsset.Editor
 			}
 			else
 			{
-				throw new Exception($"{nameof(IPackRule)}类型无效：{ruleName}");
+				throw new Exception($"{nameof(IPackRule)} is invalid：{ruleName}");
 			}
 		}
 		public static IFilterRule GetFilterRuleInstance(string ruleName)
@@ -316,7 +316,7 @@ namespace YooAsset.Editor
 			}
 			else
 			{
-				throw new Exception($"{nameof(IFilterRule)}类型无效：{ruleName}");
+				throw new Exception($"{nameof(IFilterRule)} is invalid：{ruleName}");
 			}
 		}
 

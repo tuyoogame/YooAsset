@@ -14,7 +14,8 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/AssetBundle Collector", false, 101)]
 		public static void OpenWindow()
 		{
-			AssetBundleCollectorWindow window = GetWindow<AssetBundleCollectorWindow>("资源包收集工具", true, WindowsDefine.DockedWindowTypes);
+			string windowTitle = Localization.Language(ELanguageKey.ABC_WindowTitle);
+			AssetBundleCollectorWindow window = GetWindow<AssetBundleCollectorWindow>(windowTitle, true, WindowsDefine.DockedWindowTypes);
 			window.minSize = new Vector2(800, 600);
 		}
 
@@ -51,7 +52,7 @@ namespace YooAsset.Editor
 		private ListView _groupListView;
 		private TextField _groupNameTxt;
 		private TextField _groupDescTxt;
-		private TextField _groupAssetTagsTxt;
+		private TextField _groupTagsTxt;
 
 		private VisualElement _collectorContainer;
 		private ScrollView _collectorScrollView;
@@ -106,7 +107,7 @@ namespace YooAsset.Editor
 					AssetBundleCollectorSettingData.ModifyShowPackageView(evt.newValue);
 					RefreshWindow();
 				});
-				_showEditorAliasToggle = root.Q<Toggle>("ShowEditorAlias");
+				_showEditorAliasToggle = root.Q<Toggle>("ShowRuleAlias");
 				_showEditorAliasToggle.RegisterValueChangedCallback(evt =>
 				{
 					AssetBundleCollectorSettingData.ModifyShowEditorAlias(evt.newValue);
@@ -290,8 +291,8 @@ namespace YooAsset.Editor
 				});
 
 				// 分组的资源标签
-				_groupAssetTagsTxt = root.Q<TextField>("GroupAssetTags");
-				_groupAssetTagsTxt.RegisterValueChangedCallback(evt =>
+				_groupTagsTxt = root.Q<TextField>("GroupTags");
+				_groupTagsTxt.RegisterValueChangedCallback(evt =>
 				{
 					var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
 					var selectGroup = _groupListView.selectedItem as AssetBundleCollectorGroup;
@@ -320,7 +321,7 @@ namespace YooAsset.Editor
 				// 分组激活规则
 				var activeRuleContainer = root.Q("ActiveRuleContainer");
 				{
-					_activeRulePopupField = new PopupField<RuleDisplayName>("Active Rule", _activeRuleList, 0);
+					_activeRulePopupField = new PopupField<RuleDisplayName>("ABC_ActiveRule", _activeRuleList, 0);
 					_activeRulePopupField.name = "ActiveRuleMaskField";
 					_activeRulePopupField.style.unityTextAlign = TextAnchor.MiddleLeft;
 					_activeRulePopupField.formatListItemCallback = FormatListItemCallback;
@@ -337,6 +338,40 @@ namespace YooAsset.Editor
 						}
 					});
 					activeRuleContainer.Add(_activeRulePopupField);
+				}
+
+				// 本地化设置
+				{
+					UIElementsLocalize.Localize(_globalSettingsButton);
+					UIElementsLocalize.Localize(_packageSettingsButton);
+					UIElementsLocalize.Localize(_showPackageToogle);
+					UIElementsLocalize.Localize(_showEditorAliasToggle);
+					UIElementsLocalize.Localize(_uniqueBundleNameToogle);
+					UIElementsLocalize.Localize(_enableAddressableToogle);
+					UIElementsLocalize.Localize(_locationToLowerToogle);
+					UIElementsLocalize.Localize(_includeAssetGUIDToogle);
+					UIElementsLocalize.Localize(_ignoreDefaultTypeToogle);
+					UIElementsLocalize.Localize(_autoCollectShadersToogle);
+				}
+				{
+					UIElementsLocalize.Localize(fixBtn);
+					UIElementsLocalize.Localize(importBtn);
+					UIElementsLocalize.Localize(exportBtn);
+					UIElementsLocalize.Localize(_saveButton);
+				}
+				{
+					var packageTitle = root.Q<Label>("PackageTitle");
+					var groupTitle = root.Q<Label>("GroupTitle");
+					var collectorTitle = root.Q<Label>("CollectorTitle");
+					UIElementsLocalize.Localize(packageTitle);
+					UIElementsLocalize.Localize(_packageNameTxt);
+					UIElementsLocalize.Localize(_packageDescTxt);
+					UIElementsLocalize.Localize(groupTitle);
+					UIElementsLocalize.Localize(_groupNameTxt);
+					UIElementsLocalize.Localize(_groupDescTxt);
+					UIElementsLocalize.Localize(_groupTagsTxt);
+					UIElementsLocalize.Localize(collectorTitle);
+					UIElementsLocalize.Localize(_activeRulePopupField);
 				}
 
 				// 刷新窗体
@@ -463,8 +498,9 @@ namespace YooAsset.Editor
 			var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
 			if (selectPackage != null)
 			{
+				string packageSettingName = Localization.Language(ELanguageKey.ABC_PackageSettings);
 				_packageSettingsButton.SetEnabled(true);
-				_packageSettingsButton.text = $"Package Setting ({selectPackage.PackageName})";
+				_packageSettingsButton.text = $"{packageSettingName} ({selectPackage.PackageName})";
 				_enableAddressableToogle.SetValueWithoutNotify(selectPackage.EnableAddressable);
 				_locationToLowerToogle.SetValueWithoutNotify(selectPackage.LocationToLower);
 				_includeAssetGUIDToogle.SetValueWithoutNotify(selectPackage.IncludeAssetGUID);
@@ -496,13 +532,15 @@ namespace YooAsset.Editor
 
 			if (_enableAddressableToogle.value && _locationToLowerToogle.value)
 			{
-				var helpBox = new HelpBox("无法同时开启[Enable Addressable]选项和[Location To Lower]选项", HelpBoxMessageType.Error);
+				string tips = Localization.Language(ELanguageKey.ABC_HelpBox1);
+				var helpBox = new HelpBox(tips, HelpBoxMessageType.Error);
 				_helpBoxContainer.Add(helpBox);
 			}
 
 			if (AssetBundleCollectorSettingData.Setting.Packages.Count > 1 && _uniqueBundleNameToogle.value == false)
 			{
-				var helpBox = new HelpBox("检测到当前配置存在多个Package，建议开启[Unique Bundle Name]选项", HelpBoxMessageType.Warning);
+				string tips = Localization.Language(ELanguageKey.ABC_HelpBox2);
+				var helpBox = new HelpBox(tips, HelpBoxMessageType.Warning);
 				_helpBoxContainer.Add(helpBox);
 			}
 
@@ -654,7 +692,7 @@ namespace YooAsset.Editor
 			_activeRulePopupField.SetValueWithoutNotify(GetActiveRuleIndex(selectGroup.ActiveRuleName));
 			_groupNameTxt.SetValueWithoutNotify(selectGroup.GroupName);
 			_groupDescTxt.SetValueWithoutNotify(selectGroup.GroupDesc);
-			_groupAssetTagsTxt.SetValueWithoutNotify(selectGroup.AssetTags);
+			_groupTagsTxt.SetValueWithoutNotify(selectGroup.AssetTags);
 
 			FillCollectorViewData();
 		}
@@ -731,7 +769,7 @@ namespace YooAsset.Editor
 			{
 				var objectField = new ObjectField();
 				objectField.name = "ObjectField1";
-				objectField.label = "Collector";
+				objectField.label = Localization.Language(ELanguageKey.ABC_Collector);
 				objectField.objectType = typeof(UnityEngine.Object);
 				objectField.style.unityTextAlign = TextAnchor.MiddleLeft;
 				objectField.style.flexGrow = 1f;
@@ -778,7 +816,7 @@ namespace YooAsset.Editor
 			{
 				var textField = new TextField();
 				textField.name = "TextField0";
-				textField.label = "UserData";
+				textField.label = Localization.Language(ELanguageKey.ABC_UserData);
 				textField.style.width = 200;
 				elementBottom.Add(textField);
 				var label = textField.Q<Label>();
@@ -787,7 +825,7 @@ namespace YooAsset.Editor
 			{
 				var textField = new TextField();
 				textField.name = "TextField1";
-				textField.label = "Tags";
+				textField.label = Localization.Language(ELanguageKey.ABC_Tags);
 				textField.style.width = 100;
 				textField.style.marginLeft = 20;
 				textField.style.flexGrow = 1;

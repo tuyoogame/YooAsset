@@ -7,7 +7,7 @@
         <uie:EnumField label="ABB_Compression" value="Center" name="Compression" />
         <uie:EnumField label="ABB_FileNameStyle" value="Center" name="FileNameStyle" />
         <uie:EnumField label="ABB_CopyBuildinFileOption" value="Center" name="CopyBuildinFileOption" />
-        <ui:TextField picking-mode="Ignore" label="ABB_CopyBuildinFileTags" name="CopyBuildinFileTags" />
+        <ui:TextField picking-mode="Ignore" label="ABB_CopyBuildinFileParam" name="CopyBuildinFileParam" />
         <ui:VisualElement name="ExtensionContainer" />
         <ui:Button text="ABB_ClickBuild" display-tooltip-when-elided="true" name="Build" style="height: 50px; background-color: rgb(40, 106, 42); margin-top: 10px;" />
     </ui:VisualElement>

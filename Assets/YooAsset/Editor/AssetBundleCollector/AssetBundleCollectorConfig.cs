@@ -174,7 +174,7 @@ namespace YooAsset.Editor
 			AssetBundleCollectorSettingData.Setting.UniqueBundleName = uniqueBundleName;
 			AssetBundleCollectorSettingData.Setting.Packages.AddRange(packages);
 			AssetBundleCollectorSettingData.SaveFile();
-			Debug.Log($"导入配置完毕！");
+			Debug.Log($"Asset bundle collector config import complete！");
 		}
 
 		/// <summary>
@@ -245,7 +245,7 @@ namespace YooAsset.Editor
 
 			// 生成配置文件
 			xmlDoc.Save(savePath);
-			Debug.Log($"导出配置完毕！");
+			Debug.Log($"Asset bundle collector config export complete！");
 		}
 
 		/// <summary>
