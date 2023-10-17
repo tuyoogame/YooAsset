@@ -85,7 +85,7 @@ namespace YooAsset.Editor
 		public void PackAsset(BuildAssetInfo assetInfo)
 		{
 			if (IsContainsAsset(assetInfo.AssetPath))
-				throw new System.Exception($"Asset is existed : {assetInfo.AssetPath}");
+				throw new System.Exception($"Should never get here ! Asset is existed : {assetInfo.AssetPath}");
 
 			MainAssets.Add(assetInfo);
 		}

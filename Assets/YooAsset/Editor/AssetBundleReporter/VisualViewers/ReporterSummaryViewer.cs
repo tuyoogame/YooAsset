@@ -56,38 +56,41 @@ namespace YooAsset.Editor
 		{
 			_items.Clear();
 
-			_items.Add(new ItemWrapper("YooAsset版本", buildReport.Summary.YooVersion));
-			_items.Add(new ItemWrapper("引擎版本", buildReport.Summary.UnityVersion));
-			_items.Add(new ItemWrapper("构建时间", buildReport.Summary.BuildDate));
-			_items.Add(new ItemWrapper("构建耗时", ConvertTime(buildReport.Summary.BuildSeconds)));
-			_items.Add(new ItemWrapper("构建平台", $"{buildReport.Summary.BuildTarget}"));
-			_items.Add(new ItemWrapper("构建管线", $"{buildReport.Summary.BuildPipeline}"));
-			_items.Add(new ItemWrapper("构建模式", $"{buildReport.Summary.BuildMode}"));
-			_items.Add(new ItemWrapper("包裹名称", buildReport.Summary.BuildPackageName));
-			_items.Add(new ItemWrapper("包裹版本", buildReport.Summary.BuildPackageVersion));
+			_items.Add(new ItemWrapper("YooAsset Version", buildReport.Summary.YooVersion));
+			_items.Add(new ItemWrapper("UnityEngine Version", buildReport.Summary.UnityVersion));
+			_items.Add(new ItemWrapper("Build Date", buildReport.Summary.BuildDate));
+			_items.Add(new ItemWrapper("Build Seconds", ConvertTime(buildReport.Summary.BuildSeconds)));
+			_items.Add(new ItemWrapper("Build Target", $"{buildReport.Summary.BuildTarget}"));
+			_items.Add(new ItemWrapper("Build Pipeline", $"{buildReport.Summary.BuildPipeline}"));
+			_items.Add(new ItemWrapper("Build Mode", $"{buildReport.Summary.BuildMode}"));
+			_items.Add(new ItemWrapper("Package Name", buildReport.Summary.BuildPackageName));
+			_items.Add(new ItemWrapper("Package Version", buildReport.Summary.BuildPackageVersion));
 
 			_items.Add(new ItemWrapper(string.Empty, string.Empty));
-			_items.Add(new ItemWrapper("启用可寻址资源定位", $"{buildReport.Summary.EnableAddressable}"));
-			_items.Add(new ItemWrapper("资源定位地址大小写不敏感", $"{buildReport.Summary.LocationToLower}"));
-			_items.Add(new ItemWrapper("包含资源GUID数据", $"{buildReport.Summary.IncludeAssetGUID}"));
-			_items.Add(new ItemWrapper("资源包名唯一化", $"{buildReport.Summary.UniqueBundleName}"));
-			_items.Add(new ItemWrapper("资源加密服务类", buildReport.Summary.EncryptionServicesClassName));
+			_items.Add(new ItemWrapper("Settings", string.Empty));
+			_items.Add(new ItemWrapper("Unique Bundle Name", $"{buildReport.Summary.UniqueBundleName}"));
+			_items.Add(new ItemWrapper("Enable Addressable", $"{buildReport.Summary.EnableAddressable}"));
+			_items.Add(new ItemWrapper("Location To Lower", $"{buildReport.Summary.LocationToLower}"));
+			_items.Add(new ItemWrapper("Include Asset GUID", $"{buildReport.Summary.IncludeAssetGUID}"));
+			_items.Add(new ItemWrapper("Ignore Default Type", $"{buildReport.Summary.IgnoreDefaultType}"));
+			_items.Add(new ItemWrapper("Auto Collect Shaders", $"{buildReport.Summary.AutoCollectShaders}"));
 
 			_items.Add(new ItemWrapper(string.Empty, string.Empty));
-			_items.Add(new ItemWrapper("构建参数", string.Empty));
+			_items.Add(new ItemWrapper("Build Params", string.Empty));
+			_items.Add(new ItemWrapper("Encryption Class Name", buildReport.Summary.EncryptionClassName));
 			_items.Add(new ItemWrapper("FileNameStyle", $"{buildReport.Summary.FileNameStyle}"));
 			_items.Add(new ItemWrapper("CompressOption", $"{buildReport.Summary.CompressOption}"));
 			_items.Add(new ItemWrapper("DisableWriteTypeTree", $"{buildReport.Summary.DisableWriteTypeTree}"));
 			_items.Add(new ItemWrapper("IgnoreTypeTreeChanges", $"{buildReport.Summary.IgnoreTypeTreeChanges}"));
 
 			_items.Add(new ItemWrapper(string.Empty, string.Empty));
-			_items.Add(new ItemWrapper("构建结果", string.Empty));
-			_items.Add(new ItemWrapper("构建文件总数", $"{buildReport.Summary.AssetFileTotalCount}"));
-			_items.Add(new ItemWrapper("主资源总数", $"{buildReport.Summary.MainAssetTotalCount}"));
-			_items.Add(new ItemWrapper("资源包总数", $"{buildReport.Summary.AllBundleTotalCount}"));
-			_items.Add(new ItemWrapper("资源包总大小", ConvertSize(buildReport.Summary.AllBundleTotalSize)));
-			_items.Add(new ItemWrapper("加密资源包总数", $"{buildReport.Summary.EncryptedBundleTotalCount}"));
-			_items.Add(new ItemWrapper("加密资源包总大小", ConvertSize(buildReport.Summary.EncryptedBundleTotalSize)));
+			_items.Add(new ItemWrapper("Build Results", string.Empty));
+			_items.Add(new ItemWrapper("Asset File Total Count", $"{buildReport.Summary.AssetFileTotalCount}"));
+			_items.Add(new ItemWrapper("Main Asset Total Count", $"{buildReport.Summary.MainAssetTotalCount}"));
+			_items.Add(new ItemWrapper("All Bundle Total Count", $"{buildReport.Summary.AllBundleTotalCount}"));
+			_items.Add(new ItemWrapper("All Bundle Total Size", ConvertSize(buildReport.Summary.AllBundleTotalSize)));
+			_items.Add(new ItemWrapper("Encrypted Bundle Total Count", $"{buildReport.Summary.EncryptedBundleTotalCount}"));
+			_items.Add(new ItemWrapper("Encrypted Bundle Total Size", ConvertSize(buildReport.Summary.EncryptedBundleTotalSize)));
 
 			_listView.Clear();
 			_listView.ClearSelection();

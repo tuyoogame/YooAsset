@@ -1,14 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:VisualElement name="BuildContainer">
-        <ui:TextField picking-mode="Ignore" label="ABB_BuildOutput" name="BuildOutput" />
-        <ui:TextField picking-mode="Ignore" label="ABB_BuildVersion" name="BuildVersion" />
+        <ui:TextField picking-mode="Ignore" label="Build Output" name="BuildOutput" />
+        <ui:TextField picking-mode="Ignore" label="Build Version" name="BuildVersion" />
         <ui:VisualElement name="BuildModeContainer" style="height: 24px;" />
         <ui:VisualElement name="EncryptionContainer" style="height: 24px;" />
-        <uie:EnumField label="ABB_Compression" value="Center" name="Compression" />
-        <uie:EnumField label="ABB_FileNameStyle" value="Center" name="FileNameStyle" />
-        <uie:EnumField label="ABB_CopyBuildinFileOption" value="Center" name="CopyBuildinFileOption" />
-        <ui:TextField picking-mode="Ignore" label="ABB_CopyBuildinFileParam" name="CopyBuildinFileParam" />
+        <uie:EnumField label="Compression" value="Center" name="Compression" />
+        <uie:EnumField label="File Name Style" value="Center" name="FileNameStyle" />
+        <uie:EnumField label="Copy Buildin File Option" value="Center" name="CopyBuildinFileOption" />
+        <ui:TextField picking-mode="Ignore" label="Copy Buildin File Param" name="CopyBuildinFileParam" />
         <ui:VisualElement name="ExtensionContainer" />
-        <ui:Button text="ABB_ClickBuild" display-tooltip-when-elided="true" name="Build" style="height: 50px; background-color: rgb(40, 106, 42); margin-top: 10px;" />
+        <ui:Button text="Click Build" display-tooltip-when-elided="true" name="Build" style="height: 50px; background-color: rgb(40, 106, 42); margin-top: 10px;" />
     </ui:VisualElement>
 </ui:UXML>

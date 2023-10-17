@@ -53,32 +53,16 @@ namespace YooAsset.Editor
 		/// </summary>
 		public string BuildPackageVersion;
 
-		/// <summary>
-		/// 启用可寻址资源定位
-		/// </summary>
-		public bool EnableAddressable;
-
-		/// <summary>
-		/// 资源定位地址大小写不敏感
-		/// </summary>
-		public bool LocationToLower;
-
-		/// <summary>
-		/// 包含资源GUID数据
-		/// </summary>
-		public bool IncludeAssetGUID;
-
-		/// <summary>
-		/// 资源包名唯一化
-		/// </summary>
+		// 收集器配置
 		public bool UniqueBundleName;
-
-		/// <summary>
-		/// 加密服务类名称
-		/// </summary>
-		public string EncryptionServicesClassName;
+		public bool EnableAddressable;
+		public bool LocationToLower;
+		public bool IncludeAssetGUID;
+		public bool IgnoreDefaultType;
+		public bool AutoCollectShaders;
 
 		// 构建参数
+		public string EncryptionClassName;
 		public EFileNameStyle FileNameStyle;
 		public ECompressOption CompressOption;
 		public bool DisableWriteTypeTree;

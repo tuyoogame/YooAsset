@@ -14,8 +14,7 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/AssetBundle Builder", false, 102)]
 		public static void OpenWindow()
 		{
-			string windowName = Localization.Language(ELanguageKey.ABB_WindowTitle);
-			AssetBundleBuilderWindow window = GetWindow<AssetBundleBuilderWindow>(windowName, true, WindowsDefine.DockedWindowTypes);
+			AssetBundleBuilderWindow window = GetWindow<AssetBundleBuilderWindow>("AssetBundle Builder", true, WindowsDefine.DockedWindowTypes);
 			window.minSize = new Vector2(800, 600);
 		}
 
@@ -48,7 +47,7 @@ namespace YooAsset.Editor
 				if (packageNames.Count == 0)
 				{
 					var label = new Label();
-					label.text = Localization.Language(ELanguageKey.AAB_NoPackageTips);
+					label.text = "Not found any package";
 					label.style.width = 100;
 					_toolbar.Add(label);
 					return;

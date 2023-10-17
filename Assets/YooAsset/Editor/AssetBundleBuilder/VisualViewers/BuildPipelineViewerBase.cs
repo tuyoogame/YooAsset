@@ -66,7 +66,7 @@ namespace YooAsset.Editor
 				var buildModeList = GetSupportBuildModes();
 				int defaultIndex = buildModeList.FindIndex(x => x.Equals(buildMode));
 				_buildModeField = new PopupField<Enum>(buildModeList, defaultIndex);
-				_buildModeField.label = "ABB_BuildMode";
+				_buildModeField.label = "Build Mode";
 				_buildModeField.style.width = StyleWidth;
 				_buildModeField.RegisterValueChangedCallback(evt =>
 				{
@@ -84,7 +84,7 @@ namespace YooAsset.Editor
 					var encyptionClassName = AssetBundleBuilderSetting.GetPackageEncyptionClassName(PackageName, BuildPipeline);
 					int defaultIndex = encryptionClassTypes.FindIndex(x => x.FullName.Equals(encyptionClassName));
 					_encryptionField = new PopupField<Type>(encryptionClassTypes, defaultIndex);
-					_encryptionField.label = "ABB_Encryption";
+					_encryptionField.label = "Encryption";
 					_encryptionField.style.width = StyleWidth;
 					_encryptionField.RegisterValueChangedCallback(evt =>
 					{
@@ -95,7 +95,7 @@ namespace YooAsset.Editor
 				else
 				{
 					_encryptionField = new PopupField<Type>();
-					_encryptionField.label = "ABB_Encryption";
+					_encryptionField.label = "Encryption";
 					_encryptionField.style.width = StyleWidth;
 					encryptionContainer.Add(_encryptionField);
 				}
@@ -147,17 +147,6 @@ namespace YooAsset.Editor
 			// 构建按钮
 			var buildButton = Root.Q<Button>("Build");
 			buildButton.clicked += BuildButton_clicked;
-
-			// 本地化设置
-			UIElementsLocalize.Localize(_buildOutputField);
-			UIElementsLocalize.Localize(_buildVersionField);
-			UIElementsLocalize.Localize(_buildModeField);
-			UIElementsLocalize.Localize(_encryptionField);
-			UIElementsLocalize.Localize(_compressionField);
-			UIElementsLocalize.Localize(_outputNameStyleField);
-			UIElementsLocalize.Localize(_copyBuildinFileOptionField);
-			UIElementsLocalize.Localize(_copyBuildinFileTagsField);
-			UIElementsLocalize.Localize(buildButton);
 		}
 		private void RefreshView()
 		{

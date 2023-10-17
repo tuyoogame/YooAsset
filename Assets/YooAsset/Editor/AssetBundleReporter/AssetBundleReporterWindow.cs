@@ -12,7 +12,7 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/AssetBundle Reporter", false, 103)]
 		public static void OpenWindow()
 		{
-			AssetBundleReporterWindow window = GetWindow<AssetBundleReporterWindow>("资源包报告工具", true, WindowsDefine.DockedWindowTypes);
+			AssetBundleReporterWindow window = GetWindow<AssetBundleReporterWindow>("AssetBundle Reporter", true, WindowsDefine.DockedWindowTypes);
 			window.minSize = new Vector2(800, 600);
 		}
 

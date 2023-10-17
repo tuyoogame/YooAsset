@@ -15,7 +15,7 @@ namespace YooAsset.Editor
 		[MenuItem("YooAsset/AssetBundle Debugger", false, 104)]
 		public static void OpenWindow()
 		{
-			AssetBundleDebuggerWindow wnd = GetWindow<AssetBundleDebuggerWindow>("资源包调试工具", true, WindowsDefine.DockedWindowTypes);
+			AssetBundleDebuggerWindow wnd = GetWindow<AssetBundleDebuggerWindow>("AssetBundle Debugger", true, WindowsDefine.DockedWindowTypes);
 			wnd.minSize = new Vector2(800, 600);
 		}
 
