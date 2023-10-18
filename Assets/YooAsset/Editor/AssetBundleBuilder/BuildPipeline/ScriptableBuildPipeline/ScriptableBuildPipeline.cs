@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
-using UnityEditor;
 
 namespace YooAsset.Editor
 {
@@ -26,6 +23,7 @@ namespace YooAsset.Editor
 					new TaskGetBuildMap_SBP(),
 					new TaskBuilding_SBP(),
 					new TaskVerifyBuildResult_SBP(),
+					new TaskEncryption_SBP(),
 					new TaskUpdateBundleInfo_SBP(),
 					new TaskCreateManifest_SBP(),
 					new TaskCreateReport_SBP(),

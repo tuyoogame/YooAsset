@@ -165,10 +165,10 @@ namespace YooAsset.Editor
 		{
 			PackageBundle packageBundle = new PackageBundle();
 			packageBundle.BundleName = BundleName;
+			packageBundle.UnityCRC = PackageUnityCRC;
 			packageBundle.FileHash = PackageFileHash;
 			packageBundle.FileCRC = PackageFileCRC;
 			packageBundle.FileSize = PackageFileSize;
-			packageBundle.UnityCRC = PackageUnityCRC;
 			packageBundle.Encrypted = Encrypted;
 			return packageBundle;
 		}
