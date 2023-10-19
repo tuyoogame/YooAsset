@@ -93,6 +93,7 @@ namespace YooAsset
 		protected BundleLoaderBase OwnerBundle { private set; get; }
 		protected DependAssetBundles DependBundles { private set; get; }
 		protected bool IsWaitForAsyncComplete { private set; get; } = false;
+		protected bool IsForceDestroyComplete { private set; get; } = false;
 		private readonly List<HandleBase> _handles = new List<HandleBase>();
 
 
@@ -121,7 +122,7 @@ namespace YooAsset
 		public abstract void Update();
 
 		/// <summary>
-		/// 销毁资源对象
+		/// 销毁资源提供者
 		/// </summary>
 		public void Destroy()
 		{
@@ -194,6 +195,17 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 释放所有资源句柄
+		/// </summary>
+		public void ReleaseAllHandles()
+		{
+			foreach (var handle in _handles)
+			{
+				handle.ReleaseInternal();
+			}
+		}
+
+		/// <summary>
 		/// 等待异步执行完毕
 		/// </summary>
 		public void WaitForAsyncComplete()
@@ -206,8 +218,20 @@ namespace YooAsset
 			// 验证结果
 			if (IsDone == false)
 			{
-				YooLogger.Warning($"WaitForAsyncComplete failed to loading : {MainAssetInfo.AssetPath}");
+				YooLogger.Warning($"{nameof(WaitForAsyncComplete)} failed to loading : {MainAssetInfo.AssetPath}");
 			}
+		}
+
+		/// <summary>
+		/// 强制销毁资源提供者
+		/// </summary>
+		public void ForceDestroyComplete()
+		{
+			IsForceDestroyComplete = true;
+
+			// 注意：主动轮询更新完成同步加载
+			// 说明：如果资源包未准备完毕也可以放心销毁。
+			Update();
 		}
 
 		/// <summary>

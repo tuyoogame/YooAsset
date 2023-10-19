@@ -167,23 +167,45 @@ namespace YooAsset
 
 		/// <summary>
 		/// 强制回收所有资源
+		/// 注意：加载器在销毁后关联的下载器还会继续下载！
 		/// </summary>
 		public void ForceUnloadAllAssets()
 		{
 #if UNITY_WEBGL
 			throw new Exception($"WebGL not support invoke {nameof(ForceUnloadAllAssets)}");
 #else
+			// 注意：因为场景无法异步转同步，需要等待所有场景加载完毕！
+			foreach (var sceneHandlePair in _sceneHandles)
+			{
+				var sceneHandle = sceneHandlePair.Value;
+				if (sceneHandle.PackageName == PackageName)
+				{
+					if (sceneHandle.IsDone == false)
+						throw new Exception($"{nameof(ForceUnloadAllAssets)} cannot  be called when loading the scene !");
+				}
+			}
+
+			// 释放所有资源句柄
 			foreach (var provider in _providerList)
 			{
-				provider.WaitForAsyncComplete();
+				provider.ReleaseAllHandles();
+			}
+
+			// 强制销毁资源提供者
+			foreach (var provider in _providerList)
+			{
+				provider.ForceDestroyComplete();
 				provider.Destroy();
 			}
+
+			// 强制销毁资源加载器
 			foreach (var loader in _loaderList)
 			{
-				loader.WaitForAsyncComplete();
+				loader.ForceDestroyComplete();
 				loader.Destroy();
 			}
 
+			// 清空数据
 			_providerList.Clear();
 			_providerDic.Clear();
 			_loaderList.Clear();
@@ -409,6 +431,10 @@ namespace YooAsset
 				_providerDic.Remove(provider.ProviderGUID);
 			}
 		}
+		internal bool HasAnyLoader()
+		{
+			return _loaderList.Count > 0;
+		}
 
 		private BundleLoaderBase CreateAssetBundleLoaderInternal(BundleInfo bundleInfo)
 		{
@@ -473,15 +499,6 @@ namespace YooAsset
 				providerInfo.DependBundleInfos = new List<DebugBundleInfo>();
 				provider.GetBundleDebugInfos(providerInfo.DependBundleInfos);
 				result.Add(providerInfo);
-			}
-			return result;
-		}
-		internal List<BundleInfo> GetLoadedBundleInfos()
-		{
-			List<BundleInfo> result = new List<BundleInfo>(100);
-			foreach (var loader in _loaderList)
-			{
-				result.Add(loader.MainBundleInfo);
 			}
 			return result;
 		}

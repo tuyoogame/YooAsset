@@ -46,6 +46,7 @@ namespace YooAsset
 
 		private readonly List<ProviderBase> _providers = new List<ProviderBase>(100);
 		private readonly List<ProviderBase> _removeList = new List<ProviderBase>(100);
+		protected bool IsForceDestroyComplete { private set; get; } = false;
 		internal AssetBundle CacheBundle { set; get; }
 		internal string FileLoadPath { set; get; }
 		internal float DownloadProgress { set; get; }
@@ -163,6 +164,18 @@ namespace YooAsset
 				CacheBundle.Unload(true);
 				CacheBundle = null;
 			}
+		}
+
+		/// <summary>
+		/// 强制销毁资源提供者
+		/// </summary>
+		public void ForceDestroyComplete()
+		{
+			IsForceDestroyComplete = true;
+
+			// 注意：主动轮询更新完成同步加载
+			// 说明：如果正在下载或解压也可以放心销毁。
+			Update();
 		}
 
 		/// <summary>

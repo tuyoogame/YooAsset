@@ -65,7 +65,7 @@ namespace YooAsset
 			// 2. 加载资源对象
 			if (Status == EStatus.Loading)
 			{
-				if (IsWaitForAsyncComplete)
+				if (IsWaitForAsyncComplete || IsForceDestroyComplete)
 				{
 					if (MainAssetInfo.AssetType == null)
 						AllAssetObjects = OwnerBundle.CacheBundle.LoadAssetWithSubAssets(MainAssetInfo.AssetPath);
@@ -87,7 +87,7 @@ namespace YooAsset
 			{
 				if (_cacheRequest != null)
 				{
-					if (IsWaitForAsyncComplete)
+					if (IsWaitForAsyncComplete || IsForceDestroyComplete)
 					{
 						// 强制挂起主线程（注意：该操作会很耗时）
 						YooLogger.Warning("Suspend the main thread to load unity asset.");

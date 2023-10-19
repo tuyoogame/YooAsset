@@ -66,9 +66,9 @@ namespace YooAsset
 				}
 				else
 				{
-					Error = "Scene is invalid or is not loaded.";
 					_steps = ESteps.Done;
 					Status = EOperationStatus.Failed;
+					Error = "Scene is invalid or is not loaded.";
 				}
 			}
 

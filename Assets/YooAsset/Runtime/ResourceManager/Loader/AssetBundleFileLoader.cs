@@ -191,7 +191,7 @@ namespace YooAsset
 			{
 				if (_createRequest != null)
 				{
-					if (_isWaitForAsyncComplete)
+					if (_isWaitForAsyncComplete || IsForceDestroyComplete)
 					{
 						// 强制挂起主线程（注意：该操作会很耗时）
 						YooLogger.Warning("Suspend the main thread to load unity bundle.");

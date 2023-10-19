@@ -300,7 +300,13 @@ namespace YooAsset
 		public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion = true, int timeout = 60)
 		{
 			DebugCheckInitialize(false);
-			DebugCheckUpdateManifest();
+
+			// 注意：强烈建议在更新之前保持加载器为空！
+			if (_resourceMgr.HasAnyLoader())
+			{
+				YooLogger.Warning($"Found loaded bundle before update manifest ! Recommended to call the  {nameof(ForceUnloadAllAssets)} method to release loaded bundle !");
+			}
+
 			return _playModeImpl.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
 		}
 
@@ -1125,16 +1131,6 @@ namespace YooAsset
 			{
 				if (_playModeImpl.ActiveManifest == null)
 					throw new Exception("Not found active package manifest !");
-			}
-		}
-
-		[Conditional("DEBUG")]
-		private void DebugCheckUpdateManifest()
-		{
-			var loadedBundleInfos = _resourceMgr.GetLoadedBundleInfos();
-			if (loadedBundleInfos.Count > 0)
-			{
-				YooLogger.Warning($"Found loaded bundle before update manifest ! Recommended to call the  {nameof(ForceUnloadAllAssets)} method to release loaded bundle !");
 			}
 		}
 
