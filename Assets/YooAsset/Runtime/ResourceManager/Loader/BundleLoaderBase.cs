@@ -45,6 +45,7 @@ namespace YooAsset
 		public bool IsDestroyed { private set; get; } = false;
 
 		private readonly List<ProviderBase> _providers = new List<ProviderBase>(100);
+		private readonly List<ProviderBase> _removeList = new List<ProviderBase>(100);
 		internal AssetBundle CacheBundle { set; get; }
 		internal string FileLoadPath { set; get; }
 		internal float DownloadProgress { set; get; }
@@ -57,15 +58,6 @@ namespace YooAsset
 			MainBundleInfo = bundleInfo;
 			RefCount = 0;
 			Status = EStatus.None;
-		}
-
-		/// <summary>
-		/// 添加附属的资源提供者
-		/// </summary>
-		public void AddProvider(ProviderBase provider)
-		{
-			if (_providers.Contains(provider) == false)
-				_providers.Add(provider);
 		}
 
 		/// <summary>
@@ -100,40 +92,51 @@ namespace YooAsset
 			if (IsDone() == false)
 				return false;
 
-			if (RefCount > 0)
-				return false;
-
-			return true;
+			return RefCount <= 0;
 		}
 
 		/// <summary>
-		/// 在满足条件的前提下，销毁所有资源提供者
+		/// 添加附属的资源提供者
 		/// </summary>
-		public void TryDestroyAllProviders()
+		public void AddProvider(ProviderBase provider)
 		{
+			if (_providers.Contains(provider) == false)
+				_providers.Add(provider);
+		}
+
+		/// <summary>
+		/// 尝试销毁资源提供者
+		/// </summary>
+		public void TryDestroyProviders()
+		{
+			// TODO 不用等待资源包加载完成
+			/*
 			if (IsDone() == false)
 				return;
+			*/
 
-			// 条件1：必须等待所有Provider可以销毁
+			_removeList.Clear();
+
+			// 获取移除列表
 			foreach (var provider in _providers)
 			{
-				if (provider.CanDestroy() == false)
-					return;
-			}
-
-			// 条件2：除了自己没有其它引用
-			if (RefCount > _providers.Count)
-				return;
-
-			// 销毁所有Providers
-			{
-				foreach (var provider in _providers)
+				if (provider.CanDestroy())
 				{
-					provider.Destroy();
+					_removeList.Add(provider);
 				}
-				Impl.RemoveBundleProviders(_providers);
-				_providers.Clear();
 			}
+
+			// 销毁资源提供者
+			foreach (var provider in _removeList)
+			{
+				_providers.Remove(provider);
+				provider.Destroy();
+			}
+
+			// 移除资源提供者
+			Impl.RemoveBundleProviders(_removeList);
+
+			_removeList.Clear();
 		}
 
 

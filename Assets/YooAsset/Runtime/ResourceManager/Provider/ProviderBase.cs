@@ -145,14 +145,15 @@ namespace YooAsset
 		/// </summary>
 		public bool CanDestroy()
 		{
-			if (IsDone == false)
+			// 注意：在进行资源加载过程时不可以销毁
+			if (Status == EStatus.Loading || Status == EStatus.Checking)
 				return false;
 
 			return RefCount <= 0;
 		}
 
 		/// <summary>
-		/// 创建操作句柄
+		/// 创建资源句柄
 		/// </summary>
 		public T CreateHandle<T>() where T : HandleBase
 		{
@@ -178,12 +179,12 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 释放操作句柄
+		/// 释放资源句柄
 		/// </summary>
 		public void ReleaseHandle(HandleBase handle)
 		{
 			if (RefCount <= 0)
-				YooLogger.Warning("Asset provider reference count is already zero. There may be resource leaks !");
+				throw new System.Exception("Should never get here !");
 
 			if (_handles.Remove(handle) == false)
 				throw new System.Exception("Should never get here !");

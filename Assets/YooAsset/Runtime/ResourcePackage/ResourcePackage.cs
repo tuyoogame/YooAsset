@@ -346,6 +346,7 @@ namespace YooAsset
 			return _playModeImpl.ActiveManifest.PackageVersion;
 		}
 
+		#region 资源卸载
 		/// <summary>
 		/// 资源回收（卸载引用计数为零的资源）
 		/// </summary>
@@ -356,6 +357,25 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 资源回收（尝试卸载指定的资源）
+		/// </summary>
+		public void TryUnloadUnusedAsset(string location)
+		{
+			DebugCheckInitialize();
+			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+			_resourceMgr.TryUnloadUnusedAsset(assetInfo);
+		}
+
+		/// <summary>
+		/// 资源回收（尝试卸载指定的资源）
+		/// </summary>
+		public void TryUnloadUnusedAsset(AssetInfo assetInfo)
+		{
+			DebugCheckInitialize();
+			_resourceMgr.TryUnloadUnusedAsset(assetInfo);
+		}
+
+		/// <summary>
 		/// 强制回收所有资源
 		/// </summary>
 		public void ForceUnloadAllAssets()
@@ -363,6 +383,7 @@ namespace YooAsset
 			DebugCheckInitialize();
 			_resourceMgr.ForceUnloadAllAssets();
 		}
+		#endregion
 
 		#region 沙盒相关
 		/// <summary>

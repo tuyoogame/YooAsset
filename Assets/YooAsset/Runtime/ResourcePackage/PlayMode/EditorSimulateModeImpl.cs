@@ -129,6 +129,29 @@ namespace YooAsset
 			}
 			return result.ToArray();
 		}
+		string IBundleQuery.GetMainBundleName(AssetInfo assetInfo)
+		{
+			if (assetInfo.IsInvalid)
+				throw new Exception("Should never get here !");
+
+			// 注意：如果清单里未找到资源包会抛出异常！
+			var packageBundle = _activeManifest.GetMainPackageBundle(assetInfo.AssetPath);
+			return packageBundle.BundleName;
+		}
+		string[] IBundleQuery.GetDependBundleNames(AssetInfo assetInfo)
+		{
+			if (assetInfo.IsInvalid)
+				throw new Exception("Should never get here !");
+
+			// 注意：如果清单里未找到资源包会抛出异常！
+			var depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
+			List<string> result = new List<string>(depends.Length);
+			foreach (var packageBundle in depends)
+			{
+				result.Add(packageBundle.BundleName);
+			}
+			return result.ToArray();
+		}
 		bool IBundleQuery.ManifestValid()
 		{
 			return _activeManifest != null;
