@@ -116,9 +116,8 @@ namespace YooAsset
 				return;
 			*/
 
-			_removeList.Clear();
-
 			// 获取移除列表
+			_removeList.Clear();
 			foreach (var provider in _providers)
 			{
 				if (provider.CanDestroy())
@@ -136,8 +135,6 @@ namespace YooAsset
 
 			// 移除资源提供者
 			Impl.RemoveBundleProviders(_removeList);
-
-			_removeList.Clear();
 		}
 
 

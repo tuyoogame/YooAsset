@@ -199,8 +199,9 @@ namespace YooAsset
 		/// </summary>
 		public void ReleaseAllHandles()
 		{
-			foreach (var handle in _handles)
+			for (int i = _handles.Count - 1; i >= 0; i--)
 			{
+				var handle = _handles[i];
 				handle.ReleaseInternal();
 			}
 		}

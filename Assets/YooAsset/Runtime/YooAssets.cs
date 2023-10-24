@@ -13,6 +13,14 @@ namespace YooAsset
 		private static readonly List<ResourcePackage> _packages = new List<ResourcePackage>();
 
 		/// <summary>
+		/// 是否已经初始化
+		/// </summary>
+		public static bool Initialized
+		{
+			get { return _isInitialize; }
+		}
+
+		/// <summary>
 		/// 初始化资源系统
 		/// </summary>
 		/// <param name="logger">自定义日志处理</param>
@@ -90,7 +98,7 @@ namespace YooAsset
 		public static ResourcePackage CreatePackage(string packageName)
 		{
 			CheckException(packageName);
-			if (HasPackage(packageName))
+			if (ContainsPackage(packageName))
 				throw new Exception($"Package {packageName} already existed !");
 
 			YooLogger.Log($"Create resource package : {packageName}");
@@ -142,7 +150,7 @@ namespace YooAsset
 		/// 检测资源包是否存在
 		/// </summary>
 		/// <param name="packageName">资源包名称</param>
-		public static bool HasPackage(string packageName)
+		public static bool ContainsPackage(string packageName)
 		{
 			CheckException(packageName);
 			var package = GetPackageInternal(packageName);
