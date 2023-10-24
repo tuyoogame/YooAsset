@@ -56,8 +56,11 @@ internal class SceneBattle : MonoBehaviour
 		}
 
 		// 切换场景的时候释放资源
-		var package = YooAssets.GetPackage("DefaultPackage");
-		package.UnloadUnusedAssets();
+		if (YooAssets.Initialized)
+		{
+			var package = YooAssets.GetPackage("DefaultPackage");
+			package.UnloadUnusedAssets();
+		}
 	}
 	private void Update()
 	{
