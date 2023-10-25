@@ -133,7 +133,7 @@ namespace YooAsset
 		/// </summary>
 		public int CompareTo(ProviderBase other)
 		{
-			return this.ProviderPriority.CompareTo(other.ProviderPriority);
+			return other.ProviderPriority.CompareTo(this.ProviderPriority);
 		}
 
 		/// <summary>
