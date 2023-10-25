@@ -138,20 +138,20 @@ namespace YooAsset
 		/// 异步加载原生文件
 		/// </summary>
 		/// <param name="assetInfo">资源信息</param>
-		public static RawFileHandle LoadRawFileAsync(AssetInfo assetInfo)
+		public static RawFileHandle LoadRawFileAsync(AssetInfo assetInfo, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadRawFileAsync(assetInfo);
+			return _defaultPackage.LoadRawFileAsync(assetInfo, priority);
 		}
 
 		/// <summary>
 		/// 异步加载原生文件
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
-		public static RawFileHandle LoadRawFileAsync(string location)
+		public static RawFileHandle LoadRawFileAsync(string location, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadRawFileAsync(location);
+			return _defaultPackage.LoadRawFileAsync(location, priority);
 		}
 		#endregion
 
@@ -163,7 +163,7 @@ namespace YooAsset
 		/// <param name="sceneMode">场景加载模式</param>
 		/// <param name="suspendLoad">场景加载到90%自动挂起</param>
 		/// <param name="priority">优先级</param>
-		public static SceneHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, int priority = 100)
+		public static SceneHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, uint priority = 100)
 		{
 			DebugCheckDefaultPackageValid();
 			return _defaultPackage.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
@@ -176,7 +176,7 @@ namespace YooAsset
 		/// <param name="sceneMode">场景加载模式</param>
 		/// <param name="suspendLoad">场景加载到90%自动挂起</param>
 		/// <param name="priority">优先级</param>
-		public static SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, int priority = 100)
+		public static SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, uint priority = 100)
 		{
 			DebugCheckDefaultPackageValid();
 			return _defaultPackage.LoadSceneAsync(assetInfo, sceneMode, suspendLoad, priority);
@@ -231,10 +231,10 @@ namespace YooAsset
 		/// 异步加载资源对象
 		/// </summary>
 		/// <param name="assetInfo">资源信息</param>
-		public static AssetHandle LoadAssetAsync(AssetInfo assetInfo)
+		public static AssetHandle LoadAssetAsync(AssetInfo assetInfo, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadAssetAsync(assetInfo);
+			return _defaultPackage.LoadAssetAsync(assetInfo, priority);
 		}
 
 		/// <summary>
@@ -242,10 +242,10 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
-		public static AssetHandle LoadAssetAsync<TObject>(string location) where TObject : UnityEngine.Object
+		public static AssetHandle LoadAssetAsync<TObject>(string location, uint priority = 0) where TObject : UnityEngine.Object
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadAssetAsync<TObject>(location);
+			return _defaultPackage.LoadAssetAsync<TObject>(location, priority);
 		}
 
 		/// <summary>
@@ -253,20 +253,20 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
 		/// <param name="type">资源类型</param>
-		public static AssetHandle LoadAssetAsync(string location, System.Type type)
+		public static AssetHandle LoadAssetAsync(string location, System.Type type, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadAssetAsync(location, type);
+			return _defaultPackage.LoadAssetAsync(location, type, priority);
 		}
 
 		/// <summary>
 		/// 异步加载资源对象
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
-		public static AssetHandle LoadAssetAsync(string location)
+		public static AssetHandle LoadAssetAsync(string location, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadAssetAsync(location);
+			return _defaultPackage.LoadAssetAsync(location, priority);
 		}
 		#endregion
 
@@ -318,10 +318,10 @@ namespace YooAsset
 		/// 异步加载子资源对象
 		/// </summary>
 		/// <param name="assetInfo">资源信息</param>
-		public static SubAssetsHandle LoadSubAssetsAsync(AssetInfo assetInfo)
+		public static SubAssetsHandle LoadSubAssetsAsync(AssetInfo assetInfo, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadSubAssetsAsync(assetInfo);
+			return _defaultPackage.LoadSubAssetsAsync(assetInfo, priority);
 		}
 
 		/// <summary>
@@ -329,10 +329,10 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
-		public static SubAssetsHandle LoadSubAssetsAsync<TObject>(string location) where TObject : UnityEngine.Object
+		public static SubAssetsHandle LoadSubAssetsAsync<TObject>(string location, uint priority = 0) where TObject : UnityEngine.Object
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadSubAssetsAsync<TObject>(location);
+			return _defaultPackage.LoadSubAssetsAsync<TObject>(location, priority);
 		}
 
 		/// <summary>
@@ -340,20 +340,20 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
 		/// <param name="type">子对象类型</param>
-		public static SubAssetsHandle LoadSubAssetsAsync(string location, System.Type type)
+		public static SubAssetsHandle LoadSubAssetsAsync(string location, System.Type type, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadSubAssetsAsync(location, type);
+			return _defaultPackage.LoadSubAssetsAsync(location, type, priority);
 		}
 
 		/// <summary>
 		/// 异步加载子资源对象
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
-		public static SubAssetsHandle LoadSubAssetsAsync(string location)
+		public static SubAssetsHandle LoadSubAssetsAsync(string location, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadSubAssetsAsync(location);
+			return _defaultPackage.LoadSubAssetsAsync(location, priority);
 		}
 		#endregion
 
@@ -405,10 +405,10 @@ namespace YooAsset
 		/// 异步加载资源包内所有资源对象
 		/// </summary>
 		/// <param name="assetInfo">资源信息</param>
-		public static AllAssetsHandle LoadAllAssetsAsync(AssetInfo assetInfo)
+		public static AllAssetsHandle LoadAllAssetsAsync(AssetInfo assetInfo, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadAllAssetsAsync(assetInfo);
+			return _defaultPackage.LoadAllAssetsAsync(assetInfo, priority);
 		}
 
 		/// <summary>
@@ -416,10 +416,10 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
-		public static AllAssetsHandle LoadAllAssetsAsync<TObject>(string location) where TObject : UnityEngine.Object
+		public static AllAssetsHandle LoadAllAssetsAsync<TObject>(string location, uint priority = 0) where TObject : UnityEngine.Object
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadAllAssetsAsync<TObject>(location);
+			return _defaultPackage.LoadAllAssetsAsync<TObject>(location, priority);
 		}
 
 		/// <summary>
@@ -427,20 +427,20 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
 		/// <param name="type">子对象类型</param>
-		public static AllAssetsHandle LoadAllAssetsAsync(string location, System.Type type)
+		public static AllAssetsHandle LoadAllAssetsAsync(string location, System.Type type, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadAllAssetsAsync(location, type);
+			return _defaultPackage.LoadAllAssetsAsync(location, type, priority);
 		}
 
 		/// <summary>
 		/// 异步加载资源包内所有资源对象
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
-		public static AllAssetsHandle LoadAllAssetsAsync(string location)
+		public static AllAssetsHandle LoadAllAssetsAsync(string location, uint priority = 0)
 		{
 			DebugCheckDefaultPackageValid();
-			return _defaultPackage.LoadAllAssetsAsync(location);
+			return _defaultPackage.LoadAllAssetsAsync(location, priority);
 		}
 		#endregion
 

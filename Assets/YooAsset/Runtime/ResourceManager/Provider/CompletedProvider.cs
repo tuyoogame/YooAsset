@@ -3,7 +3,7 @@ namespace YooAsset
 {
 	internal sealed class CompletedProvider : ProviderBase
 	{
-		public CompletedProvider(AssetInfo assetInfo) : base(null, string.Empty, assetInfo)
+		public CompletedProvider(AssetInfo assetInfo) : base(null, string.Empty, 0, assetInfo)
 		{
 		}
 		public override void Update()

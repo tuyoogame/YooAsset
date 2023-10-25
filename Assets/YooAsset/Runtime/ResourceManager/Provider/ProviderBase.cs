@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System;
 
 namespace YooAsset
 {
-	internal abstract class ProviderBase
+	internal abstract class ProviderBase : IComparable<ProviderBase>
 	{
 		public enum EStatus
 		{
@@ -21,6 +22,11 @@ namespace YooAsset
 		/// 资源提供者唯一标识符
 		/// </summary>
 		public string ProviderGUID { private set; get; }
+
+		/// <summary>
+		/// 资源加载的优先级
+		/// </summary>
+		public uint ProviderPriority { private set; get; }
 
 		/// <summary>
 		/// 所属资源系统
@@ -97,10 +103,11 @@ namespace YooAsset
 		private readonly List<HandleBase> _handles = new List<HandleBase>();
 
 
-		public ProviderBase(ResourceManager impl, string providerGUID, AssetInfo assetInfo)
+		public ProviderBase(ResourceManager impl, string providerGUID, uint providerPriority, AssetInfo assetInfo)
 		{
 			Impl = impl;
 			ProviderGUID = providerGUID;
+			ProviderPriority = providerPriority;
 			MainAssetInfo = assetInfo;
 
 			// 创建资源包加载器
@@ -120,6 +127,14 @@ namespace YooAsset
 		/// 轮询更新方法
 		/// </summary>
 		public abstract void Update();
+
+		/// <summary>
+		/// 排序接口实现方法
+		/// </summary>
+		public int CompareTo(ProviderBase other)
+		{
+			return this.ProviderPriority.CompareTo(other.ProviderPriority);
+		}
 
 		/// <summary>
 		/// 销毁资源提供者

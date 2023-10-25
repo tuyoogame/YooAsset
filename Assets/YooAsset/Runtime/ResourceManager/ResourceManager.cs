@@ -220,7 +220,7 @@ namespace YooAsset
 		/// <summary>
 		/// 加载场景
 		/// </summary>
-		public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad, int priority)
+		public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad, uint priority)
 		{
 			if (assetInfo.IsInvalid)
 			{
@@ -241,12 +241,16 @@ namespace YooAsset
 			ProviderBase provider;
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseSceneProvider(this, providerGUID, assetInfo, sceneMode, suspendLoad, priority);
+					provider = new DatabaseSceneProvider(this, providerGUID, priority, assetInfo, sceneMode, suspendLoad);
 				else
-					provider = new BundledSceneProvider(this, providerGUID, assetInfo, sceneMode, suspendLoad, priority);
+					provider = new BundledSceneProvider(this, providerGUID, priority, assetInfo, sceneMode, suspendLoad);
 				provider.InitSpawnDebugInfo();
 				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);
+				if (priority > 0)
+				{
+					_providerList.Sort();
+				}
 			}
 
 			var handle = provider.CreateHandle<SceneHandle>();
@@ -258,7 +262,7 @@ namespace YooAsset
 		/// <summary>
 		/// 加载资源对象
 		/// </summary>
-		public AssetHandle LoadAssetAsync(AssetInfo assetInfo)
+		public AssetHandle LoadAssetAsync(AssetInfo assetInfo, uint priority)
 		{
 			if (assetInfo.IsInvalid)
 			{
@@ -273,12 +277,16 @@ namespace YooAsset
 			if (provider == null)
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseAssetProvider(this, providerGUID, assetInfo);
+					provider = new DatabaseAssetProvider(this, providerGUID, priority, assetInfo);
 				else
-					provider = new BundledAssetProvider(this, providerGUID, assetInfo);
+					provider = new BundledAssetProvider(this, providerGUID, priority, assetInfo);
 				provider.InitSpawnDebugInfo();
 				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);
+				if (priority > 0)
+				{
+					_providerList.Sort();
+				}
 			}
 			return provider.CreateHandle<AssetHandle>();
 		}
@@ -286,7 +294,7 @@ namespace YooAsset
 		/// <summary>
 		/// 加载子资源对象
 		/// </summary>
-		public SubAssetsHandle LoadSubAssetsAsync(AssetInfo assetInfo)
+		public SubAssetsHandle LoadSubAssetsAsync(AssetInfo assetInfo, uint priority)
 		{
 			if (assetInfo.IsInvalid)
 			{
@@ -301,12 +309,16 @@ namespace YooAsset
 			if (provider == null)
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseSubAssetsProvider(this, providerGUID, assetInfo);
+					provider = new DatabaseSubAssetsProvider(this, providerGUID, priority, assetInfo);
 				else
-					provider = new BundledSubAssetsProvider(this, providerGUID, assetInfo);
+					provider = new BundledSubAssetsProvider(this, providerGUID, priority, assetInfo);
 				provider.InitSpawnDebugInfo();
 				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);
+				if (priority > 0)
+				{
+					_providerList.Sort();
+				}
 			}
 			return provider.CreateHandle<SubAssetsHandle>();
 		}
@@ -314,7 +326,7 @@ namespace YooAsset
 		/// <summary>
 		/// 加载所有资源对象
 		/// </summary>
-		public AllAssetsHandle LoadAllAssetsAsync(AssetInfo assetInfo)
+		public AllAssetsHandle LoadAllAssetsAsync(AssetInfo assetInfo, uint priority)
 		{
 			if (assetInfo.IsInvalid)
 			{
@@ -329,12 +341,16 @@ namespace YooAsset
 			if (provider == null)
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseAllAssetsProvider(this, providerGUID, assetInfo);
+					provider = new DatabaseAllAssetsProvider(this, providerGUID, priority, assetInfo);
 				else
-					provider = new BundledAllAssetsProvider(this, providerGUID, assetInfo);
+					provider = new BundledAllAssetsProvider(this, providerGUID, priority, assetInfo);
 				provider.InitSpawnDebugInfo();
 				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);
+				if (priority > 0)
+				{
+					_providerList.Sort();
+				}
 			}
 			return provider.CreateHandle<AllAssetsHandle>();
 		}
@@ -342,7 +358,7 @@ namespace YooAsset
 		/// <summary>
 		/// 加载原生文件
 		/// </summary>
-		public RawFileHandle LoadRawFileAsync(AssetInfo assetInfo)
+		public RawFileHandle LoadRawFileAsync(AssetInfo assetInfo, uint priority)
 		{
 			if (assetInfo.IsInvalid)
 			{
@@ -357,12 +373,16 @@ namespace YooAsset
 			if (provider == null)
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseRawFileProvider(this, providerGUID, assetInfo);
+					provider = new DatabaseRawFileProvider(this, providerGUID, priority, assetInfo);
 				else
-					provider = new BundledRawFileProvider(this, providerGUID, assetInfo);
+					provider = new BundledRawFileProvider(this, providerGUID, priority, assetInfo);
 				provider.InitSpawnDebugInfo();
 				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);
+				if (priority > 0)
+				{
+					_providerList.Sort();
+				}
 			}
 			return provider.CreateHandle<RawFileHandle>();
 		}

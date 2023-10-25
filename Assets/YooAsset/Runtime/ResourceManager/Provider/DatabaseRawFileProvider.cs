@@ -3,7 +3,7 @@ namespace YooAsset
 {
 	internal class DatabaseRawFileProvider : ProviderBase
 	{
-		public DatabaseRawFileProvider(ResourceManager impl, string providerGUID, AssetInfo assetInfo) : base(impl, providerGUID, assetInfo)
+		public DatabaseRawFileProvider(ResourceManager impl, string providerGUID, uint providerPriority, AssetInfo assetInfo) : base(impl, providerGUID, providerPriority, assetInfo)
 		{
 		}
 		public override void Update()

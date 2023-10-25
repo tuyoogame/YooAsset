@@ -11,15 +11,13 @@ namespace YooAsset
 		public readonly LoadSceneMode SceneMode;
 		private readonly string _sceneName;
 		private readonly bool _suspendLoad;
-		private readonly int _priority;
 		private AsyncOperation _asyncOperation;
 
-		public BundledSceneProvider(ResourceManager impl, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad, int priority) : base(impl, providerGUID, assetInfo)
+		public BundledSceneProvider(ResourceManager impl, string providerGUID, uint providerPriority, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad) : base(impl, providerGUID, providerPriority, assetInfo)
 		{
 			SceneMode = sceneMode;
 			_sceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
 			_suspendLoad = suspendLoad;
-			_priority = priority;
 		}
 		public override void Update()
 		{
@@ -68,7 +66,7 @@ namespace YooAsset
 				if (_asyncOperation != null)
 				{
 					_asyncOperation.allowSceneActivation = !_suspendLoad;
-					_asyncOperation.priority = _priority;
+					_asyncOperation.priority = (int)ProviderPriority;
 					SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
 					Status = EStatus.Checking;
 				}
