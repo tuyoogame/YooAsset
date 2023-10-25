@@ -100,7 +100,7 @@ namespace YooAsset
 			DownloaderBase newDownloader = null;
 			YooLogger.Log($"Beginning to download bundle : {bundleInfo.Bundle.BundleName} URL : {bundleInfo.RemoteMainURL}");
 #if UNITY_WEBGL
-			if (bundleInfo.Bundle.Buildpipeline == DefaultBuildPipeline.RawFileBuildPipelineName)
+			if (bundleInfo.Bundle.Buildpipeline == EDefaultBuildPipeline.RawFileBuildPipeline.ToString())
 			{
 				FileUtility.CreateFileDirectory(bundleInfo.CachedDataFilePath);
 				System.Type requesterType = typeof(FileGeneralRequest);
