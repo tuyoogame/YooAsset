@@ -134,7 +134,11 @@ namespace YooAsset
 			}
 
 			// 移除资源提供者
-			Impl.RemoveBundleProviders(_removeList);
+			if (_removeList.Count > 0)
+			{
+				Impl.RemoveBundleProviders(_removeList);
+				_removeList.Clear();
+			}
 		}
 
 

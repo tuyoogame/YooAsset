@@ -146,7 +146,7 @@ namespace YooAsset
 				var editorSimulateModeImpl = new EditorSimulateModeImpl(PackageName);
 				_bundleQuery = editorSimulateModeImpl;
 				_playModeImpl = editorSimulateModeImpl;
-				_resourceMgr.Initialize(true, parameters.LoadingMaxTimeSlice, _bundleQuery);
+				_resourceMgr.Initialize(true, parameters.AutoDestroyAssetProvider, parameters.LoadingMaxTimeSlice, _bundleQuery);
 
 				var initializeParameters = parameters as EditorSimulateModeParameters;
 				initializeOperation = editorSimulateModeImpl.InitializeAsync(assist, initializeParameters.SimulateManifestFilePath);
@@ -156,7 +156,7 @@ namespace YooAsset
 				var offlinePlayModeImpl = new OfflinePlayModeImpl(PackageName);
 				_bundleQuery = offlinePlayModeImpl;
 				_playModeImpl = offlinePlayModeImpl;
-				_resourceMgr.Initialize(false, parameters.LoadingMaxTimeSlice, _bundleQuery);
+				_resourceMgr.Initialize(false, parameters.AutoDestroyAssetProvider, parameters.LoadingMaxTimeSlice, _bundleQuery);
 
 				var initializeParameters = parameters as OfflinePlayModeParameters;
 				initializeOperation = offlinePlayModeImpl.InitializeAsync(assist);
@@ -166,7 +166,7 @@ namespace YooAsset
 				var hostPlayModeImpl = new HostPlayModeImpl(PackageName);
 				_bundleQuery = hostPlayModeImpl;
 				_playModeImpl = hostPlayModeImpl;
-				_resourceMgr.Initialize(false, parameters.LoadingMaxTimeSlice, _bundleQuery);
+				_resourceMgr.Initialize(false, parameters.AutoDestroyAssetProvider, parameters.LoadingMaxTimeSlice, _bundleQuery);
 
 				var initializeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = hostPlayModeImpl.InitializeAsync(assist,
@@ -179,7 +179,7 @@ namespace YooAsset
 				var webPlayModeImpl = new WebPlayModeImpl(PackageName);
 				_bundleQuery = webPlayModeImpl;
 				_playModeImpl = webPlayModeImpl;
-				_resourceMgr.Initialize(false, parameters.LoadingMaxTimeSlice, _bundleQuery);
+				_resourceMgr.Initialize(false, parameters.AutoDestroyAssetProvider, parameters.LoadingMaxTimeSlice, _bundleQuery);
 
 				var initializeParameters = parameters as WebPlayModeParameters;
 				initializeOperation = webPlayModeImpl.InitializeAsync(assist,

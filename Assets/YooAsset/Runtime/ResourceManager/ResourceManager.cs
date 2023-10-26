@@ -20,6 +20,7 @@ namespace YooAsset
 
 
 		private bool _simulationOnEditor;
+		private bool _autoDestroyAssetProvider;
 		private long _loadingMaxTimeSlice;
 		private IBundleQuery _bundleQuery;
 		private bool _isUnloadSafe = true;
@@ -49,9 +50,10 @@ namespace YooAsset
 		/// <summary>
 		/// 初始化
 		/// </summary>
-		public void Initialize(bool simulationOnEditor, long loadingMaxTimeSlice, IBundleQuery bundleServices)
+		public void Initialize(bool simulationOnEditor, bool autoDestroyAssetProvider, long loadingMaxTimeSlice, IBundleQuery bundleServices)
 		{
 			_simulationOnEditor = simulationOnEditor;
+			_autoDestroyAssetProvider = autoDestroyAssetProvider;
 			_loadingMaxTimeSlice = loadingMaxTimeSlice;
 			_bundleQuery = bundleServices;
 			_watch = Stopwatch.StartNew();
@@ -68,6 +70,9 @@ namespace YooAsset
 			foreach (var loader in _loaderList)
 			{
 				loader.Update();
+
+				if (_autoDestroyAssetProvider)
+					loader.TryDestroyProviders();
 			}
 
 			// 更新资源提供者

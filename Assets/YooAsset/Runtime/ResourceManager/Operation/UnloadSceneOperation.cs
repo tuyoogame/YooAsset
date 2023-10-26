@@ -82,6 +82,7 @@ namespace YooAsset
 			{
 				_asyncOp = SceneManager.UnloadSceneAsync(_provider.SceneObject);
 				_provider.ResourceMgr.UnloadSubScene(_provider.SceneName);
+				_provider.ResourceMgr.TryUnloadUnusedAsset(_provider.MainAssetInfo);
 				_steps = ESteps.Checking;		
 			}
 
