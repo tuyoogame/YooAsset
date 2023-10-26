@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace YooAsset
@@ -9,9 +12,10 @@ namespace YooAsset
 		private readonly bool _suspendLoad;
 		private AsyncOperation _asyncOperation;
 
-		public DatabaseSceneProvider(ResourceManager impl, string providerGUID, uint providerPriority, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad) : base(impl, providerGUID, providerPriority, assetInfo)
+		public DatabaseSceneProvider(ResourceManager manager, string providerGUID, uint providerPriority, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad) : base(manager, providerGUID, providerPriority, assetInfo)
 		{
 			SceneMode = sceneMode;
+			SceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
 			_suspendLoad = suspendLoad;
 		}
 		public override void Update()

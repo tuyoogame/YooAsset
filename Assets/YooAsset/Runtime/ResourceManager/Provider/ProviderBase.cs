@@ -31,7 +31,7 @@ namespace YooAsset
 		/// <summary>
 		/// 所属资源系统
 		/// </summary>
-		public ResourceManager Impl { private set; get; }
+		public ResourceManager ResourceMgr { private set; get; }
 
 		/// <summary>
 		/// 资源信息
@@ -52,6 +52,11 @@ namespace YooAsset
 		/// 获取的场景对象
 		/// </summary>
 		public UnityEngine.SceneManagement.Scene SceneObject { protected set; get; }
+
+		/// <summary>
+		/// 加载的场景名称
+		/// </summary>
+		public string SceneName { protected set; get; }
 
 		/// <summary>
 		/// 原生文件路径
@@ -103,21 +108,21 @@ namespace YooAsset
 		private readonly List<HandleBase> _handles = new List<HandleBase>();
 
 
-		public ProviderBase(ResourceManager impl, string providerGUID, uint providerPriority, AssetInfo assetInfo)
+		public ProviderBase(ResourceManager manager, string providerGUID, uint providerPriority, AssetInfo assetInfo)
 		{
-			Impl = impl;
+			ResourceMgr = manager;
 			ProviderGUID = providerGUID;
 			ProviderPriority = providerPriority;
 			MainAssetInfo = assetInfo;
 
 			// 创建资源包加载器
-			if (impl != null)
+			if (manager != null)
 			{
-				OwnerBundle = impl.CreateOwnerAssetBundleLoader(assetInfo);
+				OwnerBundle = manager.CreateOwnerAssetBundleLoader(assetInfo);
 				OwnerBundle.Reference();
 				OwnerBundle.AddProvider(this);
 
-				var dependList = impl.CreateDependAssetBundleLoaders(assetInfo);
+				var dependList = manager.CreateDependAssetBundleLoaders(assetInfo);
 				DependBundles = new DependAssetBundles(dependList);
 				DependBundles.Reference();
 			}
@@ -127,14 +132,6 @@ namespace YooAsset
 		/// 轮询更新方法
 		/// </summary>
 		public abstract void Update();
-
-		/// <summary>
-		/// 排序接口实现方法
-		/// </summary>
-		public int CompareTo(ProviderBase other)
-		{
-			return other.ProviderPriority.CompareTo(this.ProviderPriority);
-		}
 
 		/// <summary>
 		/// 销毁资源提供者
@@ -280,6 +277,13 @@ namespace YooAsset
 				return _taskCompletionSource.Task;
 			}
 		}
+
+		#region 排序接口实现
+		public int CompareTo(ProviderBase other)
+		{
+			return other.ProviderPriority.CompareTo(this.ProviderPriority);
+		}
+		#endregion
 
 		#region 异步编程相关
 		private TaskCompletionSource<object> _taskCompletionSource;

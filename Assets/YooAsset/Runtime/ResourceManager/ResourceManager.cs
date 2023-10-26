@@ -218,7 +218,9 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 加载场景
+		/// 加载场景对象
+		/// 注意：返回的场景句柄是唯一的，每个场景句柄对应自己的场景提供者对象。
+		/// 注意：业务逻辑层应该避免同时加载一个子场景。
 		/// </summary>
 		public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad, uint priority)
 		{
@@ -387,15 +389,24 @@ namespace YooAsset
 			return provider.CreateHandle<RawFileHandle>();
 		}
 
-		internal void UnloadSubScene(ProviderBase provider)
+		internal void UnloadSubScene(string sceneName)
 		{
-			string providerGUID = provider.ProviderGUID;
-			if (_sceneHandles.ContainsKey(providerGUID) == false)
-				throw new Exception("Should never get here !");
+			List<string> removeKeys = new List<string>();
+			foreach (var valuePair in _sceneHandles)
+			{
+				var sceneHandle = valuePair.Value;
+				if (sceneHandle.SceneName == sceneName)
+				{
+					// 释放子场景句柄
+					sceneHandle.ReleaseInternal();
+					removeKeys.Add(valuePair.Key);
+				}
+			}
 
-			// 释放子场景句柄
-			_sceneHandles[providerGUID].ReleaseInternal();
-			_sceneHandles.Remove(providerGUID);
+			foreach (string key in removeKeys)
+			{
+				_sceneHandles.Remove(key);
+			}
 		}
 		private void UnloadAllScene()
 		{

@@ -6,7 +6,7 @@ namespace YooAsset
 {
 	internal sealed class DatabaseSubAssetsProvider : ProviderBase
 	{
-		public DatabaseSubAssetsProvider(ResourceManager impl, string providerGUID, uint providerPriority, AssetInfo assetInfo) : base(impl, providerGUID, providerPriority, assetInfo)
+		public DatabaseSubAssetsProvider(ResourceManager manager, string providerGUID, uint providerPriority, AssetInfo assetInfo) : base(manager, providerGUID, providerPriority, assetInfo)
 		{
 		}
 		public override void Update()

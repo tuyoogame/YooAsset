@@ -9,14 +9,13 @@ namespace YooAsset
 	internal sealed class BundledSceneProvider : ProviderBase
 	{
 		public readonly LoadSceneMode SceneMode;
-		private readonly string _sceneName;
 		private readonly bool _suspendLoad;
 		private AsyncOperation _asyncOperation;
 
-		public BundledSceneProvider(ResourceManager impl, string providerGUID, uint providerPriority, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad) : base(impl, providerGUID, providerPriority, assetInfo)
+		public BundledSceneProvider(ResourceManager manager, string providerGUID, uint providerPriority, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad) : base(manager, providerGUID, providerPriority, assetInfo)
 		{
 			SceneMode = sceneMode;
-			_sceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
+			SceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
 			_suspendLoad = suspendLoad;
 		}
 		public override void Update()
@@ -73,7 +72,7 @@ namespace YooAsset
 				else
 				{
 					Status = EStatus.Failed;
-					LastError = $"Failed to load scene : {_sceneName}";
+					LastError = $"Failed to load scene : {MainAssetInfo.AssetPath}";
 					YooLogger.Error(LastError);
 					InvokeCompletion();
 				}

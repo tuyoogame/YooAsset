@@ -38,6 +38,19 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 场景名称
+		/// </summary>
+		public string SceneName
+		{
+			get
+			{
+				if (IsValidWithWarning == false)
+					return string.Empty;
+				return Provider.SceneName;
+			}
+		}
+
+		/// <summary>
 		/// 场景对象
 		/// </summary>
 		public Scene SceneObject
@@ -152,10 +165,8 @@ namespace YooAsset
 			}
 
 			// 卸载子场景
-			Scene sceneObject = SceneObject;
-			Provider.Impl.UnloadSubScene(Provider);
 			{
-				var operation = new UnloadSceneOperation(sceneObject);
+				var operation = new UnloadSceneOperation(Provider);
 				OperationSystem.StartOperation(packageName, operation);
 				return operation;
 			}

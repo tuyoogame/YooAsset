@@ -8,7 +8,7 @@ namespace YooAsset
 	{
 		private AssetBundleRequest _cacheRequest;
 
-		public BundledAssetProvider(ResourceManager impl, string providerGUID, uint providerPriority, AssetInfo assetInfo) : base(impl, providerGUID, providerPriority, assetInfo)
+		public BundledAssetProvider(ResourceManager manager, string providerGUID, uint providerPriority, AssetInfo assetInfo) : base(manager, providerGUID, providerPriority, assetInfo)
 		{
 		}
 		public override void Update()
