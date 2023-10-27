@@ -2,6 +2,43 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.0.3-preview] - 2023-10-27
+
+### Fixed
+
+- (#180) Fixed an issue with invalid encryption task in the build pipeline.
+- (#185) Fixed subscene unload error when the scene is not loaded.
+- (#190) Fixed webgl platform compile error.
+
+### Improvements
+
+- The asset load method add the priority parameter.
+- The async operation class add the priority field.
+
+### Added
+
+- The InitializeParameters calss add new parameter : AutoDestroyAssetProvider
+
+  ```c#
+  /// <summary>
+  /// 自动销毁不再使用的资源提供者
+  /// </summary>
+  public bool AutoDestroyAssetProvider = false;
+  ```
+
+- Resource package add TryUnloadUnusedAsset function.
+
+  ```c#
+  /// <summary>
+  /// 尝试卸载指定资源的资源包（包括依赖资源）
+  /// </summary>
+  public void TryUnloadUnusedAsset(AssetInfo assetInfo)
+  ```
+
+### Removed
+
+- The InitializeParameters calss remove the parameter : LoadingMaxTimeSlice 
+
 ## [2.0.2-preview] - 2023-10-17
 
 ### Fixed
