@@ -45,29 +45,50 @@ namespace YooAsset
 		{
 			_frameTime = _watch.ElapsedMilliseconds;
 
-			// 添加新的异步操作
+			// 添加新增的异步操作
 			if (_newList.Count > 0)
 			{
+				bool sorting = false;
+				foreach (var operation in _newList)
+				{
+					if (operation.Priority > 0)
+					{
+						sorting = true;
+						break;
+					}
+				}
+
 				_operations.AddRange(_newList);
 				_newList.Clear();
+
+				// 重新排序优先级
+				if (sorting)
+					_operations.Sort();
 			}
 
-			// 更新所有的异步操作
-			for (int i = _operations.Count - 1; i >= 0; i--)
+			// 更新进行中的异步操作
+			for (int i = 0; i < _operations.Count; i++)
 			{
 				if (IsBusy)
 					break;
 
 				var operation = _operations[i];
+				if (operation.IsFinish)
+					continue;
+
 				if (operation.IsDone == false)
 					operation.InternalOnUpdate();
 
 				if (operation.IsDone)
-				{
-					// 注意：如果业务端发生异常，保证异步操作提前移除。
-					_operations.RemoveAt(i);
 					operation.SetFinish();
-				}
+			}
+
+			// 移除已经完成的异步操作
+			for (int i = _operations.Count - 1; i >= 0; i--)
+			{
+				var operation = _operations[i];
+				if (operation.IsFinish)
+					_operations.RemoveAt(i);
 			}
 		}
 
@@ -113,7 +134,7 @@ namespace YooAsset
 		public static void StartOperation(string packageName, AsyncOperationBase operation)
 		{
 			_newList.Add(operation);
-			operation.SetPackageName(packageName);
+			operation.Init(packageName);
 			operation.SetStart();
 		}
 	}

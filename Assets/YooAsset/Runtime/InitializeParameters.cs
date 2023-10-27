@@ -81,12 +81,6 @@ namespace YooAsset
 		public bool AutoDestroyAssetProvider = false;
 
 		/// <summary>
-		/// 资源加载每帧处理的最大时间片段
-		/// 注意：默认值为MaxValue
-		/// </summary>
-		public long LoadingMaxTimeSlice = long.MaxValue;
-
-		/// <summary>
 		/// 启用断点续传参数
 		/// 说明：当文件的大小大于设置的字节数时启用断点续传下载器
 		/// </summary>

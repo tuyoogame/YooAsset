@@ -45,15 +45,7 @@ namespace YooAsset
 				if (IsValidWithWarning == false)
 					return EOperationStatus.None;
 
-				var status = Provider.Status;
-				if (status == ProviderBase.EStatus.None)
-					return EOperationStatus.None;
-				else if (status == ProviderBase.EStatus.Succeed)
-					return EOperationStatus.Succeed;
-				else if (status == ProviderBase.EStatus.Failed)
-					return EOperationStatus.Failed;
-				else
-					return EOperationStatus.Processing;
+				return Provider.Status;
 			}
 		}
 
@@ -66,7 +58,7 @@ namespace YooAsset
 			{
 				if (IsValidWithWarning == false)
 					return string.Empty;
-				return Provider.LastError;
+				return Provider.Error;
 			}
 		}
 

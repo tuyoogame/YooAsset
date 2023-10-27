@@ -9,32 +9,17 @@ namespace YooAsset
 {
 	internal class ResourceManager
 	{
-		private readonly Dictionary<string, BundleLoaderBase> _loaderDic = new Dictionary<string, BundleLoaderBase>(5000);
-		private readonly List<BundleLoaderBase> _loaderList = new List<BundleLoaderBase>(5000);
-
-		private readonly Dictionary<string, ProviderBase> _providerDic = new Dictionary<string, ProviderBase>(5000);
-		private readonly List<ProviderBase> _providerList = new List<ProviderBase>(5000);
-
+		// 全局场景句柄集合
 		private readonly static Dictionary<string, SceneHandle> _sceneHandles = new Dictionary<string, SceneHandle>(100);
 		private static long _sceneCreateCount = 0;
 
+		private readonly Dictionary<string, ProviderBase> _providerDic = new Dictionary<string, ProviderBase>(5000);
+		private readonly Dictionary<string, BundleLoaderBase> _loaderDic = new Dictionary<string, BundleLoaderBase>(5000);
+		private readonly List<BundleLoaderBase> _loaderList = new List<BundleLoaderBase>(5000);
 
 		private bool _simulationOnEditor;
 		private bool _autoDestroyAssetProvider;
-		private long _loadingMaxTimeSlice;
 		private IBundleQuery _bundleQuery;
-		private bool _isUnloadSafe = true;
-
-		// 计时器相关
-		private Stopwatch _watch;
-		private long _frameTime;
-		private bool IsBusy
-		{
-			get
-			{
-				return _watch.ElapsedMilliseconds - _frameTime >= _loadingMaxTimeSlice;
-			}
-		}
 
 		/// <summary>
 		/// 所属包裹
@@ -50,13 +35,11 @@ namespace YooAsset
 		/// <summary>
 		/// 初始化
 		/// </summary>
-		public void Initialize(bool simulationOnEditor, bool autoDestroyAssetProvider, long loadingMaxTimeSlice, IBundleQuery bundleServices)
+		public void Initialize(bool simulationOnEditor, bool autoDestroyAssetProvider, IBundleQuery bundleServices)
 		{
 			_simulationOnEditor = simulationOnEditor;
 			_autoDestroyAssetProvider = autoDestroyAssetProvider;
-			_loadingMaxTimeSlice = loadingMaxTimeSlice;
 			_bundleQuery = bundleServices;
-			_watch = Stopwatch.StartNew();
 		}
 
 		/// <summary>
@@ -64,9 +47,6 @@ namespace YooAsset
 		/// </summary>
 		public void Update()
 		{
-			_frameTime = _watch.ElapsedMilliseconds;
-
-			// 更新加载器	
 			foreach (var loader in _loaderList)
 			{
 				loader.Update();
@@ -74,17 +54,6 @@ namespace YooAsset
 				if (_autoDestroyAssetProvider)
 					loader.TryDestroyProviders();
 			}
-
-			// 更新资源提供者
-			// 注意：循环更新的时候，可能会扩展列表
-			_isUnloadSafe = false;
-			for (int i = 0; i < _providerList.Count; i++)
-			{
-				if (IsBusy)
-					break;
-				_providerList[i].Update();
-			}
-			_isUnloadSafe = true;
 		}
 
 		/// <summary>
@@ -92,12 +61,6 @@ namespace YooAsset
 		/// </summary>
 		public void UnloadUnusedAssets()
 		{
-			if (_isUnloadSafe == false)
-			{
-				YooLogger.Warning("Can not unload unused assets when processing resource loading !");
-				return;
-			}
-
 			// 注意：资源包之间可能存在多层深层嵌套，需要多次循环释放。
 			int loopCount = 10;
 			for (int i = 0; i < loopCount; i++)
@@ -191,13 +154,13 @@ namespace YooAsset
 			}
 
 			// 释放所有资源句柄
-			foreach (var provider in _providerList)
+			foreach (var provider in _providerDic.Values)
 			{
 				provider.ReleaseAllHandles();
 			}
 
 			// 强制销毁资源提供者
-			foreach (var provider in _providerList)
+			foreach (var provider in _providerDic.Values)
 			{
 				provider.ForceDestroyComplete();
 				provider.Destroy();
@@ -211,7 +174,6 @@ namespace YooAsset
 			}
 
 			// 清空数据
-			_providerList.Clear();
 			_providerDic.Clear();
 			_loaderList.Clear();
 			_loaderDic.Clear();
@@ -248,18 +210,15 @@ namespace YooAsset
 			ProviderBase provider;
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseSceneProvider(this, providerGUID, priority, assetInfo, sceneMode, suspendLoad);
+					provider = new DatabaseSceneProvider(this, providerGUID, assetInfo, sceneMode, suspendLoad);
 				else
-					provider = new BundledSceneProvider(this, providerGUID, priority, assetInfo, sceneMode, suspendLoad);
+					provider = new BundledSceneProvider(this, providerGUID, assetInfo, sceneMode, suspendLoad);
 				provider.InitSpawnDebugInfo();
-				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);
-				if (priority > 0)
-				{
-					_providerList.Sort();
-				}
+				OperationSystem.StartOperation(PackageName, provider);
 			}
 
+			provider.Priority = priority;
 			var handle = provider.CreateHandle<SceneHandle>();
 			handle.PackageName = PackageName;
 			_sceneHandles.Add(providerGUID, handle);
@@ -284,17 +243,15 @@ namespace YooAsset
 			if (provider == null)
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseAssetProvider(this, providerGUID, priority, assetInfo);
+					provider = new DatabaseAssetProvider(this, providerGUID, assetInfo);
 				else
-					provider = new BundledAssetProvider(this, providerGUID, priority, assetInfo);
+					provider = new BundledAssetProvider(this, providerGUID, assetInfo);
 				provider.InitSpawnDebugInfo();
-				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);
-				if (priority > 0)
-				{
-					_providerList.Sort();
-				}
+				OperationSystem.StartOperation(PackageName, provider);
 			}
+
+			provider.Priority = priority;
 			return provider.CreateHandle<AssetHandle>();
 		}
 
@@ -316,17 +273,15 @@ namespace YooAsset
 			if (provider == null)
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseSubAssetsProvider(this, providerGUID, priority, assetInfo);
+					provider = new DatabaseSubAssetsProvider(this, providerGUID, assetInfo);
 				else
-					provider = new BundledSubAssetsProvider(this, providerGUID, priority, assetInfo);
+					provider = new BundledSubAssetsProvider(this, providerGUID, assetInfo);
 				provider.InitSpawnDebugInfo();
-				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);
-				if (priority > 0)
-				{
-					_providerList.Sort();
-				}
+				OperationSystem.StartOperation(PackageName, provider);
 			}
+
+			provider.Priority = priority;
 			return provider.CreateHandle<SubAssetsHandle>();
 		}
 
@@ -348,17 +303,15 @@ namespace YooAsset
 			if (provider == null)
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseAllAssetsProvider(this, providerGUID, priority, assetInfo);
+					provider = new DatabaseAllAssetsProvider(this, providerGUID, assetInfo);
 				else
-					provider = new BundledAllAssetsProvider(this, providerGUID, priority, assetInfo);
+					provider = new BundledAllAssetsProvider(this, providerGUID, assetInfo);
 				provider.InitSpawnDebugInfo();
-				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);
-				if (priority > 0)
-				{
-					_providerList.Sort();
-				}
+				OperationSystem.StartOperation(PackageName, provider);
 			}
+
+			provider.Priority = priority;
 			return provider.CreateHandle<AllAssetsHandle>();
 		}
 
@@ -380,17 +333,15 @@ namespace YooAsset
 			if (provider == null)
 			{
 				if (_simulationOnEditor)
-					provider = new DatabaseRawFileProvider(this, providerGUID, priority, assetInfo);
+					provider = new DatabaseRawFileProvider(this, providerGUID, assetInfo);
 				else
-					provider = new BundledRawFileProvider(this, providerGUID, priority, assetInfo);
+					provider = new BundledRawFileProvider(this, providerGUID, assetInfo);
 				provider.InitSpawnDebugInfo();
-				_providerList.Add(provider);
 				_providerDic.Add(providerGUID, provider);
-				if (priority > 0)
-				{
-					_providerList.Sort();
-				}
+				OperationSystem.StartOperation(PackageName, provider);
 			}
+
+			provider.Priority = priority;
 			return provider.CreateHandle<RawFileHandle>();
 		}
 
@@ -463,7 +414,6 @@ namespace YooAsset
 		{
 			foreach (var provider in removeList)
 			{
-				_providerList.Remove(provider);
 				_providerDic.Remove(provider.ProviderGUID);
 			}
 		}
@@ -522,8 +472,8 @@ namespace YooAsset
 		#region 调试信息
 		internal List<DebugProviderInfo> GetDebugReportInfos()
 		{
-			List<DebugProviderInfo> result = new List<DebugProviderInfo>(_providerList.Count);
-			foreach (var provider in _providerList)
+			List<DebugProviderInfo> result = new List<DebugProviderInfo>(_providerDic.Count);
+			foreach (var provider in _providerDic.Values)
 			{
 				DebugProviderInfo providerInfo = new DebugProviderInfo();
 				providerInfo.AssetPath = provider.MainAssetInfo.AssetPath;

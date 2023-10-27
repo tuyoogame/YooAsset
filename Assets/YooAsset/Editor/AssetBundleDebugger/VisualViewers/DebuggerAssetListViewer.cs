@@ -224,7 +224,7 @@ namespace YooAsset.Editor
 
 			// Status
 			StyleColor textColor;
-			if (providerInfo.Status == ProviderBase.EStatus.Failed.ToString())
+			if (providerInfo.Status == EOperationStatus.Failed.ToString()) 
 				textColor = new StyleColor(Color.yellow);
 			else
 				textColor = label1.style.color;

@@ -5,15 +5,23 @@ using System.Threading.Tasks;
 
 namespace YooAsset
 {
-	public abstract class AsyncOperationBase : IEnumerator
+	public abstract class AsyncOperationBase : IEnumerator, IComparable<AsyncOperationBase>
 	{
 		// 用户请求的回调
 		private Action<AsyncOperationBase> _callback;
 
+		// 是否已经完成
+		internal bool IsFinish = false;
+		
 		/// <summary>
 		/// 所属包裹
 		/// </summary>
 		public string PackageName { private set; get; }
+
+		/// <summary>
+		/// 优先级
+		/// </summary>
+		public uint Priority { set; get; } = 0;
 
 		/// <summary>
 		/// 状态
@@ -80,7 +88,7 @@ namespace YooAsset
 		internal abstract void InternalOnUpdate();
 		internal virtual void InternalOnAbort() { }
 
-		internal void SetPackageName(string packageName)
+		internal void Init(string packageName)
 		{
 			PackageName = packageName;
 		}
@@ -91,8 +99,14 @@ namespace YooAsset
 		}
 		internal void SetFinish()
 		{
+			IsFinish = true;
+
+			// 进度百分百完成
 			Progress = 1f;
-			_callback?.Invoke(this); //注意：如果完成回调内发生异常，会导致Task无限期等待
+
+			//注意：如果完成回调内发生异常，会导致Task无限期等待
+			_callback?.Invoke(this);
+
 			if (_taskCompletionSource != null)
 				_taskCompletionSource.TrySetResult(null);
 		}
@@ -114,6 +128,13 @@ namespace YooAsset
 		{
 			_callback = null;
 		}
+
+		#region 排序接口实现
+		public int CompareTo(AsyncOperationBase other)
+		{
+			return other.Priority.CompareTo(this.Priority);
+		}
+		#endregion
 
 		#region 异步编程相关
 		bool IEnumerator.MoveNext()

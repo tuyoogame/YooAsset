@@ -146,7 +146,7 @@ namespace YooAsset
 				var editorSimulateModeImpl = new EditorSimulateModeImpl(PackageName);
 				_bundleQuery = editorSimulateModeImpl;
 				_playModeImpl = editorSimulateModeImpl;
-				_resourceMgr.Initialize(true, parameters.AutoDestroyAssetProvider, parameters.LoadingMaxTimeSlice, _bundleQuery);
+				_resourceMgr.Initialize(true, parameters.AutoDestroyAssetProvider, _bundleQuery);
 
 				var initializeParameters = parameters as EditorSimulateModeParameters;
 				initializeOperation = editorSimulateModeImpl.InitializeAsync(assist, initializeParameters.SimulateManifestFilePath);
@@ -156,7 +156,7 @@ namespace YooAsset
 				var offlinePlayModeImpl = new OfflinePlayModeImpl(PackageName);
 				_bundleQuery = offlinePlayModeImpl;
 				_playModeImpl = offlinePlayModeImpl;
-				_resourceMgr.Initialize(false, parameters.AutoDestroyAssetProvider, parameters.LoadingMaxTimeSlice, _bundleQuery);
+				_resourceMgr.Initialize(false, parameters.AutoDestroyAssetProvider, _bundleQuery);
 
 				var initializeParameters = parameters as OfflinePlayModeParameters;
 				initializeOperation = offlinePlayModeImpl.InitializeAsync(assist);
@@ -166,7 +166,7 @@ namespace YooAsset
 				var hostPlayModeImpl = new HostPlayModeImpl(PackageName);
 				_bundleQuery = hostPlayModeImpl;
 				_playModeImpl = hostPlayModeImpl;
-				_resourceMgr.Initialize(false, parameters.AutoDestroyAssetProvider, parameters.LoadingMaxTimeSlice, _bundleQuery);
+				_resourceMgr.Initialize(false, parameters.AutoDestroyAssetProvider, _bundleQuery);
 
 				var initializeParameters = parameters as HostPlayModeParameters;
 				initializeOperation = hostPlayModeImpl.InitializeAsync(assist,
@@ -179,7 +179,7 @@ namespace YooAsset
 				var webPlayModeImpl = new WebPlayModeImpl(PackageName);
 				_bundleQuery = webPlayModeImpl;
 				_playModeImpl = webPlayModeImpl;
-				_resourceMgr.Initialize(false, parameters.AutoDestroyAssetProvider, parameters.LoadingMaxTimeSlice, _bundleQuery);
+				_resourceMgr.Initialize(false, parameters.AutoDestroyAssetProvider, _bundleQuery);
 
 				var initializeParameters = parameters as WebPlayModeParameters;
 				initializeOperation = webPlayModeImpl.InitializeAsync(assist,
@@ -265,13 +265,6 @@ namespace YooAsset
 					throw new Exception($"{nameof(EPlayMode.WebPlayMode)} only support WebGL plateform !");
 				}
 #endif
-			}
-
-			// 检测参数范围
-			if (parameters.LoadingMaxTimeSlice < 10)
-			{
-				parameters.LoadingMaxTimeSlice = 10;
-				YooLogger.Warning($"{nameof(parameters.LoadingMaxTimeSlice)} minimum value is 10 milliseconds.");
 			}
 		}
 		private void InitializeOperation_Completed(AsyncOperationBase op)
@@ -566,6 +559,7 @@ namespace YooAsset
 		/// 异步加载原生文件
 		/// </summary>
 		/// <param name="assetInfo">资源信息</param>
+		/// <param name="priority">加载的优先级</param>
 		public RawFileHandle LoadRawFileAsync(AssetInfo assetInfo, uint priority = 0)
 		{
 			DebugCheckInitialize();
@@ -576,6 +570,7 @@ namespace YooAsset
 		/// 异步加载原生文件
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
+		/// <param name="priority">加载的优先级</param>
 		public RawFileHandle LoadRawFileAsync(string location, uint priority = 0)
 		{
 			DebugCheckInitialize();
@@ -601,8 +596,8 @@ namespace YooAsset
 		/// <param name="location">场景的定位地址</param>
 		/// <param name="sceneMode">场景加载模式</param>
 		/// <param name="suspendLoad">场景加载到90%自动挂起</param>
-		/// <param name="priority">优先级</param>
-		public SceneHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, uint priority = 100)
+		/// <param name="priority">加载的优先级</param>
+		public SceneHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, uint priority = 0)
 		{
 			DebugCheckInitialize();
 			AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
@@ -616,8 +611,8 @@ namespace YooAsset
 		/// <param name="assetInfo">场景的资源信息</param>
 		/// <param name="sceneMode">场景加载模式</param>
 		/// <param name="suspendLoad">场景加载到90%自动挂起</param>
-		/// <param name="priority">优先级</param>
-		public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, uint priority = 100)
+		/// <param name="priority">加载的优先级</param>
+		public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, uint priority = 0)
 		{
 			DebugCheckInitialize();
 			var handle = _resourceMgr.LoadSceneAsync(assetInfo, sceneMode, suspendLoad, priority);
@@ -677,6 +672,7 @@ namespace YooAsset
 		/// 异步加载资源对象
 		/// </summary>
 		/// <param name="assetInfo">资源信息</param>
+		/// <param name="priority">加载的优先级</param>
 		public AssetHandle LoadAssetAsync(AssetInfo assetInfo, uint priority = 0)
 		{
 			DebugCheckInitialize();
@@ -688,6 +684,7 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
+		/// <param name="priority">加载的优先级</param>
 		public AssetHandle LoadAssetAsync<TObject>(string location, uint priority = 0) where TObject : UnityEngine.Object
 		{
 			DebugCheckInitialize();
@@ -700,6 +697,7 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
 		/// <param name="type">资源类型</param>
+		/// <param name="priority">加载的优先级</param>
 		public AssetHandle LoadAssetAsync(string location, System.Type type, uint priority = 0)
 		{
 			DebugCheckInitialize();
@@ -711,6 +709,7 @@ namespace YooAsset
 		/// 异步加载资源对象
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
+		/// <param name="priority">加载的优先级</param>
 		public AssetHandle LoadAssetAsync(string location, uint priority = 0)
 		{
 			DebugCheckInitialize();
@@ -783,6 +782,7 @@ namespace YooAsset
 		/// 异步加载子资源对象
 		/// </summary>
 		/// <param name="assetInfo">资源信息</param>
+		/// <param name="priority">加载的优先级</param>
 		public SubAssetsHandle LoadSubAssetsAsync(AssetInfo assetInfo, uint priority = 0)
 		{
 			DebugCheckInitialize();
@@ -794,6 +794,7 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
+		/// <param name="priority">加载的优先级</param>
 		public SubAssetsHandle LoadSubAssetsAsync<TObject>(string location, uint priority = 0) where TObject : UnityEngine.Object
 		{
 			DebugCheckInitialize();
@@ -806,6 +807,7 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
 		/// <param name="type">子对象类型</param>
+		/// <param name="priority">加载的优先级</param>
 		public SubAssetsHandle LoadSubAssetsAsync(string location, System.Type type, uint priority = 0)
 		{
 			DebugCheckInitialize();
@@ -817,6 +819,7 @@ namespace YooAsset
 		/// 异步加载子资源对象
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
+		/// <param name="priority">加载的优先级</param>
 		public SubAssetsHandle LoadSubAssetsAsync(string location, uint priority = 0)
 		{
 			DebugCheckInitialize();
@@ -889,6 +892,7 @@ namespace YooAsset
 		/// 异步加载资源包内所有资源对象
 		/// </summary>
 		/// <param name="assetInfo">资源信息</param>
+		/// <param name="priority">加载的优先级</param>
 		public AllAssetsHandle LoadAllAssetsAsync(AssetInfo assetInfo, uint priority = 0)
 		{
 			DebugCheckInitialize();
@@ -900,6 +904,7 @@ namespace YooAsset
 		/// </summary>
 		/// <typeparam name="TObject">资源类型</typeparam>
 		/// <param name="location">资源的定位地址</param>
+		/// <param name="priority">加载的优先级</param>
 		public AllAssetsHandle LoadAllAssetsAsync<TObject>(string location, uint priority = 0) where TObject : UnityEngine.Object
 		{
 			DebugCheckInitialize();
@@ -912,6 +917,7 @@ namespace YooAsset
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
 		/// <param name="type">子对象类型</param>
+		/// <param name="priority">加载的优先级</param>
 		public AllAssetsHandle LoadAllAssetsAsync(string location, System.Type type, uint priority = 0)
 		{
 			DebugCheckInitialize();
@@ -923,6 +929,7 @@ namespace YooAsset
 		/// 异步加载资源包内所有资源对象
 		/// </summary>
 		/// <param name="location">资源的定位地址</param>
+		/// <param name="priority">加载的优先级</param>
 		public AllAssetsHandle LoadAllAssetsAsync(string location, uint priority = 0)
 		{
 			DebugCheckInitialize();

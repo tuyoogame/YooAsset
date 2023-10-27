@@ -3,23 +3,25 @@ namespace YooAsset
 {
 	internal class BundledRawFileProvider : ProviderBase
 	{
-		public BundledRawFileProvider(ResourceManager manager, string providerGUID, uint providerPriority, AssetInfo assetInfo) : base(manager, providerGUID, providerPriority, assetInfo)
+		public BundledRawFileProvider(ResourceManager manager, string providerGUID, AssetInfo assetInfo) : base(manager, providerGUID, assetInfo)
 		{
 		}
-		public override void Update()
+		internal override void InternalOnStart()
 		{
 			DebugBeginRecording();
-
+		}
+		internal override void InternalOnUpdate()
+		{
 			if (IsDone)
 				return;
 
-			if (Status == EStatus.None)
+			if (_steps == ESteps.None)
 			{
-				Status = EStatus.CheckBundle;
+				_steps = ESteps.CheckBundle;
 			}
 
 			// 1. 检测资源包
-			if (Status == EStatus.CheckBundle)
+			if (_steps == ESteps.CheckBundle)
 			{
 				if (IsWaitForAsyncComplete)
 				{
@@ -31,21 +33,19 @@ namespace YooAsset
 
 				if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
 				{
-					Status = EStatus.Failed;
-					LastError = OwnerBundle.LastError;
-					InvokeCompletion();
+					string error = OwnerBundle.LastError;
+					InvokeCompletion(error, EOperationStatus.Failed);
 					return;
 				}
 
-				Status = EStatus.Checking;
+				_steps = ESteps.Checking;
 			}
 
 			// 2. 检测加载结果
-			if (Status == EStatus.Checking)
+			if (_steps == ESteps.Checking)
 			{
 				RawFilePath = OwnerBundle.FileLoadPath;
-				Status = EStatus.Succeed;
-				InvokeCompletion();
+				InvokeCompletion(string.Empty, EOperationStatus.Succeed);
 			}
 		}
 	}

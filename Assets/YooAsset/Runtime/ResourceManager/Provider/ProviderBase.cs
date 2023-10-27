@@ -6,27 +6,21 @@ using System;
 
 namespace YooAsset
 {
-	internal abstract class ProviderBase : IComparable<ProviderBase>
+	internal abstract class ProviderBase : AsyncOperationBase
 	{
-		public enum EStatus
+		protected enum ESteps
 		{
 			None = 0,
 			CheckBundle,
 			Loading,
 			Checking,
-			Succeed,
-			Failed,
+			Done,
 		}
 
 		/// <summary>
 		/// 资源提供者唯一标识符
 		/// </summary>
 		public string ProviderGUID { private set; get; }
-
-		/// <summary>
-		/// 资源加载的优先级
-		/// </summary>
-		public uint ProviderPriority { private set; get; }
 
 		/// <summary>
 		/// 所属资源系统
@@ -63,22 +57,6 @@ namespace YooAsset
 		/// </summary>
 		public string RawFilePath { protected set; get; }
 
-
-		/// <summary>
-		/// 当前的加载状态
-		/// </summary>
-		public EStatus Status { protected set; get; } = EStatus.None;
-
-		/// <summary>
-		/// 最近的错误信息
-		/// </summary>
-		public string LastError { protected set; get; } = string.Empty;
-
-		/// <summary>
-		/// 加载进度
-		/// </summary>
-		public float Progress { protected set; get; } = 0f;
-
 		/// <summary>
 		/// 引用计数
 		/// </summary>
@@ -89,18 +67,8 @@ namespace YooAsset
 		/// </summary>
 		public bool IsDestroyed { private set; get; } = false;
 
-		/// <summary>
-		/// 是否完毕（成功或失败）
-		/// </summary>
-		public bool IsDone
-		{
-			get
-			{
-				return Status == EStatus.Succeed || Status == EStatus.Failed;
-			}
-		}
 
-
+		protected ESteps _steps = ESteps.None;
 		protected BundleLoaderBase OwnerBundle { private set; get; }
 		protected DependAssetBundles DependBundles { private set; get; }
 		protected bool IsWaitForAsyncComplete { private set; get; } = false;
@@ -108,11 +76,10 @@ namespace YooAsset
 		private readonly List<HandleBase> _handles = new List<HandleBase>();
 
 
-		public ProviderBase(ResourceManager manager, string providerGUID, uint providerPriority, AssetInfo assetInfo)
+		public ProviderBase(ResourceManager manager, string providerGUID, AssetInfo assetInfo)
 		{
 			ResourceMgr = manager;
 			ProviderGUID = providerGUID;
-			ProviderPriority = providerPriority;
 			MainAssetInfo = assetInfo;
 
 			// 创建资源包加载器
@@ -129,16 +96,18 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 轮询更新方法
-		/// </summary>
-		public abstract void Update();
-
-		/// <summary>
 		/// 销毁资源提供者
 		/// </summary>
 		public void Destroy()
 		{
 			IsDestroyed = true;
+
+			// 检测是否为正常销毁
+			if (IsDone == false)
+			{
+				Error = "User abort !";
+				Status = EOperationStatus.Failed;
+			}
 
 			// 释放资源包加载器
 			if (OwnerBundle != null)
@@ -159,7 +128,7 @@ namespace YooAsset
 		public bool CanDestroy()
 		{
 			// 注意：在进行资源加载过程时不可以销毁
-			if (Status == EStatus.Loading || Status == EStatus.Checking)
+			if (_steps == ESteps.Loading || _steps == ESteps.Checking)
 				return false;
 
 			return RefCount <= 0;
@@ -226,7 +195,7 @@ namespace YooAsset
 			IsWaitForAsyncComplete = true;
 
 			// 注意：主动轮询更新完成同步加载
-			Update();
+			InternalOnUpdate();
 
 			// 验证结果
 			if (IsDone == false)
@@ -244,7 +213,7 @@ namespace YooAsset
 
 			// 注意：主动轮询更新完成同步加载
 			// 说明：如果资源包未准备完毕也可以放心销毁。
-			Update();
+			InternalOnUpdate();
 		}
 
 		/// <summary>
@@ -255,44 +224,21 @@ namespace YooAsset
 			if (OwnerBundle.IsDestroyed)
 				throw new System.Exception("Should never get here !");
 
-			Status = EStatus.Failed;
-			LastError = $"The bundle {OwnerBundle.MainBundleInfo.Bundle.BundleName} has been destroyed by unity bugs !";
-			YooLogger.Error(LastError);
-			InvokeCompletion();
+			string error = $"The bundle {OwnerBundle.MainBundleInfo.Bundle.BundleName} has been destroyed by unity bugs !";
+			YooLogger.Error(error);
+			InvokeCompletion(Error, EOperationStatus.Failed);
 		}
 
 		/// <summary>
-		/// 异步操作任务
+		/// 结束流程
 		/// </summary>
-		public Task Task
-		{
-			get
-			{
-				if (_taskCompletionSource == null)
-				{
-					_taskCompletionSource = new TaskCompletionSource<object>();
-					if (IsDone)
-						_taskCompletionSource.SetResult(null);
-				}
-				return _taskCompletionSource.Task;
-			}
-		}
-
-		#region 排序接口实现
-		public int CompareTo(ProviderBase other)
-		{
-			return other.ProviderPriority.CompareTo(this.ProviderPriority);
-		}
-		#endregion
-
-		#region 异步编程相关
-		private TaskCompletionSource<object> _taskCompletionSource;
-		protected void InvokeCompletion()
+		protected void InvokeCompletion(string error, EOperationStatus status)
 		{
 			DebugEndRecording();
 
-			// 进度百分百完成
-			Progress = 1f;
+			_steps = ESteps.Done;
+			Error = error;
+			Status = status;
 
 			// 注意：创建临时列表是为了防止外部逻辑在回调函数内创建或者释放资源句柄。
 			// 注意：回调方法如果发生异常，会阻断列表里的后续回调方法！
@@ -304,11 +250,7 @@ namespace YooAsset
 					hande.InvokeCallback();
 				}
 			}
-
-			if (_taskCompletionSource != null)
-				_taskCompletionSource.TrySetResult(null);
 		}
-		#endregion
 
 		#region 调试信息相关
 		/// <summary>
