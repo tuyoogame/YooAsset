@@ -61,15 +61,6 @@ namespace YooAsset
 		/// </summary>
 		public void UnloadUnusedAssets()
 		{
-			// 注意：资源包之间可能存在多层深层嵌套，需要多次循环释放。
-			int loopCount = 10;
-			for (int i = 0; i < loopCount; i++)
-			{
-				UnloadUnusedAssetsInternal();
-			}
-		}
-		private void UnloadUnusedAssetsInternal()
-		{
 			for (int i = _loaderList.Count - 1; i >= 0; i--)
 			{
 				BundleLoaderBase loader = _loaderList[i];
