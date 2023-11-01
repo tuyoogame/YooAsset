@@ -29,7 +29,8 @@ namespace YooAsset.Editor
 		CharactersOverTheLimit = 400,
 		NotFoundUnityBundleHash = 401,
 		NotFoundUnityBundleCRC = 402,
-
+		BundleTempSizeIsZero = 403,
+		
 		// TaskVerifyBuildResult
 		UnintendedBuildBundle = 500,
 		UnintendedBuildResult = 501,

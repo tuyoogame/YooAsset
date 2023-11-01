@@ -29,7 +29,7 @@ namespace YooAsset.Editor
 				if (hash.isValid)
 				{
 					return hash.ToString();
-				}				
+				}
 				else
 				{
 					string message = BuildLogger.GetErrorMessage(ErrorCode.NotFoundUnityBundleHash, $"Not found unity bundle hash : {bundleInfo.BundleName}");
@@ -57,30 +57,33 @@ namespace YooAsset.Editor
 				{
 					string message = BuildLogger.GetErrorMessage(ErrorCode.NotFoundUnityBundleCRC, $"Not found unity bundle crc : {bundleInfo.BundleName}");
 					throw new Exception(message);
-				}	
+				}
 			}
 		}
-		protected override string GetBundleFileHash(string filePath, BuildParametersContext buildParametersContext)
+		protected override string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
 		{
+			string filePath = bundleInfo.PackageSourceFilePath;
 			var buildMode = buildParametersContext.Parameters.BuildMode;
 			if (buildMode == EBuildMode.DryRunBuild || buildMode == EBuildMode.SimulateBuild)
 				return GetFilePathTempHash(filePath);
 			else
 				return HashUtility.FileMD5(filePath);
 		}
-		protected override string GetBundleFileCRC(string filePath, BuildParametersContext buildParametersContext)
+		protected override string GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
 		{
+			string filePath = bundleInfo.PackageSourceFilePath;
 			var buildMode = buildParametersContext.Parameters.BuildMode;
 			if (buildMode == EBuildMode.DryRunBuild || buildMode == EBuildMode.SimulateBuild)
 				return "00000000"; //8位
 			else
 				return HashUtility.FileCRC32(filePath);
 		}
-		protected override long GetBundleFileSize(string filePath, BuildParametersContext buildParametersContext)
+		protected override long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
 		{
+			string filePath = bundleInfo.PackageSourceFilePath;
 			var buildMode = buildParametersContext.Parameters.BuildMode;
 			if (buildMode == EBuildMode.DryRunBuild || buildMode == EBuildMode.SimulateBuild)
-				return 0;
+				return GetBundleTempSize(bundleInfo);
 			else
 				return FileUtility.GetFileSize(filePath);
 		}
