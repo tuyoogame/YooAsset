@@ -12,7 +12,8 @@ namespace YooAsset
 		public ulong DownloadedBytes { private set; get; }
 		public string RequestNetError { private set; get; }
 		public long RequestHttpCode { private set; get; }
-
+		
+		public FileGeneralRequest() { }
 		public void Create(string requestURL, BundleInfo bundleInfo, params object[] args)
 		{
 			if (Status != ERequestStatus.None)

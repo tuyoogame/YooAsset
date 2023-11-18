@@ -8,14 +8,15 @@ namespace YooAsset
 		private string _tempFilePath;
 		private UnityWebRequest _webRequest;
 		private DownloadHandlerFileRange _downloadHandle;
-		private ulong _fileOriginLength;
+		private ulong _fileOriginLength = 0;
 
 		public ERequestStatus Status { private set; get; } = ERequestStatus.None;
 		public float DownloadProgress { private set; get; }
 		public ulong DownloadedBytes { private set; get; }
 		public string RequestNetError { private set; get; }
 		public long RequestHttpCode { private set; get; }
-
+		
+		public FileResumeRequest() { }
 		public void Create(string requestURL, BundleInfo bundleInfo, params object[] args)
 		{
 			if (Status != ERequestStatus.None)
