@@ -208,11 +208,17 @@ namespace YooAsset
 		{
 			if (_bundleInfoList != null)
 			{
+				TotalDownloadBytes = 0;
 				TotalDownloadCount = _bundleInfoList.Count;
 				foreach (var packageBundle in _bundleInfoList)
 				{
 					TotalDownloadBytes += packageBundle.Bundle.FileSize;
 				}
+			}
+			else
+			{
+				TotalDownloadBytes = 0;
+				TotalDownloadCount = 0;
 			}
 		}
 
@@ -255,7 +261,7 @@ namespace YooAsset
 			// 重新统计下载信息
 			CalculatDownloaderInfo();
 		}
-		
+
 		/// <summary>
 		/// 开始下载
 		/// </summary>
