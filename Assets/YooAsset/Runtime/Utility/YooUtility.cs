@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -180,7 +180,18 @@ namespace YooAsset
 		{
 			return _loadFileServices.GetFileSize(filePath);
 		}
-	}
+
+        /// <summary>
+        /// 创建文件的文件夹路径
+        /// </summary>
+        public static void CreateFileDirectory(string filePath)
+        {
+            // 获取文件的文件夹路径
+            string directory = Path.GetDirectoryName(filePath);
+            if (Directory.Exists(directory) == false)
+                Directory.CreateDirectory(directory);
+        }
+    }
 
 	/// <summary>
 	/// 哈希工具类

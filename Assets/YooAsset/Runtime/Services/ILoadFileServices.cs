@@ -10,52 +10,52 @@ namespace YooAsset
     public interface ILoadFileServices
     {
         /// <summary>
-        /// ÅĞ¶ÏÎÄ¼şÊÇ·ñ´æÔÚ
+        /// åˆ¤æ–­æ–‡ä»¶æ˜¯å¦å­˜åœ¨
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public bool Exists( string filePath);
+        public bool Exists(string filePath);
 
         /// <summary>
-        /// ¶ÁÈ¡ÎÄ¼şÄÚÈİ byte[]
+        /// è¯»å–æ–‡ä»¶å†…å®¹ byte[]
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public byte[] ReadAllBytes( string filePath );
+        public byte[] ReadAllBytes(string filePath);
 
         /// <summary>
-        /// ¶ÁÈ¡ÎÄ¼şÄÚÈİ string
+        /// è¯»å–æ–‡ä»¶å†…å®¹ string
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public string ReadAllText( string filePath );
+        public string ReadAllText(string filePath);
 
         /// <summary>
-        /// Ğ´Èëbytes
+        /// å†™å…¥bytes
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="data"></param>
-        public void WriteAllBytes( string filePath, byte[] data );
+        public void WriteAllBytes(string filePath, byte[] data);
 
         /// <summary>
-        /// Ğ´ÈëÎÄ±¾
+        /// å†™å…¥æ–‡æœ¬
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="text"></param>
-        public void WriteAllText( string filePath, string text );
+        public void WriteAllText(string filePath, string text);
 
         /// <summary>
-        /// »ñÈ¡ÎÄ¼ş´óĞ¡
+        /// è·å–æ–‡ä»¶å¤§å°
         /// </summary>
         /// <param name="filePath"></param>
-        public long GetFileSize( string filePath );
+        public long GetFileSize(string filePath);
     }
 
     internal class DefaultLoadFileServices : ILoadFileServices
     {
         public bool Exists(string filePath)
         {
-            return File.Exists( filePath);
+            return File.Exists(filePath);
         }
 
         public long GetFileSize(string filePath)
@@ -80,31 +80,21 @@ namespace YooAsset
 
         public void WriteAllBytes(string filePath, byte[] data)
         {
-            // ´´½¨ÎÄ¼ş¼ĞÂ·¾¶
-            CreateFileDirectory(filePath);
+            // åˆ›å»ºæ–‡ä»¶å¤¹è·¯å¾„
+            FileUtility.CreateFileDirectory(filePath);
 
             File.WriteAllBytes(filePath, data);
         }
 
         public void WriteAllText(string filePath, string content)
         {
-            // ´´½¨ÎÄ¼ş¼ĞÂ·¾¶
-            CreateFileDirectory(filePath);
-            //±ÜÃâĞ´ÈëBOM±ê¼Ç
+            // åˆ›å»ºæ–‡ä»¶å¤¹è·¯å¾„
+            FileUtility.CreateFileDirectory(filePath);
+            //é¿å…å†™å…¥BOMæ ‡è®°
             byte[] bytes = Encoding.UTF8.GetBytes(content);
             File.WriteAllBytes(filePath, bytes);
         }
 
-        /// <summary>
-        /// ´´½¨ÎÄ¼şµÄÎÄ¼ş¼ĞÂ·¾¶
-        /// </summary>
-        public static void CreateFileDirectory(string filePath)
-        {
-            // »ñÈ¡ÎÄ¼şµÄÎÄ¼ş¼ĞÂ·¾¶
-            string directory = Path.GetDirectoryName(filePath);
-            if (Directory.Exists(directory) == false)
-                Directory.CreateDirectory(directory);
-        }
     }
 }
 
