@@ -50,20 +50,21 @@ namespace YooAsset
 					FileLoadPath = MainBundleInfo.CachedDataFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
-				{
+                {
 #if UNITY_ANDROID
-					if (MainBundleInfo.Bundle.Encrypted)
-					{
-						_steps = ESteps.Unpack;
-						FileLoadPath = MainBundleInfo.CachedDataFilePath;
-					}
-					else
-					{
-						_steps = ESteps.LoadBundleFile;
-						FileLoadPath = MainBundleInfo.BuildinFilePath;
-					}
+					// 如果文件已经加密 && 无法判断文件存 那么需要进行解压操作
+                    if (MainBundleInfo.Bundle.Encrypted && !FileUtility.Exists(MainBundleInfo.BuildinFilePath))
+                    {
+                        _steps = ESteps.Unpack;
+                        FileLoadPath = MainBundleInfo.CachedDataFilePath;
+                    }
+                    else
+                    {
+                        _steps = ESteps.LoadBundleFile;
+                        FileLoadPath = MainBundleInfo.BuildinFilePath;
+                    }
 #else
-					_steps = ESteps.LoadBundleFile;
+                    _steps = ESteps.LoadBundleFile;
 					FileLoadPath = MainBundleInfo.BuildinFilePath;
 #endif
 				}
