@@ -91,7 +91,7 @@ internal class FsmInitializePackage : IStateNode
 		}
 		else
 		{
-			var version = package.GetPackageVersion();
+			var version = initializationOperation.PackageVersion;
 			Debug.Log($"Init resource package version : {version}");
 			_machine.ChangeState<FsmUpdatePackageVersion>();
 		}
