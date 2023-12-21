@@ -8,7 +8,7 @@ using UnityEngine;
 public class BuildinFileManifest : ScriptableObject
 {
     [Serializable]
-	public class Element
+    public class Element
     {
         public string PackageName;
         public string FileName;

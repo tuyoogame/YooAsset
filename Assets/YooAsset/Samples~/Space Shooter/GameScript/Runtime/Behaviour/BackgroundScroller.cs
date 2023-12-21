@@ -3,19 +3,19 @@ using UnityEngine;
 
 public class BackgroundScroller : MonoBehaviour
 {
-	public float ScrollSpeed;
-	public float TileSizeZ;
+    public float ScrollSpeed;
+    public float TileSizeZ;
 
-	private Vector3 _startPosition;
+    private Vector3 _startPosition;
 
-	void Start ()
-	{
-		_startPosition = transform.position;
-	}
+    void Start ()
+    {
+        _startPosition = transform.position;
+    }
 
-	void Update ()
-	{
-		float newPosition = Mathf.Repeat(Time.time * ScrollSpeed, TileSizeZ);
-		this.transform.position = _startPosition + Vector3.forward * newPosition;
-	}
+    void Update ()
+    {
+        float newPosition = Mathf.Repeat(Time.time * ScrollSpeed, TileSizeZ);
+        this.transform.position = _startPosition + Vector3.forward * newPosition;
+    }
 }
