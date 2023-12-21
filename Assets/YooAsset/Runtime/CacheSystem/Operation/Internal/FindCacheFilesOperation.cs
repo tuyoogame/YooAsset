@@ -90,12 +90,19 @@ namespace YooAsset
 					string fileRootPath = chidDirectory.FullName;
 					string dataFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleDataFileName}";
 					string infoFilePath = $"{fileRootPath}/{ YooAssetSettings.CacheBundleInfoFileName}";
+					string dataFileExtension = FindDataFileExtension(chidDirectory);
+
+					// 跳过断点续传的临时文件
+					if (dataFileExtension == ".temp")
+						continue;
+
+					// 注意：根据配置需求数据文件会带文件格式
 					if (_persistent.AppendFileExtension)
 					{
-						string fileExtension = FindFileExtension(chidDirectory);
-						if (string.IsNullOrEmpty(fileExtension) == false)
-							dataFilePath += fileExtension;
+						if (string.IsNullOrEmpty(dataFileExtension) == false)
+							dataFilePath += dataFileExtension;
 					}
+
 					VerifyCacheFileElement element = new VerifyCacheFileElement(_cache.PackageName, cacheGUID, fileRootPath, dataFilePath, infoFilePath);
 					VerifyElements.Add(element);
 				}
@@ -106,14 +113,12 @@ namespace YooAsset
 
 			return isFindItem;
 		}
-		private string FindFileExtension(DirectoryInfo directoryInfo)
+		private string FindDataFileExtension(DirectoryInfo directoryInfo)
 		{
 			string dataFileExtension = string.Empty;
 			var fileInfos = directoryInfo.GetFiles();
 			foreach (var fileInfo in fileInfos)
 			{
-				if (fileInfo.Extension == ".temp")
-					continue;
 				if (fileInfo.Name.StartsWith(YooAssetSettings.CacheBundleDataFileName))
 				{
 					dataFileExtension = fileInfo.Extension;
