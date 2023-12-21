@@ -59,16 +59,16 @@ namespace YooAsset
                 Status = ERequestStatus.Success;
             }
 #else
-			RequestHttpCode = _webRequest.responseCode;
-			if (_webRequest.isNetworkError || _webRequest.isHttpError)
-			{
-				RequestNetError = _webRequest.error;
-				Status = ERequestStatus.Error;
-			}
-			else
-			{
-				Status = ERequestStatus.Success;
-			}
+            RequestHttpCode = _webRequest.responseCode;
+            if (_webRequest.isNetworkError || _webRequest.isHttpError)
+            {
+                RequestNetError = _webRequest.error;
+                Status = ERequestStatus.Error;
+            }
+            else
+            {
+                Status = ERequestStatus.Success;
+            }
 #endif
 
             // 最终释放下载器

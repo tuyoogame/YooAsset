@@ -13,7 +13,7 @@ namespace YooAsset
         public static VerifyTempFileOperation CreateOperation(VerifyTempFileElement element)
         {
 #if UNITY_WEBGL
-			var operation = new VerifyTempFileWithoutThreadOperation(element);
+            var operation = new VerifyTempFileWithoutThreadOperation(element);
 #else
             var operation = new VerifyTempFileWithThreadOperation(element);
 #endif

@@ -100,17 +100,17 @@ namespace YooAsset
             DownloaderBase newDownloader = null;
             YooLogger.Log($"Beginning to download bundle : {bundleInfo.Bundle.BundleName} URL : {bundleInfo.RemoteMainURL}");
 #if UNITY_WEBGL
-			if (bundleInfo.Bundle.Buildpipeline == EDefaultBuildPipeline.RawFileBuildPipeline.ToString())
-			{
-				FileUtility.CreateFileDirectory(bundleInfo.CachedDataFilePath);
-				System.Type requesterType = typeof(FileGeneralRequest);
-				newDownloader = new FileDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
-			}
-			else
-			{
-				System.Type requesterType = typeof(AssetBundleWebRequest);
-				newDownloader = new WebDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
-			}
+            if (bundleInfo.Bundle.Buildpipeline == EDefaultBuildPipeline.RawFileBuildPipeline.ToString())
+            {
+                FileUtility.CreateFileDirectory(bundleInfo.CachedDataFilePath);
+                System.Type requesterType = typeof(FileGeneralRequest);
+                newDownloader = new FileDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
+            }
+            else
+            {
+                System.Type requesterType = typeof(AssetBundleWebRequest);
+                newDownloader = new WebDownloader(bundleInfo, requesterType, failedTryAgain, timeout);
+            }
 #else
             FileUtility.CreateFileDirectory(bundleInfo.CachedDataFilePath);
             bool resumeDownload = bundleInfo.Bundle.FileSize >= _breakpointResumeFileSize;

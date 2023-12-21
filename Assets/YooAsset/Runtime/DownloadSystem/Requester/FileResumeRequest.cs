@@ -48,8 +48,8 @@ namespace YooAsset
             var handler = new DownloadHandlerFile(_tempFilePath, true);
             handler.removeFileOnAbort = false;
 #else
-			var handler = new DownloadHandlerFileRange(tempFilePath, _bundleInfo.Bundle.FileSize, _webRequest);
-			_downloadHandle = handler;
+            var handler = new DownloadHandlerFileRange(tempFilePath, _bundleInfo.Bundle.FileSize, _webRequest);
+            _downloadHandle = handler;
 #endif
             _webRequest.downloadHandler = handler;
             _webRequest.disposeDownloadHandlerOnDispose = true;
@@ -83,16 +83,16 @@ namespace YooAsset
                 Status = ERequestStatus.Success;
             }
 #else
-			RequestHttpCode = _webRequest.responseCode;
-			if (_webRequest.isNetworkError || _webRequest.isHttpError)
-			{
-				RequestNetError = _webRequest.error;
-				Status = ERequestStatus.Error;
-			}
-			else
-			{
-				Status = ERequestStatus.Success;
-			}
+            RequestHttpCode = _webRequest.responseCode;
+            if (_webRequest.isNetworkError || _webRequest.isHttpError)
+            {
+                RequestNetError = _webRequest.error;
+                Status = ERequestStatus.Error;
+            }
+            else
+            {
+                Status = ERequestStatus.Success;
+            }
 #endif
 
             // 注意：下载断点续传文件发生特殊错误码之后删除文件

@@ -68,9 +68,9 @@ namespace YooAsset
             projectPath = PathUtility.RegularPath(projectPath);
             return PathUtility.Combine(projectPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
 #elif UNITY_STANDALONE
-			return PathUtility.Combine(UnityEngine.Application.dataPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
+            return PathUtility.Combine(UnityEngine.Application.dataPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
 #else
-			return PathUtility.Combine(UnityEngine.Application.persistentDataPath, YooAssetSettingsData.Setting.DefaultYooFolderName);	
+            return PathUtility.Combine(UnityEngine.Application.persistentDataPath, YooAssetSettingsData.Setting.DefaultYooFolderName);	
 #endif
         }
 

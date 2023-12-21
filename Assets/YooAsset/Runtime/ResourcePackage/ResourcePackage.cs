@@ -214,8 +214,8 @@ namespace YooAsset
                 throw new Exception($"{nameof(ResourcePackage)} create parameters is null.");
 
 #if !UNITY_EDITOR
-			if (parameters is EditorSimulateModeParameters)
-				throw new Exception($"Editor simulate mode only support unity editor.");
+            if (parameters is EditorSimulateModeParameters)
+                throw new Exception($"Editor simulate mode only support unity editor.");
 #endif
 
             if (parameters is EditorSimulateModeParameters)
@@ -255,10 +255,10 @@ namespace YooAsset
             if (_playMode != EPlayMode.EditorSimulateMode)
             {
 #if UNITY_WEBGL
-				if (_playMode != EPlayMode.WebPlayMode)
-				{
-					throw new Exception($"{_playMode} can not support WebGL plateform ! Please use {nameof(EPlayMode.WebPlayMode)}");
-				}
+                if (_playMode != EPlayMode.WebPlayMode)
+                {
+                    throw new Exception($"{_playMode} can not support WebGL plateform ! Please use {nameof(EPlayMode.WebPlayMode)}");
+                }
 #else
                 if (_playMode == EPlayMode.WebPlayMode)
                 {

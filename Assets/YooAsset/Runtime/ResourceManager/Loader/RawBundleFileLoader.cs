@@ -45,8 +45,8 @@ namespace YooAsset
                     _steps = ESteps.Unpack;
                     FileLoadPath = MainBundleInfo.CachedDataFilePath;
 #else
-					_steps = ESteps.CheckFile;
-					FileLoadPath = MainBundleInfo.BuildinFilePath;
+                    _steps = ESteps.CheckFile;
+                    FileLoadPath = MainBundleInfo.BuildinFilePath;
 #endif
                 }
                 else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)

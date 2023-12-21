@@ -71,10 +71,10 @@ namespace YooAsset
 #if UNITY_2020_3_OR_NEWER
             return _webRequest.result != UnityWebRequest.Result.Success;
 #else
-			if (_webRequest.isNetworkError || _webRequest.isHttpError)
-				return true;
-			else
-				return false;
+            if (_webRequest.isNetworkError || _webRequest.isHttpError)
+                return true;
+            else
+                return false;
 #endif
         }
 

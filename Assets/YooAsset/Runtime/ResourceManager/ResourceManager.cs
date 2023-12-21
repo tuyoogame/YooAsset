@@ -131,7 +131,7 @@ namespace YooAsset
         public void ForceUnloadAllAssets()
         {
 #if UNITY_WEBGL
-			throw new Exception($"WebGL not support invoke {nameof(ForceUnloadAllAssets)}");
+            throw new Exception($"WebGL not support invoke {nameof(ForceUnloadAllAssets)}");
 #else
             // 注意：因为场景无法异步转同步，需要等待所有场景加载完毕！
             foreach (var sceneHandlePair in _sceneHandles)
@@ -429,10 +429,10 @@ namespace YooAsset
             else
             {
 #if UNITY_WEBGL
-				if (bundleInfo.Bundle.Buildpipeline== EDefaultBuildPipeline.RawFileBuildPipeline.ToString())
-					loader = new RawBundleWebLoader(this, bundleInfo);
-				else
-					loader = new AssetBundleWebLoader(this, bundleInfo);
+                if (bundleInfo.Bundle.Buildpipeline== EDefaultBuildPipeline.RawFileBuildPipeline.ToString())
+                    loader = new RawBundleWebLoader(this, bundleInfo);
+                else
+                    loader = new AssetBundleWebLoader(this, bundleInfo);
 #else
                 if (bundleInfo.Bundle.Buildpipeline == EDefaultBuildPipeline.RawFileBuildPipeline.ToString())
                     loader = new RawBundleFileLoader(this, bundleInfo);

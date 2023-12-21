@@ -11,7 +11,7 @@ namespace YooAsset
         public static VerifyCacheFilesOperation CreateOperation(CacheManager cache, List<VerifyCacheFileElement> elements)
         {
 #if UNITY_WEBGL
-			var operation = new VerifyCacheFilesWithoutThreadOperation(cache, elements);
+            var operation = new VerifyCacheFilesWithoutThreadOperation(cache, elements);
 #else
             var operation = new VerifyCacheFilesWithThreadOperation(cache, elements);
 #endif
