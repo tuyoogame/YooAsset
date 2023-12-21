@@ -5,25 +5,25 @@ using UnityEngine.Networking.PlayerConnection;
 
 namespace YooAsset
 {
-	internal class RemoteDebuggerInRuntime : MonoBehaviour
-	{
+    internal class RemoteDebuggerInRuntime : MonoBehaviour
+    {
 #if UNITY_EDITOR
-		/// <summary>
-		/// 编辑器下获取报告的回调
-		/// </summary>
-		public static Action<int, DebugReport> EditorHandleDebugReportCallback;
+        /// <summary>
+        /// 编辑器下获取报告的回调
+        /// </summary>
+        public static Action<int, DebugReport> EditorHandleDebugReportCallback;
 
-		/// <summary>
-		/// 编辑器下请求报告数据
-		/// </summary>
-		public static void EditorRequestDebugReport()
-		{
-			if(UnityEditor.EditorApplication.isPlaying)
-			{
-				var report = YooAssets.GetDebugReport();
-				EditorHandleDebugReportCallback?.Invoke(0, report);
-			}
-		}
+        /// <summary>
+        /// 编辑器下请求报告数据
+        /// </summary>
+        public static void EditorRequestDebugReport()
+        {
+            if (UnityEditor.EditorApplication.isPlaying)
+            {
+                var report = YooAssets.GetDebugReport();
+                EditorHandleDebugReportCallback?.Invoke(0, report);
+            }
+        }
 #else
 		private void OnEnable()
 		{
@@ -49,5 +49,5 @@ namespace YooAsset
 			}
 		}
 #endif
-	}
+    }
 }

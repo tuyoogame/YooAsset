@@ -1,11 +1,11 @@
 ﻿
 namespace YooAsset
 {
-	public enum EOperationStatus
-	{
-		None,
-		Processing,
-		Succeed,
-		Failed
-	}
+    public enum EOperationStatus
+    {
+        None,
+        Processing,
+        Succeed,
+        Failed
+    }
 }

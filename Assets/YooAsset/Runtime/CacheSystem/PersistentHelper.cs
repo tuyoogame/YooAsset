@@ -1,15 +1,15 @@
 ﻿
 namespace YooAsset
 {
-	internal static class PersistentHelper
-	{
-		/// <summary>
-		/// 获取WWW加载本地资源的路径
-		/// </summary>
-		public static string ConvertToWWWPath(string path)
-		{
+    internal static class PersistentHelper
+    {
+        /// <summary>
+        /// 获取WWW加载本地资源的路径
+        /// </summary>
+        public static string ConvertToWWWPath(string path)
+        {
 #if UNITY_EDITOR
-			return StringUtility.Format("file:///{0}", path);
+            return StringUtility.Format("file:///{0}", path);
 #elif UNITY_WEBGL
 			return path;
 #elif UNITY_IPHONE
@@ -23,6 +23,6 @@ namespace YooAsset
 #else
 			return path;
 #endif
-		}
-	}
+        }
+    }
 }
