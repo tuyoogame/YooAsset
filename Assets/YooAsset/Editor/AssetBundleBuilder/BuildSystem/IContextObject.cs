@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset.Editor
 {
-	public interface IContextObject
-	{
-	}
+    public interface IContextObject
+    {
+    }
 }

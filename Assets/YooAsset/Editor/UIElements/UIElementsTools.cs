@@ -6,8 +6,8 @@ using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
-	public static class UIElementsTools
-	{
+    public static class UIElementsTools
+    {
         public static void SetElementVisible(VisualElement element, bool visible)
         {
             if (element == null)

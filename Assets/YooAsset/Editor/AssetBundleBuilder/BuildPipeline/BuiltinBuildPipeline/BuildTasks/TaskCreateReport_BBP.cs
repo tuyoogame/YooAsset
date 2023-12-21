@@ -6,19 +6,19 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	public class TaskCreateReport_BBP : TaskCreateReport, IBuildTask
-	{
-		void IBuildTask.Run(BuildContext context)
-		{
-			var buildParameters = context.GetContextObject<BuildParametersContext>();
-			var buildMapContext = context.GetContextObject<BuildMapContext>();
-			var manifestContext = context.GetContextObject<ManifestContext>();
+    public class TaskCreateReport_BBP : TaskCreateReport, IBuildTask
+    {
+        void IBuildTask.Run(BuildContext context)
+        {
+            var buildParameters = context.GetContextObject<BuildParametersContext>();
+            var buildMapContext = context.GetContextObject<BuildMapContext>();
+            var manifestContext = context.GetContextObject<ManifestContext>();
 
-			var buildMode = buildParameters.Parameters.BuildMode;
-			if (buildMode != EBuildMode.SimulateBuild)
-			{
-				CreateReportFile(buildParameters, buildMapContext, manifestContext);
-			}
-		}
-	}
+            var buildMode = buildParameters.Parameters.BuildMode;
+            if (buildMode != EBuildMode.SimulateBuild)
+            {
+                CreateReportFile(buildParameters, buildMapContext, manifestContext);
+            }
+        }
+    }
 }

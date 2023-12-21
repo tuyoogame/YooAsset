@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
-	public class RawFileBuildParameters : BuildParameters
-	{
-	}
+    public class RawFileBuildParameters : BuildParameters
+    {
+    }
 }

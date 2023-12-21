@@ -45,53 +45,53 @@ namespace YooAsset.Editor
             return collection.ToList();
         }
 #else
-		private static readonly List<Type> _cacheTypes = new List<Type>(10000);
-		private static void InitAssembly()
-		{
-			_cacheTypes.Clear();
-			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-			foreach (Assembly assembly in assemblies)
-			{
-				List<Type> types = assembly.GetTypes().ToList();
-				_cacheTypes.AddRange(types);
-			}
-		}
+        private static readonly List<Type> _cacheTypes = new List<Type>(10000);
+        private static void InitAssembly()
+        {
+            _cacheTypes.Clear();
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly assembly in assemblies)
+            {
+                List<Type> types = assembly.GetTypes().ToList();
+                _cacheTypes.AddRange(types);
+            }
+        }
 
-		/// <summary>
-		/// 获取带继承关系的所有类的类型
-		/// </summary>
-		public static List<Type> GetAssignableTypes(System.Type parentType)
-		{
-			List<Type> result = new List<Type>();
-			for (int i = 0; i < _cacheTypes.Count; i++)
-			{
-				Type type = _cacheTypes[i];
-				if (parentType.IsAssignableFrom(type))
-				{
-					if (type.Name == parentType.Name)
-						continue;
-					result.Add(type);
-				}
-			}
-			return result;
-		}
+        /// <summary>
+        /// 获取带继承关系的所有类的类型
+        /// </summary>
+        public static List<Type> GetAssignableTypes(System.Type parentType)
+        {
+            List<Type> result = new List<Type>();
+            for (int i = 0; i < _cacheTypes.Count; i++)
+            {
+                Type type = _cacheTypes[i];
+                if (parentType.IsAssignableFrom(type))
+                {
+                    if (type.Name == parentType.Name)
+                        continue;
+                    result.Add(type);
+                }
+            }
+            return result;
+        }
 
-		/// <summary>
-		/// 获取带有指定属性的所有类的类型
-		/// </summary>
-		public static List<Type> GetTypesWithAttribute(System.Type attrType)
-		{
-			List<Type> result = new List<Type>();
-			for (int i = 0; i < _cacheTypes.Count; i++)
-			{
-				Type type = _cacheTypes[i];
-				if (type.GetCustomAttribute(attrType) != null)
-				{
-					result.Add(type);
-				}
-			}
-			return result;
-		}
+        /// <summary>
+        /// 获取带有指定属性的所有类的类型
+        /// </summary>
+        public static List<Type> GetTypesWithAttribute(System.Type attrType)
+        {
+            List<Type> result = new List<Type>();
+            for (int i = 0; i < _cacheTypes.Count; i++)
+            {
+                Type type = _cacheTypes[i];
+                if (type.GetCustomAttribute(attrType) != null)
+                {
+                    result.Add(type);
+                }
+            }
+            return result;
+        }
 #endif
 
         /// <summary>
