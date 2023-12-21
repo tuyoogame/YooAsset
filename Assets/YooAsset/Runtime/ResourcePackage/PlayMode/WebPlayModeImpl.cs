@@ -67,7 +67,7 @@ namespace YooAsset
 		// 查询相关
 		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
 		{
-			return _buildinQueryServices.Query(PackageName, packageBundle.FileName);
+			return _buildinQueryServices.Query(PackageName, packageBundle.FileName, packageBundle.FileCRC);
 		}
 
 		#region IPlayMode接口

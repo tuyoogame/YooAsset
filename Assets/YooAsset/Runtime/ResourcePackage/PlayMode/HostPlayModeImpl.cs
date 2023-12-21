@@ -75,7 +75,7 @@ namespace YooAsset
 		{
 			if (_deliveryQueryServices == null)
 				return false;
-			return _deliveryQueryServices.Query(PackageName, packageBundle.FileName);
+			return _deliveryQueryServices.Query(PackageName, packageBundle.FileName, packageBundle.FileCRC);
 		}
 		private bool IsCachedPackageBundle(PackageBundle packageBundle)
 		{
@@ -83,7 +83,7 @@ namespace YooAsset
 		}
 		private bool IsBuildinPackageBundle(PackageBundle packageBundle)
 		{
-			return _buildinQueryServices.Query(PackageName, packageBundle.FileName);
+			return _buildinQueryServices.Query(PackageName, packageBundle.FileName, packageBundle.FileCRC);
 		}
 
 		#region IPlayMode接口
