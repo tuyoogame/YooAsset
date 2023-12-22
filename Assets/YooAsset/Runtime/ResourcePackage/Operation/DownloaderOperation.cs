@@ -95,6 +95,9 @@ namespace YooAsset
             _failedTryAgain = failedTryAgain;
             _timeout = timeout;
 
+            // 设置包裹名称 (fix #210)
+            SetPackageName(packageName);
+
             // 统计下载信息
             CalculatDownloaderInfo();
         }
@@ -269,7 +272,7 @@ namespace YooAsset
         {
             if (_steps == ESteps.None)
             {
-                OperationSystem.StartOperation(_packageName, this);
+                OperationSystem.StartOperation(this);
             }
         }
 

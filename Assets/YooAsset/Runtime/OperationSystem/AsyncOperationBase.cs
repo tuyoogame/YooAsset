@@ -88,7 +88,7 @@ namespace YooAsset
         internal abstract void InternalOnUpdate();
         internal virtual void InternalOnAbort() { }
 
-        internal void Init(string packageName)
+        internal void SetPackageName(string packageName)
         {
             PackageName = packageName;
         }

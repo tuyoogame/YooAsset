@@ -134,7 +134,16 @@ namespace YooAsset
         public static void StartOperation(string packageName, AsyncOperationBase operation)
         {
             _newList.Add(operation);
-            operation.Init(packageName);
+            operation.SetPackageName(packageName);
+            operation.SetStart();
+        }
+
+        /// <summary>
+        /// 开始处理异步操作类
+        /// </summary>
+        public static void StartOperation(AsyncOperationBase operation)
+        {
+            _newList.Add(operation);
             operation.SetStart();
         }
     }
