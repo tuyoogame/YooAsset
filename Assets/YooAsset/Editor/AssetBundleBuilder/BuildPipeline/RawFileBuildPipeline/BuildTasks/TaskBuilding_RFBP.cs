@@ -29,9 +29,9 @@ namespace YooAsset.Editor
             foreach (var bundleInfo in buildMapContext.Collection)
             {
                 string dest = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
-                foreach (var assetInfo in bundleInfo.MainAssets)
+                foreach (var buildAsset in bundleInfo.MainAssets)
                 {
-                    EditorTools.CopyFile(assetInfo.AssetPath, dest, true);
+                    EditorTools.CopyFile(buildAsset.AssetInfo.AssetPath, dest, true);
                 }
             }
         }

@@ -105,8 +105,8 @@ namespace YooAsset.Editor
                 {
                     PackageAsset packageAsset = new PackageAsset();
                     packageAsset.Address = buildMapContext.Command.EnableAddressable ? assetInfo.Address : string.Empty;
-                    packageAsset.AssetPath = assetInfo.AssetPath;
-                    packageAsset.AssetGUID = buildMapContext.Command.IncludeAssetGUID ? assetInfo.AssetGUID : string.Empty;
+                    packageAsset.AssetPath = assetInfo.AssetInfo.AssetPath;
+                    packageAsset.AssetGUID = buildMapContext.Command.IncludeAssetGUID ? assetInfo.AssetInfo.AssetGUID : string.Empty;
                     packageAsset.AssetTags = assetInfo.AssetTags.ToArray();
                     packageAsset.BundleID = GetCachedBundleID(assetInfo.BundleName);
                     result.Add(packageAsset);

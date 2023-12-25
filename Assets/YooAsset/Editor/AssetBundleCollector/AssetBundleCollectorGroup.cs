@@ -89,12 +89,12 @@ namespace YooAsset.Editor
             foreach (var collector in Collectors)
             {
                 var temper = collector.GetAllCollectAssets(command, this);
-                foreach (var assetInfo in temper)
+                foreach (var collectAsset in temper)
                 {
-                    if (result.ContainsKey(assetInfo.AssetPath) == false)
-                        result.Add(assetInfo.AssetPath, assetInfo);
+                    if (result.ContainsKey(collectAsset.AssetInfo.AssetPath) == false)
+                        result.Add(collectAsset.AssetInfo.AssetPath, collectAsset);
                     else
-                        throw new Exception($"The collecting asset file is existed : {assetInfo.AssetPath} in group : {GroupName}");
+                        throw new Exception($"The collecting asset file is existed : {collectAsset.AssetInfo.AssetPath} in group : {GroupName}");
                 }
             }
 
@@ -102,12 +102,12 @@ namespace YooAsset.Editor
             if (command.EnableAddressable)
             {
                 var addressTemper = new Dictionary<string, string>();
-                foreach (var collectInfoPair in result)
+                foreach (var collectAssetPair in result)
                 {
-                    if (collectInfoPair.Value.CollectorType == ECollectorType.MainAssetCollector)
+                    if (collectAssetPair.Value.CollectorType == ECollectorType.MainAssetCollector)
                     {
-                        string address = collectInfoPair.Value.Address;
-                        string assetPath = collectInfoPair.Value.AssetPath;
+                        string address = collectAssetPair.Value.Address;
+                        string assetPath = collectAssetPair.Value.AssetInfo.AssetPath;
                         if (string.IsNullOrEmpty(address))
                             continue;
 

@@ -108,7 +108,7 @@ namespace YooAsset.Editor
             }
 
             // 冗余资源列表
-            buildReport.RedundancyInfos = new List<ReportRedundancyInfo>(buildMapContext.RedundancyInfos);
+            buildReport.RedundancyAssets = new List<ReportRedundancyAsset>(buildMapContext.RedundancyInfos);
 
             // 序列化文件
             string fileName = YooAssetSettingsData.GetReportFileName(buildParameters.PackageName, buildParameters.PackageVersion);
@@ -140,11 +140,11 @@ namespace YooAsset.Editor
             var bundleInfo = buildMapContext.GetBundleInfo(bundleName);
             {
                 BuildAssetInfo findAssetInfo = null;
-                foreach (var assetInfo in bundleInfo.MainAssets)
+                foreach (var buildAsset in bundleInfo.MainAssets)
                 {
-                    if (assetInfo.AssetPath == assetPath)
+                    if (buildAsset.AssetInfo.AssetPath == assetPath)
                     {
-                        findAssetInfo = assetInfo;
+                        findAssetInfo = buildAsset;
                         break;
                     }
                 }
@@ -154,7 +154,7 @@ namespace YooAsset.Editor
                 }
                 foreach (var dependAssetInfo in findAssetInfo.AllDependAssetInfos)
                 {
-                    result.Add(dependAssetInfo.AssetPath);
+                    result.Add(dependAssetInfo.AssetInfo.AssetPath);
                 }
             }
             return result;

@@ -80,16 +80,16 @@ namespace YooAsset.Editor
             _assetListView.Rebuild();
             RefreshSortingSymbol();
         }
-        private List<ReportRedundancyInfo> FilterAndSortViewItems()
+        private List<ReportRedundancyAsset> FilterAndSortViewItems()
         {
-            List<ReportRedundancyInfo> result = new List<ReportRedundancyInfo>(_buildReport.RedundancyInfos.Count);
+            List<ReportRedundancyAsset> result = new List<ReportRedundancyAsset>(_buildReport.RedundancyAssets.Count);
 
             // 过滤列表
-            foreach (var redundancyInfo in _buildReport.RedundancyInfos)
+            foreach (var redundancyInfo in _buildReport.RedundancyAssets)
             {
                 if (string.IsNullOrEmpty(_searchKeyWord) == false)
                 {
-                    if (redundancyInfo.AssetPath.Contains(_searchKeyWord) == false)
+                    if (redundancyInfo.AssetInfo.AssetPath.Contains(_searchKeyWord) == false)
                         continue;
                 }
                 result.Add(redundancyInfo);
@@ -99,16 +99,16 @@ namespace YooAsset.Editor
             if (_sortMode == ESortMode.AssetPath)
             {
                 if (_descendingSort)
-                    return result.OrderByDescending(a => a.AssetPath).ToList();
+                    return result.OrderByDescending(a => a.AssetInfo.AssetPath).ToList();
                 else
-                    return result.OrderBy(a => a.AssetPath).ToList();
+                    return result.OrderBy(a => a.AssetInfo.AssetPath).ToList();
             }
             else if (_sortMode == ESortMode.AssetType)
             {
                 if (_descendingSort)
-                    return result.OrderByDescending(a => a.AssetType).ToList();
+                    return result.OrderByDescending(a => a.AssetInfo.AssetType).ToList();
                 else
-                    return result.OrderBy(a => a.AssetType).ToList();
+                    return result.OrderBy(a => a.AssetInfo.AssetType).ToList();
             }
             else if (_sortMode == ESortMode.FileSize)
             {
@@ -237,16 +237,16 @@ namespace YooAsset.Editor
         }
         private void BindAssetListViewItem(VisualElement element, int index)
         {
-            var sourceData = _assetListView.itemsSource as List<ReportRedundancyInfo>;
+            var sourceData = _assetListView.itemsSource as List<ReportRedundancyAsset>;
             var redundancyInfo = sourceData[index];
 
             // Asset Path
             var label1 = element.Q<Label>("Label1");
-            label1.text = redundancyInfo.AssetPath;
+            label1.text = redundancyInfo.AssetInfo.AssetPath;
 
             // Asset Type
             var label2 = element.Q<Label>("Label2");
-            label2.text = redundancyInfo.AssetType;
+            label2.text = redundancyInfo.AssetInfo.AssetType.ToString();
 
             // File Size
             var label3 = element.Q<Label>("Label3");

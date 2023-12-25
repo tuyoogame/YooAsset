@@ -21,9 +21,9 @@ namespace YooAsset.Editor
         public string Address { private set; get; }
 
         /// <summary>
-        /// 资源路径
+        /// 资源信息
         /// </summary>
-        public string AssetPath { private set; get; }
+        public AssetInfo AssetInfo { private set; get; }
 
         /// <summary>
         /// 资源分类标签
@@ -33,15 +33,15 @@ namespace YooAsset.Editor
         /// <summary>
         /// 依赖的资源列表
         /// </summary>
-        public List<string> DependAssets = new List<string>();
+        public List<AssetInfo> DependAssets = new List<AssetInfo>();
 
 
-        public CollectAssetInfo(ECollectorType collectorType, string bundleName, string address, string assetPath, List<string> assetTags)
+        public CollectAssetInfo(ECollectorType collectorType, string bundleName, string address, AssetInfo assetInfo, List<string> assetTags)
         {
             CollectorType = collectorType;
             BundleName = bundleName;
             Address = address;
-            AssetPath = assetPath;
+            AssetInfo = assetInfo;
             AssetTags = assetTags;
         }
     }

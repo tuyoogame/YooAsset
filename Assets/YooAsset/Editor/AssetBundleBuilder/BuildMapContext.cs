@@ -16,9 +16,13 @@ namespace YooAsset.Editor
         /// <summary>
         /// 冗余的资源列表
         /// </summary>
-        public readonly List<ReportRedundancyInfo> RedundancyInfos = new List<ReportRedundancyInfo>(1000);
+        public readonly List<ReportRedundancyAsset> RedundancyInfos = new List<ReportRedundancyAsset>(1000);
 
-
+        /// <summary>
+        /// 未被依赖的资源列表
+        /// </summary>
+        public readonly List<AssetInfo> UndependAssets = new List<AssetInfo>(1000);
+        
         /// <summary>
         /// 参与构建的资源总数
         /// 说明：包括主动收集的资源以及其依赖的所有资源

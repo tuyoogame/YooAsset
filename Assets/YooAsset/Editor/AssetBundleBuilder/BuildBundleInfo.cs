@@ -82,12 +82,12 @@ namespace YooAsset.Editor
         /// <summary>
         /// 添加一个打包资源
         /// </summary>
-        public void PackAsset(BuildAssetInfo assetInfo)
+        public void PackAsset(BuildAssetInfo buildAsset)
         {
-            if (IsContainsAsset(assetInfo.AssetPath))
-                throw new System.Exception($"Should never get here ! Asset is existed : {assetInfo.AssetPath}");
+            if (IsContainsAsset(buildAsset.AssetInfo.AssetPath))
+                throw new System.Exception($"Should never get here ! Asset is existed : {buildAsset.AssetInfo.AssetPath}");
 
-            MainAssets.Add(assetInfo);
+            MainAssets.Add(buildAsset);
         }
 
         /// <summary>
@@ -95,9 +95,9 @@ namespace YooAsset.Editor
         /// </summary>
         public bool IsContainsAsset(string assetPath)
         {
-            foreach (var assetInfo in MainAssets)
+            foreach (var buildAsset in MainAssets)
             {
-                if (assetInfo.AssetPath == assetPath)
+                if (buildAsset.AssetInfo.AssetPath == assetPath)
                 {
                     return true;
                 }
@@ -110,7 +110,7 @@ namespace YooAsset.Editor
         /// </summary>
         public string[] GetAllMainAssetPaths()
         {
-            return MainAssets.Select(t => t.AssetPath).ToArray();
+            return MainAssets.Select(t => t.AssetInfo.AssetPath).ToArray();
         }
 
         /// <summary>
@@ -120,17 +120,17 @@ namespace YooAsset.Editor
         {
             var packAssets = GetAllMainAssetPaths();
             List<string> result = new List<string>(packAssets);
-            foreach (var assetInfo in MainAssets)
+            foreach (var buildAsset in MainAssets)
             {
-                if (assetInfo.AllDependAssetInfos == null)
+                if (buildAsset.AllDependAssetInfos == null)
                     continue;
-                foreach (var dependAssetInfo in assetInfo.AllDependAssetInfos)
+                foreach (var dependAssetInfo in buildAsset.AllDependAssetInfos)
                 {
                     // 注意：依赖资源里只添加零依赖资源和冗余资源
                     if (dependAssetInfo.HasBundleName() == false)
                     {
-                        if (result.Contains(dependAssetInfo.AssetPath) == false)
-                            result.Add(dependAssetInfo.AssetPath);
+                        if (result.Contains(dependAssetInfo.AssetInfo.AssetPath) == false)
+                            result.Add(dependAssetInfo.AssetInfo.AssetPath);
                     }
                 }
             }

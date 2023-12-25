@@ -30,8 +30,12 @@ namespace YooAsset.Editor
         /// <summary>
         /// 冗余的资源列表
         /// </summary>
-        public List<ReportRedundancyInfo> RedundancyInfos = new List<ReportRedundancyInfo>();
+        public List<ReportRedundancyAsset> RedundancyAssets = new List<ReportRedundancyAsset>();
 
+        /// <summary>
+        /// 未被依赖的资源列表
+        /// </summary>
+        public List<AssetInfo> UndependAssets = new List<AssetInfo>();
 
         /// <summary>
         /// 获取资源包信息类

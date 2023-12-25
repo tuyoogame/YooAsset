@@ -26,19 +26,9 @@ namespace YooAsset.Editor
         public string Address { private set; get; }
 
         /// <summary>
-        /// 资源路径
+        /// 资源信息
         /// </summary>
-        public string AssetPath { private set; get; }
-
-        /// <summary>
-        /// 资源GUID
-        /// </summary>
-        public string AssetGUID { private set; get; }
-
-        /// <summary>
-        /// 资源类型
-        /// </summary>
-        public System.Type AssetType { private set; get; }
+        public AssetInfo AssetInfo { private set; get; }
 
         /// <summary>
         /// 资源的分类标签
@@ -52,25 +42,19 @@ namespace YooAsset.Editor
         public List<BuildAssetInfo> AllDependAssetInfos { private set; get; }
 
 
-        public BuildAssetInfo(ECollectorType collectorType, string bundleName, string address, string assetPath)
+        public BuildAssetInfo(ECollectorType collectorType, string bundleName, string address, AssetInfo assetInfo)
         {
             CollectorType = collectorType;
             BundleName = bundleName;
             Address = address;
-            AssetPath = assetPath;
-
-            AssetGUID = UnityEditor.AssetDatabase.AssetPathToGUID(assetPath);
-            AssetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+            AssetInfo = assetInfo;
         }
-        public BuildAssetInfo(string assetPath)
+        public BuildAssetInfo(AssetInfo assetInfo)
         {
             CollectorType = ECollectorType.None;
             BundleName = string.Empty;
             Address = string.Empty;
-            AssetPath = assetPath;
-
-            AssetGUID = UnityEditor.AssetDatabase.AssetPathToGUID(assetPath);
-            AssetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+            AssetInfo = assetInfo;
         }
 
 
