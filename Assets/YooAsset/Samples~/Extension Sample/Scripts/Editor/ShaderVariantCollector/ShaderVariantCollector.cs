@@ -146,7 +146,7 @@ public static class ShaderVariantCollector
         CollectResult collectResult = AssetBundleCollectorSettingData.Setting.GetPackageAssets(EBuildMode.DryRunBuild, _packageName);
         foreach (var assetInfo in collectResult.CollectAssets)
         {
-            string[] depends = AssetDatabase.GetDependencies(assetInfo.AssetPath, true);
+            string[] depends = AssetDatabase.GetDependencies(assetInfo.AssetInfo.AssetPath, true);
             foreach (var dependAsset in depends)
             {
                 if (allAssets.Contains(dependAsset) == false)
