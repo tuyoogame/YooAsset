@@ -65,9 +65,6 @@ namespace YooAsset.Editor
 
         public void CreateGUI()
         {
-            Undo.undoRedoPerformed -= RefreshWindow;
-            Undo.undoRedoPerformed += RefreshWindow;
-
             try
             {
                 _collectorTypeList = new List<string>()
@@ -346,6 +343,15 @@ namespace YooAsset.Editor
             {
                 Debug.LogError(e.ToString());
             }
+        }
+        public void OnEnable()
+        {
+            Undo.undoRedoPerformed += RefreshWindow;
+        }
+        public void OnDisable()
+        {
+            if (Undo.undoRedoPerformed != null)
+                Undo.undoRedoPerformed -= RefreshWindow;
         }
         public void OnDestroy()
         {
