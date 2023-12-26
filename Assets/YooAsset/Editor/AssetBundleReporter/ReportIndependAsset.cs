@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace YooAsset.Editor
 {
     [Serializable]
-    public class ReportRedundancyAsset
+    public class ReportIndependAsset
     {
         /// <summary>
         /// 资源路径
@@ -26,10 +26,5 @@ namespace YooAsset.Editor
         /// 资源文件大小
         /// </summary>
         public long FileSize;
-
-        /// <summary>
-        /// 冗余的资源包数量
-        /// </summary>
-        public int Number;
     }
 }

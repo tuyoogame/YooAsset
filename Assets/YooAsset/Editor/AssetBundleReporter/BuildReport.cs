@@ -35,7 +35,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 未被依赖的资源列表
         /// </summary>
-        public List<AssetInfo> UndependAssets = new List<AssetInfo>();
+        public List<ReportIndependAsset> IndependAssets = new List<ReportIndependAsset>();
 
         /// <summary>
         /// 获取资源包信息类

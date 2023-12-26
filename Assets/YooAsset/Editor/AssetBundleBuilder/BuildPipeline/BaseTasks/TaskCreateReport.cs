@@ -107,8 +107,9 @@ namespace YooAsset.Editor
                 buildReport.BundleInfos.Add(reportBundleInfo);
             }
 
-            // 冗余资源列表
+            // 资源列表
             buildReport.RedundancyAssets = new List<ReportRedundancyAsset>(buildMapContext.RedundancyInfos);
+            buildReport.IndependAssets = new List<ReportIndependAsset>(buildMapContext.IndependAssets);
 
             // 序列化文件
             string fileName = YooAssetSettingsData.GetReportFileName(buildParameters.PackageName, buildParameters.PackageVersion);

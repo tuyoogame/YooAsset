@@ -21,7 +21,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 未被依赖的资源列表
         /// </summary>
-        public readonly List<AssetInfo> UndependAssets = new List<AssetInfo>(1000);
+        public readonly List<ReportIndependAsset> IndependAssets = new List<ReportIndependAsset>(1000);
         
         /// <summary>
         /// 参与构建的资源总数

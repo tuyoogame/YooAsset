@@ -107,11 +107,13 @@ namespace YooAsset.Editor
             {
                 if (buildAssetInfo.IsRedundancyAsset())
                 {
-                    var redundancyInfo = new ReportRedundancyAsset();
-                    redundancyInfo.AssetInfo = buildAssetInfo.AssetInfo;
-                    redundancyInfo.FileSize = FileUtility.GetFileSize(buildAssetInfo.AssetInfo.AssetPath);
-                    redundancyInfo.Number = buildAssetInfo.GetReferenceBundleCount();
-                    context.RedundancyInfos.Add(redundancyInfo);
+                    var redundancyAsset = new ReportRedundancyAsset();
+                    redundancyAsset.AssetPath = buildAssetInfo.AssetInfo.AssetPath;
+                    redundancyAsset.AssetGUID = buildAssetInfo.AssetInfo.AssetGUID;
+                    redundancyAsset.AssetType = buildAssetInfo.AssetInfo.AssetType.ToString();
+                    redundancyAsset.FileSize = FileUtility.GetFileSize(buildAssetInfo.AssetInfo.AssetPath);
+                    redundancyAsset.Number = buildAssetInfo.GetReferenceBundleCount();
+                    context.RedundancyInfos.Add(redundancyAsset);
                 }
             }
 
@@ -179,7 +181,14 @@ namespace YooAsset.Editor
             {
                 string warning = BuildLogger.GetErrorMessage(ErrorCode.FoundUndependedAsset, $"Found undepended asset and remove it : {removeValue.AssetInfo.AssetPath}");
                 BuildLogger.Warning(warning);
-                context.UndependAssets.Add(removeValue.AssetInfo);
+
+                var independAsset = new ReportIndependAsset();
+                independAsset.AssetPath = removeValue.AssetInfo.AssetPath;
+                independAsset.AssetGUID = removeValue.AssetInfo.AssetGUID;
+                independAsset.AssetType = removeValue.AssetInfo.AssetType.ToString();
+                independAsset.FileSize = FileUtility.GetFileSize(removeValue.AssetInfo.AssetPath);
+                context.IndependAssets.Add(independAsset);
+
                 allCollectAssets.Remove(removeValue);
             }
         }

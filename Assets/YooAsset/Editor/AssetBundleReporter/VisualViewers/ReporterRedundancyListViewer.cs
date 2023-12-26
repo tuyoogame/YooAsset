@@ -89,7 +89,7 @@ namespace YooAsset.Editor
             {
                 if (string.IsNullOrEmpty(_searchKeyWord) == false)
                 {
-                    if (redundancyInfo.AssetInfo.AssetPath.Contains(_searchKeyWord) == false)
+                    if (redundancyInfo.AssetPath.Contains(_searchKeyWord) == false)
                         continue;
                 }
                 result.Add(redundancyInfo);
@@ -99,16 +99,16 @@ namespace YooAsset.Editor
             if (_sortMode == ESortMode.AssetPath)
             {
                 if (_descendingSort)
-                    return result.OrderByDescending(a => a.AssetInfo.AssetPath).ToList();
+                    return result.OrderByDescending(a => a.AssetPath).ToList();
                 else
-                    return result.OrderBy(a => a.AssetInfo.AssetPath).ToList();
+                    return result.OrderBy(a => a.AssetPath).ToList();
             }
             else if (_sortMode == ESortMode.AssetType)
             {
                 if (_descendingSort)
-                    return result.OrderByDescending(a => a.AssetInfo.AssetType).ToList();
+                    return result.OrderByDescending(a => a.AssetType).ToList();
                 else
-                    return result.OrderBy(a => a.AssetInfo.AssetType).ToList();
+                    return result.OrderBy(a => a.AssetType).ToList();
             }
             else if (_sortMode == ESortMode.FileSize)
             {
@@ -209,7 +209,7 @@ namespace YooAsset.Editor
                 label.style.unityTextAlign = TextAnchor.MiddleLeft;
                 label.style.marginLeft = 3f;
                 label.style.flexGrow = 0;
-                label.style.width = 125;
+                label.style.width = 200;
                 element.Add(label);
             }
 
@@ -242,11 +242,11 @@ namespace YooAsset.Editor
 
             // Asset Path
             var label1 = element.Q<Label>("Label1");
-            label1.text = redundancyInfo.AssetInfo.AssetPath;
+            label1.text = redundancyInfo.AssetPath;
 
             // Asset Type
             var label2 = element.Q<Label>("Label2");
-            label2.text = redundancyInfo.AssetInfo.AssetType.ToString();
+            label2.text = redundancyInfo.AssetType.ToString();
 
             // File Size
             var label3 = element.Q<Label>("Label3");
