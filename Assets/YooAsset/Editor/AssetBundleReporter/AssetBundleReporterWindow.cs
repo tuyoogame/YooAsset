@@ -35,11 +35,6 @@ namespace YooAsset.Editor
             /// 资源包视图
             /// </summary>
             BundleView,
-
-            /// <summary>
-            /// 冗余资源试图
-            /// </summary>
-            Redundancy,
         }
 
         private ToolbarMenu _viewModeMenu;
@@ -75,7 +70,6 @@ namespace YooAsset.Editor
                 _viewModeMenu.menu.AppendAction(EViewMode.Summary.ToString(), ViewModeMenuAction0, ViewModeMenuFun0);
                 _viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction1, ViewModeMenuFun1);
                 _viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction2, ViewModeMenuFun2);
-                _viewModeMenu.menu.AppendAction(EViewMode.Redundancy.ToString(), ViewModeMenuAction3, ViewModeMenuFun3);
 
                 // 搜索栏
                 var searchField = root.Q<ToolbarSearchField>("SearchField");
@@ -166,18 +160,6 @@ namespace YooAsset.Editor
                 _bundleListViewer.AttachParent(root);
             }
         }
-        private void ViewModeMenuAction3(DropdownMenuAction action)
-        {
-            if (_viewMode != EViewMode.Redundancy)
-            {
-                _viewMode = EViewMode.Redundancy;
-                VisualElement root = this.rootVisualElement;
-                _viewModeMenu.text = EViewMode.Redundancy.ToString();
-                _summaryViewer.DetachParent();
-                _assetListViewer.DetachParent();
-                _bundleListViewer.DetachParent();
-            }
-        }
         private DropdownMenuAction.Status ViewModeMenuFun0(DropdownMenuAction action)
         {
             if (_viewMode == EViewMode.Summary)
@@ -195,13 +177,6 @@ namespace YooAsset.Editor
         private DropdownMenuAction.Status ViewModeMenuFun2(DropdownMenuAction action)
         {
             if (_viewMode == EViewMode.BundleView)
-                return DropdownMenuAction.Status.Checked;
-            else
-                return DropdownMenuAction.Status.Normal;
-        }
-        private DropdownMenuAction.Status ViewModeMenuFun3(DropdownMenuAction action)
-        {
-            if (_viewMode == EViewMode.Redundancy)
                 return DropdownMenuAction.Status.Checked;
             else
                 return DropdownMenuAction.Status.Normal;
