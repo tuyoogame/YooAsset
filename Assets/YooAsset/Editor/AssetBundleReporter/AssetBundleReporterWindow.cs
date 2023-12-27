@@ -46,7 +46,6 @@ namespace YooAsset.Editor
         private ReporterSummaryViewer _summaryViewer;
         private ReporterAssetListViewer _assetListViewer;
         private ReporterBundleListViewer _bundleListViewer;
-        private ReporterRedundancyListViewer _redundancyListViewer;
 
         private EViewMode _viewMode;
         private BuildReport _buildReport;
@@ -94,10 +93,6 @@ namespace YooAsset.Editor
                 _bundleListViewer = new ReporterBundleListViewer();
                 _bundleListViewer.InitViewer();
 
-                // 加载试图
-                _redundancyListViewer = new ReporterRedundancyListViewer();
-                _redundancyListViewer.InitViewer();
-
                 // 显示视图
                 _viewMode = EViewMode.Summary;
                 _viewModeMenu.text = EViewMode.Summary.ToString();
@@ -125,7 +120,6 @@ namespace YooAsset.Editor
             _summaryViewer.FillViewData(_buildReport);
             _assetListViewer.FillViewData(_buildReport, _searchKeyWord);
             _bundleListViewer.FillViewData(_buildReport, _reportFilePath, _searchKeyWord);
-            _redundancyListViewer.FillViewData(_buildReport, _searchKeyWord);
         }
         private void OnSearchKeyWordChange(ChangeEvent<string> e)
         {
@@ -146,7 +140,6 @@ namespace YooAsset.Editor
                 _summaryViewer.AttachParent(root);
                 _assetListViewer.DetachParent();
                 _bundleListViewer.DetachParent();
-                _redundancyListViewer.DetachParent();
             }
         }
         private void ViewModeMenuAction1(DropdownMenuAction action)
@@ -159,7 +152,6 @@ namespace YooAsset.Editor
                 _summaryViewer.DetachParent();
                 _assetListViewer.AttachParent(root);
                 _bundleListViewer.DetachParent();
-                _redundancyListViewer.DetachParent();
             }
         }
         private void ViewModeMenuAction2(DropdownMenuAction action)
@@ -172,7 +164,6 @@ namespace YooAsset.Editor
                 _summaryViewer.DetachParent();
                 _assetListViewer.DetachParent();
                 _bundleListViewer.AttachParent(root);
-                _redundancyListViewer.DetachParent();
             }
         }
         private void ViewModeMenuAction3(DropdownMenuAction action)
@@ -185,7 +176,6 @@ namespace YooAsset.Editor
                 _summaryViewer.DetachParent();
                 _assetListViewer.DetachParent();
                 _bundleListViewer.DetachParent();
-                _redundancyListViewer.AttachParent(root);
             }
         }
         private DropdownMenuAction.Status ViewModeMenuFun0(DropdownMenuAction action)

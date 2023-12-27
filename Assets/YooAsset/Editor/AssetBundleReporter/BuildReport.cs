@@ -28,11 +28,6 @@ namespace YooAsset.Editor
         public List<ReportBundleInfo> BundleInfos = new List<ReportBundleInfo>();
 
         /// <summary>
-        /// 冗余的资源列表
-        /// </summary>
-        public List<ReportRedundancyAsset> RedundancyAssets = new List<ReportRedundancyAsset>();
-
-        /// <summary>
         /// 未被依赖的资源列表
         /// </summary>
         public List<ReportIndependAsset> IndependAssets = new List<ReportIndependAsset>();

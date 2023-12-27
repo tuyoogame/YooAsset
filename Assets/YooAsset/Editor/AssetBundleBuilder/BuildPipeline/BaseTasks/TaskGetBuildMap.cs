@@ -102,22 +102,7 @@ namespace YooAsset.Editor
             context.AssetFileCount = allBuildAssetInfos.Count;
             context.Command = collectResult.Command;
 
-            // 8. 记录冗余资源
-            foreach (var buildAssetInfo in allBuildAssetInfos.Values)
-            {
-                if (buildAssetInfo.IsRedundancyAsset())
-                {
-                    var redundancyAsset = new ReportRedundancyAsset();
-                    redundancyAsset.AssetPath = buildAssetInfo.AssetInfo.AssetPath;
-                    redundancyAsset.AssetGUID = buildAssetInfo.AssetInfo.AssetGUID;
-                    redundancyAsset.AssetType = buildAssetInfo.AssetInfo.AssetType.ToString();
-                    redundancyAsset.FileSize = FileUtility.GetFileSize(buildAssetInfo.AssetInfo.AssetPath);
-                    redundancyAsset.Number = buildAssetInfo.GetReferenceBundleCount();
-                    context.RedundancyInfos.Add(redundancyAsset);
-                }
-            }
-
-            // 9. 移除不参与构建的资源
+            // 8. 移除不参与构建的资源
             List<BuildAssetInfo> removeBuildList = new List<BuildAssetInfo>();
             foreach (var buildAssetInfo in allBuildAssetInfos.Values)
             {
@@ -129,7 +114,7 @@ namespace YooAsset.Editor
                 allBuildAssetInfos.Remove(removeValue.AssetInfo.AssetPath);
             }
 
-            // 10. 构建资源列表
+            // 9. 构建资源列表
             var allPackAssets = allBuildAssetInfos.Values.ToList();
             if (allPackAssets.Count == 0)
             {

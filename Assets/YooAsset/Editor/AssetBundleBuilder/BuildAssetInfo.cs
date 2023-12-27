@@ -122,17 +122,6 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 判断是否为冗余资源
-        /// </summary>
-        public bool IsRedundancyAsset()
-        {
-            if (HasBundleName())
-                return false;
-
-            return _referenceBundleNames.Count > 1;
-        }
-
-        /// <summary>
         /// 获取关联资源包的数量
         /// </summary>
         public int GetReferenceBundleCount()
