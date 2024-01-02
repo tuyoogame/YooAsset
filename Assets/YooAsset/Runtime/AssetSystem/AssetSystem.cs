@@ -72,9 +72,14 @@ namespace YooAsset
 			_isUnloadSafe = false;
 			for (int i = 0; i < _providerList.Count; i++)
 			{
+				var provider = _providerList[i];
+				if (provider.IsDone)
+					continue;
+
+				provider.Update();
+
 				if (IsBusy)
 					break;
-				_providerList[i].Update();
 			}
 			_isUnloadSafe = true;
 		}
