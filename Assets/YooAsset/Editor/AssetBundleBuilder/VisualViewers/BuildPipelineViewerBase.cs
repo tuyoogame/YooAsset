@@ -66,7 +66,7 @@ namespace YooAsset.Editor
                 var buildModeList = GetSupportBuildModes();
                 int defaultIndex = buildModeList.FindIndex(x => x.Equals(buildMode));
                 if (defaultIndex < 0)
-                    defaultIndex = 0;
+                    defaultIndex = (int)(EBuildMode)buildModeList[0];
                 _buildModeField = new PopupField<Enum>(buildModeList, defaultIndex);
                 _buildModeField.label = "Build Mode";
                 _buildModeField.style.width = StyleWidth;
