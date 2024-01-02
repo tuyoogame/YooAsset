@@ -65,6 +65,8 @@ namespace YooAsset.Editor
                 var buildMode = AssetBundleBuilderSetting.GetPackageBuildMode(PackageName, BuildPipeline);
                 var buildModeList = GetSupportBuildModes();
                 int defaultIndex = buildModeList.FindIndex(x => x.Equals(buildMode));
+                if (defaultIndex < 0)
+                    defaultIndex = 0;
                 _buildModeField = new PopupField<Enum>(buildModeList, defaultIndex);
                 _buildModeField.label = "Build Mode";
                 _buildModeField.style.width = StyleWidth;
@@ -83,6 +85,8 @@ namespace YooAsset.Editor
                 {
                     var encyptionClassName = AssetBundleBuilderSetting.GetPackageEncyptionClassName(PackageName, BuildPipeline);
                     int defaultIndex = encryptionClassTypes.FindIndex(x => x.FullName.Equals(encyptionClassName));
+                    if (defaultIndex < 0)
+                        defaultIndex = 0;
                     _encryptionField = new PopupField<Type>(encryptionClassTypes, defaultIndex);
                     _encryptionField.label = "Encryption";
                     _encryptionField.style.width = StyleWidth;
