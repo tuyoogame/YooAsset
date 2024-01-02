@@ -1,15 +1,16 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using YooAsset;
 
 /// <summary>
-/// �ļ�ƫ�Ƽ��ܷ�ʽ
+/// 文件偏移加密方式
 /// </summary>
 public class FileOffsetEncryption : IEncryptionServices
 {
     public EncryptResult Encrypt(EncryptFileInfo fileInfo)
     {
+        // 注意：只对音频资源包加密
         if (fileInfo.BundleName.Contains("_gameres_audio"))
         {
             int offset = 32;
@@ -32,7 +33,7 @@ public class FileOffsetEncryption : IEncryptionServices
 }
 
 /// <summary>
-/// �ļ������ܷ�ʽ
+/// 文件流加密方式
 /// </summary>
 public class FileStreamEncryption : IEncryptionServices
 {

@@ -44,10 +44,15 @@ namespace YooAsset
 { 
     public static class EditorSimulateModeHelper
     {
-        /// <summary>
-        /// 编辑器下模拟构建清单
-        /// </summary>
-        public static string SimulateBuild(string buildPipelineName, string packageName) { throw new System.Exception("Only support in unity editor !"); }
+        public static string SimulateBuild(string buildPipelineName, string packageName) 
+        {
+            throw new System.Exception("Only support in unity editor !");
+        }
+
+        public static string SimulateBuild(EDefaultBuildPipeline buildPipeline, string packageName)
+        {
+            throw new System.Exception("Only support in unity editor !");
+        }
     }
 }
 #endif
