@@ -31,16 +31,18 @@ namespace YooAsset.Editor
                 buildReport.Summary.BuildMode = buildParameters.BuildMode;
                 buildReport.Summary.BuildPackageName = buildParameters.PackageName;
                 buildReport.Summary.BuildPackageVersion = buildParameters.PackageVersion;
+
+                // 收集器配置
                 buildReport.Summary.UniqueBundleName = buildMapContext.Command.UniqueBundleName;
                 buildReport.Summary.EnableAddressable = buildMapContext.Command.EnableAddressable;
                 buildReport.Summary.LocationToLower = buildMapContext.Command.LocationToLower;
                 buildReport.Summary.IncludeAssetGUID = buildMapContext.Command.IncludeAssetGUID;
                 buildReport.Summary.IgnoreDefaultType = buildMapContext.Command.IgnoreDefaultType;
                 buildReport.Summary.AutoCollectShaders = buildMapContext.Command.AutoCollectShaders;
-                buildReport.Summary.EncryptionClassName = buildParameters.EncryptionServices == null ?
-                    "null" : buildParameters.EncryptionServices.GetType().FullName;
 
                 // 构建参数
+                buildReport.Summary.EnableSharePackRule = buildParameters.EnableSharePackRule;
+                buildReport.Summary.EncryptionClassName = buildParameters.EncryptionServices == null ? "null" : buildParameters.EncryptionServices.GetType().FullName;
                 if (buildParameters.BuildPipeline == nameof(BuiltinBuildPipeline))
                 {
                     var builtinBuildParameters = buildParameters as BuiltinBuildParameters;

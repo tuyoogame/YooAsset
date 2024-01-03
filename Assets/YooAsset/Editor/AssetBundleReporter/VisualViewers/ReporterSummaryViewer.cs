@@ -67,7 +67,7 @@ namespace YooAsset.Editor
             _items.Add(new ItemWrapper("Package Version", buildReport.Summary.BuildPackageVersion));
 
             _items.Add(new ItemWrapper(string.Empty, string.Empty));
-            _items.Add(new ItemWrapper("Settings", string.Empty));
+            _items.Add(new ItemWrapper("Collect Settings", string.Empty));
             _items.Add(new ItemWrapper("Unique Bundle Name", $"{buildReport.Summary.UniqueBundleName}"));
             _items.Add(new ItemWrapper("Enable Addressable", $"{buildReport.Summary.EnableAddressable}"));
             _items.Add(new ItemWrapper("Location To Lower", $"{buildReport.Summary.LocationToLower}"));
@@ -77,6 +77,7 @@ namespace YooAsset.Editor
 
             _items.Add(new ItemWrapper(string.Empty, string.Empty));
             _items.Add(new ItemWrapper("Build Params", string.Empty));
+            _items.Add(new ItemWrapper("Enable Share Pack Rule", $"{buildReport.Summary.EnableSharePackRule}"));
             _items.Add(new ItemWrapper("Encryption Class Name", buildReport.Summary.EncryptionClassName));
             _items.Add(new ItemWrapper("FileNameStyle", $"{buildReport.Summary.FileNameStyle}"));
             _items.Add(new ItemWrapper("CompressOption", $"{buildReport.Summary.CompressOption}"));

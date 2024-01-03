@@ -86,23 +86,45 @@ namespace YooAsset.Editor
             // 6. 自动收集所有依赖的着色器
             if (collectResult.Command.AutoCollectShaders)
             {
+                // 获取着色器打包规则结果
+                PackRuleResult shaderPackRuleResult = DefaultPackRule.CreateShadersPackRuleResult();
+                string shaderBundleName = shaderPackRuleResult.GetBundleName(collectResult.Command.PackageName, collectResult.Command.UniqueBundleName);
                 foreach (var buildAssetInfo in allBuildAssetInfos.Values)
                 {
                     if (buildAssetInfo.CollectorType == ECollectorType.None)
                     {
                         if (buildAssetInfo.AssetInfo.IsShaderAsset())
                         {
-                            buildAssetInfo.SetShaderBundleName(collectResult.Command.PackageName, collectResult.Command.UniqueBundleName);
+                            buildAssetInfo.SetBundleName(shaderBundleName);
                         }
                     }
                 }
             }
 
-            // 7. 记录关键信息
+            // 7. 计算共享资源的包名
+            if (buildParameters.EnableSharePackRule)
+            {
+                PreProcessPackShareBundle(buildParameters, collectResult.Command, allBuildAssetInfos);
+                foreach (var buildAssetInfo in allBuildAssetInfos.Values)
+                {
+                    if (buildAssetInfo.HasBundleName() == false)
+                    {
+                        PackRuleResult packRuleResult = GetShareBundleName(buildAssetInfo);
+                        if (packRuleResult.IsValid())
+                        {
+                            string shareBundleName = packRuleResult.GetShareBundleName(collectResult.Command.PackageName, collectResult.Command.UniqueBundleName);
+                            buildAssetInfo.SetBundleName(shareBundleName);
+                        }
+                    }
+                }
+                PostProcessPackShareBundle();
+            }
+
+            // 8. 记录关键信息
             context.AssetFileCount = allBuildAssetInfos.Count;
             context.Command = collectResult.Command;
 
-            // 8. 移除不参与构建的资源
+            // 9. 移除不参与构建的资源
             List<BuildAssetInfo> removeBuildList = new List<BuildAssetInfo>();
             foreach (var buildAssetInfo in allBuildAssetInfos.Values)
             {
@@ -114,7 +136,7 @@ namespace YooAsset.Editor
                 allBuildAssetInfos.Remove(removeValue.AssetInfo.AssetPath);
             }
 
-            // 9. 构建资源列表
+            // 10. 构建资源列表
             var allPackAssets = allBuildAssetInfos.Values.ToList();
             if (allPackAssets.Count == 0)
             {
@@ -177,5 +199,31 @@ namespace YooAsset.Editor
                 allCollectAssets.Remove(removeValue);
             }
         }
+
+        #region 共享资源打包规则
+        /// <summary>
+        /// 共享资源打包前置处理
+        /// </summary>
+        protected virtual void PreProcessPackShareBundle(BuildParameters buildParameters, CollectCommand command, Dictionary<string, BuildAssetInfo> allBuildAssetInfos)
+        {
+        }
+
+        /// <summary>
+        /// 共享资源打包后置处理
+        /// </summary>
+        protected virtual void PostProcessPackShareBundle()
+        {
+        }
+
+        /// <summary>
+        /// 获取共享资源包名称
+        /// </summary>
+        protected virtual PackRuleResult GetShareBundleName(BuildAssetInfo buildAssetInfo)
+        {
+            string bundleName = Path.GetDirectoryName(buildAssetInfo.AssetInfo.AssetPath);
+            PackRuleResult result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
+            return result;
+        }
+        #endregion
     }
 }

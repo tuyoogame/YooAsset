@@ -16,6 +16,13 @@ namespace YooAsset.Editor
             // 检测基础构建参数
             buildParametersContext.CheckBuildParameters();
 
+            // 检测不被支持的参数
+            if (buildParameters.EnableSharePackRule)
+            {
+                string message = BuildLogger.GetErrorMessage(ErrorCode.BuildPipelineNotSupportSharePackRule, $"{nameof(EBuildPipeline.RawFileBuildPipeline)} not support share pack rule !");
+                throw new Exception(message);
+            }
+
             // 检测不被支持的构建模式
             if (buildParameters.BuildMode == EBuildMode.DryRunBuild)
             {

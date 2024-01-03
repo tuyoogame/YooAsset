@@ -62,6 +62,7 @@ namespace YooAsset.Editor
         public bool AutoCollectShaders;
 
         // 构建参数
+        public bool EnableSharePackRule;
         public string EncryptionClassName;
         public EFileNameStyle FileNameStyle;
         public ECompressOption CompressOption;

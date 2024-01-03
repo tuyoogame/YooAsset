@@ -48,6 +48,11 @@ namespace YooAsset.Editor
 
 
         /// <summary>
+        /// 是否启用共享资源打包
+        /// </summary>
+        public bool EnableSharePackRule = false;
+
+        /// <summary>
         /// 验证构建结果
         /// </summary>
         public bool VerifyBuildingResult = false;
