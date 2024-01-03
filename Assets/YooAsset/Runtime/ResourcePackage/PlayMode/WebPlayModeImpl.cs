@@ -65,7 +65,7 @@ namespace YooAsset
         }
 
         // 查询相关
-#if UNITY_WX_GAME
+#if UNITY_WECHAT_GAME
         private WeChatWASM.WXFileSystemManager _wxFileSystemMgr;
         private bool IsCachedPackageBundle(PackageBundle packageBundle)
         {
