@@ -142,7 +142,7 @@ namespace YooAsset.Editor
         /// </summary>
         public UnityEditor.AssetBundleBuild CreatePipelineBuild()
         {
-            // 注意：我们不在支持AssetBundle的变种机制
+            // 注意：我们不再支持AssetBundle的变种机制
             AssetBundleBuild build = new AssetBundleBuild();
             build.assetBundleName = BundleName;
             build.assetBundleVariant = string.Empty;
