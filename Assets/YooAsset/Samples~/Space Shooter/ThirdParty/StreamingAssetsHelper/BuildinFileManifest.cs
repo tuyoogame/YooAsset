@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,5 +7,13 @@ using UnityEngine;
 /// </summary>
 public class BuildinFileManifest : ScriptableObject
 {
-	public List<string> BuildinFiles = new List<string>();
+    [Serializable]
+    public class Element
+    {
+        public string PackageName;
+        public string FileName;
+        public string FileCRC32;
+    }
+
+    public List<Element> BuildinFiles = new List<Element>();
 }

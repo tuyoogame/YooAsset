@@ -5,16 +5,16 @@ using System.Collections.Generic;
 
 namespace YooAsset.Editor
 {
-	public class TaskCreateManifest_RFBP : TaskCreateManifest, IBuildTask
-	{
-		void IBuildTask.Run(BuildContext context)
-		{
-			CreateManifestFile(context);
-		}
+    public class TaskCreateManifest_RFBP : TaskCreateManifest, IBuildTask
+    {
+        void IBuildTask.Run(BuildContext context)
+        {
+            CreateManifestFile(context);
+        }
 
-		protected override string[] GetBundleDepends(BuildContext context, string bundleName)
-		{
-			return new string[] { };
-		}
-	}
+        protected override string[] GetBundleDepends(BuildContext context, string bundleName)
+        {
+            return new string[] { };
+        }
+    }
 }

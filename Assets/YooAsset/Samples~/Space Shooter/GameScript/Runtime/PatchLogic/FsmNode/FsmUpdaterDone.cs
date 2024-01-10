@@ -8,16 +8,16 @@ using UniFramework.Machine;
 /// </summary>
 internal class FsmUpdaterDone : IStateNode
 {
-	void IStateNode.OnCreate(StateMachine machine)
-	{
-	}
-	void IStateNode.OnEnter()
-	{
-	}
-	void IStateNode.OnUpdate()
-	{
-	}
-	void IStateNode.OnExit()
-	{
-	}
+    void IStateNode.OnCreate(StateMachine machine)
+    {
+    }
+    void IStateNode.OnEnter()
+    {
+    }
+    void IStateNode.OnUpdate()
+    {
+    }
+    void IStateNode.OnExit()
+    {
+    }
 }
