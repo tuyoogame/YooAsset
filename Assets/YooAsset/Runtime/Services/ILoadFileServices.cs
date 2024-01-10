@@ -1,11 +1,19 @@
-
+//using System.Collections;
+//using System.Collections.Generic;
 using System.IO;
 using System.Text;
+//using UnityEngine;
+//using static Codice.CM.WorkspaceServer.WorkspaceTreeDataStore;
 
 namespace YooAsset
 {
     public interface ILoadFileServices
     {
+        /// <summary>
+        /// 判断是否可以直接从 StreamingAsset 读取文件
+        /// </summary>
+        public bool EnableLoadStreamingAsset { get; }
+
         /// <summary>
         /// 判断文件是否存在
         /// </summary>
@@ -50,6 +58,21 @@ namespace YooAsset
 
     internal class DefaultLoadFileServices : ILoadFileServices
     {
+        /// <summary>
+        /// 默认平台不支持android 直接读取streamingAsset文件
+        /// </summary>
+        public bool EnableLoadStreamingAsset 
+        { 
+            get
+            {
+#if UNITY_ANDROID
+                return false;
+#else
+                return true;
+#endif
+            }
+        }
+
         public bool Exists(string filePath)
         {
             return File.Exists(filePath);

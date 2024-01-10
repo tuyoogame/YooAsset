@@ -40,16 +40,15 @@ namespace YooAsset
 					FileLoadPath = MainBundleInfo.CachedDataFilePath;
 				}
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
-				{
-#if UNITY_ANDROID
-                    /// 直接判断文件是否存在用于是否需要 将文件解压到缓存中
-					if (FileUtility.Exists(MainBundleInfo.BuildinFilePath))
+                {
+					/// 判断是否可以直接从StreamingAsset 读取文件
+                    if (FileUtility.EnableLoadStreamingAsset)
                     {
                         FileLoadPath = MainBundleInfo.BuildinFilePath;
                         // 设置下载进度
                         DownloadProgress = 1f;
                         DownloadedBytes = (ulong)MainBundleInfo.Bundle.FileSize;
-						// 设置为完成状态
+                        // 设置为完成状态
                         _steps = ESteps.Done;
                         Status = EStatus.Succeed;
                     }
@@ -58,11 +57,7 @@ namespace YooAsset
                         _steps = ESteps.Unpack;
                         FileLoadPath = MainBundleInfo.CachedDataFilePath;
                     }
-#else
-                    _steps = ESteps.CheckFile;
-					FileLoadPath = MainBundleInfo.BuildinFilePath;
-#endif
-				}
+                }
 				else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
 				{
 					_steps = ESteps.CheckFile;
