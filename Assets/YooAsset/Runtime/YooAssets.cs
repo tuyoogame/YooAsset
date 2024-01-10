@@ -239,5 +239,16 @@ namespace YooAsset
             return report;
         }
         #endregion
+
+        #region 设置文件加载服务
+        /// <summary>
+        /// 设置文件加载服务
+        /// </summary>
+        /// <param name="loadFileServices"></param>
+        public static void SetLoadFileServices(ILoadFileServices loadFileServices)
+        {
+            FileUtility.SetLoadFileService(loadFileServices);
+        }
+        #endregion
     }
 }
