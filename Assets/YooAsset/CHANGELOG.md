@@ -2,6 +2,29 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.1.1] - 2024-01-17
+
+### Fixed
+
+- (#224)  修复了编辑器模式打包时 SimulateBuild 报错的问题。
+- (#223)  修复了资源构建界面读取配置导致的报错问题。
+
+### Added
+
+- 支持共享资源打包规则，可以定制化独立的构建规则。
+
+  ```c#
+  public class BuildParameters
+  {
+     /// <summary>
+      /// 是否启用共享资源打包
+      /// </summary>
+      public bool EnableSharePackRule = false; 
+  }
+  ```
+
+- 微信小游戏平台，资源下载器支持底层缓存查询。
+
 ## [2.1.0] - 2023-12-27
 
 升级了 Scriptable build pipeline (SBP) 的版本，来解决图集引用的精灵图片冗余问题。
