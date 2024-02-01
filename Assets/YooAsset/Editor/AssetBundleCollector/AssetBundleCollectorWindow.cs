@@ -476,6 +476,7 @@ namespace YooAsset.Editor
                 _locationToLowerToogle.SetValueWithoutNotify(selectPackage.LocationToLower);
                 _includeAssetGUIDToogle.SetValueWithoutNotify(selectPackage.IncludeAssetGUID);
                 _ignoreDefaultTypeToogle.SetValueWithoutNotify(selectPackage.IgnoreDefaultType);
+                _autoCollectShadersToogle.SetValueWithoutNotify(selectPackage.AutoCollectShaders);
             }
             else
             {
