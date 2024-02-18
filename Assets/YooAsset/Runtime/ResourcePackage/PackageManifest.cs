@@ -76,6 +76,12 @@ namespace YooAsset
         public Dictionary<string, PackageBundle> BundleDic2;
 
         /// <summary>
+        /// 资源包集合（提供CacheGUID获取PackageBundle）
+        /// </summary>
+        [NonSerialized]
+        public Dictionary<string, PackageBundle> BundleDic3;
+
+        /// <summary>
         /// 资源映射集合（提供AssetPath获取PackageAsset）
         /// </summary>
         [NonSerialized]
@@ -92,12 +98,6 @@ namespace YooAsset
         /// </summary>
         [NonSerialized]
         public Dictionary<string, string> AssetPathMapping2;
-
-        /// <summary>
-        /// 该资源清单所有文件的缓存GUID集合
-        /// </summary>
-        [NonSerialized]
-        public HashSet<string> CacheGUIDs = new HashSet<string>();
 
 
         /// <summary>
@@ -190,11 +190,19 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 尝试获取包裹的资源包
+        /// </summary>
+        public bool TryGetPackageBundleByCacheGUID(string cacheGUID, out PackageBundle result)
+        {
+            return BundleDic3.TryGetValue(cacheGUID, out result);
+        }
+
+        /// <summary>
         /// 是否包含资源文件
         /// </summary>
         public bool IsIncludeBundleFile(string cacheGUID)
         {
-            return CacheGUIDs.Contains(cacheGUID);
+            return BundleDic3.ContainsKey(cacheGUID);
         }
 
         /// <summary>

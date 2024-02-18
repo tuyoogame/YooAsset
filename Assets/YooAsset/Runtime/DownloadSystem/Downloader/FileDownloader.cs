@@ -207,7 +207,7 @@ namespace YooAsset
             fileInfo.MoveTo(dataFilePath);
 
             // 写入信息文件记录验证数据
-            CacheFileInfo.WriteInfoToFile(infoFilePath, dataFileCRC, dataFileSize);
+            CacheHelper.WriteInfoToFile(infoFilePath, dataFileCRC, dataFileSize);
 
             // 记录缓存文件
             _bundleInfo.CacheRecord();

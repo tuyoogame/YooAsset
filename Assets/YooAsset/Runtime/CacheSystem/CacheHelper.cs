@@ -1,8 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace YooAsset
 {
@@ -13,6 +10,37 @@ namespace YooAsset
         /// </summary>
         public static bool DisableUnityCacheOnWebGL = false;
 
+        #region 资源信息文件相关
+        private static readonly BufferWriter SharedBuffer = new BufferWriter(1024);
+
+        /// <summary>
+        /// 写入资源包信息
+        /// </summary>
+        public static void WriteInfoToFile(string filePath, string dataFileCRC, long dataFileSize)
+        {
+            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                SharedBuffer.Clear();
+                SharedBuffer.WriteUTF8(dataFileCRC);
+                SharedBuffer.WriteInt64(dataFileSize);
+                SharedBuffer.WriteToStream(fs);
+                fs.Flush();
+            }
+        }
+
+        /// <summary>
+        /// 读取资源包信息
+        /// </summary>
+        public static void ReadInfoFromFile(string filePath, out string dataFileCRC, out long dataFileSize)
+        {
+            byte[] binaryData = FileUtility.ReadAllBytes(filePath);
+            BufferReader buffer = new BufferReader(binaryData);
+            dataFileCRC = buffer.ReadUTF8();
+            dataFileSize = buffer.ReadInt64();
+        }
+        #endregion
+
+        #region 资源文件验证相关
         /// <summary>
         /// 验证缓存文件（子线程内操作）
         /// </summary>
@@ -34,7 +62,7 @@ namespace YooAsset
                         return EVerifyResult.InfoFileNotExisted;
 
                     // 解析信息文件获取验证数据
-                    CacheFileInfo.ReadInfoFromFile(element.InfoFilePath, out element.DataFileCRC, out element.DataFileSize);
+                    CacheHelper.ReadInfoFromFile(element.InfoFilePath, out element.DataFileCRC, out element.DataFileSize);
                 }
             }
             catch (Exception)
@@ -99,5 +127,6 @@ namespace YooAsset
                 return EVerifyResult.Exception;
             }
         }
+        #endregion
     }
 }

@@ -315,28 +315,6 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件
-        /// </summary>
-        public ClearUnusedCacheFilesOperation ClearUnusedCacheFilesAsync()
-        {
-            DebugCheckInitialize();
-            var operation = new ClearUnusedCacheFilesOperation(this, _cacheMgr);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
-        }
-
-        /// <summary>
-        /// 清理包裹本地所有的缓存文件
-        /// </summary>
-        public ClearAllCacheFilesOperation ClearAllCacheFilesAsync()
-        {
-            DebugCheckInitialize();
-            var operation = new ClearAllCacheFilesOperation(_cacheMgr);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
-        }
-
-        /// <summary>
         /// 获取本地包裹的版本信息
         /// </summary>
         public string GetPackageVersion()
@@ -411,6 +389,37 @@ namespace YooAsset
             DebugCheckInitialize();
             _persistentMgr.DeleteSandboxPackageFolder();
             _cacheMgr.ClearAll();
+        }
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件
+        /// </summary>
+        public ClearUnusedCacheFilesOperation ClearUnusedCacheFilesAsync()
+        {
+            DebugCheckInitialize();
+            var operation = new ClearUnusedCacheFilesOperation(this, _cacheMgr);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
+        }
+
+        /// <summary>
+        /// 清理包裹本地所有的缓存文件
+        /// </summary>
+        public ClearAllCacheFilesOperation ClearAllCacheFilesAsync()
+        {
+            DebugCheckInitialize();
+            var operation = new ClearAllCacheFilesOperation(_cacheMgr);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
+        }
+
+        public GetAllCacheFileInfosOperation GetAllCacheFileInfosAsync(string packageVersion)
+        {
+            DebugCheckInitialize();
+            
+            var operation = new GetAllCacheFileInfosOperation(_persistentMgr, _cacheMgr, packageVersion);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
         }
         #endregion
 

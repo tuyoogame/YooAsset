@@ -190,6 +190,7 @@ namespace YooAsset
                     Manifest.BundleList = new List<PackageBundle>(_packageBundleCount);
                     Manifest.BundleDic1 = new Dictionary<string, PackageBundle>(_packageBundleCount);
                     Manifest.BundleDic2 = new Dictionary<string, PackageBundle>(_packageBundleCount);
+                    Manifest.BundleDic3 = new Dictionary<string, PackageBundle>(_packageBundleCount);
                     _progressTotalValue = _packageBundleCount;
                     _steps = ESteps.DeserializeBundleList;
                 }
@@ -212,8 +213,8 @@ namespace YooAsset
                         Manifest.BundleDic2.Add(packageBundle.FileName, packageBundle);
 
                         // 注意：原始文件可能存在相同的CacheGUID
-                        if (Manifest.CacheGUIDs.Contains(packageBundle.CacheGUID) == false)
-                            Manifest.CacheGUIDs.Add(packageBundle.CacheGUID);
+                        if (Manifest.BundleDic3.ContainsKey(packageBundle.CacheGUID) == false)
+                            Manifest.BundleDic3.Add(packageBundle.CacheGUID, packageBundle);
 
                         _packageBundleCount--;
                         Progress = 1f - _packageBundleCount / _progressTotalValue;
