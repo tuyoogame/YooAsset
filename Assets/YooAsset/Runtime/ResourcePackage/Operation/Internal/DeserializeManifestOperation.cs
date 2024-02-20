@@ -142,9 +142,9 @@ namespace YooAsset
                                 Manifest.AssetPathMapping1.Add(location, packageAsset.AssetPath);
 
                             // 添加无后缀名路径的映射
-                            if (Path.HasExtension(location))
+                            string locationWithoutExtension = Path.ChangeExtension(location, null);
+                            if (ReferenceEquals(location, locationWithoutExtension) == false)
                             {
-                                string locationWithoutExtension = PathUtility.RemoveExtension(location);
                                 if (Manifest.AssetPathMapping1.ContainsKey(locationWithoutExtension))
                                     YooLogger.Warning($"Location have existed : {locationWithoutExtension}");
                                 else
