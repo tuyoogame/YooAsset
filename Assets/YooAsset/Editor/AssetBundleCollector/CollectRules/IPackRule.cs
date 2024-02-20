@@ -42,7 +42,7 @@ namespace YooAsset.Editor
         public string GetBundleName(string packageName, bool uniqueBundleName)
         {
             string fullName;
-            string bundleName = EditorTools.GetRegularPath(_bundleName).Replace('/', '_').Replace('.', '_').ToLower();
+            string bundleName = EditorTools.GetRegularPath(_bundleName).Replace('/', '_').Replace('.', '_').Replace(" ", "_").ToLower();
             if (uniqueBundleName)
                 fullName = $"{packageName}_{bundleName}.{_bundleExtension}";
             else
@@ -56,7 +56,7 @@ namespace YooAsset.Editor
         public string GetShareBundleName(string packageName, bool uniqueBundleName)
         {
             string fullName;
-            string bundleName = EditorTools.GetRegularPath(_bundleName).Replace('/', '_').Replace('.', '_').ToLower();
+            string bundleName = EditorTools.GetRegularPath(_bundleName).Replace('/', '_').Replace('.', '_').Replace(" ", "_").ToLower();
             if (uniqueBundleName)
                 fullName = $"{packageName}_share_{bundleName}.{_bundleExtension}";
             else
