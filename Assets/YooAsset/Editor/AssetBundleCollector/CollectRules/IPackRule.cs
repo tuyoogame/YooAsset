@@ -35,6 +35,7 @@ namespace YooAsset.Editor
 		{
 			string fullName;
 			string bundleName = EditorTools.GetRegularPath(_bundleName).Replace('/', '_').Replace('.', '_').ToLower();
+			bundleName = bundleName.Replace(" ", "_");
 			if (uniqueBundleName)
 				fullName = $"{packageName}_{bundleName}.{_bundleExtension}";
 			else
