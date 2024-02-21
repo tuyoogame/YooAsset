@@ -191,7 +191,7 @@ namespace YooAsset
     /// <summary>
     /// 哈希工具类
     /// </summary>
-    internal static class HashUtility
+    public static class HashUtility
     {
         private static string ToString(byte[] hashBytes)
         {

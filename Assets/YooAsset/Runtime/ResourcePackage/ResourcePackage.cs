@@ -413,6 +413,9 @@ namespace YooAsset
             return operation;
         }
 
+        /// <summary>
+        /// 获取指定版本的缓存信息
+        /// </summary>
         public GetAllCacheFileInfosOperation GetAllCacheFileInfosAsync(string packageVersion)
         {
             DebugCheckInitialize();
