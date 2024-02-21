@@ -90,14 +90,20 @@ namespace YooAsset.Editor
         /// <summary>
         /// 获取包裹收集的资源文件
         /// </summary>
-        public CollectResult GetPackageAssets(EBuildMode buildMode, string packageName)
+        public CollectResult GetPackageAssets(BuildParameters buildParameters, EBuildMode buildMode, string packageName)
         {
             if (string.IsNullOrEmpty(packageName))
                 throw new Exception("Build package name is null or empty !");
 
+
             // 检测配置合法性
             var package = GetPackage(packageName);
             package.CheckConfigError();
+
+            if (!string.IsNullOrEmpty(package.ExtraCollectFolders) && buildParameters is not RawFileBuildParameters)
+            {
+                throw new Exception($"{buildParameters.BuildPipeline} is not supported ExtraCollectFolder!");
+            }
 
             // 创建资源收集命令
             CollectCommand command = new CollectCommand(buildMode, packageName,
