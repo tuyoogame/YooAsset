@@ -1,4 +1,4 @@
-#if UNITY_2019_4_OR_NEWER
+ï»¿#if UNITY_2019_4_OR_NEWER
 using System;
 using System.IO;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// Ö´ÐÐ¹¹½¨
+        /// æ‰§è¡Œæž„å»º
         /// </summary>
         protected override void ExecuteBuild()
         {
