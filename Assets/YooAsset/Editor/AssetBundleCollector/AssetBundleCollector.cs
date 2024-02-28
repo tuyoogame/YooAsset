@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -155,6 +156,14 @@ namespace YooAsset.Editor
                 string collectDirectory = CollectPath;
                 string[] findResult = EditorTools.FindAssets(EAssetSearchType.All, collectDirectory);
                 findAssets.AddRange(findResult);
+            }
+            else if (Directory.Exists(CollectPath))
+            {
+                string[] files = Directory.GetFiles(CollectPath, "*", SearchOption.AllDirectories);
+                foreach (var file in files)
+                {
+                    findAssets.Add(EditorTools.GetRegularPath(file));
+                }
             }
             else
             {

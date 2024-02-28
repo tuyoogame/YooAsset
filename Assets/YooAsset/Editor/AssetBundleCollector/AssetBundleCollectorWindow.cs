@@ -39,6 +39,7 @@ namespace YooAsset.Editor
         private Toggle _enableAddressableToogle;
         private Toggle _locationToLowerToogle;
         private Toggle _includeAssetGUIDToogle;
+        private TextField _extraCollectFolder;
         private Toggle _ignoreDefaultTypeToogle;
         private Toggle _autoCollectShadersToogle;
 
@@ -147,6 +148,17 @@ namespace YooAsset.Editor
                     if (selectPackage != null)
                     {
                         selectPackage.IncludeAssetGUID = evt.newValue;
+                        AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
+                        RefreshWindow();
+                    }
+                });
+                _extraCollectFolder = root.Q<TextField>("ExtraCollectFolders");
+                _extraCollectFolder.RegisterValueChangedCallback(evt =>
+                {
+                    var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
+                    if (selectPackage != null)
+                    {
+                        selectPackage.ExtraCollectFolders = evt.newValue;
                         AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
                         RefreshWindow();
                     }

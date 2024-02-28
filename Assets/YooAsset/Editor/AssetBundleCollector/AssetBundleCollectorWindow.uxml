@@ -21,6 +21,7 @@
                 <ui:Toggle label="Enable Addressable" name="EnableAddressable" style="width: 196px; -unity-text-align: middle-left;" />
                 <ui:Toggle label="Location To Lower" name="LocationToLower" style="width: 196px; -unity-text-align: middle-left;" />
                 <ui:Toggle label="Include Asset GUID" name="IncludeAssetGUID" style="width: 196px; -unity-text-align: middle-left;" />
+                <ui:TextField picking-mode="Ignore" label="ExtraCollectFolders" value="filler text" name="ExtraCollectFolders" style="flex-direction: column;" />
                 <ui:Toggle label="Ignore Default Type" name="IgnoreDefaultType" style="width: 196px; -unity-text-align: middle-left;" />
                 <ui:Toggle label="Auto Collect Shaders" name="AutoCollectShaders" value="true" style="width: 196px; -unity-text-align: middle-left;" />
             </ui:VisualElement>

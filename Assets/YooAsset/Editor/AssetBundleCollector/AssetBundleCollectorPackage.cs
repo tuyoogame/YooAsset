@@ -36,6 +36,11 @@ namespace YooAsset.Editor
         public bool IncludeAssetGUID = false;
 
         /// <summary>
+        /// 额外资源收集目录 Split(';')
+        /// </summary>
+        public string ExtraCollectFolders = "";
+
+        /// <summary>
         /// 忽略Unity引擎无法识别的文件
         /// </summary>
         public bool IgnoreDefaultType = true;
@@ -97,7 +102,36 @@ namespace YooAsset.Editor
                         throw new Exception($"The collecting asset file is existed : {collectAsset.AssetInfo.AssetPath}");
                 }
             }
+            if (!string.IsNullOrEmpty(ExtraCollectFolders))
+            {
+                var paths = ExtraCollectFolders.Split(';');
+                foreach (var path in paths)
+                {
+                    var folder = PathUtility.Combine(EditorTools.GetProjectPath(), path);
 
+                    if (!System.IO.Directory.Exists(folder))
+                    {
+                        throw new Exception($"The extra collecting folder not exists : {folder}");
+                    }
+                    AssetBundleCollectorGroup extraGroup = new AssetBundleCollectorGroup();
+                    AssetBundleCollector extraCollecter = new AssetBundleCollector
+                    {
+                        CollectPath = "Assets/../" + path,
+                        AssetTags = path,
+                        PackRuleName = "PackRawFile"
+                    };
+                    extraGroup.Collectors.Add(extraCollecter);
+                    var temper = extraCollecter.GetAllCollectAssets(command, extraGroup);
+                    foreach (var collectAsset in temper)
+                    {
+                        if (result.ContainsKey(collectAsset.AssetInfo.AssetPath) == false)
+                            result.Add(collectAsset.AssetInfo.AssetPath, collectAsset);
+                        else
+                            throw new Exception($"The collecting asset file is existed : {collectAsset.AssetInfo.AssetPath}");
+                    }
+                }
+
+            }
             // 检测可寻址地址是否重复
             if (command.EnableAddressable)
             {

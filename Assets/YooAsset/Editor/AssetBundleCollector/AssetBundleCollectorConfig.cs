@@ -25,6 +25,7 @@ namespace YooAsset.Editor
         public const string XmlEnableAddressable = "AutoAddressable";
         public const string XmlLocationToLower = "LocationToLower";
         public const string XmlIncludeAssetGUID = "IncludeAssetGUID";
+        public const string XmlExtraCollectFolders = "ExtraCollectFolders";
         public const string XmlIgnoreDefaultType = "IgnoreDefaultType";
 
         public const string XmlGroup = "Group";
@@ -101,6 +102,7 @@ namespace YooAsset.Editor
                 package.EnableAddressable = packageElement.GetAttribute(XmlEnableAddressable) == "True" ? true : false;
                 package.LocationToLower = packageElement.GetAttribute(XmlLocationToLower) == "True" ? true : false;
                 package.IncludeAssetGUID = packageElement.GetAttribute(XmlIncludeAssetGUID) == "True" ? true : false;
+                package.ExtraCollectFolders = packageElement.GetAttribute(XmlExtraCollectFolders);
                 package.IgnoreDefaultType = packageElement.GetAttribute(XmlIgnoreDefaultType) == "True" ? true : false;
                 packages.Add(package);
 
@@ -213,6 +215,7 @@ namespace YooAsset.Editor
                 packageElement.SetAttribute(XmlEnableAddressable, package.EnableAddressable.ToString());
                 packageElement.SetAttribute(XmlLocationToLower, package.LocationToLower.ToString());
                 packageElement.SetAttribute(XmlIncludeAssetGUID, package.IncludeAssetGUID.ToString());
+                packageElement.SetAttribute(XmlExtraCollectFolders,package.ExtraCollectFolders);
                 packageElement.SetAttribute(XmlIgnoreDefaultType, package.IgnoreDefaultType.ToString());
                 root.AppendChild(packageElement);
 
