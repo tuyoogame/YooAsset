@@ -19,14 +19,14 @@ namespace YooAsset
             if (_steps == ESteps.None)
             {
                 // 检测资源文件是否存在
-                string guid = UnityEditor.AssetDatabase.AssetPathToGUID(MainAssetInfo.AssetPath);
-                if (string.IsNullOrEmpty(guid))
-                {
-                    string error = $"Not found asset : {MainAssetInfo.AssetPath}";
-                    YooLogger.Error(error);
-                    InvokeCompletion(error, EOperationStatus.Failed);
-                    return;
-                }
+                // string guid = UnityEditor.AssetDatabase.AssetPathToGUID(MainAssetInfo.AssetPath);
+                // if (string.IsNullOrEmpty(guid))
+                // {
+                //     string error = $"Not found asset : {MainAssetInfo.AssetPath}";
+                //     YooLogger.Error(error);
+                //     InvokeCompletion(error, EOperationStatus.Failed);
+                //     return;
+                // }
 
                 _steps = ESteps.CheckBundle;
 
