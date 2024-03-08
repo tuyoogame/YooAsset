@@ -35,6 +35,12 @@ namespace YooAsset
             // 1. 检测资源包
             if (_steps == ESteps.CheckBundle)
             {
+                if (IsWaitForAsyncComplete)
+                {
+                    DependBundles.WaitForAsyncComplete();
+                    OwnerBundle.WaitForAsyncComplete();
+                }
+
                 if (DependBundles.IsDone() == false)
                     return;
                 if (OwnerBundle.IsDone() == false)
@@ -62,6 +68,7 @@ namespace YooAsset
             {
                 if (IsWaitForAsyncComplete || IsForceDestroyComplete)
                 {
+                    // 注意：场景同步加载方法不会立即加载场景，而是在下一帧加载。
                     LoadSceneParameters parameters = new LoadSceneParameters(SceneMode);
                     SceneObject = SceneManager.LoadScene(MainAssetInfo.AssetPath, parameters);
                     _steps = ESteps.Checking;
