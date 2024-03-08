@@ -38,6 +38,16 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 等待异步执行完毕
+        /// </summary>
+        internal void WaitForAsyncComplete()
+        {
+            if (IsValidWithWarning == false)
+                return;
+            Provider.WaitForAsyncComplete();
+        }
+
+        /// <summary>
         /// 场景名称
         /// </summary>
         public string SceneName
@@ -171,5 +181,7 @@ namespace YooAsset
                 return operation;
             }
         }
+
+
     }
 }

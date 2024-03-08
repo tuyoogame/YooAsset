@@ -60,39 +60,59 @@ namespace YooAsset
             // 2. 加载场景
             if (_steps == ESteps.Loading)
             {
-                // 注意：如果场景不存在则返回NULL
-                _asyncOperation = SceneManager.LoadSceneAsync(MainAssetInfo.AssetPath, SceneMode);
-                if (_asyncOperation != null)
+                if (IsWaitForAsyncComplete || IsForceDestroyComplete)
                 {
-                    _asyncOperation.allowSceneActivation = !_suspendLoad;
-                    _asyncOperation.priority = 100;
-                    SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
-                    _steps = ESteps.Checking;
+                    LoadSceneParameters parameters = new LoadSceneParameters(SceneMode);
+                    SceneObject = SceneManager.LoadScene(MainAssetInfo.AssetPath, parameters);
                 }
                 else
                 {
-                    string error = $"Failed to load scene : {MainAssetInfo.AssetPath}";
-                    YooLogger.Error(error);
-                    InvokeCompletion(error, EOperationStatus.Failed);
+                    // 注意：如果场景不存在异步加载方法返回NULL
+                    // 注意：即使是异步加载也要在当帧获取到场景对象
+                    _asyncOperation = SceneManager.LoadSceneAsync(MainAssetInfo.AssetPath, SceneMode);
+                    if (_asyncOperation != null)
+                    {
+                        _asyncOperation.allowSceneActivation = !_suspendLoad;
+                        _asyncOperation.priority = 100;
+                        SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
+                        _steps = ESteps.Checking;
+                    }
+                    else
+                    {
+                        string error = $"Failed to load scene : {MainAssetInfo.AssetPath}";
+                        YooLogger.Error(error);
+                        InvokeCompletion(error, EOperationStatus.Failed);
+                    }
                 }
             }
 
             // 3. 检测加载结果
             if (_steps == ESteps.Checking)
             {
-                Progress = _asyncOperation.progress;
-                if (_asyncOperation.isDone)
+                if (_asyncOperation != null)
                 {
-                    if (SceneObject.IsValid())
+                    if (IsWaitForAsyncComplete || IsForceDestroyComplete)
                     {
-                        InvokeCompletion(string.Empty, EOperationStatus.Succeed);
+                        // 场景加载无法强制异步转同步
+                        YooLogger.Error("The scene is loading asyn !");
                     }
                     else
                     {
-                        string error = $"The load scene is invalid : {MainAssetInfo.AssetPath}";
-                        YooLogger.Error(error);
-                        InvokeCompletion(error, EOperationStatus.Failed);
+                        Progress = _asyncOperation.progress;
+                        if (_asyncOperation.isDone == false)
+                            return;
                     }
+                }
+
+                if (SceneObject.IsValid())
+                {
+                    InvokeCompletion(string.Empty, EOperationStatus.Succeed);
+                }
+                else
+                {
+                    string error = $"The loaded scene is invalid : {MainAssetInfo.AssetPath}";
+                    YooLogger.Error(error);
+                    InvokeCompletion(error, EOperationStatus.Failed);
                 }
             }
         }

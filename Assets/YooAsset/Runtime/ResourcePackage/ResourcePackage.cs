@@ -419,7 +419,7 @@ namespace YooAsset
         public GetAllCacheFileInfosOperation GetAllCacheFileInfosAsync(string packageVersion)
         {
             DebugCheckInitialize();
-            
+
             var operation = new GetAllCacheFileInfosOperation(_persistentMgr, _cacheMgr, packageVersion);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
@@ -603,6 +603,29 @@ namespace YooAsset
 
         #region 场景加载
         /// <summary>
+        /// 同步加载场景
+        /// </summary>
+        /// <param name="location">场景的定位地址</param>
+        /// <param name="sceneMode">场景加载模式</param>
+        public SceneHandle LoadSceneSync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single)
+        {
+            DebugCheckInitialize();
+            AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+            return LoadSceneInternal(assetInfo, true, sceneMode, false, 0);
+        }
+
+        /// <summary>
+        /// 同步加载场景
+        /// </summary>
+        /// <param name="assetInfo">场景的资源信息</param>
+        /// <param name="sceneMode">场景加载模式</param>
+        public SceneHandle LoadSceneSync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single)
+        {
+            DebugCheckInitialize();
+            return LoadSceneInternal(assetInfo, true, sceneMode, false, 0);
+        }
+
+        /// <summary>
         /// 异步加载场景
         /// </summary>
         /// <param name="location">场景的定位地址</param>
@@ -613,8 +636,7 @@ namespace YooAsset
         {
             DebugCheckInitialize();
             AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-            var handle = _resourceMgr.LoadSceneAsync(assetInfo, sceneMode, suspendLoad, priority);
-            return handle;
+            return LoadSceneInternal(assetInfo, false, sceneMode, suspendLoad, priority);
         }
 
         /// <summary>
@@ -627,7 +649,16 @@ namespace YooAsset
         public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, uint priority = 0)
         {
             DebugCheckInitialize();
+            return LoadSceneInternal(assetInfo, false, sceneMode, suspendLoad, priority);
+        }
+
+        private SceneHandle LoadSceneInternal(AssetInfo assetInfo, bool waitForAsyncComplete, LoadSceneMode sceneMode, bool suspendLoad, uint priority)
+        {
+            DebugCheckAssetLoadMethod(nameof(LoadAssetAsync));
+            DebugCheckAssetLoadType(assetInfo.AssetType);
             var handle = _resourceMgr.LoadSceneAsync(assetInfo, sceneMode, suspendLoad, priority);
+            if (waitForAsyncComplete)
+                handle.WaitForAsyncComplete();
             return handle;
         }
         #endregion
