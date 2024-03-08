@@ -61,6 +61,7 @@ namespace YooAsset
                 {
                     LoadSceneParameters loadSceneParameters = new LoadSceneParameters(SceneMode);
                     SceneObject = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(MainAssetInfo.AssetPath, loadSceneParameters);
+                    _steps = ESteps.Checking;
                 }
                 else
                 {

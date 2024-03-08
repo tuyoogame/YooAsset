@@ -64,6 +64,7 @@ namespace YooAsset
                 {
                     LoadSceneParameters parameters = new LoadSceneParameters(SceneMode);
                     SceneObject = SceneManager.LoadScene(MainAssetInfo.AssetPath, parameters);
+                    _steps = ESteps.Checking;
                 }
                 else
                 {

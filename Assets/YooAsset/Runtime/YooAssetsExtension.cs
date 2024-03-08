@@ -157,6 +157,28 @@ namespace YooAsset
 
         #region 场景加载
         /// <summary>
+        /// 同步加载场景
+        /// </summary>
+        /// <param name="location">场景的定位地址</param>
+        /// <param name="sceneMode">场景加载模式</param>
+        public static SceneHandle LoadSceneSync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single)
+        {
+            DebugCheckDefaultPackageValid();
+            return _defaultPackage.LoadSceneSync(location, sceneMode);
+        }
+
+        /// <summary>
+        /// 同步加载场景
+        /// </summary>
+        /// <param name="assetInfo">场景的资源信息</param>
+        /// <param name="sceneMode">场景加载模式</param>
+        public static SceneHandle LoadSceneSync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single)
+        {
+            DebugCheckDefaultPackageValid();
+            return _defaultPackage.LoadSceneSync(assetInfo, sceneMode);
+        }
+
+        /// <summary>
         /// 异步加载场景
         /// </summary>
         /// <param name="location">场景的定位地址</param>
