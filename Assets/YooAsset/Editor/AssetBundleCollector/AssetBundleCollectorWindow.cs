@@ -970,7 +970,7 @@ namespace YooAsset.Editor
 
             if (collector.IsValid() == false)
             {
-                Debug.LogWarning($"The collector is invalid : {collector.CollectPath} in group : {group.GroupName}");
+                collector.CheckConfigError();
                 return;
             }
 
