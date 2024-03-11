@@ -251,7 +251,7 @@ namespace YooAsset.Editor
 
 			// 忽略编辑器下的类型资源
 			Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-			if (assetType == typeof(LightingDataAsset))
+			if (assetType == typeof(LightingDataAsset) || assetType == typeof(LightmapParameters))
 				return false;
 
 			// 检测原生文件是否合规
