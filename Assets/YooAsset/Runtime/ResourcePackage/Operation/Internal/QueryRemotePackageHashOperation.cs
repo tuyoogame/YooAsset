@@ -46,7 +46,7 @@ namespace YooAsset
                 if (_downloader == null)
                 {
                     string fileName = YooAssetSettingsData.GetPackageHashFileName(_packageName, _packageVersion);
-                    string webURL = GetPackageHashRequestURL(fileName);
+                    string webURL = GetPackageHashRequestURL(_packageName, fileName);
                     YooLogger.Log($"Beginning to request package hash : {webURL}");
                     _downloader = new UnityWebDataRequester();
                     _downloader.SendRequest(webURL, _timeout);
@@ -84,15 +84,15 @@ namespace YooAsset
             }
         }
 
-        private string GetPackageHashRequestURL(string fileName)
+        private string GetPackageHashRequestURL(string packageName, string fileName)
         {
             string url;
 
             // 轮流返回请求地址
             if (_requestCount % 2 == 0)
-                url = _remoteServices.GetRemoteMainURL(fileName);
+                url = _remoteServices.GetRemoteMainURL(packageName, fileName);
             else
-                url = _remoteServices.GetRemoteFallbackURL(fileName);
+                url = _remoteServices.GetRemoteFallbackURL(packageName, fileName);
 
             return url;
         }

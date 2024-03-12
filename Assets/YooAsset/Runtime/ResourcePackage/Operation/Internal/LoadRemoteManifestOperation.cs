@@ -75,7 +75,7 @@ namespace YooAsset
                 if (_downloader == null)
                 {
                     string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_packageName, _packageVersion);
-                    string webURL = GetDownloadRequestURL(fileName);
+                    string webURL = GetDownloadRequestURL(_packageName, fileName);
                     YooLogger.Log($"Beginning to download manifest file : {webURL}");
                     _downloader = new UnityWebDataRequester();
                     _downloader.SendRequest(webURL, _timeout);
@@ -139,13 +139,13 @@ namespace YooAsset
             }
         }
 
-        private string GetDownloadRequestURL(string fileName)
+        private string GetDownloadRequestURL(string packageName, string fileName)
         {
             // 轮流返回请求地址
             if (_requestCount % 2 == 0)
-                return _remoteServices.GetRemoteMainURL(fileName);
+                return _remoteServices.GetRemoteMainURL(packageName, fileName);
             else
-                return _remoteServices.GetRemoteFallbackURL(fileName);
+                return _remoteServices.GetRemoteFallbackURL(packageName, fileName);
         }
     }
 }
