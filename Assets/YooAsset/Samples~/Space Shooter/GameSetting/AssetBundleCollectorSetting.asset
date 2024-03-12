@@ -21,8 +21,8 @@ MonoBehaviour:
     EnableAddressable: 1
     LocationToLower: 0
     IncludeAssetGUID: 0
-    IgnoreDefaultType: 1
     AutoCollectShaders: 1
+    IgnoreRuleName: NormalIgnoreRule
     Groups:
     - GroupName: battle
       GroupDesc: "\u6218\u6597"
@@ -41,7 +41,7 @@ MonoBehaviour:
         CollectorGUID: 4d7c84745db8e884f8020a8c5356e67c
         CollectorType: 0
         AddressRuleName: AddressByFileName
-        PackRuleName: PackSeparately
+        PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: 
         UserData: 
@@ -94,14 +94,6 @@ MonoBehaviour:
         UserData: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/UIPanel
         CollectorGUID: 12d33f33f3a55224c9c747d7bffa1c68
-        CollectorType: 0
-        AddressRuleName: AddressByFileName
-        PackRuleName: PackSeparately
-        FilterRuleName: CollectAll
-        AssetTags: 
-        UserData: 
-      - CollectPath: Assets/Samples/Space Shooter/GameRes/UIAtlas
-        CollectorGUID: 80caf8bc3d0ac5b48a5cab7765a68205
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackSeparately
