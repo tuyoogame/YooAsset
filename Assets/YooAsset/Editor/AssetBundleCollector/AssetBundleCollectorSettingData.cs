@@ -191,6 +191,7 @@ namespace YooAsset.Editor
             if (isFixed)
             {
                 IsDirty = true;
+                Debug.Log("Fix package config error done !");
             }
         }
 

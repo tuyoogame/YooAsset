@@ -10,7 +10,7 @@ namespace YooAsset.Editor
 {
     public class AssetBundleCollectorConfig
     {
-        public const string ConfigVersion = "v2.0.0";
+        public const string ConfigVersion = "v2.1";
 
         public const string XmlVersion = "Version";
         public const string XmlCommon = "Common";
@@ -257,6 +257,23 @@ namespace YooAsset.Editor
             string configVersion = root.GetAttribute(XmlVersion);
             if (configVersion == ConfigVersion)
                 return true;
+
+            // v2.0.0 -> v2.1
+            if (configVersion == "v2.0.0")
+            {
+                // 读取包裹配置
+                var packageNodeList = root.GetElementsByTagName(XmlPackage);
+                foreach (var packageNode in packageNodeList)
+                {
+                    XmlElement packageElement = packageNode as XmlElement;
+                    if (packageElement.HasAttribute(XmlIgnoreRuleName) == false)
+                        packageElement.SetAttribute(XmlIgnoreRuleName, nameof(NormalIgnoreRule));
+                }
+
+                // 更新版本
+                root.SetAttribute(XmlVersion, "v2.1");
+                return UpdateXmlConfig(xmlDoc);
+            }
 
             return false;
         }

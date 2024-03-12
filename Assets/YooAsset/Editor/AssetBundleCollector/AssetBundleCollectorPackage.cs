@@ -56,6 +56,16 @@ namespace YooAsset.Editor
         /// </summary>
         public void CheckConfigError()
         {
+            if (string.IsNullOrEmpty(IgnoreRuleName))
+            {
+                throw new Exception($"{nameof(IgnoreRuleName)} is null or empty !");
+            }
+            else
+            {
+                if (AssetBundleCollectorSettingData.HasIgnoreRuleName(IgnoreRuleName) == false)
+                    throw new Exception($"Invalid {nameof(IIgnoreRule)} class type : {IgnoreRuleName} in package : {PackageName}");
+            }
+
             foreach (var group in Groups)
             {
                 group.CheckConfigError();
@@ -68,6 +78,14 @@ namespace YooAsset.Editor
         public bool FixConfigError()
         {
             bool isFixed = false;
+
+            if (string.IsNullOrEmpty(IgnoreRuleName))
+            {
+                Debug.LogWarning($"Set the {nameof(IgnoreRuleName)} to {nameof(NormalIgnoreRule)}");
+                IgnoreRuleName = nameof(NormalIgnoreRule);
+                isFixed = true;
+            }
+
             foreach (var group in Groups)
             {
                 if (group.FixConfigError())
@@ -75,6 +93,7 @@ namespace YooAsset.Editor
                     isFixed = true;
                 }
             }
+
             return isFixed;
         }
 
