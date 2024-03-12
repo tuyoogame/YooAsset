@@ -14,11 +14,6 @@ namespace YooAsset.Editor
         public string PackageName { private set; get; }
 
         /// <summary>
-        /// 忽略Unity引擎无法识别的文件
-        /// </summary>
-        public bool IgnoreDefaultType { private set; get; }
-
-        /// <summary>
         /// 启用可寻址资源定位
         /// </summary>
         public bool EnableAddressable { private set; get; }
@@ -48,17 +43,24 @@ namespace YooAsset.Editor
         /// </summary>
         public string ShadersBundleName { private set; get; }
 
+        /// <summary>
+        /// 忽略规则实例
+        /// </summary>
+        public IIgnoreRule IgnoreRule { private set; get; }
 
-        public CollectCommand(EBuildMode buildMode, string packageName, bool enableAddressable, bool locationToLower, bool includeAssetGUID, bool ignoreDefaultType, bool autoCollectShaders, bool uniqueBundleName)
+
+        public CollectCommand(EBuildMode buildMode, string packageName,
+            bool enableAddressable, bool locationToLower, bool includeAssetGUID, 
+            bool autoCollectShaders, bool uniqueBundleName, IIgnoreRule ignoreRule)
         {
             BuildMode = buildMode;
             PackageName = packageName;
             EnableAddressable = enableAddressable;
             LocationToLower = locationToLower;
             IncludeAssetGUID = includeAssetGUID;
-            IgnoreDefaultType = ignoreDefaultType;
             AutoCollectShaders = autoCollectShaders;
             UniqueBundleName = uniqueBundleName;
+            IgnoreRule = ignoreRule;
 
             // 着色器统一全名称
             var packRuleResult = DefaultPackRule.CreateShadersPackRuleResult();

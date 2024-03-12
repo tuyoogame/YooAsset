@@ -25,7 +25,7 @@ namespace YooAsset.Editor
         public const string XmlEnableAddressable = "AutoAddressable";
         public const string XmlLocationToLower = "LocationToLower";
         public const string XmlIncludeAssetGUID = "IncludeAssetGUID";
-        public const string XmlIgnoreDefaultType = "IgnoreDefaultType";
+        public const string XmlIgnoreRuleName = "IgnoreRuleName";
 
         public const string XmlGroup = "Group";
         public const string XmlGroupActiveRule = "GroupActiveRule";
@@ -101,7 +101,7 @@ namespace YooAsset.Editor
                 package.EnableAddressable = packageElement.GetAttribute(XmlEnableAddressable) == "True" ? true : false;
                 package.LocationToLower = packageElement.GetAttribute(XmlLocationToLower) == "True" ? true : false;
                 package.IncludeAssetGUID = packageElement.GetAttribute(XmlIncludeAssetGUID) == "True" ? true : false;
-                package.IgnoreDefaultType = packageElement.GetAttribute(XmlIgnoreDefaultType) == "True" ? true : false;
+                package.IgnoreRuleName = packageElement.GetAttribute(XmlIgnoreRuleName);
                 packages.Add(package);
 
                 // 读取分组配置
@@ -213,7 +213,7 @@ namespace YooAsset.Editor
                 packageElement.SetAttribute(XmlEnableAddressable, package.EnableAddressable.ToString());
                 packageElement.SetAttribute(XmlLocationToLower, package.LocationToLower.ToString());
                 packageElement.SetAttribute(XmlIncludeAssetGUID, package.IncludeAssetGUID.ToString());
-                packageElement.SetAttribute(XmlIgnoreDefaultType, package.IgnoreDefaultType.ToString());
+                packageElement.SetAttribute(XmlIgnoreRuleName, package.IgnoreRuleName);
                 root.AppendChild(packageElement);
 
                 // 设置分组配置

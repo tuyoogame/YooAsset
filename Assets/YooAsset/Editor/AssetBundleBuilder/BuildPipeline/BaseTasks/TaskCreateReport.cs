@@ -37,7 +37,7 @@ namespace YooAsset.Editor
                 buildReport.Summary.EnableAddressable = buildMapContext.Command.EnableAddressable;
                 buildReport.Summary.LocationToLower = buildMapContext.Command.LocationToLower;
                 buildReport.Summary.IncludeAssetGUID = buildMapContext.Command.IncludeAssetGUID;
-                buildReport.Summary.IgnoreDefaultType = buildMapContext.Command.IgnoreDefaultType;
+                buildReport.Summary.IgnoreRuleName = buildMapContext.Command.IgnoreRule.GetType().FullName;
                 buildReport.Summary.AutoCollectShaders = buildMapContext.Command.AutoCollectShaders;
 
                 // 构建参数

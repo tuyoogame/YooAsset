@@ -58,8 +58,8 @@ namespace YooAsset.Editor
         public bool EnableAddressable;
         public bool LocationToLower;
         public bool IncludeAssetGUID;
-        public bool IgnoreDefaultType;
         public bool AutoCollectShaders;
+        public string IgnoreRuleName;
 
         // 构建参数
         public bool EnableSharePackRule;

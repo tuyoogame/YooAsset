@@ -72,8 +72,8 @@ namespace YooAsset.Editor
             _items.Add(new ItemWrapper("Enable Addressable", $"{buildReport.Summary.EnableAddressable}"));
             _items.Add(new ItemWrapper("Location To Lower", $"{buildReport.Summary.LocationToLower}"));
             _items.Add(new ItemWrapper("Include Asset GUID", $"{buildReport.Summary.IncludeAssetGUID}"));
-            _items.Add(new ItemWrapper("Ignore Default Type", $"{buildReport.Summary.IgnoreDefaultType}"));
             _items.Add(new ItemWrapper("Auto Collect Shaders", $"{buildReport.Summary.AutoCollectShaders}"));
+            _items.Add(new ItemWrapper("Ignore Rule Name", $"{buildReport.Summary.IgnoreRuleName}"));
 
             _items.Add(new ItemWrapper(string.Empty, string.Empty));
             _items.Add(new ItemWrapper("Build Params", string.Empty));

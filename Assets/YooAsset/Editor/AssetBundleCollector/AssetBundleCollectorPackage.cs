@@ -36,14 +36,14 @@ namespace YooAsset.Editor
         public bool IncludeAssetGUID = false;
 
         /// <summary>
-        /// 忽略Unity引擎无法识别的文件
-        /// </summary>
-        public bool IgnoreDefaultType = true;
-
-        /// <summary>
         /// 自动收集所有着色器（所有着色器存储在一个资源包内）
         /// </summary>
         public bool AutoCollectShaders = true;
+
+        /// <summary>
+        /// 资源忽略规则名
+        /// </summary>
+        public string IgnoreRuleName = nameof(NormalIgnoreRule);
 
         /// <summary>
         /// 分组列表

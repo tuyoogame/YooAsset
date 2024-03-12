@@ -166,7 +166,7 @@ namespace YooAsset.Editor
             foreach (string assetPath in findAssets)
             {
                 var assetInfo = new AssetInfo(assetPath);
-                if (IsValidateAsset(command, assetInfo) && IsCollectAsset(group, assetInfo))
+                if (command.IgnoreRule.IsIgnore(assetInfo) == false && IsCollectAsset(group, assetInfo))
                 {
                     if (result.ContainsKey(assetPath) == false)
                     {
@@ -228,37 +228,6 @@ namespace YooAsset.Editor
             return collectAssetInfo;
         }
 
-        private bool IsValidateAsset(CollectCommand command, AssetInfo assetInfo)
-        {
-            if (assetInfo.AssetPath.StartsWith("Assets/") == false && assetInfo.AssetPath.StartsWith("Packages/") == false)
-            {
-                UnityEngine.Debug.LogError($"Invalid asset path : {assetInfo.AssetPath}");
-                return false;
-            }
-
-            // 忽略文件夹
-            if (AssetDatabase.IsValidFolder(assetInfo.AssetPath))
-                return false;
-
-            // 忽略编辑器下的类型资源
-            if (assetInfo.AssetType == typeof(LightingDataAsset))
-                return false;
-
-            // 忽略Unity引擎无法识别的文件
-            if (command.IgnoreDefaultType)
-            {
-                if (assetInfo.AssetType == typeof(UnityEditor.DefaultAsset))
-                {
-                    UnityEngine.Debug.LogWarning($"Cannot pack default asset : {assetInfo.AssetPath}");
-                    return false;
-                }
-            }
-
-            if (DefaultFilterRule.IsIgnoreFile(assetInfo.FileExtension))
-                return false;
-
-            return true;
-        }
         private bool IsCollectAsset(AssetBundleCollectorGroup group, AssetInfo assetInfo)
         {
             // 根据规则设置过滤资源文件
@@ -312,7 +281,7 @@ namespace YooAsset.Editor
                     continue;
 
                 AssetInfo assetInfo = new AssetInfo(assetPath);
-                if (IsValidateAsset(command, assetInfo))
+                if (command.IgnoreRule.IsIgnore(assetInfo) == false)
                     result.Add(assetInfo);
             }
             return result;

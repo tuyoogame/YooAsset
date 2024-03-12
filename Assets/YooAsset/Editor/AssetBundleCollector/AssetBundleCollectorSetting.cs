@@ -24,7 +24,6 @@ namespace YooAsset.Editor
         /// </summary>
         public bool UniqueBundleName = false;
 
-
         /// <summary>
         /// 包裹列表
         /// </summary>
@@ -100,13 +99,13 @@ namespace YooAsset.Editor
             package.CheckConfigError();
 
             // 创建资源收集命令
+            IIgnoreRule ignoreRule = AssetBundleCollectorSettingData.GetIgnoreRuleInstance(package.IgnoreRuleName);
             CollectCommand command = new CollectCommand(buildMode, packageName,
                  package.EnableAddressable,
                  package.LocationToLower,
                  package.IncludeAssetGUID,
-                 package.IgnoreDefaultType,
                  package.AutoCollectShaders,
-                 UniqueBundleName);
+                 UniqueBundleName, ignoreRule);
 
             // 获取收集的资源集合
             CollectResult collectResult = new CollectResult(command);

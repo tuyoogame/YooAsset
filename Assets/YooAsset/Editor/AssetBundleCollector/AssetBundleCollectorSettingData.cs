@@ -21,6 +21,9 @@ namespace YooAsset.Editor
         private static readonly Dictionary<string, System.Type> _cacheFilterRuleTypes = new Dictionary<string, System.Type>();
         private static readonly Dictionary<string, IFilterRule> _cacheFilterRuleInstance = new Dictionary<string, IFilterRule>();
 
+        private static readonly Dictionary<string, System.Type> _cacheIgnoreRuleTypes = new Dictionary<string, System.Type>();
+        private static readonly Dictionary<string, IIgnoreRule> _cacheIgnoreRuleInstance = new Dictionary<string, IIgnoreRule>();
+        
         /// <summary>
         /// 配置数据是否被修改
         /// </summary>
@@ -129,6 +132,29 @@ namespace YooAsset.Editor
                         _cacheActiveRuleTypes.Add(type.Name, type);
                 }
             }
+
+            // IIgnoreRule
+            {
+                // 清空缓存集合
+                _cacheIgnoreRuleTypes.Clear();
+                _cacheIgnoreRuleInstance.Clear();
+
+                // 获取所有类型
+                List<Type> types = new List<Type>(100)
+                {
+                    typeof(NormalIgnoreRule),
+                    typeof(RawFileIgnoreRule),
+                };
+
+                var customTypes = EditorTools.GetAssignableTypes(typeof(IIgnoreRule));
+                types.AddRange(customTypes);
+                for (int i = 0; i < types.Count; i++)
+                {
+                    Type type = types[i];
+                    if (_cacheIgnoreRuleTypes.ContainsKey(type.Name) == false)
+                        _cacheIgnoreRuleTypes.Add(type.Name, type);
+                }
+            }
         }
 
         private static AssetBundleCollectorSetting _setting = null;
@@ -225,6 +251,18 @@ namespace YooAsset.Editor
             }
             return names;
         }
+        public static List<RuleDisplayName> GetIgnoreRuleNames()
+        {
+            List<RuleDisplayName> names = new List<RuleDisplayName>();
+            foreach (var pair in _cacheIgnoreRuleTypes)
+            {
+                RuleDisplayName ruleName = new RuleDisplayName();
+                ruleName.ClassName = pair.Key;
+                ruleName.DisplayName = GetRuleDisplayName(pair.Key, pair.Value);
+                names.Add(ruleName);
+            }
+            return names;
+        }
         private static string GetRuleDisplayName(string name, Type type)
         {
             var attribute = DisplayNameAttributeHelper.GetAttribute<DisplayNameAttribute>(type);
@@ -249,6 +287,10 @@ namespace YooAsset.Editor
         public static bool HasFilterRuleName(string ruleName)
         {
             return _cacheFilterRuleTypes.Keys.Contains(ruleName);
+        }
+        public static bool HasIgnoreRuleName(string ruleName)
+        {
+            return _cacheIgnoreRuleTypes.Keys.Contains(ruleName);
         }
 
         public static IActiveRule GetActiveRuleInstance(string ruleName)
@@ -317,6 +359,23 @@ namespace YooAsset.Editor
             else
             {
                 throw new Exception($"{nameof(IFilterRule)} is invalid：{ruleName}");
+            }
+        }
+        public static IIgnoreRule GetIgnoreRuleInstance(string ruleName)
+        {
+            if (_cacheIgnoreRuleInstance.TryGetValue(ruleName, out IIgnoreRule instance))
+                return instance;
+
+            // 如果不存在创建类的实例
+            if (_cacheIgnoreRuleTypes.TryGetValue(ruleName, out Type type))
+            {
+                instance = (IIgnoreRule)Activator.CreateInstance(type);
+                _cacheIgnoreRuleInstance.Add(ruleName, instance);
+                return instance;
+            }
+            else
+            {
+                throw new Exception($"{nameof(IIgnoreRule)} is invalid：{ruleName}");
             }
         }
 
