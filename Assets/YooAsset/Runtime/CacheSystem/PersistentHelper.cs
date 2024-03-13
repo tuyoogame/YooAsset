@@ -23,6 +23,8 @@ namespace YooAsset
             return new System.Uri(path).ToString();
 #elif UNITY_STANDALONE
             return StringUtility.Format("file:///{0}", path);
+#elif UNITY_OPENHARMONY
+            return path;
 #else
             return path;
 #endif
