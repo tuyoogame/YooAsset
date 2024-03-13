@@ -46,7 +46,12 @@ namespace YooAsset
 		}
 		private static string CreateDefaultBuildinRoot()
 		{
-			return PathUtility.Combine(UnityEngine.Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
+			string path = PathUtility.Combine(UnityEngine.Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
+#if UNITY_OPENHARMONY
+			return $"file://{path}";
+#else
+			return path;
+#endif
 		}
 		private static string CreateDefaultSandboxRoot()
 		{

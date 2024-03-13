@@ -47,6 +47,8 @@ namespace YooAsset
 			return StringUtility.Format("file:///{0}", path);
 #elif UNITY_WEBGL
 			return path;
+#elif UNITY_OPENHARMONY
+			return path;
 #endif
 		}
 	}
