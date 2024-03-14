@@ -285,6 +285,16 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 向网络端请求预下载资源版本
+        /// </summary>
+        /// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
+        /// <param name="timeout">超时时间（默认值：3秒）</param>
+        public UpdatePrePackageVersionOperation UpdatePrePackageVersionAsync(bool appendTimeTicks = true, int timeout = 3)
+        {
+            DebugCheckInitialize(false);
+            return _playModeImpl.UpdatePrePackageVersionAsync(appendTimeTicks, timeout);
+        }
+        /// <summary>
         /// 向网络端请求并更新清单
         /// </summary>
         /// <param name="packageVersion">更新的包裹版本</param>

@@ -54,6 +54,12 @@ namespace YooAsset
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
+        UpdatePrePackageVersionOperation IPlayMode.UpdatePrePackageVersionAsync(bool appendTimeTicks, int timeout)
+        {
+            var operation = new EditorPlayModeUpdatePrePackageVersionOperation();
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
+        }
         UpdatePackageManifestOperation IPlayMode.UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion, int timeout)
         {
             var operation = new EditorPlayModeUpdatePackageManifestOperation();

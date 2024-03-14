@@ -19,6 +19,11 @@ namespace YooAsset
         UpdatePackageVersionOperation UpdatePackageVersionAsync(bool appendTimeTicks, int timeout);
 
         /// <summary>
+        /// 向网络端请求预下载资源版本
+        /// </summary>
+        UpdatePrePackageVersionOperation UpdatePrePackageVersionAsync(bool appendTimeTicks, int timeout);
+
+        /// <summary>
         /// 向网络端请求并更新清单
         /// </summary>
         UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion, int timeout);
