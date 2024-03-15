@@ -46,7 +46,7 @@ namespace YooAsset
                 if (_downloader == null)
                 {
                     string fileName = YooAssetSettingsData.GetPackageVersionFileName(_packageName);
-                    string webURL = GetPackageVersionRequestURL(fileName);
+                    string webURL = GetPackageVersionRequestURL(_packageName, fileName);
                     YooLogger.Log($"Beginning to request package version : {webURL}");
                     _downloader = new UnityWebDataRequester();
                     _downloader.SendRequest(webURL, _timeout);
@@ -84,15 +84,15 @@ namespace YooAsset
             }
         }
 
-        private string GetPackageVersionRequestURL(string fileName)
+        private string GetPackageVersionRequestURL(string packageName, string fileName)
         {
             string url;
 
             // 轮流返回请求地址
             if (_requestCount % 2 == 0)
-                url = _remoteServices.GetRemoteMainURL(fileName);
+                url = _remoteServices.GetRemoteMainURL(packageName, fileName);
             else
-                url = _remoteServices.GetRemoteFallbackURL(fileName);
+                url = _remoteServices.GetRemoteFallbackURL(packageName, fileName);
 
             // 在URL末尾添加时间戳
             if (_appendTimeTicks)

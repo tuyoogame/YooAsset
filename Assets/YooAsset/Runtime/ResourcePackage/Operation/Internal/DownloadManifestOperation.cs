@@ -43,7 +43,7 @@ namespace YooAsset
                 {
                     string savePath = _persistent.GetSandboxPackageHashFilePath(_packageVersion);
                     string fileName = YooAssetSettingsData.GetPackageHashFileName(_persistent.PackageName, _packageVersion);
-                    string webURL = GetDownloadRequestURL(fileName);
+                    string webURL = GetDownloadRequestURL(_persistent.PackageName, fileName);
                     YooLogger.Log($"Beginning to download package hash file : {webURL}");
                     _downloader1 = new UnityWebFileRequester();
                     _downloader1.SendRequest(webURL, savePath, _timeout);
@@ -74,7 +74,7 @@ namespace YooAsset
                 {
                     string savePath = _persistent.GetSandboxPackageManifestFilePath(_packageVersion);
                     string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_persistent.PackageName, _packageVersion);
-                    string webURL = GetDownloadRequestURL(fileName);
+                    string webURL = GetDownloadRequestURL(_persistent.PackageName, fileName);
                     YooLogger.Log($"Beginning to download package manifest file : {webURL}");
                     _downloader2 = new UnityWebFileRequester();
                     _downloader2.SendRequest(webURL, savePath, _timeout);
@@ -101,13 +101,13 @@ namespace YooAsset
             }
         }
 
-        private string GetDownloadRequestURL(string fileName)
+        private string GetDownloadRequestURL(string packageName, string fileName)
         {
             // 轮流返回请求地址
             if (_requestCount % 2 == 0)
-                return _remoteServices.GetRemoteMainURL(fileName);
+                return _remoteServices.GetRemoteMainURL(packageName, fileName);
             else
-                return _remoteServices.GetRemoteFallbackURL(fileName);
+                return _remoteServices.GetRemoteFallbackURL(packageName, fileName);
         }
     }
 }

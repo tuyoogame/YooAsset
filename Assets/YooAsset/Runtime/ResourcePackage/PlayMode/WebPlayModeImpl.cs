@@ -48,8 +48,8 @@ namespace YooAsset
         // 下载相关
         private BundleInfo ConvertToDownloadInfo(PackageBundle packageBundle)
         {
-            string remoteMainURL = _remoteServices.GetRemoteMainURL(packageBundle.FileName);
-            string remoteFallbackURL = _remoteServices.GetRemoteFallbackURL(packageBundle.FileName);
+            string remoteMainURL = _remoteServices.GetRemoteMainURL(packageBundle.PackageName, packageBundle.FileName);
+            string remoteFallbackURL = _remoteServices.GetRemoteFallbackURL(packageBundle.PackageName, packageBundle.FileName);
             BundleInfo bundleInfo = new BundleInfo(_assist, packageBundle, BundleInfo.ELoadMode.LoadFromRemote, remoteMainURL, remoteFallbackURL);
             return bundleInfo;
         }
