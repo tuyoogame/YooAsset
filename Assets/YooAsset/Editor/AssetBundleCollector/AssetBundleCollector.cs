@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -149,7 +150,9 @@ namespace YooAsset.Editor
             Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(1000);
 
             // 收集打包资源路径
-            List<string> findAssets =new List<string>();
+            List<string> findAssets = new List<string>();
+
+            //收集路径是工程文件夹
             if (AssetDatabase.IsValidFolder(CollectPath))
             {
                 string collectDirectory = CollectPath;
@@ -159,7 +162,31 @@ namespace YooAsset.Editor
             else
             {
                 string assetPath = CollectPath;
-                findAssets.Add(assetPath);
+
+                var extra = AssetDatabase.LoadAssetAtPath<ExtraCollectPath>(assetPath);
+
+                if (extra != null)
+                {
+                    if (!string.IsNullOrEmpty(extra.path))
+                    {
+                        if(Directory.Exists(extra.path))
+                        {
+                            string[] files = Directory.GetFiles(extra.path, "*", SearchOption.AllDirectories);
+                            foreach (var file in files)
+                            {
+                                findAssets.Add(EditorTools.GetRegularPath(file));
+                            }
+                        }
+                        else if (File.Exists(extra.path))
+                        {
+                            findAssets.Add(extra.path);
+                        }
+                    }
+                }
+                else
+                {
+                    findAssets.Add(assetPath);
+                }
             }
 
             // 收集打包资源信息
