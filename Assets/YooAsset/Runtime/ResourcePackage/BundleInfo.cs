@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace YooAsset
 {
@@ -186,6 +187,7 @@ namespace YooAsset
                 var bundleInfo = CreateUnpackInfo(assist, packageBundle);
                 result.Add(bundleInfo);
             }
+            ListPool<PackageBundle>.Release(unpackList);
             return result;
         }
         private static BundleInfo CreateUnpackInfo(ResourceAssist assist, PackageBundle packageBundle)

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.SceneManagement;
 
 namespace YooAsset
@@ -107,7 +108,7 @@ namespace YooAsset
             }
 
             // 卸载依赖资源包加载器
-            string[] dependBundleNames = _bundleQuery.GetDependBundleNames(assetInfo);
+            var dependBundleNames = _bundleQuery.GetDependBundleNames(assetInfo);
             foreach (var dependBundleName in dependBundleNames)
             {
                 var dependLoader = TryGetAssetBundleLoader(dependBundleName);
@@ -122,6 +123,7 @@ namespace YooAsset
                     }
                 }
             }
+            ListPool<string>.Release(dependBundleNames);
         }
 
         /// <summary>
@@ -392,13 +394,14 @@ namespace YooAsset
         }
         internal List<BundleLoaderBase> CreateDependAssetBundleLoaders(AssetInfo assetInfo)
         {
-            BundleInfo[] depends = _bundleQuery.GetDependBundleInfos(assetInfo);
-            List<BundleLoaderBase> result = new List<BundleLoaderBase>(depends.Length);
+            List<BundleInfo> depends = _bundleQuery.GetDependBundleInfos(assetInfo);
+            List<BundleLoaderBase> result = ListPool<BundleLoaderBase>.Get();
             foreach (var bundleInfo in depends)
             {
                 BundleLoaderBase dependLoader = CreateAssetBundleLoaderInternal(bundleInfo);
                 result.Add(dependLoader);
             }
+            ListPool<BundleInfo>.Release(depends);
             return result;
         }
         internal void RemoveBundleProviders(List<ProviderBase> removeList)

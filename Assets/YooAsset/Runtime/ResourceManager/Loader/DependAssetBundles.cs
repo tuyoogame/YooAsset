@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Pool;
 
 namespace YooAsset
 {
@@ -9,7 +10,7 @@ namespace YooAsset
         /// <summary>
         /// 依赖的资源包加载器列表
         /// </summary>
-        internal readonly List<BundleLoaderBase> DependList;
+        internal List<BundleLoaderBase> DependList { private set; get; }
 
 
         public DependAssetBundles(List<BundleLoaderBase> dpendList)
@@ -92,6 +93,8 @@ namespace YooAsset
             {
                 loader.Release();
             }
+            ListPool<BundleLoaderBase>.Release(DependList);
+            DependList = null;
         }
 
         /// <summary>

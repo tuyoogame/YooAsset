@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace YooAsset
 {
     internal interface IBundleQuery
@@ -11,7 +13,7 @@ namespace YooAsset
         /// <summary>
         /// 获取依赖的资源包信息集合
         /// </summary>
-        BundleInfo[] GetDependBundleInfos(AssetInfo assetPath);
+        List<BundleInfo> GetDependBundleInfos(AssetInfo assetPath);
 
         /// <summary>
         /// 获取主资源包名称
@@ -21,7 +23,7 @@ namespace YooAsset
         /// <summary>
         /// 获取依赖的资源包名称集合
         /// </summary>
-        string[] GetDependBundleNames(AssetInfo assetInfo);
+        List<string> GetDependBundleNames(AssetInfo assetInfo);
 
         /// <summary>
         /// 清单是否有效
