@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -116,13 +116,48 @@ namespace YooAsset
     internal static class FileUtility
     {
         /// <summary>
+        /// 文件加载服务
+        /// </summary>
+        static private ILoadFileServices _loadFileServices = new DefaultLoadFileServices();
+
+        /// <summary>
+        /// 判断是否可以直接从 StreamingAsset 读取文件
+        /// </summary>
+        public static bool EnableLoadStreamingAsset
+        {
+            get
+            {
+                return _loadFileServices.EnableLoadStreamingAsset;
+            }
+        }
+
+        /// <summary>
+        /// 设置文件加载服务
+        /// </summary>
+        /// <param name="loadFileServices"></param>
+        public static void SetLoadFileService(ILoadFileServices loadFileServices)
+        {
+            if (loadFileServices == null)
+                return;
+            _loadFileServices = loadFileServices;
+        }
+
+        /// <summary>
+        /// 判断文件是否存在
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static bool Exists(string filePath)
+        {
+            return _loadFileServices.Exists(filePath);
+        }
+
+        /// <summary>
         /// 读取文件的文本数据
         /// </summary>
         public static string ReadAllText(string filePath)
         {
-            if (File.Exists(filePath) == false)
-                return string.Empty;
-            return File.ReadAllText(filePath, Encoding.UTF8);
+            return _loadFileServices.ReadAllText(filePath);
         }
 
         /// <summary>
@@ -130,9 +165,7 @@ namespace YooAsset
         /// </summary>
         public static byte[] ReadAllBytes(string filePath)
         {
-            if (File.Exists(filePath) == false)
-                return null;
-            return File.ReadAllBytes(filePath);
+            return _loadFileServices.ReadAllBytes(filePath);
         }
 
         /// <summary>
@@ -140,11 +173,7 @@ namespace YooAsset
         /// </summary>
         public static void WriteAllText(string filePath, string content)
         {
-            // 创建文件夹路径
-            CreateFileDirectory(filePath);
-
-            byte[] bytes = Encoding.UTF8.GetBytes(content);
-            File.WriteAllBytes(filePath, bytes); //避免写入BOM标记
+            _loadFileServices.WriteAllText(filePath, content);
         }
 
         /// <summary>
@@ -152,10 +181,15 @@ namespace YooAsset
         /// </summary>
         public static void WriteAllBytes(string filePath, byte[] data)
         {
-            // 创建文件夹路径
-            CreateFileDirectory(filePath);
+            _loadFileServices.WriteAllBytes(filePath, data);
+        }
 
-            File.WriteAllBytes(filePath, data);
+        /// <summary>
+        /// 获取文件大小（字节数）
+        /// </summary>
+        public static long GetFileSize(string filePath)
+        {
+            return _loadFileServices.GetFileSize(filePath);
         }
 
         /// <summary>
@@ -165,26 +199,8 @@ namespace YooAsset
         {
             // 获取文件的文件夹路径
             string directory = Path.GetDirectoryName(filePath);
-            CreateDirectory(directory);
-        }
-
-        /// <summary>
-        /// 创建文件夹路径
-        /// </summary>
-        public static void CreateDirectory(string directory)
-        {
-            // If the directory doesn't exist, create it.
             if (Directory.Exists(directory) == false)
                 Directory.CreateDirectory(directory);
-        }
-
-        /// <summary>
-        /// 获取文件大小（字节数）
-        /// </summary>
-        public static long GetFileSize(string filePath)
-        {
-            FileInfo fileInfo = new FileInfo(filePath);
-            return fileInfo.Length;
         }
     }
 
