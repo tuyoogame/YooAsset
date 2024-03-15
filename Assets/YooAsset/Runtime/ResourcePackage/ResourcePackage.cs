@@ -536,13 +536,17 @@ namespace YooAsset
                 return true;
 
             List<BundleInfo> depends = _bundleQuery.GetDependBundleInfos(assetInfo);
+            bool result = false;
             foreach (var depend in depends)
             {
                 if (depend.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
-                    return true;
+                {
+                    result = true;
+                    break;
+                }
             }
             ListPool<BundleInfo>.Release(depends);
-            return false;
+            return result;
         }
         #endregion
 
