@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.Pool;
 
 namespace YooAsset
 {
@@ -534,14 +535,18 @@ namespace YooAsset
             if (bundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
                 return true;
 
-            BundleInfo[] depends = _bundleQuery.GetDependBundleInfos(assetInfo);
+            List<BundleInfo> depends = _bundleQuery.GetDependBundleInfos(assetInfo);
+            bool result = false;
             foreach (var depend in depends)
             {
                 if (depend.LoadMode == BundleInfo.ELoadMode.LoadFromRemote)
-                    return true;
+                {
+                    result = true;
+                    break;
+                }
             }
-
-            return false;
+            ListPool<BundleInfo>.Release(depends);
+            return result;
         }
         #endregion
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Pool;
 
 namespace YooAsset
 {
@@ -60,6 +61,7 @@ namespace YooAsset
                 var bundleInfo = ConvertToDownloadInfo(packageBundle);
                 result.Add(bundleInfo);
             }
+            ListPool<PackageBundle>.Release(downloadList);
             return result;
         }
         private BundleInfo ConvertToDownloadInfo(PackageBundle packageBundle)
@@ -133,7 +135,7 @@ namespace YooAsset
         }
         public List<BundleInfo> GetDownloadListByAll(PackageManifest manifest)
         {
-            List<PackageBundle> downloadList = new List<PackageBundle>(1000);
+            List<PackageBundle> downloadList = ListPool<PackageBundle>.Get();
             foreach (var packageBundle in manifest.BundleList)
             {
                 // 忽略分发文件
@@ -162,7 +164,7 @@ namespace YooAsset
         }
         public List<BundleInfo> GetDownloadListByTags(PackageManifest manifest, string[] tags)
         {
-            List<PackageBundle> downloadList = new List<PackageBundle>(1000);
+            List<PackageBundle> downloadList = ListPool<PackageBundle>.Get();
             foreach (var packageBundle in manifest.BundleList)
             {
                 // 忽略分发文件
@@ -219,15 +221,16 @@ namespace YooAsset
                     checkList.Add(mainBundle);
 
                 // 注意：如果清单里未找到资源包会抛出异常！
-                PackageBundle[] dependBundles = manifest.GetAllDependencies(assetInfo.AssetPath);
+                List<PackageBundle> dependBundles = manifest.GetAllDependencies(assetInfo.AssetPath);
                 foreach (var dependBundle in dependBundles)
                 {
                     if (checkList.Contains(dependBundle) == false)
                         checkList.Add(dependBundle);
                 }
+                ListPool<PackageBundle>.Release(dependBundles);
             }
 
-            List<PackageBundle> downloadList = new List<PackageBundle>(1000);
+            List<PackageBundle> downloadList = ListPool<PackageBundle>.Get();
             foreach (var packageBundle in checkList)
             {
                 // 忽略分发文件
@@ -256,7 +259,7 @@ namespace YooAsset
         }
         private List<BundleInfo> GetUnpackListByAll(PackageManifest manifest)
         {
-            List<PackageBundle> downloadList = new List<PackageBundle>(1000);
+            List<PackageBundle> downloadList = ListPool<PackageBundle>.Get();
             foreach (var packageBundle in manifest.BundleList)
             {
                 // 忽略缓存文件
@@ -280,7 +283,7 @@ namespace YooAsset
         }
         private List<BundleInfo> GetUnpackListByTags(PackageManifest manifest, string[] tags)
         {
-            List<PackageBundle> downloadList = new List<PackageBundle>(1000);
+            List<PackageBundle> downloadList = ListPool<PackageBundle>.Get();
             foreach (var packageBundle in manifest.BundleList)
             {
                 // 忽略缓存文件
@@ -370,20 +373,21 @@ namespace YooAsset
             var packageBundle = _activeManifest.GetMainPackageBundle(assetInfo.AssetPath);
             return CreateBundleInfo(packageBundle);
         }
-        BundleInfo[] IBundleQuery.GetDependBundleInfos(AssetInfo assetInfo)
+        List<BundleInfo> IBundleQuery.GetDependBundleInfos(AssetInfo assetInfo)
         {
             if (assetInfo.IsInvalid)
                 throw new Exception("Should never get here !");
 
             // 注意：如果清单里未找到资源包会抛出异常！
-            var depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
-            List<BundleInfo> result = new List<BundleInfo>(depends.Length);
+            List<PackageBundle> depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
+            List<BundleInfo> result = ListPool<BundleInfo>.Get();
             foreach (var packageBundle in depends)
             {
                 BundleInfo bundleInfo = CreateBundleInfo(packageBundle);
                 result.Add(bundleInfo);
             }
-            return result.ToArray();
+            ListPool<PackageBundle>.Release(depends);
+            return result;
         }
         string IBundleQuery.GetMainBundleName(AssetInfo assetInfo)
         {
@@ -394,19 +398,20 @@ namespace YooAsset
             var packageBundle = _activeManifest.GetMainPackageBundle(assetInfo.AssetPath);
             return packageBundle.BundleName;
         }
-        string[] IBundleQuery.GetDependBundleNames(AssetInfo assetInfo)
+        List<string> IBundleQuery.GetDependBundleNames(AssetInfo assetInfo)
         {
             if (assetInfo.IsInvalid)
                 throw new Exception("Should never get here !");
 
             // 注意：如果清单里未找到资源包会抛出异常！
-            var depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
-            List<string> result = new List<string>(depends.Length);
+            List<PackageBundle> depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
+            List<string> result = ListPool<string>.Get();
             foreach (var packageBundle in depends)
             {
                 result.Add(packageBundle.BundleName);
             }
-            return result.ToArray();
+            ListPool<PackageBundle>.Release(depends);
+            return result;
         }
         bool IBundleQuery.ManifestValid()
         {

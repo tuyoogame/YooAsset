@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Pool;
 
 namespace YooAsset
 {
@@ -146,10 +147,10 @@ namespace YooAsset
         /// 获取资源依赖列表
         /// 注意：传入的资源路径一定合法有效！
         /// </summary>
-        public PackageBundle[] GetAllDependencies(string assetPath)
+        public List<PackageBundle> GetAllDependencies(string assetPath)
         {
             var packageBundle = GetMainPackageBundle(assetPath);
-            List<PackageBundle> result = new List<PackageBundle>(packageBundle.DependIDs.Length);
+            var result = ListPool<PackageBundle>.Get();
             foreach (var dependID in packageBundle.DependIDs)
             {
                 if (dependID >= 0 && dependID < BundleList.Count)
@@ -162,7 +163,7 @@ namespace YooAsset
                     throw new Exception($"Invalid bundle id : {dependID} Asset path : {assetPath}");
                 }
             }
-            return result.ToArray();
+            return result;
         }
 
         /// <summary>

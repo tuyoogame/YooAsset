@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Pool;
 
 namespace YooAsset
 {
@@ -114,20 +115,21 @@ namespace YooAsset
             var packageBundle = _activeManifest.GetMainPackageBundle(assetInfo.AssetPath);
             return CreateBundleInfo(packageBundle, assetInfo);
         }
-        BundleInfo[] IBundleQuery.GetDependBundleInfos(AssetInfo assetInfo)
+        List<BundleInfo> IBundleQuery.GetDependBundleInfos(AssetInfo assetInfo)
         {
             if (assetInfo.IsInvalid)
                 throw new Exception("Should never get here !");
 
             // 注意：如果清单里未找到资源包会抛出异常！
-            var depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
-            List<BundleInfo> result = new List<BundleInfo>(depends.Length);
+            List<PackageBundle> depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
+            List<BundleInfo> result = ListPool<BundleInfo>.Get();
             foreach (var packageBundle in depends)
             {
                 BundleInfo bundleInfo = CreateBundleInfo(packageBundle, assetInfo);
                 result.Add(bundleInfo);
             }
-            return result.ToArray();
+            ListPool<PackageBundle>.Release(depends);
+            return result;
         }
         string IBundleQuery.GetMainBundleName(AssetInfo assetInfo)
         {
@@ -138,19 +140,20 @@ namespace YooAsset
             var packageBundle = _activeManifest.GetMainPackageBundle(assetInfo.AssetPath);
             return packageBundle.BundleName;
         }
-        string[] IBundleQuery.GetDependBundleNames(AssetInfo assetInfo)
+        List<string> IBundleQuery.GetDependBundleNames(AssetInfo assetInfo)
         {
             if (assetInfo.IsInvalid)
                 throw new Exception("Should never get here !");
 
             // 注意：如果清单里未找到资源包会抛出异常！
-            var depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
-            List<string> result = new List<string>(depends.Length);
+            List<PackageBundle> depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
+            List<string> result = ListPool<string>.Get();
             foreach (var packageBundle in depends)
             {
                 result.Add(packageBundle.BundleName);
             }
-            return result.ToArray();
+            ListPool<PackageBundle>.Release(depends);
+            return result;
         }
         bool IBundleQuery.ManifestValid()
         {
