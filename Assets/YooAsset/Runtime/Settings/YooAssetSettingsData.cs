@@ -71,5 +71,13 @@ namespace YooAsset
         {
             return $"{Setting.ManifestFileName}_{packageName}.version";
         }
+
+        /// <summary>
+        /// 获取包裹的预下载版本文件完整名称
+        /// </summary>
+        public static string GetPrePackageVersionFileName(string packageName)
+        {
+            return $"{Setting.ManifestFileName}_{packageName}.preversion";
+        }
     }
 }
