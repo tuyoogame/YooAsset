@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,12 +7,12 @@ namespace YooAsset
     public abstract class UpdatePrePackageVersionOperation : AsyncOperationBase
     {
         /// <summary>
-        /// Ô¤ÏÂÔØ°ü¹ü°æ±¾
+        /// é¢„ä¸‹è½½åŒ…è£¹ç‰ˆæœ¬
         /// </summary>
         public string PrePackageVersion { protected set; get; }
     }
     /// <summary>
-    /// ±à¼­Æ÷ÏÂÄ£ÄâÄ£Ê½µÄÇëÇóÔ¶¶Ë°ü¹üµÄÔ¤ÏÂÔØ°æ±¾
+    /// ç¼–è¾‘å™¨ä¸‹æ¨¡æ‹Ÿæ¨¡å¼çš„è¯·æ±‚è¿œç«¯åŒ…è£¹çš„é¢„ä¸‹è½½ç‰ˆæœ¬
     /// </summary>
     internal sealed class EditorPlayModeUpdatePrePackageVersionOperation : UpdatePrePackageVersionOperation
     {
@@ -26,7 +26,7 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// ÀëÏßÄ£Ê½µÄÇëÇóÔ¶¶Ë°ü¹üµÄÔ¤ÏÂÔØ°æ±¾
+    /// ç¦»çº¿æ¨¡å¼çš„è¯·æ±‚è¿œç«¯åŒ…è£¹çš„é¢„ä¸‹è½½ç‰ˆæœ¬
     /// </summary>
     internal sealed class OfflinePlayModeUpdatePrePackageVersionOperation : UpdatePrePackageVersionOperation
     {
@@ -40,7 +40,7 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// Áª»úÄ£Ê½µÄÇëÇóÔ¶¶Ë°ü¹üµÄÔ¤ÏÂÔØ°æ±¾
+    /// è”æœºæ¨¡å¼çš„è¯·æ±‚è¿œç«¯åŒ…è£¹çš„é¢„ä¸‹è½½ç‰ˆæœ¬
     /// </summary>
     internal sealed class HostPlayModeUpdatePrePackageVersionOperation : UpdatePrePackageVersionOperation
     {
@@ -100,7 +100,7 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// WebGLÄ£Ê½µÄÇëÇóÔ¶¶Ë°ü¹üµÄÔ¤ÏÂÔØ°æ±¾
+    /// WebGLæ¨¡å¼çš„è¯·æ±‚è¿œç«¯åŒ…è£¹çš„é¢„ä¸‹è½½ç‰ˆæœ¬
     /// </summary>
     internal sealed class WebPlayModeUpdatePrePackageVersionOperation : UpdatePrePackageVersionOperation
     {

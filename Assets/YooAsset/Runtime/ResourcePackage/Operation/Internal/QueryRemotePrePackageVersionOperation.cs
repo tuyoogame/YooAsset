@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace YooAsset
@@ -21,7 +21,7 @@ namespace YooAsset
         private int _requestCount = 0;
 
         /// <summary>
-        /// °ü¹ü°æ±¾
+        /// åŒ…è£¹ç‰ˆæœ¬
         /// </summary>
         public string PrePackageVersion { private set; get; }
 
@@ -48,7 +48,7 @@ namespace YooAsset
                 if (_downloader == null)
                 {
                     string fileName = YooAssetSettingsData.GetPrePackageVersionFileName(_packageName);
-                    string webURL = GetPackageVersionRequestURL(fileName);
+                    string webURL = GetPackageVersionRequestURL(_packageName, fileName);
                     YooLogger.Log($"Beginning to request pre package version : {webURL}");
                     _downloader = new UnityWebDataRequester();
                     _downloader.SendRequest(webURL, _timeout);
@@ -86,17 +86,17 @@ namespace YooAsset
             }
         }
 
-        private string GetPackageVersionRequestURL(string fileName)
+        private string GetPackageVersionRequestURL(string packageName, string fileName)
         {
             string url;
 
-            // ÂÖÁ÷·µ»ØÇëÇóµØÖ·
+            // è½®æµè¿”å›è¯·æ±‚åœ°å€
             if (_requestCount % 2 == 0)
-                url = _remoteServices.GetRemoteMainURL(fileName);
+                url = _remoteServices.GetRemoteMainURL(packageName, fileName);
             else
-                url = _remoteServices.GetRemoteFallbackURL(fileName);
+                url = _remoteServices.GetRemoteFallbackURL(packageName, fileName);
 
-            // ÔÚURLÄ©Î²Ìí¼ÓÊ±¼ä´Á
+            // åœ¨URLæœ«å°¾æ·»åŠ æ—¶é—´æˆ³
             if (_appendTimeTicks)
                 return $"{url}?{System.DateTime.UtcNow.Ticks}";
             else
