@@ -91,14 +91,7 @@ namespace YooAsset
 			_failedTryAgain = failedTryAgain;
 			_timeout = timeout;
 
-			if (downloadList != null)
-			{
-				TotalDownloadCount = downloadList.Count;
-				foreach (var packageBundle in downloadList)
-				{
-					TotalDownloadBytes += packageBundle.Bundle.FileSize;
-				}
-			}
+			CalculatDownloaderInfo();
 		}
 		internal override void Start()
 		{
@@ -206,6 +199,57 @@ namespace YooAsset
 				}
 			}
 		}
+		private void CalculatDownloaderInfo()
+		{
+			if (_downloadList != null)
+			{
+				TotalDownloadBytes = 0;
+				TotalDownloadCount = _downloadList.Count;
+				foreach (var packageBundle in _downloadList)
+				{
+					TotalDownloadBytes += packageBundle.Bundle.FileSize;
+				}
+			}
+			else
+			{
+				TotalDownloadBytes = 0;
+				TotalDownloadCount = 0;
+			}
+		}
+
+		/// <summary>
+		/// 合并其它下载器
+		/// </summary>
+		/// <param name="downloader">合并的下载器</param>
+		public void Combine(DownloaderOperation downloader)
+		{
+			if (_steps != ESteps.None)
+			{
+				YooLogger.Error("The downloader is running, can not combine with other downloader !");
+				return;
+			}
+
+			HashSet<string> temper = new HashSet<string>();
+			foreach (var bundleInfo in _downloadList)
+			{
+				if (temper.Contains(bundleInfo.Bundle.CachedDataFilePath) == false)
+				{
+					temper.Add(bundleInfo.Bundle.CachedDataFilePath);
+				}
+			}
+
+			// 合并下载列表
+			foreach (var bundleInfo in downloader._downloadList)
+			{
+				if (temper.Contains(bundleInfo.Bundle.CachedDataFilePath) == false)
+				{
+					_downloadList.Add(bundleInfo);
+				}
+			}
+
+			// 重新统计下载信息
+			CalculatDownloaderInfo();
+		}
 
 		/// <summary>
 		/// 开始下载
@@ -279,6 +323,23 @@ namespace YooAsset
 		{
 			List<BundleInfo> downloadList = new List<BundleInfo>();
 			var operation = new ResourceUnpackerOperation(downloadList, upackingMaxNumber, failedTryAgain, int.MaxValue);
+			return operation;
+		}
+	}
+	public sealed class ResourceImporterOperation : DownloaderOperation
+	{
+		internal ResourceImporterOperation(List<BundleInfo> downloadList, int downloadingMaxNumber, int failedTryAgain, int timeout)
+			: base(downloadList, downloadingMaxNumber, failedTryAgain, timeout)
+		{
+		}
+
+		/// <summary>
+		/// 创建空的导入器
+		/// </summary>
+		internal static ResourceImporterOperation CreateEmptyImporter(int upackingMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> downloadList = new List<BundleInfo>();
+			var operation = new ResourceImporterOperation(downloadList, upackingMaxNumber, failedTryAgain, int.MaxValue);
 			return operation;
 		}
 	}

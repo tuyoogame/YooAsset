@@ -11,6 +11,11 @@ namespace YooAsset
 	public abstract class InitializationOperation : AsyncOperationBase
 	{
 		public string PackageVersion { protected set; get; }
+
+		/// <summary>
+		/// 本地记录的资源包裹的版本
+		/// </summary>
+		public string RecordVersion { protected set; get; }
 	}
 
 	/// <summary>
@@ -242,6 +247,7 @@ namespace YooAsset
 
 				if (_queryCachePackageVersionOp.Status == EOperationStatus.Succeed)
 				{
+					RecordVersion = _queryCachePackageVersionOp.PackageVersion;
 					_steps = ESteps.TryLoadCacheManifest;
 				}
 				else

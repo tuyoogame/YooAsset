@@ -91,6 +91,15 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取记录对象
+		/// </summary>
+		public static PackageCache.RecordWrapper TryGetWrapper(string packageName, string cacheGUID)
+        {
+			var cache = GetOrCreateCache(packageName);
+			return cache.TryGetWrapper(cacheGUID);
+		}
+
+		/// <summary>
 		/// 验证缓存文件（子线程内操作）
 		/// </summary>
 		public static EVerifyResult VerifyingCacheFile(VerifyCacheFileElement element)
@@ -165,9 +174,9 @@ namespace YooAsset
 		/// <summary>
 		/// 获取所有的缓存文件
 		/// </summary>
-		public static List<string> GetAllCacheGUIDs(ResourcePackage package)
+		public static List<string> GetAllCacheGUIDs(string packageName)
 		{
-			var cache = GetOrCreateCache(package.PackageName);
+			var cache = GetOrCreateCache(packageName);
 			return cache.GetAllKeys();
 		}
 

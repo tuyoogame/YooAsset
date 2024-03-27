@@ -284,6 +284,39 @@ namespace YooAsset
 
 			return ManifestTools.ConvertToUnpackInfos(downloadList);
 		}
+
+		ResourceImporterOperation IPlayModeServices.CreateResourceImporterByFilePaths(string[] filePaths, int importerMaxNumber, int failedTryAgain, int timeout)
+		{
+			List<BundleInfo> importerList = GetImporterListByFilePaths(_activeManifest, filePaths);
+			var operation = new ResourceImporterOperation(importerList, importerMaxNumber, failedTryAgain, timeout);
+			return operation;
+		}
+		private List<BundleInfo> GetImporterListByFilePaths(PackageManifest manifest, string[] filePaths)
+		{
+			List<BundleInfo> result = new List<BundleInfo>();
+			foreach (var filePath in filePaths)
+			{
+				string fileName = System.IO.Path.GetFileName(filePath);
+				if (manifest.TryGetPackageBundleByFileName(fileName, out PackageBundle packageBundle))
+				{
+					// 忽略缓存文件
+					if (IsCachedPackageBundle(packageBundle))
+						continue;
+
+					// 忽略APP资源
+					if (IsBuildinPackageBundle(packageBundle))
+						continue;
+
+					var bundleInfo = ManifestTools.ConvertToImportInfo(packageBundle, filePath);
+					result.Add(bundleInfo);
+				}
+				else
+				{
+					YooLogger.Warning($"Not found package bundle, importer file path : {filePath}");
+				}
+			}
+			return result;
+		}
 		#endregion
 
 		#region IBundleServices接口

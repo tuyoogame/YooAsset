@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -130,7 +131,7 @@ namespace YooAsset.Editor
 		{
 			var buildMode = buildParametersContext.Parameters.BuildMode;
 			if (buildMode == EBuildMode.DryRunBuild || buildMode == EBuildMode.SimulateBuild)
-				return "00000000000000000000000000000000"; //32位
+				return GetFilePathTempHash(filePath);
 			else
 				return HashUtility.FileMD5(filePath);
 		}
@@ -149,6 +150,33 @@ namespace YooAsset.Editor
 				return 0;
 			else
 				return FileUtility.GetFileSize(filePath);
+		}
+
+		protected string GetFilePathTempHash(string filePath)
+		{
+			byte[] bytes = Encoding.UTF8.GetBytes(filePath);
+			return HashUtility.BytesMD5(bytes);
+
+			// 注意：在文件路径的哈希值冲突的情况下，可以使用下面的方法
+			//return $"{HashUtility.BytesMD5(bytes)}-{Guid.NewGuid():N}";
+		}
+		protected long GetBundleTempSize(BuildBundleInfo bundleInfo)
+		{
+			long tempSize = 0;
+
+			var assetPaths = bundleInfo.GetAllMainAssetPaths();
+			foreach (var assetPath in assetPaths)
+			{
+				long size = FileUtility.GetFileSize(assetPath);
+				tempSize += size;
+			}
+
+			if (tempSize == 0)
+			{
+				string message = $"Bundle temp size is zero, check bundle main asset list : {bundleInfo.BundleName}";
+				throw new Exception(message);
+			}
+			return tempSize;
 		}
 	}
 }

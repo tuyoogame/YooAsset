@@ -37,7 +37,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.GetAllCacheFiles)
 			{
-				_allCacheGUIDs = CacheSystem.GetAllCacheGUIDs(_package);
+				_allCacheGUIDs = CacheSystem.GetAllCacheGUIDs(_package.PackageName);
 				_fileTotalCount = _allCacheGUIDs.Count;
 				YooLogger.Log($"Found all cache file count : {_fileTotalCount}");
 				_steps = ESteps.ClearAllCacheFiles;

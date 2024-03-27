@@ -300,6 +300,17 @@ namespace YooAsset
 		}
 
 		/// <summary>
+		/// 获取指定版本的缓存信息
+		/// </summary>
+		public GetAllCacheFileInfosOperation GetAllCacheFileInfosAsync(string packageVersion, int timeout = 60)
+		{
+			DebugCheckInitialize();
+			var operation = new GetAllCacheFileInfosOperation(PackageName);
+			OperationSystem.StartOperation(operation);
+			return operation;
+		}
+
+		/// <summary>
 		/// 获取本地包裹的版本信息
 		/// </summary>
 		public string GetPackageVersion()
@@ -335,7 +346,7 @@ namespace YooAsset
 		{
 			DebugCheckInitialize();
 			var persistent = PersistentTools.GetPersistent(PackageName);
-			return persistent.BuildinRoot;
+			return persistent.BuildinPackageRoot;
 		}
 
 		/// <summary>
@@ -345,7 +356,17 @@ namespace YooAsset
 		{
 			DebugCheckInitialize();
 			var persistent = PersistentTools.GetPersistent(PackageName);
-			return persistent.SandboxRoot;
+			return persistent.SandboxPackageRoot;
+		}
+
+		/// <summary>
+		/// 获取包裹的沙盒文件AB文件的缓存目录
+		/// </summary>
+		public string GetPackageSandboxCacheBundleRootDirectory()
+        {
+			DebugCheckInitialize();
+			var persistent = PersistentTools.GetPersistent(PackageName);
+			return persistent.SandboxCacheBundleFilesRoot;
 		}
 
 		/// <summary>
@@ -1023,6 +1044,21 @@ namespace YooAsset
 		{
 			DebugCheckInitialize();
 			return _playModeServices.CreateResourceUnpackerByAll(unpackingMaxNumber, failedTryAgain, int.MaxValue);
+		}
+		#endregion
+
+		#region 资源导入
+		/// <summary>
+		/// 创建资源导入器
+		/// 注意：资源文件名称必须和资源服务器部署的文件名称一致！
+		/// </summary>
+		/// <param name="filePaths">资源路径列表</param>
+		/// <param name="importerMaxNumber">同时导入的最大文件数</param>
+		/// <param name="failedTryAgain">导入失败的重试次数</param>
+		public ResourceImporterOperation CreateResourceImporter(string[] filePaths, int importerMaxNumber, int failedTryAgain)
+		{
+			DebugCheckInitialize();
+			return _playModeServices.CreateResourceImporterByFilePaths(filePaths, importerMaxNumber, failedTryAgain, int.MaxValue);
 		}
 		#endregion
 

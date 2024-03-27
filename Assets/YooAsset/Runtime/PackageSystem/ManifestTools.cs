@@ -154,10 +154,12 @@ namespace YooAsset
 
 			// 填充BundleDic
 			manifest.BundleDic = new Dictionary<string, PackageBundle>(manifest.BundleList.Count);
+			manifest.BundleDic2 = new Dictionary<string, PackageBundle>(manifest.BundleList.Count);
 			foreach (var packageBundle in manifest.BundleList)
 			{
 				packageBundle.ParseBundle(manifest.PackageName, manifest.OutputNameStyle);
 				manifest.BundleDic.Add(packageBundle.BundleName, packageBundle);
+				manifest.BundleDic2.Add(packageBundle.FileName, packageBundle);
 			}
 
 			// 填充AssetDic
@@ -210,7 +212,18 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 批量转换为解压BundleInfo
+		/// 转换为导入BundleInfo
+		/// </summary>
+		public static BundleInfo ConvertToImportInfo(PackageBundle packageBundle, string filePath)
+		{
+			// 注意：我们把本地文件路径指定为远端下载地址
+			string persistentPath = PersistentTools.ConvertToWWWPath(filePath);
+			BundleInfo bundleInfo = new BundleInfo(packageBundle, BundleInfo.ELoadMode.None, persistentPath, persistentPath);
+			return bundleInfo;
+		}
+
+		/// <summary>
+		/// 批量转换解压为BundleInfo
 		/// </summary>
 		public static List<BundleInfo> ConvertToUnpackInfos(List<PackageBundle> unpackList)
 		{
