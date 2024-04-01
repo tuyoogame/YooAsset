@@ -65,13 +65,15 @@ namespace YooAsset
         }
 
         // 查询相关
-#if UNITY_WECHAT_GAME
+        // 未命中缓存的情况，微信小程序会抛出报错，日志数量多了会卡。
+#if UNITY_WECHAT_GAME && !UNITY_EDITOR
         private WeChatWASM.WXFileSystemManager _wxFileSystemMgr;
         private bool IsCachedPackageBundle(PackageBundle packageBundle)
         {
             if (_wxFileSystemMgr == null)
                 _wxFileSystemMgr = WeChatWASM.WX.GetFileSystemManager();
-            string filePath = WeChatWASM.WX.env.USER_DATA_PATH + packageBundle.FileName;
+            // 如果微信小游戏设置的CDN后面还有子目录，这里也要相应添加
+            string filePath = System.IO.Path.Combine(WeChatWASM.WX.env.USER_DATA_PATH, "__GAME_FILE_CACHE", packageBundle.FileName);
             string result = _wxFileSystemMgr.AccessSync(filePath);
             return result.Equals("access:ok");
         }

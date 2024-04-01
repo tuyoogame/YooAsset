@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -29,6 +30,12 @@ namespace YooAsset
             // 解析附加参数
             _getAssetBundle = (bool)args[0];
 
+#if UNITY_WECHAT_GAME && !UNITY_EDITOR
+            uint crc = bundleInfo.Bundle.UnityCRC;
+            _webRequest = WeChatWASM.WXAssetBundle.GetAssetBundle(requestURL, crc);
+            _webRequest.disposeDownloadHandlerOnDispose = false;
+#else
+
             // 创建下载器
             _webRequest = DownloadHelper.NewRequest(requestURL);
             if (CacheHelper.DisableUnityCacheOnWebGL)
@@ -47,6 +54,8 @@ namespace YooAsset
 #endif
             _webRequest.downloadHandler = _downloadhandler;
             _webRequest.disposeDownloadHandlerOnDispose = true;
+#endif
+
             _webRequest.SendWebRequest();
             Status = ERequestStatus.InProgress;
         }
@@ -92,7 +101,11 @@ namespace YooAsset
             {
                 if (_getAssetBundle)
                 {
+#if UNITY_WECHAT_GAME && !UNITY_EDITOR
+                    _cacheAssetBundle = (_webRequest.downloadHandler as WeChatWASM.DownloadHandlerWXAssetBundle).assetBundle;
+#else
                     _cacheAssetBundle = _downloadhandler.assetBundle;
+#endif
                     if (_cacheAssetBundle == null)
                     {
                         RequestNetError = "assetBundle is null";
