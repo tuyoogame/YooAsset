@@ -162,7 +162,7 @@ namespace YooAsset
             // 注意：在连续时间段内无新增下载数据及判定为超时
             if (_isAbort == false)
             {
-                if (_latestDownloadBytes != DownloadedBytes)
+                if (_latestDownloadBytes != DownloadedBytes || _latestDownloadRealtime == 0)
                 {
                     _latestDownloadBytes = DownloadedBytes;
                     _latestDownloadRealtime = Time.realtimeSinceStartup;
@@ -172,6 +172,7 @@ namespace YooAsset
                 if (offset > _timeout)
                 {
                     YooLogger.Warning($"Web file request timeout : {_requestURL}");
+                    _latestDownloadRealtime = 0;
                     if (_requester != null)
                         _requester.Abort();
                     _isAbort = true;
