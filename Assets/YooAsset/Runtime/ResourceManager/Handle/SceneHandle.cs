@@ -100,6 +100,7 @@ namespace YooAsset
             if (IsValidWithWarning == false)
                 return false;
 
+            // 注意：当场景挂起操作执行之后无法中途取消！
             if (SceneObject.IsValid())
             {
                 if (Provider is DatabaseSceneProvider)
