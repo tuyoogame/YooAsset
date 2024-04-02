@@ -215,12 +215,20 @@ namespace YooAsset
         /// </summary>
         public static string FileSHA1(string filePath)
         {
+            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                return StreamSHA1(fs);
+            }
+        }
+
+        /// <summary>
+        /// 获取文件的Hash值
+        /// </summary>
+        public static string FileSHA1Safely(string filePath)
+        {
             try
             {
-                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    return StreamSHA1(fs);
-                }
+                return FileSHA1(filePath);
             }
             catch (Exception e)
             {
@@ -267,12 +275,20 @@ namespace YooAsset
         /// </summary>
         public static string FileMD5(string filePath)
         {
+            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                return StreamMD5(fs);
+            }
+        }
+
+        /// <summary>
+        /// 获取文件的MD5
+        /// </summary>
+        public static string FileMD5Safely(string filePath)
+        {
             try
             {
-                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    return StreamMD5(fs);
-                }
+                return FileMD5(filePath);
             }
             catch (Exception e)
             {
@@ -317,12 +333,20 @@ namespace YooAsset
         /// </summary>
         public static string FileCRC32(string filePath)
         {
+            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                return StreamCRC32(fs);
+            }
+        }
+
+        /// <summary>
+        /// 获取文件的CRC32
+        /// </summary>
+        public static string FileCRC32Safely(string filePath)
+        {
             try
             {
-                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    return StreamCRC32(fs);
-                }
+                return FileCRC32(filePath);
             }
             catch (Exception e)
             {

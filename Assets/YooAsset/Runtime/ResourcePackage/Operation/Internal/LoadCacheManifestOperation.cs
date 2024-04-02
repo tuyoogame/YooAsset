@@ -77,7 +77,7 @@ namespace YooAsset
                     return;
                 }
 
-                string fileHash = HashUtility.FileMD5(_manifestFilePath);
+                string fileHash = HashUtility.FileMD5Safely(_manifestFilePath);
                 if (fileHash != _queryCachePackageHashOp.PackageHash)
                 {
                     _steps = ESteps.Done;
