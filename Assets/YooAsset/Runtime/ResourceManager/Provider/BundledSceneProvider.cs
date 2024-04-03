@@ -9,14 +9,14 @@ namespace YooAsset
     internal sealed class BundledSceneProvider : ProviderBase
     {
         public readonly LoadSceneMode SceneMode;
-        private readonly bool _suspendLoad;
         private AsyncOperation _asyncOperation;
+        private bool _suspendLoadMode;
 
         public BundledSceneProvider(ResourceManager manager, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad) : base(manager, providerGUID, assetInfo)
         {
             SceneMode = sceneMode;
             SceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
-            _suspendLoad = suspendLoad;
+            _suspendLoadMode = suspendLoad;
         }
         internal override void InternalOnStart()
         {
@@ -80,7 +80,7 @@ namespace YooAsset
                     _asyncOperation = SceneManager.LoadSceneAsync(MainAssetInfo.AssetPath, SceneMode);
                     if (_asyncOperation != null)
                     {
-                        _asyncOperation.allowSceneActivation = !_suspendLoad;
+                        _asyncOperation.allowSceneActivation = !_suspendLoadMode;
                         _asyncOperation.priority = 100;
                         SceneObject = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
                         _steps = ESteps.Checking;
@@ -106,6 +106,13 @@ namespace YooAsset
                     }
                     else
                     {
+                        // 注意：在业务层中途可以取消挂起
+                        if (_asyncOperation.allowSceneActivation == false)
+                        {
+                            if (_suspendLoadMode == false)
+                                _asyncOperation.allowSceneActivation = true;
+                        }
+
                         Progress = _asyncOperation.progress;
                         if (_asyncOperation.isDone == false)
                             return;
@@ -128,13 +135,12 @@ namespace YooAsset
         /// <summary>
         /// 解除场景加载挂起操作
         /// </summary>
-        public bool UnSuspendLoad()
+        public void UnSuspendLoad()
         {
-            if (_asyncOperation == null)
-                return false;
-
-            _asyncOperation.allowSceneActivation = true;
-            return true;
+            if (IsDone == false)
+            {
+                _suspendLoadMode = false;
+            }
         }
     }
 }
