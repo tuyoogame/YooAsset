@@ -31,6 +31,22 @@ namespace YooAsset
         {
             _error = null;
             _provider = provider;
+
+            // 注意：卸载场景前必须先解除挂起操作
+            if (provider is DatabaseSceneProvider)
+            {
+                var temp = provider as DatabaseSceneProvider;
+                temp.UnSuspendLoad();
+            }
+            else if (provider is BundledSceneProvider)
+            {
+                var temp = provider as BundledSceneProvider;
+                temp.UnSuspendLoad();
+            }
+            else
+            {
+                throw new System.NotImplementedException();
+            }
         }
         internal override void InternalOnStart()
         {
