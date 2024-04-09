@@ -25,7 +25,7 @@ public class ShaderVariantCollectionManifest
     }
 
     [Serializable]
-    public class ShaderVariantInfo
+    public class ShaderVariantInfo : IComparable<ShaderVariantInfo>
     {
         /// <summary>
         /// 着色器资源路径.
@@ -46,6 +46,13 @@ public class ShaderVariantCollectionManifest
         /// 着色器变种列表
         /// </summary>
         public List<ShaderVariantElement> ShaderVariantElements = new List<ShaderVariantElement>(1000);
+
+        public int CompareTo(ShaderVariantInfo other)
+        {
+            string thisStr = AssetPath + "+" +ShaderName;
+            string otherStr = other.AssetPath + "+" + other.ShaderName;
+            return thisStr.CompareTo(otherStr);
+        }
     }
 
 
@@ -141,6 +148,8 @@ public class ShaderVariantCollectionManifest
             }
         }
 
+        // 重新排序
+        manifest.ShaderVariantInfos.Sort();
         return manifest;
     }
 }

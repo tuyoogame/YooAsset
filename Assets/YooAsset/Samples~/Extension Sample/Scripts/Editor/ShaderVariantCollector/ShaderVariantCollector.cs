@@ -22,7 +22,7 @@ public static class ShaderVariantCollector
     }
 
     private const float WaitMilliseconds = 1000f;
-    private const float SleepMilliseconds = 100f;
+    private const float SleepMilliseconds = 2000f;
     private static string _savePath;
     private static string _packageName;
     private static int _processMaxNum;
