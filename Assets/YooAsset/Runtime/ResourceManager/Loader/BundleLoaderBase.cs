@@ -156,7 +156,11 @@ namespace YooAsset
 
             if (CacheBundle != null)
             {
+#if UNITY_WECHAT_GAME && !UNITY_EDITOR
+                WeChatWASM.AssetBundleExtensions.WXUnload(CacheBundle, true);
+#else
                 CacheBundle.Unload(true);
+#endif
                 CacheBundle = null;
             }
         }
