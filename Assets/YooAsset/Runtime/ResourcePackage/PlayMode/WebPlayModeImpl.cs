@@ -10,6 +10,7 @@ namespace YooAsset
         private ResourceAssist _assist;
         private IBuildinQueryServices _buildinQueryServices;
         private IRemoteServices _remoteServices;
+        private IWechatQueryServices _wechatQueryServices;
 
         public readonly string PackageName;
         public DownloadManager Download
@@ -34,11 +35,12 @@ namespace YooAsset
         /// <summary>
         /// 异步初始化
         /// </summary>
-        public InitializationOperation InitializeAsync(ResourceAssist assist, IBuildinQueryServices buildinQueryServices, IRemoteServices remoteServices)
+        public InitializationOperation InitializeAsync(ResourceAssist assist, IBuildinQueryServices buildinQueryServices, IRemoteServices remoteServices, IWechatQueryServices wechatQueryServices)
         {
             _assist = assist;
             _buildinQueryServices = buildinQueryServices;
             _remoteServices = remoteServices;
+            _wechatQueryServices = wechatQueryServices;
 
             var operation = new WebPlayModeInitializationOperation(this);
             OperationSystem.StartOperation(PackageName, operation);
@@ -65,23 +67,13 @@ namespace YooAsset
         }
 
         // 查询相关
-#if UNITY_WECHAT_GAME
-        private WeChatWASM.WXFileSystemManager _wxFileSystemMgr;
         private bool IsCachedPackageBundle(PackageBundle packageBundle)
         {
-            if (_wxFileSystemMgr == null)
-                _wxFileSystemMgr = WeChatWASM.WX.GetFileSystemManager();
-            string filePath = WeChatWASM.WX.env.USER_DATA_PATH + packageBundle.FileName;
-            string result = _wxFileSystemMgr.AccessSync(filePath);
-            return result.Equals("access:ok");
+            if (_wechatQueryServices != null)
+                return _wechatQueryServices.Query(PackageName, packageBundle.FileName, packageBundle.FileCRC);
+            else
+                 return false;
         }
-#else
-        private bool IsCachedPackageBundle(PackageBundle packageBundle)
-        {
-            return false;
-        }
-#endif
-
         private bool IsBuildinPackageBundle(PackageBundle packageBundle)
         {
             return _buildinQueryServices.Query(PackageName, packageBundle.FileName, packageBundle.FileCRC);

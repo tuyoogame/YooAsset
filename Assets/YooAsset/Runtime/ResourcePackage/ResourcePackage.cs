@@ -184,7 +184,8 @@ namespace YooAsset
                 var initializeParameters = parameters as WebPlayModeParameters;
                 initializeOperation = webPlayModeImpl.InitializeAsync(assist,
                     initializeParameters.BuildinQueryServices,
-                    initializeParameters.RemoteServices);
+                    initializeParameters.RemoteServices,
+                    initializeParameters.WechatQueryServices);
             }
             else
             {

@@ -150,5 +150,10 @@ namespace YooAsset
         /// 内置资源查询服务接口
         /// </summary>
         public IBuildinQueryServices BuildinQueryServices = null;
+
+        /// <summary>
+        /// 微信缓存查询服务接口
+        /// </summary>
+        public IWechatQueryServices WechatQueryServices = null;
     }
 }
