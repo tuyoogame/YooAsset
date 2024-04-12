@@ -133,6 +133,7 @@ namespace YooAsset
 		/// </summary>
 		public void SaveSandboxPackageVersionFile(string version)
 		{
+			YooLogger.Log($"Save package version : {version}");
 			string filePath = GetSandboxPackageVersionFilePath();
 			FileUtility.WriteAllText(filePath, version);
 		}

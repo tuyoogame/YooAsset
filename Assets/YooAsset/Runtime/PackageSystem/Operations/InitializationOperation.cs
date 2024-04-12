@@ -342,6 +342,7 @@ namespace YooAsset
 				{
 					PackageVersion = _loadBuildinManifestOp.Manifest.PackageVersion;
 					_impl.ActiveManifest = _loadBuildinManifestOp.Manifest;
+					_impl.FlushManifestVersionFile();
 					_steps = ESteps.PackageCaching;
 				}
 				else
