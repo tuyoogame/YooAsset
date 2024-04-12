@@ -332,6 +332,7 @@ namespace YooAsset
                 {
                     PackageVersion = _loadBuildinManifestOp.Manifest.PackageVersion;
                     _impl.ActiveManifest = _loadBuildinManifestOp.Manifest;
+                    _impl.FlushManifestVersionFile(); //注意：解压内置清单并加载成功后保存该清单版本。
                     _steps = ESteps.PackageCaching;
                 }
                 else

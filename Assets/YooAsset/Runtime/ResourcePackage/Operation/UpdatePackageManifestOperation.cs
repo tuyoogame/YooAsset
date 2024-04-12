@@ -63,7 +63,6 @@ namespace YooAsset
             TryLoadCacheManifest,
             DownloadManifest,
             LoadCacheManifest,
-            CheckDeserializeManifest,
             Done,
         }
 
