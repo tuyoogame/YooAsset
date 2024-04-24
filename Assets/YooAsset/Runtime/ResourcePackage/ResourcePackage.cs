@@ -1011,26 +1011,28 @@ namespace YooAsset
         /// 创建资源下载器，用于下载指定的资源标签关联的资源包文件
         /// </summary>
         /// <param name="tag">资源标签</param>
+        /// <param name="includeTags">包含还是排除标签</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(string tag, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             DebugCheckInitialize();
-            return _playModeImpl.CreateResourceDownloaderByTags(new string[] { tag }, downloadingMaxNumber, failedTryAgain, timeout);
+            return _playModeImpl.CreateResourceDownloaderByTags(new string[] { tag }, includeTags, downloadingMaxNumber, failedTryAgain, timeout);
         }
 
         /// <summary>
         /// 创建资源下载器，用于下载指定的资源标签列表关联的资源包文件
         /// </summary>
         /// <param name="tags">资源标签列表</param>
+        /// <param name="includeTags">包含还是排除标签</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(string[] tags, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             DebugCheckInitialize();
-            return _playModeImpl.CreateResourceDownloaderByTags(tags, downloadingMaxNumber, failedTryAgain, timeout);
+            return _playModeImpl.CreateResourceDownloaderByTags(tags, includeTags, downloadingMaxNumber, failedTryAgain, timeout);
         }
 
         /// <summary>
@@ -1111,24 +1113,26 @@ namespace YooAsset
         /// 创建内置资源解压器，用于解压指定的资源标签关联的资源包文件
         /// </summary>
         /// <param name="tag">资源标签</param>
+        /// <param name="includeTags">包含还是排除标签</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public ResourceUnpackerOperation CreateResourceUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
+        public ResourceUnpackerOperation CreateResourceUnpacker(string tag, bool includeTags, int unpackingMaxNumber, int failedTryAgain)
         {
             DebugCheckInitialize();
-            return _playModeImpl.CreateResourceUnpackerByTags(new string[] { tag }, unpackingMaxNumber, failedTryAgain, int.MaxValue);
+            return _playModeImpl.CreateResourceUnpackerByTags(new string[] { tag }, includeTags, unpackingMaxNumber, failedTryAgain, int.MaxValue);
         }
 
         /// <summary>
         /// 创建内置资源解压器，用于解压指定的资源标签列表关联的资源包文件
         /// </summary>
         /// <param name="tags">资源标签列表</param>
+        /// <param name="includeTags">包含还是排除标签</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public ResourceUnpackerOperation CreateResourceUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
+        public ResourceUnpackerOperation CreateResourceUnpacker(string[] tags, bool includeTags, int unpackingMaxNumber, int failedTryAgain)
         {
             DebugCheckInitialize();
-            return _playModeImpl.CreateResourceUnpackerByTags(tags, unpackingMaxNumber, failedTryAgain, int.MaxValue);
+            return _playModeImpl.CreateResourceUnpackerByTags(tags, includeTags, unpackingMaxNumber, failedTryAgain, int.MaxValue);
         }
         #endregion
 

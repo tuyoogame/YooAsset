@@ -482,24 +482,26 @@ namespace YooAsset
         /// 创建资源下载器，用于下载指定的资源标签关联的资源包文件
         /// </summary>
         /// <param name="tag">资源标签</param>
+        /// <param name="includeTags">包含还是排除标签</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        public static ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain)
+        public static ResourceDownloaderOperation CreateResourceDownloader(string tag, bool includeTags, int downloadingMaxNumber, int failedTryAgain)
         {
             DebugCheckDefaultPackageValid();
-            return _defaultPackage.CreateResourceDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain);
+            return _defaultPackage.CreateResourceDownloader(new string[] { tag }, includeTags, downloadingMaxNumber, failedTryAgain);
         }
 
         /// <summary>
         /// 创建资源下载器，用于下载指定的资源标签列表关联的资源包文件
         /// </summary>
         /// <param name="tags">资源标签列表</param>
+        /// <param name="includeTags">包含还是排除标签</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        public static ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain)
+        public static ResourceDownloaderOperation CreateResourceDownloader(string[] tags, bool includeTags, int downloadingMaxNumber, int failedTryAgain)
         {
             DebugCheckDefaultPackageValid();
-            return _defaultPackage.CreateResourceDownloader(tags, downloadingMaxNumber, failedTryAgain);
+            return _defaultPackage.CreateResourceDownloader(tags, includeTags, downloadingMaxNumber, failedTryAgain);
         }
 
         /// <summary>
@@ -567,24 +569,26 @@ namespace YooAsset
         /// 创建内置资源解压器，用于解压指定的资源标签关联的资源包文件
         /// </summary>
         /// <param name="tag">资源标签</param>
+        /// <param name="includeTags">包含还是排除标签</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public static ResourceUnpackerOperation CreateResourceUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
+        public static ResourceUnpackerOperation CreateResourceUnpacker(string tag, bool includeTags, int unpackingMaxNumber, int failedTryAgain)
         {
             DebugCheckDefaultPackageValid();
-            return _defaultPackage.CreateResourceUnpacker(tag, unpackingMaxNumber, failedTryAgain);
+            return _defaultPackage.CreateResourceUnpacker(tag, includeTags, unpackingMaxNumber, failedTryAgain);
         }
 
         /// <summary>
         /// 创建内置资源解压器，用于解压指定的资源标签列表关联的资源包文件
         /// </summary>
         /// <param name="tags">资源标签列表</param>
+        /// <param name="includeTags">包含还是排除标签</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public static ResourceUnpackerOperation CreateResourceUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
+        public static ResourceUnpackerOperation CreateResourceUnpacker(string[] tags, bool includeTags, int unpackingMaxNumber, int failedTryAgain)
         {
             DebugCheckDefaultPackageValid();
-            return _defaultPackage.CreateResourceUnpacker(tags, unpackingMaxNumber, failedTryAgain);
+            return _defaultPackage.CreateResourceUnpacker(tags, includeTags, unpackingMaxNumber, failedTryAgain);
         }
         #endregion
 

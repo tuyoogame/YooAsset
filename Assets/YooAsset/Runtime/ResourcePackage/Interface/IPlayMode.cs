@@ -30,12 +30,12 @@ namespace YooAsset
 
         // 下载相关
         ResourceDownloaderOperation CreateResourceDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout);
-        ResourceDownloaderOperation CreateResourceDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout);
+        ResourceDownloaderOperation CreateResourceDownloaderByTags(string[] tags, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout);
         ResourceDownloaderOperation CreateResourceDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout);
 
         // 解压相关
         ResourceUnpackerOperation CreateResourceUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout);
-        ResourceUnpackerOperation CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout);
+        ResourceUnpackerOperation CreateResourceUnpackerByTags(string[] tags, bool includeTags, int upackingMaxNumber, int failedTryAgain, int timeout);
 
         // 导入相关
         ResourceImporterOperation CreateResourceImporterByFilePaths(string[] filePaths, int importerMaxNumber, int failedTryAgain, int timeout);

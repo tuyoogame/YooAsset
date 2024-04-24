@@ -154,13 +154,13 @@ namespace YooAsset
             return ConvertToDownloadList(downloadList);
         }
 
-        ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
+        ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByTags(string[] tags, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout)
         {
-            List<BundleInfo> downloadList = GetDownloadListByTags(_activeManifest, tags);
+            List<BundleInfo> downloadList = GetDownloadListByTags(_activeManifest, tags, includeTags);
             var operation = new ResourceDownloaderOperation(Download, PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
             return operation;
         }
-        public List<BundleInfo> GetDownloadListByTags(PackageManifest manifest, string[] tags)
+        public List<BundleInfo> GetDownloadListByTags(PackageManifest manifest, string[] tags, bool includeTags)
         {
             List<PackageBundle> downloadList = new List<PackageBundle>(1000);
             foreach (var packageBundle in manifest.BundleList)
@@ -185,7 +185,7 @@ namespace YooAsset
                 else
                 {
                     // 查询DLC资源
-                    if (packageBundle.HasTag(tags))
+                    if (packageBundle.HasTag(tags) == includeTags)
                     {
                         downloadList.Add(packageBundle);
                     }
@@ -272,13 +272,13 @@ namespace YooAsset
             return BundleInfo.CreateUnpackInfos(_assist, downloadList);
         }
 
-        ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
+        ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByTags(string[] tags, bool includeTags, int upackingMaxNumber, int failedTryAgain, int timeout)
         {
-            List<BundleInfo> unpcakList = GetUnpackListByTags(_activeManifest, tags);
+            List<BundleInfo> unpcakList = GetUnpackListByTags(_activeManifest, tags, includeTags);
             var operation = new ResourceUnpackerOperation(Download, PackageName, unpcakList, upackingMaxNumber, failedTryAgain, timeout);
             return operation;
         }
-        private List<BundleInfo> GetUnpackListByTags(PackageManifest manifest, string[] tags)
+        private List<BundleInfo> GetUnpackListByTags(PackageManifest manifest, string[] tags, bool includeTags)
         {
             List<PackageBundle> downloadList = new List<PackageBundle>(1000);
             foreach (var packageBundle in manifest.BundleList)
@@ -290,7 +290,7 @@ namespace YooAsset
                 // 查询DLC资源
                 if (IsBuildinPackageBundle(packageBundle))
                 {
-                    if (packageBundle.HasTag(tags))
+                    if (packageBundle.HasTag(tags) == includeTags)
                     {
                         downloadList.Add(packageBundle);
                     }
