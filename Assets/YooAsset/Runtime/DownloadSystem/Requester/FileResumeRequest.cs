@@ -142,6 +142,7 @@ namespace YooAsset
 
             if (_webRequest != null)
             {
+                //注意：引擎底层会自动调用Abort方法
                 _webRequest.Dispose();
                 _webRequest = null;
             }
