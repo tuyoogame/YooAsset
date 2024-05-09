@@ -28,7 +28,7 @@ namespace UnityEditor.Build.Pipeline.Tasks
 #endif
             buildTasks.Add(new CalculateAssetDependencyData());
             buildTasks.Add(new StripUnusedSpriteSources());
-            buildTasks.Add(new CreateBuiltInShadersBundle(builtInShaderBundleName));
+            buildTasks.Add(new CreateBuiltInBundle(builtInShaderBundleName));
             buildTasks.Add(new PostDependencyCallback());
 
             // Packing
