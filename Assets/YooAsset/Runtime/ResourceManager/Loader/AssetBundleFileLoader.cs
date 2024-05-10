@@ -208,21 +208,46 @@ namespace YooAsset
                 // Check error			
                 if (CacheBundle == null)
                 {
-                    _steps = ESteps.Done;
-                    Status = EStatus.Failed;
-                    LastError = $"Failed to load assetBundle : {MainBundleInfo.Bundle.BundleName}";
-                    YooLogger.Error(LastError);
-
                     // 注意：当缓存文件的校验等级为Low的时候，并不能保证缓存文件的完整性。
                     // 在AssetBundle文件加载失败的情况下，我们需要重新验证文件的完整性！
                     if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
                     {
                         var result = MainBundleInfo.VerifySelf();
-                        if (result != EVerifyResult.Succeed)
+                        if (result == EVerifyResult.Succeed)
                         {
-                            YooLogger.Error($"Found possibly corrupt file ! {MainBundleInfo.Bundle.CacheGUID} Verify result : {result}");
+                            // 说明：在安卓移动平台，华为和三星真机上有极小概率加载资源包失败。
+                            // 大多数情况在首次安装下载资源到沙盒内，游戏过程中切换到后台再回到游戏内有很大概率触发！
+                            byte[] fileData = FileUtility.ReadAllBytes(FileLoadPath);
+                            if (fileData != null && fileData.Length > 0)
+                                CacheBundle = AssetBundle.LoadFromMemory(fileData);
+                            if (CacheBundle == null)
+                            {
+                                _steps = ESteps.Done;
+                                Status = EStatus.Failed;
+                                LastError = $"Failed to load assetBundle from memory : {MainBundleInfo.Bundle.BundleName}";
+                                YooLogger.Error(LastError);
+                            }
+                            else
+                            {
+                                _steps = ESteps.Done;
+                                Status = EStatus.Succeed;
+                            }
+                        }
+                        else
+                        {
+                            _steps = ESteps.Done;
+                            Status = EStatus.Failed;
+                            LastError = $"Found possibly corrupt file ! {MainBundleInfo.Bundle.CacheGUID} Verify result : {result}";
+                            YooLogger.Error(LastError);
                             MainBundleInfo.CacheDiscard();
                         }
+                    }
+                    else
+                    {
+                        _steps = ESteps.Done;
+                        Status = EStatus.Failed;
+                        LastError = $"Failed to load assetBundle : {MainBundleInfo.Bundle.BundleName}";
+                        YooLogger.Error(LastError);
                     }
                 }
                 else
