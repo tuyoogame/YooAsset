@@ -45,6 +45,7 @@ namespace YooAsset
             if (_steps == ESteps.Checking)
             {
                 RawFilePath = OwnerBundle.FileLoadPath;
+                RawFileInfo = OwnerBundle.MainBundleInfo;
                 InvokeCompletion(string.Empty, EOperationStatus.Succeed);
             }
         }

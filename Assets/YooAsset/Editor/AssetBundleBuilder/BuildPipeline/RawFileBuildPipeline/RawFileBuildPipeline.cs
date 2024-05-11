@@ -32,6 +32,7 @@ namespace YooAsset.Editor
                     new TaskPrepare_RFBP(),
                     new TaskGetBuildMap_RFBP(),
                     new TaskBuilding_RFBP(),
+                    new TaskEncryption_RFBP(),
                     new TaskUpdateBundleInfo_RFBP(),
                     new TaskCreateManifest_RFBP(),
                     new TaskCreateReport_RFBP(),

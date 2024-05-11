@@ -146,6 +146,13 @@ namespace YooAsset
         }
         #endregion
 
+        #region RawFile
+        internal byte[] LoadRawFile(string fileLoadPath)
+        {
+            return _assist.Loader.LoadRawFile(this, fileLoadPath);
+        }
+        #endregion
+
         #region AssetBundle
         internal AssetBundle LoadAssetBundle(string fileLoadPath, out Stream managedStream)
         {

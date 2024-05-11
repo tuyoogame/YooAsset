@@ -116,6 +116,18 @@ namespace YooAsset
     internal static class FileUtility
     {
         /// <summary>
+        /// 字节数据转换成文本数据
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string BytesToText(byte[] data)
+        {
+            UTF8Encoding utf8 = new UTF8Encoding();
+            string txt = utf8.GetString(data);
+            return txt;
+        }
+
+        /// <summary>
         /// 读取文件的文本数据
         /// </summary>
         public static string ReadAllText(string filePath)
