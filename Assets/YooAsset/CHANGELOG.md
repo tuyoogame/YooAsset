@@ -2,6 +2,42 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.1.2] - 2024-05-16
+
+SBP库依赖版本升级至2.1.3
+
+### Fixed
+
+- (#236) 修复了资源配置界面AutoCollectShader复选框没有刷新的问题。
+- (#244) 修复了导入器在安卓平台导入本地下载的资源失败的问题。
+- (#268) 修复了挂起场景未解除状态前无法卸载的问题。
+- (#269) 优化场景挂起流程，支持中途取消挂起操作。
+- (#276) 修复了HostPlayMode模式下，如果内置清单是最新版本，每次运行都会触发拷贝行为。
+- (#289) 修复了Unity2019版本脚本IWebRequester编译报错。
+- (#295) 解决了在安卓移动平台，华为和三星真机上有极小概率加载资源包失败 : Unable to open archive file
+
+### Added
+
+- 新增GetAllCacheFileInfosOperation()获取缓存文件信息的方法。
+
+- 新增LoadSceneSync()同步加载场景的方法。
+
+- 新增IIgnoreRule接口，资源收集流程可以自定义。
+
+- 新增IWechatQueryServices接口，用于微信平台本地文件查询。
+
+  后续将会通过虚拟文件系统来支持！
+
+### Changed
+
+- 调整了UnloadSceneOperation代码里场景的卸载顺序。
+
+### Improvements
+
+- 优化了资源清单的解析过程。
+- 移除资源包名里的空格字符。
+- 支持华为鸿蒙系统。
+
 ## [2.1.1] - 2024-01-17
 
 ### Fixed
