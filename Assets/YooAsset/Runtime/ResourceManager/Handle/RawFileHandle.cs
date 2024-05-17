@@ -73,7 +73,7 @@ namespace YooAsset
                 return null;
             string filePath = Provider.RawFilePath;
             if (Provider.RawFileInfo == null ||
-               Provider.RawFileInfo.Bundle.Encrypted == false)
+                Provider.RawFileInfo.Bundle.Encrypted == false)
                 return FileUtility.ReadAllBytes(filePath);
             else
                 return Provider.RawFileInfo.LoadRawFile(filePath);
