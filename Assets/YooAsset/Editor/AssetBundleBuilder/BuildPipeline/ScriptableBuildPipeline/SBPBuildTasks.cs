@@ -28,7 +28,13 @@ namespace UnityEditor.Build.Pipeline.Tasks
 #endif
             buildTasks.Add(new CalculateAssetDependencyData());
             buildTasks.Add(new StripUnusedSpriteSources());
+
+#if TUANJIE_1_0_OR_NEWER
+            buildTasks.Add(new CreateBuiltInShadersBundle(builtInShaderBundleName));
+#else
             buildTasks.Add(new CreateBuiltInBundle(builtInShaderBundleName));
+#endif
+
             buildTasks.Add(new PostDependencyCallback());
 
             // Packing
