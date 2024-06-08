@@ -51,8 +51,8 @@ namespace YooAsset
                 }
                 else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromStreaming)
                 {
-#if UNITY_ANDROID
-                    if (MainBundleInfo.Bundle.Encrypted)
+                    /// 如果文件加密了的话需要判断 是否可以读取StreamingAsset 中的文件
+                    if (MainBundleInfo.Bundle.Encrypted && !FileUtility.EnableLoadStreamingAsset)
                     {
                         _steps = ESteps.Unpack;
                         FileLoadPath = MainBundleInfo.CachedDataFilePath;
@@ -62,10 +62,6 @@ namespace YooAsset
                         _steps = ESteps.LoadBundleFile;
                         FileLoadPath = MainBundleInfo.BuildinFilePath;
                     }
-#else
-                    _steps = ESteps.LoadBundleFile;
-                    FileLoadPath = MainBundleInfo.BuildinFilePath;
-#endif
                 }
                 else if (MainBundleInfo.LoadMode == BundleInfo.ELoadMode.LoadFromCache)
                 {
