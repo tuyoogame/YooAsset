@@ -71,7 +71,7 @@ namespace YooAsset
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
-        ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
+        ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByTags(string[] tags, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout)
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
@@ -84,7 +84,7 @@ namespace YooAsset
         {
             return ResourceUnpackerOperation.CreateEmptyUnpacker(Download, PackageName, upackingMaxNumber, failedTryAgain, timeout);
         }
-        ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
+        ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByTags(string[] tags, bool includeTags, int upackingMaxNumber, int failedTryAgain, int timeout)
         {
             return ResourceUnpackerOperation.CreateEmptyUnpacker(Download, PackageName, upackingMaxNumber, failedTryAgain, timeout);
         }

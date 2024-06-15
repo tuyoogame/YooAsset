@@ -21,7 +21,7 @@ namespace YooAsset
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="timeout">超时时间</param>
-        public abstract ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60);
+        public abstract ResourceDownloaderOperation CreateResourceDownloader(string tag, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60);
 
         /// <summary>
         /// 创建资源下载器，用于下载指定的资源标签列表关联的资源包文件
@@ -30,7 +30,7 @@ namespace YooAsset
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="timeout">超时时间</param>
-        public abstract ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60);
+        public abstract ResourceDownloaderOperation CreateResourceDownloader(string[] tags, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60);
 
         /// <summary>
         /// 创建资源下载器，用于下载指定的资源依赖的资源包文件
@@ -71,11 +71,11 @@ namespace YooAsset
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
-        public override ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public override ResourceDownloaderOperation CreateResourceDownloader(string tag, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
-        public override ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public override ResourceDownloaderOperation CreateResourceDownloader(string[] tags, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
@@ -108,11 +108,11 @@ namespace YooAsset
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
-        public override ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public override ResourceDownloaderOperation CreateResourceDownloader(string tag, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
-        public override ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public override ResourceDownloaderOperation CreateResourceDownloader(string[] tags, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
@@ -262,7 +262,7 @@ namespace YooAsset
             var operation = new ResourceDownloaderOperation(_impl.Download, _impl.PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
             return operation;
         }
-        public override ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public override ResourceDownloaderOperation CreateResourceDownloader(string tag, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             if (Status != EOperationStatus.Succeed)
             {
@@ -270,11 +270,11 @@ namespace YooAsset
                 return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
             }
 
-            List<BundleInfo> downloadList = _impl.GetDownloadListByTags(_manifest, new string[] { tag });
+            List<BundleInfo> downloadList = _impl.GetDownloadListByTags(_manifest, new string[] { tag }, includeTags);
             var operation = new ResourceDownloaderOperation(_impl.Download, _impl.PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
             return operation;
         }
-        public override ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public override ResourceDownloaderOperation CreateResourceDownloader(string[] tags, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             if (Status != EOperationStatus.Succeed)
             {
@@ -282,7 +282,7 @@ namespace YooAsset
                 return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
             }
 
-            List<BundleInfo> downloadList = _impl.GetDownloadListByTags(_manifest, tags);
+            List<BundleInfo> downloadList = _impl.GetDownloadListByTags(_manifest, tags, includeTags);
             var operation = new ResourceDownloaderOperation(_impl.Download, _impl.PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
             return operation;
         }
@@ -342,11 +342,11 @@ namespace YooAsset
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
-        public override ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public override ResourceDownloaderOperation CreateResourceDownloader(string tag, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
-        public override ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public override ResourceDownloaderOperation CreateResourceDownloader(string[] tags, bool includeTags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             return ResourceDownloaderOperation.CreateEmptyDownloader(_impl.Download, _impl.PackageName, downloadingMaxNumber, failedTryAgain, timeout);
         }
