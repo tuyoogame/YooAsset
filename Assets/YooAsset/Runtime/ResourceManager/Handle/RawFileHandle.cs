@@ -64,7 +64,6 @@ namespace YooAsset
             this.ReleaseInternal();
         }
 
-
         /// <summary>
         /// 获取原生文件的二进制数据
         /// </summary>
@@ -73,7 +72,11 @@ namespace YooAsset
             if (IsValidWithWarning == false)
                 return null;
             string filePath = Provider.RawFilePath;
-            return FileUtility.ReadAllBytes(filePath);
+            if (Provider.RawFileInfo == null ||
+                Provider.RawFileInfo.Bundle.Encrypted == false)
+                return FileUtility.ReadAllBytes(filePath);
+            else
+                return Provider.RawFileInfo.LoadRawFile(filePath);
         }
 
         /// <summary>
@@ -84,7 +87,11 @@ namespace YooAsset
             if (IsValidWithWarning == false)
                 return null;
             string filePath = Provider.RawFilePath;
-            return FileUtility.ReadAllText(filePath);
+            if (Provider.RawFileInfo == null ||
+                Provider.RawFileInfo.Bundle.Encrypted == false)
+                return FileUtility.ReadAllText(filePath);
+            else
+                return FileUtility.BytesToText(Provider.RawFileInfo.LoadRawFile(filePath));
         }
 
         /// <summary>

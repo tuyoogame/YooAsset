@@ -15,6 +15,27 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 同步加载原生数据对象
+        /// </summary>
+        /// <param name="bundleInfo"></param>
+        /// <param name="fileLoadPath"></param>
+        /// <returns></returns>
+        public byte[] LoadRawFile(BundleInfo bundleInfo, string fileLoadPath)
+        {
+            if (_decryption == null)
+            {
+                YooLogger.Error($"{nameof(IDecryptionServices)} is null ! when load raw file {bundleInfo.Bundle.BundleName}!");
+                return null;
+            }
+
+            DecryptFileInfo fileInfo = new DecryptFileInfo();
+            fileInfo.BundleName = bundleInfo.Bundle.BundleName;
+            fileInfo.FileLoadPath = fileLoadPath;
+            fileInfo.ConentCRC = bundleInfo.Bundle.UnityCRC;
+            return _decryption.LoadRawFileData(fileInfo);
+        }
+
+        /// <summary>
         /// 同步加载资源包对象
         /// </summary>
         public AssetBundle LoadAssetBundle(BundleInfo bundleInfo, string fileLoadPath, out Stream managedStream)

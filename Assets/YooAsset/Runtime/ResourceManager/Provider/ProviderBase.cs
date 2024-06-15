@@ -58,6 +58,11 @@ namespace YooAsset
         public string RawFilePath { protected set; get; }
 
         /// <summary>
+        /// 原生文件信息
+        /// </summary>
+        public BundleInfo RawFileInfo { protected set; get; }
+
+        /// <summary>
         /// 引用计数
         /// </summary>
         public int RefCount { private set; get; } = 0;
