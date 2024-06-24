@@ -23,7 +23,7 @@ namespace YooAsset.Editor
 
         private static readonly Dictionary<string, System.Type> _cacheIgnoreRuleTypes = new Dictionary<string, System.Type>();
         private static readonly Dictionary<string, IIgnoreRule> _cacheIgnoreRuleInstance = new Dictionary<string, IIgnoreRule>();
-        
+
         /// <summary>
         /// 配置数据是否被修改
         /// </summary>
@@ -275,23 +275,23 @@ namespace YooAsset.Editor
 
         public static bool HasActiveRuleName(string ruleName)
         {
-            return _cacheActiveRuleTypes.Keys.Contains(ruleName);
+            return _cacheActiveRuleTypes.ContainsKey(ruleName);
         }
         public static bool HasAddressRuleName(string ruleName)
         {
-            return _cacheAddressRuleTypes.Keys.Contains(ruleName);
+            return _cacheAddressRuleTypes.ContainsKey(ruleName);
         }
         public static bool HasPackRuleName(string ruleName)
         {
-            return _cachePackRuleTypes.Keys.Contains(ruleName);
+            return _cachePackRuleTypes.ContainsKey(ruleName);
         }
         public static bool HasFilterRuleName(string ruleName)
         {
-            return _cacheFilterRuleTypes.Keys.Contains(ruleName);
+            return _cacheFilterRuleTypes.ContainsKey(ruleName);
         }
         public static bool HasIgnoreRuleName(string ruleName)
         {
-            return _cacheIgnoreRuleTypes.Keys.Contains(ruleName);
+            return _cacheIgnoreRuleTypes.ContainsKey(ruleName);
         }
 
         public static IActiveRule GetActiveRuleInstance(string ruleName)

@@ -166,10 +166,8 @@ namespace YooAsset
             {
                 // 注意：我们不允许原始路径存在重名
                 string assetPath = packageAsset.AssetPath;
-                if (manifest.AssetDic.ContainsKey(assetPath))
+                if (!manifest.AssetDic.TryAdd(assetPath, packageAsset))
                     throw new Exception($"AssetPath have existed : {assetPath}");
-                else
-                    manifest.AssetDic.Add(assetPath, packageAsset);
             }
 
             return manifest;

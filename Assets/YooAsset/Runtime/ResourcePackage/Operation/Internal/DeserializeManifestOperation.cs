@@ -124,10 +124,8 @@ namespace YooAsset
 
                         // 注意：我们不允许原始路径存在重名
                         string assetPath = packageAsset.AssetPath;
-                        if (Manifest.AssetDic.ContainsKey(assetPath))
+                        if (!Manifest.AssetDic.TryAdd(assetPath, packageAsset))
                             throw new System.Exception($"AssetPath have existed : {assetPath}");
-                        else
-                            Manifest.AssetDic.Add(assetPath, packageAsset);
 
                         // 填充AssetPathMapping1
                         {
@@ -136,19 +134,15 @@ namespace YooAsset
                                 location = location.ToLower();
 
                             // 添加原生路径的映射
-                            if (Manifest.AssetPathMapping1.ContainsKey(location))
+                            if (!Manifest.AssetPathMapping1.TryAdd(location, packageAsset.AssetPath))
                                 throw new System.Exception($"Location have existed : {location}");
-                            else
-                                Manifest.AssetPathMapping1.Add(location, packageAsset.AssetPath);
 
                             // 添加无后缀名路径的映射
                             string locationWithoutExtension = Path.ChangeExtension(location, null);
                             if (ReferenceEquals(location, locationWithoutExtension) == false)
                             {
-                                if (Manifest.AssetPathMapping1.ContainsKey(locationWithoutExtension))
+                                if (!Manifest.AssetPathMapping1.TryAdd(locationWithoutExtension, packageAsset.AssetPath))
                                     YooLogger.Warning($"Location have existed : {locationWithoutExtension}");
-                                else
-                                    Manifest.AssetPathMapping1.Add(locationWithoutExtension, packageAsset.AssetPath);
                             }
                         }
                         if (Manifest.EnableAddressable)
@@ -156,20 +150,16 @@ namespace YooAsset
                             string location = packageAsset.Address;
                             if (string.IsNullOrEmpty(location) == false)
                             {
-                                if (Manifest.AssetPathMapping1.ContainsKey(location))
+                                if (!Manifest.AssetPathMapping1.TryAdd(location, packageAsset.AssetPath))
                                     throw new System.Exception($"Location have existed : {location}");
-                                else
-                                    Manifest.AssetPathMapping1.Add(location, packageAsset.AssetPath);
                             }
                         }
 
                         // 填充AssetPathMapping2
                         if (Manifest.IncludeAssetGUID)
                         {
-                            if (Manifest.AssetPathMapping2.ContainsKey(packageAsset.AssetGUID))
+                            if (!Manifest.AssetPathMapping2.TryAdd(packageAsset.AssetGUID, packageAsset.AssetPath))
                                 throw new System.Exception($"AssetGUID have existed : {packageAsset.AssetGUID}");
-                            else
-                                Manifest.AssetPathMapping2.Add(packageAsset.AssetGUID, packageAsset.AssetPath);
                         }
 
                         _packageAssetCount--;

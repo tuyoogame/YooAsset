@@ -180,9 +180,9 @@ namespace YooAsset.Editor
             for (int index = 0; index < manifest.BundleList.Count; index++)
             {
                 var packageBundle = manifest.BundleList[index];
-                if (_cacheBundleTags.ContainsKey(index))
+                if (_cacheBundleTags.TryGetValue(index, out var value))
                 {
-                    packageBundle.Tags = _cacheBundleTags[index].ToArray();
+                    packageBundle.Tags = value.ToArray();
                 }
                 else
                 {

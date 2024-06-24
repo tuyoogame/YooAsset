@@ -94,10 +94,7 @@ namespace YooAsset
                 }
             }
 
-            if (_wrappers.ContainsKey(cacheGUID))
-            {
-                _wrappers.Remove(cacheGUID);
-            }
+            _wrappers.Remove(cacheGUID);
         }
 
         /// <summary>
