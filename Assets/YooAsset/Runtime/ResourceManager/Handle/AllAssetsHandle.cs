@@ -67,7 +67,7 @@ namespace YooAsset
         /// <summary>
         /// 子资源对象集合
         /// </summary>
-        public UnityEngine.Object[] AllAssetObjects
+        public IReadOnlyList<UnityEngine.Object> AllAssetObjects
         {
             get
             {
