@@ -31,8 +31,6 @@ namespace YooAsset
         {
             if (_fileSystem.CheckNeedDownload(_bundle))
             {                
-                DownloadProgress = 0f;
-                DownloadedBytes = 0;
                 _steps = ESteps.DownloadFile;
             }
             else
@@ -219,8 +217,6 @@ namespace YooAsset
         {
             if (_fileSystem.CheckNeedDownload(_bundle))
             {
-                DownloadProgress = 0f;
-                DownloadedBytes = 0;
                 _steps = ESteps.DownloadFile;
             }
             else

@@ -24,8 +24,6 @@ namespace YooAsset
         }
         internal override void InternalOnStart()
         {
-            DownloadProgress = 0f;
-            DownloadedBytes = 0;
             _steps = ESteps.DownloadFile;
         }
         internal override void InternalOnUpdate()
