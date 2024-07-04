@@ -160,10 +160,11 @@ namespace YooAsset
         /// <summary>
         /// 创建默认的Web文件系统参数
         /// </summary>
-        public static FileSystemParameters CreateDefaultWebFileSystemParameters()
+        public static FileSystemParameters CreateDefaultWebFileSystemParameters(bool disableUnityWebCache = false)
         {
             string fileSystemClass = typeof(DefaultWebFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
+            fileSystemParams.AddParameter("DISABLE_UNITY_WEB_CACHE", disableUnityWebCache);
             fileSystemParams.AddParameter("ALLOW_CROSS_ACCESS", false);
             return fileSystemParams;
         }
@@ -172,12 +173,13 @@ namespace YooAsset
         /// 创建默认的Web文件系统参数
         /// </summary>
         /// <param name="remoteServices">远端资源地址查询服务类</param>
-        public static FileSystemParameters CreateDefaultWebFileSystemParameters(IRemoteServices remoteServices)
+        public static FileSystemParameters CreateDefaultWebFileSystemParameters(IRemoteServices remoteServices, bool disableUnityWebCache = false)
         {
             string fileSystemClass = typeof(DefaultWebFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
-            fileSystemParams.AddParameter("ALLOW_CROSS_ACCESS", true);
             fileSystemParams.AddParameter("REMOTE_SERVICES", remoteServices);
+            fileSystemParams.AddParameter("DISABLE_UNITY_WEB_CACHE", disableUnityWebCache);
+            fileSystemParams.AddParameter("ALLOW_CROSS_ACCESS", true);
             return fileSystemParams;
         }
     }

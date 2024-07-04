@@ -61,12 +61,20 @@ namespace YooAsset
         }
 
         #region 自定义参数
-        public bool AllowCrossAccess { private set; get; } = false;
-
         /// <summary>
         /// 自定义参数：远程服务接口
         /// </summary>
         public IRemoteServices RemoteServices { private set; get; } = null;
+
+        /// <summary>
+        /// 禁用Unity的网络缓存
+        /// </summary>
+        public bool DisableUnityWebCache { private set; get; } = false;
+
+        /// <summary>
+        /// 允许跨域访问和下载
+        /// </summary>
+        public bool AllowCrossAccess { private set; get; } = false;
         #endregion
 
 
@@ -124,13 +132,17 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == "ALLOW_CROSS_ACCESS")
-            {
-                AllowCrossAccess = (bool)value;
-            }
-            else if (name == "REMOTE_SERVICES")
+            if (name == "REMOTE_SERVICES")
             {
                 RemoteServices = (IRemoteServices)value;
+            }
+            else if (name == "DISABLE_UNITY_WEB_CACHE")
+            {
+                DisableUnityWebCache = (bool)value;
+            }
+            else if (name == "ALLOW_CROSS_ACCESS")
+            {
+                AllowCrossAccess = (bool)value;
             }
             else
             {

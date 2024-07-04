@@ -110,19 +110,33 @@ namespace YooAsset
 
         private void CreateWebRequest()
         {
-            uint unityCRC = Bundle.UnityCRC;
-            Hash128 fileHash = Hash128.Parse(Bundle.FileHash);
-
-            // 注意：优先从浏览器缓存里获取文件
-            // The file hash defining the version of the asset bundle.
             _webRequest = DownloadSystemHelper.NewUnityWebRequestGet(_requestURL);
-            _downloadhandler = new DownloadHandlerAssetBundle(_requestURL, fileHash, unityCRC);
-#if UNITY_2020_3_OR_NEWER
-            _downloadhandler.autoLoadAssetBundle = false;
-#endif
-            _webRequest.downloadHandler = _downloadhandler;
+            _webRequest.downloadHandler = CreateDownloadHandler();
             _webRequest.disposeDownloadHandlerOnDispose = true;
             _webRequest.SendWebRequest();
+        }
+        private DownloadHandlerAssetBundle CreateDownloadHandler()
+        {
+            if (_fileSystem.DisableUnityWebCache)
+            {
+                var downloadhandler = new DownloadHandlerAssetBundle(_requestURL, 0);
+#if UNITY_2020_3_OR_NEWER
+                downloadhandler.autoLoadAssetBundle = false;
+#endif
+                return downloadhandler;
+            }
+            else
+            {
+                // 注意：优先从浏览器缓存里获取文件
+                // The file hash defining the version of the asset bundle.
+                uint unityCRC = Bundle.UnityCRC;
+                Hash128 fileHash = Hash128.Parse(Bundle.FileHash);
+                var downloadhandler = new DownloadHandlerAssetBundle(_requestURL, fileHash, unityCRC);
+#if UNITY_2020_3_OR_NEWER
+                downloadhandler.autoLoadAssetBundle = false;
+#endif
+                return downloadhandler;
+            }
         }
         private void DisposeWebRequest()
         {
