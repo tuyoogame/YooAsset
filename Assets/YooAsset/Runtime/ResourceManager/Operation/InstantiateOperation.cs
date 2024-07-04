@@ -73,27 +73,22 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 取消实例化对象操作
-        /// </summary>
-        public void Cancel()
-        {
-            if (IsDone == false)
-            {
-                _steps = ESteps.Done;
-                Status = EOperationStatus.Failed;
-                Error = $"User cancelled !";
-            }
-        }
-
-        /// <summary>
         /// 等待异步实例化结束
         /// </summary>
-        public void WaitForAsyncComplete()
+        public override void WaitForAsyncComplete()
         {
             if (_steps == ESteps.Done)
                 return;
             _handle.WaitForAsyncComplete();
             InternalOnUpdate();
+        }
+
+        /// <summary>
+        /// 取消实例化对象操作
+        /// </summary>
+        public void Cancel()
+        {
+            SetAbort();
         }
 
         internal static GameObject InstantiateInternal(UnityEngine.Object assetObject, bool setPositionAndRotation, Vector3 position, Quaternion rotation, Transform parent, bool worldPositionStays)

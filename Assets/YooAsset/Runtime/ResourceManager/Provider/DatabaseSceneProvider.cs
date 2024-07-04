@@ -38,15 +38,15 @@ namespace YooAsset
             {
                 if (IsWaitForAsyncComplete)
                 {
-                    OwnerBundle.WaitForAsyncComplete();
+                    FileLoader.WaitForAsyncComplete();
                 }
 
-                if (OwnerBundle.IsDone() == false)
+                if (FileLoader.IsDone() == false)
                     return;
 
-                if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
+                if (FileLoader.Status != BundleFileLoader.EStatus.Succeed)
                 {
-                    string error = OwnerBundle.LastError;
+                    string error = FileLoader.LastError;
                     InvokeCompletion(error, EOperationStatus.Failed);
                     return;
                 }
@@ -57,7 +57,7 @@ namespace YooAsset
             // 2. 加载资源对象
             if (_steps == ESteps.Loading)
             {
-                if (IsWaitForAsyncComplete || IsForceDestroyComplete)
+                if (IsWaitForAsyncComplete)
                 {
                     LoadSceneParameters loadSceneParameters = new LoadSceneParameters(SceneMode);
                     SceneObject = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(MainAssetInfo.AssetPath, loadSceneParameters);
@@ -88,7 +88,7 @@ namespace YooAsset
             {
                 if (_asyncOperation != null)
                 {
-                    if (IsWaitForAsyncComplete || IsForceDestroyComplete)
+                    if (IsWaitForAsyncComplete)
                     {
                         // 场景加载无法强制异步转同步
                         YooLogger.Error("The scene is loading asyn !");

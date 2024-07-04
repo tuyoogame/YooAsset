@@ -1,4 +1,6 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+
 namespace YooAsset
 {
     /// <summary>
@@ -49,47 +51,146 @@ namespace YooAsset
     }
 
     /// <summary>
+    /// 文件系统参数
+    /// </summary>
+    public class FileSystemParameters
+    {
+        internal Dictionary<string, object> CreateParameters = new Dictionary<string, object>();
+
+        /// <summary>
+        /// 文件系统类
+        /// 格式: "namespace.class,assembly"
+        /// 格式: "命名空间.类型名,程序集"
+        /// </summary>
+        public string FileSystemClass { private set; get; }
+
+        /// <summary>
+        /// 文件系统的根目录
+        /// </summary>
+        public string RootDirectory { private set; get; }
+
+
+        public FileSystemParameters(string fileSystemClass, string rootDirectory)
+        {
+            FileSystemClass = fileSystemClass;
+            RootDirectory = rootDirectory;
+        }
+
+        /// <summary>
+        /// 添加自定义参数
+        /// </summary>
+        public void AddParameter(string name, object value)
+        {
+            CreateParameters.Add(name, value);
+        }
+
+
+        /// <summary>
+        /// 创建默认的编辑器文件系统参数
+        /// <param name="simulateManifestFilePath">用于模拟运行的资源清单路径</param>
+        /// </summary>
+        public static FileSystemParameters CreateDefaultEditorFileSystemParameters(string simulateManifestFilePath)
+        {
+            string fileSystemClass = typeof(DefaultEditorFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
+            fileSystemParams.AddParameter("SIMULATE_MANIFEST_FILE_PATH", simulateManifestFilePath);
+            return fileSystemParams;
+        }
+
+        /// <summary>
+        /// 创建默认的内置文件系统参数
+        /// </summary>
+        /// <param name="verifyLevel">缓存文件的校验等级</param>
+        /// <param name="rootDirectory">内置文件的根路径</param>
+        public static FileSystemParameters CreateDefaultBuildinFileSystemParameters(EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
+        {
+            string fileSystemClass = typeof(DefaultBuildinFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
+            fileSystemParams.AddParameter("FILE_VERIFY_LEVEL", verifyLevel);
+            return fileSystemParams;
+        }
+
+        /// <summary>
+        /// 创建默认的内置文件系统参数（原生文件）
+        /// </summary>
+        /// <param name="verifyLevel">缓存文件的校验等级</param>
+        /// <param name="rootDirectory">内置文件的根路径</param>
+        public static FileSystemParameters CreateDefaultBuildinRawFileSystemParameters(EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
+        {
+            string fileSystemClass = typeof(DefaultBuildinFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
+            fileSystemParams.AddParameter("FILE_VERIFY_LEVEL", verifyLevel);
+            fileSystemParams.AddParameter("APPEND_FILE_EXTENSION", true);
+            fileSystemParams.AddParameter("RAW_FILE_BUILD_PIPELINE", true);
+            return fileSystemParams;
+        }
+
+        /// <summary>
+        /// 创建默认的缓存文件系统参数
+        /// </summary>
+        /// <param name="remoteServices">远端资源地址查询服务类</param>
+        /// <param name="verifyLevel">缓存文件的校验等级</param>
+        /// <param name="rootDirectory">文件系统的根目录</param>
+        public static FileSystemParameters CreateDefaultCacheFileSystemParameters(IRemoteServices remoteServices, EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
+        {
+            string fileSystemClass = typeof(DefaultCacheFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
+            fileSystemParams.AddParameter("REMOTE_SERVICES", remoteServices);
+            fileSystemParams.AddParameter("FILE_VERIFY_LEVEL", verifyLevel);
+            return fileSystemParams;
+        }
+
+        /// <summary>
+        /// 创建默认的缓存文件系统参数（原生文件）
+        /// </summary>
+        /// <param name="remoteServices">远端资源地址查询服务类</param>
+        /// <param name="verifyLevel">缓存文件的校验等级</param>
+        /// <param name="rootDirectory">文件系统的根目录</param>
+        public static FileSystemParameters CreateDefaultCacheRawFileSystemParameters(IRemoteServices remoteServices, EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
+        {
+            string fileSystemClass = typeof(DefaultCacheFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
+            fileSystemParams.AddParameter("REMOTE_SERVICES", remoteServices);
+            fileSystemParams.AddParameter("FILE_VERIFY_LEVEL", verifyLevel);
+            fileSystemParams.AddParameter("APPEND_FILE_EXTENSION", true);
+            fileSystemParams.AddParameter("RAW_FILE_BUILD_PIPELINE", true);
+            return fileSystemParams;
+        }
+
+        /// <summary>
+        /// 创建默认的Web文件系统参数
+        /// </summary>
+        public static FileSystemParameters CreateDefaultWebFileSystemParameters()
+        {
+            string fileSystemClass = typeof(DefaultWebFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
+            fileSystemParams.AddParameter("ALLOW_CROSS_ACCESS", false);
+            return fileSystemParams;
+        }
+
+        /// <summary>
+        /// 创建默认的Web文件系统参数
+        /// </summary>
+        /// <param name="remoteServices">远端资源地址查询服务类</param>
+        public static FileSystemParameters CreateDefaultWebFileSystemParameters(IRemoteServices remoteServices)
+        {
+            string fileSystemClass = typeof(DefaultWebFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
+            fileSystemParams.AddParameter("ALLOW_CROSS_ACCESS", true);
+            fileSystemParams.AddParameter("REMOTE_SERVICES", remoteServices);
+            return fileSystemParams;
+        }
+    }
+
+    /// <summary>
     /// 初始化参数
     /// </summary>
     public abstract class InitializeParameters
     {
         /// <summary>
-        /// 内置文件的根路径
-        /// 注意：当参数为空的时候会使用默认的根目录。
-        /// </summary>
-        public string BuildinRootDirectory = string.Empty;
-
-        /// <summary>
-        /// 沙盒文件的根路径
-        /// 注意：当参数为空的时候会使用默认的根目录。
-        /// </summary>
-        public string SandboxRootDirectory = string.Empty;
-
-        /// <summary>
-        /// 缓存文件追加原始后缀格式
-        /// </summary>
-        public bool CacheFileAppendExtension = false;
-
-        /// <summary>
-        /// 缓存系统启动时的验证级别
-        /// </summary>
-        public EVerifyLevel CacheBootVerifyLevel = EVerifyLevel.Middle;
-
-        /// <summary>
         /// 自动销毁不再使用的资源提供者
         /// </summary>
         public bool AutoDestroyAssetProvider = false;
-
-        /// <summary>
-        /// 启用断点续传参数
-        /// 说明：当文件的大小大于设置的字节数时启用断点续传下载器
-        /// </summary>
-        public uint BreakpointResumeFileSize = int.MaxValue;
-
-        /// <summary>
-        /// 文件解密服务接口
-        /// </summary>
-        public IDecryptionServices DecryptionServices = null;
     }
 
     /// <summary>
@@ -97,10 +198,7 @@ namespace YooAsset
     /// </summary>
     public class EditorSimulateModeParameters : InitializeParameters
     {
-        /// <summary>
-        /// 用于模拟运行的资源清单路径
-        /// </summary>
-        public string SimulateManifestFilePath = string.Empty;
+        public FileSystemParameters EditorFileSystemParameters;
     }
 
     /// <summary>
@@ -108,6 +206,7 @@ namespace YooAsset
     /// </summary>
     public class OfflinePlayModeParameters : InitializeParameters
     {
+        public FileSystemParameters BuildinFileSystemParameters;
     }
 
     /// <summary>
@@ -115,25 +214,9 @@ namespace YooAsset
     /// </summary>
     public class HostPlayModeParameters : InitializeParameters
     {
-        /// <summary>
-        /// 远端资源地址查询服务类
-        /// </summary>
-        public IRemoteServices RemoteServices = null;
-
-        /// <summary>
-        /// 内置资源查询服务接口
-        /// </summary>
-        public IBuildinQueryServices BuildinQueryServices = null;
-
-        /// <summary>
-        /// 分发资源查询服务接口
-        /// </summary>
-        public IDeliveryQueryServices DeliveryQueryServices = null;
-
-        /// <summary>
-        /// 分发资源加载服务接口
-        /// </summary>
-        public IDeliveryLoadServices DeliveryLoadServices = null;
+        public FileSystemParameters BuildinFileSystemParameters;
+        public FileSystemParameters DeliveryFileSystemParameters;
+        public FileSystemParameters CacheFileSystemParameters;
     }
 
     /// <summary>
@@ -141,19 +224,6 @@ namespace YooAsset
     /// </summary>
     public class WebPlayModeParameters : InitializeParameters
     {
-        /// <summary>
-        /// 远端资源地址查询服务类
-        /// </summary>
-        public IRemoteServices RemoteServices = null;
-
-        /// <summary>
-        /// 内置资源查询服务接口
-        /// </summary>
-        public IBuildinQueryServices BuildinQueryServices = null;
-
-        /// <summary>
-        /// 微信缓存查询服务接口
-        /// </summary>
-        public IWechatQueryServices WechatQueryServices = null;
+        public FileSystemParameters WebFileSystemParameters;
     }
 }

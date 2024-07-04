@@ -4,29 +4,39 @@ namespace YooAsset
     internal interface IPlayMode
     {
         /// <summary>
-        /// 激活的清单
+        /// 当前激活的清单
         /// </summary>
         PackageManifest ActiveManifest { set; get; }
 
         /// <summary>
-        /// 保存清单版本文件到沙盒
+        /// 更新游戏模式
         /// </summary>
-        void FlushManifestVersionFile();
+        void UpdatePlayMode();
 
         /// <summary>
         /// 向网络端请求最新的资源版本
         /// </summary>
-        UpdatePackageVersionOperation UpdatePackageVersionAsync(bool appendTimeTicks, int timeout);
+        RequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks, int timeout);
 
         /// <summary>
         /// 向网络端请求并更新清单
         /// </summary>
-        UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion, int timeout);
+        UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, int timeout);
 
         /// <summary>
         /// 预下载指定版本的包裹内容
         /// </summary>
         PreDownloadContentOperation PreDownloadContentAsync(string packageVersion, int timeout);
+
+        /// <summary>
+        /// 清空所有文件
+        /// </summary>
+        ClearAllBundleFilesOperation ClearAllBundleFilesAsync();
+
+        /// <summary>
+        /// 清空未使用的文件
+        /// </summary>
+        ClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync();
 
         // 下载相关
         ResourceDownloaderOperation CreateResourceDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout);

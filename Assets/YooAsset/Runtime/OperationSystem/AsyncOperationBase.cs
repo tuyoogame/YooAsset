@@ -10,13 +10,11 @@ namespace YooAsset
         // 用户请求的回调
         private Action<AsyncOperationBase> _callback;
 
+        // 所属包裹
+        private string _packageName = null;
+
         // 是否已经完成
         internal bool IsFinish = false;
-
-        /// <summary>
-        /// 所属包裹
-        /// </summary>
-        public string PackageName { private set; get; }
 
         /// <summary>
         /// 优先级
@@ -88,9 +86,13 @@ namespace YooAsset
         internal abstract void InternalOnUpdate();
         internal virtual void InternalOnAbort() { }
 
+        internal string GetPackageName()
+        {
+            return _packageName;
+        }
         internal void SetPackageName(string packageName)
         {
-            PackageName = packageName;
+            _packageName = packageName;
         }
         internal void SetStart()
         {
@@ -116,9 +118,17 @@ namespace YooAsset
             {
                 Status = EOperationStatus.Failed;
                 Error = "user abort";
-                YooLogger.Warning($"Async operaiton has been abort : {this.GetType().Name}");
+                YooLogger.Warning($"Async operaiton {this.GetType().Name} has been abort !");
                 InternalOnAbort();
             }
+        }
+
+        /// <summary>
+        /// 等待异步执行完毕
+        /// </summary>
+        public virtual void WaitForAsyncComplete()
+        {
+            throw new System.NotImplementedException(this.GetType().Name);
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ namespace YooAsset
 {
     internal sealed class BundledAllAssetsProvider : ProviderBase
     {
+        private AssetBundle _assetBundle;
         private AssetBundleRequest _cacheRequest;
 
         public BundledAllAssetsProvider(ResourceManager manager, string providerGUID, AssetInfo assetInfo) : base(manager, providerGUID, assetInfo)
@@ -30,54 +31,62 @@ namespace YooAsset
             {
                 if (IsWaitForAsyncComplete)
                 {
-                    DependBundles.WaitForAsyncComplete();
-                    OwnerBundle.WaitForAsyncComplete();
+                    DependLoaders.WaitForAsyncComplete();
+                    FileLoader.WaitForAsyncComplete();
                 }
 
-                if (DependBundles.IsDone() == false)
+                if (DependLoaders.IsDone() == false)
                     return;
-                if (OwnerBundle.IsDone() == false)
+                if (FileLoader.IsDone() == false)
                     return;
 
-                if (DependBundles.IsSucceed() == false)
+                if (DependLoaders.IsSucceed() == false)
                 {
-                    string error = DependBundles.GetLastError();
+                    string error = DependLoaders.GetLastError();
                     InvokeCompletion(error, EOperationStatus.Failed);
                     return;
                 }
 
-                if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
+                if (FileLoader.Status != BundleFileLoader.EStatus.Succeed)
                 {
-                    string error = OwnerBundle.LastError;
+                    string error = FileLoader.LastError;
                     InvokeCompletion(error, EOperationStatus.Failed);
                     return;
                 }
 
-                if (OwnerBundle.CacheBundle == null)
+                if (FileLoader.Result == null)
                 {
-                    ProcessCacheBundleException();
+                    ProcessFatalEvent();
                     return;
                 }
 
+                if (FileLoader.Result is AssetBundle == false)
+                {
+                    string error = "Try load raw file using load assetbundle method !";
+                    InvokeCompletion(error, EOperationStatus.Failed);
+                    return;
+                }
+
+                _assetBundle = FileLoader.Result as AssetBundle;
                 _steps = ESteps.Loading;
             }
 
             // 2. 加载资源对象
             if (_steps == ESteps.Loading)
             {
-                if (IsWaitForAsyncComplete || IsForceDestroyComplete)
+                if (IsWaitForAsyncComplete)
                 {
                     if (MainAssetInfo.AssetType == null)
-                        AllAssetObjects = OwnerBundle.CacheBundle.LoadAllAssets();
+                        AllAssetObjects = _assetBundle.LoadAllAssets();
                     else
-                        AllAssetObjects = OwnerBundle.CacheBundle.LoadAllAssets(MainAssetInfo.AssetType);
+                        AllAssetObjects = _assetBundle.LoadAllAssets(MainAssetInfo.AssetType);
                 }
                 else
                 {
                     if (MainAssetInfo.AssetType == null)
-                        _cacheRequest = OwnerBundle.CacheBundle.LoadAllAssetsAsync();
+                        _cacheRequest = _assetBundle.LoadAllAssetsAsync();
                     else
-                        _cacheRequest = OwnerBundle.CacheBundle.LoadAllAssetsAsync(MainAssetInfo.AssetType);
+                        _cacheRequest = _assetBundle.LoadAllAssetsAsync(MainAssetInfo.AssetType);
                 }
                 _steps = ESteps.Checking;
             }
@@ -87,7 +96,7 @@ namespace YooAsset
             {
                 if (_cacheRequest != null)
                 {
-                    if (IsWaitForAsyncComplete || IsForceDestroyComplete)
+                    if (IsWaitForAsyncComplete)
                     {
                         // 强制挂起主线程（注意：该操作会很耗时）
                         YooLogger.Warning("Suspend the main thread to load unity asset.");
@@ -106,9 +115,9 @@ namespace YooAsset
                 {
                     string error;
                     if (MainAssetInfo.AssetType == null)
-                        error = $"Failed to load all assets : {MainAssetInfo.AssetPath} AssetType : null AssetBundle : {OwnerBundle.MainBundleInfo.Bundle.BundleName}";
+                        error = $"Failed to load all assets : {MainAssetInfo.AssetPath} AssetType : null AssetBundle : {FileLoader.MainBundleInfo.Bundle.BundleName}";
                     else
-                        error = $"Failed to load all assets : {MainAssetInfo.AssetPath} AssetType : {MainAssetInfo.AssetType} AssetBundle : {OwnerBundle.MainBundleInfo.Bundle.BundleName}";
+                        error = $"Failed to load all assets : {MainAssetInfo.AssetPath} AssetType : {MainAssetInfo.AssetType} AssetBundle : {FileLoader.MainBundleInfo.Bundle.BundleName}";
                     YooLogger.Error(error);
                     InvokeCompletion(error, EOperationStatus.Failed);
                 }

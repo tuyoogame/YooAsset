@@ -3,9 +3,6 @@ using UnityEngine;
 
 namespace YooAsset
 {
-    /// <summary>
-    /// 解密文件的信息
-    /// </summary>
     public struct DecryptFileInfo
     {
         /// <summary>
@@ -21,12 +18,9 @@ namespace YooAsset
         /// <summary>
         /// Unity引擎用于内容校验的CRC
         /// </summary>
-        public uint ConentCRC;
+        public uint FileLoadCRC;
     }
 
-    /// <summary>
-    /// 解密类服务接口
-    /// </summary>
     public interface IDecryptionServices
     {
         /// <summary>

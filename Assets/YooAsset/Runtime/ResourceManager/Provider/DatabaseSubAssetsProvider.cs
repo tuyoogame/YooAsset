@@ -43,15 +43,15 @@ namespace YooAsset
             {
                 if (IsWaitForAsyncComplete)
                 {
-                    OwnerBundle.WaitForAsyncComplete();
+                    FileLoader.WaitForAsyncComplete();
                 }
 
-                if (OwnerBundle.IsDone() == false)
+                if (FileLoader.IsDone() == false)
                     return;
 
-                if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
+                if (FileLoader.Status != BundleFileLoader.EStatus.Succeed)
                 {
-                    string error = OwnerBundle.LastError;
+                    string error = FileLoader.LastError;
                     InvokeCompletion(error, EOperationStatus.Failed);
                     return;
                 }

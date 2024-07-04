@@ -26,7 +26,7 @@ namespace YooAsset.Editor
             {
                 EncryptFileInfo fileInfo = new EncryptFileInfo();
                 fileInfo.BundleName = bundleInfo.BundleName;
-                fileInfo.FilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
+                fileInfo.FileLoadPath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
                 var encryptResult = encryptionServices.Encrypt(fileInfo);
                 if (encryptResult.Encrypted)
                 {

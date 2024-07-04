@@ -43,15 +43,15 @@ namespace YooAsset
             {
                 if (IsWaitForAsyncComplete)
                 {
-                    OwnerBundle.WaitForAsyncComplete();
+                    FileLoader.WaitForAsyncComplete();
                 }
 
-                if (OwnerBundle.IsDone() == false)
+                if (FileLoader.IsDone() == false)
                     return;
 
-                if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
+                if (FileLoader.Status != BundleFileLoader.EStatus.Succeed)
                 {
-                    string error = OwnerBundle.LastError;
+                    string error = FileLoader.LastError;
                     InvokeCompletion(error, EOperationStatus.Failed);
                     return;
                 }
@@ -65,7 +65,7 @@ namespace YooAsset
                 if (MainAssetInfo.AssetType == null)
                 {
                     List<UnityEngine.Object> result = new List<Object>();
-                    foreach (var assetPath in OwnerBundle.MainBundleInfo.IncludeAssetsInEditor)
+                    foreach (var assetPath in FileLoader.MainBundleInfo.IncludeAssetsInEditor)
                     {
                         UnityEngine.Object mainAsset = UnityEditor.AssetDatabase.LoadMainAssetAtPath(assetPath);
                         if (mainAsset != null)
@@ -76,7 +76,7 @@ namespace YooAsset
                 else
                 {
                     List<UnityEngine.Object> result = new List<Object>();
-                    foreach (var assetPath in OwnerBundle.MainBundleInfo.IncludeAssetsInEditor)
+                    foreach (var assetPath in FileLoader.MainBundleInfo.IncludeAssetsInEditor)
                     {
                         UnityEngine.Object mainAsset = UnityEditor.AssetDatabase.LoadAssetAtPath(assetPath, MainAssetInfo.AssetType);
                         if (mainAsset != null)

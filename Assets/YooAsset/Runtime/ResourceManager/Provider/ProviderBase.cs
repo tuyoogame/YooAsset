@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System;
 
 namespace YooAsset
@@ -69,10 +68,9 @@ namespace YooAsset
 
 
         protected ESteps _steps = ESteps.None;
-        protected BundleLoaderBase OwnerBundle { private set; get; }
-        protected DependAssetBundles DependBundles { private set; get; }
+        protected BundleFileLoader FileLoader { private set; get; }
+        protected DependFileLoaders DependLoaders { private set; get; }
         protected bool IsWaitForAsyncComplete { private set; get; } = false;
-        protected bool IsForceDestroyComplete { private set; get; } = false;
         private readonly List<HandleBase> _handles = new List<HandleBase>();
 
 
@@ -85,13 +83,30 @@ namespace YooAsset
             // 创建资源包加载器
             if (manager != null)
             {
-                OwnerBundle = manager.CreateOwnerAssetBundleLoader(assetInfo);
-                OwnerBundle.Reference();
-                OwnerBundle.AddProvider(this);
+                FileLoader = manager.CreateOwnerFileLoader(assetInfo);
+                FileLoader.Reference();
+                FileLoader.AddProvider(this);
 
-                var dependList = manager.CreateDependAssetBundleLoaders(assetInfo);
-                DependBundles = new DependAssetBundles(dependList);
-                DependBundles.Reference();
+                var dependList = manager.CreateDependFileLoaders(assetInfo);
+                DependLoaders = new DependFileLoaders(dependList);
+                DependLoaders.Reference();
+            }
+        }
+
+        /// <summary>
+        /// 等待异步执行完毕
+        /// </summary>
+        public override void WaitForAsyncComplete()
+        {
+            IsWaitForAsyncComplete = true;
+
+            // 注意：主动轮询更新完成同步加载
+            InternalOnUpdate();
+
+            // 验证结果
+            if (IsDone == false)
+            {
+                YooLogger.Warning($"{nameof(WaitForAsyncComplete)} failed to loading : {MainAssetInfo.AssetPath}");
             }
         }
 
@@ -110,15 +125,15 @@ namespace YooAsset
             }
 
             // 释放资源包加载器
-            if (OwnerBundle != null)
+            if (FileLoader != null)
             {
-                OwnerBundle.Release();
-                OwnerBundle = null;
+                FileLoader.Release();
+                FileLoader = null;
             }
-            if (DependBundles != null)
+            if (DependLoaders != null)
             {
-                DependBundles.Release();
-                DependBundles = null;
+                DependLoaders.Release();
+                DependLoaders = null;
             }
         }
 
@@ -188,43 +203,14 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 等待异步执行完毕
+        /// 处理致命问题
         /// </summary>
-        public void WaitForAsyncComplete()
+        protected void ProcessFatalEvent()
         {
-            IsWaitForAsyncComplete = true;
-
-            // 注意：主动轮询更新完成同步加载
-            InternalOnUpdate();
-
-            // 验证结果
-            if (IsDone == false)
-            {
-                YooLogger.Warning($"{nameof(WaitForAsyncComplete)} failed to loading : {MainAssetInfo.AssetPath}");
-            }
-        }
-
-        /// <summary>
-        /// 强制销毁资源提供者
-        /// </summary>
-        public void ForceDestroyComplete()
-        {
-            IsForceDestroyComplete = true;
-
-            // 注意：主动轮询更新完成同步加载
-            // 说明：如果资源包未准备完毕也可以放心销毁。
-            InternalOnUpdate();
-        }
-
-        /// <summary>
-        /// 处理特殊异常
-        /// </summary>
-        protected void ProcessCacheBundleException()
-        {
-            if (OwnerBundle.IsDestroyed)
+            if (FileLoader.IsDestroyed)
                 throw new System.Exception("Should never get here !");
 
-            string error = $"The bundle {OwnerBundle.MainBundleInfo.Bundle.BundleName} has been destroyed by unity bugs !";
+            string error = $"The bundle {FileLoader.MainBundleInfo.Bundle.BundleName} has been destroyed by unity bugs !";
             YooLogger.Error(error);
             InvokeCompletion(Error, EOperationStatus.Failed);
         }
@@ -250,6 +236,28 @@ namespace YooAsset
                     hande.InvokeCallback();
                 }
             }
+        }
+
+        /// <summary>
+        /// 获取下载报告
+        /// </summary>
+        public DownloadStatus GetDownloadStatus()
+        {
+            DownloadStatus status = new DownloadStatus();
+            status.TotalBytes = FileLoader.MainBundleInfo.Bundle.FileSize;
+            status.DownloadedBytes = FileLoader.DownloadedBytes;
+            foreach (var dependBundle in DependLoaders.DependList)
+            {
+                status.TotalBytes += dependBundle.MainBundleInfo.Bundle.FileSize;
+                status.DownloadedBytes += dependBundle.DownloadedBytes;
+            }
+
+            if (status.TotalBytes == 0)
+                throw new System.Exception("Should never get here !");
+
+            status.IsDone = status.DownloadedBytes == status.TotalBytes;
+            status.Progress = (float)status.DownloadedBytes / status.TotalBytes;
+            return status;
         }
 
         #region 调试信息相关
@@ -305,39 +313,17 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 获取下载报告
-        /// </summary>
-        internal DownloadStatus GetDownloadStatus()
-        {
-            DownloadStatus status = new DownloadStatus();
-            status.TotalBytes = (ulong)OwnerBundle.MainBundleInfo.Bundle.FileSize;
-            status.DownloadedBytes = OwnerBundle.DownloadedBytes;
-            foreach (var dependBundle in DependBundles.DependList)
-            {
-                status.TotalBytes += (ulong)dependBundle.MainBundleInfo.Bundle.FileSize;
-                status.DownloadedBytes += dependBundle.DownloadedBytes;
-            }
-
-            if (status.TotalBytes == 0)
-                throw new System.Exception("Should never get here !");
-
-            status.IsDone = status.DownloadedBytes == status.TotalBytes;
-            status.Progress = (float)status.DownloadedBytes / status.TotalBytes;
-            return status;
-        }
-
-        /// <summary>
         /// 获取资源包的调试信息列表
         /// </summary>
         internal void GetBundleDebugInfos(List<DebugBundleInfo> output)
         {
             var bundleInfo = new DebugBundleInfo();
-            bundleInfo.BundleName = OwnerBundle.MainBundleInfo.Bundle.BundleName;
-            bundleInfo.RefCount = OwnerBundle.RefCount;
-            bundleInfo.Status = OwnerBundle.Status.ToString();
+            bundleInfo.BundleName = FileLoader.MainBundleInfo.Bundle.BundleName;
+            bundleInfo.RefCount = FileLoader.RefCount;
+            bundleInfo.Status = FileLoader.Status.ToString();
             output.Add(bundleInfo);
 
-            DependBundles.GetBundleDebugInfos(output);
+            DependLoaders.GetBundleDebugInfos(output);
         }
         #endregion
     }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-
+﻿
 namespace YooAsset
 {
     /// <summary>
@@ -9,18 +6,14 @@ namespace YooAsset
     /// </summary>
     public abstract class UpdatePackageManifestOperation : AsyncOperationBase
     {
-        /// <summary>
-        /// 保存当前清单的版本，用于下次启动时自动加载的版本。
-        /// </summary>
-        public virtual void SavePackageVersion() { }
     }
 
     /// <summary>
-    /// 编辑器下模拟运行的更新清单操作
+    /// 编辑器下模拟运行
     /// </summary>
-    internal sealed class EditorPlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
+    internal sealed class EditorSimulateModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
     {
-        public EditorPlayModeUpdatePackageManifestOperation()
+        public EditorSimulateModeUpdatePackageManifestOperation()
         {
         }
         internal override void InternalOnStart()
@@ -33,7 +26,7 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// 离线模式的更新清单操作
+    /// 离线运行模式
     /// </summary>
     internal sealed class OfflinePlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
     {
@@ -50,8 +43,7 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// 联机模式的更新清单操作
-    /// 注意：优先加载沙盒里缓存的清单文件，如果缓存没找到就下载远端清单文件，并保存到本地。
+    /// 联机运行模式
     /// </summary>
     internal sealed class HostPlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
     {
@@ -60,27 +52,21 @@ namespace YooAsset
             None,
             CheckParams,
             CheckActiveManifest,
-            TryLoadCacheManifest,
-            DownloadManifest,
-            LoadCacheManifest,
+            LoadPackageManifest,
             Done,
         }
 
         private readonly HostPlayModeImpl _impl;
         private readonly string _packageVersion;
-        private readonly bool _autoSaveVersion;
         private readonly int _timeout;
-        private LoadCacheManifestOperation _tryLoadCacheManifestOp;
-        private LoadCacheManifestOperation _loadCacheManifestOp;
-        private DownloadManifestOperation _downloadManifestOp;
+        private FSLoadPackageManifestOperation _loadPackageManifestOp;
         private ESteps _steps = ESteps.None;
 
 
-        internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageVersion, bool autoSaveVersion, int timeout)
+        internal HostPlayModeUpdatePackageManifestOperation(HostPlayModeImpl impl, string packageVersion, int timeout)
         {
             _impl = impl;
             _packageVersion = packageVersion;
-            _autoSaveVersion = autoSaveVersion;
             _timeout = timeout;
         }
         internal override void InternalOnStart()
@@ -99,10 +85,11 @@ namespace YooAsset
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
                     Error = "Package version is null or empty.";
-                    return;
                 }
-
-                _steps = ESteps.CheckActiveManifest;
+                else
+                {
+                    _steps = ESteps.CheckActiveManifest;
+                }
             }
 
             if (_steps == ESteps.CheckActiveManifest)
@@ -115,94 +102,36 @@ namespace YooAsset
                 }
                 else
                 {
-                    _steps = ESteps.TryLoadCacheManifest;
+                    _steps = ESteps.LoadPackageManifest;
                 }
             }
 
-            if (_steps == ESteps.TryLoadCacheManifest)
+            if (_steps == ESteps.LoadPackageManifest)
             {
-                if (_tryLoadCacheManifestOp == null)
-                {
-                    _tryLoadCacheManifestOp = new LoadCacheManifestOperation(_impl.Persistent, _packageVersion);
-                    OperationSystem.StartOperation(_impl.PackageName, _tryLoadCacheManifestOp);
-                }
+                if (_loadPackageManifestOp == null)
+                    _loadPackageManifestOp = _impl.CacheFileSystem.LoadPackageManifestAsync(_packageVersion, _timeout);
 
-                if (_tryLoadCacheManifestOp.IsDone == false)
+                if (_loadPackageManifestOp.IsDone == false)
                     return;
 
-                if (_tryLoadCacheManifestOp.Status == EOperationStatus.Succeed)
-                {
-                    _impl.ActiveManifest = _tryLoadCacheManifestOp.Manifest;
-                    if (_autoSaveVersion)
-                        SavePackageVersion();
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Succeed;
-                }
-                else
-                {
-                    _steps = ESteps.DownloadManifest;
-                }
-            }
-
-            if (_steps == ESteps.DownloadManifest)
-            {
-                if (_downloadManifestOp == null)
-                {
-                    _downloadManifestOp = new DownloadManifestOperation(_impl.Persistent, _impl.RemoteServices, _packageVersion, _timeout);
-                    OperationSystem.StartOperation(_impl.PackageName, _downloadManifestOp);
-                }
-
-                if (_downloadManifestOp.IsDone == false)
-                    return;
-
-                if (_downloadManifestOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.LoadCacheManifest;
-                }
-                else
+                if (_loadPackageManifestOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _downloadManifestOp.Error;
-                }
-            }
-
-            if (_steps == ESteps.LoadCacheManifest)
-            {
-                if (_loadCacheManifestOp == null)
-                {
-                    _loadCacheManifestOp = new LoadCacheManifestOperation(_impl.Persistent, _packageVersion);
-                    OperationSystem.StartOperation(_impl.PackageName, _loadCacheManifestOp);
-                }
-
-                if (_loadCacheManifestOp.IsDone == false)
-                    return;
-
-                if (_loadCacheManifestOp.Status == EOperationStatus.Succeed)
-                {
-                    _impl.ActiveManifest = _loadCacheManifestOp.Manifest;
-                    if (_autoSaveVersion)
-                        SavePackageVersion();
-                    _steps = ESteps.Done;
+                    _impl.ActiveManifest = _loadPackageManifestOp.Result;            
                     Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _loadCacheManifestOp.Error;
+                    Error = _loadPackageManifestOp.Error;
                 }
             }
-        }
-
-        public override void SavePackageVersion()
-        {
-            _impl.FlushManifestVersionFile();
         }
     }
 
     /// <summary>
-    /// WebGL模式的更新清单操作
+    /// WebGL运行模式
     /// </summary>
     internal sealed class WebPlayModeUpdatePackageManifestOperation : UpdatePackageManifestOperation
     {
@@ -218,7 +147,7 @@ namespace YooAsset
         private readonly WebPlayModeImpl _impl;
         private readonly string _packageVersion;
         private readonly int _timeout;
-        private LoadRemoteManifestOperation _loadCacheManifestOp;
+        private FSLoadPackageManifestOperation _loadPackageManifestOp;
         private ESteps _steps = ESteps.None;
 
 
@@ -244,10 +173,11 @@ namespace YooAsset
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
                     Error = "Package version is null or empty.";
-                    return;
                 }
-
-                _steps = ESteps.CheckActiveManifest;
+                else
+                {
+                    _steps = ESteps.CheckActiveManifest;
+                }
             }
 
             if (_steps == ESteps.CheckActiveManifest)
@@ -266,26 +196,23 @@ namespace YooAsset
 
             if (_steps == ESteps.LoadRemoteManifest)
             {
-                if (_loadCacheManifestOp == null)
-                {
-                    _loadCacheManifestOp = new LoadRemoteManifestOperation(_impl.RemoteServices, _impl.PackageName, _packageVersion, _timeout);
-                    OperationSystem.StartOperation(_impl.PackageName, _loadCacheManifestOp);
-                }
+                if (_loadPackageManifestOp == null)
+                    _loadPackageManifestOp = _impl.WebFileSystem.LoadPackageManifestAsync(_packageVersion, _timeout);
 
-                if (_loadCacheManifestOp.IsDone == false)
+                if (_loadPackageManifestOp.IsDone == false)
                     return;
 
-                if (_loadCacheManifestOp.Status == EOperationStatus.Succeed)
+                if (_loadPackageManifestOp.Status == EOperationStatus.Succeed)
                 {
-                    _impl.ActiveManifest = _loadCacheManifestOp.Manifest;
                     _steps = ESteps.Done;
+                    _impl.ActiveManifest = _loadPackageManifestOp.Result;
                     Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _loadCacheManifestOp.Error;
+                    Error = _loadPackageManifestOp.Error;
                 }
             }
         }

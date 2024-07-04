@@ -24,12 +24,9 @@ namespace YooAsset
         /// <summary>
         /// 文件路径
         /// </summary>
-        public string FilePath;
+        public string FileLoadPath;
     }
 
-    /// <summary>
-    /// 加密服务类接口
-    /// </summary>
     public interface IEncryptionServices
     {
         EncryptResult Encrypt(EncryptFileInfo fileInfo);

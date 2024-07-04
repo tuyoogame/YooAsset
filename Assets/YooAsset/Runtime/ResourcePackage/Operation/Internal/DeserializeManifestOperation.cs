@@ -212,9 +212,9 @@ namespace YooAsset
                         Manifest.BundleDic1.Add(packageBundle.BundleName, packageBundle);
                         Manifest.BundleDic2.Add(packageBundle.FileName, packageBundle);
 
-                        // 注意：原始文件可能存在相同的CacheGUID
-                        if (Manifest.BundleDic3.ContainsKey(packageBundle.CacheGUID) == false)
-                            Manifest.BundleDic3.Add(packageBundle.CacheGUID, packageBundle);
+                        // 注意：原始文件可能存在相同的BundleGUID
+                        if (Manifest.BundleDic3.ContainsKey(packageBundle.BundleGUID) == false)
+                            Manifest.BundleDic3.Add(packageBundle.BundleGUID, packageBundle);
 
                         _packageBundleCount--;
                         Progress = 1f - _packageBundleCount / _progressTotalValue;

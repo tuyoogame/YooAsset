@@ -13,6 +13,13 @@ namespace YooAsset
             YooAssets.Update();
         }
 
+#if UNITY_EDITOR
+        void OnApplicationQuit()
+        {
+            YooAssets.OnApplicationQuit();
+        }
+#endif
+
         [Conditional("DEBUG")]
         private void DebugCheckDuplicateDriver()
         {

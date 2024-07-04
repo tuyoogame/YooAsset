@@ -112,7 +112,7 @@ namespace YooAsset
             // 终止临时队列里的任务
             foreach (var operation in _newList)
             {
-                if (operation.PackageName == packageName)
+                if (operation.GetPackageName() == packageName)
                 {
                     operation.SetAbort();
                 }
@@ -121,7 +121,7 @@ namespace YooAsset
             // 终止正在进行的任务
             foreach (var operation in _operations)
             {
-                if (operation.PackageName == packageName)
+                if (operation.GetPackageName() == packageName)
                 {
                     operation.SetAbort();
                 }
@@ -135,15 +135,6 @@ namespace YooAsset
         {
             _newList.Add(operation);
             operation.SetPackageName(packageName);
-            operation.SetStart();
-        }
-
-        /// <summary>
-        /// 开始处理异步操作类
-        /// </summary>
-        public static void StartOperation(AsyncOperationBase operation)
-        {
-            _newList.Add(operation);
             operation.SetStart();
         }
     }

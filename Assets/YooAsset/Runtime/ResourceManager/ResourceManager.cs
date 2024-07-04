@@ -13,9 +13,9 @@ namespace YooAsset
         private readonly static Dictionary<string, SceneHandle> _sceneHandles = new Dictionary<string, SceneHandle>(100);
         private static long _sceneCreateCount = 0;
 
-        private readonly Dictionary<string, ProviderBase> _providerDic = new Dictionary<string, ProviderBase>(5000);
-        private readonly Dictionary<string, BundleLoaderBase> _loaderDic = new Dictionary<string, BundleLoaderBase>(5000);
-        private readonly List<BundleLoaderBase> _loaderList = new List<BundleLoaderBase>(5000);
+        internal readonly Dictionary<string, ProviderBase> _providerDic = new Dictionary<string, ProviderBase>(5000);
+        internal readonly Dictionary<string, BundleFileLoader> _loaderDic = new Dictionary<string, BundleFileLoader>(5000);
+        internal readonly List<BundleFileLoader> _loaderList = new List<BundleFileLoader>(5000);
 
         private bool _simulationOnEditor;
         private bool _autoDestroyAssetProvider;
@@ -35,10 +35,10 @@ namespace YooAsset
         /// <summary>
         /// 初始化
         /// </summary>
-        public void Initialize(bool simulationOnEditor, bool autoDestroyAssetProvider, IBundleQuery bundleServices)
+        public void Initialize(InitializeParameters initializeParameters, IBundleQuery bundleServices)
         {
-            _simulationOnEditor = simulationOnEditor;
-            _autoDestroyAssetProvider = autoDestroyAssetProvider;
+            _simulationOnEditor = initializeParameters is EditorSimulateModeParameters;
+            _autoDestroyAssetProvider = initializeParameters.AutoDestroyAssetProvider;
             _bundleQuery = bundleServices;
         }
 
@@ -57,30 +57,6 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 资源回收（卸载引用计数为零的资源）
-        /// </summary>
-        public void UnloadUnusedAssets()
-        {
-            for (int i = _loaderList.Count - 1; i >= 0; i--)
-            {
-                BundleLoaderBase loader = _loaderList[i];
-                loader.TryDestroyProviders();
-            }
-
-            for (int i = _loaderList.Count - 1; i >= 0; i--)
-            {
-                BundleLoaderBase loader = _loaderList[i];
-                if (loader.CanDestroy())
-                {
-                    string bundleName = loader.MainBundleInfo.Bundle.BundleName;
-                    loader.Destroy();
-                    _loaderList.RemoveAt(i);
-                    _loaderDic.Remove(bundleName);
-                }
-            }
-        }
-
-        /// <summary>
         /// 尝试卸载指定资源的资源包（包括依赖资源）
         /// </summary>
         public void TryUnloadUnusedAsset(AssetInfo assetInfo)
@@ -92,8 +68,8 @@ namespace YooAsset
             }
 
             // 卸载主资源包加载器
-            string manBundleName = _bundleQuery.GetMainBundleName(assetInfo);
-            var mainLoader = TryGetAssetBundleLoader(manBundleName);
+            string mainBundleName = _bundleQuery.GetMainBundleName(assetInfo);
+            var mainLoader = TryGetFileLoader(mainBundleName);
             if (mainLoader != null)
             {
                 mainLoader.TryDestroyProviders();
@@ -110,7 +86,7 @@ namespace YooAsset
             string[] dependBundleNames = _bundleQuery.GetDependBundleNames(assetInfo);
             foreach (var dependBundleName in dependBundleNames)
             {
-                var dependLoader = TryGetAssetBundleLoader(dependBundleName);
+                var dependLoader = TryGetFileLoader(dependBundleName);
                 if (dependLoader != null)
                 {
                     if (dependLoader.CanDestroy())
@@ -122,57 +98,6 @@ namespace YooAsset
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// 强制回收所有资源
-        /// 注意：加载器在销毁后关联的下载器还会继续下载！
-        /// </summary>
-        public void ForceUnloadAllAssets()
-        {
-#if UNITY_WEBGL
-            throw new Exception($"WebGL not support invoke {nameof(ForceUnloadAllAssets)}");
-#else
-            // 注意：因为场景无法异步转同步，需要等待所有场景加载完毕！
-            foreach (var sceneHandlePair in _sceneHandles)
-            {
-                var sceneHandle = sceneHandlePair.Value;
-                if (sceneHandle.PackageName == PackageName)
-                {
-                    if (sceneHandle.IsDone == false)
-                        throw new Exception($"{nameof(ForceUnloadAllAssets)} cannot  be called when loading the scene !");
-                }
-            }
-
-            // 释放所有资源句柄
-            foreach (var provider in _providerDic.Values)
-            {
-                provider.ReleaseAllHandles();
-            }
-
-            // 强制销毁资源提供者
-            foreach (var provider in _providerDic.Values)
-            {
-                provider.ForceDestroyComplete();
-                provider.Destroy();
-            }
-
-            // 强制销毁资源加载器
-            foreach (var loader in _loaderList)
-            {
-                loader.ForceDestroyComplete();
-                loader.Destroy();
-            }
-
-            // 清空数据
-            _providerDic.Clear();
-            _loaderList.Clear();
-            _loaderDic.Clear();
-            ClearSceneHandle();
-
-            // 注意：调用底层接口释放所有资源
-            Resources.UnloadUnusedAssets();
-#endif
         }
 
         /// <summary>
@@ -336,6 +261,7 @@ namespace YooAsset
             return provider.CreateHandle<RawFileHandle>();
         }
 
+
         internal void UnloadSubScene(string sceneName)
         {
             List<string> removeKeys = new List<string>();
@@ -355,7 +281,7 @@ namespace YooAsset
                 _sceneHandles.Remove(key);
             }
         }
-        private void UnloadAllScene()
+        internal void UnloadAllScene()
         {
             // 释放所有场景句柄
             foreach (var valuePair in _sceneHandles)
@@ -364,7 +290,7 @@ namespace YooAsset
             }
             _sceneHandles.Clear();
         }
-        private void ClearSceneHandle()
+        internal void ClearSceneHandle()
         {
             // 释放资源包下的所有场景
             if (_bundleQuery.ManifestValid())
@@ -385,18 +311,18 @@ namespace YooAsset
             }
         }
 
-        internal BundleLoaderBase CreateOwnerAssetBundleLoader(AssetInfo assetInfo)
+        internal BundleFileLoader CreateOwnerFileLoader(AssetInfo assetInfo)
         {
             BundleInfo bundleInfo = _bundleQuery.GetMainBundleInfo(assetInfo);
-            return CreateAssetBundleLoaderInternal(bundleInfo);
+            return CreateFileLoaderInternal(bundleInfo);
         }
-        internal List<BundleLoaderBase> CreateDependAssetBundleLoaders(AssetInfo assetInfo)
+        internal List<BundleFileLoader> CreateDependFileLoaders(AssetInfo assetInfo)
         {
             BundleInfo[] depends = _bundleQuery.GetDependBundleInfos(assetInfo);
-            List<BundleLoaderBase> result = new List<BundleLoaderBase>(depends.Length);
+            List<BundleFileLoader> result = new List<BundleFileLoader>(depends.Length);
             foreach (var bundleInfo in depends)
             {
-                BundleLoaderBase dependLoader = CreateAssetBundleLoaderInternal(bundleInfo);
+                BundleFileLoader dependLoader = CreateFileLoaderInternal(bundleInfo);
                 result.Add(dependLoader);
             }
             return result;
@@ -413,41 +339,23 @@ namespace YooAsset
             return _loaderList.Count > 0;
         }
 
-        private BundleLoaderBase CreateAssetBundleLoaderInternal(BundleInfo bundleInfo)
+        private BundleFileLoader CreateFileLoaderInternal(BundleInfo bundleInfo)
         {
             // 如果加载器已经存在
             string bundleName = bundleInfo.Bundle.BundleName;
-            BundleLoaderBase loader = TryGetAssetBundleLoader(bundleName);
+            BundleFileLoader loader = TryGetFileLoader(bundleName);
             if (loader != null)
                 return loader;
 
             // 新增下载需求
-            if (_simulationOnEditor)
-            {
-                loader = new VirtualBundleFileLoader(this, bundleInfo);
-            }
-            else
-            {
-#if UNITY_WEBGL
-                if (bundleInfo.Bundle.Buildpipeline== EDefaultBuildPipeline.RawFileBuildPipeline.ToString())
-                    loader = new RawBundleWebLoader(this, bundleInfo);
-                else
-                    loader = new AssetBundleWebLoader(this, bundleInfo);
-#else
-                if (bundleInfo.Bundle.Buildpipeline == EDefaultBuildPipeline.RawFileBuildPipeline.ToString())
-                    loader = new RawBundleFileLoader(this, bundleInfo);
-                else
-                    loader = new AssetBundleFileLoader(this, bundleInfo);
-#endif
-            }
-
+            loader = new BundleFileLoader(this, bundleInfo);
             _loaderList.Add(loader);
             _loaderDic.Add(bundleName, loader);
             return loader;
         }
-        private BundleLoaderBase TryGetAssetBundleLoader(string bundleName)
+        private BundleFileLoader TryGetFileLoader(string bundleName)
         {
-            if (_loaderDic.TryGetValue(bundleName, out BundleLoaderBase value))
+            if (_loaderDic.TryGetValue(bundleName, out BundleFileLoader value))
                 return value;
             else
                 return null;

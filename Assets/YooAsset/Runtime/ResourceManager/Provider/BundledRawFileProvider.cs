@@ -24,16 +24,21 @@ namespace YooAsset
             if (_steps == ESteps.CheckBundle)
             {
                 if (IsWaitForAsyncComplete)
-                {
-                    OwnerBundle.WaitForAsyncComplete();
-                }
+                    FileLoader.WaitForAsyncComplete();
 
-                if (OwnerBundle.IsDone() == false)
+                if (FileLoader.IsDone() == false)
                     return;
 
-                if (OwnerBundle.Status != BundleLoaderBase.EStatus.Succeed)
+                if (FileLoader.Status != BundleFileLoader.EStatus.Succeed)
                 {
-                    string error = OwnerBundle.LastError;
+                    string error = FileLoader.LastError;
+                    InvokeCompletion(error, EOperationStatus.Failed);
+                    return;
+                }
+
+                if (FileLoader.Result is string == false)
+                {
+                    string error = "Try load AssetBundle file using load raw file method !";
                     InvokeCompletion(error, EOperationStatus.Failed);
                     return;
                 }
@@ -44,7 +49,7 @@ namespace YooAsset
             // 2. 检测加载结果
             if (_steps == ESteps.Checking)
             {
-                RawFilePath = OwnerBundle.FileLoadPath;
+                RawFilePath = FileLoader.Result as string;
                 InvokeCompletion(string.Empty, EOperationStatus.Succeed);
             }
         }

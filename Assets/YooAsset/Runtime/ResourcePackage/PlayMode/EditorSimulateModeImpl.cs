@@ -6,14 +6,9 @@ namespace YooAsset
 {
     internal class EditorSimulateModeImpl : IPlayMode, IBundleQuery
     {
-        private PackageManifest _activeManifest;
-        private ResourceAssist _assist;
-
         public readonly string PackageName;
-        public DownloadManager Download
-        {
-            get { return _assist.Download; }
-        }
+        public IFileSystem EditorFileSystem { set; get; }
+
 
         public EditorSimulateModeImpl(string packageName)
         {
@@ -23,75 +18,89 @@ namespace YooAsset
         /// <summary>
         /// 异步初始化
         /// </summary>
-        public InitializationOperation InitializeAsync(ResourceAssist assist, string simulateManifestFilePath)
+        public InitializationOperation InitializeAsync(EditorSimulateModeParameters initParameters)
         {
-            _assist = assist;
-
-            var operation = new EditorSimulateModeInitializationOperation(this, simulateManifestFilePath);
+            var operation = new EditorSimulateModeInitializationOperation(this, initParameters);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
 
         #region IPlayMode接口
-        public PackageManifest ActiveManifest
+        public PackageManifest ActiveManifest { set; get; }
+
+        void IPlayMode.UpdatePlayMode()
         {
-            set
-            {
-                _activeManifest = value;
-            }
-            get
-            {
-                return _activeManifest;
-            }
-        }
-        public void FlushManifestVersionFile()
-        {
+            if (EditorFileSystem != null)
+                EditorFileSystem.OnUpdate();
         }
 
-        UpdatePackageVersionOperation IPlayMode.UpdatePackageVersionAsync(bool appendTimeTicks, int timeout)
+        RequestPackageVersionOperation IPlayMode.RequestPackageVersionAsync(bool appendTimeTicks, int timeout)
         {
-            var operation = new EditorPlayModeUpdatePackageVersionOperation();
+            var operation = new EditorSimulateModeRequestPackageVersionOperation();
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        UpdatePackageManifestOperation IPlayMode.UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion, int timeout)
+        UpdatePackageManifestOperation IPlayMode.UpdatePackageManifestAsync(string packageVersion, int timeout)
         {
-            var operation = new EditorPlayModeUpdatePackageManifestOperation();
+            var operation = new EditorSimulateModeUpdatePackageManifestOperation();
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
         PreDownloadContentOperation IPlayMode.PreDownloadContentAsync(string packageVersion, int timeout)
         {
-            var operation = new EditorPlayModePreDownloadContentOperation(this);
+            var operation = new EditorSimulateModePreDownloadContentOperation(this);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
+        }
+
+        ClearAllBundleFilesOperation IPlayMode.ClearAllBundleFilesAsync()
+        {
+            var operation = new EditorSimulateModeClearAllBundleFilesOperation(this);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
+        }
+        ClearUnusedBundleFilesOperation IPlayMode.ClearUnusedBundleFilesAsync()
+        {
+            var operation = new EditorSimulateModeClearUnusedBundleFilesOperation(this);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
 
         ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
         {
-            return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+            List<BundleInfo> downloadList = PlayModeHelper.GetDownloadListByAll(ActiveManifest, EditorFileSystem);
+            var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+            return operation;
         }
         ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
         {
-            return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+            List<BundleInfo> downloadList = PlayModeHelper.GetDownloadListByTags(ActiveManifest, tags, EditorFileSystem);
+            var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+            return operation;
         }
         ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
         {
-            return ResourceDownloaderOperation.CreateEmptyDownloader(Download, PackageName, downloadingMaxNumber, failedTryAgain, timeout);
+            List<BundleInfo> downloadList = PlayModeHelper.GetDownloadListByPaths(ActiveManifest, assetInfos, EditorFileSystem);
+            var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
+            return operation;
         }
-
         ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
         {
-            return ResourceUnpackerOperation.CreateEmptyUnpacker(Download, PackageName, upackingMaxNumber, failedTryAgain, timeout);
+            List<BundleInfo> unpcakList = PlayModeHelper.GetUnpackListByAll(ActiveManifest, EditorFileSystem);
+            var operation = new ResourceUnpackerOperation(PackageName, unpcakList, upackingMaxNumber, failedTryAgain, timeout);
+            return operation;
         }
         ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
         {
-            return ResourceUnpackerOperation.CreateEmptyUnpacker(Download, PackageName, upackingMaxNumber, failedTryAgain, timeout);
+            List<BundleInfo> unpcakList = PlayModeHelper.GetUnpackListByTags(ActiveManifest, tags, EditorFileSystem);
+            var operation = new ResourceUnpackerOperation(PackageName, unpcakList, upackingMaxNumber, failedTryAgain, timeout);
+            return operation;
         }
-
         ResourceImporterOperation IPlayMode.CreateResourceImporterByFilePaths(string[] filePaths, int importerMaxNumber, int failedTryAgain, int timeout)
         {
-            return ResourceImporterOperation.CreateEmptyImporter(Download, PackageName, importerMaxNumber, failedTryAgain, timeout);
+            List<BundleInfo> importerList = PlayModeHelper.GetImporterListByFilePaths(ActiveManifest, filePaths, EditorFileSystem);
+            var operation = new ResourceImporterOperation(PackageName, importerList, importerMaxNumber, failedTryAgain, timeout);
+            return operation;
         }
         #endregion
 
@@ -101,9 +110,14 @@ namespace YooAsset
             if (packageBundle == null)
                 throw new Exception("Should never get here !");
 
-            BundleInfo bundleInfo = new BundleInfo(_assist, packageBundle, BundleInfo.ELoadMode.LoadFromEditor);
-            bundleInfo.IncludeAssetsInEditor = _activeManifest.GetBundleIncludeAssets(assetInfo.AssetPath);
-            return bundleInfo;
+            if (EditorFileSystem.Belong(packageBundle))
+            {
+                BundleInfo bundleInfo = new BundleInfo(EditorFileSystem, packageBundle);
+                bundleInfo.IncludeAssetsInEditor = ActiveManifest.GetBundleIncludeAssets(assetInfo.AssetPath);
+                return bundleInfo;
+            }
+
+            throw new Exception($"Can not found belong file system : {packageBundle.BundleName}");
         }
         BundleInfo IBundleQuery.GetMainBundleInfo(AssetInfo assetInfo)
         {
@@ -111,7 +125,7 @@ namespace YooAsset
                 throw new Exception("Should never get here !");
 
             // 注意：如果清单里未找到资源包会抛出异常！
-            var packageBundle = _activeManifest.GetMainPackageBundle(assetInfo.AssetPath);
+            var packageBundle = ActiveManifest.GetMainPackageBundle(assetInfo.AssetPath);
             return CreateBundleInfo(packageBundle, assetInfo);
         }
         BundleInfo[] IBundleQuery.GetDependBundleInfos(AssetInfo assetInfo)
@@ -120,7 +134,7 @@ namespace YooAsset
                 throw new Exception("Should never get here !");
 
             // 注意：如果清单里未找到资源包会抛出异常！
-            var depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
+            var depends = ActiveManifest.GetAllDependencies(assetInfo.AssetPath);
             List<BundleInfo> result = new List<BundleInfo>(depends.Length);
             foreach (var packageBundle in depends)
             {
@@ -135,7 +149,7 @@ namespace YooAsset
                 throw new Exception("Should never get here !");
 
             // 注意：如果清单里未找到资源包会抛出异常！
-            var packageBundle = _activeManifest.GetMainPackageBundle(assetInfo.AssetPath);
+            var packageBundle = ActiveManifest.GetMainPackageBundle(assetInfo.AssetPath);
             return packageBundle.BundleName;
         }
         string[] IBundleQuery.GetDependBundleNames(AssetInfo assetInfo)
@@ -144,7 +158,7 @@ namespace YooAsset
                 throw new Exception("Should never get here !");
 
             // 注意：如果清单里未找到资源包会抛出异常！
-            var depends = _activeManifest.GetAllDependencies(assetInfo.AssetPath);
+            var depends = ActiveManifest.GetAllDependencies(assetInfo.AssetPath);
             List<string> result = new List<string>(depends.Length);
             foreach (var packageBundle in depends)
             {
@@ -154,7 +168,7 @@ namespace YooAsset
         }
         bool IBundleQuery.ManifestValid()
         {
-            return _activeManifest != null;
+            return ActiveManifest != null;
         }
         #endregion
     }

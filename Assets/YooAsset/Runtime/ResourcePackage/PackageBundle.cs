@@ -55,12 +55,12 @@ namespace YooAsset
         /// <summary>
         /// 所属的构建管线
         /// </summary>
-        public string Buildpipeline { private set; get; }
+        public string BuildPipeline { private set; get; }
 
         /// <summary>
-        /// 缓存GUID
+        /// 资源包GUID
         /// </summary>
-        public string CacheGUID
+        public string BundleGUID
         {
             get { return FileHash; }
         }
@@ -104,7 +104,7 @@ namespace YooAsset
         public void ParseBundle(PackageManifest manifest)
         {
             PackageName = manifest.PackageName;
-            Buildpipeline = manifest.BuildPipeline;
+            BuildPipeline = manifest.BuildPipeline;
             _fileExtension = ManifestTools.GetRemoteBundleFileExtension(BundleName);
             _fileName = ManifestTools.GetRemoteBundleFileName(manifest.OutputNameStyle, BundleName, _fileExtension, FileHash);
         }

@@ -76,7 +76,7 @@ namespace YooAsset
         public Dictionary<string, PackageBundle> BundleDic2;
 
         /// <summary>
-        /// 资源包集合（提供CacheGUID获取PackageBundle）
+        /// 资源包集合（提供BundleGUID获取PackageBundle）
         /// </summary>
         [NonSerialized]
         public Dictionary<string, PackageBundle> BundleDic3;
@@ -192,17 +192,17 @@ namespace YooAsset
         /// <summary>
         /// 尝试获取包裹的资源包
         /// </summary>
-        public bool TryGetPackageBundleByCacheGUID(string cacheGUID, out PackageBundle result)
+        public bool TryGetPackageBundleByBundleGUID(string bundleGUID, out PackageBundle result)
         {
-            return BundleDic3.TryGetValue(cacheGUID, out result);
+            return BundleDic3.TryGetValue(bundleGUID, out result);
         }
 
         /// <summary>
         /// 是否包含资源文件
         /// </summary>
-        public bool IsIncludeBundleFile(string cacheGUID)
+        public bool IsIncludeBundleFile(string bundleGUID)
         {
-            return BundleDic3.ContainsKey(cacheGUID);
+            return BundleDic3.ContainsKey(bundleGUID);
         }
 
         /// <summary>
