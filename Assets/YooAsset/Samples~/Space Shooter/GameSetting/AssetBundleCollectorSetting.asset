@@ -100,3 +100,11 @@ MonoBehaviour:
         FilterRuleName: CollectAll
         AssetTags: 
         UserData: 
+      - CollectPath: Assets/Samples/Space Shooter/GameRes/UIAtlas
+        CollectorGUID: 80caf8bc3d0ac5b48a5cab7765a68205
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 

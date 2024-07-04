@@ -34,8 +34,7 @@ public class FsmUpdatePackageManifest : IStateNode
         var packageName = (string)_machine.GetBlackboardValue("PackageName");
         var packageVersion = (string)_machine.GetBlackboardValue("PackageVersion");
         var package = YooAssets.GetPackage(packageName);
-        bool savePackageVersion = true;
-        var operation = package.UpdatePackageManifestAsync(packageVersion, savePackageVersion);
+        var operation = package.UpdatePackageManifestAsync(packageVersion);
         yield return operation;
 
         if (operation.Status != EOperationStatus.Succeed)
