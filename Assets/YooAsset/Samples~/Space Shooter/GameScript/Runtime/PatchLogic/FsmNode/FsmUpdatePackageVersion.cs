@@ -43,6 +43,7 @@ internal class FsmUpdatePackageVersion : IStateNode
         }
         else
         {
+            Debug.Log($"Request package version : {operation.PackageVersion}");
             _machine.SetBlackboardValue("PackageVersion", operation.PackageVersion);
             _machine.ChangeState<FsmUpdatePackageManifest>();
         }

@@ -44,9 +44,9 @@ internal class FsmInitializePackage : IStateNode
         InitializationOperation initializationOperation = null;
         if (playMode == EPlayMode.EditorSimulateMode)
         {
-            string simulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild(buildPipeline, packageName);
+            var simulateBuildResult = EditorSimulateModeHelper.SimulateBuild(buildPipeline, packageName);
             var createParameters = new EditorSimulateModeParameters();
-            createParameters.EditorFileSystemParameters = FileSystemParameters.CreateDefaultEditorFileSystemParameters(simulateManifestFilePath);
+            createParameters.EditorFileSystemParameters = FileSystemParameters.CreateDefaultEditorFileSystemParameters(simulateBuildResult);
             initializationOperation = package.InitializeAsync(createParameters);
         }
 
