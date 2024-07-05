@@ -1,4 +1,4 @@
-﻿#if !UNITY_WECHAT_GAME
+﻿#if UNITY_WECHAT_GAME
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -6,6 +6,19 @@ using UnityEngine;
 using UnityEngine.Networking;
 using YooAsset;
 using WeChatWASM;
+
+public static class WechatFileSystemCreater
+{
+    public static FileSystemParameters CreateWechatFileSystemParameters(IRemoteServices remoteServices)
+    {
+        string fileSystemClass = $"{nameof(WechatFileSystem)},YooAsset.RuntimeExtension";
+        var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
+        fileSystemParams.AddParameter("REMOTE_SERVICES", remoteServices);
+        fileSystemParams.AddParameter("DISABLE_UNITY_WEB_CACHE", true);
+        fileSystemParams.AddParameter("ALLOW_CROSS_ACCESS", true);
+        return fileSystemParams;
+    }
+}
 
 /// <summary>
 /// 微信小游戏文件系统扩展
@@ -35,8 +48,8 @@ internal partial class WechatFileSystem : DefaultWebFileSystem
         int timeout = (int)args[3];
 
         string mainURL = RemoteServices.GetRemoteMainURL(bundle.FileName);
-        string fallbackURL = RemoteServices.GetRemoteFallbackURL(bundle.FileName);   
-        var operation = new WechatDownloadFileOperation(this, bundle, mainURL,fallbackURL, failedTryAgain, timeout);
+        string fallbackURL = RemoteServices.GetRemoteFallbackURL(bundle.FileName);
+        var operation = new WechatDownloadFileOperation(this, bundle, mainURL, fallbackURL, failedTryAgain, timeout);
         OperationSystem.StartOperation(PackageName, operation);
         return operation;
     }
