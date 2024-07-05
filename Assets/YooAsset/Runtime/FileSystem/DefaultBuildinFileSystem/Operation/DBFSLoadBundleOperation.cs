@@ -34,7 +34,7 @@ namespace YooAsset
             DownloadProgress = 1f;
             DownloadedBytes = _bundle.FileSize;
 
-            if (_fileSystem.CheckNeedUnpack(_bundle))
+            if (_fileSystem.NeedUnpack(_bundle))
             {
                 _steps = ESteps.UnpackAssetBundleFile;
             }
@@ -205,7 +205,7 @@ namespace YooAsset
             DownloadProgress = 1f;
             DownloadedBytes = _bundle.FileSize;
 
-            if (_fileSystem.CheckNeedUnpack(_bundle))
+            if (_fileSystem.NeedUnpack(_bundle))
             {
                 _steps = ESteps.UnpackRawBundleFile;
             }

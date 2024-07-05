@@ -128,6 +128,44 @@ namespace YooAsset
             string buidlinFilePath = GetBuildinFileLoadPath(bundle);
             return UnpackFileSystem.DownloadFileAsync(bundle, buidlinFilePath, failedTryAgain, timeout);
         }
+        public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
+        {
+            if (RawFileBuildPipeline)
+            {
+                var operation = new DBFSLoadRawBundleOperation(this, bundle);
+                OperationSystem.StartOperation(PackageName, operation);
+                return operation;
+            }
+            else
+            {
+                var operation = new DBFSLoadAssetBundleOperation(this, bundle);
+                OperationSystem.StartOperation(PackageName, operation);
+                return operation;
+            }
+        }
+        public virtual void UnloadBundleFile(PackageBundle bundle, object result)
+        {
+            AssetBundle assetBundle = result as AssetBundle;
+            if (assetBundle == null)
+                return;
+
+            if (UnpackFileSystem.Exists(bundle))
+            {
+                UnpackFileSystem.UnloadBundleFile(bundle, assetBundle);
+            }
+            else
+            {
+                if (assetBundle != null)
+                    assetBundle.Unload(true);
+
+                if (_loadedStream.TryGetValue(bundle.BundleGUID, out Stream managedStream))
+                {
+                    managedStream.Close();
+                    managedStream.Dispose();
+                    _loadedStream.Remove(bundle.BundleGUID);
+                }
+            }
+        }
 
         public virtual void SetParameter(string name, object value)
         {
@@ -170,26 +208,17 @@ namespace YooAsset
 
         public virtual bool Belong(PackageBundle bundle)
         {
-            return Belong(bundle.BundleGUID);
-        }
-        public virtual bool Belong(string bundleGUID)
-        {
-            return _wrappers.ContainsKey(bundleGUID);
+            return _wrappers.ContainsKey(bundle.BundleGUID);
         }
         public virtual bool Exists(PackageBundle bundle)
         {
-            return Exists(bundle.BundleGUID);
+            return _wrappers.ContainsKey(bundle.BundleGUID);
         }
-        public virtual bool Exists(string bundleGUID)
-        {
-            return _wrappers.ContainsKey(bundleGUID);
-        }
-
-        public virtual bool CheckNeedDownload(PackageBundle bundle)
+        public virtual bool NeedDownload(PackageBundle bundle)
         {
             return false;
         }
-        public virtual bool CheckNeedUnpack(PackageBundle bundle)
+        public virtual bool NeedUnpack(PackageBundle bundle)
         {
             if (Belong(bundle) == false)
                 return false;
@@ -200,74 +229,9 @@ namespace YooAsset
             return false;
 #endif
         }
-        public virtual bool CheckNeedImport(PackageBundle bundle)
+        public virtual bool NeedImport(PackageBundle bundle)
         {
             return false;
-        }
-
-        public virtual bool WriteFile(PackageBundle bundle, string copyPath)
-        {
-            return UnpackFileSystem.WriteFile(bundle, copyPath);
-        }
-        public virtual bool DeleteFile(PackageBundle bundle)
-        {
-            return UnpackFileSystem.DeleteFile(bundle);
-        }
-        public virtual bool DeleteFile(string bundleGUID)
-        {
-            return UnpackFileSystem.DeleteFile(bundleGUID);
-        }
-        public virtual EFileVerifyResult VerifyFile(PackageBundle bundle)
-        {
-            return UnpackFileSystem.VerifyFile(bundle);
-        }
-
-        public virtual byte[] ReadFileBytes(PackageBundle bundle)
-        {
-            throw new System.NotImplementedException();
-        }
-        public virtual string ReadFileText(PackageBundle bundle)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
-        {
-            if (RawFileBuildPipeline)
-            {
-                var operation = new DBFSLoadRawBundleOperation(this, bundle);
-                OperationSystem.StartOperation(PackageName, operation);
-                return operation;
-            }
-            else
-            {
-                var operation = new DBFSLoadAssetBundleOperation(this, bundle);
-                OperationSystem.StartOperation(PackageName, operation);
-                return operation;
-            }
-        }
-        public virtual void UnloadBundleFile(PackageBundle bundle, object result)
-        {
-            AssetBundle assetBundle = result as AssetBundle;
-            if (assetBundle == null)
-                return;
-
-            if (UnpackFileSystem.Exists(bundle))
-            {
-                UnpackFileSystem.UnloadBundleFile(bundle, assetBundle);
-            }
-            else
-            {
-                if (assetBundle != null)
-                    assetBundle.Unload(true);
-
-                if (_loadedStream.TryGetValue(bundle.BundleGUID, out Stream managedStream))
-                {
-                    managedStream.Close();
-                    managedStream.Dispose();
-                    _loadedStream.Remove(bundle.BundleGUID);
-                }
-            }
         }
 
         #region 内部方法
@@ -311,9 +275,9 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 记录缓存信息
+        /// 记录文件信息
         /// </summary>
-        public bool Record(string bundleGUID, FileWrapper wrapper)
+        public bool RecordFile(string bundleGUID, FileWrapper wrapper)
         {
             if (_wrappers.ContainsKey(bundleGUID))
             {

@@ -1,22 +1,19 @@
-﻿using System.IO;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 namespace YooAsset
 {
-    internal class DWFSDownloadWebFileOperation : DefaultDownloadFileOperation
+    internal class DownloadHandlerAssetBundleOperation : DefaultDownloadFileOperation
     {
         private readonly DefaultWebFileSystem _fileSystem;
         private DownloadHandlerAssetBundle _downloadhandler;
         private ESteps _steps = ESteps.None;
 
-        /// <summary>
-        /// 下载结果
-        /// </summary>
         public AssetBundle Result { private set; get; }
 
 
-        internal DWFSDownloadWebFileOperation(DefaultWebFileSystem fileSystem, PackageBundle bundle, string mainURL, string fallbackURL, int failedTryAgain, int timeout)
+        internal DownloadHandlerAssetBundleOperation(DefaultWebFileSystem fileSystem, PackageBundle bundle,
+            string mainURL, string fallbackURL, int failedTryAgain, int timeout)
             : base(bundle, mainURL, fallbackURL, failedTryAgain, timeout)
         {
             _fileSystem = fileSystem;
@@ -37,16 +34,7 @@ namespace YooAsset
                 _requestURL = GetRequestURL();
 
                 // 重置变量
-                _isAbort = false;
-                _latestDownloadBytes = 0;
-                _latestDownloadRealtime = Time.realtimeSinceStartup;
-                DownloadProgress = 0f;
-                DownloadedBytes = 0;
-
-                // 重置计时器
-                if (_tryAgainTimer > 0f)
-                    YooLogger.Warning($"Try again download : {_requestURL}");
-                _tryAgainTimer = 0f;
+                ResetRequestFiled();
 
                 // 创建下载器
                 CreateWebRequest();
@@ -110,10 +98,20 @@ namespace YooAsset
 
         private void CreateWebRequest()
         {
+            _downloadhandler = CreateDownloadHandler();
             _webRequest = DownloadSystemHelper.NewUnityWebRequestGet(_requestURL);
-            _webRequest.downloadHandler = CreateDownloadHandler();
+            _webRequest.downloadHandler = _downloadhandler;
             _webRequest.disposeDownloadHandlerOnDispose = true;
             _webRequest.SendWebRequest();
+        }
+        private void DisposeWebRequest()
+        {
+            if (_webRequest != null)
+            {
+                //注意：引擎底层会自动调用Abort方法
+                _webRequest.Dispose();
+                _webRequest = null;
+            }
         }
         private DownloadHandlerAssetBundle CreateDownloadHandler()
         {
@@ -136,15 +134,6 @@ namespace YooAsset
                 downloadhandler.autoLoadAssetBundle = false;
 #endif
                 return downloadhandler;
-            }
-        }
-        private void DisposeWebRequest()
-        {
-            if (_webRequest != null)
-            {
-                //注意：引擎底层会自动调用Abort方法
-                _webRequest.Dispose();
-                _webRequest = null;
             }
         }
     }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace YooAsset
 {
     /// <summary>
-    /// 内置文件系统
+    /// 模拟文件系统
     /// </summary>
     internal class DefaultEditorFileSystem : IFileSystem
     {
@@ -95,6 +91,15 @@ namespace YooAsset
         {
             throw new System.NotImplementedException();
         }
+        public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
+        {
+            var operation = new DEFSLoadBundleOperation(this, bundle);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
+        }
+        public virtual void UnloadBundleFile(PackageBundle bundle, object result)
+        {
+        }
 
         public virtual void SetParameter(string name, object value)
         {
@@ -124,80 +129,27 @@ namespace YooAsset
         {
             return true;
         }
-        public virtual bool Belong(string bundleGUID)
-        {
-            return true;
-        }
         public virtual bool Exists(PackageBundle bundle)
         {
             return true;
         }
-        public virtual bool Exists(string bundleGUID)
-        {
-            return true;
-        }
-
-        public virtual bool CheckNeedDownload(PackageBundle bundle)
+        public virtual bool NeedDownload(PackageBundle bundle)
         {
             return false;
         }
-        public virtual bool CheckNeedUnpack(PackageBundle bundle)
+        public virtual bool NeedUnpack(PackageBundle bundle)
         {
             return false;
         }
-        public virtual bool CheckNeedImport(PackageBundle bundle)
+        public virtual bool NeedImport(PackageBundle bundle)
         {
             return false;
-        }
-
-        public virtual bool WriteFile(PackageBundle bundle, string copyPath)
-        {
-            return true;
-        }
-        public virtual bool DeleteFile(PackageBundle bundle)
-        {
-            return true;
-        }
-        public virtual bool DeleteFile(string bundleGUID)
-        {
-            return true;
-        }
-        public virtual EFileVerifyResult VerifyFile(PackageBundle bundle)
-        {
-            return EFileVerifyResult.Succeed;
-        }
-
-        public virtual byte[] ReadFileBytes(PackageBundle bundle)
-        {
-            throw new System.NotImplementedException();
-        }
-        public virtual string ReadFileText(PackageBundle bundle)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
-        {
-            var operation = new DEFSLoadBundleOperation(this, bundle);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
-        }
-        public virtual void UnloadBundleFile(PackageBundle bundle, object result)
-        {
         }
 
         #region 内部方法
         protected string GetDefaultRoot()
         {
             return "Assets/";
-        }
-
-        /// <summary>
-        /// 记录缓存信息
-        /// </summary>
-        public bool Record(string bundleGUID, object value)
-        {
-            return true;
         }
         #endregion
     }

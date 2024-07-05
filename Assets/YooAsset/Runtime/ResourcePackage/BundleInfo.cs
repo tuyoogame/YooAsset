@@ -62,7 +62,7 @@ namespace YooAsset
         /// </summary>
         public bool IsNeedDownloadFromRemote()
         {
-            return _fileSystem.CheckNeedDownload(Bundle);
+            return _fileSystem.NeedDownload(Bundle);
         }
 
         /// <summary>

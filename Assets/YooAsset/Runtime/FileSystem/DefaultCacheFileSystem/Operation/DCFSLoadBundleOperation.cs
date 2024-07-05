@@ -29,7 +29,7 @@ namespace YooAsset
         }
         internal override void InternalOnStart()
         {
-            if (_fileSystem.CheckNeedDownload(_bundle))
+            if (_fileSystem.NeedDownload(_bundle))
             {                
                 _steps = ESteps.DownloadFile;
             }
@@ -112,7 +112,7 @@ namespace YooAsset
                 {
                     // 注意：当缓存文件的校验等级为Low的时候，并不能保证缓存文件的完整性。
                     // 说明：在AssetBundle文件加载失败的情况下，我们需要重新验证文件的完整性！
-                    EFileVerifyResult result = _fileSystem.VerifyFile(_bundle);
+                    EFileVerifyResult result = _fileSystem.VerifyCacheFile(_bundle);
                     if (result == EFileVerifyResult.Succeed)
                     {
                         // 注意：在安卓移动平台，华为和三星真机上有极小概率加载资源包失败。
@@ -146,7 +146,7 @@ namespace YooAsset
                     else
                     {
                         _steps = ESteps.Done;
-                        _fileSystem.DeleteFile(_bundle);
+                        _fileSystem.DeleteCacheFile(_bundle.BundleGUID);
                         Status = EOperationStatus.Failed;
                         Error = $"Find corrupted file and delete the file : {_bundle.BundleName}";                  
                         YooLogger.Error(Error);
@@ -215,7 +215,7 @@ namespace YooAsset
         }
         internal override void InternalOnStart()
         {
-            if (_fileSystem.CheckNeedDownload(_bundle))
+            if (_fileSystem.NeedDownload(_bundle))
             {
                 _steps = ESteps.DownloadFile;
             }

@@ -8,17 +8,18 @@ namespace YooAsset
     {
         private readonly DefaultCacheFileSystem _fileSystem;
         private VerifyTempFileOperation _verifyOperation;
-        private string _fileSavePath;
+        private string _tempFilePath;
         private ESteps _steps = ESteps.None;
 
-        internal DCFSDownloadNormalFileOperation(DefaultCacheFileSystem fileSystem, PackageBundle bundle, string mainURL, string fallbackURL, int failedTryAgain, int timeout)
+        internal DCFSDownloadNormalFileOperation(DefaultCacheFileSystem fileSystem, PackageBundle bundle, 
+            string mainURL, string fallbackURL, int failedTryAgain, int timeout)
             : base(bundle, mainURL, fallbackURL, failedTryAgain, timeout)
         {
             _fileSystem = fileSystem;
         }
         internal override void InternalOnStart()
         {
-            _fileSavePath = _fileSystem.GetTempFilePath(Bundle);
+            _tempFilePath = _fileSystem.GetTempFilePath(Bundle);
             _steps = ESteps.CheckExists;
         }
         internal override void InternalOnUpdate()
@@ -43,26 +44,17 @@ namespace YooAsset
             // 创建下载器
             if (_steps == ESteps.CreateRequest)
             {
-                FileUtility.CreateFileDirectory(_fileSavePath);
+                FileUtility.CreateFileDirectory(_tempFilePath);
+
+                // 删除临时文件
+                if (File.Exists(_tempFilePath))
+                    File.Delete(_tempFilePath);
 
                 // 获取请求地址
                 _requestURL = GetRequestURL();
 
-                // 重置变量
-                _isAbort = false;
-                _latestDownloadBytes = 0;
-                _latestDownloadRealtime = Time.realtimeSinceStartup;
-                DownloadProgress = 0f;
-                DownloadedBytes = 0;
-
-                // 重置计时器
-                if (_tryAgainTimer > 0f)
-                    YooLogger.Warning($"Try again download : {_requestURL}");
-                _tryAgainTimer = 0f;
-
-                // 删除临时文件
-                if (File.Exists(_fileSavePath))
-                    File.Delete(_fileSavePath);
+                // 重置请求
+                ResetRequestFiled();
 
                 // 创建下载器
                 CreateWebRequest();
@@ -95,7 +87,7 @@ namespace YooAsset
             // 验证下载文件
             if (_steps == ESteps.VerifyTempFile)
             {
-                var element = new TempFileElement(_fileSavePath, Bundle.FileCRC, Bundle.FileSize);
+                var element = new TempFileElement(_tempFilePath, Bundle.FileCRC, Bundle.FileSize);
                 _verifyOperation = new VerifyTempFileOperation(element);
                 OperationSystem.StartOperation(_fileSystem.PackageName, _verifyOperation);
                 _steps = ESteps.CheckVerifyTempFile;
@@ -111,7 +103,7 @@ namespace YooAsset
 
                 if (_verifyOperation.Status == EOperationStatus.Succeed)
                 {
-                    if (_fileSystem.WriteFile(Bundle, _fileSavePath))
+                    if (_fileSystem.WriteCacheFile(Bundle, _tempFilePath))
                     {
                         Status = EOperationStatus.Succeed;
                         _steps = ESteps.Done;
@@ -131,8 +123,8 @@ namespace YooAsset
                 }
 
                 // 注意：验证完成后直接删除文件
-                if (File.Exists(_fileSavePath))
-                    File.Delete(_fileSavePath);
+                if (File.Exists(_tempFilePath))
+                    File.Delete(_tempFilePath);
             }
 
             // 重新尝试下载
@@ -183,7 +175,7 @@ namespace YooAsset
         private void CreateWebRequest()
         {
             _webRequest = DownloadSystemHelper.NewUnityWebRequestGet(_requestURL);
-            DownloadHandlerFile handler = new DownloadHandlerFile(_fileSavePath);
+            DownloadHandlerFile handler = new DownloadHandlerFile(_tempFilePath);
             handler.removeFileOnAbort = true;
             _webRequest.downloadHandler = handler;
             _webRequest.disposeDownloadHandlerOnDispose = true;
@@ -210,7 +202,8 @@ namespace YooAsset
         private ESteps _steps = ESteps.None;
 
 
-        internal DCFSDownloadResumeFileOperation(DefaultCacheFileSystem fileSystem, PackageBundle bundle, string mainURL, string fallbackURL, int failedTryAgain, int timeout)
+        internal DCFSDownloadResumeFileOperation(DefaultCacheFileSystem fileSystem, PackageBundle bundle,
+            string mainURL, string fallbackURL, int failedTryAgain, int timeout)
                  : base(bundle, mainURL, fallbackURL, failedTryAgain, timeout)
         {
             _fileSystem = fileSystem;
@@ -248,19 +241,10 @@ namespace YooAsset
                 _requestURL = GetRequestURL();
 
                 // 重置变量
-                _isAbort = false;
-                _latestDownloadBytes = 0;
-                _latestDownloadRealtime = Time.realtimeSinceStartup;
-                _fileOriginLength = 0;
-                DownloadProgress = 0f;
-                DownloadedBytes = 0;
-
-                // 重置计时器
-                if (_tryAgainTimer > 0f)
-                    YooLogger.Warning($"Try again download : {_requestURL}");
-                _tryAgainTimer = 0f;
+                ResetRequestFiled();
 
                 // 获取下载起始位置
+                _fileOriginLength = 0;
                 long fileBeginLength = -1;
                 if (File.Exists(_fileSavePath))
                 {
@@ -325,7 +309,7 @@ namespace YooAsset
 
                 if (_verifyOperation.Status == EOperationStatus.Succeed)
                 {
-                    if (_fileSystem.WriteFile(Bundle, _fileSavePath))
+                    if (_fileSystem.WriteCacheFile(Bundle, _fileSavePath))
                     {
                         Status = EOperationStatus.Succeed;
                         _steps = ESteps.Done;

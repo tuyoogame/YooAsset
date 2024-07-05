@@ -53,7 +53,17 @@ namespace YooAsset
         /// 下载远端文件
         /// </summary>
         FSDownloadFileOperation DownloadFileAsync(params object[] args);
-        
+
+        /// <summary>
+        /// 加载Bundle文件
+        /// </summary>
+        FSLoadBundleOperation LoadBundleFile(PackageBundle bundle);
+
+        /// <summary>
+        /// 卸载Bundle文件
+        /// </summary>
+        void UnloadBundleFile(PackageBundle bundle, object result);
+
 
         /// <summary>
         /// 设置自定义参数
@@ -77,77 +87,23 @@ namespace YooAsset
         bool Belong(PackageBundle bundle);
 
         /// <summary>
-        /// 查询文件归属
-        /// </summary>
-        bool Belong(string bundleGUID);
-
-        /// <summary>
         /// 查询文件是否存在
         /// </summary>
         bool Exists(PackageBundle bundle);
 
         /// <summary>
-        /// 查询文件是否存在
+        /// 是否需要下载
         /// </summary>
-        bool Exists(string bundleGUID);
-
+        bool NeedDownload(PackageBundle bundle);
 
         /// <summary>
-        /// 检测是否需要下载
+        /// 是否需要解压
         /// </summary>
-        bool CheckNeedDownload(PackageBundle bundle);
-
+        bool NeedUnpack(PackageBundle bundle);
+        
         /// <summary>
-        /// 检测是否需要解压
+        /// 是否需要导入
         /// </summary>
-        bool CheckNeedUnpack(PackageBundle bundle);
-
-        /// <summary>
-        /// 检测是否需要导入
-        /// </summary>
-        bool CheckNeedImport(PackageBundle bundle);
-
-
-        /// <summary>
-        /// 写入文件
-        /// </summary>
-        bool WriteFile(PackageBundle bundle, string copyPath);
-
-        /// <summary>
-        /// 删除文件
-        /// </summary>
-        bool DeleteFile(PackageBundle bundle);
-
-        /// <summary>
-        /// 删除文件
-        /// </summary>
-        bool DeleteFile(string bundleGUID);
-
-        /// <summary>
-        /// 校验文件
-        /// </summary>
-        EFileVerifyResult VerifyFile(PackageBundle bundle);
-
-
-        /// <summary>
-        /// 读取文件的二进制数据
-        /// </summary>
-        byte[] ReadFileBytes(PackageBundle bundle);
-
-        /// <summary>
-        /// 读取文件的文本数据
-        /// </summary>
-        string ReadFileText(PackageBundle bundle);
-
-
-        /// <summary>
-        /// 加载Bundle文件
-        /// </summary>
-        FSLoadBundleOperation LoadBundleFile(PackageBundle bundle);
-
-        /// <summary>
-        /// 卸载Bundle文件
-        /// </summary>
-        void UnloadBundleFile(PackageBundle bundle, object result);
+        bool NeedImport(PackageBundle bundle);
     }
 }

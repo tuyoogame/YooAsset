@@ -197,6 +197,37 @@ namespace YooAsset
                 }
             }
         }
+        public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
+        {
+            if (RawFileBuildPipeline)
+            {
+                var operation = new DCFSLoadRawBundleOperation(this, bundle);
+                OperationSystem.StartOperation(PackageName, operation);
+                return operation;
+            }
+            else
+            {
+                var operation = new DCFSLoadAssetBundleOperation(this, bundle);
+                OperationSystem.StartOperation(PackageName, operation);
+                return operation;
+            }
+        }
+        public virtual void UnloadBundleFile(PackageBundle bundle, object result)
+        {
+            AssetBundle assetBundle = result as AssetBundle;
+            if (assetBundle == null)
+                return;
+
+            if (assetBundle != null)
+                assetBundle.Unload(true);
+
+            if (_loadedStream.TryGetValue(bundle.BundleGUID, out Stream managedStream))
+            {
+                managedStream.Close();
+                managedStream.Dispose();
+                _loadedStream.Remove(bundle.BundleGUID);
+            }
+        }
 
         public virtual void SetParameter(string name, object value)
         {
@@ -269,152 +300,30 @@ namespace YooAsset
 
         public virtual bool Belong(PackageBundle bundle)
         {
-            return Belong(bundle.BundleGUID);
-        }
-        public virtual bool Belong(string bundleGUID)
-        {
             // 注意：缓存文件系统保底加载！
             return true;
         }
         public virtual bool Exists(PackageBundle bundle)
         {
-            return Exists(bundle.BundleGUID);
+            return _wrappers.ContainsKey(bundle.BundleGUID);
         }
-        public virtual bool Exists(string bundleGUID)
-        {
-            return _wrappers.ContainsKey(bundleGUID);
-        }
-
-        public virtual bool CheckNeedDownload(PackageBundle bundle)
+        public virtual bool NeedDownload(PackageBundle bundle)
         {
             if (Belong(bundle) == false)
                 return false;
 
             return Exists(bundle) == false;
         }
-        public virtual bool CheckNeedUnpack(PackageBundle bundle)
+        public virtual bool NeedUnpack(PackageBundle bundle)
         {
             return false;
         }
-        public virtual bool CheckNeedImport(PackageBundle bundle)
+        public virtual bool NeedImport(PackageBundle bundle)
         {
             if (Belong(bundle) == false)
                 return false;
 
             return Exists(bundle) == false;
-        }
-
-        public virtual bool WriteFile(PackageBundle bundle, string copyPath)
-        {
-            if (_wrappers.ContainsKey(bundle.BundleGUID))
-            {
-                throw new Exception("Should never get here !");
-            }
-
-            string infoFilePath = GetInfoFilePath(bundle);
-            string dataFilePath = GetDataFilePath(bundle);
-
-            try
-            {
-                if (File.Exists(infoFilePath))
-                    File.Delete(infoFilePath);
-                if (File.Exists(dataFilePath))
-                    File.Delete(dataFilePath);
-
-                FileUtility.CreateFileDirectory(dataFilePath);
-
-                // 拷贝数据文件
-                FileInfo fileInfo = new FileInfo(copyPath);
-                fileInfo.CopyTo(dataFilePath);
-
-                // 写入文件信息
-                WriteInfoFile(infoFilePath, bundle.FileCRC, bundle.FileSize);
-            }
-            catch (Exception e)
-            {
-                YooLogger.Error($"Failed to write cache file ! {e.Message}");
-                return false;
-            }
-
-            FileWrapper wrapper = new FileWrapper(infoFilePath, dataFilePath, bundle.FileCRC, bundle.FileSize);
-            return Record(bundle.BundleGUID, wrapper);
-        }
-        public virtual bool DeleteFile(PackageBundle bundle)
-        {
-            return DeleteFile(bundle.BundleGUID);
-        }
-        public virtual bool DeleteFile(string bundleGUID)
-        {
-            if (_wrappers.TryGetValue(bundleGUID, out FileWrapper wrapper))
-            {
-                try
-                {
-                    string dataFilePath = wrapper.DataFilePath;
-                    FileInfo fileInfo = new FileInfo(dataFilePath);
-                    if (fileInfo.Exists)
-                        fileInfo.Directory.Delete(true);
-                    _wrappers.Remove(bundleGUID);
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    YooLogger.Error($"Failed to delete cache file ! {e.Message}");
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        public virtual EFileVerifyResult VerifyFile(PackageBundle bundle)
-        {
-            if (_wrappers.TryGetValue(bundle.BundleGUID, out FileWrapper wrapper) == false)
-                return EFileVerifyResult.CacheNotFound;
-
-            EFileVerifyResult result = FileSystemHelper.FileVerify(wrapper.DataFilePath, wrapper.DataFileSize, wrapper.DataFileCRC, EFileVerifyLevel.High);
-            return result;
-        }
-
-        public virtual byte[] ReadFileBytes(PackageBundle bundle)
-        {
-            throw new System.NotImplementedException();
-        }
-        public virtual string ReadFileText(PackageBundle bundle)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
-        {
-            if (RawFileBuildPipeline)
-            {
-                var operation = new DCFSLoadRawBundleOperation(this, bundle);
-                OperationSystem.StartOperation(PackageName, operation);
-                return operation;
-            }
-            else
-            {
-                var operation = new DCFSLoadAssetBundleOperation(this, bundle);
-                OperationSystem.StartOperation(PackageName, operation);
-                return operation;
-            }
-        }
-        public virtual void UnloadBundleFile(PackageBundle bundle, object result)
-        {
-            AssetBundle assetBundle = result as AssetBundle;
-            if (assetBundle == null)
-                return;
-
-            if (assetBundle != null)
-                assetBundle.Unload(true);
-
-            if (_loadedStream.TryGetValue(bundle.BundleGUID, out Stream managedStream))
-            {
-                managedStream.Close();
-                managedStream.Dispose();
-                _loadedStream.Remove(bundle.BundleGUID);
-            }
         }
 
         #region 内部方法
@@ -504,24 +413,21 @@ namespace YooAsset
         {
             return PathUtility.Combine(_manifestFileRoot, DefaultCacheFileSystemDefine.AppFootPrintFileName);
         }
-        public void DeleteAllManifestFiles()
+
+        /// <summary>
+        /// 是否已经记录了文件
+        /// </summary>
+        public bool IsRecordFile(string bundleGUID)
         {
-            if (Directory.Exists(_manifestFileRoot))
-            {
-                Directory.Delete(_manifestFileRoot, true);
-            }
-        }
-        public List<string> GetAllCachedBundleGUIDs()
-        {
-            return _wrappers.Keys.ToList();
+            return _wrappers.ContainsKey(bundleGUID);
         }
 
         /// <summary>
-        /// 记录缓存信息
+        /// 记录文件信息
         /// </summary>
-        public bool Record(string bundleGUID, FileWrapper wrapper)
+        public bool RecordFile(string bundleGUID, FileWrapper wrapper)
         {
-            if (Exists(bundleGUID))
+            if (_wrappers.ContainsKey(bundleGUID))
             {
                 YooLogger.Error($"{nameof(DefaultCacheFileSystem)} has element : {bundleGUID}");
                 return false;
@@ -529,6 +435,104 @@ namespace YooAsset
 
             _wrappers.Add(bundleGUID, wrapper);
             return true;
+        }
+
+        /// <summary>
+        /// 验证缓存文件
+        /// </summary>
+        public EFileVerifyResult VerifyCacheFile(PackageBundle bundle)
+        {
+            if (_wrappers.TryGetValue(bundle.BundleGUID, out FileWrapper wrapper) == false)
+                return EFileVerifyResult.CacheNotFound;
+
+            EFileVerifyResult result = FileSystemHelper.FileVerify(wrapper.DataFilePath, wrapper.DataFileSize, wrapper.DataFileCRC, EFileVerifyLevel.High);
+            return result;
+        }
+
+        /// <summary>
+        /// 写入缓存文件
+        /// </summary>
+        public bool WriteCacheFile(PackageBundle bundle, string copyPath)
+        {
+            if (_wrappers.ContainsKey(bundle.BundleGUID))
+            {
+                throw new Exception("Should never get here !");
+            }
+
+            string infoFilePath = GetInfoFilePath(bundle);
+            string dataFilePath = GetDataFilePath(bundle);
+
+            try
+            {
+                if (File.Exists(infoFilePath))
+                    File.Delete(infoFilePath);
+                if (File.Exists(dataFilePath))
+                    File.Delete(dataFilePath);
+
+                FileUtility.CreateFileDirectory(dataFilePath);
+
+                // 拷贝数据文件
+                FileInfo fileInfo = new FileInfo(copyPath);
+                fileInfo.CopyTo(dataFilePath);
+
+                // 写入文件信息
+                WriteInfoFile(infoFilePath, bundle.FileCRC, bundle.FileSize);
+            }
+            catch (Exception e)
+            {
+                YooLogger.Error($"Failed to write cache file ! {e.Message}");
+                return false;
+            }
+
+            FileWrapper wrapper = new FileWrapper(infoFilePath, dataFilePath, bundle.FileCRC, bundle.FileSize);
+            return RecordFile(bundle.BundleGUID, wrapper);
+        }
+
+        /// <summary>
+        /// 删除缓存文件
+        /// </summary>
+        public bool DeleteCacheFile(string bundleGUID)
+        {
+            if (_wrappers.TryGetValue(bundleGUID, out FileWrapper wrapper))
+            {
+                try
+                {
+                    string dataFilePath = wrapper.DataFilePath;
+                    FileInfo fileInfo = new FileInfo(dataFilePath);
+                    if (fileInfo.Exists)
+                        fileInfo.Directory.Delete(true);
+                    _wrappers.Remove(bundleGUID);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    YooLogger.Error($"Failed to delete cache file ! {e.Message}");
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 删除所有清单文件
+        /// </summary>
+        public void DeleteAllManifestFiles()
+        {
+            if (Directory.Exists(_manifestFileRoot))
+            {
+                Directory.Delete(_manifestFileRoot, true);
+            }
+        }
+
+        /// <summary>
+        /// 获取所有缓存文件GUID
+        /// </summary>
+        public List<string> GetAllCachedBundleGUIDs()
+        {
+            return _wrappers.Keys.ToList();
         }
         #endregion
     }

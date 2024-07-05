@@ -37,17 +37,17 @@ namespace YooAsset
                 IFileSystem fileSystem = null;
                 if (fileSystemA != null && fileSystemA.Belong(packageBundle))
                 {
-                    if (fileSystemA.CheckNeedDownload(packageBundle))
+                    if (fileSystemA.NeedDownload(packageBundle))
                         fileSystem = fileSystemA;
                 }
                 else if (fileSystemB != null && fileSystemB.Belong(packageBundle))
                 {
-                    if (fileSystemB.CheckNeedDownload(packageBundle))
+                    if (fileSystemB.NeedDownload(packageBundle))
                         fileSystem = fileSystemB;
                 }
                 else if (fileSystemC != null && fileSystemC.Belong(packageBundle))
                 {
-                    if (fileSystemC.CheckNeedDownload(packageBundle))
+                    if (fileSystemC.NeedDownload(packageBundle))
                         fileSystem = fileSystemC;
                 }
                 else
@@ -70,17 +70,17 @@ namespace YooAsset
                 IFileSystem fileSystem = null;
                 if (fileSystemA != null && fileSystemA.Belong(packageBundle))
                 {
-                    if (fileSystemA.CheckNeedDownload(packageBundle))
+                    if (fileSystemA.NeedDownload(packageBundle))
                         fileSystem = fileSystemA;
                 }
                 else if (fileSystemB != null && fileSystemB.Belong(packageBundle))
                 {
-                    if (fileSystemB.CheckNeedDownload(packageBundle))
+                    if (fileSystemB.NeedDownload(packageBundle))
                         fileSystem = fileSystemB;
                 }
                 else if (fileSystemC != null && fileSystemC.Belong(packageBundle))
                 {
-                    if (fileSystemC.CheckNeedDownload(packageBundle))
+                    if (fileSystemC.NeedDownload(packageBundle))
                         fileSystem = fileSystemC;
                 }
                 else
@@ -140,17 +140,17 @@ namespace YooAsset
                 IFileSystem fileSystem = null;
                 if (fileSystemA != null && fileSystemA.Belong(packageBundle))
                 {
-                    if (fileSystemA.CheckNeedDownload(packageBundle))
+                    if (fileSystemA.NeedDownload(packageBundle))
                         fileSystem = fileSystemA;
                 }
                 else if (fileSystemB != null && fileSystemB.Belong(packageBundle))
                 {
-                    if (fileSystemB.CheckNeedDownload(packageBundle))
+                    if (fileSystemB.NeedDownload(packageBundle))
                         fileSystem = fileSystemB;
                 }
                 else if (fileSystemC != null && fileSystemC.Belong(packageBundle))
                 {
-                    if (fileSystemC.CheckNeedDownload(packageBundle))
+                    if (fileSystemC.NeedDownload(packageBundle))
                         fileSystem = fileSystemC;
                 }
                 else
@@ -173,17 +173,17 @@ namespace YooAsset
                 IFileSystem fileSystem = null;
                 if (fileSystemA != null && fileSystemA.Belong(packageBundle))
                 {
-                    if (fileSystemA.CheckNeedUnpack(packageBundle))
+                    if (fileSystemA.NeedUnpack(packageBundle))
                         fileSystem = fileSystemA;
                 }
                 else if (fileSystemB != null && fileSystemB.Belong(packageBundle))
                 {
-                    if (fileSystemB.CheckNeedUnpack(packageBundle))
+                    if (fileSystemB.NeedUnpack(packageBundle))
                         fileSystem = fileSystemB;
                 }
                 else if (fileSystemC != null && fileSystemC.Belong(packageBundle))
                 {
-                    if (fileSystemC.CheckNeedUnpack(packageBundle))
+                    if (fileSystemC.NeedUnpack(packageBundle))
                         fileSystem = fileSystemC;
                 }
                 else
@@ -207,17 +207,17 @@ namespace YooAsset
                 IFileSystem fileSystem = null;
                 if (fileSystemA != null && fileSystemA.Belong(packageBundle))
                 {
-                    if (fileSystemA.CheckNeedUnpack(packageBundle))
+                    if (fileSystemA.NeedUnpack(packageBundle))
                         fileSystem = fileSystemA;
                 }
                 else if (fileSystemB != null && fileSystemB.Belong(packageBundle))
                 {
-                    if (fileSystemB.CheckNeedUnpack(packageBundle))
+                    if (fileSystemB.NeedUnpack(packageBundle))
                         fileSystem = fileSystemB;
                 }
                 else if (fileSystemC != null && fileSystemC.Belong(packageBundle))
                 {
-                    if (fileSystemC.CheckNeedUnpack(packageBundle))
+                    if (fileSystemC.NeedUnpack(packageBundle))
                         fileSystem = fileSystemC;
                 }
                 else
@@ -248,17 +248,17 @@ namespace YooAsset
                     IFileSystem fileSystem = null;
                     if (fileSystemA != null && fileSystemA.Belong(packageBundle))
                     {
-                        if (fileSystemA.CheckNeedImport(packageBundle))
+                        if (fileSystemA.NeedImport(packageBundle))
                             fileSystem = fileSystemA;
                     }
                     else if (fileSystemB != null && fileSystemB.Belong(packageBundle))
                     {
-                        if (fileSystemB.CheckNeedImport(packageBundle))
+                        if (fileSystemB.NeedImport(packageBundle))
                             fileSystem = fileSystemB;
                     }
                     else if (fileSystemC != null && fileSystemC.Belong(packageBundle))
                     {
-                        if (fileSystemC.CheckNeedImport(packageBundle))
+                        if (fileSystemC.NeedImport(packageBundle))
                             fileSystem = fileSystemC;
                     }
                     else

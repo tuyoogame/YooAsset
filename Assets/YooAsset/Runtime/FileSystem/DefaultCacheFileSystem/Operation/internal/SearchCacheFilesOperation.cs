@@ -81,7 +81,7 @@ namespace YooAsset
                 foreach (var chidDirectory in childDirectories)
                 {
                     string bundleGUID = chidDirectory.Name;
-                    if (_fileSystem.Exists(bundleGUID))
+                    if (_fileSystem.IsRecordFile(bundleGUID))
                         continue;
 
                     // 创建验证元素类

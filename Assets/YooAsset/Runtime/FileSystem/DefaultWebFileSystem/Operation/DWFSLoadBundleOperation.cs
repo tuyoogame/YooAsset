@@ -7,13 +7,12 @@ namespace YooAsset
         {
             None,
             DownloadFile,
-            CheckResult,
             Done,
         }
 
         private readonly DefaultWebFileSystem _fileSystem;
         private readonly PackageBundle _bundle;
-        private DWFSDownloadWebFileOperation _downloadWebFileOp;
+        private DownloadHandlerAssetBundleOperation _downloadhanlderAssetBundleOp;
         private ESteps _steps = ESteps.None;
 
 
@@ -33,32 +32,32 @@ namespace YooAsset
 
             if (_steps == ESteps.DownloadFile)
             {
-                if (_downloadWebFileOp == null)
+                if (_downloadhanlderAssetBundleOp == null)
                 {
                     int failedTryAgain = int.MaxValue;
                     int timeout = 60;
                     string mainURL = _fileSystem.RemoteServices.GetRemoteMainURL(_bundle.FileName);
                     string fallbackURL = _fileSystem.RemoteServices.GetRemoteFallbackURL(_bundle.FileName);
-                    _downloadWebFileOp = new DWFSDownloadWebFileOperation(_fileSystem, _bundle, mainURL, fallbackURL, failedTryAgain, timeout);
+                    _downloadhanlderAssetBundleOp = new DownloadHandlerAssetBundleOperation(_fileSystem, _bundle, mainURL, fallbackURL, failedTryAgain, timeout);
                 }
 
-                DownloadProgress = _downloadWebFileOp.DownloadProgress;
-                DownloadedBytes = _downloadWebFileOp.DownloadedBytes;
-                Progress = _downloadWebFileOp.Progress;
-                if (_downloadWebFileOp.IsDone == false)
+                DownloadProgress = _downloadhanlderAssetBundleOp.DownloadProgress;
+                DownloadedBytes = _downloadhanlderAssetBundleOp.DownloadedBytes;
+                Progress = _downloadhanlderAssetBundleOp.Progress;
+                if (_downloadhanlderAssetBundleOp.IsDone == false)
                     return;
 
-                if (_downloadWebFileOp.Status == EOperationStatus.Succeed)
+                if (_downloadhanlderAssetBundleOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
-                    Result = _downloadWebFileOp.Result;
+                    Result = _downloadhanlderAssetBundleOp.Result;
                     Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _downloadWebFileOp.Error;
+                    Error = _downloadhanlderAssetBundleOp.Error;
                 }
             }
         }
@@ -77,8 +76,8 @@ namespace YooAsset
         {
             if (_steps == ESteps.DownloadFile)
             {
-                if (_downloadWebFileOp != null)
-                    _downloadWebFileOp.SetAbort();
+                if (_downloadhanlderAssetBundleOp != null)
+                    _downloadhanlderAssetBundleOp.SetAbort();
             }
         }
     }

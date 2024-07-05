@@ -159,7 +159,7 @@ namespace YooAsset
             {
                 _succeedCount++;
                 var fileWrapper = new DefaultCacheFileSystem.FileWrapper(element.InfoFilePath, element.DataFilePath, element.DataFileCRC, element.DataFileSize);
-                _fileSystem.Record(element.BundleGUID, fileWrapper);
+                _fileSystem.RecordFile(element.BundleGUID, fileWrapper);
             }
             else
             {

@@ -1,4 +1,5 @@
-﻿using UnityEngine.Networking;
+﻿using UnityEngine;
+using UnityEngine.Networking;
 
 namespace YooAsset
 {
@@ -59,6 +60,24 @@ namespace YooAsset
                 return _fallbackURL;
             else
                 return _mainURL;
+        }
+
+        /// <summary>
+        /// 重置请求字段
+        /// </summary>
+        protected void ResetRequestFiled()
+        {
+            // 重置变量
+            _isAbort = false;
+            _latestDownloadBytes = 0;
+            _latestDownloadRealtime = Time.realtimeSinceStartup;
+            DownloadProgress = 0f;
+            DownloadedBytes = 0;
+
+            // 重置计时器
+            if (_tryAgainTimer > 0f)
+                YooLogger.Warning($"Try again download : {_requestURL}");
+            _tryAgainTimer = 0f;
         }
 
         /// <summary>

@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace YooAsset
 {
+    /// <summary>
+    /// Web文件系统
+    /// </summary>
     internal class DefaultWebFileSystem : IFileSystem
     {
         public class FileWrapper
@@ -128,6 +131,21 @@ namespace YooAsset
         {
             throw new System.NotImplementedException();
         }
+        public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
+        {
+            var operation = new DWFSLoadAssetBundleOperation(this, bundle);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
+        }
+        public virtual void UnloadBundleFile(PackageBundle bundle, object result)
+        {
+            AssetBundle assetBundle = result as AssetBundle;
+            if (assetBundle == null)
+                return;
+
+            if (assetBundle != null)
+                assetBundle.Unload(true);
+        }
 
         public virtual void SetParameter(string name, object value)
         {
@@ -165,72 +183,24 @@ namespace YooAsset
         {
             return true;
         }
-        public virtual bool Belong(string bundleGUID)
+        public virtual bool Exists(PackageBundle bundle)
         {
             return true;
         }
-        public virtual bool Exists(PackageBundle bundle)
+        public virtual bool NeedDownload(PackageBundle bundle)
+        {
+            if (Belong(bundle) == false)
+                return false;
+
+            return Exists(bundle) == false;
+        }
+        public virtual bool NeedUnpack(PackageBundle bundle)
         {
             return false;
         }
-        public virtual bool Exists(string bundleGUID)
+        public virtual bool NeedImport(PackageBundle bundle)
         {
             return false;
-        }
-
-        public virtual bool CheckNeedDownload(PackageBundle bundle)
-        {
-            return false;
-        }
-        public virtual bool CheckNeedUnpack(PackageBundle bundle)
-        {
-            return false;
-        }
-        public virtual bool CheckNeedImport(PackageBundle bundle)
-        {
-            return false;
-        }
-
-        public virtual bool WriteFile(PackageBundle bundle, string copyPath)
-        {
-            throw new System.NotImplementedException();
-        }
-        public virtual bool DeleteFile(PackageBundle bundle)
-        {
-            throw new System.NotImplementedException();
-        }
-        public virtual bool DeleteFile(string bundleGUID)
-        {
-            throw new System.NotImplementedException();
-        }
-        public virtual EFileVerifyResult VerifyFile(PackageBundle bundle)
-        {
-            return EFileVerifyResult.Succeed;
-        }
-
-        public virtual byte[] ReadFileBytes(PackageBundle bundle)
-        {
-            throw new System.NotImplementedException();
-        }
-        public virtual string ReadFileText(PackageBundle bundle)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
-        {
-            var operation = new DWFSLoadAssetBundleOperation(this, bundle);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
-        }
-        public virtual void UnloadBundleFile(PackageBundle bundle, object result)
-        {
-            AssetBundle assetBundle = result as AssetBundle;
-            if (assetBundle == null)
-                return;
-
-            if (assetBundle != null)
-                assetBundle.Unload(true);
         }
 
         #region 内部方法
@@ -270,9 +240,9 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 记录缓存信息
+        /// 记录文件信息
         /// </summary>
-        public bool Record(string bundleGUID, FileWrapper wrapper)
+        public bool RecordFile(string bundleGUID, FileWrapper wrapper)
         {
             if (_wrappers.ContainsKey(bundleGUID))
             {

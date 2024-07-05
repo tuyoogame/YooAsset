@@ -60,7 +60,7 @@ namespace YooAsset
                 foreach (var wrapper in catalog.Wrappers)
                 {
                     var fileWrapper = new DefaultWebFileSystem.FileWrapper(wrapper.FileName);
-                    _fileSystem.Record(wrapper.BundleGUID, fileWrapper);
+                    _fileSystem.RecordFile(wrapper.BundleGUID, fileWrapper);
                 }
 
                 YooLogger.Log($"Package '{_fileSystem.PackageName}' catalog files count : {catalog.Wrappers.Count}");

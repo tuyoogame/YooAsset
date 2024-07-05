@@ -170,7 +170,7 @@ namespace YooAsset
                     if (manifest.TryGetPackageBundleByFileName(fileName, out PackageBundle value))
                     {
                         var fileWrapper = new DefaultBuildinFileSystem.FileWrapper(fileName);
-                        _fileSystem.Record(value.BundleGUID, fileWrapper);
+                        _fileSystem.RecordFile(value.BundleGUID, fileWrapper);
                     }
                     else
                     {
