@@ -1,17 +1,48 @@
-#if !UNITY_WECHAT_GAME
+﻿#if !UNITY_WECHAT_GAME
+using System;
+using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using YooAsset;
 using WeChatWASM;
 
 /// <summary>
-/// ΢��С��Ϸ�ļ�ϵͳ��չ
-/// �ο���https://wechat-miniprogram.github.io/minigame-unity-webgl-transform/Design/UsingAssetBundle.html
+/// 微信小游戏文件系统扩展
+/// 参考：https://wechat-miniprogram.github.io/minigame-unity-webgl-transform/Design/UsingAssetBundle.html
 /// </summary>
-internal class WechatFileSystem : DefaultWebFileSystem
+internal partial class WechatFileSystem : DefaultWebFileSystem
 {
+    private WXFileSystemManager _wxFileSystemMgr;
+    private readonly Dictionary<string, string> _wxFilePaths = new Dictionary<string, string>(10000);
+    private string _wxFileCacheRoot = string.Empty;
+
+    public override void OnCreate(string packageName, string rootDirectory)
+    {
+        base.OnCreate(packageName, rootDirectory);
+
+        _wxFileSystemMgr = WX.GetFileSystemManager();
+        _wxFileCacheRoot = WX.env.USER_DATA_PATH; //注意：如果有子目录，请修改此处！
+    }
+
     /// <summary>
-    /// ��Դ�ļ�����
+    /// 重写资源文件下载方法
+    /// </summary>
+    public override FSDownloadFileOperation DownloadFileAsync(params object[] args)
+    {
+        PackageBundle bundle = args[0] as PackageBundle;
+        int failedTryAgain = (int)args[2];
+        int timeout = (int)args[3];
+
+        string mainURL = RemoteServices.GetRemoteMainURL(bundle.FileName);
+        string fallbackURL = RemoteServices.GetRemoteFallbackURL(bundle.FileName);   
+        var operation = new WechatDownloadFileOperation(this, bundle, mainURL,fallbackURL, failedTryAgain, timeout);
+        OperationSystem.StartOperation(PackageName, operation);
+        return operation;
+    }
+
+    /// <summary>
+    /// 重写资源文件加载方法
     /// </summary>
     public override FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
     {
@@ -21,7 +52,7 @@ internal class WechatFileSystem : DefaultWebFileSystem
     }
 
     /// <summary>
-    /// ��Դ�ļ�ж��
+    /// 重写资源文件卸载方法
     /// </summary>
     public override void UnloadBundleFile(PackageBundle bundle, object result)
     {
@@ -30,10 +61,31 @@ internal class WechatFileSystem : DefaultWebFileSystem
             assetBundle.WXUnload(true);
     }
 
-
     /// <summary>
-    /// ��д��Դ�ļ�������
+    /// 重写查询方法
     /// </summary>
+    public override bool Exists(PackageBundle bundle)
+    {
+        string filePath = GetWXFileLoadPath(bundle);
+        string result = _wxFileSystemMgr.AccessSync(filePath);
+        return result.Equals("access:ok");
+    }
+
+    #region 内部方法
+    private string GetWXFileLoadPath(PackageBundle bundle)
+    {
+        if (_wxFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
+        {
+            filePath = PathUtility.Combine(_wxFileCacheRoot, bundle.FileName);
+            _wxFilePaths.Add(bundle.BundleGUID, filePath);
+        }
+        return filePath;
+    }
+    #endregion
+}
+
+internal partial class WechatFileSystem
+{
     internal class WechatLoadBundleOperation : FSLoadBundleOperation
     {
         private enum ESteps
@@ -47,7 +99,6 @@ internal class WechatFileSystem : DefaultWebFileSystem
         private readonly PackageBundle _bundle;
         private UnityWebRequest _webRequest;
         private ESteps _steps = ESteps.None;
-
 
         internal WechatLoadBundleOperation(WechatFileSystem fileSystem, PackageBundle bundle)
         {
@@ -129,6 +180,103 @@ internal class WechatFileSystem : DefaultWebFileSystem
                 return true;
             }
 #endif
+        }
+    }
+    internal class WechatDownloadFileOperation : DefaultDownloadFileOperation
+    {
+        private WechatFileSystem _fileSystem;
+        private ESteps _steps = ESteps.None;
+
+        internal WechatDownloadFileOperation(WechatFileSystem fileSystem, PackageBundle bundle,
+            string mainURL, string fallbackURL, int failedTryAgain, int timeout)
+            : base(bundle, mainURL, fallbackURL, failedTryAgain, timeout)
+        {
+            _fileSystem = fileSystem;
+        }
+        internal override void InternalOnStart()
+        {
+            _steps = ESteps.CreateRequest;
+        }
+        internal override void InternalOnUpdate()
+        {
+            // 创建下载器
+            if (_steps == ESteps.CreateRequest)
+            {
+                // 获取请求地址
+                _requestURL = GetRequestURL();
+
+                // 重置变量
+                ResetRequestFiled();
+
+                // 创建下载器
+                CreateWebRequest();
+
+                _steps = ESteps.CheckRequest;
+            }
+
+            // 检测下载结果
+            if (_steps == ESteps.CheckRequest)
+            {
+                DownloadProgress = _webRequest.downloadProgress;
+                DownloadedBytes = (long)_webRequest.downloadedBytes;
+                Progress = DownloadProgress;
+                if (_webRequest.isDone == false)
+                {
+                    CheckRequestTimeout();
+                    return;
+                }
+
+                // 检查网络错误
+                if (CheckRequestResult())
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Succeed;
+                }
+                else
+                {
+                    _steps = ESteps.TryAgain;
+                }
+
+                // 注意：最终释放请求器
+                DisposeWebRequest();
+            }
+
+            // 重新尝试下载
+            if (_steps == ESteps.TryAgain)
+            {
+                if (FailedTryAgain <= 0)
+                {
+                    Status = EOperationStatus.Failed;
+                    _steps = ESteps.Done;
+                    YooLogger.Error(Error);
+                    return;
+                }
+
+                _tryAgainTimer += Time.unscaledDeltaTime;
+                if (_tryAgainTimer > 1f)
+                {
+                    FailedTryAgain--;
+                    _steps = ESteps.CreateRequest;
+                    YooLogger.Warning(Error);
+                }
+            }
+        }
+
+        private void CreateWebRequest()
+        {
+            _webRequest = WXAssetBundle.GetAssetBundle(_requestURL);
+            _webRequest.SetRequestHeader("wechatminigame-preload", "1");
+            _webRequest.disposeDownloadHandlerOnDispose = true;
+            _webRequest.SendWebRequest();
+        }
+        private void DisposeWebRequest()
+        {
+            if (_webRequest != null)
+            {
+                //注意：引擎底层会自动调用Abort方法
+                _webRequest.Dispose();
+                _webRequest = null;
+            }
         }
     }
 }
