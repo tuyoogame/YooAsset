@@ -12,7 +12,7 @@ public class SceneHome : MonoBehaviour
     private IEnumerator Start()
     {
         // 加载登录页面
-        _windowHandle = YooAssets.LoadAssetSync<GameObject>("UIHome");
+        _windowHandle = YooAssets.LoadAssetAsync<GameObject>("UIHome");
         yield return _windowHandle;
         _windowHandle.InstantiateSync(CanvasDesktop.transform);
     }

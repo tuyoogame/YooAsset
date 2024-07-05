@@ -73,11 +73,8 @@ internal class FsmInitializePackage : IStateNode
         // WebGL运行模式
         if (playMode == EPlayMode.WebPlayMode)
         {
-            string defaultHostServer = GetHostServerURL();
-            string fallbackHostServer = GetHostServerURL();
-            IRemoteServices remoteServices = new RemoteServices(defaultHostServer, fallbackHostServer);
             var createParameters = new WebPlayModeParameters();
-            createParameters.WebFileSystemParameters = FileSystemParameters.CreateDefaultWebFileSystemParameters(remoteServices);
+            createParameters.WebFileSystemParameters = FileSystemParameters.CreateDefaultWebFileSystemParameters();
             initializationOperation = package.InitializeAsync(createParameters);
         }
 
