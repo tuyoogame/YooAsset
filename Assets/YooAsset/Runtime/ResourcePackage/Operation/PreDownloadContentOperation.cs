@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
+    /// <summary>
+    /// 预下载内容
+    /// 说明：目前只支持联机模式
+    /// </summary>
     public abstract class PreDownloadContentOperation : AsyncOperationBase
     {
         /// <summary>

@@ -12,7 +12,6 @@ namespace YooAsset
     {
         protected string _packageRoot;
 
-
         /// <summary>
         /// 包裹名称
         /// </summary>
@@ -53,9 +52,9 @@ namespace YooAsset
 
         #region 自定义参数
         /// <summary>
-        /// 自定义参数：模拟运行的资源清单文件路径
+        /// 自定义参数：模拟构建结果
         /// </summary>
-        public string SimulateManifestFilePath { private set; get; } = string.Empty;
+        public SimulateBuildResult BuildResult { private set; get; } = null;
         #endregion
 
 
@@ -76,33 +75,32 @@ namespace YooAsset
         }
         public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(params object[] args)
         {
-            throw new System.NotImplementedException();
+            var operation = new DEFSRequestPackageVersionOperation(this);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
         }
         public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync(params object[] args)
         {
-            var operation = new DEFSClearAllBundleFilesOperation(this);
+            var operation = new FSClearAllBundleFilesCompleteOperation();
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
         public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(params object[] args)
         {
-            var operation = new DEFSClearUnusedBundleFilesOperation(this);
+            var operation = new FSClearUnusedBundleFilesCompleteOperation();
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
         public virtual FSDownloadFileOperation DownloadFileAsync(params object[] args)
         {
-            PackageBundle bundle = args[0] as PackageBundle;
-            var operation = new DEFSDownloadFileOperation(bundle);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
+            throw new System.NotImplementedException();
         }
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == "SIMULATE_MANIFEST_FILE_PATH")
+            if (name == "SIMULATE_BUILD_RESULT")
             {
-                SimulateManifestFilePath = (string)value;
+                BuildResult = (SimulateBuildResult)value;
             }
             else
             {

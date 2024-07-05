@@ -19,22 +19,26 @@ namespace YooAsset
         internal override void InternalOnStart()
         {
             _fileSavePath = _fileSystem.GetTempFilePath(Bundle);
-
-            // 注意：检测文件是否存在
-            if (_fileSystem.Exists(Bundle))
-            {
-                _steps = ESteps.Done;
-                Status = EOperationStatus.Succeed;
-            }
-            else
-            {
-                _steps = ESteps.CreateRequest;
-            }
+            _steps = ESteps.CheckExists;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
+
+            // 检测文件是否存在
+            if (_steps == ESteps.CheckExists)
+            {
+                if (_fileSystem.Exists(Bundle))
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Succeed;
+                }
+                else
+                {
+                    _steps = ESteps.CreateRequest;
+                }
+            }
 
             // 创建下载器
             if (_steps == ESteps.CreateRequest)
@@ -214,22 +218,26 @@ namespace YooAsset
         internal override void InternalOnStart()
         {
             _fileSavePath = _fileSystem.GetTempFilePath(Bundle);
-
-            // 注意：检测文件是否存在
-            if (_fileSystem.Exists(Bundle))
-            {
-                _steps = ESteps.Done;
-                Status = EOperationStatus.Succeed;
-            }
-            else
-            {
-                _steps = ESteps.CreateRequest;
-            }
+            _steps = ESteps.CheckExists;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
+
+            // 检测文件是否存在
+            if (_steps == ESteps.CheckExists)
+            {
+                if (_fileSystem.Exists(Bundle))
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Succeed;
+                }
+                else
+                {
+                    _steps = ESteps.CreateRequest;
+                }
+            }
 
             // 创建下载器
             if (_steps == ESteps.CreateRequest)

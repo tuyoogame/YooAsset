@@ -87,13 +87,13 @@ namespace YooAsset
 
         /// <summary>
         /// 创建默认的编辑器文件系统参数
-        /// <param name="simulateManifestFilePath">用于模拟运行的资源清单路径</param>
+        /// <param name="SimulateBuildResult">模拟构建结果</param>
         /// </summary>
-        public static FileSystemParameters CreateDefaultEditorFileSystemParameters(string simulateManifestFilePath)
+        public static FileSystemParameters CreateDefaultEditorFileSystemParameters(SimulateBuildResult simulateBuildResult)
         {
             string fileSystemClass = typeof(DefaultEditorFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
-            fileSystemParams.AddParameter("SIMULATE_MANIFEST_FILE_PATH", simulateManifestFilePath);
+            fileSystemParams.AddParameter("SIMULATE_BUILD_RESULT", simulateBuildResult);
             return fileSystemParams;
         }
 

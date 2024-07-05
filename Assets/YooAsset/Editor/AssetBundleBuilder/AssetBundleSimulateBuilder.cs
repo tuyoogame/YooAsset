@@ -8,8 +8,11 @@ namespace YooAsset.Editor
         /// <summary>
         /// 模拟构建
         /// </summary>
-        public static string SimulateBuild(string buildPipelineName, string packageName)
+        public static SimulateBuildResult SimulateBuild(string buildPipelineName, string packageName)
         {
+            string packageVersion = "Simulate";
+            BuildResult buildResult;
+
             if (buildPipelineName == EBuildPipeline.BuiltinBuildPipeline.ToString())
             {
                 BuiltinBuildParameters buildParameters = new BuiltinBuildParameters();
@@ -19,23 +22,13 @@ namespace YooAsset.Editor
                 buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
                 buildParameters.BuildMode = EBuildMode.SimulateBuild;
                 buildParameters.PackageName = packageName;
-                buildParameters.PackageVersion = "Simulate";
+                buildParameters.PackageVersion = packageVersion;
                 buildParameters.FileNameStyle = EFileNameStyle.HashName;
                 buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
                 buildParameters.BuildinFileCopyParams = string.Empty;
 
                 BuiltinBuildPipeline pipeline = new BuiltinBuildPipeline();
-                var buildResult = pipeline.Run(buildParameters, false);
-                if (buildResult.Success)
-                {
-                    string manifestFileName = YooAssetSettingsData.GetManifestBinaryFileName(buildParameters.PackageName, buildParameters.PackageVersion);
-                    string manifestFilePath = $"{buildResult.OutputPackageDirectory}/{manifestFileName}";
-                    return manifestFilePath;
-                }
-                else
-                {
-                    return null;
-                }
+                buildResult = pipeline.Run(buildParameters, false);
             }
             else if (buildPipelineName == EBuildPipeline.ScriptableBuildPipeline.ToString())
             {
@@ -46,23 +39,13 @@ namespace YooAsset.Editor
                 buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
                 buildParameters.BuildMode = EBuildMode.SimulateBuild;
                 buildParameters.PackageName = packageName;
-                buildParameters.PackageVersion = "Simulate";
+                buildParameters.PackageVersion = packageVersion;
                 buildParameters.FileNameStyle = EFileNameStyle.HashName;
                 buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
                 buildParameters.BuildinFileCopyParams = string.Empty;
 
                 ScriptableBuildPipeline pipeline = new ScriptableBuildPipeline();
-                var buildResult = pipeline.Run(buildParameters, true);
-                if (buildResult.Success)
-                {
-                    string manifestFileName = YooAssetSettingsData.GetManifestBinaryFileName(buildParameters.PackageName, buildParameters.PackageVersion);
-                    string manifestFilePath = $"{buildResult.OutputPackageDirectory}/{manifestFileName}";
-                    return manifestFilePath;
-                }
-                else
-                {
-                    return null;
-                }
+                buildResult = pipeline.Run(buildParameters, true);
             }
             else if (buildPipelineName == EBuildPipeline.RawFileBuildPipeline.ToString())
             {
@@ -73,27 +56,34 @@ namespace YooAsset.Editor
                 buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
                 buildParameters.BuildMode = EBuildMode.SimulateBuild;
                 buildParameters.PackageName = packageName;
-                buildParameters.PackageVersion = "Simulate";
+                buildParameters.PackageVersion = packageVersion;
                 buildParameters.FileNameStyle = EFileNameStyle.HashName;
                 buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
                 buildParameters.BuildinFileCopyParams = string.Empty;
 
                 RawFileBuildPipeline pipeline = new RawFileBuildPipeline();
-                var buildResult = pipeline.Run(buildParameters, true);
-                if (buildResult.Success)
-                {
-                    string manifestFileName = YooAssetSettingsData.GetManifestBinaryFileName(buildParameters.PackageName, buildParameters.PackageVersion);
-                    string manifestFilePath = $"{buildResult.OutputPackageDirectory}/{manifestFileName}";
-                    return manifestFilePath;
-                }
-                else
-                {
-                    return null;
-                }
+                buildResult = pipeline.Run(buildParameters, true);
             }
             else
             {
                 throw new System.NotImplementedException(buildPipelineName);
+            }
+
+            // 返回结果
+            if (buildResult.Success)
+            {
+                SimulateBuildResult reulst = new SimulateBuildResult();
+                string versionFileName = YooAssetSettingsData.GetPackageVersionFileName(packageName);
+                string manifestFileName = YooAssetSettingsData.GetManifestBinaryFileName(packageName, packageVersion);
+                string hashFileName = YooAssetSettingsData.GetPackageHashFileName(packageName, packageVersion);
+                reulst.PackageVersionFilePath = $"{buildResult.OutputPackageDirectory}/{versionFileName}";
+                reulst.PackageManifestFilePath = $"{buildResult.OutputPackageDirectory}/{manifestFileName}";
+                reulst.PackageHashFilePath = $"{buildResult.OutputPackageDirectory}/{hashFileName}";
+                return reulst;
+            }
+            else
+            {
+                return null;
             }
         }
     }

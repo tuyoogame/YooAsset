@@ -21,7 +21,6 @@ namespace YooAsset
         protected readonly Dictionary<string, string> _webFilePaths = new Dictionary<string, string>(10000);
         protected string _webPackageRoot = string.Empty;
 
-
         /// <summary>
         /// 包裹名称
         /// </summary>
@@ -115,13 +114,13 @@ namespace YooAsset
         }
         public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync(params object[] args)
         {
-            var operation = new DWFSClearAllBundleFilesOperation(this);
+            var operation = new FSClearAllBundleFilesCompleteOperation();
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
         public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(params object[] args)
         {
-            var operation = new DWFSClearUnusedBundleFilesOperation(this);
+            var operation = new FSClearUnusedBundleFilesCompleteOperation();
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }

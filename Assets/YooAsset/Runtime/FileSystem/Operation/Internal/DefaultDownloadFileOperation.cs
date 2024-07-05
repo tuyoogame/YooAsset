@@ -7,6 +7,7 @@ namespace YooAsset
         protected enum ESteps
         {
             None,
+            CheckExists,
             CreateRequest,
             CheckRequest,
             VerifyTempFile,

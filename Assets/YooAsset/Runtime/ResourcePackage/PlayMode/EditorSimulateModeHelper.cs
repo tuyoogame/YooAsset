@@ -3,6 +3,13 @@ using System.Reflection;
 
 namespace YooAsset
 {
+    public class SimulateBuildResult
+    {
+        public string PackageVersionFilePath;
+        public string PackageManifestFilePath;
+        public string PackageHashFilePath;
+    }
+
     public static class EditorSimulateModeHelper
     {
         private static System.Type _classType;
@@ -10,19 +17,18 @@ namespace YooAsset
         /// <summary>
         /// 编辑器下模拟构建清单
         /// </summary>
-        public static string SimulateBuild(string buildPipelineName, string packageName)
+        public static SimulateBuildResult SimulateBuild(string buildPipelineName, string packageName)
         {
             if (_classType == null)
                 _classType = Assembly.Load("YooAsset.Editor").GetType("YooAsset.Editor.AssetBundleSimulateBuilder");
 
-            string manifestFilePath = (string)InvokePublicStaticMethod(_classType, "SimulateBuild", buildPipelineName, packageName);
-            return manifestFilePath;
+            return (SimulateBuildResult)InvokePublicStaticMethod(_classType, "SimulateBuild", buildPipelineName, packageName);
         }
 
         /// <summary>
         /// 编辑器下模拟构建清单
         /// </summary>
-        public static string SimulateBuild(EDefaultBuildPipeline buildPipeline, string packageName)
+        public static SimulateBuildResult SimulateBuild(EDefaultBuildPipeline buildPipeline, string packageName)
         {
             return SimulateBuild(buildPipeline.ToString(), packageName);
         }

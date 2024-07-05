@@ -9,46 +9,109 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// 编辑器下模拟模式
+    /// 通用类
     /// </summary>
-    internal sealed class EditorSimulateModeClearAllBundleFilesOperation : ClearAllBundleFilesOperation
+    internal sealed class DefaultClearAllBundleFilesOperation : ClearAllBundleFilesOperation
     {
         private enum ESteps
         {
             None,
-            ClearAllBundleFiles,
+            ClearFileSystemA,
+            ClearFileSystemB,
+            ClearFileSystemC,
             Done,
         }
 
-        private readonly EditorSimulateModeImpl _impl;
-        private FSClearAllBundleFilesOperation _clearAllBundleFilesOp;
+        private readonly IPlayMode _impl;
+        private readonly IFileSystem _fileSystemA;
+        private readonly IFileSystem _fileSystemB;
+        private readonly IFileSystem _fileSystemC;
+        private FSClearAllBundleFilesOperation _clearAllBundleFilesOpA;
+        private FSClearAllBundleFilesOperation _clearAllBundleFilesOpB;
+        private FSClearAllBundleFilesOperation _clearAllBundleFilesOpC;
         private ESteps _steps = ESteps.None;
 
-        internal EditorSimulateModeClearAllBundleFilesOperation(EditorSimulateModeImpl impl)
+        internal DefaultClearAllBundleFilesOperation(IPlayMode impl, IFileSystem fileSystemA, IFileSystem fileSystemB, IFileSystem fileSystemC)
         {
             _impl = impl;
+            _fileSystemA = fileSystemA;
+            _fileSystemB = fileSystemB;
+            _fileSystemC = fileSystemC;
         }
         internal override void InternalOnStart()
         {
-            _steps = ESteps.ClearAllBundleFiles;
+            _steps = ESteps.ClearFileSystemA;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.ClearAllBundleFiles)
+            if (_steps == ESteps.ClearFileSystemA)
             {
-                if (_clearAllBundleFilesOp == null)
-                {
-                    _clearAllBundleFilesOp = _impl.EditorFileSystem.ClearAllBundleFilesAsync();
-                }
+                if (_clearAllBundleFilesOpA == null)
+                    _clearAllBundleFilesOpA = _fileSystemA.ClearAllBundleFilesAsync();
 
-                Progress = _clearAllBundleFilesOp.Progress;
-                if (_clearAllBundleFilesOp.IsDone == false)
+                Progress = _clearAllBundleFilesOpA.Progress;
+                if (_clearAllBundleFilesOpA.IsDone == false)
                     return;
 
-                if (_clearAllBundleFilesOp.Status == EOperationStatus.Succeed)
+                if (_clearAllBundleFilesOpA.Status == EOperationStatus.Succeed)
+                {
+                    _steps = ESteps.ClearFileSystemB;
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = _clearAllBundleFilesOpA.Error;
+                }
+            }
+
+            if (_steps == ESteps.ClearFileSystemB)
+            {
+                if (_fileSystemB == null)
+                {
+                    _steps = ESteps.ClearFileSystemC;
+                    return;
+                }
+
+                if (_clearAllBundleFilesOpB == null)
+                    _clearAllBundleFilesOpB = _fileSystemB.ClearAllBundleFilesAsync();
+
+                Progress = _clearAllBundleFilesOpB.Progress;
+                if (_clearAllBundleFilesOpB.IsDone == false)
+                    return;
+
+                if (_clearAllBundleFilesOpB.Status == EOperationStatus.Succeed)
+                {
+                    _steps = ESteps.ClearFileSystemC;
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = _clearAllBundleFilesOpB.Error;
+                }
+            }
+
+            if (_steps == ESteps.ClearFileSystemC)
+            {
+                if (_fileSystemC == null)
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Succeed;
+                    return;
+                }
+
+                if (_clearAllBundleFilesOpC == null)
+                    _clearAllBundleFilesOpC = _fileSystemC.ClearAllBundleFilesAsync();
+
+                Progress = _clearAllBundleFilesOpC.Progress;
+                if (_clearAllBundleFilesOpC.IsDone == false)
+                    return;
+
+                if (_clearAllBundleFilesOpC.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
@@ -57,228 +120,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _clearAllBundleFilesOp.Error;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 离线运行模式
-    /// </summary>
-    internal sealed class OfflinePlayModeClearAllBundleFilesOperation : ClearAllBundleFilesOperation
-    {
-        private enum ESteps
-        {
-            None,
-            ClearAllBundleFiles,
-            Done,
-        }
-
-        private readonly OfflinePlayModeImpl _impl;
-        private FSClearAllBundleFilesOperation _clearAllBundleFilesOp;
-        private ESteps _steps = ESteps.None;
-
-        internal OfflinePlayModeClearAllBundleFilesOperation(OfflinePlayModeImpl impl)
-        {
-            _impl = impl;
-        }
-        internal override void InternalOnStart()
-        {
-            _steps = ESteps.ClearAllBundleFiles;
-        }
-        internal override void InternalOnUpdate()
-        {
-            if (_steps == ESteps.None || _steps == ESteps.Done)
-                return;
-
-            if (_steps == ESteps.ClearAllBundleFiles)
-            {
-                if (_clearAllBundleFilesOp == null)
-                {
-                    _clearAllBundleFilesOp = _impl.BuildinFileSystem.ClearAllBundleFilesAsync();
-                }
-
-                Progress = _clearAllBundleFilesOp.Progress;
-                if (_clearAllBundleFilesOp.IsDone == false)
-                    return;
-
-                if (_clearAllBundleFilesOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Succeed;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _clearAllBundleFilesOp.Error;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 联机运行模式
-    /// </summary>
-    internal sealed class HostPlayModeClearAllBundleFilesOperation : ClearAllBundleFilesOperation
-    {
-        private enum ESteps
-        {
-            None,
-            ClearBuildinAllBundleFiles,
-            ClearDeliveryAllBundleFiles,
-            ClearCacheAllBundleFiles,
-            Done,
-        }
-
-        private readonly HostPlayModeImpl _impl;
-        private FSClearAllBundleFilesOperation _clearBuildinAllBundleFilesOp;
-        private FSClearAllBundleFilesOperation _clearDeliveryAllBundleFilesOp;
-        private FSClearAllBundleFilesOperation _clearCacheAllBundleFilesOp;
-        private ESteps _steps = ESteps.None;
-
-        internal HostPlayModeClearAllBundleFilesOperation(HostPlayModeImpl impl)
-        {
-            _impl = impl;
-        }
-        internal override void InternalOnStart()
-        {
-            _steps = ESteps.ClearBuildinAllBundleFiles;
-        }
-        internal override void InternalOnUpdate()
-        {
-            if (_steps == ESteps.None || _steps == ESteps.Done)
-                return;
-
-            if (_steps == ESteps.ClearBuildinAllBundleFiles)
-            {
-                if (_clearBuildinAllBundleFilesOp == null)
-                {
-                    _clearBuildinAllBundleFilesOp = _impl.BuildinFileSystem.ClearAllBundleFilesAsync();
-                }
-
-                Progress = _clearBuildinAllBundleFilesOp.Progress;
-                if (_clearBuildinAllBundleFilesOp.IsDone == false)
-                    return;
-
-                if (_clearBuildinAllBundleFilesOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.ClearDeliveryAllBundleFiles;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _clearBuildinAllBundleFilesOp.Error;
-                }
-            }
-
-            if (_steps == ESteps.ClearDeliveryAllBundleFiles)
-            {
-                if (_impl.DeliveryFileSystem == null)
-                {
-                    _steps = ESteps.ClearCacheAllBundleFiles;
-                    return;
-                }
-
-                if (_clearDeliveryAllBundleFilesOp == null)
-                {
-                    _clearDeliveryAllBundleFilesOp = _impl.DeliveryFileSystem.ClearAllBundleFilesAsync();
-                }
-
-                Progress = _clearDeliveryAllBundleFilesOp.Progress;
-                if (_clearDeliveryAllBundleFilesOp.IsDone == false)
-                    return;
-
-                if (_clearDeliveryAllBundleFilesOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.ClearCacheAllBundleFiles;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _clearDeliveryAllBundleFilesOp.Error;
-                }
-            }
-
-            if (_steps == ESteps.ClearCacheAllBundleFiles)
-            {
-                if (_clearCacheAllBundleFilesOp == null)
-                {
-                    _clearCacheAllBundleFilesOp = _impl.CacheFileSystem.ClearAllBundleFilesAsync();
-                }
-
-                Progress = _clearCacheAllBundleFilesOp.Progress;
-                if (_clearCacheAllBundleFilesOp.IsDone == false)
-                    return;
-
-                if (_clearCacheAllBundleFilesOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Succeed;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _clearCacheAllBundleFilesOp.Error;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// WebGL运行模式
-    /// </summary>
-    internal sealed class WebPlayModeClearAllBundleFilesOperation : ClearAllBundleFilesOperation
-    {
-        private enum ESteps
-        {
-            None,
-            ClearAllBundleFiles,
-            Done,
-        }
-
-        private readonly WebPlayModeImpl _impl;
-        private FSClearAllBundleFilesOperation _clearAllBundleFilesOp;
-        private ESteps _steps = ESteps.None;
-
-        internal WebPlayModeClearAllBundleFilesOperation(WebPlayModeImpl impl)
-        {
-            _impl = impl;
-        }
-        internal override void InternalOnStart()
-        {
-            _steps = ESteps.ClearAllBundleFiles;
-        }
-        internal override void InternalOnUpdate()
-        {
-            if (_steps == ESteps.None || _steps == ESteps.Done)
-                return;
-
-            if (_steps == ESteps.ClearAllBundleFiles)
-            {
-                if (_clearAllBundleFilesOp == null)
-                {
-                    _clearAllBundleFilesOp = _impl.WebFileSystem.ClearAllBundleFilesAsync();
-                }
-
-                Progress = _clearAllBundleFilesOp.Progress;
-                if (_clearAllBundleFilesOp.IsDone == false)
-                    return;
-
-                if (_clearAllBundleFilesOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Succeed;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _clearAllBundleFilesOp.Error;
+                    Error = _clearAllBundleFilesOpC.Error;
                 }
             }
         }

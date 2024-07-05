@@ -38,7 +38,7 @@ namespace YooAsset
 
             if (_steps == ESteps.LoadFileData)
             {
-                string manifestFilePath = _fileSystem.SimulateManifestFilePath;
+                string manifestFilePath = _fileSystem.BuildResult.PackageManifestFilePath;
                 if (File.Exists(manifestFilePath))
                 {
                     _steps = ESteps.LoadManifest;
@@ -48,7 +48,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Simulation manifest file not found : {manifestFilePath}";
+                    Error = $"Simulation package manifest file not found : {manifestFilePath}";
                 }
             }
 

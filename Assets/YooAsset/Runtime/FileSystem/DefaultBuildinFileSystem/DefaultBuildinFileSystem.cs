@@ -25,11 +25,8 @@ namespace YooAsset
         protected readonly Dictionary<string, string> _buildinFilePaths = new Dictionary<string, string>(10000);
         protected string _packageRoot;
 
-        /// <summary>
-        /// 解压文件系统
-        /// </summary>
+        // 解压文件系统
         public IFileSystem UnpackFileSystem { private set; get; }
-
 
         /// <summary>
         /// 包裹名称
@@ -110,27 +107,24 @@ namespace YooAsset
         }
         public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(params object[] args)
         {
-            throw new System.NotImplementedException();
+            var operation = new DBFSRequestPackageVersionOperation(this);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
         }
         public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync(params object[] args)
         {
-            var operation = new DBFSClearAllBundleFilesOperation(this);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
+            return UnpackFileSystem.ClearAllBundleFilesAsync();
         }
         public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(params object[] args)
         {
             PackageManifest manifest = args[0] as PackageManifest;
-            var operation = new DBFSClearUnusedBundleFilesOperation(this, manifest);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
+            return UnpackFileSystem.ClearUnusedBundleFilesAsync(manifest);
         }
         public virtual FSDownloadFileOperation DownloadFileAsync(params object[] args)
         {
             PackageBundle bundle = args[0] as PackageBundle;
             int failedTryAgain = (int)args[2];
             int timeout = (int)args[3];
-
             string buidlinFilePath = GetBuildinFileLoadPath(bundle);
             return UnpackFileSystem.DownloadFileAsync(bundle, buidlinFilePath, failedTryAgain, timeout);
         }
@@ -176,7 +170,7 @@ namespace YooAsset
 
         public virtual bool Belong(PackageBundle bundle)
         {
-            return _wrappers.ContainsKey(bundle.BundleGUID);
+            return Belong(bundle.BundleGUID);
         }
         public virtual bool Belong(string bundleGUID)
         {
@@ -184,7 +178,7 @@ namespace YooAsset
         }
         public virtual bool Exists(PackageBundle bundle)
         {
-            return _wrappers.ContainsKey(bundle.BundleGUID);
+            return Exists(bundle.BundleGUID);
         }
         public virtual bool Exists(string bundleGUID)
         {
@@ -199,7 +193,7 @@ namespace YooAsset
         {
             if (Belong(bundle) == false)
                 return false;
-            
+
 #if UNITY_ANDROID
             return RawFileBuildPipeline || bundle.Encrypted;
 #else
@@ -230,11 +224,11 @@ namespace YooAsset
 
         public virtual byte[] ReadFileBytes(PackageBundle bundle)
         {
-            return UnpackFileSystem.ReadFileBytes(bundle);
+            throw new System.NotImplementedException();
         }
         public virtual string ReadFileText(PackageBundle bundle)
         {
-            return UnpackFileSystem.ReadFileText(bundle);
+            throw new System.NotImplementedException();
         }
 
         public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)

@@ -40,7 +40,6 @@ namespace YooAsset
         protected string _tempFileRoot;
         protected string _manifestFileRoot;
 
-
         /// <summary>
         /// 包裹名称
         /// </summary>
@@ -270,17 +269,16 @@ namespace YooAsset
 
         public virtual bool Belong(PackageBundle bundle)
         {
-            // 注意：缓存文件系统保底加载！
-            return true;
+            return Belong(bundle.BundleGUID);
         }
         public virtual bool Belong(string bundleGUID)
         {
             // 注意：缓存文件系统保底加载！
             return true;
         }
-        public virtual bool Exists(PackageBundle packageBundle)
+        public virtual bool Exists(PackageBundle bundle)
         {
-            return _wrappers.ContainsKey(packageBundle.BundleGUID);
+            return Exists(bundle.BundleGUID);
         }
         public virtual bool Exists(string bundleGUID)
         {

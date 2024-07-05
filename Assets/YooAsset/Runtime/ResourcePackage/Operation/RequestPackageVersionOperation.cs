@@ -13,146 +13,57 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// 编辑器下模拟运行
+    /// 通用类
     /// </summary>
-    internal class EditorSimulateModeRequestPackageVersionOperation : RequestPackageVersionOperation
-    {
-        internal override void InternalOnStart()
-        {
-            Status = EOperationStatus.Succeed;
-        }
-        internal override void InternalOnUpdate()
-        {
-        }
-    }
-
-    /// <summary>
-    /// 离线运行模式
-    /// </summary>
-    internal class OfflinePlayModeRequestPackageVersionOperation : RequestPackageVersionOperation
-    {
-        internal override void InternalOnStart()
-        {
-            Status = EOperationStatus.Succeed;
-        }
-        internal override void InternalOnUpdate()
-        {
-        }
-    }
-
-    /// <summary>
-    /// 联机运行模式
-    /// </summary>
-    internal class HostPlayModeRequestPackageVersionOperation : RequestPackageVersionOperation
+    internal sealed class DefaultRequestPackageVersionOperation : RequestPackageVersionOperation
     {
         private enum ESteps
         {
             None,
-            QueryPackageVersion,
+            RequestPackageVersion,
             Done,
         }
 
-        private readonly HostPlayModeImpl _impl;
+        private readonly IFileSystem _fileSystem;
         private readonly bool _appendTimeTicks;
         private readonly int _timeout;
-        private FSRequestPackageVersionOperation _queryPackageVersionOp;
+        private FSRequestPackageVersionOperation _requestPackageVersionOp;
         private ESteps _steps = ESteps.None;
 
-        internal HostPlayModeRequestPackageVersionOperation(HostPlayModeImpl impl, bool appendTimeTicks, int timeout)
+        internal DefaultRequestPackageVersionOperation(IFileSystem fileSystem, bool appendTimeTicks, int timeout)
         {
-            _impl = impl;
+            _fileSystem = fileSystem;
             _appendTimeTicks = appendTimeTicks;
             _timeout = timeout;
         }
         internal override void InternalOnStart()
         {
-            _steps = ESteps.QueryPackageVersion;
+            _steps = ESteps.RequestPackageVersion;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.QueryPackageVersion)
+            if (_steps == ESteps.RequestPackageVersion)
             {
-                if (_queryPackageVersionOp == null)
-                {
-                    _queryPackageVersionOp = _impl.CacheFileSystem.RequestPackageVersionAsync(_appendTimeTicks, _timeout);
-                }
+                if (_requestPackageVersionOp == null)
+                    _requestPackageVersionOp = _fileSystem.RequestPackageVersionAsync(_appendTimeTicks, _timeout);
 
-                if (_queryPackageVersionOp.IsDone == false)
+                if (_requestPackageVersionOp.IsDone == false)
                     return;
 
-                if (_queryPackageVersionOp.Status == EOperationStatus.Succeed)
+                if (_requestPackageVersionOp.Status == EOperationStatus.Succeed)
                 {
-                    PackageVersion = _queryPackageVersionOp.PackageVersion;
                     _steps = ESteps.Done;
+                    PackageVersion = _requestPackageVersionOp.PackageVersion;
                     Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _queryPackageVersionOp.Error;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// WebGL运行模式
-    /// </summary>
-    internal class WebPlayModeRequestPackageVersionOperation : RequestPackageVersionOperation
-    {
-        private enum ESteps
-        {
-            None,
-            QueryPackageVersion,
-            Done,
-        }
-
-        private readonly WebPlayModeImpl _impl;
-        private readonly bool _appendTimeTicks;
-        private readonly int _timeout;
-        private FSRequestPackageVersionOperation _queryPackageVersionOp;
-        private ESteps _steps = ESteps.None;
-
-        internal WebPlayModeRequestPackageVersionOperation(WebPlayModeImpl impl, bool appendTimeTicks, int timeout)
-        {
-            _impl = impl;
-            _appendTimeTicks = appendTimeTicks;
-            _timeout = timeout;
-        }
-        internal override void InternalOnStart()
-        {
-            _steps = ESteps.QueryPackageVersion;
-        }
-        internal override void InternalOnUpdate()
-        {
-            if (_steps == ESteps.None || _steps == ESteps.Done)
-                return;
-
-            if (_steps == ESteps.QueryPackageVersion)
-            {
-                if (_queryPackageVersionOp == null)
-                {
-                    _queryPackageVersionOp = _impl.WebFileSystem.RequestPackageVersionAsync(_appendTimeTicks, _timeout);
-                }
-
-                if (_queryPackageVersionOp.IsDone == false)
-                    return;
-
-                if (_queryPackageVersionOp.Status == EOperationStatus.Succeed)
-                {
-                    PackageVersion = _queryPackageVersionOp.PackageVersion;
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Succeed;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _queryPackageVersionOp.Error;
+                    Error = _requestPackageVersionOp.Error;
                 }
             }
         }

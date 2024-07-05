@@ -9,46 +9,110 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// 编辑器下模拟模式
+    /// 通用类
     /// </summary>
-    internal sealed class EditorSimulateModeClearUnusedBundleFilesOperation : ClearUnusedBundleFilesOperation
+    internal sealed class DefaultClearUnusedBundleFilesOperation : ClearUnusedBundleFilesOperation
     {
         private enum ESteps
         {
             None,
-            ClearUnusedBundleFiles,
+            ClearFileSystemA,
+            ClearFileSystemB,
+            ClearFileSystemC,
             Done,
         }
 
-        private readonly EditorSimulateModeImpl _impl;
-        private FSClearUnusedBundleFilesOperation _clearUnusedBundleFilesOp;
+        private readonly IPlayMode _impl;
+        private readonly IFileSystem _fileSystemA;
+        private readonly IFileSystem _fileSystemB;
+        private readonly IFileSystem _fileSystemC;
+        private FSClearUnusedBundleFilesOperation _clearUnusedBundleFilesOpA;
+        private FSClearUnusedBundleFilesOperation _clearUnusedBundleFilesOpB;
+        private FSClearUnusedBundleFilesOperation _clearUnusedBundleFilesOpC;
         private ESteps _steps = ESteps.None;
 
-        internal EditorSimulateModeClearUnusedBundleFilesOperation(EditorSimulateModeImpl impl)
+        internal DefaultClearUnusedBundleFilesOperation(IPlayMode impl, IFileSystem fileSystemA, IFileSystem fileSystemB, IFileSystem fileSystemC)
         {
             _impl = impl;
+            _fileSystemA = fileSystemA;
+            _fileSystemB = fileSystemB;
+            _fileSystemC = fileSystemC;
         }
         internal override void InternalOnStart()
         {
-            _steps = ESteps.ClearUnusedBundleFiles;
+            _steps = ESteps.ClearFileSystemA;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.ClearUnusedBundleFiles)
+            if (_steps == ESteps.ClearFileSystemA)
             {
-                if (_clearUnusedBundleFilesOp == null)
-                {
-                    _clearUnusedBundleFilesOp = _impl.EditorFileSystem.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
-                }
+                if (_clearUnusedBundleFilesOpA == null)
+                    _clearUnusedBundleFilesOpA = _fileSystemA.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
 
-                Progress = _clearUnusedBundleFilesOp.Progress;
-                if (_clearUnusedBundleFilesOp.IsDone == false)
+                Progress = _clearUnusedBundleFilesOpA.Progress;
+                if (_clearUnusedBundleFilesOpA.IsDone == false)
                     return;
 
-                if (_clearUnusedBundleFilesOp.Status == EOperationStatus.Succeed)
+                if (_clearUnusedBundleFilesOpA.Status == EOperationStatus.Succeed)
+                {
+                    _steps = ESteps.ClearFileSystemB;
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = _clearUnusedBundleFilesOpA.Error;
+                }
+            }
+
+            if (_steps == ESteps.ClearFileSystemB)
+            {
+                if (_fileSystemB == null)
+                {
+                    _steps = ESteps.ClearFileSystemC;
+                    return;
+                }
+
+                if (_clearUnusedBundleFilesOpB == null)
+                    _clearUnusedBundleFilesOpB = _fileSystemB.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
+
+                Progress = _clearUnusedBundleFilesOpB.Progress;
+                if (_clearUnusedBundleFilesOpB.IsDone == false)
+                    return;
+
+                if (_clearUnusedBundleFilesOpB.Status == EOperationStatus.Succeed)
+                {
+                    _steps = ESteps.ClearFileSystemC;
+
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = _clearUnusedBundleFilesOpB.Error;
+                }
+            }
+
+            if (_steps == ESteps.ClearFileSystemC)
+            {
+                if (_fileSystemC == null)
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Succeed;
+                    return;
+                }
+
+                if (_clearUnusedBundleFilesOpC == null)
+                    _clearUnusedBundleFilesOpC = _fileSystemC.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
+
+                Progress = _clearUnusedBundleFilesOpC.Progress;
+                if (_clearUnusedBundleFilesOpC.IsDone == false)
+                    return;
+
+                if (_clearUnusedBundleFilesOpC.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
@@ -57,229 +121,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _clearUnusedBundleFilesOp.Error;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 离线运行模式
-    /// </summary>
-    internal sealed class OfflinePlayModeClearUnusedBundleFilesOperation : ClearUnusedBundleFilesOperation
-    {
-        private enum ESteps
-        {
-            None,
-            ClearUnusedBundleFiles,
-            Done,
-        }
-
-        private readonly OfflinePlayModeImpl _impl;
-        private FSClearUnusedBundleFilesOperation _clearUnusedBundleFilesOp;
-        private ESteps _steps = ESteps.None;
-
-        internal OfflinePlayModeClearUnusedBundleFilesOperation(OfflinePlayModeImpl impl)
-        {
-            _impl = impl;
-        }
-        internal override void InternalOnStart()
-        {
-            _steps = ESteps.ClearUnusedBundleFiles;
-        }
-        internal override void InternalOnUpdate()
-        {
-            if (_steps == ESteps.None || _steps == ESteps.Done)
-                return;
-
-            if (_steps == ESteps.ClearUnusedBundleFiles)
-            {
-                if (_clearUnusedBundleFilesOp == null)
-                {
-                    _clearUnusedBundleFilesOp = _impl.BuildinFileSystem.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
-                }
-
-                Progress = _clearUnusedBundleFilesOp.Progress;
-                if (_clearUnusedBundleFilesOp.IsDone == false)
-                    return;
-
-                if (_clearUnusedBundleFilesOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Succeed;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _clearUnusedBundleFilesOp.Error;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 联机运行模式
-    /// </summary>
-    internal sealed class HostPlayModeClearUnusedBundleFilesOperation : ClearUnusedBundleFilesOperation
-    {
-        private enum ESteps
-        {
-            None,
-            ClearBuildinUnusedBundleFiles,
-            ClearDeliveryUnusedBundleFiles,
-            ClearCacheUnusedBundleFiles,
-            Done,
-        }
-
-        private readonly HostPlayModeImpl _impl;
-        private FSClearUnusedBundleFilesOperation _clearBuildinUnusedBundleFilesOp;
-        private FSClearUnusedBundleFilesOperation _clearDeliveryUnusedBundleFilesOp;
-        private FSClearUnusedBundleFilesOperation _clearCacheUnusedBundleFilesOp;
-        private ESteps _steps = ESteps.None;
-
-        internal HostPlayModeClearUnusedBundleFilesOperation(HostPlayModeImpl impl)
-        {
-            _impl = impl;
-        }
-        internal override void InternalOnStart()
-        {
-            _steps = ESteps.ClearBuildinUnusedBundleFiles;
-        }
-        internal override void InternalOnUpdate()
-        {
-            if (_steps == ESteps.None || _steps == ESteps.Done)
-                return;
-
-            if (_steps == ESteps.ClearBuildinUnusedBundleFiles)
-            {
-                if (_clearBuildinUnusedBundleFilesOp == null)
-                {
-                    _clearBuildinUnusedBundleFilesOp = _impl.BuildinFileSystem.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
-                }
-
-                Progress = _clearBuildinUnusedBundleFilesOp.Progress;
-                if (_clearBuildinUnusedBundleFilesOp.IsDone == false)
-                    return;
-
-                if (_clearBuildinUnusedBundleFilesOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.ClearDeliveryUnusedBundleFiles;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _clearBuildinUnusedBundleFilesOp.Error;
-                }
-            }
-
-            if (_steps == ESteps.ClearDeliveryUnusedBundleFiles)
-            {
-                if (_impl.DeliveryFileSystem == null)
-                {
-                    _steps = ESteps.ClearCacheUnusedBundleFiles;
-                    return;
-                }
-
-                if (_clearDeliveryUnusedBundleFilesOp == null)
-                {
-                    _clearDeliveryUnusedBundleFilesOp = _impl.DeliveryFileSystem.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
-                }
-
-                Progress = _clearDeliveryUnusedBundleFilesOp.Progress;
-                if (_clearDeliveryUnusedBundleFilesOp.IsDone == false)
-                    return;
-
-                if (_clearDeliveryUnusedBundleFilesOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.ClearCacheUnusedBundleFiles;
-
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _clearDeliveryUnusedBundleFilesOp.Error;
-                }
-            }
-
-            if (_steps == ESteps.ClearCacheUnusedBundleFiles)
-            {
-                if (_clearCacheUnusedBundleFilesOp == null)
-                {
-                    _clearCacheUnusedBundleFilesOp = _impl.CacheFileSystem.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
-                }
-
-                Progress = _clearCacheUnusedBundleFilesOp.Progress;
-                if (_clearCacheUnusedBundleFilesOp.IsDone == false)
-                    return;
-
-                if (_clearCacheUnusedBundleFilesOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Succeed;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _clearCacheUnusedBundleFilesOp.Error;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// WebGL运行模式
-    /// </summary>
-    internal sealed class WebPlayModeClearUnusedBundleFilesOperation : ClearUnusedBundleFilesOperation
-    {
-        private enum ESteps
-        {
-            None,
-            ClearUnusedBundleFiles,
-            Done,
-        }
-
-        private readonly WebPlayModeImpl _impl;
-        private FSClearUnusedBundleFilesOperation _clearUnusedBundleFilesOp;
-        private ESteps _steps = ESteps.None;
-
-        internal WebPlayModeClearUnusedBundleFilesOperation(WebPlayModeImpl impl)
-        {
-            _impl = impl;
-        }
-        internal override void InternalOnStart()
-        {
-            _steps = ESteps.ClearUnusedBundleFiles;
-        }
-        internal override void InternalOnUpdate()
-        {
-            if (_steps == ESteps.None || _steps == ESteps.Done)
-                return;
-
-            if (_steps == ESteps.ClearUnusedBundleFiles)
-            {
-                if (_clearUnusedBundleFilesOp == null)
-                {
-                    _clearUnusedBundleFilesOp = _impl.WebFileSystem.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
-                }
-
-                Progress = _clearUnusedBundleFilesOp.Progress;
-                if (_clearUnusedBundleFilesOp.IsDone == false)
-                    return;
-
-                if (_clearUnusedBundleFilesOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Succeed;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _clearUnusedBundleFilesOp.Error;
+                    Error = _clearUnusedBundleFilesOpC.Error;
                 }
             }
         }
