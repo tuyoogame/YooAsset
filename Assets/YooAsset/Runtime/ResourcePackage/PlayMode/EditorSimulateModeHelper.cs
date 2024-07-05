@@ -3,13 +3,6 @@ using System.Reflection;
 
 namespace YooAsset
 {
-    public class SimulateBuildResult
-    {
-        public string PackageVersionFilePath;
-        public string PackageManifestFilePath;
-        public string PackageHashFilePath;
-    }
-
     public static class EditorSimulateModeHelper
     {
         private static System.Type _classType;
@@ -50,12 +43,12 @@ namespace YooAsset
 { 
     public static class EditorSimulateModeHelper
     {
-        public static string SimulateBuild(string buildPipelineName, string packageName) 
+        public static SimulateBuildResult SimulateBuild(string buildPipelineName, string packageName) 
         {
             throw new System.Exception("Only support in unity editor !");
         }
 
-        public static string SimulateBuild(EDefaultBuildPipeline buildPipeline, string packageName)
+        public static SimulateBuildResult SimulateBuild(EDefaultBuildPipeline buildPipeline, string packageName)
         {
             throw new System.Exception("Only support in unity editor !");
         }

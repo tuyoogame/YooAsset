@@ -38,8 +38,19 @@ namespace YooAsset
                 {
                     string packageName = _fileSystem.PackageName;
                     string fileName = YooAssetSettingsData.GetPackageVersionFileName(packageName);
-                    string mainURL = _fileSystem.RemoteServices.GetRemoteMainURL(fileName);
-                    string fallbackURL = _fileSystem.RemoteServices.GetRemoteFallbackURL(fileName);
+                    string mainURL;
+                    string fallbackURL;
+                    if (_fileSystem.AllowCrossAccess)
+                    {
+                        mainURL = _fileSystem.RemoteServices.GetRemoteMainURL(fileName);
+                        fallbackURL = _fileSystem.RemoteServices.GetRemoteFallbackURL(fileName);
+                    }
+                    else
+                    {
+                        string filePath = _fileSystem.GetWebPackageVersionFilePath();
+                        mainURL = DownloadSystemHelper.ConvertToWWWPath(filePath);
+                        fallbackURL = mainURL;
+                    }
                     _getRemotePackageVersionOp = new DefaultGetRemotePackageVersionOperation(packageName, mainURL, fallbackURL, _appendTimeTicks, _timeout);
                     OperationSystem.StartOperation(packageName, _getRemotePackageVersionOp);
                 }
