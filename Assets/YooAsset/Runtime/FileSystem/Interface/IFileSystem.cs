@@ -32,27 +32,27 @@ namespace YooAsset
         /// <summary>
         /// 加载包裹清单
         /// </summary>
-        FSLoadPackageManifestOperation LoadPackageManifestAsync(params object[] args);
+        FSLoadPackageManifestOperation LoadPackageManifestAsync(string packageVersion, int timeout);
 
         /// <summary>
         /// 查询最新的版本
         /// </summary>
-        FSRequestPackageVersionOperation RequestPackageVersionAsync(params object[] args);
+        FSRequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks, int timeout);
 
         /// <summary>
         /// 清空所有的文件
         /// </summary>
-        FSClearAllBundleFilesOperation ClearAllBundleFilesAsync(params object[] args);
-
+        FSClearAllBundleFilesOperation ClearAllBundleFilesAsync();
+        
         /// <summary>
         /// 清空未使用的文件
         /// </summary>
-        FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(params object[] args);
+        FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(PackageManifest manifest);
 
         /// <summary>
         /// 下载远端文件
         /// </summary>
-        FSDownloadFileOperation DownloadFileAsync(params object[] args);
+        FSDownloadFileOperation DownloadFileAsync(PackageBundle bundle, DownloadParam param);
 
         /// <summary>
         /// 加载Bundle文件

@@ -125,7 +125,7 @@ namespace YooAsset
                 if (_loadCachePackageManifestOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
-                    Result = _loadCachePackageManifestOp.Manifest;
+                    Manifest = _loadCachePackageManifestOp.Manifest;
                     Status = EOperationStatus.Succeed;
                 }
                 else
@@ -144,7 +144,6 @@ namespace YooAsset
             string manifestFilePath = _fileSystem.GetCachePackageManifestFilePath(_packageVersion);
             if (File.Exists(manifestFilePath))
             {
-                YooLogger.Warning($"Failed to load cache manifest file : {Error}");
                 YooLogger.Warning($"Invalid cache manifest file have been removed : {manifestFilePath}");
                 File.Delete(manifestFilePath);
             }

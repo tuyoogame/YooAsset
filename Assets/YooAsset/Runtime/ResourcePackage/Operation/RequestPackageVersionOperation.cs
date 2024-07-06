@@ -11,11 +11,7 @@ namespace YooAsset
         /// </summary>
         public string PackageVersion { protected set; get; }
     }
-
-    /// <summary>
-    /// 通用类
-    /// </summary>
-    internal sealed class DefaultRequestPackageVersionOperation : RequestPackageVersionOperation
+    internal sealed class RequestPackageVersionImplOperation : RequestPackageVersionOperation
     {
         private enum ESteps
         {
@@ -30,7 +26,7 @@ namespace YooAsset
         private FSRequestPackageVersionOperation _requestPackageVersionOp;
         private ESteps _steps = ESteps.None;
 
-        internal DefaultRequestPackageVersionOperation(IFileSystem fileSystem, bool appendTimeTicks, int timeout)
+        internal RequestPackageVersionImplOperation(IFileSystem fileSystem, bool appendTimeTicks, int timeout)
         {
             _fileSystem = fileSystem;
             _appendTimeTicks = appendTimeTicks;

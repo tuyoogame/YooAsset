@@ -1,6 +1,4 @@
-﻿using System.IO;
-using UnityEngine;
-
+﻿
 namespace YooAsset
 {
     internal class DCFSInitializeOperation : FSInitializeFileSystemOperation
@@ -43,7 +41,7 @@ namespace YooAsset
                 {
                     _fileSytem.DeleteAllManifestFiles();
                     appFootPrint.Coverage(_fileSytem.PackageName);
-                    YooLogger.Log("Delete manifest files when application foot print dirty !");
+                    YooLogger.Warning("Delete manifest files when application foot print dirty !");
                 }
 
                 _steps = ESteps.SearchCacheFiles;
@@ -76,11 +74,18 @@ namespace YooAsset
                 if (_verifyCacheFilesOp.IsDone == false)
                     return;
 
-                // 注意：总是返回成功
-                _steps = ESteps.Done;
-                Status = EOperationStatus.Succeed;
-
-                YooLogger.Log($"Package '{_fileSytem.PackageName}' cached files count : {_fileSytem.FileCount}");
+                if (_verifyCacheFilesOp.Status == EOperationStatus.Succeed)
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Succeed;
+                    YooLogger.Log($"Package '{_fileSytem.PackageName}' cached files count : {_fileSytem.FileCount}");
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = _verifyCacheFilesOp.Error;
+                }
             }
         }
     }

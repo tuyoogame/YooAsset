@@ -41,7 +41,7 @@ namespace YooAsset
 #elif UNITY_STANDALONE
             return StringUtility.Format("file:///{0}", path);
 #elif UNITY_OPENHARMONY
-            return path;
+            return StringUtility.Format("file://{0}", path);
 #else
             return path;
 #endif

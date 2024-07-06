@@ -63,31 +63,31 @@ namespace YooAsset
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(params object[] args)
+        public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(string packageVersion, int timeout)
         {
             var operation = new DEFSLoadPackageManifestOperation(this);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(params object[] args)
+        public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks, int timeout)
         {
             var operation = new DEFSRequestPackageVersionOperation(this);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync(params object[] args)
+        public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync()
         {
             var operation = new FSClearAllBundleFilesCompleteOperation();
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(params object[] args)
+        public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(PackageManifest manifest)
         {
             var operation = new FSClearUnusedBundleFilesCompleteOperation();
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSDownloadFileOperation DownloadFileAsync(params object[] args)
+        public virtual FSDownloadFileOperation DownloadFileAsync(PackageBundle bundle, DownloadParam param)
         {
             throw new System.NotImplementedException();
         }

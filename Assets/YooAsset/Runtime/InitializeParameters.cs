@@ -87,7 +87,7 @@ namespace YooAsset
 
         /// <summary>
         /// 创建默认的编辑器文件系统参数
-        /// <param name="SimulateBuildResult">模拟构建结果</param>
+        /// <param name="simulateBuildResult">模拟构建结果</param>
         /// </summary>
         public static FileSystemParameters CreateDefaultEditorFileSystemParameters(SimulateBuildResult simulateBuildResult)
         {
@@ -160,26 +160,12 @@ namespace YooAsset
         /// <summary>
         /// 创建默认的Web文件系统参数
         /// </summary>
+        /// <param name="disableUnityWebCache">禁用Unity的网络缓存</param>
         public static FileSystemParameters CreateDefaultWebFileSystemParameters(bool disableUnityWebCache = false)
         {
             string fileSystemClass = typeof(DefaultWebFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
             fileSystemParams.AddParameter("DISABLE_UNITY_WEB_CACHE", disableUnityWebCache);
-            fileSystemParams.AddParameter("ALLOW_CROSS_ACCESS", false);
-            return fileSystemParams;
-        }
-
-        /// <summary>
-        /// 创建默认的Web文件系统参数
-        /// </summary>
-        /// <param name="remoteServices">远端资源地址查询服务类</param>
-        public static FileSystemParameters CreateDefaultWebFileSystemParameters(IRemoteServices remoteServices, bool disableUnityWebCache = false)
-        {
-            string fileSystemClass = typeof(DefaultWebFileSystem).FullName;
-            var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
-            fileSystemParams.AddParameter("REMOTE_SERVICES", remoteServices);
-            fileSystemParams.AddParameter("DISABLE_UNITY_WEB_CACHE", disableUnityWebCache);
-            fileSystemParams.AddParameter("ALLOW_CROSS_ACCESS", true);
             return fileSystemParams;
         }
     }

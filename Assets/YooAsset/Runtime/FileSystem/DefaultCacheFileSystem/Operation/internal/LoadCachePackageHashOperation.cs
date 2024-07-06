@@ -42,7 +42,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Cache package hash file not found : {filePath}";
+                    Error = $"Can not found cache package hash file : {filePath}";
                     return;
                 }
 

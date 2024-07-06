@@ -35,11 +35,11 @@ namespace YooAsset
                 return;
 
             if (_steps == ESteps.GetUnusedCacheFiles)
-            {
-                _steps = ESteps.ClearUnusedCacheFiles;
+            {    
                 _unusedBundleGUIDs = GetUnusedBundleGUIDs();
                 _unusedFileTotalCount = _unusedBundleGUIDs.Count;
-                YooLogger.Log($"Found unused cache file count : {_unusedFileTotalCount}");
+                _steps = ESteps.ClearUnusedCacheFiles;
+                YooLogger.Log($"Found unused cache files count : {_unusedFileTotalCount}");
             }
 
             if (_steps == ESteps.ClearUnusedCacheFiles)

@@ -57,7 +57,6 @@ namespace YooAsset
                     string savePath = _fileSystem.GetCachePackageManifestFilePath(_packageVersion);
                     string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_fileSystem.PackageName, _packageVersion);
                     string webURL = GetDownloadRequestURL(fileName);
-                    YooLogger.Log($"Beginning to download package manifest file : {webURL}");
                     _webFileRequestOp = new UnityWebFileRequestOperation(webURL, savePath, _timeout);
                     OperationSystem.StartOperation(_fileSystem.PackageName, _webFileRequestOp);
                 }

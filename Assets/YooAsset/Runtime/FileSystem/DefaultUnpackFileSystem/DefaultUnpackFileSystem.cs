@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 缓存文件系统
+    /// 解压文件系统
     /// </summary>
     internal class DefaultUnpackFileSystem : DefaultCacheFileSystem
     {
@@ -16,6 +16,21 @@ namespace YooAsset
             // 注意：重写保存根目录和临时目录
             _saveFileRoot = PathUtility.Combine(_packageRoot, DefaultUnpackFileSystemDefine.SaveFilesFolderName);
             _tempFileRoot = PathUtility.Combine(_packageRoot, DefaultUnpackFileSystemDefine.TempFilesFolderName);
+        }
+        public override FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
+        {
+            if (RawFileBuildPipeline)
+            {
+                var operation = new DUFSLoadRawBundleOperation(this, bundle);
+                OperationSystem.StartOperation(PackageName, operation);
+                return operation;
+            }
+            else
+            {
+                var operation = new DUFSLoadAssetBundleOperation(this, bundle);
+                OperationSystem.StartOperation(PackageName, operation);
+                return operation;
+            }
         }
     }
 }

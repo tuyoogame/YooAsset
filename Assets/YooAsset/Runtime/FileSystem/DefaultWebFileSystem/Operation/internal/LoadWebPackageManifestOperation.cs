@@ -20,9 +20,10 @@ namespace YooAsset
         private ESteps _steps = ESteps.None;
 
         /// <summary>
-        /// 加载的清单实例
+        /// 包裹清单
         /// </summary>
         public PackageManifest Manifest { private set; get; }
+
 
         internal LoadWebPackageManifestOperation(DefaultWebFileSystem fileSystem, string packageVersion, string packageHash)
         {

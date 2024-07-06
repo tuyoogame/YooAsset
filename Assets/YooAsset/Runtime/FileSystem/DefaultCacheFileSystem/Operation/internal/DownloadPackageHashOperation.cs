@@ -57,7 +57,6 @@ namespace YooAsset
                     string savePath = _fileSystem.GetCachePackageHashFilePath(_packageVersion);
                     string fileName = YooAssetSettingsData.GetPackageHashFileName(_fileSystem.PackageName, _packageVersion);
                     string webURL = GetWebRequestURL(fileName);
-                    YooLogger.Log($"Beginning to download package hash file : {webURL}");
                     _webFileRequestOp = new UnityWebFileRequestOperation(webURL, savePath, _timeout);
                     OperationSystem.StartOperation(_fileSystem.PackageName, _webFileRequestOp);
                 }

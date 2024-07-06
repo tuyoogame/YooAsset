@@ -17,11 +17,8 @@ namespace YooAsset
             Done,
         }
 
-        // 初始参数
-        protected readonly string _mainURL;
-        protected readonly string _fallbackURL;
-        protected readonly int _failedTryAgain;
-        protected readonly int _timeout;
+        // 下载参数
+        protected readonly DownloadParam Param;
 
         // 请求相关
         protected UnityWebRequest _webRequest;
@@ -38,15 +35,10 @@ namespace YooAsset
         protected int FailedTryAgain;
 
 
-        internal DefaultDownloadFileOperation(PackageBundle bundle,
-            string mainURL, string fallbackURL, int failedTryAgain, int timeout) : base(bundle)
+        internal DefaultDownloadFileOperation(PackageBundle bundle, DownloadParam param) : base(bundle)
         {
-            _mainURL = mainURL;
-            _fallbackURL = fallbackURL;
-            _failedTryAgain = failedTryAgain;
-            _timeout = timeout;
-
-            FailedTryAgain = failedTryAgain;
+            Param = param;
+            FailedTryAgain = param.FailedTryAgain;
         }
 
         /// <summary>
@@ -57,9 +49,9 @@ namespace YooAsset
             // 轮流返回请求地址
             _requestCount++;
             if (_requestCount % 2 == 0)
-                return _fallbackURL;
+                return Param.FallbackURL;
             else
-                return _mainURL;
+                return Param.MainURL;
         }
 
         /// <summary>
@@ -95,7 +87,7 @@ namespace YooAsset
                 }
 
                 float offset = UnityEngine.Time.realtimeSinceStartup - _latestDownloadRealtime;
-                if (offset > _timeout)
+                if (offset > Param.Timeout)
                 {
                     YooLogger.Warning($"Web file request timeout : {_requestURL}");
                     if (_webRequest != null)

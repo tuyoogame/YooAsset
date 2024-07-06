@@ -36,13 +36,13 @@ namespace YooAsset
 
         RequestPackageVersionOperation IPlayMode.RequestPackageVersionAsync(bool appendTimeTicks, int timeout)
         {
-            var operation = new DefaultRequestPackageVersionOperation(EditorFileSystem, appendTimeTicks, timeout);
+            var operation = new RequestPackageVersionImplOperation(EditorFileSystem, appendTimeTicks, timeout);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
         UpdatePackageManifestOperation IPlayMode.UpdatePackageManifestAsync(string packageVersion, int timeout)
         {
-            var operation = new DefaultUpdatePackageManifestOperation(this, EditorFileSystem, packageVersion, timeout);
+            var operation = new UpdatePackageManifestImplOperation(this, EditorFileSystem, packageVersion, timeout);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
@@ -55,13 +55,13 @@ namespace YooAsset
 
         ClearAllBundleFilesOperation IPlayMode.ClearAllBundleFilesAsync()
         {
-            var operation = new DefaultClearAllBundleFilesOperation(this, EditorFileSystem, null, null);
+            var operation = new ClearAllBundleFilesImplOperation(this, EditorFileSystem, null, null);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
         ClearUnusedBundleFilesOperation IPlayMode.ClearUnusedBundleFilesAsync()
         {
-            var operation = new DefaultClearUnusedBundleFilesOperation(this, EditorFileSystem, null, null);
+            var operation = new ClearUnusedBundleFilesImplOperation(this, EditorFileSystem, null, null);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }

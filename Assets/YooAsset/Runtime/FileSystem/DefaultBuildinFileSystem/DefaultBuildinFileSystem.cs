@@ -10,6 +10,36 @@ namespace YooAsset
     /// </summary>
     internal class DefaultBuildinFileSystem : IFileSystem
     {
+        private class UnpackRemoteServices : IRemoteServices
+        {
+            private readonly string _buildinPackageRoot;
+            protected readonly Dictionary<string, string> _mapping = new Dictionary<string, string>(10000);
+
+            public UnpackRemoteServices(string buildinPackRoot)
+            {
+                _buildinPackageRoot = buildinPackRoot;
+            }
+            string IRemoteServices.GetRemoteMainURL(string fileName)
+            {
+                return GetFileLoadURL(fileName);
+            }
+            string IRemoteServices.GetRemoteFallbackURL(string fileName)
+            {
+                return GetFileLoadURL(fileName);
+            }
+
+            private string GetFileLoadURL(string fileName)
+            {
+                if (_mapping.TryGetValue(fileName, out string url) == false)
+                {
+                    string filePath = PathUtility.Combine(_buildinPackageRoot, fileName);
+                    url = DownloadSystemHelper.ConvertToWWWPath(filePath);
+                    _mapping.Add(fileName, url);
+                }
+                return url;
+            }
+        }
+
         public class FileWrapper
         {
             public string FileName { private set; get; }
@@ -23,10 +53,8 @@ namespace YooAsset
         protected readonly Dictionary<string, FileWrapper> _wrappers = new Dictionary<string, FileWrapper>(10000);
         protected readonly Dictionary<string, Stream> _loadedStream = new Dictionary<string, Stream>(10000);
         protected readonly Dictionary<string, string> _buildinFilePaths = new Dictionary<string, string>(10000);
+        protected IFileSystem _unpackFileSystem;
         protected string _packageRoot;
-
-        // 解压文件系统
-        public IFileSystem UnpackFileSystem { private set; get; }
 
         /// <summary>
         /// 包裹名称
@@ -99,37 +127,38 @@ namespace YooAsset
             return operation;
 #endif
         }
-        public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(params object[] args)
+        public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(string packageVersion, int timeout)
         {
             var operation = new DBFSLoadPackageManifestOperation(this);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(params object[] args)
+        public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks, int timeout)
         {
             var operation = new DBFSRequestPackageVersionOperation(this);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync(params object[] args)
+        public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync()
         {
-            return UnpackFileSystem.ClearAllBundleFilesAsync();
+            return _unpackFileSystem.ClearAllBundleFilesAsync();
         }
-        public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(params object[] args)
+        public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(PackageManifest manifest)
         {
-            PackageManifest manifest = args[0] as PackageManifest;
-            return UnpackFileSystem.ClearUnusedBundleFilesAsync(manifest);
+            return _unpackFileSystem.ClearUnusedBundleFilesAsync(manifest);
         }
-        public virtual FSDownloadFileOperation DownloadFileAsync(params object[] args)
+        public virtual FSDownloadFileOperation DownloadFileAsync(PackageBundle bundle, DownloadParam param)
         {
-            PackageBundle bundle = args[0] as PackageBundle;
-            int failedTryAgain = (int)args[2];
-            int timeout = (int)args[3];
-            string buidlinFilePath = GetBuildinFileLoadPath(bundle);
-            return UnpackFileSystem.DownloadFileAsync(bundle, buidlinFilePath, failedTryAgain, timeout);
+            param.ImportFilePath = GetBuildinFileLoadPath(bundle);
+            return _unpackFileSystem.DownloadFileAsync(bundle, param);
         }
         public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
         {
+            if (NeedUnpack(bundle))
+            {
+                return _unpackFileSystem.LoadBundleFile(bundle);
+            }
+
             if (RawFileBuildPipeline)
             {
                 var operation = new DBFSLoadRawBundleOperation(this, bundle);
@@ -149,9 +178,9 @@ namespace YooAsset
             if (assetBundle == null)
                 return;
 
-            if (UnpackFileSystem.Exists(bundle))
+            if (_unpackFileSystem.Exists(bundle))
             {
-                UnpackFileSystem.UnloadBundleFile(bundle, assetBundle);
+                _unpackFileSystem.UnloadBundleFile(bundle, assetBundle);
             }
             else
             {
@@ -196,11 +225,13 @@ namespace YooAsset
             _packageRoot = PathUtility.Combine(rootDirectory, packageName);
 
             // 创建解压文件系统
-            UnpackFileSystem = new DefaultUnpackFileSystem();
-            UnpackFileSystem.SetParameter("FILE_VERIFY_LEVEL", FileVerifyLevel);
-            UnpackFileSystem.SetParameter("APPEND_FILE_EXTENSION", AppendFileExtension);
-            UnpackFileSystem.SetParameter("RAW_FILE_BUILD_PIPELINE", RawFileBuildPipeline);
-            UnpackFileSystem.OnCreate(packageName, null);
+            var remoteServices = new UnpackRemoteServices(_packageRoot);
+            _unpackFileSystem = new DefaultUnpackFileSystem();
+            _unpackFileSystem.SetParameter("REMOTE_SERVICES", remoteServices);
+            _unpackFileSystem.SetParameter("FILE_VERIFY_LEVEL", FileVerifyLevel);
+            _unpackFileSystem.SetParameter("APPEND_FILE_EXTENSION", AppendFileExtension);
+            _unpackFileSystem.SetParameter("RAW_FILE_BUILD_PIPELINE", RawFileBuildPipeline);
+            _unpackFileSystem.OnCreate(packageName, null);
         }
         public virtual void OnUpdate()
         {
@@ -237,12 +268,7 @@ namespace YooAsset
         #region 内部方法
         protected string GetDefaultRoot()
         {
-            string path = PathUtility.Combine(UnityEngine.Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
-#if UNITY_OPENHARMONY
-            return $"file://{path}";
-#else
-            return path;
-#endif
+            return PathUtility.Combine(Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
         }
         public string GetBuildinFileLoadPath(PackageBundle bundle)
         {
@@ -287,6 +313,14 @@ namespace YooAsset
 
             _wrappers.Add(bundleGUID, wrapper);
             return true;
+        }
+
+        /// <summary>
+        /// 初始化解压文件系统
+        /// </summary>
+        public FSInitializeFileSystemOperation InitializeUpackFileSystem()
+        {
+            return _unpackFileSystem.InitializeFileSystemAsync();
         }
         #endregion
     }

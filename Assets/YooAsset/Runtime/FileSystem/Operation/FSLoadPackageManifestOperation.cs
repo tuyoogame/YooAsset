@@ -4,8 +4,8 @@ namespace YooAsset
     internal abstract class FSLoadPackageManifestOperation : AsyncOperationBase
     {
         /// <summary>
-        /// 加载结果
+        /// 资源清单
         /// </summary>
-        internal PackageManifest Result { set; get; }
+        internal PackageManifest Manifest { set; get; }
     }
 }

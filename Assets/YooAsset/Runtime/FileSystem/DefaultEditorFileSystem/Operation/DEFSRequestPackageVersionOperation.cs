@@ -6,7 +6,7 @@ namespace YooAsset
         private enum ESteps
         {
             None,
-            GetPackageVersion,
+            LoadPackageVersion,
             Done,
         }
 
@@ -21,14 +21,14 @@ namespace YooAsset
         }
         internal override void InternalOnStart()
         {
-            _steps = ESteps.GetPackageVersion;
+            _steps = ESteps.LoadPackageVersion;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.GetPackageVersion)
+            if (_steps == ESteps.LoadPackageVersion)
             {
                 if (_loadEditorPackageVersionOp == null)
                 {

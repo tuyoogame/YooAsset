@@ -43,7 +43,7 @@ namespace YooAsset
                 if (_loadEditorPackageManifestOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
-                    Result = _loadEditorPackageManifestOp.Manifest;
+                    Manifest = _loadEditorPackageManifestOp.Manifest;
                     Status = EOperationStatus.Succeed;
                 }
                 else

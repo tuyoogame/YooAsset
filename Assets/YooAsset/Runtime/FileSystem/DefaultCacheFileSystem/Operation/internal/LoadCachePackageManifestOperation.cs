@@ -21,7 +21,7 @@ namespace YooAsset
         private ESteps _steps = ESteps.None;
 
         /// <summary>
-        /// 加载的清单实例
+        /// 包裹清单
         /// </summary>
         public PackageManifest Manifest { private set; get; }
 
@@ -53,7 +53,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Cache manifest file not found : {manifestFilePath}";
+                    Error = $"Can not found cache manifest file : {manifestFilePath}";
                 }
             }
 

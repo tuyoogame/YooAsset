@@ -106,7 +106,7 @@ namespace YooAsset
             CheckException(packageName);
             var package = GetPackageInternal(packageName);
             if (package == null)
-                YooLogger.Error($"Not found resource package : {packageName}");
+                YooLogger.Error($"Can not found resource package : {packageName}");
             return package;
         }
 

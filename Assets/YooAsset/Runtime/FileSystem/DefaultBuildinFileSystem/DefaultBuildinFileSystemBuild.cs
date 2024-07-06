@@ -10,8 +10,8 @@ namespace YooAsset
         public int callbackOrder { get { return 0; } }
 
         /// <summary>
-        /// 在构建应用程序前自动生成内置资源清单。
-        /// 原理：搜索StreamingAssets目录下的所有资源文件，然后将这些文件信息写入内置资源清单，并存储在Resources目录下。
+        /// 在构建应用程序前自动生成内置资源目录文件。
+        /// 原理：搜索StreamingAssets目录下的所有资源文件，然后将这些文件信息写入文件，并存储在Resources目录下。
         /// </summary>
         public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report)
         {
@@ -24,7 +24,7 @@ namespace YooAsset
             DirectoryInfo rootDirectory = new DirectoryInfo(rootPath);
             if (rootDirectory.Exists == false)
             {
-                Debug.LogWarning($"Not found buildin root folder : {rootPath}");
+                Debug.LogWarning($"Can not found buildin root folder : {rootPath}");
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace YooAsset
                 string versionFilePath = $"{pacakgeDirectory}/{versionFileName}";
                 if (File.Exists(versionFilePath) == false)
                 {
-                    Debug.LogWarning($"Not found package version file : {versionFilePath}");
+                    Debug.LogWarning($"Can not found package version file : {versionFilePath}");
                     return;
                 }
 
@@ -58,7 +58,7 @@ namespace YooAsset
                 string manifestFilePath = $"{pacakgeDirectory}/{manifestFileName}";
                 if (File.Exists(manifestFilePath) == false)
                 {
-                    Debug.LogWarning($"Not found package manifest file : {manifestFilePath}");
+                    Debug.LogWarning($"Can not found package manifest file : {manifestFilePath}");
                     return;
                 }
 
@@ -107,7 +107,7 @@ namespace YooAsset
             UnityEditor.AssetDatabase.CreateAsset(buildinFileCatalog, saveFilePath);
             UnityEditor.AssetDatabase.SaveAssets();
             UnityEditor.AssetDatabase.Refresh();
-            Debug.Log($"一共记录{buildinFileCatalog.Wrappers.Count}个内置资源文件，内置资源目录文件保存成功 : {saveFilePath}");
+            Debug.Log($"Succeed to save buildin file catalog : {saveFilePath}");
         }
     }
 }

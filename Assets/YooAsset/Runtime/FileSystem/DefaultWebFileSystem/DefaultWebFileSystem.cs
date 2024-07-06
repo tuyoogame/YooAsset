@@ -64,19 +64,9 @@ namespace YooAsset
 
         #region 自定义参数
         /// <summary>
-        /// 自定义参数：远程服务接口
-        /// </summary>
-        public IRemoteServices RemoteServices { private set; get; } = null;
-
-        /// <summary>
         /// 禁用Unity的网络缓存
         /// </summary>
         public bool DisableUnityWebCache { private set; get; } = false;
-
-        /// <summary>
-        /// 允许跨域访问和下载
-        /// </summary>
-        public bool AllowCrossAccess { private set; get; } = false;
         #endregion
 
 
@@ -89,45 +79,31 @@ namespace YooAsset
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(params object[] args)
+        public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(string packageVersion, int timeout)
         {
-            string packageVersion = args[0] as string;
-            int timeout = (int)args[1];
-
-            if (AllowCrossAccess)
-            {
-                var operation = new DWFSLoadRemotePackageManifestOperation(this, packageVersion, timeout);
-                OperationSystem.StartOperation(PackageName, operation);
-                return operation;
-            }
-            else
-            {
-                var operation = new DWFSLoadWebPackageManifestOperation(this, timeout);
-                OperationSystem.StartOperation(PackageName, operation);
-                return operation;
-            }
-        }
-        public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(params object[] args)
-        {
-            bool appendTimeTicks = (bool)args[0];
-            int timeout = (int)args[1];
-            var operation = new DWFSRequestPackageVersionOperation(this, appendTimeTicks, timeout);
+            var operation = new DWFSLoadPackageManifestOperation(this, timeout);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync(params object[] args)
+        public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks, int timeout)
+        {
+            var operation = new DWFSRequestPackageVersionOperation(this, timeout);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
+        }
+        public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync()
         {
             var operation = new FSClearAllBundleFilesCompleteOperation();
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(params object[] args)
+        public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(PackageManifest manifest)
         {
             var operation = new FSClearUnusedBundleFilesCompleteOperation();
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSDownloadFileOperation DownloadFileAsync(params object[] args)
+        public virtual FSDownloadFileOperation DownloadFileAsync(PackageBundle bundle, DownloadParam param)
         {
             throw new System.NotImplementedException();
         }
@@ -149,17 +125,9 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == "REMOTE_SERVICES")
-            {
-                RemoteServices = (IRemoteServices)value;
-            }
-            else if (name == "DISABLE_UNITY_WEB_CACHE")
+            if (name == "DISABLE_UNITY_WEB_CACHE")
             {
                 DisableUnityWebCache = (bool)value;
-            }
-            else if (name == "ALLOW_CROSS_ACCESS")
-            {
-                AllowCrossAccess = (bool)value;
             }
             else
             {
@@ -189,10 +157,7 @@ namespace YooAsset
         }
         public virtual bool NeedDownload(PackageBundle bundle)
         {
-            if (Belong(bundle) == false)
-                return false;
-
-            return Exists(bundle) == false;
+            return false;
         }
         public virtual bool NeedUnpack(PackageBundle bundle)
         {

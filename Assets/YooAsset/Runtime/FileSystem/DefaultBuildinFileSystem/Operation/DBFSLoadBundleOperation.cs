@@ -3,13 +3,14 @@ using UnityEngine;
 
 namespace YooAsset
 {
+    /// <summary>
+    /// 加载AssetBundle文件
+    /// </summary>
     internal class DBFSLoadAssetBundleOperation : FSLoadBundleOperation
     {
         private enum ESteps
         {
             None,
-            UnpackAssetBundleFile,
-            LoadUnpackAssetBundle,
             LoadBuidlinAssetBundle,
             CheckLoadBuildinResult,
             Done,
@@ -17,8 +18,6 @@ namespace YooAsset
 
         private readonly DefaultBuildinFileSystem _fileSystem;
         private readonly PackageBundle _bundle;
-        private FSLoadBundleOperation _loadUnpackBundleOp;
-        private FSDownloadFileOperation _unpackBundleOp;
         private AssetBundleCreateRequest _createRequest;
         private bool _isWaitForAsyncComplete = false;
         private ESteps _steps = ESteps.None;
@@ -33,66 +32,12 @@ namespace YooAsset
         {
             DownloadProgress = 1f;
             DownloadedBytes = _bundle.FileSize;
-
-            if (_fileSystem.NeedUnpack(_bundle))
-            {
-                _steps = ESteps.UnpackAssetBundleFile;
-            }
-            else
-            {
-                _steps = ESteps.LoadBuidlinAssetBundle;
-            }
+            _steps = ESteps.LoadBuidlinAssetBundle;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
-
-            if (_steps == ESteps.UnpackAssetBundleFile)
-            {
-                if (_unpackBundleOp == null)
-                {
-                    int failedTryAgain = 0;
-                    int timeout = int.MaxValue;
-                    _unpackBundleOp = _fileSystem.DownloadFileAsync(_bundle, null, failedTryAgain, timeout);
-                }
-
-                if (_unpackBundleOp.IsDone == false)
-                    return;
-
-                if (_unpackBundleOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.LoadUnpackAssetBundle;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _unpackBundleOp.Error;
-                }
-            }
-
-            if (_steps == ESteps.LoadUnpackAssetBundle)
-            {
-                if (_loadUnpackBundleOp == null)
-                    _loadUnpackBundleOp = _fileSystem.UnpackFileSystem.LoadBundleFile(_bundle);
-
-                if (_loadUnpackBundleOp.IsDone == false)
-                    return;
-
-                if (_loadUnpackBundleOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    Result = _loadUnpackBundleOp.Result;
-                    Status = EOperationStatus.Succeed;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _loadUnpackBundleOp.Error;
-                }
-            }
 
             if (_steps == ESteps.LoadBuidlinAssetBundle)
             {
@@ -146,18 +91,6 @@ namespace YooAsset
 
             while (true)
             {
-                if (_unpackBundleOp != null)
-                {
-                    if (_unpackBundleOp.IsDone == false)
-                        _unpackBundleOp.WaitForAsyncComplete();
-                }
-                
-                if (_loadUnpackBundleOp != null)
-                {
-                    if (_loadUnpackBundleOp.IsDone == false)
-                        _loadUnpackBundleOp.WaitForAsyncComplete();
-                }
-
                 // 驱动流程
                 InternalOnUpdate();
 
@@ -168,21 +101,17 @@ namespace YooAsset
         }
         public override void AbortDownloadOperation()
         {
-            if (_steps == ESteps.UnpackAssetBundleFile)
-            {
-                if (_unpackBundleOp != null)
-                    _unpackBundleOp.SetAbort();
-            }
         }
     }
 
+    /// <summary>
+    /// 加载原生文件
+    /// </summary>
     internal class DBFSLoadRawBundleOperation : FSLoadBundleOperation
     {
         private enum ESteps
         {
             None,
-            UnpackRawBundleFile,
-            LoadUnpackRawBundle,
             LoadBuildinRawBundle,
             CheckLoadBuildinResult,
             Done,
@@ -190,8 +119,6 @@ namespace YooAsset
 
         private readonly DefaultBuildinFileSystem _fileSystem;
         private readonly PackageBundle _bundle;
-        private FSLoadBundleOperation _loadUnpackBundleOp;
-        private FSDownloadFileOperation _unpackBundleOp;
         private ESteps _steps = ESteps.None;
 
 
@@ -204,66 +131,12 @@ namespace YooAsset
         {
             DownloadProgress = 1f;
             DownloadedBytes = _bundle.FileSize;
-
-            if (_fileSystem.NeedUnpack(_bundle))
-            {
-                _steps = ESteps.UnpackRawBundleFile;
-            }
-            else
-            {
-                _steps = ESteps.LoadBuildinRawBundle;
-            }
+            _steps = ESteps.LoadBuildinRawBundle;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
-
-            if (_steps == ESteps.UnpackRawBundleFile)
-            {
-                if (_unpackBundleOp == null)
-                {
-                    int failedTryAgain = 0;
-                    int timeout = int.MaxValue;
-                    _unpackBundleOp = _fileSystem.DownloadFileAsync(_bundle, null, failedTryAgain, timeout);
-                }
-
-                if (_unpackBundleOp.IsDone == false)
-                    return;
-
-                if (_unpackBundleOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.LoadUnpackRawBundle;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _unpackBundleOp.Error;
-                }
-            }
-
-            if (_steps == ESteps.LoadUnpackRawBundle)
-            {
-                if (_loadUnpackBundleOp == null)
-                    _loadUnpackBundleOp = _fileSystem.UnpackFileSystem.LoadBundleFile(_bundle);
-
-                if (_loadUnpackBundleOp.IsDone == false)
-                    return;
-
-                if (_loadUnpackBundleOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    Result = _loadUnpackBundleOp.Result;
-                    Status = EOperationStatus.Succeed;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _loadUnpackBundleOp.Error;
-                }
-            }
 
             if (_steps == ESteps.LoadBuildinRawBundle)
             {
@@ -302,18 +175,6 @@ namespace YooAsset
         {
             while (true)
             {
-                if (_unpackBundleOp != null)
-                {
-                    if (_unpackBundleOp.IsDone == false)
-                        _unpackBundleOp.WaitForAsyncComplete();
-                }
-
-                if (_loadUnpackBundleOp != null)
-                {
-                    if (_loadUnpackBundleOp.IsDone == false)
-                        _loadUnpackBundleOp.WaitForAsyncComplete();
-                }
-
                 // 驱动流程
                 InternalOnUpdate();
 
@@ -324,11 +185,6 @@ namespace YooAsset
         }
         public override void AbortDownloadOperation()
         {
-            if (_steps == ESteps.UnpackRawBundleFile)
-            {
-                if (_unpackBundleOp != null)
-                    _unpackBundleOp.SetAbort();
-            }
         }
     }
 }

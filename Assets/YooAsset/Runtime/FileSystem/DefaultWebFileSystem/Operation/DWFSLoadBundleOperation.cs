@@ -34,22 +34,11 @@ namespace YooAsset
             {
                 if (_downloadhanlderAssetBundleOp == null)
                 {
-                    int failedTryAgain = int.MaxValue;
-                    int timeout = 60;
-                    string mainURL;
-                    string fallbackURL;
-                    if (_fileSystem.AllowCrossAccess)
-                    {
-                        mainURL = _fileSystem.RemoteServices.GetRemoteMainURL(_bundle.FileName);
-                        fallbackURL = _fileSystem.RemoteServices.GetRemoteFallbackURL(_bundle.FileName);
-                    }
-                    else
-                    {
-                        string fileLoadPath = _fileSystem.GetWebFileLoadPath(_bundle);
-                        mainURL = DownloadSystemHelper.ConvertToWWWPath(fileLoadPath);
-                        fallbackURL = mainURL;
-                    }
-                    _downloadhanlderAssetBundleOp = new DownloadHandlerAssetBundleOperation(_fileSystem, _bundle, mainURL, fallbackURL, failedTryAgain, timeout);
+                    DownloadParam downloadParam = new DownloadParam(int.MaxValue, 60);
+                    string fileLoadPath = _fileSystem.GetWebFileLoadPath(_bundle);
+                    downloadParam.MainURL = DownloadSystemHelper.ConvertToWWWPath(fileLoadPath);
+                    downloadParam.FallbackURL = downloadParam.MainURL;
+                    _downloadhanlderAssetBundleOp = new DownloadHandlerAssetBundleOperation(_fileSystem, _bundle, downloadParam);
                     OperationSystem.StartOperation(_fileSystem.PackageName, _downloadhanlderAssetBundleOp);
                 }
 

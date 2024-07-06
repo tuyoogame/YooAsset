@@ -13,7 +13,7 @@ namespace YooAsset
         private readonly DefaultCacheFileSystem _fileSystem;
         private readonly bool _appendTimeTicks;
         private readonly int _timeout;
-        private DefaultGetRemotePackageVersionOperation _getRemotePackageVersionOp;
+        private RequestRemotePackageVersionOperation _requestRemotePackageVersionOp;
         private ESteps _steps = ESteps.None;
 
 
@@ -34,31 +34,27 @@ namespace YooAsset
 
             if (_steps == ESteps.GetPackageVersion)
             {
-                if (_getRemotePackageVersionOp == null)
+                if (_requestRemotePackageVersionOp == null)
                 {
-                    string packageName = _fileSystem.PackageName;
-                    string fileName = YooAssetSettingsData.GetPackageVersionFileName(packageName);
-                    string mainURL = _fileSystem.RemoteServices.GetRemoteMainURL(fileName);
-                    string fallbackURL = _fileSystem.RemoteServices.GetRemoteFallbackURL(fileName);
-                    _getRemotePackageVersionOp = new DefaultGetRemotePackageVersionOperation(packageName, mainURL, fallbackURL, _appendTimeTicks, _timeout);
-                    OperationSystem.StartOperation(packageName, _getRemotePackageVersionOp);
+                    _requestRemotePackageVersionOp = new RequestRemotePackageVersionOperation(_fileSystem, _appendTimeTicks, _timeout);
+                    OperationSystem.StartOperation(_fileSystem.PackageName, _requestRemotePackageVersionOp);
                 }
 
-                Progress = _getRemotePackageVersionOp.Progress;
-                if (_getRemotePackageVersionOp.IsDone == false)
+                Progress = _requestRemotePackageVersionOp.Progress;
+                if (_requestRemotePackageVersionOp.IsDone == false)
                     return;
 
-                if (_getRemotePackageVersionOp.Status == EOperationStatus.Succeed)
+                if (_requestRemotePackageVersionOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
-                    PackageVersion = _getRemotePackageVersionOp.PackageVersion;
+                    PackageVersion = _requestRemotePackageVersionOp.PackageVersion;
                     Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _getRemotePackageVersionOp.Error;
+                    Error = _requestRemotePackageVersionOp.Error;
                 }
             }
         }

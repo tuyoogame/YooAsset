@@ -1047,7 +1047,7 @@ namespace YooAsset
             if (checkActiveManifest)
             {
                 if (_playModeImpl.ActiveManifest == null)
-                    throw new Exception("Not found active package manifest !");
+                    throw new Exception("Can not found active package manifest !");
             }
         }
 

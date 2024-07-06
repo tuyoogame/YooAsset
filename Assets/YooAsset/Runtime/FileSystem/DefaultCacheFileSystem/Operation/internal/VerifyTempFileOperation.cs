@@ -81,7 +81,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Failed verify file : {_element.TempFilePath} ! ErrorCode : {VerifyResult}";
+                    Error = $"Failed to verify file : {_element.TempFilePath} ! ErrorCode : {VerifyResult}";
                 }
             }
         }

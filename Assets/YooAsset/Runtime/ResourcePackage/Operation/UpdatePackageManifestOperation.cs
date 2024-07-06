@@ -7,11 +7,7 @@ namespace YooAsset
     public abstract class UpdatePackageManifestOperation : AsyncOperationBase
     {
     }
-
-    /// <summary>
-    /// 通用类
-    /// </summary>
-    internal sealed class DefaultUpdatePackageManifestOperation : UpdatePackageManifestOperation
+    internal sealed class UpdatePackageManifestImplOperation : UpdatePackageManifestOperation
     {
         private enum ESteps
         {
@@ -30,7 +26,7 @@ namespace YooAsset
         private ESteps _steps = ESteps.None;
 
 
-        internal DefaultUpdatePackageManifestOperation(IPlayMode impl, IFileSystem fileSystem, string packageVersion, int timeout)
+        internal UpdatePackageManifestImplOperation(IPlayMode impl, IFileSystem fileSystem, string packageVersion, int timeout)
         {
             _impl = impl;
             _fileSystem = fileSystem;
@@ -85,7 +81,7 @@ namespace YooAsset
                 if (_loadPackageManifestOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
-                    _impl.ActiveManifest = _loadPackageManifestOp.Result;
+                    _impl.ActiveManifest = _loadPackageManifestOp.Manifest;
                     Status = EOperationStatus.Succeed;
                 }
                 else

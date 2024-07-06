@@ -20,7 +20,7 @@ namespace YooAsset
         private ESteps _steps = ESteps.None;
 
         /// <summary>
-        /// 加载的清单实例
+        /// 包裹清单
         /// </summary>
         public PackageManifest Manifest { private set; get; }
 
@@ -76,7 +76,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = "Failed to verify buildin package manifest file!";
+                    Error = "Failed to verify buildin package manifest file !";
                 }
             }
 

@@ -44,7 +44,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Failed to load catalog file : {catalogFilePath}";
+                    Error = $"Failed to load web catalog file : {catalogFilePath}";
                     return;
                 }
 
@@ -52,7 +52,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"The catalog file package name {catalog.PackageName} cannot match the file system package name {_fileSystem.PackageName}";
+                    Error = $"Web catalog file package name {catalog.PackageName} cannot match the file system package name {_fileSystem.PackageName}";
                     return;
                 }
 

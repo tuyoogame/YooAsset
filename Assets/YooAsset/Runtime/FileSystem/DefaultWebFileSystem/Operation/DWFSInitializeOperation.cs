@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-    internal partial class DWFSInitializeOperation : FSInitializeFileSystemOperation
+    internal class DWFSInitializeOperation : FSInitializeFileSystemOperation
     {
         private enum ESteps
         {
@@ -39,10 +39,17 @@ namespace YooAsset
                 if (_loadCatalogFileOp.IsDone == false)
                     return;
 
-                // 说明：应用程序内不一定存在序列化文件
-                // 注意：总是返回成功
-                _steps = ESteps.Done;
-                Status = EOperationStatus.Succeed;
+                if (_loadCatalogFileOp.Status == EOperationStatus.Succeed)
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Succeed;
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = _loadCatalogFileOp.Error;
+                }
             }
         }
     }

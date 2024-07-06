@@ -56,7 +56,6 @@ namespace YooAsset
                 if (SearchFiles())
                     return;
 
-                // 注意：总是返回成功
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Succeed;
                 float costTime = UnityEngine.Time.realtimeSinceStartup - _verifyStartTime;

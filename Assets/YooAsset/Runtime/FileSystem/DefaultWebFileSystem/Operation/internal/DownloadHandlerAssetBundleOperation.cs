@@ -12,9 +12,7 @@ namespace YooAsset
         public AssetBundle Result { private set; get; }
 
 
-        internal DownloadHandlerAssetBundleOperation(DefaultWebFileSystem fileSystem, PackageBundle bundle,
-            string mainURL, string fallbackURL, int failedTryAgain, int timeout)
-            : base(bundle, mainURL, fallbackURL, failedTryAgain, timeout)
+        internal DownloadHandlerAssetBundleOperation(DefaultWebFileSystem fileSystem, PackageBundle bundle, DownloadParam param) : base(bundle, param)
         {
             _fileSystem = fileSystem;
         }

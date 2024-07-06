@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace YooAsset
 {
     internal class BundleInfo
@@ -54,7 +51,9 @@ namespace YooAsset
         /// </summary>
         public FSDownloadFileOperation CreateDownloader(int failedTryAgain, int timeout)
         {
-            return _fileSystem.DownloadFileAsync(Bundle, _importFilePath, failedTryAgain, timeout);
+            DownloadParam downloadParam = new DownloadParam(failedTryAgain, timeout);
+            downloadParam.ImportFilePath = _importFilePath;
+            return _fileSystem.DownloadFileAsync(Bundle, downloadParam);
         }
 
         /// <summary>

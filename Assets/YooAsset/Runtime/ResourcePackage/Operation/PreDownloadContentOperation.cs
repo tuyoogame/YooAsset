@@ -204,7 +204,7 @@ namespace YooAsset
 
                 if (_loadPackageManifestOp.Status == EOperationStatus.Succeed)
                 {
-                    _manifest = _loadPackageManifestOp.Result;
+                    _manifest = _loadPackageManifestOp.Manifest;
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
                 }

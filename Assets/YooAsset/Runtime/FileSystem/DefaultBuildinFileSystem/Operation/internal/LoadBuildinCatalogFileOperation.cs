@@ -44,7 +44,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"The catalog file package name {catalog.PackageName} cannot match the file system package name {_fileSystem.PackageName}";
+                    Error = $"Catalog file package name {catalog.PackageName} cannot match the file system package name {_fileSystem.PackageName}";
                     return;
                 }
 
@@ -54,7 +54,7 @@ namespace YooAsset
                     _fileSystem.RecordFile(wrapper.BundleGUID, fileWrapper);
                 }
 
-                YooLogger.Log($"Package '{_fileSystem.PackageName}' catalog files count : {catalog.Wrappers.Count}");
+                YooLogger.Log($"Package '{_fileSystem.PackageName}' buildin catalog files count : {catalog.Wrappers.Count}");
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Succeed;
             }

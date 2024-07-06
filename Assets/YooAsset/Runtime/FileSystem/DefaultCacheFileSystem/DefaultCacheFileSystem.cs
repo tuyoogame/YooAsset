@@ -120,42 +120,32 @@ namespace YooAsset
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(params object[] args)
+        public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(string packageVersion, int timeout)
         {
-            string packageVersion = args[0] as string;
-            int timeout = (int)args[1];
             var operation = new DCFSLoadPackageManifestOperation(this, packageVersion, timeout);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(params object[] args)
+        public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks, int timeout)
         {
-            bool appendTimeTicks = (bool)args[0];
-            int timeout = (int)args[1];
             var operation = new DCFSRequestPackageVersionOperation(this, appendTimeTicks, timeout);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync(params object[] args)
+        public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync()
         {
             var operation = new DCFSClearAllBundleFilesOperation(this);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(params object[] args)
+        public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(PackageManifest manifest)
         {
-            PackageManifest manifest = args[0] as PackageManifest;
             var operation = new DCFSClearUnusedBundleFilesOperation(this, manifest);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSDownloadFileOperation DownloadFileAsync(params object[] args)
+        public virtual FSDownloadFileOperation DownloadFileAsync(PackageBundle bundle, DownloadParam param)
         {
-            PackageBundle bundle = args[0] as PackageBundle;
-            string localCopyFilePath = (string)args[1];
-            int failedTryAgain = (int)args[2];
-            int timeout = (int)args[3];
-
             // 查询旧的下载器
             if (_downloaders.TryGetValue(bundle.BundleGUID, out var oldDownloader))
             {
@@ -165,23 +155,21 @@ namespace YooAsset
 
             // 创建新的下载器
             {
-                string mainURL;
-                string fallbackURL;
-                if (string.IsNullOrEmpty(localCopyFilePath))
+                if (string.IsNullOrEmpty(param.ImportFilePath))
                 {
-                    mainURL = RemoteServices.GetRemoteMainURL(bundle.FileName);
-                    fallbackURL = RemoteServices.GetRemoteFallbackURL(bundle.FileName);
+                    param.MainURL = RemoteServices.GetRemoteMainURL(bundle.FileName);
+                    param.FallbackURL = RemoteServices.GetRemoteFallbackURL(bundle.FileName);
                 }
                 else
                 {
                     // 注意：把本地文件路径指定为远端下载地址
-                    mainURL = DownloadSystemHelper.ConvertToWWWPath(localCopyFilePath);
-                    fallbackURL = mainURL;
+                    param.MainURL = DownloadSystemHelper.ConvertToWWWPath(param.ImportFilePath);
+                    param.FallbackURL = param.MainURL;
                 }
 
                 if (bundle.FileSize >= ResumeDownloadMinimumSize)
                 {
-                    var newDownloader = new DCFSDownloadResumeFileOperation(this, bundle, mainURL, fallbackURL, failedTryAgain, timeout);
+                    var newDownloader = new DCFSDownloadResumeFileOperation(this, bundle, param);
                     newDownloader.Reference();
                     _downloaders.Add(bundle.BundleGUID, newDownloader);
                     OperationSystem.StartOperation(PackageName, newDownloader);
@@ -189,7 +177,7 @@ namespace YooAsset
                 }
                 else
                 {
-                    var newDownloader = new DCFSDownloadNormalFileOperation(this, bundle, mainURL, fallbackURL, failedTryAgain, timeout);
+                    var newDownloader = new DCFSDownloadNormalFileOperation(this, bundle, param);
                     newDownloader.Reference();
                     _downloaders.Add(bundle.BundleGUID, newDownloader);
                     OperationSystem.StartOperation(PackageName, newDownloader);

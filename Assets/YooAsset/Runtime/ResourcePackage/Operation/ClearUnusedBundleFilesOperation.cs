@@ -7,11 +7,7 @@ namespace YooAsset
     public abstract class ClearUnusedBundleFilesOperation : AsyncOperationBase
     {
     }
-
-    /// <summary>
-    /// 通用类
-    /// </summary>
-    internal sealed class DefaultClearUnusedBundleFilesOperation : ClearUnusedBundleFilesOperation
+    internal sealed class ClearUnusedBundleFilesImplOperation : ClearUnusedBundleFilesOperation
     {
         private enum ESteps
         {
@@ -31,7 +27,7 @@ namespace YooAsset
         private FSClearUnusedBundleFilesOperation _clearUnusedBundleFilesOpC;
         private ESteps _steps = ESteps.None;
 
-        internal DefaultClearUnusedBundleFilesOperation(IPlayMode impl, IFileSystem fileSystemA, IFileSystem fileSystemB, IFileSystem fileSystemC)
+        internal ClearUnusedBundleFilesImplOperation(IPlayMode impl, IFileSystem fileSystemA, IFileSystem fileSystemB, IFileSystem fileSystemC)
         {
             _impl = impl;
             _fileSystemA = fileSystemA;

@@ -34,7 +34,7 @@ namespace YooAsset
             if (_steps == ESteps.InitUnpackFileSystem)
             {
                 if (_initUnpackFIleSystemOp == null)
-                    _initUnpackFIleSystemOp = _fileSystem.UnpackFileSystem.InitializeFileSystemAsync();
+                    _initUnpackFIleSystemOp = _fileSystem.InitializeUpackFileSystem();
 
                 Progress = _initUnpackFIleSystemOp.Progress;
                 if (_initUnpackFIleSystemOp.IsDone == false)
@@ -113,7 +113,7 @@ namespace YooAsset
             if (_steps == ESteps.InitUnpackFileSystem)
             {
                 if (_initUnpackFIleSystemOp == null)
-                    _initUnpackFIleSystemOp = _fileSystem.UnpackFileSystem.InitializeFileSystemAsync();
+                    _initUnpackFIleSystemOp = _fileSystem.InitializeUpackFileSystem();
 
                 Progress = _initUnpackFIleSystemOp.Progress;
                 if (_initUnpackFIleSystemOp.IsDone == false)
@@ -156,7 +156,7 @@ namespace YooAsset
 
             if (_steps == ESteps.RecordFiles)
             {
-                PackageManifest manifest = _loadPackageManifestOp.Result;
+                PackageManifest manifest = _loadPackageManifestOp.Manifest;
                 string pacakgeDirectory = _fileSystem.FileRoot;
                 DirectoryInfo rootDirectory = new DirectoryInfo(pacakgeDirectory);
                 FileInfo[] fileInfos = rootDirectory.GetFiles();
@@ -174,7 +174,7 @@ namespace YooAsset
                     }
                     else
                     {
-                        YooLogger.Warning($"Failed mapping file : {fileName}");
+                        YooLogger.Warning($"Failed to mapping buildin bundle file : {fileName}");
                     }
                 }
 

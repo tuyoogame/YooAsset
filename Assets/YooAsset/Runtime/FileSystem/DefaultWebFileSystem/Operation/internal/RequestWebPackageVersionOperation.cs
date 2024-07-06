@@ -48,13 +48,7 @@ namespace YooAsset
                 if (_webTextRequestOp.IsDone == false)
                     return;
 
-                if (_webTextRequestOp.Status != EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _webTextRequestOp.Error;
-                }
-                else
+                if (_webTextRequestOp.Status == EOperationStatus.Succeed)
                 {
                     PackageVersion = _webTextRequestOp.Result;
                     if (string.IsNullOrEmpty(PackageVersion))
@@ -68,6 +62,12 @@ namespace YooAsset
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Succeed;
                     }
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = _webTextRequestOp.Error;
                 }
             }
         }

@@ -35,7 +35,7 @@ namespace YooAsset
             }
             catch (System.Exception e)
             {
-                YooLogger.Warning($"Failed delete cache bundle folder : {e}");
+                YooLogger.Warning($"Failed to delete cache bundle folder : {e}");
             }
         }
     }
@@ -165,7 +165,7 @@ namespace YooAsset
             {
                 _failedCount++;
 
-                YooLogger.Warning($"Failed verify file {element.Result} and delete files : {element.FileRootPath}");
+                YooLogger.Warning($"Failed to verify file {element.Result} and delete files : {element.FileRootPath}");
                 element.DeleteFiles();
             }
         }

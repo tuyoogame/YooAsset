@@ -14,6 +14,9 @@ namespace YooAsset
         private readonly DefaultEditorFileSystem _fileSystem;
         private ESteps _steps = ESteps.None;
 
+        /// <summary>
+        /// 包裹版本
+        /// </summary>
         public string PackageVersion { private set; get; }
 
 
@@ -43,7 +46,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Simulation package version file not found : {versionFilePath}";
+                    Error = $"Can not found simulation package version file : {versionFilePath}";
                 }
             }
         }

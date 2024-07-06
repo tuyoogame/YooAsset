@@ -85,7 +85,7 @@ namespace YooAsset
             if (_steps == ESteps.LoadManifestFile)
             {
                 if (_loadPackageManifestOp == null)
-                    _loadPackageManifestOp = _impl.EditorFileSystem.LoadPackageManifestAsync(null);
+                    _loadPackageManifestOp = _impl.EditorFileSystem.LoadPackageManifestAsync(null, int.MaxValue);
 
                 Progress = _loadPackageManifestOp.Progress;
                 if (_loadPackageManifestOp.IsDone == false)
@@ -94,7 +94,7 @@ namespace YooAsset
                 if (_loadPackageManifestOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
-                    _impl.ActiveManifest = _loadPackageManifestOp.Result;
+                    _impl.ActiveManifest = _loadPackageManifestOp.Manifest;
                     Status = EOperationStatus.Succeed;
                 }
                 else
@@ -187,7 +187,7 @@ namespace YooAsset
             if (_steps == ESteps.LoadManifestFile)
             {
                 if (_loadPackageManifestOp == null)
-                    _loadPackageManifestOp = _impl.BuildinFileSystem.LoadPackageManifestAsync(null);
+                    _loadPackageManifestOp = _impl.BuildinFileSystem.LoadPackageManifestAsync(null, int.MaxValue);
 
                 Progress = _loadPackageManifestOp.Progress;
                 if (_loadPackageManifestOp.IsDone == false)
@@ -196,7 +196,7 @@ namespace YooAsset
                 if (_loadPackageManifestOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
-                    _impl.ActiveManifest = _loadPackageManifestOp.Result;
+                    _impl.ActiveManifest = _loadPackageManifestOp.Manifest;
                     Status = EOperationStatus.Succeed;
                 }
                 else

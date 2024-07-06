@@ -11,9 +11,7 @@ namespace YooAsset
         private string _tempFilePath;
         private ESteps _steps = ESteps.None;
 
-        internal DCFSDownloadNormalFileOperation(DefaultCacheFileSystem fileSystem, PackageBundle bundle, 
-            string mainURL, string fallbackURL, int failedTryAgain, int timeout)
-            : base(bundle, mainURL, fallbackURL, failedTryAgain, timeout)
+        internal DCFSDownloadNormalFileOperation(DefaultCacheFileSystem fileSystem, PackageBundle bundle, DownloadParam param) : base(bundle, param)
         {
             _fileSystem = fileSystem;
         }
@@ -110,7 +108,7 @@ namespace YooAsset
                     }
                     else
                     {
-                        Error = $"{_fileSystem.GetType().FullName} write file failed !";
+                        Error = $"{_fileSystem.GetType().FullName} failed to write file !";
                         Status = EOperationStatus.Failed;
                         _steps = ESteps.Done;
                         YooLogger.Error(Error);
@@ -198,19 +196,17 @@ namespace YooAsset
         private DownloadHandlerFileRange _downloadHandle;
         private VerifyTempFileOperation _verifyOperation;
         private long _fileOriginLength = 0;
-        private string _fileSavePath;
+        private string _tempFilePath;
         private ESteps _steps = ESteps.None;
 
 
-        internal DCFSDownloadResumeFileOperation(DefaultCacheFileSystem fileSystem, PackageBundle bundle,
-            string mainURL, string fallbackURL, int failedTryAgain, int timeout)
-                 : base(bundle, mainURL, fallbackURL, failedTryAgain, timeout)
+        internal DCFSDownloadResumeFileOperation(DefaultCacheFileSystem fileSystem, PackageBundle bundle, DownloadParam param) : base(bundle, param)
         {
             _fileSystem = fileSystem;
         }
         internal override void InternalOnStart()
         {
-            _fileSavePath = _fileSystem.GetTempFilePath(Bundle);
+            _tempFilePath = _fileSystem.GetTempFilePath(Bundle);
             _steps = ESteps.CheckExists;
         }
         internal override void InternalOnUpdate()
@@ -235,7 +231,7 @@ namespace YooAsset
             // 创建下载器
             if (_steps == ESteps.CreateRequest)
             {
-                FileUtility.CreateFileDirectory(_fileSavePath);
+                FileUtility.CreateFileDirectory(_tempFilePath);
 
                 // 获取请求地址
                 _requestURL = GetRequestURL();
@@ -246,9 +242,9 @@ namespace YooAsset
                 // 获取下载起始位置
                 _fileOriginLength = 0;
                 long fileBeginLength = -1;
-                if (File.Exists(_fileSavePath))
+                if (File.Exists(_tempFilePath))
                 {
-                    FileInfo fileInfo = new FileInfo(_fileSavePath);
+                    FileInfo fileInfo = new FileInfo(_tempFilePath);
                     fileBeginLength = fileInfo.Length;
                     _fileOriginLength = fileBeginLength;
                     DownloadedBytes = _fileOriginLength;
@@ -258,8 +254,8 @@ namespace YooAsset
                 if (fileBeginLength >= Bundle.FileSize)
                 {
                     // 删除临时文件
-                    if (File.Exists(_fileSavePath))
-                        File.Delete(_fileSavePath);
+                    if (File.Exists(_tempFilePath))
+                        File.Delete(_tempFilePath);
                 }
 
                 // 创建下载器
@@ -295,7 +291,7 @@ namespace YooAsset
             // 验证下载文件
             if (_steps == ESteps.VerifyTempFile)
             {
-                var element = new TempFileElement(_fileSavePath, Bundle.FileCRC, Bundle.FileSize);
+                var element = new TempFileElement(_tempFilePath, Bundle.FileCRC, Bundle.FileSize);
                 _verifyOperation = new VerifyTempFileOperation(element);
                 OperationSystem.StartOperation(_fileSystem.PackageName, _verifyOperation);
                 _steps = ESteps.CheckVerifyTempFile;
@@ -309,14 +305,14 @@ namespace YooAsset
 
                 if (_verifyOperation.Status == EOperationStatus.Succeed)
                 {
-                    if (_fileSystem.WriteCacheFile(Bundle, _fileSavePath))
+                    if (_fileSystem.WriteCacheFile(Bundle, _tempFilePath))
                     {
                         Status = EOperationStatus.Succeed;
                         _steps = ESteps.Done;
                     }
                     else
                     {
-                        Error = $"{_fileSystem.GetType().FullName} write file failed : {_fileSavePath}";
+                        Error = $"{_fileSystem.GetType().FullName} failed to write file !";
                         Status = EOperationStatus.Failed;
                         _steps = ESteps.Done;
                     }
@@ -328,8 +324,8 @@ namespace YooAsset
                 }
 
                 // 注意：验证完成后直接删除文件
-                if (File.Exists(_fileSavePath))
-                    File.Delete(_fileSavePath);
+                if (File.Exists(_tempFilePath))
+                    File.Delete(_tempFilePath);
             }
 
             // 重新尝试下载
@@ -381,7 +377,7 @@ namespace YooAsset
         {
             _webRequest = DownloadSystemHelper.NewUnityWebRequestGet(_requestURL);
 #if UNITY_2019_4_OR_NEWER
-            var handler = new DownloadHandlerFile(_fileSavePath, true);
+            var handler = new DownloadHandlerFile(_tempFilePath, true);
             handler.removeFileOnAbort = false;
 #else
             var handler = new DownloadHandlerFileRange(FileSavePath, Bundle.FileSize, _webRequest);
@@ -416,8 +412,8 @@ namespace YooAsset
             //说明：如果遇到以下错误返回码，验证失败直接删除文件
             if (_fileSystem.ResumeDownloadResponseCodes.Contains(HttpCode))
             {
-                if (File.Exists(_fileSavePath))
-                    File.Delete(_fileSavePath);
+                if (File.Exists(_tempFilePath))
+                    File.Delete(_tempFilePath);
             }
         }
     }

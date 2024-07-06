@@ -10,7 +10,7 @@ namespace YooAsset
             Type classType = Type.GetType(parameters.FileSystemClass);
             if (classType == null)
             {
-                YooLogger.Error($"Not found file system class type {parameters.FileSystemClass}");
+                YooLogger.Error($"Can not found file system class type {parameters.FileSystemClass}");
                 return null;
             }
 
