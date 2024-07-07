@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -157,6 +158,20 @@ namespace YooAsset
         object IEnumerator.Current => null;
 
         private TaskCompletionSource<object> _taskCompletionSource;
+        #endregion
+
+        #region 调试方法
+        [Conditional("DEBUG")]
+        protected void DebugCheckWaitForAsyncComplete(string error = null)
+        {
+            if (IsDone == false)
+            {
+                if (string.IsNullOrEmpty(error))
+                    YooLogger.Error($"Operation {this.GetType().Name} failed to wait for async complete !");
+                else
+                    YooLogger.Error($"Operation {this.GetType().Name} failed to wait for async complete ! {error}");
+            }
+        }
         #endregion
     }
 }

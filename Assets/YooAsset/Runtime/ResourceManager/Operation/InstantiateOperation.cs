@@ -77,10 +77,12 @@ namespace YooAsset
         /// </summary>
         public override void WaitForAsyncComplete()
         {
-            if (_steps == ESteps.Done)
-                return;
-            _handle.WaitForAsyncComplete();
-            InternalOnUpdate();
+            if (_steps == ESteps.Clone)
+            {
+                _handle.WaitForAsyncComplete();
+                InternalOnUpdate();
+                DebugCheckWaitForAsyncComplete();
+            }
         }
 
         /// <summary>

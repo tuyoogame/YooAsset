@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace YooAsset
 {
@@ -57,6 +56,11 @@ namespace YooAsset
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Succeed;
             }
+        }
+        public override void WaitForAsyncComplete()
+        {
+            InternalOnUpdate();
+            DebugCheckWaitForAsyncComplete();
         }
     }
 }

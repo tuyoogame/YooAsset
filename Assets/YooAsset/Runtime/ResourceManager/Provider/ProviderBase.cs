@@ -102,12 +102,7 @@ namespace YooAsset
 
             // 注意：主动轮询更新完成同步加载
             InternalOnUpdate();
-
-            // 验证结果
-            if (IsDone == false)
-            {
-                YooLogger.Warning($"{nameof(WaitForAsyncComplete)} failed to loading : {MainAssetInfo.AssetPath}");
-            }
+            DebugCheckWaitForAsyncComplete($"Loading asset {MainAssetInfo.AssetPath}");
         }
 
         /// <summary>

@@ -39,9 +39,7 @@ namespace YooAsset
             if (_steps == ESteps.CheckBundle)
             {
                 if (IsWaitForAsyncComplete)
-                {
                     FileLoader.WaitForAsyncComplete();
-                }
 
                 if (FileLoader.IsDone() == false)
                     return;
