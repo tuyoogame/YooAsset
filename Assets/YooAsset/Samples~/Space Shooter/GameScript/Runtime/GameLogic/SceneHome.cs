@@ -6,16 +6,26 @@ using YooAsset;
 public class SceneHome : MonoBehaviour
 {
     public GameObject CanvasDesktop;
-
     private AssetHandle _windowHandle;
 
+#if UNITY_WEBGL
     private IEnumerator Start()
     {
-        // 加载登录页面
+        // 同步加载登录页面
         _windowHandle = YooAssets.LoadAssetAsync<GameObject>("UIHome");
         yield return _windowHandle;
         _windowHandle.InstantiateSync(CanvasDesktop.transform);
     }
+#else
+    private void Start()
+    {
+        // 异步加载登录页面
+        _windowHandle = YooAssets.LoadAssetSync<GameObject>("UIHome");
+        _windowHandle.InstantiateSync(CanvasDesktop.transform);
+    }
+#endif
+
+
     private void OnDestroy()
     {
         if (_windowHandle != null)
@@ -28,7 +38,8 @@ public class SceneHome : MonoBehaviour
         if (YooAssets.Initialized)
         {
             var package = YooAssets.GetPackage("DefaultPackage");
-            package.UnloadUnusedAssetsAsync();
+            var operation = package.UnloadUnusedAssetsAsync();
+            operation.WaitForAsyncComplete();
         }
     }
 }
