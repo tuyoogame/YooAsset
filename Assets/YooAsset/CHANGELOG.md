@@ -2,6 +2,63 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.2.0-preview] - 2024-07-07
+
+重构了运行时代码，新增了文件系统接口（IFileSystem）方便开发者扩展特殊需求。
+
+新增微信小游戏文件系统示例代码，详细见Extension Sample/Runtime/WechatFileSystem
+
+### Added
+
+- 新增了ResourcePackage.DestroyAsync方法
+
+- 新增了FileSystemParameters类帮助初始化文件系统
+
+  内置了编辑器文件系统参数，内置文件系统参数，缓存文件系统参数，Web文件系统参数。
+
+  ```csharp
+  public class FileSystemParameters
+  {
+      /// <summary>
+      /// 文件系统类
+      /// </summary>
+      public string FileSystemClass { private set; get; }
+      
+      /// <summary>
+      /// 文件系统的根目录
+      /// </summary>
+      public string RootDirectory { private set; get; }   
+      
+      /// <summary>
+      /// 添加自定义参数
+      /// </summary>
+      public void AddParameter(string name, object value)    
+  }
+  ```
+
+### Changed
+
+- 重构了InitializeParameters初始化参数
+- 重命名YooAssets.DestroyPackage方法为RemovePackage
+- 重命名ResourcePackage.UpdatePackageVersionAsync方法为RequestPackageVersionAsync
+- 重命名ResourcePackage.UnloadUnusedAssets方法为UnloadUnusedAssetsAsync
+- 重命名ResourcePackage.ForceUnloadAllAssets方法为UnloadAllAssetsAsync
+- 重命名ResourcePackage.ClearUnusedCacheFilesAsync方法为ClearUnusedBundleFilesAsync
+- 重命名ResourcePackage.ClearAllCacheFilesAsync方法为ClearAllBundleFilesAsync
+
+### Removed
+
+- 移除了YooAssets.Destroy方法
+- 移除了YooAssets.SetDownloadSystemClearFileResponseCode方法
+- 移除了YooAssets.SetCacheSystemDisableCacheOnWebGL方法
+- 移除了ResourcePackage.GetPackageBuildinRootDirectory方法
+- 移除了ResourcePackage.GetPackageSandboxRootDirectory方法
+- 移除了ResourcePackage.ClearPackageSandbox方法
+- 移除了IBuildinQueryServices接口
+- 移除了IDeliveryLoadServices接口
+- 移除了IDeliveryQueryServices接口
+
+
 ## [2.1.2] - 2024-05-16
 
 SBP库依赖版本升级至2.1.3
