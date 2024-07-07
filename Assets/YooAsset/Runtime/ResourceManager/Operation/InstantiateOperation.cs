@@ -71,17 +71,19 @@ namespace YooAsset
                 Status = EOperationStatus.Succeed;
             }
         }
-
-        /// <summary>
-        /// 等待异步实例化结束
-        /// </summary>
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
-            if (_steps == ESteps.Clone)
+            while (true)
             {
-                _handle.WaitForAsyncComplete();
-                InternalOnUpdate();
-                DebugCheckWaitForAsyncComplete();
+                // 等待句柄完成
+                if (_handle != null)
+                    _handle.WaitForAsyncComplete();
+
+                if (ExecuteWhileDone())
+                {
+                    _steps = ESteps.Done;
+                    break;
+                }
             }
         }
 

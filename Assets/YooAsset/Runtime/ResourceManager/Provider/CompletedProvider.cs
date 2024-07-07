@@ -1,9 +1,9 @@
 ﻿
 namespace YooAsset
 {
-    internal sealed class CompletedProvider : ProviderBase
+    internal sealed class CompletedProvider : ProviderOperation
     {
-        public CompletedProvider(AssetInfo assetInfo) : base(null, string.Empty, assetInfo)
+        public CompletedProvider(ResourceManager manager, AssetInfo assetInfo) : base(manager, string.Empty, assetInfo)
         {
         }
 

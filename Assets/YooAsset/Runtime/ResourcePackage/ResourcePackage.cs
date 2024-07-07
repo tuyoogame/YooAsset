@@ -42,9 +42,6 @@ namespace YooAsset
         /// </summary>
         internal void UpdatePackage()
         {
-            if (_resourceManager != null)
-                _resourceManager.Update();
-
             if (_playModeImpl != null)
                 _playModeImpl.UpdatePlayMode();
         }

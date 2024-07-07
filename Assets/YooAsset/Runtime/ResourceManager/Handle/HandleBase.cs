@@ -6,9 +6,9 @@ namespace YooAsset
     public abstract class HandleBase : IEnumerator
     {
         private readonly AssetInfo _assetInfo;
-        internal ProviderBase Provider { private set; get; }
+        internal ProviderOperation Provider { private set; get; }
 
-        internal HandleBase(ProviderBase provider)
+        internal HandleBase(ProviderOperation provider)
         {
             Provider = provider;
             _assetInfo = provider.MainAssetInfo;

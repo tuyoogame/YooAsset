@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace YooAsset
 {
@@ -29,25 +31,30 @@ namespace YooAsset
 
             if (_steps == ESteps.UnloadUnused)
             {
-                var loaderList = _resManager._loaderList;
                 var loaderDic = _resManager._loaderDic;
+                var removeList = new List<LoadBundleFileOperation>(loaderDic.Count);
 
-                for (int i = loaderList.Count - 1; i >= 0; i--)
+                // 注意：优先销毁资源提供者
+                foreach (var loader in loaderDic.Values)
                 {
-                    BundleFileLoader loader = loaderList[i];
                     loader.TryDestroyProviders();
                 }
 
-                for (int i = loaderList.Count - 1; i >= 0; i--)
+                // 获取销毁列表
+                foreach (var loader in loaderDic.Values)
                 {
-                    BundleFileLoader loader = loaderList[i];
-                    if (loader.CanDestroy())
+                    if (loader.CanDestroyLoader())
                     {
-                        string bundleName = loader.MainBundleInfo.Bundle.BundleName;
-                        loader.Destroy();
-                        loaderList.RemoveAt(i);
-                        loaderDic.Remove(bundleName);
+                        removeList.Add(loader);
                     }
+                }
+
+                // 销毁文件加载器
+                foreach (var loader in removeList)
+                {
+                    string bundleName = loader.BundleFileInfo.Bundle.BundleName;
+                    loader.DestroyLoader();
+                    _resManager._loaderDic.Remove(bundleName);
                 }
 
                 // 注意：调用底层接口释放所有资源
@@ -57,10 +64,16 @@ namespace YooAsset
                 Status = EOperationStatus.Succeed;
             }
         }
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
-            InternalOnUpdate();
-            DebugCheckWaitForAsyncComplete();
+            while (true)
+            {
+                if (ExecuteWhileDone())
+                {
+                    _steps = ESteps.Done;
+                    break;
+                }
+            }
         }
     }
 }

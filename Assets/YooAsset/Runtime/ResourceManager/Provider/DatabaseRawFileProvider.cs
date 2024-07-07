@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-    internal class DatabaseRawFileProvider : ProviderBase
+    internal class DatabaseRawFileProvider : ProviderOperation
     {
         public DatabaseRawFileProvider(ResourceManager manager, string providerGUID, AssetInfo assetInfo) : base(manager, providerGUID, assetInfo)
         {
@@ -38,16 +38,12 @@ namespace YooAsset
             // 1. 检测资源包
             if (_steps == ESteps.CheckBundle)
             {
-                if (IsWaitForAsyncComplete)
-                    FileLoader.WaitForAsyncComplete();
-
-                if (FileLoader.IsDone() == false)
+                if (LoadBundleFileOp.IsDone == false)
                     return;
 
-                if (FileLoader.Status != BundleFileLoader.EStatus.Succeed)
+                if (LoadBundleFileOp.Status != EOperationStatus.Succeed)
                 {
-                    string error = FileLoader.LastError;
-                    InvokeCompletion(error, EOperationStatus.Failed);
+                    InvokeCompletion(LoadBundleFileOp.Error, EOperationStatus.Failed);
                     return;
                 }
 

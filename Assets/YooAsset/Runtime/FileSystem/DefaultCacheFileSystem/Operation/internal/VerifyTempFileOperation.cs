@@ -85,14 +85,12 @@ namespace YooAsset
                 }
             }
         }
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
             while (true)
             {
-                // 驱动流程
+                // 注意：等待子线程验证文件完毕
                 InternalOnUpdate();
-
-                // 完成后退出
                 if (IsDone)
                     break;
             }

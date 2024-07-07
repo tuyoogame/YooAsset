@@ -7,7 +7,7 @@ namespace YooAsset
         private System.Action<SceneHandle> _callback;
         internal string PackageName { set; get; }
 
-        internal SceneHandle(ProviderBase provider) : base(provider)
+        internal SceneHandle(ProviderOperation provider) : base(provider)
         {
         }
         internal override void InvokeCallback()

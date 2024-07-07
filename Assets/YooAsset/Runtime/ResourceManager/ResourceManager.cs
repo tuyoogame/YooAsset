@@ -13,12 +13,10 @@ namespace YooAsset
         private readonly static Dictionary<string, SceneHandle> _sceneHandles = new Dictionary<string, SceneHandle>(100);
         private static long _sceneCreateCount = 0;
 
-        internal readonly Dictionary<string, ProviderBase> _providerDic = new Dictionary<string, ProviderBase>(5000);
-        internal readonly Dictionary<string, BundleFileLoader> _loaderDic = new Dictionary<string, BundleFileLoader>(5000);
-        internal readonly List<BundleFileLoader> _loaderList = new List<BundleFileLoader>(5000);
+        internal readonly Dictionary<string, ProviderOperation> _providerDic = new Dictionary<string, ProviderOperation>(5000);
+        internal readonly Dictionary<string, LoadBundleFileOperation> _loaderDic = new Dictionary<string, LoadBundleFileOperation>(5000);
 
         private bool _simulationOnEditor;
-        private bool _autoDestroyAssetProvider;
         private IBundleQuery _bundleQuery;
 
         /// <summary>
@@ -38,22 +36,7 @@ namespace YooAsset
         public void Initialize(InitializeParameters initializeParameters, IBundleQuery bundleServices)
         {
             _simulationOnEditor = initializeParameters is EditorSimulateModeParameters;
-            _autoDestroyAssetProvider = initializeParameters.AutoDestroyAssetProvider;
             _bundleQuery = bundleServices;
-        }
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        public void Update()
-        {
-            foreach (var loader in _loaderList)
-            {
-                loader.Update();
-
-                if (_autoDestroyAssetProvider)
-                    loader.TryDestroyProviders();
-            }
         }
 
         /// <summary>
@@ -73,11 +56,10 @@ namespace YooAsset
             if (mainLoader != null)
             {
                 mainLoader.TryDestroyProviders();
-                if (mainLoader.CanDestroy())
+                if (mainLoader.CanDestroyLoader())
                 {
-                    string bundleName = mainLoader.MainBundleInfo.Bundle.BundleName;
-                    mainLoader.Destroy();
-                    _loaderList.Remove(mainLoader);
+                    string bundleName = mainLoader.BundleFileInfo.Bundle.BundleName;
+                    mainLoader.DestroyLoader();
                     _loaderDic.Remove(bundleName);
                 }
             }
@@ -89,11 +71,10 @@ namespace YooAsset
                 var dependLoader = TryGetFileLoader(dependBundleName);
                 if (dependLoader != null)
                 {
-                    if (dependLoader.CanDestroy())
+                    if (dependLoader.CanDestroyLoader())
                     {
-                        string bundleName = dependLoader.MainBundleInfo.Bundle.BundleName;
-                        dependLoader.Destroy();
-                        _loaderList.Remove(dependLoader);
+                        string bundleName = dependLoader.BundleFileInfo.Bundle.BundleName;
+                        dependLoader.DestroyLoader();
                         _loaderDic.Remove(bundleName);
                     }
                 }
@@ -110,7 +91,7 @@ namespace YooAsset
             if (assetInfo.IsInvalid)
             {
                 YooLogger.Error($"Failed to load scene ! {assetInfo.Error}");
-                CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
                 completedProvider.SetCompleted(assetInfo.Error);
                 return completedProvider.CreateHandle<SceneHandle>();
             }
@@ -123,7 +104,7 @@ namespace YooAsset
 
             // 注意：同一个场景的ProviderGUID每次加载都会变化
             string providerGUID = $"{assetInfo.GUID}-{++_sceneCreateCount}";
-            ProviderBase provider;
+            ProviderOperation provider;
             {
                 if (_simulationOnEditor)
                     provider = new DatabaseSceneProvider(this, providerGUID, assetInfo, sceneMode, suspendLoad);
@@ -149,13 +130,13 @@ namespace YooAsset
             if (assetInfo.IsInvalid)
             {
                 YooLogger.Error($"Failed to load asset ! {assetInfo.Error}");
-                CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
                 completedProvider.SetCompleted(assetInfo.Error);
                 return completedProvider.CreateHandle<AssetHandle>();
             }
 
             string providerGUID = nameof(LoadAssetAsync) + assetInfo.GUID;
-            ProviderBase provider = TryGetProvider(providerGUID);
+            ProviderOperation provider = TryGetProvider(providerGUID);
             if (provider == null)
             {
                 if (_simulationOnEditor)
@@ -179,13 +160,13 @@ namespace YooAsset
             if (assetInfo.IsInvalid)
             {
                 YooLogger.Error($"Failed to load sub assets ! {assetInfo.Error}");
-                CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
                 completedProvider.SetCompleted(assetInfo.Error);
                 return completedProvider.CreateHandle<SubAssetsHandle>();
             }
 
             string providerGUID = nameof(LoadSubAssetsAsync) + assetInfo.GUID;
-            ProviderBase provider = TryGetProvider(providerGUID);
+            ProviderOperation provider = TryGetProvider(providerGUID);
             if (provider == null)
             {
                 if (_simulationOnEditor)
@@ -209,13 +190,13 @@ namespace YooAsset
             if (assetInfo.IsInvalid)
             {
                 YooLogger.Error($"Failed to load all assets ! {assetInfo.Error}");
-                CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
                 completedProvider.SetCompleted(assetInfo.Error);
                 return completedProvider.CreateHandle<AllAssetsHandle>();
             }
 
             string providerGUID = nameof(LoadAllAssetsAsync) + assetInfo.GUID;
-            ProviderBase provider = TryGetProvider(providerGUID);
+            ProviderOperation provider = TryGetProvider(providerGUID);
             if (provider == null)
             {
                 if (_simulationOnEditor)
@@ -239,13 +220,13 @@ namespace YooAsset
             if (assetInfo.IsInvalid)
             {
                 YooLogger.Error($"Failed to load raw file ! {assetInfo.Error}");
-                CompletedProvider completedProvider = new CompletedProvider(assetInfo);
+                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
                 completedProvider.SetCompleted(assetInfo.Error);
                 return completedProvider.CreateHandle<RawFileHandle>();
             }
 
             string providerGUID = nameof(LoadRawFileAsync) + assetInfo.GUID;
-            ProviderBase provider = TryGetProvider(providerGUID);
+            ProviderOperation provider = TryGetProvider(providerGUID);
             if (provider == null)
             {
                 if (_simulationOnEditor)
@@ -311,23 +292,25 @@ namespace YooAsset
             }
         }
 
-        internal BundleFileLoader CreateOwnerFileLoader(AssetInfo assetInfo)
+        internal LoadBundleFileOperation CreateMainBundleFileLoader(AssetInfo assetInfo)
         {
             BundleInfo bundleInfo = _bundleQuery.GetMainBundleInfo(assetInfo);
             return CreateFileLoaderInternal(bundleInfo);
         }
-        internal List<BundleFileLoader> CreateDependFileLoaders(AssetInfo assetInfo)
+        internal LoadDependBundleFileOperation CreateDependFileLoaders(AssetInfo assetInfo)
         {
-            BundleInfo[] depends = _bundleQuery.GetDependBundleInfos(assetInfo);
-            List<BundleFileLoader> result = new List<BundleFileLoader>(depends.Length);
-            foreach (var bundleInfo in depends)
+            BundleInfo[] bundleInfos = _bundleQuery.GetDependBundleInfos(assetInfo);
+            List<LoadBundleFileOperation> depends = new List<LoadBundleFileOperation>(bundleInfos.Length);
+            foreach (var bundleInfo in bundleInfos)
             {
-                BundleFileLoader dependLoader = CreateFileLoaderInternal(bundleInfo);
-                result.Add(dependLoader);
+                LoadBundleFileOperation dependLoader = CreateFileLoaderInternal(bundleInfo);
+                depends.Add(dependLoader);
             }
-            return result;
+            var operation = new LoadDependBundleFileOperation(depends);
+            OperationSystem.StartOperation(PackageName, operation);
+            return operation;
         }
-        internal void RemoveBundleProviders(List<ProviderBase> removeList)
+        internal void RemoveBundleProviders(List<ProviderOperation> removeList)
         {
             foreach (var provider in removeList)
             {
@@ -336,33 +319,33 @@ namespace YooAsset
         }
         internal bool HasAnyLoader()
         {
-            return _loaderList.Count > 0;
+            return _loaderDic.Count > 0;
         }
 
-        private BundleFileLoader CreateFileLoaderInternal(BundleInfo bundleInfo)
+        private LoadBundleFileOperation CreateFileLoaderInternal(BundleInfo bundleInfo)
         {
             // 如果加载器已经存在
             string bundleName = bundleInfo.Bundle.BundleName;
-            BundleFileLoader loader = TryGetFileLoader(bundleName);
-            if (loader != null)
-                return loader;
+            LoadBundleFileOperation loaderOperation = TryGetFileLoader(bundleName);
+            if (loaderOperation != null)
+                return loaderOperation;
 
             // 新增下载需求
-            loader = new BundleFileLoader(this, bundleInfo);
-            _loaderList.Add(loader);
-            _loaderDic.Add(bundleName, loader);
-            return loader;
+            loaderOperation = new LoadBundleFileOperation(this, bundleInfo);
+            OperationSystem.StartOperation(PackageName, loaderOperation);
+            _loaderDic.Add(bundleName, loaderOperation);
+            return loaderOperation;
         }
-        private BundleFileLoader TryGetFileLoader(string bundleName)
+        private LoadBundleFileOperation TryGetFileLoader(string bundleName)
         {
-            if (_loaderDic.TryGetValue(bundleName, out BundleFileLoader value))
+            if (_loaderDic.TryGetValue(bundleName, out LoadBundleFileOperation value))
                 return value;
             else
                 return null;
         }
-        private ProviderBase TryGetProvider(string providerGUID)
+        private ProviderOperation TryGetProvider(string providerGUID)
         {
-            if (_providerDic.TryGetValue(providerGUID, out ProviderBase value))
+            if (_providerDic.TryGetValue(providerGUID, out ProviderOperation value))
                 return value;
             else
                 return null;

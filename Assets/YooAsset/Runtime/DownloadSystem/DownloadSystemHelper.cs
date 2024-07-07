@@ -43,7 +43,7 @@ namespace YooAsset
 #elif UNITY_OPENHARMONY
             return StringUtility.Format("file://{0}", path);
 #else
-            return path;
+            throw new System.NotImplementedException(); 
 #endif
         }
     }

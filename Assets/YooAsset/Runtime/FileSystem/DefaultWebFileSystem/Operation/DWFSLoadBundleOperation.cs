@@ -62,10 +62,9 @@ namespace YooAsset
                 }
             }
         }
-
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
-            if (IsDone == false)
+            if (_steps != ESteps.Done)
             {
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Failed;

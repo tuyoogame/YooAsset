@@ -20,8 +20,7 @@ namespace YooAsset
         internal override void InternalOnUpdate()
         {
         }
-
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
         }
         public override void AbortDownloadOperation()

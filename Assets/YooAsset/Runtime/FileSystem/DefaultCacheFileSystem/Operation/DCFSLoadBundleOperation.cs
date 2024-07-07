@@ -159,31 +159,23 @@ namespace YooAsset
                 }
             }
         }
-
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
             _isWaitForAsyncComplete = true;
 
-            int frame = 1000;
             while (true)
             {
-                // 保险机制
-                // 注意：如果需要从远端下载资源，可能会触发保险机制！
-                frame--;
-                if (frame == 0)
+                if(_downloadFileOp != null)
+                    _downloadFileOp.WaitForAsyncComplete();
+
+                if (ExecuteWhileDone())
                 {
-                    Status = EOperationStatus.Failed;
-                    Error = $"{nameof(WaitForAsyncComplete)} failed ! Try load bundle {_bundle.BundleName} from remote with sync load method !";
+                    if (_downloadFileOp != null && _downloadFileOp.Status == EOperationStatus.Failed)
+                        YooLogger.Error($"Try load bundle {_bundle.BundleName} from remote !");
+
                     _steps = ESteps.Done;
-                    YooLogger.Error(Error);
-                }
-
-                // 驱动流程
-                InternalOnUpdate();
-
-                // 完成后退出
-                if (IsDone)
                     break;
+                }
             }
         }
         public override void AbortDownloadOperation()
@@ -299,29 +291,21 @@ namespace YooAsset
                 }
             }
         }
-
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
-            int frame = 1000;
             while (true)
             {
-                // 保险机制
-                // 注意：如果需要从远端下载资源，可能会触发保险机制！
-                frame--;
-                if (frame == 0)
+                if (_downloadFileOp != null)
+                    _downloadFileOp.WaitForAsyncComplete();
+
+                if (ExecuteWhileDone())
                 {
-                    Status = EOperationStatus.Failed;
-                    Error = $"{nameof(WaitForAsyncComplete)} failed ! Try load bundle {_bundle.BundleName} from remote with sync load method !";
+                    if (_downloadFileOp != null && _downloadFileOp.Status == EOperationStatus.Failed)
+                        YooLogger.Error($"Try load bundle {_bundle.BundleName} from remote !");
+
                     _steps = ESteps.Done;
-                    YooLogger.Error(Error);
-                }
-
-                // 驱动流程
-                InternalOnUpdate();
-
-                // 完成后退出
-                if (IsDone)
                     break;
+                }
             }
         }
         public override void AbortDownloadOperation()

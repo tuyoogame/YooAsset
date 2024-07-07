@@ -17,20 +17,5 @@ namespace YooAsset
             _saveFileRoot = PathUtility.Combine(_packageRoot, DefaultUnpackFileSystemDefine.SaveFilesFolderName);
             _tempFileRoot = PathUtility.Combine(_packageRoot, DefaultUnpackFileSystemDefine.TempFilesFolderName);
         }
-        public override FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
-        {
-            if (RawFileBuildPipeline)
-            {
-                var operation = new DUFSLoadRawBundleOperation(this, bundle);
-                OperationSystem.StartOperation(PackageName, operation);
-                return operation;
-            }
-            else
-            {
-                var operation = new DUFSLoadAssetBundleOperation(this, bundle);
-                OperationSystem.StartOperation(PackageName, operation);
-                return operation;
-            }
-        }
     }
 }

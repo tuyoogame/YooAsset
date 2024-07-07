@@ -94,8 +94,6 @@ namespace YooAsset
             // 等待验证完成
             if (_steps == ESteps.CheckVerifyTempFile)
             {
-                // 注意：同步解压文件更新
-                _verifyOperation.InternalOnUpdate();
                 if (_verifyOperation.IsDone == false)
                     return;
 
@@ -103,21 +101,21 @@ namespace YooAsset
                 {
                     if (_fileSystem.WriteCacheFile(Bundle, _tempFilePath))
                     {
-                        Status = EOperationStatus.Succeed;
                         _steps = ESteps.Done;
+                        Status = EOperationStatus.Succeed;
                     }
                     else
                     {
-                        Error = $"{_fileSystem.GetType().FullName} failed to write file !";
-                        Status = EOperationStatus.Failed;
                         _steps = ESteps.Done;
+                        Status = EOperationStatus.Failed;
+                        Error = $"{_fileSystem.GetType().FullName} failed to write file !";
                         YooLogger.Error(Error);
                     }
                 }
                 else
                 {
-                    Error = _verifyOperation.Error;
                     _steps = ESteps.TryAgain;
+                    Error = _verifyOperation.Error;
                 }
 
                 // 注意：验证完成后直接删除文件
@@ -150,23 +148,30 @@ namespace YooAsset
             _steps = ESteps.Done;
             DisposeWebRequest();
         }
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
+            bool isReuqestLocalFile = IsRequestLocalFile();
+
             while (true)
             {
-                // 文件验证
                 if (_verifyOperation != null)
+                    _verifyOperation.WaitForAsyncComplete();
+
+                // 注意：如果是导入或解压本地文件，执行等待完毕
+                if (isReuqestLocalFile)
                 {
-                    if (_verifyOperation.IsDone == false)
-                        _verifyOperation.WaitForAsyncComplete();
+                    InternalOnUpdate();
+                    if (IsDone)
+                        break;
                 }
-
-                // 驱动流程
-                InternalOnUpdate();
-
-                // 完成后退出
-                if (IsDone)
-                    break;
+                else
+                {
+                    if (ExecuteWhileDone())
+                    {
+                        _steps = ESteps.Done;
+                        break;
+                    }
+                }
             }
         }
 
@@ -353,23 +358,30 @@ namespace YooAsset
             _steps = ESteps.Done;
             DisposeWebRequest();
         }
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
+            bool isReuqestLocalFile = IsRequestLocalFile();
+
             while (true)
             {
-                // 文件验证
                 if (_verifyOperation != null)
+                    _verifyOperation.WaitForAsyncComplete();
+
+                // 注意：如果是导入或解压本地文件，执行等待完毕
+                if (isReuqestLocalFile)
                 {
-                    if (_verifyOperation.IsDone == false)
-                        _verifyOperation.WaitForAsyncComplete();
+                    InternalOnUpdate();
+                    if (IsDone)
+                        break;
                 }
-
-                // 驱动流程
-                InternalOnUpdate();
-
-                // 完成后退出
-                if (IsDone)
-                    break;
+                else
+                {
+                    if (ExecuteWhileDone())
+                    {
+                        _steps = ESteps.Done;
+                        break;
+                    }
+                }
             }
         }
 

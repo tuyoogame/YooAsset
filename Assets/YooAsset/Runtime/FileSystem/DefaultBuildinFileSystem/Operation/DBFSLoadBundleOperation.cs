@@ -84,19 +84,17 @@ namespace YooAsset
                 }
             }
         }
-
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
             _isWaitForAsyncComplete = true;
 
             while (true)
             {
-                // 驱动流程
-                InternalOnUpdate();
-
-                // 完成后退出
-                if (IsDone)
+                if (ExecuteWhileDone())
+                {
+                    _steps = ESteps.Done;
                     break;
+                }
             }
         }
         public override void AbortDownloadOperation()
@@ -170,17 +168,15 @@ namespace YooAsset
                 }
             }
         }
-
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
             while (true)
             {
-                // 驱动流程
-                InternalOnUpdate();
-
-                // 完成后退出
-                if (IsDone)
+                if (ExecuteWhileDone())
+                {
+                    _steps = ESteps.Done;
                     break;
+                }
             }
         }
         public override void AbortDownloadOperation()

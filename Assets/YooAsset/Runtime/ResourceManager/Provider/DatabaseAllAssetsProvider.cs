@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace YooAsset
 {
-    internal sealed class DatabaseAllAssetsProvider : ProviderBase
+    internal sealed class DatabaseAllAssetsProvider : ProviderOperation
     {
         public DatabaseAllAssetsProvider(ResourceManager manager, string providerGUID, AssetInfo assetInfo) : base(manager, providerGUID, assetInfo)
         {
@@ -41,16 +41,12 @@ namespace YooAsset
             // 1. 检测资源包
             if (_steps == ESteps.CheckBundle)
             {
-                if (IsWaitForAsyncComplete)
-                    FileLoader.WaitForAsyncComplete();
-
-                if (FileLoader.IsDone() == false)
+                if (LoadBundleFileOp.IsDone == false)
                     return;
 
-                if (FileLoader.Status != BundleFileLoader.EStatus.Succeed)
+                if (LoadBundleFileOp.Status != EOperationStatus.Succeed)
                 {
-                    string error = FileLoader.LastError;
-                    InvokeCompletion(error, EOperationStatus.Failed);
+                    InvokeCompletion(LoadBundleFileOp.Error, EOperationStatus.Failed);
                     return;
                 }
 
@@ -63,7 +59,7 @@ namespace YooAsset
                 if (MainAssetInfo.AssetType == null)
                 {
                     List<UnityEngine.Object> result = new List<Object>();
-                    foreach (var assetPath in FileLoader.MainBundleInfo.IncludeAssetsInEditor)
+                    foreach (var assetPath in LoadBundleFileOp.BundleFileInfo.IncludeAssetsInEditor)
                     {
                         UnityEngine.Object mainAsset = UnityEditor.AssetDatabase.LoadMainAssetAtPath(assetPath);
                         if (mainAsset != null)
@@ -74,7 +70,7 @@ namespace YooAsset
                 else
                 {
                     List<UnityEngine.Object> result = new List<Object>();
-                    foreach (var assetPath in FileLoader.MainBundleInfo.IncludeAssetsInEditor)
+                    foreach (var assetPath in LoadBundleFileOp.BundleFileInfo.IncludeAssetsInEditor)
                     {
                         UnityEngine.Object mainAsset = UnityEditor.AssetDatabase.LoadAssetAtPath(assetPath, MainAssetInfo.AssetType);
                         if (mainAsset != null)

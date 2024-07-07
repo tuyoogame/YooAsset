@@ -8,7 +8,7 @@ namespace YooAsset
     {
         private System.Action<RawFileHandle> _callback;
 
-        internal RawFileHandle(ProviderBase provider) : base(provider)
+        internal RawFileHandle(ProviderOperation provider) : base(provider)
         {
         }
         internal override void InvokeCallback()

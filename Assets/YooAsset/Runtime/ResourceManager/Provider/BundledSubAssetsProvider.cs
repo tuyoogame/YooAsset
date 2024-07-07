@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace YooAsset
 {
-    internal sealed class BundledSubAssetsProvider : ProviderBase
+    internal sealed class BundledSubAssetsProvider : ProviderOperation
     {
         private AssetBundle _assetBundle;
         private AssetBundleRequest _cacheRequest;
@@ -29,45 +29,37 @@ namespace YooAsset
             // 1. 检测资源包
             if (_steps == ESteps.CheckBundle)
             {
-                if (IsWaitForAsyncComplete)
-                {
-                    DependLoaders.WaitForAsyncComplete();
-                    FileLoader.WaitForAsyncComplete();
-                }
-
-                if (DependLoaders.IsDone() == false)
+                if (LoadDependBundleFileOp.IsDone == false)
                     return;
-                if (FileLoader.IsDone() == false)
+                if (LoadBundleFileOp.IsDone == false)
                     return;
 
-                if (DependLoaders.IsSucceed() == false)
+                if (LoadDependBundleFileOp.Status != EOperationStatus.Succeed)
                 {
-                    string error = DependLoaders.GetLastError();
-                    InvokeCompletion(error, EOperationStatus.Failed);
+                    InvokeCompletion(LoadDependBundleFileOp.Error, EOperationStatus.Failed);
                     return;
                 }
 
-                if (FileLoader.Status != BundleFileLoader.EStatus.Succeed)
+                if (LoadBundleFileOp.Status != EOperationStatus.Succeed)
                 {
-                    string error = FileLoader.LastError;
-                    InvokeCompletion(error, EOperationStatus.Failed);
+                    InvokeCompletion(LoadBundleFileOp.Error, EOperationStatus.Failed);
                     return;
                 }
 
-                if (FileLoader.Result == null)
+                if (LoadBundleFileOp.Result == null)
                 {
                     ProcessFatalEvent();
                     return;
                 }
 
-                if (FileLoader.Result is AssetBundle == false)
+                if (LoadBundleFileOp.Result is AssetBundle == false)
                 {
                     string error = "Try load raw file using load assetbundle method !";
                     InvokeCompletion(error, EOperationStatus.Failed);
                     return;
                 }
 
-                _assetBundle = FileLoader.Result as AssetBundle;
+                _assetBundle = LoadBundleFileOp.Result as AssetBundle;
                 _steps = ESteps.Loading;
             }
 
@@ -115,9 +107,9 @@ namespace YooAsset
                 {
                     string error;
                     if (MainAssetInfo.AssetType == null)
-                        error = $"Failed to load sub assets : {MainAssetInfo.AssetPath} AssetType : null AssetBundle : {FileLoader.MainBundleInfo.Bundle.BundleName}";
+                        error = $"Failed to load sub assets : {MainAssetInfo.AssetPath} AssetType : null AssetBundle : {LoadBundleFileOp.BundleFileInfo.Bundle.BundleName}";
                     else
-                        error = $"Failed to load sub assets : {MainAssetInfo.AssetPath} AssetType : {MainAssetInfo.AssetType} AssetBundle : {FileLoader.MainBundleInfo.Bundle.BundleName}";
+                        error = $"Failed to load sub assets : {MainAssetInfo.AssetPath} AssetType : {MainAssetInfo.AssetType} AssetBundle : {LoadBundleFileOp.BundleFileInfo.Bundle.BundleName}";
                     YooLogger.Error(error);
                     InvokeCompletion(error, EOperationStatus.Failed);
                 }

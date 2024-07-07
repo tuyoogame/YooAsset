@@ -7,7 +7,7 @@ namespace YooAsset
     {
         private System.Action<SubAssetsHandle> _callback;
 
-        internal SubAssetsHandle(ProviderBase provider) : base(provider)
+        internal SubAssetsHandle(ProviderOperation provider) : base(provider)
         {
         }
         internal override void InvokeCallback()

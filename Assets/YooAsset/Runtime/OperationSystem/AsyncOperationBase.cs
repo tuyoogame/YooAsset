@@ -8,13 +8,13 @@ namespace YooAsset
 {
     public abstract class AsyncOperationBase : IEnumerator, IComparable<AsyncOperationBase>
     {
-        // 用户请求的回调
         private Action<AsyncOperationBase> _callback;
-
-        // 所属包裹
         private string _packageName = null;
+        private int _whileFrame = 1000;
 
-        // 是否已经完成
+        /// <summary>
+        /// 是否已经完成
+        /// </summary>
         internal bool IsFinish = false;
 
         /// <summary>
@@ -85,7 +85,13 @@ namespace YooAsset
 
         internal abstract void InternalOnStart();
         internal abstract void InternalOnUpdate();
-        internal virtual void InternalOnAbort() { }
+        internal virtual void InternalOnAbort()
+        {
+        }
+        internal virtual void InternalWaitForAsyncComplete()
+        {
+            throw new System.NotImplementedException(this.GetType().Name);
+        }
 
         internal string GetPackageName()
         {
@@ -125,19 +131,36 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 等待异步执行完毕
+        /// 执行While循环
         /// </summary>
-        public virtual void WaitForAsyncComplete()
+        protected bool ExecuteWhileDone()
         {
-            throw new System.NotImplementedException(this.GetType().Name);
+            if (IsDone == false)
+            {
+                // 执行更新逻辑
+                InternalOnUpdate();
+
+                // 当执行次数用完时
+                _whileFrame--;
+                if (_whileFrame == 0)
+                {
+                    Status = EOperationStatus.Failed;
+                    Error = $"Operation {this.GetType().Name} failed to wait for async complete !";
+                    YooLogger.Error(Error);
+                }
+            }
+            return IsDone;
         }
 
         /// <summary>
-        /// 清空完成回调
+        /// 等待异步执行完毕
         /// </summary>
-        protected void ClearCompletedCallback()
+        public void WaitForAsyncComplete()
         {
-            _callback = null;
+            if (IsDone)
+                return;
+
+            InternalWaitForAsyncComplete();
         }
 
         #region 排序接口实现
@@ -158,20 +181,6 @@ namespace YooAsset
         object IEnumerator.Current => null;
 
         private TaskCompletionSource<object> _taskCompletionSource;
-        #endregion
-
-        #region 调试方法
-        [Conditional("DEBUG")]
-        protected void DebugCheckWaitForAsyncComplete(string error = null)
-        {
-            if (IsDone == false)
-            {
-                if (string.IsNullOrEmpty(error))
-                    YooLogger.Error($"Operation {this.GetType().Name} failed to wait for async complete !");
-                else
-                    YooLogger.Error($"Operation {this.GetType().Name} failed to wait for async complete ! {error}");
-            }
-        }
         #endregion
     }
 }

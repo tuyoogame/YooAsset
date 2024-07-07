@@ -89,7 +89,7 @@ namespace YooAsset
                 float offset = UnityEngine.Time.realtimeSinceStartup - _latestDownloadRealtime;
                 if (offset > Param.Timeout)
                 {
-                    YooLogger.Warning($"Web file request timeout : {_requestURL}");
+                    YooLogger.Warning($"Download request timeout : {_requestURL}");
                     if (_webRequest != null)
                         _webRequest.Abort();
                     _isAbort = true;
@@ -125,6 +125,20 @@ namespace YooAsset
                 return true;
             }
 #endif
+        }
+
+        /// <summary>
+        /// 是否请求的本地文件
+        /// </summary>
+        protected bool IsRequestLocalFile()
+        {
+            //TODO : UNITY_STANDALONE_OSX平台目前无法确定
+            if (Param.MainURL.StartsWith("file:"))
+                return true;
+            if (Param.MainURL.StartsWith("jar:file:"))
+                return true;
+
+            return false;
         }
     }
 }

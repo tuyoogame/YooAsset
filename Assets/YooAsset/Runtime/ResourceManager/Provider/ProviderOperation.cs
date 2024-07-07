@@ -5,7 +5,7 @@ using System;
 
 namespace YooAsset
 {
-    internal abstract class ProviderBase : AsyncOperationBase
+    internal abstract class ProviderOperation : AsyncOperationBase
     {
         protected enum ESteps
         {
@@ -68,47 +68,52 @@ namespace YooAsset
 
 
         protected ESteps _steps = ESteps.None;
-        protected BundleFileLoader FileLoader { private set; get; }
-        protected DependFileLoaders DependLoaders { private set; get; }
+        protected LoadBundleFileOperation LoadBundleFileOp { private set; get; }
+        protected LoadDependBundleFileOperation LoadDependBundleFileOp { private set; get; }
         protected bool IsWaitForAsyncComplete { private set; get; } = false;
         private readonly List<HandleBase> _handles = new List<HandleBase>();
 
 
-        public ProviderBase(ResourceManager manager, string providerGUID, AssetInfo assetInfo)
+        public ProviderOperation(ResourceManager manager, string providerGUID, AssetInfo assetInfo)
         {
             ResourceMgr = manager;
             ProviderGUID = providerGUID;
             MainAssetInfo = assetInfo;
 
-            // 创建资源包加载器
-            if (manager != null)
+            if (string.IsNullOrEmpty(providerGUID) == false)
             {
-                FileLoader = manager.CreateOwnerFileLoader(assetInfo);
-                FileLoader.Reference();
-                FileLoader.AddProvider(this);
+                LoadBundleFileOp = manager.CreateMainBundleFileLoader(assetInfo);
+                LoadBundleFileOp.Reference();
+                LoadBundleFileOp.AddProvider(this);
 
-                var dependList = manager.CreateDependFileLoaders(assetInfo);
-                DependLoaders = new DependFileLoaders(dependList);
-                DependLoaders.Reference();
+                LoadDependBundleFileOp = manager.CreateDependFileLoaders(assetInfo);
+                LoadDependBundleFileOp.Reference();
             }
         }
 
-        /// <summary>
-        /// 等待异步执行完毕
-        /// </summary>
-        public override void WaitForAsyncComplete()
+        internal override void InternalWaitForAsyncComplete()
         {
             IsWaitForAsyncComplete = true;
 
-            // 注意：主动轮询更新完成同步加载
-            InternalOnUpdate();
-            DebugCheckWaitForAsyncComplete($"Loading asset {MainAssetInfo.AssetPath}");
+            while (true)
+            {
+                if (LoadDependBundleFileOp != null)
+                    LoadDependBundleFileOp.WaitForAsyncComplete();
+                if (LoadBundleFileOp != null)
+                    LoadBundleFileOp.WaitForAsyncComplete();
+
+                if (ExecuteWhileDone())
+                {
+                    _steps = ESteps.Done;
+                    break;
+                }
+            }
         }
 
         /// <summary>
         /// 销毁资源提供者
         /// </summary>
-        public void Destroy()
+        public void DestroyProvider()
         {
             IsDestroyed = true;
 
@@ -120,22 +125,22 @@ namespace YooAsset
             }
 
             // 释放资源包加载器
-            if (FileLoader != null)
+            if (LoadBundleFileOp != null)
             {
-                FileLoader.Release();
-                FileLoader = null;
+                LoadBundleFileOp.Release();
+                LoadBundleFileOp = null;
             }
-            if (DependLoaders != null)
+            if (LoadDependBundleFileOp != null)
             {
-                DependLoaders.Release();
-                DependLoaders = null;
+                LoadDependBundleFileOp.Release();
+                LoadDependBundleFileOp = null;
             }
         }
 
         /// <summary>
         /// 是否可以销毁
         /// </summary>
-        public bool CanDestroy()
+        public bool CanDestroyProvider()
         {
             // 注意：在进行资源加载过程时不可以销毁
             if (_steps == ESteps.Loading || _steps == ESteps.Checking)
@@ -202,10 +207,10 @@ namespace YooAsset
         /// </summary>
         protected void ProcessFatalEvent()
         {
-            if (FileLoader.IsDestroyed)
+            if (LoadBundleFileOp.IsDestroyed)
                 throw new System.Exception("Should never get here !");
 
-            string error = $"The bundle {FileLoader.MainBundleInfo.Bundle.BundleName} has been destroyed by unity bugs !";
+            string error = $"The bundle {LoadBundleFileOp.BundleFileInfo.Bundle.BundleName} has been destroyed by unity bugs !";
             YooLogger.Error(error);
             InvokeCompletion(Error, EOperationStatus.Failed);
         }
@@ -239,11 +244,11 @@ namespace YooAsset
         public DownloadStatus GetDownloadStatus()
         {
             DownloadStatus status = new DownloadStatus();
-            status.TotalBytes = FileLoader.MainBundleInfo.Bundle.FileSize;
-            status.DownloadedBytes = FileLoader.DownloadedBytes;
-            foreach (var dependBundle in DependLoaders.DependList)
+            status.TotalBytes = LoadBundleFileOp.BundleFileInfo.Bundle.FileSize;
+            status.DownloadedBytes = LoadBundleFileOp.DownloadedBytes;
+            foreach (var dependBundle in LoadDependBundleFileOp.Depends)
             {
-                status.TotalBytes += dependBundle.MainBundleInfo.Bundle.FileSize;
+                status.TotalBytes += dependBundle.BundleFileInfo.Bundle.FileSize;
                 status.DownloadedBytes += dependBundle.DownloadedBytes;
             }
 
@@ -313,12 +318,12 @@ namespace YooAsset
         internal void GetBundleDebugInfos(List<DebugBundleInfo> output)
         {
             var bundleInfo = new DebugBundleInfo();
-            bundleInfo.BundleName = FileLoader.MainBundleInfo.Bundle.BundleName;
-            bundleInfo.RefCount = FileLoader.RefCount;
-            bundleInfo.Status = FileLoader.Status.ToString();
+            bundleInfo.BundleName = LoadBundleFileOp.BundleFileInfo.Bundle.BundleName;
+            bundleInfo.RefCount = LoadBundleFileOp.RefCount;
+            bundleInfo.Status = LoadBundleFileOp.Status;
             output.Add(bundleInfo);
 
-            DependLoaders.GetBundleDebugInfos(output);
+            LoadDependBundleFileOp.GetBundleDebugInfos(output);
         }
         #endregion
     }

@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace YooAsset
 {
-    internal sealed class DatabaseSceneProvider : ProviderBase
+    internal sealed class DatabaseSceneProvider : ProviderOperation
     {
         public readonly LoadSceneMode SceneMode;
         private bool _suspendLoadMode;
@@ -36,16 +36,12 @@ namespace YooAsset
             // 1. 检测资源包
             if (_steps == ESteps.CheckBundle)
             {
-                if (IsWaitForAsyncComplete)
-                    FileLoader.WaitForAsyncComplete();
-
-                if (FileLoader.IsDone() == false)
+                if (LoadBundleFileOp.IsDone == false)
                     return;
 
-                if (FileLoader.Status != BundleFileLoader.EStatus.Succeed)
+                if (LoadBundleFileOp.Status != EOperationStatus.Succeed)
                 {
-                    string error = FileLoader.LastError;
-                    InvokeCompletion(error, EOperationStatus.Failed);
+                    InvokeCompletion(LoadBundleFileOp.Error, EOperationStatus.Failed);
                     return;
                 }
 

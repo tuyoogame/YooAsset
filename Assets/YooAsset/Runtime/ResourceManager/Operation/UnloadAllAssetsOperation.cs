@@ -33,8 +33,8 @@ namespace YooAsset
             if (_steps == ESteps.AbortDownload)
             {
                 // 注意：终止所有下载任务
-                var loaderList = _resManager._loaderList;
-                foreach (var loader in loaderList)
+                var loaderDic = _resManager._loaderDic;
+                foreach (var loader in loaderDic.Values)
                 {
                     loader.AbortDownloadOperation();
                 }
@@ -55,7 +55,6 @@ namespace YooAsset
 
             if (_steps == ESteps.UnloadAll)
             {
-                var loaderList = _resManager._loaderList;
                 var loaderDic = _resManager._loaderDic;
                 var providerDic = _resManager._providerDic;
 
@@ -68,18 +67,17 @@ namespace YooAsset
                 // 强制销毁资源提供者
                 foreach (var provider in providerDic.Values)
                 {
-                    provider.Destroy();
+                    provider.DestroyProvider();
                 }
 
                 // 强制销毁文件加载器
-                foreach (var loader in loaderList)
+                foreach (var loader in loaderDic.Values)
                 {
-                    loader.Destroy();
+                    loader.DestroyLoader();
                 }
 
                 // 清空数据
                 providerDic.Clear();
-                loaderList.Clear();
                 loaderDic.Clear();
                 _resManager.ClearSceneHandle();
 

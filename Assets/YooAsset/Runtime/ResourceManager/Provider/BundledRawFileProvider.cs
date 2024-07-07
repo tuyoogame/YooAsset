@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-    internal class BundledRawFileProvider : ProviderBase
+    internal class BundledRawFileProvider : ProviderOperation
     {
         public BundledRawFileProvider(ResourceManager manager, string providerGUID, AssetInfo assetInfo) : base(manager, providerGUID, assetInfo)
         {
@@ -23,20 +23,16 @@ namespace YooAsset
             // 1. 检测资源包
             if (_steps == ESteps.CheckBundle)
             {
-                if (IsWaitForAsyncComplete)
-                    FileLoader.WaitForAsyncComplete();
-
-                if (FileLoader.IsDone() == false)
+                if (LoadBundleFileOp.IsDone == false)
                     return;
 
-                if (FileLoader.Status != BundleFileLoader.EStatus.Succeed)
+                if (LoadBundleFileOp.Status != EOperationStatus.Succeed)
                 {
-                    string error = FileLoader.LastError;
-                    InvokeCompletion(error, EOperationStatus.Failed);
+                    InvokeCompletion(LoadBundleFileOp.Error, EOperationStatus.Failed);
                     return;
                 }
 
-                if (FileLoader.Result is string == false)
+                if (LoadBundleFileOp.Result is string == false)
                 {
                     string error = "Try load AssetBundle file using load raw file method !";
                     InvokeCompletion(error, EOperationStatus.Failed);
@@ -49,7 +45,7 @@ namespace YooAsset
             // 2. 检测加载结果
             if (_steps == ESteps.Checking)
             {
-                RawFilePath = FileLoader.Result as string;
+                RawFilePath = LoadBundleFileOp.Result as string;
                 InvokeCompletion(string.Empty, EOperationStatus.Succeed);
             }
         }

@@ -20,14 +20,14 @@ namespace YooAsset
 
         private ESteps _steps = ESteps.None;
         private readonly string _error;
-        private readonly ProviderBase _provider;
+        private readonly ProviderOperation _provider;
         private AsyncOperation _asyncOp;
 
         internal UnloadSceneOperation(string error)
         {
             _error = error;
         }
-        internal UnloadSceneOperation(ProviderBase provider)
+        internal UnloadSceneOperation(ProviderOperation provider)
         {
             _error = null;
             _provider = provider;

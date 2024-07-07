@@ -175,10 +175,6 @@ namespace YooAsset
     /// </summary>
     public abstract class InitializeParameters
     {
-        /// <summary>
-        /// 自动销毁不再使用的资源提供者
-        /// </summary>
-        public bool AutoDestroyAssetProvider = false;
     }
 
     /// <summary>
