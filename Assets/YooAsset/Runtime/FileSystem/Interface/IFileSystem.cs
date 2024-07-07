@@ -9,11 +9,6 @@ namespace YooAsset
         string PackageName { get; }
 
         /// <summary>
-        /// 文件访问权限
-        /// </summary>
-        EFileAccess FileSystemAccess { get; }
-
-        /// <summary>
         /// 文件根目录
         /// </summary>
         string FileRoot { get; }

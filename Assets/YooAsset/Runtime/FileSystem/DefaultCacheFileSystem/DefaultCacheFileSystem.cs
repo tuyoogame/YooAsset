@@ -46,17 +46,6 @@ namespace YooAsset
         public string PackageName { private set; get; }
 
         /// <summary>
-        /// 文件访问权限
-        /// </summary>
-        public EFileAccess FileSystemAccess
-        {
-            get
-            {
-                return EFileAccess.ReadWrite;
-            }
-        }
-
-        /// <summary>
         /// 文件根目录
         /// </summary>
         public string FileRoot
