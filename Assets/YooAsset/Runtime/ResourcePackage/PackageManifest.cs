@@ -344,7 +344,7 @@ namespace YooAsset
             if (string.IsNullOrEmpty(location) == false)
             {
                 // 检查路径末尾是否有空格
-                int index = location.LastIndexOf(" ");
+                int index = location.LastIndexOf(' ');
                 if (index != -1)
                 {
                     if (location.Length == index + 1)

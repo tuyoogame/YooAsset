@@ -14,7 +14,7 @@ namespace YooAsset.Editor
 
         protected override string[] GetBundleDepends(BuildContext context, string bundleName)
         {
-            return new string[] { };
+            return Array.Empty<string>();
         }
     }
 }

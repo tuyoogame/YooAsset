@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace YooAsset
 {
@@ -29,7 +27,7 @@ namespace YooAsset
             if (string.IsNullOrEmpty(str))
                 return str;
 
-            int index = str.LastIndexOf(".");
+            int index = str.LastIndexOf('.');
             if (index == -1)
                 return str;
             else

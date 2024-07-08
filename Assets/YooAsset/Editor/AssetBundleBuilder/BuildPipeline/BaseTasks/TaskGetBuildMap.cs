@@ -56,9 +56,9 @@ namespace YooAsset.Editor
                 string bundleName = collectAssetInfo.BundleName;
                 foreach (var dependAsset in collectAssetInfo.DependAssets)
                 {
-                    if (allBuildAssetInfos.ContainsKey(dependAsset.AssetPath))
+                    if (allBuildAssetInfos.TryGetValue(dependAsset.AssetPath, out var value))
                     {
-                        allBuildAssetInfos[dependAsset.AssetPath].AddReferenceBundleName(bundleName);
+                        value.AddReferenceBundleName(bundleName);
                     }
                     else
                     {
