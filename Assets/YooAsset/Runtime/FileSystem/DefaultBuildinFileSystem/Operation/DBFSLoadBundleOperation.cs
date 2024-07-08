@@ -111,7 +111,6 @@ namespace YooAsset
         {
             None,
             LoadBuildinRawBundle,
-            CheckLoadBuildinResult,
             Done,
         }
 
@@ -139,32 +138,17 @@ namespace YooAsset
             if (_steps == ESteps.LoadBuildinRawBundle)
             {
                 string filePath = _fileSystem.GetBuildinFileLoadPath(_bundle);
-                Result = filePath;
-                _steps = ESteps.CheckLoadBuildinResult;
-            }
-
-            if (_steps == ESteps.CheckLoadBuildinResult)
-            {
-                if (Result != null)
+                if (File.Exists(filePath))
                 {
-                    string filePath = Result as string;
-                    if (File.Exists(filePath))
-                    {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Succeed;
-                    }
-                    else
-                    {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Failed;
-                        Error = $"Can not found buildin raw bundle file : {filePath}";
-                    }
+                    _steps = ESteps.Done;
+                    Result = new RawBundle(_fileSystem, _bundle, filePath);
+                    Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Failed to load buildin raw bundle file : {_bundle.BundleName}";
+                    Error = $"Can not found buildin raw bundle file : {filePath}";
                 }
             }
         }

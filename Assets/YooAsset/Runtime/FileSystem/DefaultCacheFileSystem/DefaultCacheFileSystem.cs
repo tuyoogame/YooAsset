@@ -303,6 +303,23 @@ namespace YooAsset
             return Exists(bundle) == false;
         }
 
+        public virtual byte[] ReadFileData(PackageBundle bundle)
+        {
+            if (Exists(bundle) == false)
+                return null;
+
+            string filePath = GetCacheFileLoadPath(bundle);
+            return FileUtility.ReadAllBytes(filePath);
+        }
+        public virtual string ReadFileText(PackageBundle bundle)
+        {
+            if (Exists(bundle) == false)
+                return null;
+
+            string filePath = GetCacheFileLoadPath(bundle);
+            return FileUtility.ReadAllText(filePath);
+        }
+
         #region 内部方法
         private readonly BufferWriter _sharedBuffer = new BufferWriter(1024);
         public void WriteInfoFile(string filePath, string dataFileCRC, long dataFileSize)
@@ -368,7 +385,7 @@ namespace YooAsset
             }
             return filePath;
         }
-        public string GetFileLoadPath(PackageBundle bundle)
+        public string GetCacheFileLoadPath(PackageBundle bundle)
         {
             return GetDataFilePath(bundle);
         }

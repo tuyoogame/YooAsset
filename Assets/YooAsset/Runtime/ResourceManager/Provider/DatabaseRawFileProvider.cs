@@ -53,7 +53,7 @@ namespace YooAsset
             // 2. 检测加载结果
             if (_steps == ESteps.Checking)
             {
-                RawFilePath = MainAssetInfo.AssetPath;
+                RawBundleObject = new RawBundle(null, null, MainAssetInfo.AssetPath);
                 InvokeCompletion(string.Empty, EOperationStatus.Succeed);
             }
 #endif

@@ -157,6 +157,15 @@ namespace YooAsset
             return false;
         }
 
+        public virtual byte[] ReadFileData(PackageBundle bundle)
+        {
+            throw new System.NotImplementedException();
+        }
+        public virtual string ReadFileText(PackageBundle bundle)
+        {
+            throw new System.NotImplementedException();
+        }
+
         #region 内部方法
         protected string GetDefaultWebRoot()
         {

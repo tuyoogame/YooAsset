@@ -47,14 +47,14 @@ namespace YooAsset
         public UnityEngine.SceneManagement.Scene SceneObject { protected set; get; }
 
         /// <summary>
+        /// 获取的原生对象
+        /// </summary>
+        public RawBundle RawBundleObject { protected set; get; }
+
+        /// <summary>
         /// 加载的场景名称
         /// </summary>
         public string SceneName { protected set; get; }
-
-        /// <summary>
-        /// 原生文件路径
-        /// </summary>
-        public string RawFilePath { protected set; get; }
 
         /// <summary>
         /// 引用计数

@@ -38,7 +38,7 @@ namespace YooAsset
         /// 清空所有的文件
         /// </summary>
         FSClearAllBundleFilesOperation ClearAllBundleFilesAsync();
-        
+
         /// <summary>
         /// 清空未使用的文件
         /// </summary>
@@ -95,10 +95,21 @@ namespace YooAsset
         /// 是否需要解压
         /// </summary>
         bool NeedUnpack(PackageBundle bundle);
-        
+
         /// <summary>
         /// 是否需要导入
         /// </summary>
         bool NeedImport(PackageBundle bundle);
+
+
+        /// <summary>
+        /// 读取文件二进制数据
+        /// </summary>
+        byte[] ReadFileData(PackageBundle bundle);
+
+        /// <summary>
+        /// 读取文件文本数据
+        /// </summary>
+        string ReadFileText(PackageBundle bundle);
     }
 }

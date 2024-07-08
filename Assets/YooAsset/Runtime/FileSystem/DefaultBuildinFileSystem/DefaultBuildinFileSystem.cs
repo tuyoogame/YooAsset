@@ -254,6 +254,29 @@ namespace YooAsset
             return false;
         }
 
+        public virtual byte[] ReadFileData(PackageBundle bundle)
+        {
+            if (NeedUnpack(bundle))
+                return _unpackFileSystem.ReadFileData(bundle);
+
+            if (Exists(bundle) == false)
+                return null;
+
+            string filePath = GetBuildinFileLoadPath(bundle);
+            return FileUtility.ReadAllBytes(filePath);
+        }
+        public virtual string ReadFileText(PackageBundle bundle)
+        {
+            if (NeedUnpack(bundle))
+                return _unpackFileSystem.ReadFileText(bundle);
+
+            if (Exists(bundle) == false)
+                return null;
+
+            string filePath = GetBuildinFileLoadPath(bundle);
+            return FileUtility.ReadAllText(filePath);
+        }
+
         #region 内部方法
         protected string GetDefaultRoot()
         {

@@ -78,7 +78,7 @@ namespace YooAsset
 
             if (_steps == ESteps.LoadAssetBundle)
             {
-                string filePath = _fileSystem.GetFileLoadPath(_bundle);
+                string filePath = _fileSystem.GetCacheFileLoadPath(_bundle);
                 if (_isWaitForAsyncComplete)
                 {
                     Result = AssetBundle.LoadFromFile(filePath);
@@ -122,7 +122,7 @@ namespace YooAsset
                     {
                         // 注意：在安卓移动平台，华为和三星真机上有极小概率加载资源包失败。
                         // 说明：大多数情况在首次安装下载资源到沙盒内，游戏过程中切换到后台再回到游戏内有很大概率触发！
-                        string filePath = _fileSystem.GetFileLoadPath(_bundle);
+                        string filePath = _fileSystem.GetCacheFileLoadPath(_bundle);
                         byte[] fileData = FileUtility.ReadAllBytes(filePath);
                         if (fileData != null && fileData.Length > 0)
                         {
@@ -165,7 +165,7 @@ namespace YooAsset
 
             while (true)
             {
-                if(_downloadFileOp != null)
+                if (_downloadFileOp != null)
                     _downloadFileOp.WaitForAsyncComplete();
 
                 if (ExecuteWhileDone())
@@ -195,8 +195,7 @@ namespace YooAsset
             None,
             CheckExist,
             DownloadFile,
-            LoadRawBundle,
-            CheckResult,
+            LoadCacheRawBundle,
             Done,
         }
 
@@ -226,7 +225,7 @@ namespace YooAsset
                 {
                     DownloadProgress = 1f;
                     DownloadedBytes = _bundle.FileSize;
-                    _steps = ESteps.LoadRawBundle;
+                    _steps = ESteps.LoadCacheRawBundle;
                 }
                 else
                 {
@@ -249,7 +248,7 @@ namespace YooAsset
 
                 if (_downloadFileOp.Status == EOperationStatus.Succeed)
                 {
-                    _steps = ESteps.LoadRawBundle;
+                    _steps = ESteps.LoadCacheRawBundle;
                 }
                 else
                 {
@@ -259,35 +258,20 @@ namespace YooAsset
                 }
             }
 
-            if (_steps == ESteps.LoadRawBundle)
+            if (_steps == ESteps.LoadCacheRawBundle)
             {
-                string filePath = _fileSystem.GetFileLoadPath(_bundle);
-                Result = filePath;
-                _steps = ESteps.CheckResult;
-            }
-
-            if (_steps == ESteps.CheckResult)
-            {
-                if (Result != null)
+                string filePath = _fileSystem.GetCacheFileLoadPath(_bundle);
+                if (File.Exists(filePath))
                 {
-                    string filePath = Result as string;
-                    if (File.Exists(filePath))
-                    {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Succeed;
-                    }
-                    else
-                    {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Failed;
-                        Error = $"Can not found cache raw bundle file : {filePath}";
-                    }
+                    _steps = ESteps.Done;
+                    Result = new RawBundle(_fileSystem, _bundle, filePath);
+                    Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Failed to load cache raw bundle file : {_bundle.BundleName}";
+                    Error = $"Can not found cache raw bundle file : {filePath}";
                 }
             }
         }

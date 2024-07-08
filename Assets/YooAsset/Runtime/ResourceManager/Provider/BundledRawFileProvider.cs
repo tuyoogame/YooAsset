@@ -32,7 +32,7 @@ namespace YooAsset
                     return;
                 }
 
-                if (LoadBundleFileOp.Result is string == false)
+                if (LoadBundleFileOp.Result is RawBundle == false)
                 {
                     string error = "Try load AssetBundle file using load raw file method !";
                     InvokeCompletion(error, EOperationStatus.Failed);
@@ -45,7 +45,7 @@ namespace YooAsset
             // 2. 检测加载结果
             if (_steps == ESteps.Checking)
             {
-                RawFilePath = LoadBundleFileOp.Result as string;
+                RawBundleObject = LoadBundleFileOp.Result as RawBundle;
                 InvokeCompletion(string.Empty, EOperationStatus.Succeed);
             }
         }

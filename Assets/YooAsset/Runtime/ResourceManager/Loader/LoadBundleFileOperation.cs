@@ -45,7 +45,7 @@ namespace YooAsset
         public long DownloadedBytes { set; get; } = 0;
 
         /// <summary>
-        /// 下载结果
+        /// 加载结果
         /// </summary>
         public object Result { set; get; }
 

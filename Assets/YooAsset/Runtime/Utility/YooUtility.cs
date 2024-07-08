@@ -121,7 +121,7 @@ namespace YooAsset
         public static string ReadAllText(string filePath)
         {
             if (File.Exists(filePath) == false)
-                return string.Empty;
+                return null;
             return File.ReadAllText(filePath, Encoding.UTF8);
         }
 
