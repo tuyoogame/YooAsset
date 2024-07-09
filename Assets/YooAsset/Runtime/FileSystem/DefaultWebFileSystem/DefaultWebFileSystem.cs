@@ -201,6 +201,11 @@ namespace YooAsset
             string fileName = YooAssetSettingsData.GetManifestBinaryFileName(PackageName, packageVersion);
             return PathUtility.Combine(FileRoot, fileName);
         }
+        public string GetStreamingAssetsPackageRoot()
+        {
+            string rootPath = PathUtility.Combine(Application.dataPath, "StreamingAssets", YooAssetSettingsData.Setting.DefaultYooFolderName);
+            return PathUtility.Combine(rootPath, PackageName);
+        }
 
         /// <summary>
         /// 记录文件信息

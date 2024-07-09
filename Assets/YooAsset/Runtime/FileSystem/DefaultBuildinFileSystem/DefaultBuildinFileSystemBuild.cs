@@ -24,7 +24,7 @@ namespace YooAsset
             DirectoryInfo rootDirectory = new DirectoryInfo(rootPath);
             if (rootDirectory.Exists == false)
             {
-                Debug.LogWarning($"Can not found buildin root folder : {rootPath}");
+                Debug.LogWarning($"Can not found StreamingAssets root directory : {rootPath}");
                 return;
             }
 
@@ -32,10 +32,14 @@ namespace YooAsset
             DirectoryInfo[] subDirectories = rootDirectory.GetDirectories();
             foreach (var subDirectory in subDirectories)
             {
-                CreateBuildinManifest(subDirectory.Name, subDirectory.FullName);
+                CreateBuildinCatalogFile(subDirectory.Name, subDirectory.FullName);
             }
         }
-        private void CreateBuildinManifest(string packageName, string pacakgeDirectory)
+        
+        /// <summary>
+        /// 生成包裹的内置资源目录文件
+        /// </summary>
+        public static void CreateBuildinCatalogFile(string packageName, string pacakgeDirectory)
         {
             // 获取资源清单版本
             string packageVersion;

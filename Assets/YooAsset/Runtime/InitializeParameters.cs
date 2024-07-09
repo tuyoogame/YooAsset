@@ -92,8 +92,7 @@ namespace YooAsset
         public static FileSystemParameters CreateDefaultEditorFileSystemParameters(SimulateBuildResult simulateBuildResult)
         {
             string fileSystemClass = typeof(DefaultEditorFileSystem).FullName;
-            var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
-            fileSystemParams.AddParameter("SIMULATE_BUILD_RESULT", simulateBuildResult);
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, simulateBuildResult.PackageRootDirectory);
             return fileSystemParams;
         }
 

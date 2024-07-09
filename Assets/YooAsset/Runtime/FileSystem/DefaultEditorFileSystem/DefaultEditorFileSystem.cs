@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 namespace YooAsset
 {
     /// <summary>
@@ -35,13 +36,6 @@ namespace YooAsset
             }
         }
 
-        #region 自定义参数
-        /// <summary>
-        /// 自定义参数：模拟构建结果
-        /// </summary>
-        public SimulateBuildResult BuildResult { private set; get; } = null;
-        #endregion
-
 
         public DefaultEditorFileSystem()
         {
@@ -54,7 +48,7 @@ namespace YooAsset
         }
         public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(string packageVersion, int timeout)
         {
-            var operation = new DEFSLoadPackageManifestOperation(this);
+            var operation = new DEFSLoadPackageManifestOperation(this, packageVersion);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
@@ -92,23 +86,17 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == "SIMULATE_BUILD_RESULT")
-            {
-                BuildResult = (SimulateBuildResult)value;
-            }
-            else
-            {
-                YooLogger.Warning($"Invalid parameter : {name}");
-            }
+            YooLogger.Warning($"Invalid parameter : {name}");
         }
         public virtual void OnCreate(string packageName, string rootDirectory)
         {
             PackageName = packageName;
 
             if (string.IsNullOrEmpty(rootDirectory))
-                rootDirectory = GetDefaultRoot();
+                throw new Exception($"{nameof(DefaultEditorFileSystem)} root directory is null or empty !");
 
-            _packageRoot = PathUtility.Combine(rootDirectory, packageName);
+            // 注意：基础目录即为包裹目录
+            _packageRoot = rootDirectory;
         }
         public virtual void OnUpdate()
         {
@@ -143,11 +131,22 @@ namespace YooAsset
         {
             throw new System.NotImplementedException();
         }
-
+        
         #region 内部方法
-        protected string GetDefaultRoot()
+        public string GetEditorPackageVersionFilePath()
         {
-            return "Assets/";
+            string fileName = YooAssetSettingsData.GetPackageVersionFileName(PackageName);
+            return PathUtility.Combine(FileRoot, fileName);
+        }
+        public string GetEditorPackageHashFilePath(string packageVersion)
+        {
+            string fileName = YooAssetSettingsData.GetPackageHashFileName(PackageName, packageVersion);
+            return PathUtility.Combine(FileRoot, fileName);
+        }
+        public string GetEditorPackageManifestFilePath(string packageVersion)
+        {
+            string fileName = YooAssetSettingsData.GetManifestBinaryFileName(PackageName, packageVersion);
+            return PathUtility.Combine(FileRoot, fileName);
         }
         #endregion
     }

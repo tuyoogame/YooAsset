@@ -18,14 +18,12 @@ namespace YooAsset
             None,
             CreateFileSystem,
             InitFileSystem,
-            LoadManifestFile,
             Done,
         }
 
         private readonly EditorSimulateModeImpl _impl;
         private readonly EditorSimulateModeParameters _parameters;
         private FSInitializeFileSystemOperation _initFileSystemOp;
-        private FSLoadPackageManifestOperation _loadPackageManifestOp;
         private ESteps _steps = ESteps.None;
 
         internal EditorSimulateModeInitializationOperation(EditorSimulateModeImpl impl, EditorSimulateModeParameters parameters)
@@ -72,36 +70,14 @@ namespace YooAsset
 
                 if (_initFileSystemOp.Status == EOperationStatus.Succeed)
                 {
-                    _steps = ESteps.LoadManifestFile;
-                }
-                else
-                {
                     _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _initFileSystemOp.Error;
-                }
-            }
-
-            if (_steps == ESteps.LoadManifestFile)
-            {
-                if (_loadPackageManifestOp == null)
-                    _loadPackageManifestOp = _impl.EditorFileSystem.LoadPackageManifestAsync(null, int.MaxValue);
-
-                Progress = _loadPackageManifestOp.Progress;
-                if (_loadPackageManifestOp.IsDone == false)
-                    return;
-
-                if (_loadPackageManifestOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    _impl.ActiveManifest = _loadPackageManifestOp.Manifest;
                     Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _loadPackageManifestOp.Error;
+                    Error = _initFileSystemOp.Error;
                 }
             }
         }
@@ -117,13 +93,13 @@ namespace YooAsset
             None,
             CreateFileSystem,
             InitFileSystem,
-            LoadManifestFile,
             Done,
         }
 
         private readonly OfflinePlayModeImpl _impl;
         private readonly OfflinePlayModeParameters _parameters;
         private FSInitializeFileSystemOperation _initFileSystemOp;
+        private FSRequestPackageVersionOperation _requestPackageVersionOp;
         private FSLoadPackageManifestOperation _loadPackageManifestOp;
         private ESteps _steps = ESteps.None;
 
@@ -174,36 +150,14 @@ namespace YooAsset
 
                 if (_initFileSystemOp.Status == EOperationStatus.Succeed)
                 {
-                    _steps = ESteps.LoadManifestFile;
-                }
-                else
-                {
                     _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _initFileSystemOp.Error;
-                }
-            }
-
-            if (_steps == ESteps.LoadManifestFile)
-            {
-                if (_loadPackageManifestOp == null)
-                    _loadPackageManifestOp = _impl.BuildinFileSystem.LoadPackageManifestAsync(null, int.MaxValue);
-
-                Progress = _loadPackageManifestOp.Progress;
-                if (_loadPackageManifestOp.IsDone == false)
-                    return;
-
-                if (_loadPackageManifestOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.Done;
-                    _impl.ActiveManifest = _loadPackageManifestOp.Manifest;
                     Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _loadPackageManifestOp.Error;
+                    Error = _initFileSystemOp.Error;
                 }
             }
         }

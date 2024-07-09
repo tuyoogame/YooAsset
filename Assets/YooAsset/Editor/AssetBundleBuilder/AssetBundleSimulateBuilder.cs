@@ -73,12 +73,7 @@ namespace YooAsset.Editor
             if (buildResult.Success)
             {
                 SimulateBuildResult reulst = new SimulateBuildResult();
-                string versionFileName = YooAssetSettingsData.GetPackageVersionFileName(packageName);
-                string manifestFileName = YooAssetSettingsData.GetManifestBinaryFileName(packageName, packageVersion);
-                string hashFileName = YooAssetSettingsData.GetPackageHashFileName(packageName, packageVersion);
-                reulst.PackageVersionFilePath = $"{buildResult.OutputPackageDirectory}/{versionFileName}";
-                reulst.PackageManifestFilePath = $"{buildResult.OutputPackageDirectory}/{manifestFileName}";
-                reulst.PackageHashFilePath = $"{buildResult.OutputPackageDirectory}/{hashFileName}";
+                reulst.PackageRootDirectory = buildResult.OutputPackageDirectory;
                 return reulst;
             }
             else

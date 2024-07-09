@@ -6,61 +6,37 @@ namespace YooAsset
         private enum ESteps
         {
             None,
-            RequestBuildinPackageVersion,
             RequestBuildinPackageHash,
             LoadBuildinPackageManifest,
             Done,
         }
 
         private readonly DefaultBuildinFileSystem _fileSystem;
-        private RequestBuildinPackageVersionOperation _requestBuildinPackageVersionOp;
+        private readonly string _packageVersion;
         private RequestBuildinPackageHashOperation _requestBuildinPackageHashOp;
         private LoadBuildinPackageManifestOperation _loadBuildinPackageManifestOp;
         private ESteps _steps = ESteps.None;
 
 
-        public DBFSLoadPackageManifestOperation(DefaultBuildinFileSystem fileSystem)
+        public DBFSLoadPackageManifestOperation(DefaultBuildinFileSystem fileSystem, string packageVersion)
         {
             _fileSystem = fileSystem;
+            _packageVersion = packageVersion;
         }
         internal override void InternalOnStart()
         {
-            _steps = ESteps.RequestBuildinPackageVersion;
+            _steps = ESteps.RequestBuildinPackageHash;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.RequestBuildinPackageVersion)
-            {
-                if (_requestBuildinPackageVersionOp == null)
-                {
-                    _requestBuildinPackageVersionOp = new RequestBuildinPackageVersionOperation(_fileSystem);
-                    OperationSystem.StartOperation(_fileSystem.PackageName, _requestBuildinPackageVersionOp);
-                }
-
-                if (_requestBuildinPackageVersionOp.IsDone == false)
-                    return;
-
-                if (_requestBuildinPackageVersionOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.RequestBuildinPackageHash;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _requestBuildinPackageVersionOp.Error;
-                }
-            }
-
             if (_steps == ESteps.RequestBuildinPackageHash)
             {
                 if (_requestBuildinPackageHashOp == null)
                 {
-                    string packageVersion = _requestBuildinPackageVersionOp.PackageVersion;
-                    _requestBuildinPackageHashOp = new RequestBuildinPackageHashOperation(_fileSystem, packageVersion);
+                    _requestBuildinPackageHashOp = new RequestBuildinPackageHashOperation(_fileSystem, _packageVersion);
                     OperationSystem.StartOperation(_fileSystem.PackageName, _requestBuildinPackageHashOp);
                 }
 
@@ -83,9 +59,8 @@ namespace YooAsset
             {
                 if (_loadBuildinPackageManifestOp == null)
                 {
-                    string packageVersion = _requestBuildinPackageVersionOp.PackageVersion;
                     string packageHash = _requestBuildinPackageHashOp.PackageHash;
-                    _loadBuildinPackageManifestOp = new LoadBuildinPackageManifestOperation(_fileSystem, packageVersion, packageHash);
+                    _loadBuildinPackageManifestOp = new LoadBuildinPackageManifestOperation(_fileSystem, _packageVersion, packageHash);
                     OperationSystem.StartOperation(_fileSystem.PackageName, _loadBuildinPackageManifestOp);
                 }
 

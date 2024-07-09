@@ -32,6 +32,13 @@ namespace YooAsset
             {
                 if (_loadCatalogFileOp == null)
                 {
+#if UNITY_EDITOR
+                    // 兼容性初始化
+                    // 说明：内置文件系统在编辑器下运行时需要动态生成
+                    string packageRoot = _fileSystem.GetStreamingAssetsPackageRoot();
+                    DefaultBuildinFileSystemBuild.CreateBuildinCatalogFile(_fileSystem.PackageName, packageRoot);
+#endif
+
                     _loadCatalogFileOp = new LoadWebCatalogFileOperation(_fileSystem);
                     OperationSystem.StartOperation(_fileSystem.PackageName, _loadCatalogFileOp);
                 }

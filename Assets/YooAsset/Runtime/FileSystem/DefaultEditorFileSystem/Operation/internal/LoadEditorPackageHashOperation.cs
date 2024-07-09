@@ -2,51 +2,53 @@
 
 namespace YooAsset
 {
-    internal class LoadEditorPackageVersionOperation : AsyncOperationBase
+    internal class LoadEditorPackageHashOperation : AsyncOperationBase
     {
         private enum ESteps
         {
             None,
-            LoadVersion,
+            LoadHash,
             Done,
         }
 
         private readonly DefaultEditorFileSystem _fileSystem;
+        private readonly string _packageVersion;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
-        /// 包裹版本
+        /// 包裹哈希值
         /// </summary>
-        public string PackageVersion { private set; get; }
+        public string PackageHash { private set; get; }
 
 
-        internal LoadEditorPackageVersionOperation(DefaultEditorFileSystem fileSystem)
+        internal LoadEditorPackageHashOperation(DefaultEditorFileSystem fileSystem, string packageVersion)
         {
             _fileSystem = fileSystem;
+            _packageVersion = packageVersion;
         }
         internal override void InternalOnStart()
         {
-            _steps = ESteps.LoadVersion;
+            _steps = ESteps.LoadHash;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.LoadVersion)
+            if (_steps == ESteps.LoadHash)
             {
-                string versionFilePath = _fileSystem.GetEditorPackageVersionFilePath();
-                if (File.Exists(versionFilePath))
+                string hashFilePath = _fileSystem.GetEditorPackageHashFilePath(_packageVersion);
+                if (File.Exists(hashFilePath))
                 {
                     _steps = ESteps.Done;
-                    PackageVersion = FileUtility.ReadAllText(versionFilePath);
+                    PackageHash = FileUtility.ReadAllText(hashFilePath);
                     Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Can not found simulation package version file : {versionFilePath}";
+                    Error = $"Can not found simulation package hash file : {hashFilePath}";
                 }
             }
         }

@@ -106,19 +106,13 @@ namespace YooAsset
         }
         public virtual FSInitializeFileSystemOperation InitializeFileSystemAsync()
         {
-#if UNITY_EDITOR
-            var operation = new DBFSInitializeInEditorPlayModeOperation(this);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
-#else
             var operation = new DBFSInitializeOperation(this);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
-#endif
         }
         public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(string packageVersion, int timeout)
         {
-            var operation = new DBFSLoadPackageManifestOperation(this);
+            var operation = new DBFSLoadPackageManifestOperation(this, packageVersion);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
@@ -311,7 +305,12 @@ namespace YooAsset
             string fileName = YooAssetSettingsData.GetManifestBinaryFileName(PackageName, packageVersion);
             return PathUtility.Combine(FileRoot, fileName);
         }
-
+        public string GetStreamingAssetsPackageRoot()
+        {
+            string rootPath = PathUtility.Combine(Application.dataPath, "StreamingAssets", YooAssetSettingsData.Setting.DefaultYooFolderName);
+            return PathUtility.Combine(rootPath, PackageName);
+        }
+        
         /// <summary>
         /// 记录文件信息
         /// </summary>
