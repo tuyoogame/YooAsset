@@ -2,6 +2,18 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.2.1-preview] - 2024-07-10
+
+统一了所有PlayMode的初始化逻辑，EditorSimulateMode和OfflinePlayMode初始化不再主动加载资源清单！
+
+### Added
+
+- 新增了IFileSystem.ReadFileData方法，支持原生文件自定义获取文本和二进制数据。
+
+### Improvements
+
+- 优化了DefaultWebFileSystem和DefaultBuildFileSystem文件系统的内部初始化逻辑。
+
 ## [2.2.0-preview] - 2024-07-07
 
 重构了运行时代码，新增了文件系统接口（IFileSystem）方便开发者扩展特殊需求。
