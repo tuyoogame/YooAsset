@@ -1,4 +1,4 @@
-﻿#if UNITY_WECHAT_GAME
+﻿#if UNITY_WEBGL && WEIXINMINIGAME
 using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
@@ -52,12 +52,12 @@ internal class WechatFileSystem : IFileSystem
         }
     }
 
-    #region 自定义参数
+#region 自定义参数
     /// <summary>
     /// 自定义参数：远程服务接口
     /// </summary>
     public IRemoteServices RemoteServices { private set; get; } = null;
-    #endregion
+#endregion
 
 
     public WechatFileSystem()
@@ -171,7 +171,7 @@ internal class WechatFileSystem : IFileSystem
         throw new System.NotImplementedException();
     }
 
-    #region 内部方法
+#region 内部方法
     private string GetWXFileLoadPath(PackageBundle bundle)
     {
         if (_wxFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
@@ -181,6 +181,6 @@ internal class WechatFileSystem : IFileSystem
         }
         return filePath;
     }
-    #endregion
+#endregion
 }
 #endif

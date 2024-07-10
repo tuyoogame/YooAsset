@@ -1,4 +1,4 @@
-﻿#if UNITY_WECHAT_GAME
+﻿#if UNITY_WEBGL && WEIXINMINIGAME
 using YooAsset;
 
 internal class LoadWechatPackageManifestOperation : AsyncOperationBase
