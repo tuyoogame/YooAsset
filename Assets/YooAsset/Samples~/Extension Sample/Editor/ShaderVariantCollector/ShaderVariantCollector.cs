@@ -21,8 +21,8 @@ public static class ShaderVariantCollector
         WaitingDone,
     }
 
-    private const float WaitMilliseconds = 1000f;
-    private const float SleepMilliseconds = 2000f;
+    private const float WaitMilliseconds = 3000f;
+    private const float SleepMilliseconds = 3000f;
     private static string _savePath;
     private static string _packageName;
     private static int _processMaxNum;

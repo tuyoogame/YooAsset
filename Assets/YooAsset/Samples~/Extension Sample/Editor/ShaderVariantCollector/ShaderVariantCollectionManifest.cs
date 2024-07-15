@@ -11,8 +11,10 @@ using UnityEditor;
 public class ShaderVariantCollectionManifest
 {
     [Serializable]
-    public class ShaderVariantElement
+    public class ShaderVariantElement : IComparable<ShaderVariantElement>
     {
+        public string SortValue { private set; get; }
+
         /// <summary>
         ///  Pass type to use in this variant.
         /// </summary>
@@ -22,11 +24,31 @@ public class ShaderVariantCollectionManifest
         /// Array of shader keywords to use in this variant.
         /// </summary>
         public string[] Keywords;
+
+        public void MakeSortValue()
+        {
+            string combineKeyword = string.Empty;
+            for (int i = 0; i < Keywords.Length; i++)
+            {
+                if (i == 0)
+                    combineKeyword = Keywords[0];
+                else
+                    combineKeyword = $"{combineKeyword}+{Keywords[0]}";
+            }
+
+            SortValue = $"{PassType}+{combineKeyword}";
+        }
+        public int CompareTo(ShaderVariantElement other)
+        {
+            return SortValue.CompareTo(other.SortValue);
+        }
     }
 
     [Serializable]
     public class ShaderVariantInfo : IComparable<ShaderVariantInfo>
     {
+        public string SortValue { private set; get; }
+
         /// <summary>
         /// 着色器资源路径.
         /// </summary>
@@ -47,11 +69,13 @@ public class ShaderVariantCollectionManifest
         /// </summary>
         public List<ShaderVariantElement> ShaderVariantElements = new List<ShaderVariantElement>(1000);
 
+        public void MakeSortValue()
+        {
+            SortValue = AssetPath + "+" + ShaderName;
+        }
         public int CompareTo(ShaderVariantInfo other)
         {
-            string thisStr = AssetPath + "+" +ShaderName;
-            string otherStr = other.AssetPath + "+" + other.ShaderName;
-            return thisStr.CompareTo(otherStr);
+            return SortValue.CompareTo(other.SortValue);
         }
     }
 
@@ -76,10 +100,15 @@ public class ShaderVariantCollectionManifest
     /// </summary>
     public void AddShaderVariant(string assetPath, string shaderName, PassType passType, string[] keywords)
     {
+        // 排序Keyword列表
+        List<string> temper = new List<string>(keywords);
+        temper.Sort();
+
         var info = GetOrCreateShaderVariantInfo(assetPath, shaderName);
         ShaderVariantElement element = new ShaderVariantElement();
         element.PassType = passType;
-        element.Keywords = keywords;
+        element.Keywords = temper.ToArray();
+        element.MakeSortValue();
         info.ShaderVariantElements.Add(element);
         info.ShaderVariantCount++;
     }
@@ -91,6 +120,7 @@ public class ShaderVariantCollectionManifest
             ShaderVariantInfo newInfo = new ShaderVariantInfo();
             newInfo.AssetPath = assetPath;
             newInfo.ShaderName = shaderName;
+            newInfo.MakeSortValue();
             ShaderVariantInfos.Add(newInfo);
             return newInfo;
         }
@@ -150,6 +180,11 @@ public class ShaderVariantCollectionManifest
 
         // 重新排序
         manifest.ShaderVariantInfos.Sort();
+        foreach (var shaderVariantInfo in manifest.ShaderVariantInfos)
+        {
+            shaderVariantInfo.ShaderVariantElements.Sort();
+        }
+
         return manifest;
     }
 }
