@@ -35,7 +35,7 @@ namespace YooAsset
                 CreateBuildinCatalogFile(subDirectory.Name, subDirectory.FullName);
             }
         }
-        
+
         /// <summary>
         /// 生成包裹的内置资源目录文件
         /// </summary>
@@ -109,8 +109,8 @@ namespace YooAsset
             FileUtility.CreateFileDirectory(saveFilePath);
 
             UnityEditor.AssetDatabase.CreateAsset(buildinFileCatalog, saveFilePath);
-            UnityEditor.AssetDatabase.SaveAssets();
-            UnityEditor.AssetDatabase.Refresh();
+            UnityEditor.EditorUtility.SetDirty(buildinFileCatalog);
+            UnityEditor.AssetDatabase.SaveAssetIfDirty(buildinFileCatalog);
             Debug.Log($"Succeed to save buildin file catalog : {saveFilePath}");
         }
     }
