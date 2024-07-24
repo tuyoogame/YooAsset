@@ -100,12 +100,12 @@ public class BattleRoom
             if (_startWaitTimer.Update(Time.deltaTime))
             {
                 // 生成实体
-                var handle = YooAssets.LoadAssetAsync<GameObject>("player_ship");
-                handle.Completed += (AssetHandle handle) =>
+                var assetHandle = YooAssets.LoadAssetAsync<GameObject>("player_ship");
+                assetHandle.Completed += (AssetHandle handle) =>
                 {
                     handle.InstantiateSync(_roomRoot.transform);
                 };
-                _handles.Add(handle);
+                _handles.Add(assetHandle);
                 _steps = ESteps.SpawnEnemy;
             }
         }
@@ -117,12 +117,12 @@ public class BattleRoom
             Quaternion spawnRotation = Quaternion.identity;
 
             // 生成实体
-            var handle = YooAssets.LoadAssetAsync<GameObject>(enemyLocation);
-            handle.Completed += (AssetHandle handle) =>
+            var assetHandle = YooAssets.LoadAssetAsync<GameObject>(enemyLocation);
+            assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(spawnPosition, spawnRotation, _roomRoot.transform);
             };
-            _handles.Add(handle);
+            _handles.Add(assetHandle);
 
             _waveSpawnCount++;
             if (_waveSpawnCount >= EnemyCount)
@@ -166,12 +166,12 @@ public class BattleRoom
             var msg = message as BattleEventDefine.PlayerDead;
 
             // 创建爆炸效果
-            var handle = YooAssets.LoadAssetAsync<GameObject>("explosion_player");
-            handle.Completed += (AssetHandle handle) =>
+            var assetHandle = YooAssets.LoadAssetAsync<GameObject>("explosion_player");
+            assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
             };
-            _handles.Add(handle);
+            _handles.Add(assetHandle);
 
             _steps = ESteps.GameOver;
             BattleEventDefine.GameOver.SendEventMessage();
@@ -181,12 +181,12 @@ public class BattleRoom
             var msg = message as BattleEventDefine.EnemyDead;
 
             // 创建爆炸效果
-            var handle = YooAssets.LoadAssetAsync<GameObject>("explosion_enemy");
-            handle.Completed += (AssetHandle handle) =>
+            var assetHandle = YooAssets.LoadAssetAsync<GameObject>("explosion_enemy");
+            assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
             };
-            _handles.Add(handle);
+            _handles.Add(assetHandle);
 
             _totalScore += EnemyScore;
             BattleEventDefine.ScoreChange.SendEventMessage(_totalScore);
@@ -196,12 +196,12 @@ public class BattleRoom
             var msg = message as BattleEventDefine.AsteroidExplosion;
 
             // 创建爆炸效果
-            var handle = YooAssets.LoadAssetAsync<GameObject>("explosion_asteroid");
-            handle.Completed += (AssetHandle handle) =>
+            var assetHandle = YooAssets.LoadAssetAsync<GameObject>("explosion_asteroid");
+            assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
             };
-            _handles.Add(handle);
+            _handles.Add(assetHandle);
 
             _totalScore += AsteroidScore;
             BattleEventDefine.ScoreChange.SendEventMessage(_totalScore);
@@ -211,24 +211,24 @@ public class BattleRoom
             var msg = message as BattleEventDefine.PlayerFireBullet;
 
             // 创建子弹实体
-            var handle = YooAssets.LoadAssetAsync<GameObject>("player_bullet");
-            handle.Completed += (AssetHandle handle) =>
+            var assetHandle = YooAssets.LoadAssetAsync<GameObject>("player_bullet");
+            assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
             };
-            _handles.Add(handle);
+            _handles.Add(assetHandle);
         }
         else if (message is BattleEventDefine.EnemyFireBullet)
         {
             var msg = message as BattleEventDefine.EnemyFireBullet;
 
             // 创建子弹实体
-            var handle = YooAssets.LoadAssetAsync<GameObject>("enemy_bullet");
-            handle.Completed += (AssetHandle handle) =>
+            var assetHandle = YooAssets.LoadAssetAsync<GameObject>("enemy_bullet");
+            assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
             };
-            _handles.Add(handle);
+            _handles.Add(assetHandle);
         }
     }
 }
