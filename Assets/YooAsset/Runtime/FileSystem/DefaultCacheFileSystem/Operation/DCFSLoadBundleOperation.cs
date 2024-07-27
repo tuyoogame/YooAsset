@@ -78,15 +78,15 @@ namespace YooAsset
 
             if (_steps == ESteps.LoadAssetBundle)
             {
-                string filePath = _fileSystem.GetCacheFileLoadPath(_bundle);
                 if (_isWaitForAsyncComplete)
                 {
-                    Result = AssetBundle.LoadFromFile(filePath);
+                    Result = _fileSystem.LoadAssetBundle(_bundle);
                 }
                 else
                 {
-                    _createRequest = AssetBundle.LoadFromFileAsync(filePath);
+                    _createRequest = _fileSystem.LoadAssetBundleAsync(_bundle);
                 }
+
                 _steps = ESteps.CheckResult;
             }
 

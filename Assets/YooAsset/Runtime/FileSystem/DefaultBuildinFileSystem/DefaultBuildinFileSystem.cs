@@ -98,6 +98,11 @@ namespace YooAsset
         /// 自定义参数：原生文件构建管线
         /// </summary>
         public bool RawFileBuildPipeline { private set; get; } = false;
+
+        /// <summary>
+        ///  自定义参数：解密方法类
+        /// </summary>
+        public IDecryptionServices DecryptionServices { private set; get; }
         #endregion
 
 
@@ -181,17 +186,21 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == "FILE_VERIFY_LEVEL")
+            if (name == FileSystemParameters.FILE_VERIFY_LEVEL)
             {
                 FileVerifyLevel = (EFileVerifyLevel)value;
             }
-            else if (name == "APPEND_FILE_EXTENSION")
+            else if (name == FileSystemParameters.APPEND_FILE_EXTENSION)
             {
                 AppendFileExtension = (bool)value;
             }
-            else if (name == "RAW_FILE_BUILD_PIPELINE")
+            else if (name == FileSystemParameters.RAW_FILE_BUILD_PIPELINE)
             {
                 RawFileBuildPipeline = (bool)value;
+            }
+            else if (name == FileSystemParameters.DECRYPTION_SERVICES)
+            {
+                DecryptionServices = (IDecryptionServices)value;
             }
             else
             {
@@ -210,10 +219,10 @@ namespace YooAsset
             // 创建解压文件系统
             var remoteServices = new UnpackRemoteServices(_packageRoot);
             _unpackFileSystem = new DefaultUnpackFileSystem();
-            _unpackFileSystem.SetParameter("REMOTE_SERVICES", remoteServices);
-            _unpackFileSystem.SetParameter("FILE_VERIFY_LEVEL", FileVerifyLevel);
-            _unpackFileSystem.SetParameter("APPEND_FILE_EXTENSION", AppendFileExtension);
-            _unpackFileSystem.SetParameter("RAW_FILE_BUILD_PIPELINE", RawFileBuildPipeline);
+            _unpackFileSystem.SetParameter(FileSystemParameters.REMOTE_SERVICES, remoteServices);
+            _unpackFileSystem.SetParameter(FileSystemParameters.FILE_VERIFY_LEVEL, FileVerifyLevel);
+            _unpackFileSystem.SetParameter(FileSystemParameters.APPEND_FILE_EXTENSION, AppendFileExtension);
+            _unpackFileSystem.SetParameter(FileSystemParameters.RAW_FILE_BUILD_PIPELINE, RawFileBuildPipeline);
             _unpackFileSystem.OnCreate(packageName, null);
         }
         public virtual void OnUpdate()
@@ -310,7 +319,60 @@ namespace YooAsset
             string rootPath = PathUtility.Combine(Application.dataPath, "StreamingAssets", YooAssetSettingsData.Setting.DefaultYooFolderName);
             return PathUtility.Combine(rootPath, PackageName);
         }
-        
+        public AssetBundle LoadAssetBundle(PackageBundle bundle)
+        {
+            string filePath = GetBuildinFileLoadPath(bundle);
+
+            if (bundle.Encrypted)
+            {
+                if (DecryptionServices == null)
+                {
+                    YooLogger.Error($"DecryptionServices is Null!");
+                    return null;
+                }
+                else
+                {
+                    return DecryptionServices.LoadAssetBundle(new DecryptFileInfo()
+                    {
+                        BundleName = bundle.BundleName,
+                        FileLoadCRC = bundle.UnityCRC,
+                        FileLoadPath = filePath,
+                    }, out _);
+                }
+            }
+            else
+            {
+                return AssetBundle.LoadFromFile(filePath);
+            }
+        }
+
+        public AssetBundleCreateRequest LoadAssetBundleAsync(PackageBundle bundle)
+        {
+            string filePath = GetBuildinFileLoadPath(bundle);
+
+            if (bundle.Encrypted)
+            {
+                if (DecryptionServices == null)
+                {
+                    YooLogger.Error($"DecryptionServices is Empty!");
+                    return null;
+                }
+                else
+                {
+                    return DecryptionServices.LoadAssetBundleAsync(new DecryptFileInfo()
+                    {
+                        BundleName = bundle.BundleName,
+                        FileLoadCRC = bundle.UnityCRC,
+                        FileLoadPath = filePath,
+                    }, out _);
+                }
+            }
+            else
+            {
+                return AssetBundle.LoadFromFileAsync(filePath);
+            }
+        }
+
         /// <summary>
         /// 记录文件信息
         /// </summary>
