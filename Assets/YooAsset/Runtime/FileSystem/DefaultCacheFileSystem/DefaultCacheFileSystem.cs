@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Text;
 
 namespace YooAsset
 {
@@ -316,9 +317,19 @@ namespace YooAsset
         {
             if (Exists(bundle) == false)
                 return null;
-
             string filePath = GetCacheFileLoadPath(bundle);
-            return FileUtility.ReadAllBytes(filePath);
+            var data = FileUtility.ReadAllBytes(filePath);
+
+            if (bundle.Encrypted)
+            {
+                if (DecryptionServices == null)
+                {
+                    YooLogger.Error($"DecryptionServices is Null!");
+                    return null;
+                }
+                return DecryptionServices.ReadFileData(data);
+            }
+            return data;
         }
         public virtual string ReadFileText(PackageBundle bundle)
         {
@@ -326,7 +337,18 @@ namespace YooAsset
                 return null;
 
             string filePath = GetCacheFileLoadPath(bundle);
-            return FileUtility.ReadAllText(filePath);
+            var data = FileUtility.ReadAllBytes(filePath);
+
+            if (bundle.Encrypted)
+            {
+                if (DecryptionServices == null)
+                {
+                    YooLogger.Error($"DecryptionServices is Null!");
+                    return null;
+                }
+                data = DecryptionServices.ReadFileData(data);
+            }
+            return Encoding.UTF8.GetString(data);
         }
 
         #region 内部方法

@@ -124,13 +124,14 @@ namespace YooAsset
         /// </summary>
         /// <param name="verifyLevel">缓存文件的校验等级</param>
         /// <param name="rootDirectory">内置文件的根路径</param>
-        public static FileSystemParameters CreateDefaultBuildinRawFileSystemParameters(EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
+        public static FileSystemParameters CreateDefaultBuildinRawFileSystemParameters(IDecryptionServices decryptionServices = null, EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
         {
             string fileSystemClass = typeof(DefaultBuildinFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
             fileSystemParams.AddParameter(FILE_VERIFY_LEVEL, verifyLevel);
             fileSystemParams.AddParameter(APPEND_FILE_EXTENSION, true);
             fileSystemParams.AddParameter(RAW_FILE_BUILD_PIPELINE, true);
+            fileSystemParams.AddParameter(DECRYPTION_SERVICES, decryptionServices);
             return fileSystemParams;
         }
 
@@ -156,7 +157,7 @@ namespace YooAsset
         /// <param name="remoteServices">远端资源地址查询服务类</param>
         /// <param name="verifyLevel">缓存文件的校验等级</param>
         /// <param name="rootDirectory">文件系统的根目录</param>
-        public static FileSystemParameters CreateDefaultCacheRawFileSystemParameters(IRemoteServices remoteServices, EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
+        public static FileSystemParameters CreateDefaultCacheRawFileSystemParameters(IRemoteServices remoteServices, IDecryptionServices decryptionServices = null, EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
         {
             string fileSystemClass = typeof(DefaultCacheFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
@@ -164,6 +165,7 @@ namespace YooAsset
             fileSystemParams.AddParameter(FILE_VERIFY_LEVEL, verifyLevel);
             fileSystemParams.AddParameter(APPEND_FILE_EXTENSION, true);
             fileSystemParams.AddParameter(RAW_FILE_BUILD_PIPELINE, true);
+            fileSystemParams.AddParameter(DECRYPTION_SERVICES, decryptionServices);
             return fileSystemParams;
         }
 
