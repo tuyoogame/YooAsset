@@ -223,6 +223,7 @@ namespace YooAsset
             _unpackFileSystem.SetParameter(FileSystemParameters.FILE_VERIFY_LEVEL, FileVerifyLevel);
             _unpackFileSystem.SetParameter(FileSystemParameters.APPEND_FILE_EXTENSION, AppendFileExtension);
             _unpackFileSystem.SetParameter(FileSystemParameters.RAW_FILE_BUILD_PIPELINE, RawFileBuildPipeline);
+            _unpackFileSystem.SetParameter(FileSystemParameters.DECRYPTION_SERVICES, DecryptionServices);
             _unpackFileSystem.OnCreate(packageName, null);
         }
         public virtual void OnUpdate()
