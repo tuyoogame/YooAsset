@@ -40,6 +40,6 @@ namespace YooAsset
         /// </summary>
         /// <param name="encryptData"></param>
         /// <returns></returns>
-        public byte[] ReadFileData(byte[] encryptData);
+        byte[] ReadFileData(byte[] encryptData);
     }
 }
