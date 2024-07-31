@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace YooAsset
 {
-    internal class DefaultBuildinFileSystemBuild : UnityEditor.Build.IPreprocessBuildWithReport
+    public class DefaultBuildinFileSystemBuild : UnityEditor.Build.IPreprocessBuildWithReport
     {
         public int callbackOrder { get { return 0; } }
 
@@ -90,7 +90,8 @@ namespace YooAsset
             foreach (var fileInfo in fileInfos)
             {
                 if (fileInfo.Extension == ".meta" || fileInfo.Extension == ".version" ||
-                    fileInfo.Extension == ".hash" || fileInfo.Extension == ".bytes")
+                    fileInfo.Extension == ".hash" || fileInfo.Extension == ".bytes" ||
+                    fileInfo.Extension == ".json")
                     continue;
 
                 string fileName = fileInfo.Name;
@@ -110,7 +111,11 @@ namespace YooAsset
 
             UnityEditor.AssetDatabase.CreateAsset(buildinFileCatalog, saveFilePath);
             UnityEditor.EditorUtility.SetDirty(buildinFileCatalog);
+#if UNITY_2019
+            UnityEditor.AssetDatabase.SaveAssets();
+#else
             UnityEditor.AssetDatabase.SaveAssetIfDirty(buildinFileCatalog);
+#endif
             Debug.Log($"Succeed to save buildin file catalog : {saveFilePath}");
         }
     }
