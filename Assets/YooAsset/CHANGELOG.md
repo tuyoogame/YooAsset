@@ -2,6 +2,13 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.2.2-preview] - 2024-07-31
+
+### Fixed
+
+- (#321) 修复了在Unity2022里编辑器下离线模式运行失败的问题。
+- (#325) 修复了在Unity2019里编译报错问题。
+
 ## [2.2.1-preview] - 2024-07-10
 
 统一了所有PlayMode的初始化逻辑，EditorSimulateMode和OfflinePlayMode初始化不再主动加载资源清单！
