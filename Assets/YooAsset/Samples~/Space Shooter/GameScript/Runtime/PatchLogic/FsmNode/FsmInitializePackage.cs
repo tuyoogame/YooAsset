@@ -172,6 +172,22 @@ internal class FsmInitializePackage : IStateNode
             return AssetBundle.LoadFromStreamAsync(bundleStream, fileInfo.FileLoadCRC, GetManagedReadBufferSize());
         }
 
+        /// <summary>
+        /// 获取解密的字节数据
+        /// </summary>
+        byte[] IDecryptionServices.ReadFileData(DecryptFileInfo fileInfo)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
+        /// 获取解密的文本数据
+        /// </summary>
+        string IDecryptionServices.ReadFileText(DecryptFileInfo fileInfo)
+        {
+            throw new System.NotImplementedException();
+        }
+
         private static uint GetManagedReadBufferSize()
         {
             return 1024;
@@ -201,6 +217,22 @@ internal class FsmInitializePackage : IStateNode
         {
             managedStream = null;
             return AssetBundle.LoadFromFileAsync(fileInfo.FileLoadPath, fileInfo.FileLoadCRC, GetFileOffset());
+        }
+
+        /// <summary>
+        /// 获取解密的字节数据
+        /// </summary>
+        byte[] IDecryptionServices.ReadFileData(DecryptFileInfo fileInfo)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
+        /// 获取解密的文本数据
+        /// </summary>
+        string IDecryptionServices.ReadFileText(DecryptFileInfo fileInfo)
+        {
+            throw new System.NotImplementedException();
         }
 
         private static ulong GetFileOffset()
