@@ -153,6 +153,14 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 清空完成回调
+        /// </summary>
+        protected void ClearCompletedCallback()
+        {
+            _callback = null;
+        }
+
+        /// <summary>
         /// 等待异步执行完毕
         /// </summary>
         public void WaitForAsyncComplete()
