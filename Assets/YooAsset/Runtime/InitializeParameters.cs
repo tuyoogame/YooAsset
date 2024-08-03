@@ -55,15 +55,6 @@ namespace YooAsset
     /// </summary>
     public class FileSystemParameters
     {
-        public const string FILE_VERIFY_LEVEL = "FILE_VERIFY_LEVEL";
-        public const string DECRYPTION_SERVICES = "DECRYPTION_SERVICES";
-        public const string APPEND_FILE_EXTENSION = "APPEND_FILE_EXTENSION";
-        public const string RAW_FILE_BUILD_PIPELINE = "RAW_FILE_BUILD_PIPELINE";
-        public const string REMOTE_SERVICES = "REMOTE_SERVICES";
-        public const string DISABLE_UNITY_WEB_CACHE = "DISABLE_UNITY_WEB_CACHE";
-        public const string RESUME_DOWNLOAD_MINMUM_SIZE = "RESUME_DOWNLOAD_MINMUM_SIZE";
-        public const string RESUME_DOWNLOAD_RESPONSE_CODES = "RESUME_DOWNLOAD_RESPONSE_CODES";
-
         internal Dictionary<string, object> CreateParameters = new Dictionary<string, object>();
 
         /// <summary>
@@ -108,30 +99,32 @@ namespace YooAsset
         /// <summary>
         /// 创建默认的内置文件系统参数
         /// </summary>
+        /// <param name="decryptionServices">加密文件解密服务类</param>
         /// <param name="verifyLevel">缓存文件的校验等级</param>
         /// <param name="rootDirectory">内置文件的根路径</param>
         public static FileSystemParameters CreateDefaultBuildinFileSystemParameters(IDecryptionServices decryptionServices = null, EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
         {
             string fileSystemClass = typeof(DefaultBuildinFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
-            fileSystemParams.AddParameter(FILE_VERIFY_LEVEL, verifyLevel);
-            fileSystemParams.AddParameter(DECRYPTION_SERVICES, decryptionServices);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.FILE_VERIFY_LEVEL, verifyLevel);
             return fileSystemParams;
         }
 
         /// <summary>
         /// 创建默认的内置文件系统参数（原生文件）
         /// </summary>
+        /// <param name="decryptionServices">加密文件解密服务类</param>
         /// <param name="verifyLevel">缓存文件的校验等级</param>
         /// <param name="rootDirectory">内置文件的根路径</param>
         public static FileSystemParameters CreateDefaultBuildinRawFileSystemParameters(IDecryptionServices decryptionServices = null, EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
         {
             string fileSystemClass = typeof(DefaultBuildinFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
-            fileSystemParams.AddParameter(FILE_VERIFY_LEVEL, verifyLevel);
-            fileSystemParams.AddParameter(APPEND_FILE_EXTENSION, true);
-            fileSystemParams.AddParameter(RAW_FILE_BUILD_PIPELINE, true);
-            fileSystemParams.AddParameter(DECRYPTION_SERVICES, decryptionServices);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.FILE_VERIFY_LEVEL, verifyLevel);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.APPEND_FILE_EXTENSION, true);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.RAW_FILE_BUILD_PIPELINE, true);
             return fileSystemParams;
         }
 
@@ -139,15 +132,16 @@ namespace YooAsset
         /// 创建默认的缓存文件系统参数
         /// </summary>
         /// <param name="remoteServices">远端资源地址查询服务类</param>
+        /// <param name="decryptionServices">加密文件解密服务类</param>
         /// <param name="verifyLevel">缓存文件的校验等级</param>
         /// <param name="rootDirectory">文件系统的根目录</param>
         public static FileSystemParameters CreateDefaultCacheFileSystemParameters(IRemoteServices remoteServices, IDecryptionServices decryptionServices = null, EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
         {
             string fileSystemClass = typeof(DefaultCacheFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
-            fileSystemParams.AddParameter(REMOTE_SERVICES, remoteServices);
-            fileSystemParams.AddParameter(FILE_VERIFY_LEVEL, verifyLevel);
-            fileSystemParams.AddParameter(DECRYPTION_SERVICES, decryptionServices);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.FILE_VERIFY_LEVEL, verifyLevel);
             return fileSystemParams;
         }
 
@@ -155,17 +149,18 @@ namespace YooAsset
         /// 创建默认的缓存文件系统参数（原生文件）
         /// </summary>
         /// <param name="remoteServices">远端资源地址查询服务类</param>
+        /// <param name="decryptionServices">加密文件解密服务类</param>
         /// <param name="verifyLevel">缓存文件的校验等级</param>
         /// <param name="rootDirectory">文件系统的根目录</param>
         public static FileSystemParameters CreateDefaultCacheRawFileSystemParameters(IRemoteServices remoteServices, IDecryptionServices decryptionServices = null, EFileVerifyLevel verifyLevel = EFileVerifyLevel.Middle, string rootDirectory = null)
         {
             string fileSystemClass = typeof(DefaultCacheFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
-            fileSystemParams.AddParameter(REMOTE_SERVICES, remoteServices);
-            fileSystemParams.AddParameter(FILE_VERIFY_LEVEL, verifyLevel);
-            fileSystemParams.AddParameter(APPEND_FILE_EXTENSION, true);
-            fileSystemParams.AddParameter(RAW_FILE_BUILD_PIPELINE, true);
-            fileSystemParams.AddParameter(DECRYPTION_SERVICES, decryptionServices);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.FILE_VERIFY_LEVEL, verifyLevel);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.APPEND_FILE_EXTENSION, true);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.RAW_FILE_BUILD_PIPELINE, true);
             return fileSystemParams;
         }
 
@@ -177,7 +172,7 @@ namespace YooAsset
         {
             string fileSystemClass = typeof(DefaultWebFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
-            fileSystemParams.AddParameter(DISABLE_UNITY_WEB_CACHE, disableUnityWebCache);
+            fileSystemParams.AddParameter(FileSystemParametersDefine.DISABLE_UNITY_WEB_CACHE, disableUnityWebCache);
             return fileSystemParams;
         }
     }

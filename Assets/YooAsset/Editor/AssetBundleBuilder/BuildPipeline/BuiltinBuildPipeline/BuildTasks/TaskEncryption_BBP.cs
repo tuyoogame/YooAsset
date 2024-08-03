@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-
+﻿
 namespace YooAsset.Editor
 {
     public class TaskEncryption_BBP : TaskEncryption, IBuildTask

@@ -78,13 +78,41 @@ namespace YooAsset
 
             if (_steps == ESteps.LoadAssetBundle)
             {
+                if (_bundle.Encrypted)
+                {
+                    if (_fileSystem.DecryptionServices == null)
+                    {
+                        _steps = ESteps.Done;
+                        Status = EOperationStatus.Failed;
+                        Error = $"The {nameof(IDecryptionServices)} is null !";
+                        YooLogger.Error(Error);
+                        return;
+                    }
+                }
+
                 if (_isWaitForAsyncComplete)
                 {
-                    Result = _fileSystem.LoadAssetBundle(_bundle);
+                    if (_bundle.Encrypted)
+                    {
+                        Result = _fileSystem.LoadEncryptedAssetBundle(_bundle);
+                    }
+                    else
+                    {
+                        string filePath = _fileSystem.GetCacheFileLoadPath(_bundle);
+                        Result = AssetBundle.LoadFromFile(filePath);
+                    }
                 }
                 else
                 {
-                    _createRequest = _fileSystem.LoadAssetBundleAsync(_bundle);
+                    if (_bundle.Encrypted)
+                    {
+                        _createRequest = _fileSystem.LoadEncryptedAssetBundleAsync(_bundle);
+                    }
+                    else
+                    {
+                        string filePath = _fileSystem.GetCacheFileLoadPath(_bundle);
+                        _createRequest = AssetBundle.LoadFromFileAsync(filePath);
+                    }
                 }
 
                 _steps = ESteps.CheckResult;
@@ -112,50 +140,58 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
+                    return;
                 }
-                else
+
+                // 注意：当缓存文件的校验等级为Low的时候，并不能保证缓存文件的完整性。
+                // 说明：在AssetBundle文件加载失败的情况下，我们需要重新验证文件的完整性！
+                EFileVerifyResult verifyResult = _fileSystem.VerifyCacheFile(_bundle);
+                if (verifyResult == EFileVerifyResult.Succeed)
                 {
-                    // 注意：当缓存文件的校验等级为Low的时候，并不能保证缓存文件的完整性。
-                    // 说明：在AssetBundle文件加载失败的情况下，我们需要重新验证文件的完整性！
-                    EFileVerifyResult verifyResult = _fileSystem.VerifyCacheFile(_bundle);
-                    if (verifyResult == EFileVerifyResult.Succeed)
+                    if (_bundle.Encrypted)
                     {
-                        // 注意：在安卓移动平台，华为和三星真机上有极小概率加载资源包失败。
-                        // 说明：大多数情况在首次安装下载资源到沙盒内，游戏过程中切换到后台再回到游戏内有很大概率触发！
-                        string filePath = _fileSystem.GetCacheFileLoadPath(_bundle);
-                        byte[] fileData = FileUtility.ReadAllBytes(filePath);
-                        if (fileData != null && fileData.Length > 0)
+                        _steps = ESteps.Done;
+                        Status = EOperationStatus.Failed;
+                        Error = $"Failed to load encrypted asset bundle file : {_bundle.BundleName}";
+                        YooLogger.Error(Error);
+                        return;
+                    }
+
+                    // 注意：在安卓移动平台，华为和三星真机上有极小概率加载资源包失败。
+                    // 说明：大多数情况在首次安装下载资源到沙盒内，游戏过程中切换到后台再回到游戏内有很大概率触发！
+                    string filePath = _fileSystem.GetCacheFileLoadPath(_bundle);
+                    byte[] fileData = FileUtility.ReadAllBytes(filePath);
+                    if (fileData != null && fileData.Length > 0)
+                    {
+                        Result = AssetBundle.LoadFromMemory(fileData);
+                        if (Result == null)
                         {
-                            Result = AssetBundle.LoadFromMemory(fileData);
-                            if (Result == null)
-                            {
-                                _steps = ESteps.Done;
-                                Status = EOperationStatus.Failed;
-                                Error = $"Failed to load assetBundle from memory : {_bundle.BundleName}";
-                                YooLogger.Error(Error);
-                            }
-                            else
-                            {
-                                _steps = ESteps.Done;
-                                Status = EOperationStatus.Succeed;
-                            }
+                            _steps = ESteps.Done;
+                            Status = EOperationStatus.Failed;
+                            Error = $"Failed to load asset bundle from memory : {_bundle.BundleName}";
+                            YooLogger.Error(Error);
                         }
                         else
                         {
                             _steps = ESteps.Done;
-                            Status = EOperationStatus.Failed;
-                            Error = $"Failed to read assetBundle file bytes : {_bundle.BundleName}";
-                            YooLogger.Error(Error);
+                            Status = EOperationStatus.Succeed;
                         }
                     }
                     else
                     {
                         _steps = ESteps.Done;
-                        _fileSystem.DeleteCacheFile(_bundle.BundleGUID);
                         Status = EOperationStatus.Failed;
-                        Error = $"Find corrupted file and delete the file : {_bundle.BundleName}";
+                        Error = $"Failed to read asset bundle file bytes : {_bundle.BundleName}";
                         YooLogger.Error(Error);
                     }
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    _fileSystem.DeleteCacheFile(_bundle.BundleGUID);
+                    Status = EOperationStatus.Failed;
+                    Error = $"Find corrupted asset bundle file and delete : {_bundle.BundleName}";
+                    YooLogger.Error(Error);
                 }
             }
         }
@@ -272,6 +308,7 @@ namespace YooAsset
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
                     Error = $"Can not found cache raw bundle file : {filePath}";
+                    YooLogger.Error(Error);
                 }
             }
         }

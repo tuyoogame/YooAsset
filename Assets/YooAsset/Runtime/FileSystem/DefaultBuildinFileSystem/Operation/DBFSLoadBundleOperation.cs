@@ -11,8 +11,8 @@ namespace YooAsset
         private enum ESteps
         {
             None,
-            LoadBuidlinAssetBundle,
-            CheckLoadBuildinResult,
+            LoadAssetBundle,
+            CheckResult,
             Done,
         }
 
@@ -32,27 +32,56 @@ namespace YooAsset
         {
             DownloadProgress = 1f;
             DownloadedBytes = _bundle.FileSize;
-            _steps = ESteps.LoadBuidlinAssetBundle;
+            _steps = ESteps.LoadAssetBundle;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.LoadBuidlinAssetBundle)
+            if (_steps == ESteps.LoadAssetBundle)
             {
+                if (_bundle.Encrypted)
+                {
+                    if (_fileSystem.DecryptionServices == null)
+                    {
+                        _steps = ESteps.Done;
+                        Status = EOperationStatus.Failed;
+                        Error = $"The {nameof(IDecryptionServices)} is null !";
+                        YooLogger.Error(Error);
+                        return;
+                    }
+                }
+
                 if (_isWaitForAsyncComplete)
                 {
-                    Result = _fileSystem.LoadAssetBundle(_bundle); 
+                    if (_bundle.Encrypted)
+                    {
+                        Result = _fileSystem.LoadEncryptedAssetBundle(_bundle);
+                    }
+                    else
+                    {
+                        string filePath = _fileSystem.GetBuildinFileLoadPath(_bundle);
+                        Result = AssetBundle.LoadFromFile(filePath);
+                    }
                 }
                 else
                 {
-                    _createRequest = _fileSystem.LoadAssetBundleAsync(_bundle);
+                    if (_bundle.Encrypted)
+                    {
+                        _createRequest = _fileSystem.LoadEncryptedAssetBundleAsync(_bundle);
+                    }
+                    else
+                    {
+                        string filePath = _fileSystem.GetBuildinFileLoadPath(_bundle);
+                        _createRequest = AssetBundle.LoadFromFileAsync(filePath);
+                    }
                 }
-                _steps = ESteps.CheckLoadBuildinResult;
+
+                _steps = ESteps.CheckResult;
             }
 
-            if (_steps == ESteps.CheckLoadBuildinResult)
+            if (_steps == ESteps.CheckResult)
             {
                 if (_createRequest != null)
                 {
@@ -74,12 +103,22 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
+                    return;
+                }
+
+                if (_bundle.Encrypted)
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = $"Failed to load encrypted buildin asset bundle file : {_bundle.BundleName}";
+                    YooLogger.Error(Error);
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
                     Error = $"Failed to load buildin asset bundle file : {_bundle.BundleName}";
+                    YooLogger.Error(Error);
                 }
             }
         }
@@ -148,6 +187,7 @@ namespace YooAsset
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
                     Error = $"Can not found buildin raw bundle file : {filePath}";
+                    YooLogger.Error(Error);
                 }
             }
         }

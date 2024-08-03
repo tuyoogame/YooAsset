@@ -36,10 +36,13 @@ namespace YooAsset
         AssetBundleCreateRequest LoadAssetBundleAsync(DecryptFileInfo fileInfo, out Stream managedStream);
 
         /// <summary>
-        /// 解密字节数据
+        /// 获取解密的字节数据
         /// </summary>
-        /// <param name="encryptData"></param>
-        /// <returns></returns>
-        byte[] ReadFileData(byte[] encryptData);
+        byte[] ReadFileData(DecryptFileInfo fileInfo);
+
+        /// <summary>
+        /// 获取解密的文本数据
+        /// </summary>
+        string ReadFileText(DecryptFileInfo fileInfo);
     }
 }

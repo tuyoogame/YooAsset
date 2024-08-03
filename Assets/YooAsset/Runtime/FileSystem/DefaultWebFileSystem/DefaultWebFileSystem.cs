@@ -114,7 +114,7 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == FileSystemParameters.DISABLE_UNITY_WEB_CACHE)
+            if (name == FileSystemParametersDefine.DISABLE_UNITY_WEB_CACHE)
             {
                 DisableUnityWebCache = (bool)value;
             }
