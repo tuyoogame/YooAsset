@@ -486,11 +486,11 @@ namespace YooAsset
         /// </summary>
         /// <param name="location">场景的定位地址</param>
         /// <param name="sceneMode">场景加载模式</param>
-        public SceneHandle LoadSceneSync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, LocalPhysicsMode physicsMode = default)
+        public SceneHandle LoadSceneSync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, LocalPhysicsMode physicsMode = LocalPhysicsMode.None)
         {
             DebugCheckInitialize();
             AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-            return LoadSceneInternal(assetInfo, true, sceneMode, false, 0, physicsMode);
+            return LoadSceneInternal(assetInfo, true, sceneMode, physicsMode, false, 0);
         }
 
         /// <summary>
@@ -498,10 +498,10 @@ namespace YooAsset
         /// </summary>
         /// <param name="assetInfo">场景的资源信息</param>
         /// <param name="sceneMode">场景加载模式</param>
-        public SceneHandle LoadSceneSync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, LocalPhysicsMode physicsMode = default)
+        public SceneHandle LoadSceneSync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, LocalPhysicsMode physicsMode = LocalPhysicsMode.None)
         {
             DebugCheckInitialize();
-            return LoadSceneInternal(assetInfo, true, sceneMode, false, 0, physicsMode);
+            return LoadSceneInternal(assetInfo, true, sceneMode, physicsMode, false, 0);
         }
 
         /// <summary>
@@ -511,11 +511,11 @@ namespace YooAsset
         /// <param name="sceneMode">场景加载模式</param>
         /// <param name="suspendLoad">场景加载到90%自动挂起</param>
         /// <param name="priority">加载的优先级</param>
-        public SceneHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, uint priority = 0, LocalPhysicsMode physicsMode = default)
+        public SceneHandle LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, LocalPhysicsMode physicsMode = LocalPhysicsMode.None, bool suspendLoad = false, uint priority = 0)
         {
             DebugCheckInitialize();
             AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-            return LoadSceneInternal(assetInfo, false, sceneMode, suspendLoad, priority, physicsMode);
+            return LoadSceneInternal(assetInfo, false, sceneMode, physicsMode, suspendLoad, priority);
         }
 
         /// <summary>
@@ -525,16 +525,17 @@ namespace YooAsset
         /// <param name="sceneMode">场景加载模式</param>
         /// <param name="suspendLoad">场景加载到90%自动挂起</param>
         /// <param name="priority">加载的优先级</param>
-        public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, uint priority = 0, LocalPhysicsMode physicsMode = default)
+        public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode = LoadSceneMode.Single, LocalPhysicsMode physicsMode = LocalPhysicsMode.None, bool suspendLoad = false, uint priority = 0)
         {
             DebugCheckInitialize();
-            return LoadSceneInternal(assetInfo, false, sceneMode, suspendLoad, priority, physicsMode);
+            return LoadSceneInternal(assetInfo, false, sceneMode, physicsMode, suspendLoad, priority);
         }
 
-        private SceneHandle LoadSceneInternal(AssetInfo assetInfo, bool waitForAsyncComplete, LoadSceneMode sceneMode, bool suspendLoad, uint priority, LocalPhysicsMode physicsMode = default)
+        private SceneHandle LoadSceneInternal(AssetInfo assetInfo, bool waitForAsyncComplete, LoadSceneMode sceneMode, LocalPhysicsMode physicsMode, bool suspendLoad, uint priority)
         {
             DebugCheckAssetLoadType(assetInfo.AssetType);
-            var handle = _resourceManager.LoadSceneAsync(assetInfo, sceneMode, suspendLoad, priority, physicsMode);
+            var loadSceneParams = new LoadSceneParameters(sceneMode, physicsMode);
+            var handle = _resourceManager.LoadSceneAsync(assetInfo, loadSceneParams, suspendLoad, priority);
             if (waitForAsyncComplete)
                 handle.WaitForAsyncComplete();
             return handle;

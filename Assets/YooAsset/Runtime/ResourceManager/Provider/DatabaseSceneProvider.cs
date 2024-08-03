@@ -8,14 +8,24 @@ namespace YooAsset
 {
     internal sealed class DatabaseSceneProvider : ProviderOperation
     {
-        public LoadSceneMode SceneMode => LoadSceneParams.loadSceneMode;
-        public readonly LoadSceneParameters LoadSceneParams;
-        private bool _suspendLoadMode;
+        public readonly LoadSceneParameters LoadSceneParams;    
         private AsyncOperation _asyncOperation;
+        private bool _suspendLoadMode;
 
-        public DatabaseSceneProvider(ResourceManager manager, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad, LocalPhysicsMode physicsMode = default) : base(manager, providerGUID, assetInfo)
+        /// <summary>
+        /// 场景加载模式
+        /// </summary>
+        public LoadSceneMode SceneMode
         {
-            LoadSceneParams = new LoadSceneParameters(sceneMode, physicsMode);
+            get
+            {
+                return LoadSceneParams.loadSceneMode;
+            }
+        }
+
+        public DatabaseSceneProvider(ResourceManager manager, string providerGUID, AssetInfo assetInfo, LoadSceneParameters loadSceneParams, bool suspendLoad) : base(manager, providerGUID, assetInfo)
+        {
+            LoadSceneParams = loadSceneParams;
             SceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
             _suspendLoadMode = suspendLoad;
         }
