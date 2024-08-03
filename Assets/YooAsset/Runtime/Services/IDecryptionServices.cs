@@ -34,5 +34,12 @@ namespace YooAsset
         /// 注意：加载流对象在资源包对象释放的时候会自动释放
         /// </summary>
         AssetBundleCreateRequest LoadAssetBundleAsync(DecryptFileInfo fileInfo, out Stream managedStream);
+
+        /// <summary>
+        /// 解密字节数据
+        /// </summary>
+        /// <param name="encryptData"></param>
+        /// <returns></returns>
+        byte[] ReadFileData(byte[] encryptData);
     }
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Text;
 
 namespace YooAsset
 {
@@ -97,6 +98,11 @@ namespace YooAsset
         /// 自定义参数：断点续传下载器关注的错误码
         /// </summary>
         public List<long> ResumeDownloadResponseCodes { private set; get; } = null;
+
+        /// <summary>
+        ///  自定义参数：解密方法类
+        /// </summary>
+        public IDecryptionServices DecryptionServices { private set; get; }
         #endregion
 
 
@@ -208,29 +214,33 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == "REMOTE_SERVICES")
+            if (name == FileSystemParameters.REMOTE_SERVICES)
             {
                 RemoteServices = (IRemoteServices)value;
             }
-            else if (name == "FILE_VERIFY_LEVEL")
+            else if (name == FileSystemParameters.FILE_VERIFY_LEVEL)
             {
                 FileVerifyLevel = (EFileVerifyLevel)value;
             }
-            else if (name == "APPEND_FILE_EXTENSION")
+            else if (name == FileSystemParameters.APPEND_FILE_EXTENSION)
             {
                 AppendFileExtension = (bool)value;
             }
-            else if (name == "RAW_FILE_BUILD_PIPELINE")
+            else if (name == FileSystemParameters.RAW_FILE_BUILD_PIPELINE)
             {
                 RawFileBuildPipeline = (bool)value;
             }
-            else if (name == "RESUME_DOWNLOAD_MINMUM_SIZE")
+            else if (name == FileSystemParameters.RESUME_DOWNLOAD_MINMUM_SIZE)
             {
                 ResumeDownloadMinimumSize = (long)value;
             }
-            else if (name == "RESUME_DOWNLOAD_RESPONSE_CODES")
+            else if (name == FileSystemParameters.RESUME_DOWNLOAD_RESPONSE_CODES)
             {
                 ResumeDownloadResponseCodes = (List<long>)value;
+            }
+            else if (name == FileSystemParameters.DECRYPTION_SERVICES)
+            {
+                DecryptionServices = (IDecryptionServices)value;
             }
             else
             {
@@ -307,9 +317,19 @@ namespace YooAsset
         {
             if (Exists(bundle) == false)
                 return null;
-
             string filePath = GetCacheFileLoadPath(bundle);
-            return FileUtility.ReadAllBytes(filePath);
+            var data = FileUtility.ReadAllBytes(filePath);
+
+            if (bundle.Encrypted)
+            {
+                if (DecryptionServices == null)
+                {
+                    YooLogger.Error($"DecryptionServices is Null!");
+                    return null;
+                }
+                return DecryptionServices.ReadFileData(data);
+            }
+            return data;
         }
         public virtual string ReadFileText(PackageBundle bundle)
         {
@@ -317,7 +337,18 @@ namespace YooAsset
                 return null;
 
             string filePath = GetCacheFileLoadPath(bundle);
-            return FileUtility.ReadAllText(filePath);
+            var data = FileUtility.ReadAllBytes(filePath);
+
+            if (bundle.Encrypted)
+            {
+                if (DecryptionServices == null)
+                {
+                    YooLogger.Error($"DecryptionServices is Null!");
+                    return null;
+                }
+                data = DecryptionServices.ReadFileData(data);
+            }
+            return Encoding.UTF8.GetString(data);
         }
 
         #region 内部方法
@@ -527,6 +558,60 @@ namespace YooAsset
         public List<string> GetAllCachedBundleGUIDs()
         {
             return _wrappers.Keys.ToList();
+        }
+
+        internal AssetBundle LoadAssetBundle(PackageBundle bundle)
+        {
+            string filePath = GetCacheFileLoadPath(bundle);
+
+            if (bundle.Encrypted)
+            {
+                if (DecryptionServices == null)
+                {
+                    YooLogger.Error($"DecryptionServices is Null!");
+                    return null;
+                }
+                else
+                {
+                    return DecryptionServices.LoadAssetBundle(new DecryptFileInfo()
+                    {
+                        BundleName = bundle.BundleName,
+                        FileLoadCRC = bundle.UnityCRC,
+                        FileLoadPath = filePath,
+                    }, out _);
+                }
+            }
+            else
+            {
+                return AssetBundle.LoadFromFile(filePath);
+            }
+        }
+
+        internal AssetBundleCreateRequest LoadAssetBundleAsync(PackageBundle bundle)
+        {
+            string filePath = GetCacheFileLoadPath(bundle);
+
+            if (bundle.Encrypted)
+            {
+                if (DecryptionServices == null)
+                {
+                    YooLogger.Error($"DecryptionServices is Empty!");
+                    return null;
+                }
+                else
+                {
+                    return DecryptionServices.LoadAssetBundleAsync(new DecryptFileInfo()
+                    {
+                        BundleName = bundle.BundleName,
+                        FileLoadCRC = bundle.UnityCRC,
+                        FileLoadPath = filePath,
+                    }, out _);
+                }
+            }
+            else
+            {
+                return AssetBundle.LoadFromFileAsync(filePath);
+            }
         }
         #endregion
     }
