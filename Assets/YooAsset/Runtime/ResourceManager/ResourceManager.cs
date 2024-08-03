@@ -86,7 +86,7 @@ namespace YooAsset
         /// 注意：返回的场景句柄是唯一的，每个场景句柄对应自己的场景提供者对象。
         /// 注意：业务逻辑层应该避免同时加载一个子场景。
         /// </summary>
-        public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad, uint priority)
+        public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad, uint priority, LocalPhysicsMode physicsMode = default)
         {
             if (assetInfo.IsInvalid)
             {
@@ -107,9 +107,9 @@ namespace YooAsset
             ProviderOperation provider;
             {
                 if (_simulationOnEditor)
-                    provider = new DatabaseSceneProvider(this, providerGUID, assetInfo, sceneMode, suspendLoad);
+                    provider = new DatabaseSceneProvider(this, providerGUID, assetInfo, sceneMode, suspendLoad, physicsMode);
                 else
-                    provider = new BundledSceneProvider(this, providerGUID, assetInfo, sceneMode, suspendLoad);
+                    provider = new BundledSceneProvider(this, providerGUID, assetInfo, sceneMode, suspendLoad, physicsMode);
                 provider.InitSpawnDebugInfo();
                 _providerDic.Add(providerGUID, provider);
                 OperationSystem.StartOperation(PackageName, provider);

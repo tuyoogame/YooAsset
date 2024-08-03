@@ -8,13 +8,14 @@ namespace YooAsset
 {
     internal sealed class DatabaseSceneProvider : ProviderOperation
     {
-        public readonly LoadSceneMode SceneMode;
+        public LoadSceneMode SceneMode => LoadSceneParams.loadSceneMode;
+        public readonly LoadSceneParameters LoadSceneParams;
         private bool _suspendLoadMode;
         private AsyncOperation _asyncOperation;
 
-        public DatabaseSceneProvider(ResourceManager manager, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad) : base(manager, providerGUID, assetInfo)
+        public DatabaseSceneProvider(ResourceManager manager, string providerGUID, AssetInfo assetInfo, LoadSceneMode sceneMode, bool suspendLoad, LocalPhysicsMode physicsMode = default) : base(manager, providerGUID, assetInfo)
         {
-            SceneMode = sceneMode;
+            LoadSceneParams = new LoadSceneParameters(sceneMode, physicsMode);
             SceneName = Path.GetFileNameWithoutExtension(assetInfo.AssetPath);
             _suspendLoadMode = suspendLoad;
         }
@@ -53,14 +54,12 @@ namespace YooAsset
             {
                 if (IsWaitForAsyncComplete)
                 {
-                    LoadSceneParameters loadSceneParameters = new LoadSceneParameters(SceneMode);
-                    SceneObject = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(MainAssetInfo.AssetPath, loadSceneParameters);
+                    SceneObject = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(MainAssetInfo.AssetPath, LoadSceneParams);
                     _steps = ESteps.Checking;
                 }
                 else
                 {
-                    LoadSceneParameters loadSceneParameters = new LoadSceneParameters(SceneMode);
-                    _asyncOperation = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(MainAssetInfo.AssetPath, loadSceneParameters);
+                    _asyncOperation = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(MainAssetInfo.AssetPath, LoadSceneParams);
                     if (_asyncOperation != null)
                     {
                         _asyncOperation.allowSceneActivation = !_suspendLoadMode;
