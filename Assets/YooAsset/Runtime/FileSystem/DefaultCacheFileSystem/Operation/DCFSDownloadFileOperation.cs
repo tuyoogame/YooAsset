@@ -250,17 +250,17 @@ namespace YooAsset
                 if (File.Exists(_tempFilePath))
                 {
                     FileInfo fileInfo = new FileInfo(_tempFilePath);
-                    fileBeginLength = fileInfo.Length;
-                    _fileOriginLength = fileBeginLength;
-                    DownloadedBytes = _fileOriginLength;
-                }
-
-                // 检测下载起始位置
-                if (fileBeginLength >= Bundle.FileSize)
-                {
-                    // 删除临时文件
-                    if (File.Exists(_tempFilePath))
+                    if (fileInfo.Length >= Bundle.FileSize)
+                    {
+                        // 删除临时文件
                         File.Delete(_tempFilePath);
+                    }
+                    else
+                    {
+                        fileBeginLength = fileInfo.Length;
+                        _fileOriginLength = fileBeginLength;
+                        DownloadedBytes = _fileOriginLength;
+                    }
                 }
 
                 // 创建下载器
