@@ -7,7 +7,7 @@ namespace YooAsset
     internal class HostPlayModeImpl : IPlayMode, IBundleQuery
     {
         public readonly string PackageName;
-        public IFileSystem BuildinFileSystem { set; get; }
+        public IFileSystem BuildinFileSystem { set; get; } //可以为空！
         public IFileSystem DeliveryFileSystem { set; get; } //可以为空！
         public IFileSystem CacheFileSystem { set; get; }
 
@@ -118,7 +118,7 @@ namespace YooAsset
             if (packageBundle == null)
                 throw new Exception("Should never get here !");
 
-            if (BuildinFileSystem.Belong(packageBundle))
+            if (BuildinFileSystem != null && BuildinFileSystem.Belong(packageBundle))
             {
                 BundleInfo bundleInfo = new BundleInfo(BuildinFileSystem, packageBundle);
                 return bundleInfo;

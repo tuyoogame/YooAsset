@@ -45,6 +45,12 @@ namespace YooAsset
 
             if (_steps == ESteps.ClearFileSystemA)
             {
+                if (_fileSystemA == null)
+                {
+                    _steps = ESteps.ClearFileSystemB;
+                    return;
+                }
+
                 if (_clearUnusedBundleFilesOpA == null)
                     _clearUnusedBundleFilesOpA = _fileSystemA.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
 
