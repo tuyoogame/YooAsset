@@ -21,6 +21,36 @@ public static class WechatFileSystemCreater
 /// </summary>
 internal class WechatFileSystem : IFileSystem
 {
+    private class WebRemoteServices : IRemoteServices
+    {
+        private readonly string _webPackageRoot;
+        protected readonly Dictionary<string, string> _mapping = new Dictionary<string, string>(10000);
+
+        public WebRemoteServices(string buildinPackRoot)
+        {
+            _webPackageRoot = buildinPackRoot;
+        }
+        string IRemoteServices.GetRemoteMainURL(string fileName)
+        {
+            return GetFileLoadURL(fileName);
+        }
+        string IRemoteServices.GetRemoteFallbackURL(string fileName)
+        {
+            return GetFileLoadURL(fileName);
+        }
+
+        private string GetFileLoadURL(string fileName)
+        {
+            if (_mapping.TryGetValue(fileName, out string url) == false)
+            {
+                string filePath = PathUtility.Combine(_webPackageRoot, fileName);
+                url = DownloadSystemHelper.ConvertToWWWPath(filePath);
+                _mapping.Add(fileName, url);
+            }
+            return url;
+        }
+    }
+
     private readonly Dictionary<string, string> _wxFilePaths = new Dictionary<string, string>(10000);
     private WXFileSystemManager _wxFileSystemMgr;
     private string _wxFileCacheRoot = string.Empty;
@@ -52,12 +82,12 @@ internal class WechatFileSystem : IFileSystem
         }
     }
 
-#region 自定义参数
+    #region 自定义参数
     /// <summary>
     /// 自定义参数：远程服务接口
     /// </summary>
     public IRemoteServices RemoteServices { private set; get; } = null;
-#endregion
+    #endregion
 
 
     public WechatFileSystem()
@@ -129,6 +159,13 @@ internal class WechatFileSystem : IFileSystem
     {
         PackageName = packageName;
 
+        // 注意：CDN服务未启用的情况下，使用微信WEB服务器
+        if (RemoteServices == null)
+        {
+            string webRoot = PathUtility.Combine(Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName, packageName);
+            RemoteServices = new WebRemoteServices(webRoot);
+        }
+
         _wxFileSystemMgr = WX.GetFileSystemManager();
         _wxFileCacheRoot = WX.env.USER_DATA_PATH; //注意：如果有子目录，请修改此处！
     }
@@ -171,7 +208,7 @@ internal class WechatFileSystem : IFileSystem
         throw new System.NotImplementedException();
     }
 
-#region 内部方法
+    #region 内部方法
     private string GetWXFileLoadPath(PackageBundle bundle)
     {
         if (_wxFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
@@ -181,6 +218,6 @@ internal class WechatFileSystem : IFileSystem
         }
         return filePath;
     }
-#endregion
+    #endregion
 }
 #endif
