@@ -14,14 +14,13 @@ namespace YooAsset
             CheckError,
             PrepareDone,
             UnLoadScene,
-            Checking,
             Done,
         }
 
         private ESteps _steps = ESteps.None;
         private readonly string _error;
         private readonly ProviderOperation _provider;
-        private AsyncOperation _asyncOp;
+        private AsyncOperation _asyncOp = null;
 
         internal UnloadSceneOperation(string error)
         {
@@ -96,16 +95,16 @@ namespace YooAsset
 
             if (_steps == ESteps.UnLoadScene)
             {
-                _asyncOp = SceneManager.UnloadSceneAsync(_provider.SceneObject);
-                _provider.ResourceMgr.UnloadSubScene(_provider.SceneName);
-                _steps = ESteps.Checking;
-            }
+                if (_asyncOp == null)
+                {
+                    _asyncOp = SceneManager.UnloadSceneAsync(_provider.SceneObject);
+                    _provider.ResourceMgr.UnloadSubScene(_provider.SceneName);
+                }
 
-            if (_steps == ESteps.Checking)
-            {
                 Progress = _asyncOp.progress;
                 if (_asyncOp.isDone == false)
                     return;
+
                 _provider.ResourceMgr.TryUnloadUnusedAsset(_provider.MainAssetInfo);
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Succeed;

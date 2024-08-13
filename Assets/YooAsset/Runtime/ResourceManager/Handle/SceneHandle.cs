@@ -23,7 +23,7 @@ namespace YooAsset
             add
             {
                 if (IsValidWithWarning == false)
-                    throw new System.Exception($"{nameof(SceneHandle)} is invalid");
+                    throw new System.Exception($"{nameof(SceneHandle)} is invalid !");
                 if (Provider.IsDone)
                     value.Invoke(this);
                 else
@@ -32,7 +32,7 @@ namespace YooAsset
             remove
             {
                 if (IsValidWithWarning == false)
-                    throw new System.Exception($"{nameof(SceneHandle)} is invalid");
+                    throw new System.Exception($"{nameof(SceneHandle)} is invalid !");
                 _callback -= value;
             }
         }
@@ -168,13 +168,12 @@ namespace YooAsset
             }
 
             // 卸载子场景
+            // 注意：如果场景正在加载过程，必须等待加载完成后才可以卸载该场景。
             {
                 var operation = new UnloadSceneOperation(Provider);
                 OperationSystem.StartOperation(packageName, operation);
                 return operation;
             }
         }
-
-
     }
 }

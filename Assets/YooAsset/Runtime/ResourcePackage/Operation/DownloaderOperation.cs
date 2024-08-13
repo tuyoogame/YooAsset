@@ -130,7 +130,7 @@ namespace YooAsset
                 long downloadBytes = _cachedDownloadBytes;
                 foreach (var downloader in _downloaders)
                 {
-                    downloadBytes += (long)downloader.DownloadedBytes;
+                    downloadBytes += downloader.DownloadedBytes;
                     if (downloader.IsDone == false)
                         continue;
 
@@ -145,7 +145,7 @@ namespace YooAsset
                     // 下载成功
                     _removeList.Add(downloader);
                     _cachedDownloadCount++;
-                    _cachedDownloadBytes += (long)downloader.DownloadedBytes;
+                    _cachedDownloadBytes += downloader.DownloadedBytes;
                 }
 
                 // 移除已经完成的下载器（无论成功或失败）
