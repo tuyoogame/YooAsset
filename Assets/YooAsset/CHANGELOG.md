@@ -2,6 +2,41 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.2.3-preview] - 2024-08-13
+
+### Fixed
+
+- (#311) 修复了断点续传下载器极小概率报错 : “416 Range Not Satisfiable”
+
+### Improvements
+
+- 原生文件构建管线支持原生文件加密。
+
+- HostPlayMode模式下内置文件系统初始化参数可以为空。
+
+- 场景加载增加了LocalPhysicsMode参数来控制物理运行模式。
+
+- 默认的内置文件系统和缓存文件系统增加解密方法。
+
+  ```csharp
+  /// <summary>
+  /// 创建默认的内置文件系统参数
+  /// </summary>
+  /// <param name="decryptionServices">加密文件解密服务类</param>
+  /// <param name="verifyLevel">缓存文件的校验等级</param>
+  /// <param name="rootDirectory">内置文件的根路径</param>
+  public static FileSystemParameters CreateDefaultBuildinFileSystemParameters(IDecryptionServices decryptionServices, EFileVerifyLevel verifyLevel, string rootDirectory);
+  
+  /// <summary>
+  /// 创建默认的缓存文件系统参数
+  /// </summary>
+  /// <param name="remoteServices">远端资源地址查询服务类</param>
+  /// <param name="decryptionServices">加密文件解密服务类</param>
+  /// <param name="verifyLevel">缓存文件的校验等级</param>
+  /// <param name="rootDirectory">文件系统的根目录</param>
+  public static FileSystemParameters CreateDefaultCacheFileSystemParameters(IRemoteServices remoteServices, IDecryptionServices decryptionServices, EFileVerifyLevel verifyLevel, string rootDirectory);
+  ```
+
 ## [2.2.2-preview] - 2024-07-31
 
 ### Fixed
