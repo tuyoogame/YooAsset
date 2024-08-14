@@ -42,6 +42,12 @@ namespace YooAsset.Editor
             AssetPath = assetPath;
             AssetGUID = UnityEditor.AssetDatabase.AssetPathToGUID(AssetPath);
             AssetType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(AssetPath);
+
+            // 注意：如果资源文件损坏或者实例化关联脚本丢失，获取的资源类型会无效！
+            if (AssetType == null)
+            {
+                throw new Exception($"Found invalid asset : {AssetPath}");
+            }
         }
 
         /// <summary>
