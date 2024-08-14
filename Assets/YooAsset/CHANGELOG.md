@@ -2,6 +2,26 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.5.8] - 2024-8-14
+
+### Fixed
+
+- (#175) 修复了Mac平台URL路径有空格的情况，会报Malformed URL错误。
+- (#177) 修复了加载一个地址的主资源或子资源之后无法再加载另一种的问题。
+- (#266) 修复了资源系统遍历IsBusy次数过多，导致过多的耗时的问题。
+- (#276) 修复了HostPlayMode模式下，如果内置清单是最新版本，每次运行都会触发拷贝行为。
+- (#295) 修复了在安卓平台，华为和三星真机上有极小概率加载资源包失败 : Unable to open archive file。
+
+### Added
+
+- 新增资源导入器。
+- 新增获取缓存文件信息的方法。
+
+### Changed
+
+- 支持鸿蒙操作系统。
+- 支持资源下载器合并。
+
 ## [1.5.7] - 2023-10-07
 
 ### Changed
