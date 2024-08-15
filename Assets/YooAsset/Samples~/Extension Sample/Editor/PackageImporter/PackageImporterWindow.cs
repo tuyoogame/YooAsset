@@ -29,9 +29,8 @@ namespace YooAsset.Editor
             if (GUILayout.Button("选择补丁包", GUILayout.MaxWidth(150)))
             {
                 string resultPath = EditorUtility.OpenFilePanel("Find", "Assets/", "bytes");
-                if (string.IsNullOrEmpty(resultPath))
-                    return;
-                _manifestPath = resultPath;
+                if (!string.IsNullOrEmpty(resultPath))
+                    _manifestPath = resultPath;
             }
             EditorGUILayout.LabelField(_manifestPath);
             EditorGUILayout.EndHorizontal();
