@@ -6,7 +6,7 @@ All notable changes to this package will be documented in this file.
 
 ### Fixed
 
-- (#311) 修复了HostPlayMode初始化卡死的问题。
+- 修复了HostPlayMode初始化卡死的问题。
 
 ## [2.2.3-preview] - 2024-08-13
 
