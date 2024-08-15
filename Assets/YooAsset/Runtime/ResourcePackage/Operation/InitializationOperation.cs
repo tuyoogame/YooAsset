@@ -219,7 +219,6 @@ namespace YooAsset
                         Error = "Failed to create buildin file system";
                         return;
                     }
-                    return;
                 }
 
                 if (_parameters.DeliveryFileSystemParameters != null)
