@@ -177,7 +177,8 @@ internal class ByteGameFileSystem : IFileSystem
     }
     public virtual bool Exists(PackageBundle bundle)
     {
-        return _fileSystemManager.AccessSync(bundle.FileName);
+        string filePath = GetCacheFileLoadPath(bundle);
+        return _fileSystemManager.AccessSync(filePath);
     }
     public virtual bool NeedDownload(PackageBundle bundle)
     {
@@ -205,7 +206,7 @@ internal class ByteGameFileSystem : IFileSystem
     }
     
     #region 内部方法
-    private string GetFileLoadPath(PackageBundle bundle)
+    private string GetCacheFileLoadPath(PackageBundle bundle)
     {
         if (_cacheFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
         {

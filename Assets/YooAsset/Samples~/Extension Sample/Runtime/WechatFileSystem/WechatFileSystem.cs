@@ -51,9 +51,9 @@ internal class WechatFileSystem : IFileSystem
         }
     }
 
-    private readonly Dictionary<string, string> _wxFilePaths = new Dictionary<string, string>(10000);
-    private WXFileSystemManager _wxFileSystemMgr;
-    private string _wxFileCacheRoot = string.Empty;
+    private readonly Dictionary<string, string> _cacheFilePaths = new Dictionary<string, string>(10000);
+    private WXFileSystemManager _fileSystemManager;
+    private string _fileCacheRoot = string.Empty;
 
     /// <summary>
     /// 包裹名称
@@ -67,7 +67,7 @@ internal class WechatFileSystem : IFileSystem
     {
         get
         {
-            return _wxFileCacheRoot;
+            return _fileCacheRoot;
         }
     }
 
@@ -166,8 +166,8 @@ internal class WechatFileSystem : IFileSystem
             RemoteServices = new WebRemoteServices(webRoot);
         }
 
-        _wxFileSystemMgr = WX.GetFileSystemManager();
-        _wxFileCacheRoot = WX.env.USER_DATA_PATH; //注意：如果有子目录，请修改此处！
+        _fileSystemManager = WX.GetFileSystemManager();
+        _fileCacheRoot = WX.env.USER_DATA_PATH; //注意：如果有子目录，请修改此处！
     }
     public virtual void OnUpdate()
     {
@@ -179,8 +179,8 @@ internal class WechatFileSystem : IFileSystem
     }
     public virtual bool Exists(PackageBundle bundle)
     {
-        string filePath = GetWXFileLoadPath(bundle);
-        string result = _wxFileSystemMgr.AccessSync(filePath);
+        string filePath = GetCacheFileLoadPath(bundle);
+        string result = _fileSystemManager.AccessSync(filePath);
         return result.Equals("access:ok");
     }
     public virtual bool NeedDownload(PackageBundle bundle)
@@ -209,12 +209,12 @@ internal class WechatFileSystem : IFileSystem
     }
 
     #region 内部方法
-    private string GetWXFileLoadPath(PackageBundle bundle)
+    private string GetCacheFileLoadPath(PackageBundle bundle)
     {
-        if (_wxFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
+        if (_cacheFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
         {
-            filePath = PathUtility.Combine(_wxFileCacheRoot, bundle.FileName);
-            _wxFilePaths.Add(bundle.BundleGUID, filePath);
+            filePath = PathUtility.Combine(_fileCacheRoot, bundle.FileName);
+            _cacheFilePaths.Add(bundle.BundleGUID, filePath);
         }
         return filePath;
     }
