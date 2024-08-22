@@ -29,7 +29,7 @@ namespace YooAsset
         internal override void InternalOnStart()
         {
             _requestCount = WebRequestCounter.GetRequestFailedCount(_fileSystem.PackageName, nameof(DownloadPackageManifestOperation));
-            _steps = ESteps.DownloadFile;
+            _steps = ESteps.CheckExist;
         }
         internal override void InternalOnUpdate()
         {
