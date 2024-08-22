@@ -7,6 +7,8 @@ namespace YooAsset
     {
         public static IFileSystem CreateFileSystem(string packageName, FileSystemParameters parameters)
         {
+            YooLogger.Log($"The package {packageName} create file system : {parameters.FileSystemClass}");
+
             Type classType = Type.GetType(parameters.FileSystemClass);
             if (classType == null)
             {
