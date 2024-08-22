@@ -47,5 +47,13 @@ namespace YooAsset
         {
             return OperationSystem.IsBusy;
         }
+
+        /// <summary>
+        /// 终止异步操作
+        /// </summary>
+        protected void Abort()
+        {
+            SetAbort();
+        }
     }
 }
