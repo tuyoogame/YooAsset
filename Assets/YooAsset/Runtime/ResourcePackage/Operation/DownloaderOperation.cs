@@ -15,10 +15,10 @@ namespace YooAsset
 
         private const int MAX_LOADER_COUNT = 64;
 
-        public delegate void OnDownloadOver(bool isSucceed);
-        public delegate void OnDownloadProgress(int totalDownloadCount, int currentDownloadCount, long totalDownloadBytes, long currentDownloadBytes);
-        public delegate void OnDownloadError(string fileName, string error);
-        public delegate void OnStartDownloadFile(string fileName, long sizeBytes);
+        public delegate void OnDownloadOver(string packageName, bool isSucceed);
+        public delegate void OnDownloadProgress(string packageName, int totalDownloadCount, int currentDownloadCount, long totalDownloadBytes, long currentDownloadBytes);
+        public delegate void OnDownloadError(string packageName, string fileName, string error);
+        public delegate void OnStartDownloadFile(string packageName, string fileName, long sizeBytes);
 
         private readonly string _packageName;
         private readonly int _downloadingMaxNumber;
@@ -160,7 +160,7 @@ namespace YooAsset
                     _lastDownloadBytes = downloadBytes;
                     _lastDownloadCount = _cachedDownloadCount;
                     Progress = (float)_lastDownloadBytes / TotalDownloadBytes;
-                    OnDownloadProgressCallback?.Invoke(TotalDownloadCount, _lastDownloadCount, TotalDownloadBytes, _lastDownloadBytes);
+                    OnDownloadProgressCallback?.Invoke(GetPackageName(), TotalDownloadCount, _lastDownloadCount, TotalDownloadBytes, _lastDownloadBytes);
                 }
 
                 // 动态创建新的下载器到最大数量限制
@@ -177,7 +177,7 @@ namespace YooAsset
                         var downloader = bundleInfo.CreateDownloader(_failedTryAgain, _timeout);
                         _downloaders.Add(downloader);
                         _bundleInfoList.RemoveAt(index);
-                        OnStartDownloadFileCallback?.Invoke(bundleInfo.Bundle.BundleName, bundleInfo.Bundle.FileSize);
+                        OnStartDownloadFileCallback?.Invoke(GetPackageName(), bundleInfo.Bundle.BundleName, bundleInfo.Bundle.FileSize);
                     }
                 }
 
@@ -191,15 +191,15 @@ namespace YooAsset
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Failed;
                         Error = $"Failed to download file : {bundleName}";
-                        OnDownloadErrorCallback?.Invoke(bundleName, failedDownloader.Error);
-                        OnDownloadOverCallback?.Invoke(false);
+                        OnDownloadErrorCallback?.Invoke(GetPackageName(), bundleName, failedDownloader.Error);
+                        OnDownloadOverCallback?.Invoke(GetPackageName(), false);
                     }
                     else
                     {
                         // 结算成功
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Succeed;
-                        OnDownloadOverCallback?.Invoke(true);
+                        OnDownloadOverCallback?.Invoke(GetPackageName(), true);
                     }
                 }
             }
