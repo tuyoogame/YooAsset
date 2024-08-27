@@ -6,7 +6,7 @@ using StarkSDKSpace;
 
 public static class ByteGameFileSystemCreater
 {
-    public static FileSystemParameters CreateWechatFileSystemParameters(IRemoteServices remoteServices)
+    public static FileSystemParameters CreateByteGameFileSystemParameters(IRemoteServices remoteServices)
     {
         string fileSystemClass = $"{nameof(ByteGameFileSystem)},YooAsset.RuntimeExtension";
         var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
