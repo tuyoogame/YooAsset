@@ -93,7 +93,7 @@ namespace YooAsset
             throw new System.NotImplementedException(this.GetType().Name);
         }
 
-        internal string GetPackageName()
+        public string GetPackageName()
         {
             return _packageName;
         }
