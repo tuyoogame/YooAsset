@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 namespace YooAsset
 {
