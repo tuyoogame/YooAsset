@@ -29,9 +29,7 @@ namespace YooAsset
         public DownloadStatus GetDownloadStatus()
         {
             if (IsValidWithWarning == false)
-            {
                 return DownloadStatus.CreateDefaultStatus();
-            }
             return Provider.GetDownloadStatus();
         }
 
@@ -44,7 +42,6 @@ namespace YooAsset
             {
                 if (IsValidWithWarning == false)
                     return EOperationStatus.None;
-
                 return Provider.Status;
             }
         }
@@ -83,7 +80,7 @@ namespace YooAsset
             get
             {
                 if (IsValidWithWarning == false)
-                    return false;
+                    return true;
                 return Provider.IsDone;
             }
         }
@@ -141,7 +138,12 @@ namespace YooAsset
         /// </summary>
         public System.Threading.Tasks.Task Task
         {
-            get { return Provider.Task; }
+            get 
+            {
+                if (IsValidWithWarning == false)
+                    return null;
+                return Provider.Task; 
+            }
         }
 
         // 协程相关
