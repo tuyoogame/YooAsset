@@ -89,7 +89,7 @@ namespace YooAsset
 
             foreach (var assetObject in Provider.AllAssetObjects)
             {
-                if (assetObject.name == assetName)
+                if (assetObject.name == assetName && assetObject is TObject)
                     return assetObject as TObject;
             }
 
