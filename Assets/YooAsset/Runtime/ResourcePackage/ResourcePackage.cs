@@ -181,6 +181,8 @@ namespace YooAsset
         {
             _initializeStatus = op.Status;
             _initializeError = op.Error;
+            if (_initializeStatus != EOperationStatus.Succeed)
+                YooLogger.Error(_initializeError);
         }
 
         /// <summary>

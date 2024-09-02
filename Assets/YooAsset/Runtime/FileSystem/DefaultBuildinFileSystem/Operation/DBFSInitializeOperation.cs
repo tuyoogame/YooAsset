@@ -24,7 +24,13 @@ namespace YooAsset
         }
         internal override void InternalOnStart()
         {
+#if UNITY_WEBGL
+            _steps = ESteps.Done;
+            Status = EOperationStatus.Failed;
+            Error = $"{nameof(DefaultBuildinFileSystem)} is not support WEBGL platform !";
+#else
             _steps = ESteps.InitUnpackFileSystem;
+#endif
         }
         internal override void InternalOnUpdate()
         {
