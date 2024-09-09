@@ -32,7 +32,7 @@ internal class FsmClearPackageCache : IStateNode
 
     private void Operation_Completed(YooAsset.AsyncOperationBase obj)
     {
-#if UNITY_WEBGL || WEIXINMINIGAME
+#if UNITY_WEBGL && WEIXINMINIGAME
 
 			//删除旧的资源清单文件和哈希文件
 			if (WX.StorageHasKeySync(YooAssets.DefaultPackageVersion_Key))
