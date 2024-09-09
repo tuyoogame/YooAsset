@@ -6,13 +6,18 @@ using WeChatWASM;
 
 public static class WechatFileSystemCreater
 {
-    public static FileSystemParameters CreateWechatFileSystemParameters(IRemoteServices remoteServices)
+    public static FileSystemParameters CreateWechatFileSystemParameters(IRemoteServices remoteServices,string rootDirectory = null)
     {
         string fileSystemClass = $"{nameof(WechatFileSystem)},YooAsset.RuntimeExtension";
-        var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
+        var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
         fileSystemParams.AddParameter("REMOTE_SERVICES", remoteServices);
         return fileSystemParams;
     }
+
+    /// <summary>
+    /// AppVersion
+    /// </summary>
+    public static string AppVersion { get; set; }
 }
 
 /// <summary>
@@ -82,12 +87,12 @@ internal class WechatFileSystem : IFileSystem
         }
     }
 
-    #region 自定义参数
+#region 自定义参数
     /// <summary>
     /// 自定义参数：远程服务接口
     /// </summary>
     public IRemoteServices RemoteServices { private set; get; } = null;
-    #endregion
+#endregion
 
 
     public WechatFileSystem()
@@ -113,13 +118,13 @@ internal class WechatFileSystem : IFileSystem
     }
     public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync()
     {
-        var operation = new FSClearAllBundleFilesCompleteOperation();
+        var operation = new WXFSClearAllBundleFilesOperation(this);
         OperationSystem.StartOperation(PackageName, operation);
         return operation;
     }
     public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(PackageManifest manifest)
     {
-        var operation = new FSClearUnusedBundleFilesCompleteOperation();
+        var operation = new WXFSClearUnusedBundleFilesAsync(this, manifest);
         OperationSystem.StartOperation(PackageName, operation);
         return operation;
     }
@@ -167,7 +172,7 @@ internal class WechatFileSystem : IFileSystem
         }
 
         _fileSystemManager = WX.GetFileSystemManager();
-        _fileCacheRoot = WX.env.USER_DATA_PATH; //注意：如果有子目录，请修改此处！
+        _fileCacheRoot = rootDirectory;// WX.PluginCachePath; //WX.env.USER_DATA_PATH; //注意：如果有子目录，请修改此处！
     }
     public virtual void OnUpdate()
     {
@@ -179,9 +184,9 @@ internal class WechatFileSystem : IFileSystem
     }
     public virtual bool Exists(PackageBundle bundle)
     {
-        string filePath = GetCacheFileLoadPath(bundle);
-        string result = _fileSystemManager.AccessSync(filePath);
-        return result.Equals("access:ok");
+        string filePath = GetWXFileLoadPath(bundle);
+        //Debug.Log($"CacheFile:{WX.GetCachePath($"StreamingAssets/WebGL/v1.0.0/{bundle.FileName}")}");
+        return CheckWXFileIsExist(filePath);
     }
     public virtual bool NeedDownload(PackageBundle bundle)
     {
@@ -207,8 +212,42 @@ internal class WechatFileSystem : IFileSystem
     {
         throw new System.NotImplementedException();
     }
+    public byte[] ReadFileData(string filePath)
+    {
+        if (CheckWXFileIsExist(filePath))
+            return _wxFileSystemMgr.ReadFileSync(filePath);
+        else
+            return Array.Empty<byte>();
+        //throw new System.NotImplementedException();
+    }
 
-    #region 内部方法
+    public string ReadFileText(string filePath)
+    {
+        if(CheckWXFileIsExist(filePath))
+            return _wxFileSystemMgr.ReadFileSync(filePath, "utf8");
+        else
+            return string.Empty;
+        //throw new System.NotImplementedException();
+    }
+    /// <summary>
+    /// 获取所有缓存文件的路径
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<string,string> GetWXAllCacheFilePath() 
+    {
+        return _wxFilePaths;
+    }
+    /// <summary>
+    /// 判断微信缓存文件是否存在
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <returns></returns>
+    public bool CheckWXFileIsExist(string filePath)
+    {
+        string result = _wxFileSystemMgr.AccessSync(filePath);
+        return result.Equals("access:ok");
+    }
+#region 内部方法
     private string GetCacheFileLoadPath(PackageBundle bundle)
     {
         if (_cacheFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
@@ -218,6 +257,6 @@ internal class WechatFileSystem : IFileSystem
         }
         return filePath;
     }
-    #endregion
+#endregion
 }
 #endif
