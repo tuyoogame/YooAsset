@@ -247,6 +247,58 @@ internal class WechatFileSystem : IFileSystem
         string result = _wxFileSystemMgr.AccessSync(filePath);
         return result.Equals("access:ok");
     }
+#region 调用微信小游戏接口删除缓存文件目录下所有文件
+    public void ClearAllCacheFile()
+    {
+#if !UNITY_EDITOR && UNITY_WEBGL && WEIXINMINIGAME
+        ShowModalOption showModalOp = new ShowModalOption();
+        showModalOp.title = "提示";
+        showModalOp.content = "是否确定要清理缓存并重启";
+        showModalOp.confirmText = "确定";
+        showModalOp.cancelText = "取消";
+        showModalOp.complete = (GeneralCallbackResult callResult) => { Debug.Log($"complete==={callResult.errMsg}"); };
+        showModalOp.fail = (GeneralCallbackResult callResult) => { Debug.Log($"fail==={callResult.errMsg}"); };
+        showModalOp.success = (ShowModalSuccessCallbackResult callResult) =>
+        { 
+            if(callResult.confirm)
+                RestartMiniGame(); 
+        };
+        WX.ShowModal(showModalOp);
+#endif
+    }
+
+    /// <summary>
+    /// 微信小游戏清除缓存并且重启小游戏
+    /// 参考小游戏=>出发吧麦芬
+    /// </summary>
+    private void RestartMiniGame()
+    {
+        WX.CleanAllFileCache((bool isOk) =>
+        {
+            RestartMiniProgramOption restartMini = new RestartMiniProgramOption();
+            restartMini.complete = RestartMiniComplete;
+            restartMini.fail = RestartMiniFailComplete;
+            restartMini.success = RestartMiniSuccComplete;
+            WX.RestartMiniProgram(restartMini);
+        });
+    }
+
+    private void RestartMiniComplete(GeneralCallbackResult result)
+    {
+        Debug.Log($"RestartMiniComplete:{result.errMsg}");
+    }
+
+    private void RestartMiniFailComplete(GeneralCallbackResult result)
+    {
+        Debug.Log($"RestartMiniFailComplete:{result.errMsg}");
+    }
+
+    private void RestartMiniSuccComplete(GeneralCallbackResult result)
+    {
+        Debug.Log($"RestartMiniSuccComplete:{result.errMsg}");
+    }
+
+#endregion
 #region 内部方法
     private string GetCacheFileLoadPath(PackageBundle bundle)
     {
