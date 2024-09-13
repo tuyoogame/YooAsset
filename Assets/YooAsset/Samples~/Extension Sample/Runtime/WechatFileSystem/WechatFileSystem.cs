@@ -112,7 +112,7 @@ internal class WechatFileSystem : IFileSystem
     }
     public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks, int timeout)
     {
-        var operation = new WXFSRequestPackageVersionOperation(this, timeout);
+        var operation = new WXFSRequestPackageVersionOperation(this, appendTimeTicks, timeout);
         OperationSystem.StartOperation(PackageName, operation);
         return operation;
     }

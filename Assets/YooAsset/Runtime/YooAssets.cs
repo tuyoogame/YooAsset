@@ -13,6 +13,7 @@ namespace YooAsset
         private static readonly List<ResourcePackage> _packages = new List<ResourcePackage>();
 
         public const string DefaultPackageVersion_Key = "DefaultPackageVersion_Key";
+        public const string DefaultPcakageVersion = "100000";
 
         /// <summary>
         /// 是否已经初始化

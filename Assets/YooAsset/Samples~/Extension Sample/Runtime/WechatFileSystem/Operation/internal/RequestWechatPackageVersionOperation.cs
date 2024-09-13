@@ -12,6 +12,7 @@ internal class RequestWechatPackageVersionOperation : AsyncOperationBase
 
     private readonly WechatFileSystem _fileSystem;
     private readonly int _timeout;
+    private readonly bool _appendTimeTicks;
     private UnityWebTextRequestOperation _webTextRequestOp;
     private int _requestCount = 0;
     private ESteps _steps = ESteps.None;
@@ -22,9 +23,10 @@ internal class RequestWechatPackageVersionOperation : AsyncOperationBase
     public string PackageVersion { private set; get; }
 
     
-    public RequestWechatPackageVersionOperation(WechatFileSystem fileSystem, int timeout)
+    public RequestWechatPackageVersionOperation(WechatFileSystem fileSystem, bool appendTimeTicks, int timeout)
     {
         _fileSystem = fileSystem;
+        _appendTimeTicks = appendTimeTicks;
         _timeout = timeout;
     }
     internal override void InternalOnStart()
@@ -78,11 +80,19 @@ internal class RequestWechatPackageVersionOperation : AsyncOperationBase
 
     private string GetRequestURL(string fileName)
     {
+        string url;
+
         // 轮流返回请求地址
         if (_requestCount % 2 == 0)
-            return _fileSystem.RemoteServices.GetRemoteMainURL(fileName);
+            url = _fileSystem.RemoteServices.GetRemoteMainURL(fileName);
         else
-            return _fileSystem.RemoteServices.GetRemoteFallbackURL(fileName);
+            url = _fileSystem.RemoteServices.GetRemoteFallbackURL(fileName);
+
+        // 在URL末尾添加时间戳
+        if (_appendTimeTicks)
+            return $"{url}?{System.DateTime.UtcNow.Ticks}";
+        else
+            return url;
     }
 }
 #endif

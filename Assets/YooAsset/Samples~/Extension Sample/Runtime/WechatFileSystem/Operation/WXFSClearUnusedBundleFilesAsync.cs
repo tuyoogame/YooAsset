@@ -49,7 +49,6 @@ internal class WXFSClearUnusedBundleFilesAsync : FSClearUnusedBundleFilesOperati
             if(_fileData != null && _fileData.Length > 0 && !string.IsNullOrEmpty(_packageHash))
             {
                 _steps = ESteps.VerifyFileData;
-                Debug.Log($"===_packageHash==={_packageHash}");
             }
             else
             {
@@ -57,8 +56,6 @@ internal class WXFSClearUnusedBundleFilesAsync : FSClearUnusedBundleFilesOperati
                 Status = EOperationStatus.Failed;
                 Error = "Failed to load cache package manifest file!";
             }
-            
-            //YooLogger.Log($"Found unused cache files count : {_unusedFileTotalCount}");
         }
 
         if(_steps == ESteps.VerifyFileData) 
@@ -165,12 +162,13 @@ internal class WXFSClearUnusedBundleFilesAsync : FSClearUnusedBundleFilesOperati
     private void LoadManifestInfo()
     {
         var packageName = _fileSystem.PackageName;
-        _lastPackageVersion = WX.StorageGetStringSync(YooAssets.DefaultPackageVersion_Key, "100000");
+        _lastPackageVersion = WX.StorageGetStringSync(YooAssets.DefaultPackageVersion_Key, YooAssets.DefaultPcakageVersion);
         Debug.Log($"==========取出本地数据版本文件成功==={_lastPackageVersion}");
         if (!string.IsNullOrEmpty(_lastPackageVersion))
         {
             var cacheManifestHashPath = GetUnuseCachePathByBundleName(YooAssetSettingsData.GetPackageHashFileName(packageName, _lastPackageVersion));
             var cacheManifestPath = GetUnuseCachePathByBundleName(YooAssetSettingsData.GetManifestBinaryFileName(packageName, _lastPackageVersion));
+            if(string.IsNullOrEmpty(cacheManifestHashPath) || string.IsNullOrEmpty(cacheManifestPath)) { return; }
 
             _packageHash = _fileSystem.ReadFileText(cacheManifestHashPath);
             _fileData = _fileSystem.ReadFileData(cacheManifestPath);
@@ -179,8 +177,8 @@ internal class WXFSClearUnusedBundleFilesAsync : FSClearUnusedBundleFilesOperati
 
     private string GetUnuseCachePathByBundleName(string fileName)
     {
-        var path = $"StreamingAssets/WebGL/v{WechatFileSystemCreater.AppVersion}/{fileName}";
-        return WX.GetCachePath(path);
+        var filePath = $"StreamingAssets/WebGL/{fileName}";
+        return WX.GetCachePath(filePath);
     }
 }
 #endif

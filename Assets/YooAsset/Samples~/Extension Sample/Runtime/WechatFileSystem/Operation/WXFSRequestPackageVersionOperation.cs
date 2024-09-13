@@ -11,14 +11,16 @@ internal class WXFSRequestPackageVersionOperation : FSRequestPackageVersionOpera
     }
 
     private readonly WechatFileSystem _fileSystem;
+    private readonly bool _appendTimeTicks;
     private readonly int _timeout;
     private RequestWechatPackageVersionOperation _requestWebPackageVersionOp;
     private ESteps _steps = ESteps.None;
 
 
-    internal WXFSRequestPackageVersionOperation(WechatFileSystem fileSystem, int timeout)
+    internal WXFSRequestPackageVersionOperation(WechatFileSystem fileSystem, bool appendTimeTicks, int timeout)
     {
         _fileSystem = fileSystem;
+        _appendTimeTicks = appendTimeTicks;
         _timeout = timeout;
     }
     internal override void InternalOnStart()
@@ -34,7 +36,7 @@ internal class WXFSRequestPackageVersionOperation : FSRequestPackageVersionOpera
         {
             if (_requestWebPackageVersionOp == null)
             {
-                _requestWebPackageVersionOp = new RequestWechatPackageVersionOperation(_fileSystem, _timeout);
+                _requestWebPackageVersionOp = new RequestWechatPackageVersionOperation(_fileSystem, _appendTimeTicks, _timeout);
                 OperationSystem.StartOperation(_fileSystem.PackageName, _requestWebPackageVersionOp);
             }
 
