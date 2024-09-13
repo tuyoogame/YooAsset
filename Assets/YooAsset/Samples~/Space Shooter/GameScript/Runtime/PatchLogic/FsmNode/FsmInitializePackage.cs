@@ -75,11 +75,10 @@ internal class FsmInitializePackage : IStateNode
         {
             var createParameters = new WebPlayModeParameters();
 #if UNITY_WEBGL && WEIXINMINIGAME && !UNITY_EDITOR
-				string defaultHostServer = GetHostServerURL();
-                string fallbackHostServer = GetHostServerURL();
-                IRemoteServices remoteServices = new RemoteServices(defaultHostServer, fallbackHostServer);
-                var rootDir = string.Format("{0}/{1}", WX.PluginCachePath, $"StreamingAssets/WebGL/v1.0.0");//这个1.0.0是App大版本文件，转微信小游戏后，没删除
-                createParameters.WebFileSystemParameters = WechatFileSystemCreater.CreateWechatFileSystemParameters(remoteServices, rootDir);
+			string defaultHostServer = GetHostServerURL();
+            string fallbackHostServer = GetHostServerURL();
+            IRemoteServices remoteServices = new RemoteServices(defaultHostServer, fallbackHostServer);
+            createParameters.WebFileSystemParameters = WechatFileSystemCreater.CreateWechatFileSystemParameters(remoteServices);
 #else
             createParameters.WebFileSystemParameters = FileSystemParameters.CreateDefaultWebFileSystemParameters();
 #endif

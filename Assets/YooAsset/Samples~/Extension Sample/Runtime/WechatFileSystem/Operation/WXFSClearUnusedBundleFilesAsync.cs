@@ -28,6 +28,8 @@ internal class WXFSClearUnusedBundleFilesAsync : FSClearUnusedBundleFilesOperati
     private string _packageHash;
     private int _unusedFileTotalCount = 0;
     private string _lastPackageVersion;
+    private string _cacheManifestHashPath;
+    private string _cacheManifestPath;
 
     internal WXFSClearUnusedBundleFilesAsync(WechatFileSystem fileSystem, PackageManifest manifest)
     {
@@ -116,7 +118,7 @@ internal class WXFSClearUnusedBundleFilesAsync : FSClearUnusedBundleFilesOperati
                 {
                     if (bundle != null)
                     {
-                        var cachePath = GetUnuseCachePathByBundleName(bundle.FileName);
+                        var cachePath = GetCachePathByFileName(bundle.FileName);
                         WX.RemoveFile(cachePath, (bool isOk) =>
                         {
                             Debug.Log($"{_unusedBundleGUIDs.Count}---删除缓存文件路径成功====={cachePath}==");
@@ -139,6 +141,7 @@ internal class WXFSClearUnusedBundleFilesAsync : FSClearUnusedBundleFilesOperati
 
             if (_unusedBundleGUIDs.Count == 0)
             {
+                CheckPackageVerion();
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Succeed;
             }
@@ -162,16 +165,39 @@ internal class WXFSClearUnusedBundleFilesAsync : FSClearUnusedBundleFilesOperati
     private void LoadManifestInfo()
     {
         var packageName = _fileSystem.PackageName;
-        _lastPackageVersion = WX.StorageGetStringSync(YooAssets.DefaultPackageVersion_Key, YooAssets.DefaultPcakageVersion);
-        Debug.Log($"==========取出本地数据版本文件成功==={_lastPackageVersion}");
-        if (!string.IsNullOrEmpty(_lastPackageVersion))
+        var packageVersion = _manifest.PackageVersion;
+        if (WX.StorageHasKeySync(YooAssets.DefaultPackageVersion_Key))
         {
-            var cacheManifestHashPath = GetUnuseCachePathByBundleName(YooAssetSettingsData.GetPackageHashFileName(packageName, _lastPackageVersion));
-            var cacheManifestPath = GetUnuseCachePathByBundleName(YooAssetSettingsData.GetManifestBinaryFileName(packageName, _lastPackageVersion));
-            if(string.IsNullOrEmpty(cacheManifestHashPath) || string.IsNullOrEmpty(cacheManifestPath)) { return; }
+            _lastPackageVersion = WX.StorageGetStringSync(YooAssets.DefaultPackageVersion_Key, YooAssets.DefaultPcakageVersion);
+            Debug.Log($"==========Get Storage PackageVerion Succ==={_lastPackageVersion}");
+            if (!string.IsNullOrEmpty(_lastPackageVersion) && (_lastPackageVersion != packageVersion))
+            {
+                _cacheManifestHashPath = GetCachePathByFileName(YooAssetSettingsData.GetPackageHashFileName(packageName, _lastPackageVersion));
+                _cacheManifestPath = GetCachePathByFileName(YooAssetSettingsData.GetManifestBinaryFileName(packageName, _lastPackageVersion));
+                if(string.IsNullOrEmpty(_cacheManifestHashPath) || string.IsNullOrEmpty(_cacheManifestPath)) { return; }
 
-            _packageHash = _fileSystem.ReadFileText(cacheManifestHashPath);
-            _fileData = _fileSystem.ReadFileData(cacheManifestPath);
+                _packageHash = _fileSystem.ReadFileText(_cacheManifestHashPath);
+                _fileData = _fileSystem.ReadFileData(_cacheManifestPath);
+            }
+        }
+        else
+        {
+            WX.StorageSetStringSync(YooAssets.DefaultPackageVersion_Key, packageVersion);
+            Debug.Log($"first Set Storage PackageVerion Succ==={packageVersion}");
+        }
+    }
+
+    private void CheckPackageVerion()
+    {
+        var packageName = _fileSystem.PackageName;
+        var packageVersion = _manifest.PackageVersion;
+        if (_lastPackageVersion != packageVersion)
+        {
+            WX.StorageSetStringSync(YooAssets.DefaultPackageVersion_Key, packageVersion);
+            //删除旧的资源清单文件和哈希文件
+            WX.RemoveFile(_cacheManifestHashPath, (bool isOk) => { Debug.Log("====Delect manifestHashPath Succ"); });
+            WX.RemoveFile(_cacheManifestPath, (bool isOk) => { Debug.Log("====Delect manifestPath Succ"); });
+            Debug.Log($"==========Set Storage PackageVerion Succ==={packageVersion}");
         }
     }
 

@@ -3,21 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
 using WeChatWASM;
+using System;
 
 public static class WechatFileSystemCreater
 {
-    public static FileSystemParameters CreateWechatFileSystemParameters(IRemoteServices remoteServices,string rootDirectory = null)
+    public static FileSystemParameters CreateWechatFileSystemParameters(IRemoteServices remoteServices)
     {
         string fileSystemClass = $"{nameof(WechatFileSystem)},YooAsset.RuntimeExtension";
-        var fileSystemParams = new FileSystemParameters(fileSystemClass, rootDirectory);
+        var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
         fileSystemParams.AddParameter("REMOTE_SERVICES", remoteServices);
         return fileSystemParams;
     }
-
-    /// <summary>
-    /// AppVersion
-    /// </summary>
-    public static string AppVersion { get; set; }
 }
 
 /// <summary>
@@ -56,9 +52,12 @@ internal class WechatFileSystem : IFileSystem
         }
     }
 
-    private readonly Dictionary<string, string> _cacheFilePaths = new Dictionary<string, string>(10000);
-    private WXFileSystemManager _fileSystemManager;
-    private string _fileCacheRoot = string.Empty;
+    /// <summary>
+    /// Key:资源包GUID Value:缓存路径
+    /// </summary>
+    private readonly Dictionary<string, string> _wxFilePaths = new Dictionary<string, string>(10000);
+    private WXFileSystemManager _wxFileSystemMgr;
+    private string _wxFileCacheRoot = string.Empty;
 
     /// <summary>
     /// 包裹名称
@@ -72,7 +71,7 @@ internal class WechatFileSystem : IFileSystem
     {
         get
         {
-            return _fileCacheRoot;
+            return _wxFileCacheRoot;
         }
     }
 
@@ -87,12 +86,12 @@ internal class WechatFileSystem : IFileSystem
         }
     }
 
-#region 自定义参数
+    #region 自定义参数
     /// <summary>
     /// 自定义参数：远程服务接口
     /// </summary>
     public IRemoteServices RemoteServices { private set; get; } = null;
-#endregion
+    #endregion
 
 
     public WechatFileSystem()
@@ -122,6 +121,7 @@ internal class WechatFileSystem : IFileSystem
         OperationSystem.StartOperation(PackageName, operation);
         return operation;
     }
+
     public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(PackageManifest manifest)
     {
         var operation = new WXFSClearUnusedBundleFilesAsync(this, manifest);
@@ -171,8 +171,9 @@ internal class WechatFileSystem : IFileSystem
             RemoteServices = new WebRemoteServices(webRoot);
         }
 
-        _fileSystemManager = WX.GetFileSystemManager();
-        _fileCacheRoot = rootDirectory;// WX.PluginCachePath; //WX.env.USER_DATA_PATH; //注意：如果有子目录，请修改此处！
+        _wxFileSystemMgr = WX.GetFileSystemManager();
+        _wxFileCacheRoot = PathUtility.Combine(WX.PluginCachePath, $"StreamingAssets/WebGL");// WX.PluginCachePath; //注意：如果有子目录，请修改此处！
+        Debug.Log($"==_wxFileCacheRoot=={_wxFileCacheRoot}");
     }
     public virtual void OnUpdate()
     {
@@ -193,6 +194,7 @@ internal class WechatFileSystem : IFileSystem
         if (Belong(bundle) == false)
             return false;
 
+        //Debug.Log($"WX NeedDownload: bundleName:{bundle.BundleName} + Exists:{Exists(bundle)}");
         return Exists(bundle) == false;
     }
     public virtual bool NeedUnpack(PackageBundle bundle)
@@ -212,6 +214,7 @@ internal class WechatFileSystem : IFileSystem
     {
         throw new System.NotImplementedException();
     }
+
     public byte[] ReadFileData(string filePath)
     {
         if (CheckWXFileIsExist(filePath))
@@ -229,6 +232,7 @@ internal class WechatFileSystem : IFileSystem
             return string.Empty;
         //throw new System.NotImplementedException();
     }
+
     /// <summary>
     /// 获取所有缓存文件的路径
     /// </summary>
@@ -247,68 +251,16 @@ internal class WechatFileSystem : IFileSystem
         string result = _wxFileSystemMgr.AccessSync(filePath);
         return result.Equals("access:ok");
     }
-#region 调用微信小游戏接口删除缓存文件目录下所有文件
-    public void ClearAllCacheFile()
+    #region 内部方法
+    private string GetWXFileLoadPath(PackageBundle bundle)
     {
-#if !UNITY_EDITOR && UNITY_WEBGL && WEIXINMINIGAME
-        ShowModalOption showModalOp = new ShowModalOption();
-        showModalOp.title = "提示";
-        showModalOp.content = "是否确定要清理缓存并重启";
-        showModalOp.confirmText = "确定";
-        showModalOp.cancelText = "取消";
-        showModalOp.complete = (GeneralCallbackResult callResult) => { Debug.Log($"complete==={callResult.errMsg}"); };
-        showModalOp.fail = (GeneralCallbackResult callResult) => { Debug.Log($"fail==={callResult.errMsg}"); };
-        showModalOp.success = (ShowModalSuccessCallbackResult callResult) =>
-        { 
-            if(callResult.confirm)
-                RestartMiniGame(); 
-        };
-        WX.ShowModal(showModalOp);
-#endif
-    }
-
-    /// <summary>
-    /// 微信小游戏清除缓存并且重启小游戏
-    /// 参考小游戏=>出发吧麦芬
-    /// </summary>
-    private void RestartMiniGame()
-    {
-        WX.CleanAllFileCache((bool isOk) =>
+        if (_wxFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
         {
-            RestartMiniProgramOption restartMini = new RestartMiniProgramOption();
-            restartMini.complete = RestartMiniComplete;
-            restartMini.fail = RestartMiniFailComplete;
-            restartMini.success = RestartMiniSuccComplete;
-            WX.RestartMiniProgram(restartMini);
-        });
-    }
-
-    private void RestartMiniComplete(GeneralCallbackResult result)
-    {
-        Debug.Log($"RestartMiniComplete:{result.errMsg}");
-    }
-
-    private void RestartMiniFailComplete(GeneralCallbackResult result)
-    {
-        Debug.Log($"RestartMiniFailComplete:{result.errMsg}");
-    }
-
-    private void RestartMiniSuccComplete(GeneralCallbackResult result)
-    {
-        Debug.Log($"RestartMiniSuccComplete:{result.errMsg}");
-    }
-
-#endregion
-#region 内部方法
-    private string GetCacheFileLoadPath(PackageBundle bundle)
-    {
-        if (_cacheFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
-        {
-            filePath = PathUtility.Combine(_fileCacheRoot, bundle.FileName);
-            _cacheFilePaths.Add(bundle.BundleGUID, filePath);
+            filePath = PathUtility.Combine(_wxFileCacheRoot, bundle.FileName);
+            _wxFilePaths.Add(bundle.BundleGUID, filePath);
         }
         return filePath;
     }
-#endregion
+    #endregion
 }
 #endif
