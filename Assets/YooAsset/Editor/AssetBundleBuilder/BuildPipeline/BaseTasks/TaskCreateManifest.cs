@@ -180,15 +180,18 @@ namespace YooAsset.Editor
             for (int index = 0; index < manifest.BundleList.Count; index++)
             {
                 var packageBundle = manifest.BundleList[index];
-                if (_cacheBundleTags.TryGetValue(index, out var value))
+                foreach (var dependBundleID in packageBundle.DependIDs)
                 {
-                    packageBundle.Tags = value.ToArray();
-                }
-                else
-                {
-                    // 注意：SBP构建管线会自动剔除一些冗余资源的引用关系，导致游离资源包没有被任何主资源包引用。
-                    string warning = BuildLogger.GetErrorMessage(ErrorCode.FoundStrayBundle, $"Found stray bundle ! Bundle ID : {index} Bundle name : {packageBundle.BundleName}");
-                    BuildLogger.Warning(warning);
+                    if (_cacheBundleTags.TryGetValue(dependBundleID, out var value))
+                    {
+                        packageBundle.Tags = value.ToArray();
+                    }
+                    else
+                    {
+                        // 注意：SBP构建管线会自动剔除一些冗余资源的引用关系，导致游离资源包没有被任何主资源包引用。
+                        string warning = BuildLogger.GetErrorMessage(ErrorCode.FoundStrayBundle, $"Found stray bundle ! Bundle ID : {index} Bundle name : {packageBundle.BundleName}");
+                        BuildLogger.Warning(warning);
+                    }
                 }
             }
         }
