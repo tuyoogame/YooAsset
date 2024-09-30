@@ -1,4 +1,4 @@
-﻿#if UNITY_WEBGL
+﻿#if UNITY_WEBGL && BYTEMINIGAME
 using YooAsset;
 
 internal class LoadByteGamePackageManifestOperation : AsyncOperationBase

@@ -1,4 +1,4 @@
-﻿#if UNITY_WEBGL
+﻿#if UNITY_WEBGL && BYTEMINIGAME
 using UnityEngine;
 using UnityEngine.Networking;
 using YooAsset;
