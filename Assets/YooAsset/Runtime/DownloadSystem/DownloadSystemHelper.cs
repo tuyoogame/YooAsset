@@ -25,26 +25,28 @@ namespace YooAsset
         /// </summary>
         public static string ConvertToWWWPath(string path)
         {
+            string urlPath;
 #if UNITY_EDITOR
-            return StringUtility.Format("file:///{0}", path);
+            urlPath = StringUtility.Format("file:///{0}", path);
 #elif UNITY_WEBGL
-            return path;
+            urlPath = path;
 #elif UNITY_IPHONE
-            return StringUtility.Format("file://{0}", path);
+            urlPath = StringUtility.Format("file://{0}", path);
 #elif UNITY_ANDROID
             if (path.StartsWith("jar:file://"))
-                return path;
+                urlPath = path;
             else
-                return StringUtility.Format("jar:file://{0}", path);
+                urlPath = StringUtility.Format("jar:file://{0}", path);
 #elif UNITY_STANDALONE_OSX
-            return new System.Uri(path).ToString();
+            urlPath = new System.Uri(path).ToString();
 #elif UNITY_STANDALONE
-            return StringUtility.Format("file:///{0}", path);
+            urlPath = StringUtility.Format("file:///{0}", path);
 #elif UNITY_OPENHARMONY
-            return StringUtility.Format("file://{0}", path);
+            urlPath = StringUtility.Format("file://{0}", path);
 #else
-            throw new System.NotImplementedException(); 
+            throw new System.NotImplementedException();
 #endif
+            return urlPath.Replace("+", "%2B").Replace("#", "%23").Replace("?", "%3F");
         }
     }
 }
