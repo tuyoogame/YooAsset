@@ -149,7 +149,7 @@ namespace YooAsset.Editor
             Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(1000);
 
             // 收集打包资源路径
-            List<string> findAssets =new List<string>();
+            List<string> findAssets = new List<string>();
             if (AssetDatabase.IsValidFolder(CollectPath))
             {
                 string collectDirectory = CollectPath;
@@ -272,19 +272,43 @@ namespace YooAsset.Editor
         }
         private List<AssetInfo> GetAllDependencies(CollectCommand command, string mainAssetPath)
         {
-            string[] depends = AssetDatabase.GetDependencies(mainAssetPath, true);
-            List<AssetInfo> result = new List<AssetInfo>(depends.Length);
-            foreach (string assetPath in depends)
+            List<AssetInfo> dependencies = new List<AssetInfo>();
+            HashSet<AssetStamp> m_AssetStamps = new HashSet<AssetStamp>();
+            void GetDependRecursive(string assetPath)
             {
-                // 注意：排除主资源对象
-                if (assetPath == mainAssetPath)
-                    continue;
+                string[] depends = AssetDatabase.GetDependencies(assetPath, false);
 
-                AssetInfo assetInfo = new AssetInfo(assetPath);
-                if (command.IgnoreRule.IsIgnore(assetInfo) == false)
-                    result.Add(assetInfo);
+                foreach (string dependPath in depends)
+                {
+                    AssetInfo assetInfo = new AssetInfo(dependPath);
+
+                    // 注意：排除资源自身
+                    if (dependPath == assetPath)
+                        continue;
+                    //排除主资源
+                    if (dependPath == mainAssetPath)
+                        continue;
+
+                    var stamp = new AssetStamp(mainAssetPath, dependPath);
+
+                    //主资源对于一个资源只有一个依赖
+                    if (m_AssetStamps.Contains(stamp))
+                        continue;
+                    m_AssetStamps.Add(stamp);
+
+                    //根据忽略规则排除
+                    if (command.IgnoreRule.IsIgnore(assetInfo))
+                        continue;
+
+                    dependencies.Add(assetInfo);
+
+                    GetDependRecursive(dependPath);
+                }
             }
-            return result;
+
+            GetDependRecursive(mainAssetPath);
+
+            return dependencies;
         }
     }
 }
