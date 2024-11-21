@@ -280,8 +280,6 @@ namespace YooAsset.Editor
 
                 foreach (string dependPath in depends)
                 {
-                    AssetInfo assetInfo = new AssetInfo(dependPath);
-
                     // 注意：排除资源自身
                     if (dependPath == assetPath)
                         continue;
@@ -295,7 +293,9 @@ namespace YooAsset.Editor
                     if (m_AssetStamps.Contains(stamp))
                         continue;
                     m_AssetStamps.Add(stamp);
-
+                    
+                    AssetInfo assetInfo = new AssetInfo(dependPath);
+                    
                     //根据忽略规则排除
                     if (command.IgnoreRule.IsIgnore(assetInfo))
                         continue;
