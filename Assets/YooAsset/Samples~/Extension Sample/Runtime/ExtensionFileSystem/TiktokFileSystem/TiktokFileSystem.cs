@@ -1,4 +1,4 @@
-﻿#if UNITY_WEBGL && DOUYINMINIGAME
+#if UNITY_WEBGL && DOUYINMINIGAME
 using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
@@ -57,6 +57,7 @@ internal class TiktokFileSystem : IFileSystem
     private readonly Dictionary<string, string> _cacheFilePaths = new Dictionary<string, string>(10000);
     private TTFileSystemManager _fileSystemMgr;
     private string _ttCacheRoot = string.Empty;
+    private string _recordsFilePath = string.Empty;
 
     /// <summary>
     /// 包裹名称
@@ -160,6 +161,7 @@ internal class TiktokFileSystem : IFileSystem
     {
         PackageName = packageName;
         _ttCacheRoot = rootDirectory;
+        _recordsFilePath = PathUtility.Combine(FileRoot, "__GAME_FILE_CACHE", "cache_records");
 
         if (string.IsNullOrEmpty(_ttCacheRoot))
         {
@@ -174,6 +176,24 @@ internal class TiktokFileSystem : IFileSystem
         }
 
         _fileSystemMgr = TT.GetFileSystemManager();
+        
+        // 读取本地文件缓存记录
+        if (CheckCacheFileExist(_recordsFilePath))
+        {
+            string recordText = _fileSystemMgr.ReadFileSync(_recordsFilePath, "utf8");
+            if (string.IsNullOrEmpty(recordText) == false)
+            {
+                string[] records = recordText.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var record in records)
+                {
+                    _recorders.Add(record);
+                }
+            }
+        }
+        else
+        {
+            _fileSystemMgr.WriteFileSync(_recordsFilePath, string.Empty);
+        }
     }
     public virtual void OnUpdate()
     {
@@ -259,6 +279,9 @@ internal class TiktokFileSystem : IFileSystem
         }
 
         _recorders.Add(filePath);
+        // 抖音没有AppendFileSync方法，所以这里直接写入，等后面增加这个方法再修改
+        _fileSystemMgr.WriteFileSync(_recordsFilePath, string.Join(",", _recorders));
+        // _fileSystemMgr.AppendFileSync(_recordsFilePath, filePath + ",");
         return true;
     }
     public void TryRecordBundle(PackageBundle bundle)
@@ -267,11 +290,15 @@ internal class TiktokFileSystem : IFileSystem
         if (_recorders.Contains(filePath) == false)
         {
             _recorders.Add(filePath);
+            // 抖音没有AppendFileSync方法，所以这里直接写入，等后面增加这个方法再修改
+            _fileSystemMgr.WriteFileSync(_recordsFilePath, string.Join(",", _recorders));
+            // _fileSystemMgr.AppendFileSync(_recordsFilePath, filePath + ",");
         }
     }
     public void ClearAllRecords()
     {
         _recorders.Clear();
+        _fileSystemMgr.WriteFileSync(_recordsFilePath, string.Empty);
     }
     public void ClearRecord(string filePath)
     {
@@ -279,6 +306,7 @@ internal class TiktokFileSystem : IFileSystem
         {
             _recorders.Remove(filePath);
         }
+        //TODO: 这里没做记录移除，因为耗时，后续可以看情况添加
     }
     #endregion
 }
