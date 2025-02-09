@@ -1,4 +1,4 @@
-﻿#if UNITY_WEBGL && WEIXINMINIGAME
+#if UNITY_WEBGL && WEIXINMINIGAME
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +57,7 @@ internal class WechatFileSystem : IFileSystem
     private readonly Dictionary<string, string> _cacheFilePaths = new Dictionary<string, string>(10000);
     private WXFileSystemManager _fileSystemMgr;
     private string _wxCacheRoot = string.Empty;
+    private string _recordsFilePath = string.Empty;
 
     /// <summary>
     /// 包裹名称
@@ -176,6 +177,7 @@ internal class WechatFileSystem : IFileSystem
     {
         PackageName = packageName;
         _wxCacheRoot = rootDirectory;
+        _recordsFilePath = PathUtility.Combine(FileRoot, "__GAME_FILE_CACHE", "cache_records");
 
         if (string.IsNullOrEmpty(_wxCacheRoot))
         {
@@ -190,6 +192,24 @@ internal class WechatFileSystem : IFileSystem
         }
 
         _fileSystemMgr = WX.GetFileSystemManager();
+        
+        // 读取本地文件缓存记录
+        if (CheckCacheFileExist(_recordsFilePath))
+        {
+            string recordText = _fileSystemMgr.ReadFileSync(_recordsFilePath, "utf8");
+            if (string.IsNullOrEmpty(recordText) == false)
+            {
+                string[] records = recordText.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var record in records)
+                {
+                    _recorders.Add(record);
+                }
+            }
+        }
+        else
+        {
+            _fileSystemMgr.WriteFileSync(_recordsFilePath, string.Empty);
+        }
     }
     public virtual void OnUpdate()
     {
@@ -276,6 +296,7 @@ internal class WechatFileSystem : IFileSystem
         }
 
         _recorders.Add(filePath);
+        _fileSystemMgr.AppendFileSync(_recordsFilePath, filePath + ",");
         return true;
     }
     public void TryRecordBundle(PackageBundle bundle)
@@ -284,11 +305,13 @@ internal class WechatFileSystem : IFileSystem
         if (_recorders.Contains(filePath) == false)
         {
             _recorders.Add(filePath);
+            _fileSystemMgr.AppendFileSync(_recordsFilePath, filePath + ",");
         }
     }
     public void ClearAllRecords()
     {
         _recorders.Clear();
+        _fileSystemMgr.WriteFileSync(_recordsFilePath, string.Empty);
     }
     public void ClearRecord(string filePath)
     {
@@ -296,6 +319,7 @@ internal class WechatFileSystem : IFileSystem
         {
             _recorders.Remove(filePath);
         }
+        //TODO: 这里没做记录移除，因为耗时，后续可以看情况添加
     }
     #endregion
 }
