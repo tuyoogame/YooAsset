@@ -125,7 +125,7 @@ namespace YooAsset.Editor
             // 1. 读取现有内容
             ReadRspFile(ref existingDefines, ref otherLines);
             // 2. 添加新宏
-            if (macrosToAdd != null && macrosToAdd.Count > 0))
+            if (macrosToAdd != null && macrosToAdd.Count > 0)
             {
                 macrosToAdd.ForEach(x =>
                 {
@@ -134,7 +134,7 @@ namespace YooAsset.Editor
                 });
             }
             // 3. 移除指定宏
-            if (macrosToRemove != null && macrosToRemove.Count > 0))
+            if (macrosToRemove != null && macrosToRemove.Count > 0)
             {
                 macrosToRemove.ForEach(x =>
                 {
