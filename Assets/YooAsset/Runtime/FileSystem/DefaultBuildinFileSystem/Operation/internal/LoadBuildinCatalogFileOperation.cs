@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 
 namespace YooAsset
 {
@@ -8,9 +9,11 @@ namespace YooAsset
         {
             None,
             LoadCatalog,
+            WaitForRequest,
             Done,
         }
 
+        private UnityWebRequest _request;
         private readonly DefaultBuildinFileSystem _fileSystem;
         private ESteps _steps = ESteps.None;
 
@@ -28,12 +31,39 @@ namespace YooAsset
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
+            string catalogFilePath = _fileSystem.GetCatalogFileLoadPath();
+
             if (_steps == ESteps.LoadCatalog)
             {
-                string catalogFilePath = _fileSystem.GetCatalogFileLoadPath();
-                var catalog = Resources.Load<DefaultBuildinFileCatalog>(catalogFilePath);
+                _request = UnityWebRequest.Get(catalogFilePath);
+                _request.SendWebRequest();
+                _steps = ESteps.WaitForRequest;
+                return;
+            }
+
+            if (_steps == ESteps.WaitForRequest)
+            {
+                // 等待请求完成
+                if (!_request.isDone)
+                    return;
+
+                if (_request.result != UnityWebRequest.Result.Success)
+                {
+                    _request.Dispose();
+                    _request = null;
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = $"Failed to load catalog file: {_request.error}";
+                    return;
+                }
+
+                // 解析 JSON
+                string jsonText = _request.downloadHandler.text;
+                var catalog = JsonUtility.FromJson<DefaultBuildinFileCatalog>(jsonText);
                 if (catalog == null)
                 {
+                    _request.Dispose();
+                    _request = null;
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
                     Error = $"Failed to load catalog file : {catalogFilePath}";
@@ -42,6 +72,8 @@ namespace YooAsset
 
                 if (catalog.PackageName != _fileSystem.PackageName)
                 {
+                    _request.Dispose();
+                    _request = null;
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
                     Error = $"Catalog file package name {catalog.PackageName} cannot match the file system package name {_fileSystem.PackageName}";
@@ -55,6 +87,8 @@ namespace YooAsset
                 }
 
                 YooLogger.Log($"Package '{_fileSystem.PackageName}' buildin catalog files count : {catalog.Wrappers.Count}");
+                _request.Dispose();
+                _request = null;
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Succeed;
             }

@@ -338,8 +338,8 @@ namespace YooAsset
         }
         public string GetCatalogFileLoadPath()
         {
-            string fileName = Path.GetFileNameWithoutExtension(DefaultBuildinFileSystemDefine.BuildinCatalogFileName);
-            return YooAssetSettingsData.GetYooResourcesLoadPath(PackageName, fileName);
+            string fileName = DefaultBuildinFileSystemDefine.BuildinCatalogFileName;
+            return PathUtility.Combine(YooAssetSettingsData.GetRequestYooDefaultBuildinRoot(), PackageName, fileName);
         }
 
         /// <summary>

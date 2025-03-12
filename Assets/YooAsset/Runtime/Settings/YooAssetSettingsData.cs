@@ -220,6 +220,26 @@ namespace YooAsset
             else
                 return PathUtility.Combine(Application.streamingAssetsPath, Setting.DefaultYooFolderName);
         }
+
+        internal static string GetRequestYooDefaultBuildinRoot()
+        {
+            if (string.IsNullOrEmpty(Setting.DefaultYooFolderName))
+                return GetRequestStreamingAssetsPath();
+            else
+                return PathUtility.Combine(GetRequestStreamingAssetsPath(), Setting.DefaultYooFolderName);
+        }
+
+        /// <summary>
+        /// 获取UnityWebRequest StreamingAssets的路径 (OSX and iOS 需要加 file://)
+        /// </summary>
+        internal static string GetRequestStreamingAssetsPath()
+        {
+#if UNITY_STANDALONE_OSX || UNITY_IOS
+            return $"file://{Application.streamingAssetsPath}";
+#else
+            return Application.streamingAssetsPath;
+#endif
+        }
         #endregion
     }
 }
