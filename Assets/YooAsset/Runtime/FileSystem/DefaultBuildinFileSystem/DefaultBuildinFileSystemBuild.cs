@@ -15,6 +15,15 @@ namespace YooAsset
         /// </summary>
         public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report)
         {
+            ExportBuildinCatalogFile();
+        }
+
+        /// <summary>
+        /// 输出包裹的内置资源目录文件
+        /// </summary>
+        /// <exception cref="System.Exception"></exception>
+        public static void ExportBuildinCatalogFile()
+        {
             YooLogger.Log("Begin to create catalog file !");
 
             string rootPath = YooAssetSettingsData.GetYooDefaultBuildinRoot();
@@ -127,7 +136,7 @@ namespace YooAsset
             string saveFilePath = $"{pacakgeDirectory}/{DefaultBuildinFileSystemDefine.BuildinCatalogFileName}";
             if (File.Exists(saveFilePath))
                 File.Delete(saveFilePath);
-            
+
             // 创建输出文件
             File.WriteAllText(saveFilePath, JsonUtility.ToJson(buildinFileCatalog, false));
             UnityEditor.AssetDatabase.Refresh();

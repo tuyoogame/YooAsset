@@ -15,6 +15,7 @@ namespace YooAsset.Editor
             if (buildParametersContext.Parameters.BuildinFileCopyOption != EBuildinFileCopyOption.None)
             {
                 CopyBuildinFilesToStreaming(buildParametersContext, manifestContext.Manifest);
+                DefaultBuildinFileSystemBuild.ExportBuildinCatalogFile();
             }
         }
     }
