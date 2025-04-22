@@ -328,6 +328,33 @@ namespace YooAsset
         /// </summary>
         public static string GetRemoteBundleFileName(int nameStyle, string bundleName, string fileExtension, string fileHash)
         {
+            // 编辑器下的 ESBP 会并行调用
+            #if UNITY_EDITOR
+            if (nameStyle == (int)EFileNameStyle.HashName)
+            {
+                return $"{fileHash}{fileExtension}";
+            }
+            else if (nameStyle == (int)EFileNameStyle.BundleName)
+            {
+                return bundleName;
+            }
+            else if (nameStyle == (int)EFileNameStyle.BundleName_HashName)
+            {
+                if (string.IsNullOrEmpty(fileExtension))
+                {
+                    return $"{bundleName}_{fileHash}";
+                }
+                else
+                {
+                    string fileName = bundleName.Remove(bundleName.LastIndexOf('.'));
+                    return $"{fileName}_{fileHash}{fileExtension}";
+                }
+            }
+            else
+            {
+                throw new NotImplementedException($"Invalid name style : {nameStyle}");
+            }
+            #else
             if (nameStyle == (int)EFileNameStyle.HashName)
             {
                 return StringUtility.Format("{0}{1}", fileHash, fileExtension);
@@ -352,6 +379,7 @@ namespace YooAsset
             {
                 throw new NotImplementedException($"Invalid name style : {nameStyle}");
             }
+            #endif
         }
     }
 }

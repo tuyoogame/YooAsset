@@ -3,20 +3,60 @@ using System.IO;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using UnityEditor;
 
-namespace YooAsset.Editor
-{
-    public abstract class TaskUpdateBundleInfo
-    {
-        public void UpdateBundleInfo(BuildContext context)
-        {
+namespace YooAsset.Editor {
+    public abstract class TaskUpdateBundleInfo {
+        public void UpdateBundleInfo(BuildContext context) {
             var buildParametersContext = context.GetContextObject<BuildParametersContext>();
             var buildMapContext = context.GetContextObject<BuildMapContext>();
             string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
             string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
             int outputNameStyle = (int)buildParametersContext.Parameters.FileNameStyle;
 
+            // 仅在编辑器下并行构建
+            #if UNITY_EDITOR
+            Parallel.ForEach(buildMapContext.Collection, bundleInfo => {
+                // 1.检测文件名长度
+                {
+                    // NOTE：检测文件名长度不要超过260字符。
+                    string fileName = bundleInfo.BundleName;
+                    if (fileName.Length >= 260) {
+                        string message = BuildLogger.GetErrorMessage(ErrorCode.CharactersOverTheLimit, $"Bundle file name character count exceeds limit : {fileName}");
+                        throw new Exception(message);
+                    }
+                }
+
+                // 2.更新构建输出的文件路径
+                {
+                    bundleInfo.BuildOutputFilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}";
+                    if (bundleInfo.Encrypted)
+                        bundleInfo.PackageSourceFilePath = bundleInfo.EncryptedFilePath;
+                    else
+                        bundleInfo.PackageSourceFilePath = bundleInfo.BuildOutputFilePath;
+                }
+
+                // 3.更新文件其它信息
+                {
+                    bundleInfo.PackageUnityHash = GetUnityHash(bundleInfo, context);
+                    bundleInfo.PackageUnityCRC = GetUnityCRC(bundleInfo, context);
+                    bundleInfo.PackageFileHash = GetBundleFileHash(bundleInfo, buildParametersContext);
+                    bundleInfo.PackageFileCRC = GetBundleFileCRC(bundleInfo, buildParametersContext);
+                    bundleInfo.PackageFileSize = GetBundleFileSize(bundleInfo, buildParametersContext);
+                }
+
+                // 4.更新补丁包输出的文件路径
+                {
+                    string bundleName = bundleInfo.BundleName;
+                    string fileHash = bundleInfo.PackageFileHash;
+                    string fileExtension = ManifestTools.GetRemoteBundleFileExtension(bundleName);
+                    string fileName = ManifestTools.GetRemoteBundleFileName(outputNameStyle, bundleName, fileExtension, fileHash);
+                    bundleInfo.PackageDestFilePath = $"{packageOutputDirectory}/{fileName}";
+                }
+            });
+            #else
             // 1.检测文件名长度
             foreach (var bundleInfo in buildMapContext.Collection)
             {
@@ -58,12 +98,13 @@ namespace YooAsset.Editor
                 string fileName = ManifestTools.GetRemoteBundleFileName(outputNameStyle, bundleName, fileExtension, fileHash);
                 bundleInfo.PackageDestFilePath = $"{packageOutputDirectory}/{fileName}";
             }
+            #endif
         }
 
-        protected abstract string GetUnityHash(BuildBundleInfo bundleInfo, BuildContext context);
-        protected abstract uint GetUnityCRC(BuildBundleInfo bundleInfo, BuildContext context);
+        protected abstract string GetUnityHash(BuildBundleInfo      bundleInfo, BuildContext           context);
+        protected abstract uint   GetUnityCRC(BuildBundleInfo       bundleInfo, BuildContext           context);
         protected abstract string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
-        protected abstract string GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
-        protected abstract long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
+        protected abstract string GetBundleFileCRC(BuildBundleInfo  bundleInfo, BuildParametersContext buildParametersContext);
+        protected abstract long   GetBundleFileSize(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
     }
 }
