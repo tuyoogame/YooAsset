@@ -14,12 +14,19 @@ namespace YooAsset.Editor
         [MenuItem("YooAsset/AssetBundle Collector", false, 101)]
         public static void OpenWindow()
         {
-            AssetBundleCollectorWindow window = GetWindow<AssetBundleCollectorWindow>("AssetBundle Collector", true, WindowsDefine.DockedWindowTypes);
+            AssetBundleCollectorWindow window =
+                GetWindow<AssetBundleCollectorWindow>("AssetBundle Collector", true, WindowsDefine.DockedWindowTypes);
             window.minSize = new Vector2(800, 600);
         }
 
-        private VisualElement _mainContainer;
-        private VisualElement _searchContainer;
+        private enum EViewMode
+        {
+            Normal,
+            Search,
+        }
+
+        private EViewMode _viewMode;
+        private string _searchKey;
 
         private ToolbarSearchField _searchField;
 
@@ -52,12 +59,14 @@ namespace YooAsset.Editor
         private ListView _packageListView;
         private TextField _packageNameTxt;
         private TextField _packageDescTxt;
+        private VisualElement _packageOperationContainer;
 
         private VisualElement _groupContainer;
         private ListView _groupListView;
         private TextField _groupNameTxt;
         private TextField _groupDescTxt;
         private TextField _groupTagsTxt;
+        private VisualElement _groupOperationContainer;
 
         private VisualElement _collectorContainer;
         private ScrollView _collectorScrollView;
@@ -73,6 +82,8 @@ namespace YooAsset.Editor
         {
             try
             {
+                _viewMode = EViewMode.Normal;
+                
                 _collectorTypeList = new List<string>()
                 {
                     $"{nameof(ECollectorType.MainAssetCollector)}",
@@ -93,9 +104,6 @@ namespace YooAsset.Editor
                     return;
 
                 visualAsset.CloneTree(root);
-
-                _mainContainer = root.Q<VisualElement>("MainContainer");
-                _searchContainer = root.Q<VisualElement>("SearchContainer");
 
                 _searchField = root.Q<ToolbarSearchField>("SearchField");
                 _searchField.RegisterValueChangedCallback(OnSearchFieldValueChanged);
@@ -232,6 +240,7 @@ namespace YooAsset.Editor
                     var removeBtn = packageAddContainer.Q<Button>("RemoveBtn");
                     removeBtn.clicked += RemovePackageBtn_clicked;
                 }
+                _packageOperationContainer = packageAddContainer;
 
                 // 包裹名称
                 _packageNameTxt = root.Q<TextField>("PackageName");
@@ -279,6 +288,7 @@ namespace YooAsset.Editor
                     var removeBtn = groupAddContainer.Q<Button>("RemoveBtn");
                     removeBtn.clicked += RemoveGroupBtn_clicked;
                 }
+                _groupOperationContainer = groupAddContainer;
 
                 // 分组容器
                 _groupContainer = root.Q("GroupContainer");
@@ -372,16 +382,18 @@ namespace YooAsset.Editor
 
         private void OnSearchFieldValueChanged(ChangeEvent<string> evt)
         {
-            if (string.IsNullOrEmpty(evt.newValue))
+            _searchKey = evt.newValue;
+            
+            if (string.IsNullOrWhiteSpace(evt.newValue))
             {
-                _mainContainer.style.display = DisplayStyle.Flex;
-                _searchContainer.style.display = DisplayStyle.None;
+                _viewMode = EViewMode.Normal;
             }
             else
             {
-                _mainContainer.style.display = DisplayStyle.None;
-                _searchContainer.style.display = DisplayStyle.Flex;
+                _viewMode = EViewMode.Search;
             }
+
+            RefreshWindow();
         }
 
         public void OnEnable()
@@ -425,7 +437,17 @@ namespace YooAsset.Editor
 
             FillPackageViewData();
             RefreshSettings();
+            RefreshOperationContainer();
         }
+
+        private void RefreshOperationContainer()
+        {
+            _packageOperationContainer.style.display =
+                _viewMode == EViewMode.Normal ? DisplayStyle.Flex : DisplayStyle.None;
+            _groupOperationContainer.style.display =
+                _viewMode == EViewMode.Normal ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+        
         private void FixBtn_clicked()
         {
             AssetBundleCollectorSettingData.FixFile();
@@ -542,6 +564,13 @@ namespace YooAsset.Editor
 #if UNITY_2020_3_OR_NEWER
             _helpBoxContainer.Clear();
 
+            if (_viewMode == EViewMode.Search)
+            {
+                string tips = "Currently in search mode";
+                var helpBox = new HelpBox(tips, HelpBoxMessageType.Error);
+                _helpBoxContainer.Add(helpBox);
+            }
+            
             if (_enableAddressableToogle.value && _locationToLowerToogle.value)
             {
                 string tips = "The [Enable Addressable] option and [Location To Lower] option cannot be enabled at the same time.";
@@ -576,6 +605,31 @@ namespace YooAsset.Editor
                 _packageListView.selectedIndex = _lastModifyPackageIndex;
             }
         }
+        
+        private void FillPackageViewDataWithSearch(string searchKey)
+        {
+            _packageListView.Clear();
+            _packageListView.ClearSelection();
+            
+            List<AssetBundleCollectorPackage> packages = new List<AssetBundleCollectorPackage>();
+
+            foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
+            {
+                if (package.PackageName.ToLower().Contains(searchKey.ToLower()))
+                {
+                    packages.Add(package);
+                }
+            }
+
+            _packageListView.itemsSource = packages;
+            _packageListView.Rebuild();
+
+            if (_lastModifyPackageIndex >= 0 && _lastModifyPackageIndex < _packageListView.itemsSource.Count)
+            {
+                _packageListView.selectedIndex = _lastModifyPackageIndex;
+            }
+        }
+        
         private VisualElement MakePackageListViewItem()
         {
             VisualElement element = new VisualElement();
