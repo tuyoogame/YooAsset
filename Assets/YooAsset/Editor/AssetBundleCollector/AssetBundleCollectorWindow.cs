@@ -18,6 +18,11 @@ namespace YooAsset.Editor
             window.minSize = new Vector2(800, 600);
         }
 
+        private VisualElement _mainContainer;
+        private VisualElement _searchContainer;
+
+        private ToolbarSearchField _searchField;
+
         private Button _saveButton;
         private List<string> _collectorTypeList;
         private List<RuleDisplayName> _activeRuleList;
@@ -88,6 +93,12 @@ namespace YooAsset.Editor
                     return;
 
                 visualAsset.CloneTree(root);
+
+                _mainContainer = root.Q<VisualElement>("MainContainer");
+                _searchContainer = root.Q<VisualElement>("SearchContainer");
+
+                _searchField = root.Q<ToolbarSearchField>("SearchField");
+                _searchField.RegisterValueChangedCallback(OnSearchFieldValueChanged);
 
                 // 警示栏
                 _helpBoxContainer = root.Q("HelpBoxContainer");
@@ -358,6 +369,21 @@ namespace YooAsset.Editor
                 Debug.LogError(e.ToString());
             }
         }
+
+        private void OnSearchFieldValueChanged(ChangeEvent<string> evt)
+        {
+            if (string.IsNullOrEmpty(evt.newValue))
+            {
+                _mainContainer.style.display = DisplayStyle.Flex;
+                _searchContainer.style.display = DisplayStyle.None;
+            }
+            else
+            {
+                _mainContainer.style.display = DisplayStyle.None;
+                _searchContainer.style.display = DisplayStyle.Flex;
+            }
+        }
+
         public void OnEnable()
         {
             Undo.undoRedoPerformed += RefreshWindow;
