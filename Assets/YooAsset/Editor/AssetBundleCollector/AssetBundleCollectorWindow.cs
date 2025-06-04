@@ -59,14 +59,12 @@ namespace YooAsset.Editor
         private ListView _packageListView;
         private TextField _packageNameTxt;
         private TextField _packageDescTxt;
-        private VisualElement _packageOperationContainer;
 
         private VisualElement _groupContainer;
         private ListView _groupListView;
         private TextField _groupNameTxt;
         private TextField _groupDescTxt;
         private TextField _groupTagsTxt;
-        private VisualElement _groupOperationContainer;
 
         private VisualElement _collectorContainer;
         private ScrollView _collectorScrollView;
@@ -240,7 +238,6 @@ namespace YooAsset.Editor
                     var removeBtn = packageAddContainer.Q<Button>("RemoveBtn");
                     removeBtn.clicked += RemovePackageBtn_clicked;
                 }
-                _packageOperationContainer = packageAddContainer;
 
                 // 包裹名称
                 _packageNameTxt = root.Q<TextField>("PackageName");
@@ -288,7 +285,6 @@ namespace YooAsset.Editor
                     var removeBtn = groupAddContainer.Q<Button>("RemoveBtn");
                     removeBtn.clicked += RemoveGroupBtn_clicked;
                 }
-                _groupOperationContainer = groupAddContainer;
 
                 // 分组容器
                 _groupContainer = root.Q("GroupContainer");
@@ -392,7 +388,7 @@ namespace YooAsset.Editor
             {
                 _viewMode = EViewMode.Search;
             }
-
+            
             RefreshWindow();
         }
 
@@ -437,15 +433,6 @@ namespace YooAsset.Editor
 
             FillPackageViewData();
             RefreshSettings();
-            RefreshOperationContainer();
-        }
-
-        private void RefreshOperationContainer()
-        {
-            _packageOperationContainer.style.display =
-                _viewMode == EViewMode.Normal ? DisplayStyle.Flex : DisplayStyle.None;
-            _groupOperationContainer.style.display =
-                _viewMode == EViewMode.Normal ? DisplayStyle.Flex : DisplayStyle.None;
         }
         
         private void FixBtn_clicked()
@@ -597,27 +584,67 @@ namespace YooAsset.Editor
         {
             _packageListView.Clear();
             _packageListView.ClearSelection();
-            _packageListView.itemsSource = AssetBundleCollectorSettingData.Setting.Packages;
-            _packageListView.Rebuild();
 
-            if (_lastModifyPackageIndex >= 0 && _lastModifyPackageIndex < _packageListView.itemsSource.Count)
+            List<AssetBundleCollectorPackage> packages = null;
+
+            if (_viewMode == EViewMode.Normal)
             {
-                _packageListView.selectedIndex = _lastModifyPackageIndex;
+                packages = AssetBundleCollectorSettingData.Setting.Packages;
             }
-        }
-        
-        private void FillPackageViewDataWithSearch(string searchKey)
-        {
-            _packageListView.Clear();
-            _packageListView.ClearSelection();
-            
-            List<AssetBundleCollectorPackage> packages = new List<AssetBundleCollectorPackage>();
-
-            foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
+            else if (_viewMode == EViewMode.Search)
             {
-                if (package.PackageName.ToLower().Contains(searchKey.ToLower()))
+                packages = new List<AssetBundleCollectorPackage>();
+                
+                var lowerSearchKey = _searchKey.ToLower();
+                
+                foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
                 {
-                    packages.Add(package);
+                    //检查packageName
+                    if (package.PackageName.ToLower().Contains(lowerSearchKey))
+                    {
+                        packages.Add(package);        
+                        continue;       
+                    }
+                    
+                    //检查Groups和GroupAssetTags
+                    foreach (var group in package.Groups)
+                    {
+                        if (group.GroupName.ToLower().Contains(lowerSearchKey))
+                        {
+                            packages.Add(package);
+                            break;
+                        }
+
+                        if (group.AssetTags.ToLower().Contains(lowerSearchKey))
+                        {
+                            packages.Add(package);
+                            break;
+                        }
+
+                        var needAdd = false;
+                        
+                        //检查Collectors和tags
+                        foreach (var collector in group.Collectors)
+                        {
+                            if (collector.CollectPath.ToLower().Contains(lowerSearchKey))
+                            {
+                                needAdd = true;
+                                break;
+                            }
+                            
+                            if (collector.AssetTags.ToLower().Contains(lowerSearchKey))
+                            {
+                                needAdd = true;
+                                break;
+                            }
+                        }
+
+                        if (needAdd)
+                        {
+                            packages.Add(package);
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -647,7 +674,7 @@ namespace YooAsset.Editor
         }
         private void BindPackageListViewItem(VisualElement element, int index)
         {
-            var package = AssetBundleCollectorSettingData.Setting.Packages[index];
+            var package = _packageListView.itemsSource[index] as AssetBundleCollectorPackage;
 
             var textField1 = element.Q<Label>("Label1");
             if (string.IsNullOrEmpty(package.PackageDesc))
