@@ -50,7 +50,7 @@
             <ui:VisualElement name="ActiveRuleContainer" style="height: 20px;" />
             <ui:TextField picking-mode="Ignore" label="Group Name" name="GroupName" />
             <ui:TextField picking-mode="Ignore" label="Group Desc" name="GroupDesc" />
-            <ui:TextField picking-mode="Ignore" label="Asset Tags" name="GroupTags" />
+            <ui:TextField picking-mode="Ignore" label="Asset Tags" name="GroupTags" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-bottom-left-radius: 0;" />
             <ui:VisualElement name="CollectorAddContainer" style="height: 20px; flex-direction: row-reverse;">
                 <ui:Button text="[ + ]" display-tooltip-when-elided="true" name="AddBtn" />
             </ui:VisualElement>

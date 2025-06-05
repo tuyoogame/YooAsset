@@ -848,7 +848,7 @@ namespace YooAsset.Editor
             _groupDescTxt.SetValueWithoutNotify(selectGroup.GroupDesc);
             _groupTagsTxt.SetValueWithoutNotify(selectGroup.AssetTags);
 
-            FillCollectorViewData();
+			FillCollectorViewData();
         }
         private void AddGroupBtn_clicked()
         {
@@ -1054,12 +1054,16 @@ namespace YooAsset.Editor
 			{
 				if (collector.CollectPath.ToLower().Contains(_lowerSearchKey))
 				{
-					objectField1.Q<Label>().style.color = new Color(1, 0, 0, 1);
+					objectField1.Q<Label>().text = "<color=red>Collector</color>";
 				}
 				else
 				{
-					objectField1.Q<Label>().style.color = new Color(1, 1, 1, 1);
+					objectField1.Q<Label>().text = "Collector";
 				}
+			}
+			else
+			{
+				objectField1.Q<Label>().text = "Collector";
 			}
 
 			objectField1.RegisterValueChangedCallback(evt =>
@@ -1072,12 +1076,16 @@ namespace YooAsset.Editor
 				{
 					if(collector.CollectPath.ToLower().Contains(_lowerSearchKey))
 					{
-						objectField1.Q<Label>().style.color = new Color(1, 0, 0, 1);
+						objectField1.Q<Label>().text = "<color=red>Collector</color>";
 					}
 					else
 					{
-						objectField1.Q<Label>().style.color = new Color(1, 1, 1, 1);
+						objectField1.Q<Label>().text = "Collector";
 					}
+				}
+				else
+				{
+					objectField1.Q<Label>().text = "Collector";
 				}
 
                 AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
@@ -1164,7 +1172,22 @@ namespace YooAsset.Editor
 
             // Tags
             var textFiled1 = element.Q<TextField>("TextField1");
-            textFiled1.SetValueWithoutNotify(collector.AssetTags);
+			if(_viewMode == EViewMode.Search)
+			{
+				if(collector.AssetTags.ToLower().Contains(_lowerSearchKey))
+				{
+					textFiled1.label = "<color=red>Tags</color>";
+				}
+				else
+				{
+					textFiled1.label = "Tags";
+				}
+			}
+			else
+			{
+				textFiled1.label = "Tags";
+			}
+			textFiled1.SetValueWithoutNotify(collector.AssetTags);
             textFiled1.RegisterValueChangedCallback(evt =>
             {
                 collector.AssetTags = evt.newValue;
