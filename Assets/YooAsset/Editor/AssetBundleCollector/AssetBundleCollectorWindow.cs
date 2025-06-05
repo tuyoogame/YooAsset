@@ -78,7 +78,6 @@ namespace YooAsset.Editor
 		
 		private List<AssetBundleCollectorGroup> _displayGroupList;
 
-
         public void CreateGUI()
         {
             try
@@ -489,8 +488,20 @@ namespace YooAsset.Editor
             else
                 return ruleDisplayName.ClassName;
         }
+		
+		private void ShowSearchBorder(VisualElement element)
+		{
+			element.style.borderBottomColor = new Color(0.7f,0,0,1);
+			element.style.borderBottomWidth = 1;
+		}
+		
+		private void ClearBorder(VisualElement element)
+		{
+			element.style.borderBottomColor = Color.white;
+			element.style.borderBottomWidth = 0;
+		}
 
-        private string ConvertText(string str)
+        private string ConvertSearchText(string str)
         {
             if (_viewMode == EViewMode.Search)
             {
@@ -702,9 +713,9 @@ namespace YooAsset.Editor
 
             var textField1 = element.Q<Label>("Label1");
             if (string.IsNullOrEmpty(package.PackageDesc))
-                textField1.text = ConvertText(package.PackageName);
+                textField1.text = ConvertSearchText(package.PackageName);
             else
-                textField1.text = ConvertText($"{package.PackageName} ({package.PackageDesc})");
+                textField1.text = ConvertSearchText($"{package.PackageName} ({package.PackageDesc})");
         }
         private void PackageListView_onSelectionChange(IEnumerable<object> objs)
         {
@@ -823,9 +834,9 @@ namespace YooAsset.Editor
 
             var textField1 = element.Q<Label>("Label1");
             if (string.IsNullOrEmpty(group.GroupDesc))
-                textField1.text = ConvertText(group.GroupName);
+                textField1.text = ConvertSearchText(group.GroupName);
             else
-                textField1.text = ConvertText($"{group.GroupName} ({group.GroupDesc})");
+                textField1.text = ConvertSearchText($"{group.GroupName} ({group.GroupDesc})");
 
             // 激活状态
             IActiveRule activeRule = AssetBundleCollectorSettingData.GetActiveRuleInstance(group.ActiveRuleName);
@@ -847,7 +858,22 @@ namespace YooAsset.Editor
             _groupNameTxt.SetValueWithoutNotify(selectGroup.GroupName);
             _groupDescTxt.SetValueWithoutNotify(selectGroup.GroupDesc);
             _groupTagsTxt.SetValueWithoutNotify(selectGroup.AssetTags);
-
+			
+			if(_viewMode == EViewMode.Search)
+			{
+				if(selectGroup.AssetTags.ToLower().Contains(_lowerSearchKey))
+				{
+					ShowSearchBorder(_groupTagsTxt);
+				}
+				else
+				{
+					ClearBorder(_groupTagsTxt);
+				}
+			}
+			else
+			{
+				ClearBorder(_groupTagsTxt);
+			}
 			FillCollectorViewData();
         }
         private void AddGroupBtn_clicked()
@@ -1054,16 +1080,16 @@ namespace YooAsset.Editor
 			{
 				if (collector.CollectPath.ToLower().Contains(_lowerSearchKey))
 				{
-					objectField1.Q<Label>().text = "<color=red>Collector</color>";
+					ShowSearchBorder(objectField1);
 				}
 				else
 				{
-					objectField1.Q<Label>().text = "Collector";
+					ClearBorder(objectField1);
 				}
 			}
 			else
 			{
-				objectField1.Q<Label>().text = "Collector";
+				ClearBorder(objectField1);
 			}
 
 			objectField1.RegisterValueChangedCallback(evt =>
@@ -1076,16 +1102,16 @@ namespace YooAsset.Editor
 				{
 					if(collector.CollectPath.ToLower().Contains(_lowerSearchKey))
 					{
-						objectField1.Q<Label>().text = "<color=red>Collector</color>";
+						ShowSearchBorder(objectField1);
 					}
 					else
 					{
-						objectField1.Q<Label>().text = "Collector";
+						ClearBorder(objectField1);
 					}
 				}
 				else
 				{
-					objectField1.Q<Label>().text = "Collector";
+					ClearBorder(objectField1);
 				}
 
                 AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
@@ -1176,16 +1202,16 @@ namespace YooAsset.Editor
 			{
 				if(collector.AssetTags.ToLower().Contains(_lowerSearchKey))
 				{
-					textFiled1.label = "<color=red>Tags</color>";
+					ShowSearchBorder(textFiled1);
 				}
 				else
 				{
-					textFiled1.label = "Tags";
+					ClearBorder(textFiled1);
 				}
 			}
 			else
 			{
-				textFiled1.label = "Tags";
+				ClearBorder(textFiled1);
 			}
 			textFiled1.SetValueWithoutNotify(collector.AssetTags);
             textFiled1.RegisterValueChangedCallback(evt =>
