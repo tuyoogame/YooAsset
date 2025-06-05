@@ -75,6 +75,8 @@ namespace YooAsset.Editor
         private int _lastModifyGroupIndex = 0;
         private bool _showGlobalSettings = false;
         private bool _showPackageSettings = false;
+		
+		private List<AssetBundleCollectorGroup> _displayGroupList;
 
 
         public void CreateGUI()
@@ -748,10 +750,47 @@ namespace YooAsset.Editor
             var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
             if (selectPackage == null)
                 return;
+			
+			if(_viewMode == EViewMode.Search)
+			{
+				_displayGroupList = new List<AssetBundleCollectorGroup>();
+				foreach(var group in selectPackage.Groups)
+				{
+					if(group.GroupName.ToLower().Contains(_lowerSearchKey))
+					{
+						_displayGroupList.Add(group);
+					}
+					else if(group.AssetTags.ToLower().Contains(_lowerSearchKey))
+					{
+						_displayGroupList.Add(group);
+					}
+					else
+					{
+						foreach(var collector in group.Collectors)
+						{
+							if(collector.CollectPath.ToLower().Contains(_lowerSearchKey))
+							{
+								_displayGroupList.Add(group);
+								break;
+							}
+
+							if(collector.AssetTags.ToLower().Contains(_lowerSearchKey))
+							{
+								_displayGroupList.Add(group);
+								break;
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				_displayGroupList = selectPackage.Groups;
+			}
 
             _groupListView.Clear();
             _groupListView.ClearSelection();
-            _groupListView.itemsSource = selectPackage.Groups;
+            _groupListView.itemsSource = _displayGroupList;
             _groupListView.Rebuild();
 
             if (_lastModifyGroupIndex >= 0 && _lastModifyGroupIndex < _groupListView.itemsSource.Count)
@@ -780,7 +819,7 @@ namespace YooAsset.Editor
             if (selectPackage == null)
                 return;
 
-            var group = selectPackage.Groups[index];
+            var group = _displayGroupList[index];
 
             var textField1 = element.Q<Label>("Label1");
             if (string.IsNullOrEmpty(group.GroupDesc))
