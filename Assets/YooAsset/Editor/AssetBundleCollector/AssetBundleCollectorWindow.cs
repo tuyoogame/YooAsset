@@ -912,6 +912,19 @@ namespace YooAsset.Editor
             _collectorScrollView.Clear();
             for (int i = 0; i < selectGroup.Collectors.Count; i++)
             {
+				if(_viewMode == EViewMode.Search)
+				{
+					if(selectGroup.Collectors[i].CollectPath.ToLower().Contains(_lowerSearchKey))
+					{
+					}
+					else if(selectGroup.Collectors[i].AssetTags.ToLower().Contains(_lowerSearchKey))
+					{
+					}
+					else
+					{
+						continue;
+					}
+				}
                 VisualElement element = MakeCollectorListViewItem();
                 BindCollectorListViewItem(element, i);
                 _collectorScrollView.Add(element);
