@@ -27,6 +27,7 @@ namespace YooAsset.Editor
 
         private EViewMode _viewMode;
         private string _searchKey;
+        private string _lowerSearchKey;
 
         private ToolbarSearchField _searchField;
 
@@ -379,6 +380,7 @@ namespace YooAsset.Editor
         private void OnSearchFieldValueChanged(ChangeEvent<string> evt)
         {
             _searchKey = evt.newValue;
+            _lowerSearchKey = evt.newValue.ToLower();
             
             if (string.IsNullOrWhiteSpace(evt.newValue))
             {
@@ -484,6 +486,28 @@ namespace YooAsset.Editor
                 return ruleDisplayName.DisplayName;
             else
                 return ruleDisplayName.ClassName;
+        }
+
+        private string ConvertText(string str)
+        {
+            if (_viewMode == EViewMode.Search)
+            {
+                if (str.ToLower().Contains(_lowerSearchKey))
+                {
+                    int startIndex = str.ToLower().IndexOf(_lowerSearchKey);
+                    while (startIndex >= 0)
+                    {
+                        string before = str.Substring(0, startIndex);
+                        string match = str.Substring(startIndex, _lowerSearchKey.Length);
+                        string after = str.Substring(startIndex + _lowerSearchKey.Length);
+                        str = $"{before}<color=red>{match}</color>{after}";
+                        startIndex = str.ToLower().IndexOf(_lowerSearchKey, startIndex + 20); // 20是<color=red></color>的长度
+                    }
+                    return str;
+                }
+            }
+            
+            return str;
         }
 
         // 设置栏相关
@@ -595,12 +619,10 @@ namespace YooAsset.Editor
             {
                 packages = new List<AssetBundleCollectorPackage>();
                 
-                var lowerSearchKey = _searchKey.ToLower();
-                
                 foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
                 {
                     //检查packageName
-                    if (package.PackageName.ToLower().Contains(lowerSearchKey))
+                    if (package.PackageName.ToLower().Contains(_lowerSearchKey))
                     {
                         packages.Add(package);        
                         continue;       
@@ -609,13 +631,13 @@ namespace YooAsset.Editor
                     //检查Groups和GroupAssetTags
                     foreach (var group in package.Groups)
                     {
-                        if (group.GroupName.ToLower().Contains(lowerSearchKey))
+                        if (group.GroupName.ToLower().Contains(_lowerSearchKey))
                         {
                             packages.Add(package);
                             break;
                         }
 
-                        if (group.AssetTags.ToLower().Contains(lowerSearchKey))
+                        if (group.AssetTags.ToLower().Contains(_lowerSearchKey))
                         {
                             packages.Add(package);
                             break;
@@ -626,13 +648,13 @@ namespace YooAsset.Editor
                         //检查Collectors和tags
                         foreach (var collector in group.Collectors)
                         {
-                            if (collector.CollectPath.ToLower().Contains(lowerSearchKey))
+                            if (collector.CollectPath.ToLower().Contains(_lowerSearchKey))
                             {
                                 needAdd = true;
                                 break;
                             }
                             
-                            if (collector.AssetTags.ToLower().Contains(lowerSearchKey))
+                            if (collector.AssetTags.ToLower().Contains(_lowerSearchKey))
                             {
                                 needAdd = true;
                                 break;
@@ -678,9 +700,9 @@ namespace YooAsset.Editor
 
             var textField1 = element.Q<Label>("Label1");
             if (string.IsNullOrEmpty(package.PackageDesc))
-                textField1.text = package.PackageName;
+                textField1.text = ConvertText(package.PackageName);
             else
-                textField1.text = $"{package.PackageName} ({package.PackageDesc})";
+                textField1.text = ConvertText($"{package.PackageName} ({package.PackageDesc})");
         }
         private void PackageListView_onSelectionChange(IEnumerable<object> objs)
         {
