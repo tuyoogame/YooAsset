@@ -784,9 +784,9 @@ namespace YooAsset.Editor
 
             var textField1 = element.Q<Label>("Label1");
             if (string.IsNullOrEmpty(group.GroupDesc))
-                textField1.text = group.GroupName;
+                textField1.text = ConvertText(group.GroupName);
             else
-                textField1.text = $"{group.GroupName} ({group.GroupDesc})";
+                textField1.text = ConvertText($"{group.GroupName} ({group.GroupDesc})");
 
             // 激活状态
             IActiveRule activeRule = AssetBundleCollectorSettingData.GetActiveRuleInstance(group.ActiveRuleName);
