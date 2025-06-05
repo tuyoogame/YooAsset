@@ -1010,11 +1010,37 @@ namespace YooAsset.Editor
             // Collector Path
             var objectField1 = element.Q<ObjectField>("ObjectField1");
             objectField1.SetValueWithoutNotify(collectObject);
-            objectField1.RegisterValueChangedCallback(evt =>
+
+			if (_viewMode == EViewMode.Search)
+			{
+				if (collector.CollectPath.ToLower().Contains(_lowerSearchKey))
+				{
+					objectField1.Q<Label>().style.color = new Color(1, 0, 0, 1);
+				}
+				else
+				{
+					objectField1.Q<Label>().style.color = new Color(1, 1, 1, 1);
+				}
+			}
+
+			objectField1.RegisterValueChangedCallback(evt =>
             {
                 collector.CollectPath = AssetDatabase.GetAssetPath(evt.newValue);
                 collector.CollectorGUID = AssetDatabase.AssetPathToGUID(collector.CollectPath);
                 objectField1.value.name = collector.CollectPath;
+				
+				if(_viewMode == EViewMode.Search)
+				{
+					if(collector.CollectPath.ToLower().Contains(_lowerSearchKey))
+					{
+						objectField1.Q<Label>().style.color = new Color(1, 0, 0, 1);
+					}
+					else
+					{
+						objectField1.Q<Label>().style.color = new Color(1, 1, 1, 1);
+					}
+				}
+
                 AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
                 if (foldout.value)
                 {
