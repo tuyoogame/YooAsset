@@ -501,28 +501,6 @@ namespace YooAsset.Editor
 			element.style.borderBottomWidth = 0;
 		}
 
-        private string ConvertSearchText(string str)
-        {
-            if (_viewMode == EViewMode.Search)
-            {
-                if (str.ToLower().Contains(_lowerSearchKey))
-                {
-                    int startIndex = str.ToLower().IndexOf(_lowerSearchKey);
-                    while (startIndex >= 0)
-                    {
-                        string before = str.Substring(0, startIndex);
-                        string match = str.Substring(startIndex, _lowerSearchKey.Length);
-                        string after = str.Substring(startIndex + _lowerSearchKey.Length);
-                        str = $"{before}<color=red>{match}</color>{after}";
-                        startIndex = str.ToLower().IndexOf(_lowerSearchKey, startIndex + 20); // 20是<color=red></color>的长度
-                    }
-                    return str;
-                }
-            }
-            
-            return str;
-        }
-
         // 设置栏相关
         private void RefreshSettings()
         {
@@ -712,10 +690,23 @@ namespace YooAsset.Editor
             var package = _packageListView.itemsSource[index] as AssetBundleCollectorPackage;
 
             var textField1 = element.Q<Label>("Label1");
-            if (string.IsNullOrEmpty(package.PackageDesc))
-                textField1.text = ConvertSearchText(package.PackageName);
-            else
-                textField1.text = ConvertSearchText($"{package.PackageName} ({package.PackageDesc})");
+			textField1.text = package.PackageName;
+			
+			if(_viewMode == EViewMode.Search)
+			{
+				if(package.PackageName.ToLower().Contains(_lowerSearchKey))
+				{
+					ShowSearchBorder(element);
+				}
+				else
+				{
+					ClearBorder(element);
+				}
+			}
+			else
+			{
+				ClearBorder(element);
+			}
         }
         private void PackageListView_onSelectionChange(IEnumerable<object> objs)
         {
@@ -833,10 +824,23 @@ namespace YooAsset.Editor
             var group = _displayGroupList[index];
 
             var textField1 = element.Q<Label>("Label1");
-            if (string.IsNullOrEmpty(group.GroupDesc))
-                textField1.text = ConvertSearchText(group.GroupName);
-            else
-                textField1.text = ConvertSearchText($"{group.GroupName} ({group.GroupDesc})");
+			textField1.text = group.GroupName;
+
+			if(_viewMode == EViewMode.Search)
+			{
+				if(group.GroupName.ToLower().Contains(_lowerSearchKey))
+				{
+					ShowSearchBorder(element);
+				}
+				else
+				{
+					ClearBorder(element);
+				}
+			}
+			else
+			{
+				ClearBorder(element);
+			}
 
             // 激活状态
             IActiveRule activeRule = AssetBundleCollectorSettingData.GetActiveRuleInstance(group.ActiveRuleName);
