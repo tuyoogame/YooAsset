@@ -19,15 +19,7 @@ namespace YooAsset.Editor
             window.minSize = new Vector2(800, 600);
         }
 
-        private enum EViewMode
-        {
-            Normal,
-            Search,
-        }
-
-        private EViewMode _viewMode;
-        private string _searchKey;
-        private string _lowerSearchKey;
+        private string _lowerSearchKey = string.Empty;
 
         private ToolbarSearchField _searchField;
 
@@ -82,8 +74,6 @@ namespace YooAsset.Editor
         {
             try
             {
-                _viewMode = EViewMode.Normal;
-                
                 _collectorTypeList = new List<string>()
                 {
                     $"{nameof(ECollectorType.MainAssetCollector)}",
@@ -380,17 +370,7 @@ namespace YooAsset.Editor
 
         private void OnSearchFieldValueChanged(ChangeEvent<string> evt)
         {
-            _searchKey = evt.newValue;
             _lowerSearchKey = evt.newValue.ToLower();
-            
-            if (string.IsNullOrWhiteSpace(evt.newValue))
-            {
-                _viewMode = EViewMode.Normal;
-            }
-            else
-            {
-                _viewMode = EViewMode.Search;
-            }
             
             RefreshWindow();
         }
@@ -566,7 +546,7 @@ namespace YooAsset.Editor
 #if UNITY_2020_3_OR_NEWER
             _helpBoxContainer.Clear();
 
-            if (_viewMode == EViewMode.Search)
+            if (string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
             {
                 string tips = "Currently in search mode";
                 var helpBox = new HelpBox(tips, HelpBoxMessageType.Error);
@@ -602,11 +582,11 @@ namespace YooAsset.Editor
 
             List<AssetBundleCollectorPackage> packages = null;
 
-            if (_viewMode == EViewMode.Normal)
+            if (string.IsNullOrWhiteSpace(_lowerSearchKey))
             {
                 packages = AssetBundleCollectorSettingData.Setting.Packages;
             }
-            else if (_viewMode == EViewMode.Search)
+            else
             {
                 packages = new List<AssetBundleCollectorPackage>();
                 
@@ -692,7 +672,7 @@ namespace YooAsset.Editor
             var textField1 = element.Q<Label>("Label1");
 			textField1.text = package.PackageName;
 			
-			if(_viewMode == EViewMode.Search)
+			if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
 			{
 				if(package.PackageName.ToLower().Contains(_lowerSearchKey))
 				{
@@ -753,7 +733,7 @@ namespace YooAsset.Editor
             if (selectPackage == null)
                 return;
 			
-			if(_viewMode == EViewMode.Search)
+			if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
 			{
 				_displayGroupList = new List<AssetBundleCollectorGroup>();
 				foreach(var group in selectPackage.Groups)
@@ -826,7 +806,7 @@ namespace YooAsset.Editor
             var textField1 = element.Q<Label>("Label1");
 			textField1.text = group.GroupName;
 
-			if(_viewMode == EViewMode.Search)
+			if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
 			{
 				if(group.GroupName.ToLower().Contains(_lowerSearchKey))
 				{
@@ -863,7 +843,7 @@ namespace YooAsset.Editor
             _groupDescTxt.SetValueWithoutNotify(selectGroup.GroupDesc);
             _groupTagsTxt.SetValueWithoutNotify(selectGroup.AssetTags);
 			
-			if(_viewMode == EViewMode.Search)
+			if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
 			{
 				if(selectGroup.AssetTags.ToLower().Contains(_lowerSearchKey))
 				{
@@ -916,7 +896,7 @@ namespace YooAsset.Editor
             _collectorScrollView.Clear();
             for (int i = 0; i < selectGroup.Collectors.Count; i++)
             {
-				if(_viewMode == EViewMode.Search)
+				if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
 				{
 					if(selectGroup.Collectors[i].CollectPath.ToLower().Contains(_lowerSearchKey))
 					{
@@ -1093,7 +1073,7 @@ namespace YooAsset.Editor
             var objectField1 = element.Q<ObjectField>("ObjectField1");
             objectField1.SetValueWithoutNotify(collectObject);
 
-			if (_viewMode == EViewMode.Search)
+			if (string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
 			{
 				if (collector.CollectPath.ToLower().Contains(_lowerSearchKey))
 				{
@@ -1115,7 +1095,7 @@ namespace YooAsset.Editor
                 collector.CollectorGUID = AssetDatabase.AssetPathToGUID(collector.CollectPath);
                 objectField1.value.name = collector.CollectPath;
 				
-				if(_viewMode == EViewMode.Search)
+				if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
 				{
 					if(collector.CollectPath.ToLower().Contains(_lowerSearchKey))
 					{
@@ -1215,7 +1195,7 @@ namespace YooAsset.Editor
 
             // Tags
             var textFiled1 = element.Q<TextField>("TextField1");
-			if(_viewMode == EViewMode.Search)
+			if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
 			{
 				if(collector.AssetTags.ToLower().Contains(_lowerSearchKey))
 				{
