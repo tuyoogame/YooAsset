@@ -68,8 +68,6 @@ namespace YooAsset.Editor
         private bool _showGlobalSettings = false;
         private bool _showPackageSettings = false;
 		
-		private List<AssetBundleCollectorGroup> _displayGroupList;
-
         public void CreateGUI()
         {
             try
@@ -732,19 +730,21 @@ namespace YooAsset.Editor
             var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
             if (selectPackage == null)
                 return;
+
+            List<AssetBundleCollectorGroup> displayGroupList = null;
 			
 			if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
 			{
-				_displayGroupList = new List<AssetBundleCollectorGroup>();
+				displayGroupList = new List<AssetBundleCollectorGroup>();
 				foreach(var group in selectPackage.Groups)
 				{
 					if(group.GroupName.ToLower().Contains(_lowerSearchKey))
 					{
-						_displayGroupList.Add(group);
+						displayGroupList.Add(group);
 					}
 					else if(group.AssetTags.ToLower().Contains(_lowerSearchKey))
 					{
-						_displayGroupList.Add(group);
+						displayGroupList.Add(group);
 					}
 					else
 					{
@@ -752,13 +752,13 @@ namespace YooAsset.Editor
 						{
 							if(collector.CollectPath.ToLower().Contains(_lowerSearchKey))
 							{
-								_displayGroupList.Add(group);
+								displayGroupList.Add(group);
 								break;
 							}
 
 							if(collector.AssetTags.ToLower().Contains(_lowerSearchKey))
 							{
-								_displayGroupList.Add(group);
+								displayGroupList.Add(group);
 								break;
 							}
 						}
@@ -767,12 +767,12 @@ namespace YooAsset.Editor
 			}
 			else
 			{
-				_displayGroupList = selectPackage.Groups;
+				displayGroupList = selectPackage.Groups;
 			}
 
             _groupListView.Clear();
             _groupListView.ClearSelection();
-            _groupListView.itemsSource = _displayGroupList;
+            _groupListView.itemsSource = displayGroupList;
             _groupListView.Rebuild();
 
             if (_lastModifyGroupIndex >= 0 && _lastModifyGroupIndex < _groupListView.itemsSource.Count)
@@ -801,7 +801,7 @@ namespace YooAsset.Editor
             if (selectPackage == null)
                 return;
 
-            var group = _displayGroupList[index];
+            var group = _groupListView.itemsSource[index] as AssetBundleCollectorGroup;
 
             var textField1 = element.Q<Label>("Label1");
 			textField1.text = group.GroupName;
