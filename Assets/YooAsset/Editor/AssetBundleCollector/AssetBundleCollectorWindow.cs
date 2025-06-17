@@ -67,8 +67,9 @@ namespace YooAsset.Editor
         private int _lastModifyGroupIndex = 0;
         private bool _showGlobalSettings = false;
         private bool _showPackageSettings = false;
-		
-        public void CreateGUI()
+		private EditorApplication.CallbackFunction _searchTimer;
+
+		public void CreateGUI()
         {
             try
             {
@@ -369,8 +370,37 @@ namespace YooAsset.Editor
         private void OnSearchFieldValueChanged(ChangeEvent<string> evt)
         {
             _lowerSearchKey = evt.newValue.ToLower();
-            
-            RefreshWindow();
+
+			if(string.IsNullOrWhiteSpace(_lowerSearchKey))
+			{
+				//清空搜索时，立即刷新窗口
+				if (_searchTimer != null)
+				{
+					EditorApplication.update -= _searchTimer;
+					_searchTimer = null;
+				}
+				RefreshWindow();
+				return;
+			}
+
+			if (_searchTimer != null)
+            {
+                EditorApplication.update -= _searchTimer;
+				_searchTimer = null;
+            }
+
+            float startTime = Time.realtimeSinceStartup;
+            _searchTimer = () =>
+            {
+                float elapsed = Time.realtimeSinceStartup - startTime;
+                if (elapsed >= 0.5f)
+                {
+                    EditorApplication.update -= _searchTimer;
+                    _searchTimer = null;
+                    RefreshWindow();
+                }
+            };
+            EditorApplication.update += _searchTimer;
         }
 
         public void OnEnable()
