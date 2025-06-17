@@ -467,18 +467,6 @@ namespace YooAsset.Editor
                 return ruleDisplayName.ClassName;
         }
 		
-		private void ShowSearchBorder(VisualElement element)
-		{
-			element.style.borderBottomColor = new Color(0.7f,0,0,1);
-			element.style.borderBottomWidth = 1;
-		}
-		
-		private void ClearBorder(VisualElement element)
-		{
-			element.style.borderBottomColor = Color.white;
-			element.style.borderBottomWidth = 0;
-		}
-
         // 设置栏相关
         private void RefreshSettings()
         {
@@ -590,40 +578,14 @@ namespace YooAsset.Editor
                 
                 foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
                 {
-                    //检查packageName
-                    if (package.PackageName.ToLower().Contains(_lowerSearchKey))
-                    {
-                        packages.Add(package);        
-                        continue;       
-                    }
-                    
-                    //检查Groups和GroupAssetTags
                     foreach (var group in package.Groups)
                     {
-                        if (group.GroupName.ToLower().Contains(_lowerSearchKey))
-                        {
-                            packages.Add(package);
-                            break;
-                        }
-
-                        if (group.AssetTags.ToLower().Contains(_lowerSearchKey))
-                        {
-                            packages.Add(package);
-                            break;
-                        }
-
                         var needAdd = false;
                         
-                        //检查Collectors和tags
+                        //检查CollectPath
                         foreach (var collector in group.Collectors)
                         {
                             if (collector.CollectPath.ToLower().Contains(_lowerSearchKey))
-                            {
-                                needAdd = true;
-                                break;
-                            }
-                            
-                            if (collector.AssetTags.ToLower().Contains(_lowerSearchKey))
                             {
                                 needAdd = true;
                                 break;
@@ -669,22 +631,6 @@ namespace YooAsset.Editor
 
             var textField1 = element.Q<Label>("Label1");
 			textField1.text = package.PackageName;
-			
-			if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
-			{
-				if(package.PackageName.ToLower().Contains(_lowerSearchKey))
-				{
-					ShowSearchBorder(element);
-				}
-				else
-				{
-					ClearBorder(element);
-				}
-			}
-			else
-			{
-				ClearBorder(element);
-			}
         }
         private void PackageListView_onSelectionChange(IEnumerable<object> objs)
         {
@@ -738,29 +684,12 @@ namespace YooAsset.Editor
 				displayGroupList = new List<AssetBundleCollectorGroup>();
 				foreach(var group in selectPackage.Groups)
 				{
-					if(group.GroupName.ToLower().Contains(_lowerSearchKey))
+					foreach (var collector in group.Collectors)
 					{
-						displayGroupList.Add(group);
-					}
-					else if(group.AssetTags.ToLower().Contains(_lowerSearchKey))
-					{
-						displayGroupList.Add(group);
-					}
-					else
-					{
-						foreach(var collector in group.Collectors)
+						if (collector.CollectPath.ToLower().Contains(_lowerSearchKey))
 						{
-							if(collector.CollectPath.ToLower().Contains(_lowerSearchKey))
-							{
-								displayGroupList.Add(group);
-								break;
-							}
-
-							if(collector.AssetTags.ToLower().Contains(_lowerSearchKey))
-							{
-								displayGroupList.Add(group);
-								break;
-							}
+							displayGroupList.Add(group);
+							break;
 						}
 					}
 				}
@@ -806,22 +735,6 @@ namespace YooAsset.Editor
             var textField1 = element.Q<Label>("Label1");
 			textField1.text = group.GroupName;
 
-			if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
-			{
-				if(group.GroupName.ToLower().Contains(_lowerSearchKey))
-				{
-					ShowSearchBorder(element);
-				}
-				else
-				{
-					ClearBorder(element);
-				}
-			}
-			else
-			{
-				ClearBorder(element);
-			}
-
             // 激活状态
             IActiveRule activeRule = AssetBundleCollectorSettingData.GetActiveRuleInstance(group.ActiveRuleName);
             bool isActive = activeRule.IsActiveGroup(new GroupData(group.GroupName));
@@ -843,21 +756,6 @@ namespace YooAsset.Editor
             _groupDescTxt.SetValueWithoutNotify(selectGroup.GroupDesc);
             _groupTagsTxt.SetValueWithoutNotify(selectGroup.AssetTags);
 			
-			if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
-			{
-				if(selectGroup.AssetTags.ToLower().Contains(_lowerSearchKey))
-				{
-					ShowSearchBorder(_groupTagsTxt);
-				}
-				else
-				{
-					ClearBorder(_groupTagsTxt);
-				}
-			}
-			else
-			{
-				ClearBorder(_groupTagsTxt);
-			}
 			FillCollectorViewData();
         }
         private void AddGroupBtn_clicked()
@@ -899,9 +797,6 @@ namespace YooAsset.Editor
 				if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
 				{
 					if(selectGroup.Collectors[i].CollectPath.ToLower().Contains(_lowerSearchKey))
-					{
-					}
-					else if(selectGroup.Collectors[i].AssetTags.ToLower().Contains(_lowerSearchKey))
 					{
 					}
 					else
@@ -1073,44 +968,12 @@ namespace YooAsset.Editor
             var objectField1 = element.Q<ObjectField>("ObjectField1");
             objectField1.SetValueWithoutNotify(collectObject);
 
-			if (string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
-			{
-				if (collector.CollectPath.ToLower().Contains(_lowerSearchKey))
-				{
-					ShowSearchBorder(objectField1);
-				}
-				else
-				{
-					ClearBorder(objectField1);
-				}
-			}
-			else
-			{
-				ClearBorder(objectField1);
-			}
-
 			objectField1.RegisterValueChangedCallback(evt =>
             {
                 collector.CollectPath = AssetDatabase.GetAssetPath(evt.newValue);
                 collector.CollectorGUID = AssetDatabase.AssetPathToGUID(collector.CollectPath);
                 objectField1.value.name = collector.CollectPath;
 				
-				if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
-				{
-					if(collector.CollectPath.ToLower().Contains(_lowerSearchKey))
-					{
-						ShowSearchBorder(objectField1);
-					}
-					else
-					{
-						ClearBorder(objectField1);
-					}
-				}
-				else
-				{
-					ClearBorder(objectField1);
-				}
-
                 AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
                 if (foldout.value)
                 {
@@ -1195,21 +1058,6 @@ namespace YooAsset.Editor
 
             // Tags
             var textFiled1 = element.Q<TextField>("TextField1");
-			if(string.IsNullOrWhiteSpace(_lowerSearchKey) == false)
-			{
-				if(collector.AssetTags.ToLower().Contains(_lowerSearchKey))
-				{
-					ShowSearchBorder(textFiled1);
-				}
-				else
-				{
-					ClearBorder(textFiled1);
-				}
-			}
-			else
-			{
-				ClearBorder(textFiled1);
-			}
 			textFiled1.SetValueWithoutNotify(collector.AssetTags);
             textFiled1.RegisterValueChangedCallback(evt =>
             {
