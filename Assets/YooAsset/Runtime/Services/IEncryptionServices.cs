@@ -1,19 +1,6 @@
 ﻿
 namespace YooAsset
 {
-    public struct EncryptResult
-    {
-        /// <summary>
-        /// 文件是否加密
-        /// </summary>
-        public bool Encrypted;
-
-        /// <summary>
-        /// 加密后的文件数据
-        /// </summary>
-        public byte[] EncryptedData;
-    }
-
     public struct EncryptFileInfo
     {
         /// <summary>
@@ -25,6 +12,18 @@ namespace YooAsset
         /// 文件路径
         /// </summary>
         public string FileLoadPath;
+    }
+    public struct EncryptResult
+    {
+        /// <summary>
+        /// 文件是否加密
+        /// </summary>
+        public bool Encrypted;
+
+        /// <summary>
+        /// 加密后的文件数据
+        /// </summary>
+        public byte[] EncryptedData;
     }
 
     public interface IEncryptionServices

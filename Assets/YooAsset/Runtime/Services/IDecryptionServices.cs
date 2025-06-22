@@ -42,14 +42,22 @@ namespace YooAsset
     public interface IDecryptionServices
     {
         /// <summary>
-        /// 同步方式获取解密的资源包对象
+        /// 同步方式获取解密的资源包
         /// </summary>
         DecryptResult LoadAssetBundle(DecryptFileInfo fileInfo);
 
         /// <summary>
-        /// 异步方式获取解密的资源包对象
+        /// 异步方式获取解密的资源包
         /// </summary>
         DecryptResult LoadAssetBundleAsync(DecryptFileInfo fileInfo);
+
+        /// <summary>
+        /// 后备方式获取解密的资源包
+        /// 注意：当正常解密方法失败后，会触发后备加载！
+        /// 说明：建议通过LoadFromMemory()方法加载资源包作为保底机制。
+        /// issues : https://github.com/tuyoogame/YooAsset/issues/562
+        /// </summary>
+        DecryptResult LoadAssetBundleFallback(DecryptFileInfo fileInfo);
 
         /// <summary>
         /// 获取解密的字节数据

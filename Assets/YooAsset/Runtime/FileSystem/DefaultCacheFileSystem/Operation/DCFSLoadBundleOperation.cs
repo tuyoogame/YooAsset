@@ -164,11 +164,23 @@ namespace YooAsset
                 {
                     if (_bundle.Encrypted)
                     {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Failed;
-                        Error = $"Failed to load encrypted asset bundle file : {_bundle.BundleName}";
-                        YooLogger.Error(Error);
-                        return;
+                        var decryptResult = _fileSystem.LoadEncryptedAssetBundleFallback(_bundle);
+                        _assetBundle = decryptResult.Result;
+                        if (_assetBundle != null)
+                        {
+                            _steps = ESteps.Done;
+                            Result = new AssetBundleResult(_fileSystem, _bundle, _assetBundle, _managedStream);
+                            Status = EOperationStatus.Succeed;
+                            return;
+                        }
+                        else
+                        {
+                            _steps = ESteps.Done;
+                            Status = EOperationStatus.Failed;
+                            Error = $"Failed to load encrypted asset bundle file : {_bundle.BundleName}";
+                            YooLogger.Error(Error);
+                            return;
+                        }
                     }
 
                     // 注意：在安卓移动平台，华为和三星真机上有极小概率加载资源包失败。

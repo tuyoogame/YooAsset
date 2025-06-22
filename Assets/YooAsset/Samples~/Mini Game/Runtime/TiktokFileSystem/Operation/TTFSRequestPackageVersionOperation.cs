@@ -11,14 +11,16 @@ internal class TTFSRequestPackageVersionOperation : FSRequestPackageVersionOpera
     }
 
     private readonly TiktokFileSystem _fileSystem;
+    private readonly bool _appendTimeTicks;
     private readonly int _timeout;
     private RequestTiktokPackageVersionOperation _requestPackageVersionOp;
     private ESteps _steps = ESteps.None;
 
 
-    internal TTFSRequestPackageVersionOperation(TiktokFileSystem fileSystem, int timeout)
+    internal TTFSRequestPackageVersionOperation(TiktokFileSystem fileSystem, bool appendTimeTicks, int timeout)
     {
         _fileSystem = fileSystem;
+        _appendTimeTicks = appendTimeTicks;
         _timeout = timeout;
     }
     internal override void InternalStart()
@@ -34,7 +36,7 @@ internal class TTFSRequestPackageVersionOperation : FSRequestPackageVersionOpera
         {
             if (_requestPackageVersionOp == null)
             {
-                _requestPackageVersionOp = new RequestTiktokPackageVersionOperation(_fileSystem, _timeout);
+                _requestPackageVersionOp = new RequestTiktokPackageVersionOperation(_fileSystem, _appendTimeTicks, _timeout);
                 _requestPackageVersionOp.StartOperation();
                 AddChildOperation(_requestPackageVersionOp);
             }

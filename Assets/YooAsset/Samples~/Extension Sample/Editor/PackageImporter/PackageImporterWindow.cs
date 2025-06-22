@@ -71,7 +71,7 @@ namespace YooAsset.Editor
 
             // 加载补丁清单
             byte[] bytesData = FileUtility.ReadAllBytes(manifestFilePath);
-            PackageManifest manifest = ManifestTools.DeserializeFromBinary(bytesData);
+            PackageManifest manifest = ManifestTools.DeserializeFromBinary(bytesData, null); //TODO 自行处理解密
 
             // 拷贝文件列表
             int fileCount = 0;

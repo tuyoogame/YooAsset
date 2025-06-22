@@ -69,6 +69,8 @@ namespace YooAsset
             url = new System.Uri(path).ToString();
 #elif UNITY_STANDALONE || UNITY_WSA
             url = StringUtility.Format("file:///{0}", path);
+#elif UNITY_TVOS
+            url = StringUtility.Format("file:///{0}", path);
 #else
             throw new System.NotImplementedException();
 #endif

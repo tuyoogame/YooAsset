@@ -10,7 +10,7 @@ public static class TiktokFileSystemCreater
 {
     public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteServices remoteServices)
     {
-        string fileSystemClass = $"{nameof(TiktokFileSystem)},YooAsset.RuntimeExtension";
+        string fileSystemClass = $"{nameof(TiktokFileSystem)},YooAsset.MiniGame";
         var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
         fileSystemParams.AddParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
         return fileSystemParams;
@@ -18,7 +18,7 @@ public static class TiktokFileSystemCreater
 
     public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteServices remoteServices, IWebDecryptionServices decryptionServices)
     {
-        string fileSystemClass = $"{nameof(TiktokFileSystem)},YooAsset.RuntimeExtension";
+        string fileSystemClass = $"{nameof(TiktokFileSystem)},YooAsset.MiniGame";
         var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
         fileSystemParams.AddParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
         fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
@@ -121,7 +121,7 @@ internal class TiktokFileSystem : IFileSystem
     }
     public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks, int timeout)
     {
-        var operation = new TTFSRequestPackageVersionOperation(this, timeout);
+        var operation = new TTFSRequestPackageVersionOperation(this, appendTimeTicks, timeout);
         return operation;
     }
     public virtual FSClearCacheFilesOperation ClearCacheFilesAsync(PackageManifest manifest, ClearCacheFilesOptions options)

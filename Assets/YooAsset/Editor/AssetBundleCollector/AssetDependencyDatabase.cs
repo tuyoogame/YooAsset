@@ -70,7 +70,11 @@ namespace YooAsset.Editor
                     foreach (var cacheInfoPair in _database)
                     {
                         var assetPath = cacheInfoPair.Key;
+#if UNITY_2021_3_OR_NEWER
                         var assetGUID = AssetDatabase.AssetPathToGUID(assetPath, AssetPathToGUIDOptions.OnlyExistingAssets);
+#else
+                        var assetGUID = AssetDatabase.AssetPathToGUID(assetPath);
+#endif
                         if (string.IsNullOrEmpty(assetGUID))
                         {
                             removeList.Add(assetPath);
@@ -183,16 +187,30 @@ namespace YooAsset.Editor
             }
 
             var result = new HashSet<string> { assetPath };
-            CollectDependencies(assetPath, result, recursive);
+            CollectDependencies(assetPath, assetPath, result, recursive);
 
             // 注意：AssetDatabase.GetDependencies保持一致，将主资源添加到依赖列表最前面
             return result.ToArray();
         }
-        private void CollectDependencies(string assetPath, HashSet<string> result, bool recursive)
+        private void CollectDependencies(string parent, string assetPath, HashSet<string> result, bool recursive)
         {
             if (_database.TryGetValue(assetPath, out var cacheInfo) == false)
             {
-                throw new Exception($"Fatal : can not found cache info : {assetPath}");
+                // 说明：检测是否为丢失引用的资产
+#if UNITY_2021_3_OR_NEWER
+                var assetGUID = AssetDatabase.AssetPathToGUID(assetPath, AssetPathToGUIDOptions.OnlyExistingAssets);
+#else
+                var assetGUID = AssetDatabase.AssetPathToGUID(assetPath);
+#endif
+                if (string.IsNullOrEmpty(assetGUID))
+                {
+                    Debug.LogWarning($"{parent} found missing asset : {assetPath}");
+                    return;
+                }
+                else
+                {
+                    throw new Exception($"Fatal : can not found cache info : {assetPath}");
+                }
             }
 
             foreach (var dependGUID in cacheInfo.DependGUIDs)
@@ -213,7 +231,7 @@ namespace YooAsset.Editor
 
                 // 递归收集依赖
                 if (recursive)
-                    CollectDependencies(dependAssetPath, result, recursive);
+                    CollectDependencies(assetPath, dependAssetPath, result, recursive);
             }
         }
 

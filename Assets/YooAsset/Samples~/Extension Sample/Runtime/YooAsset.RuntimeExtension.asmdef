@@ -2,9 +2,7 @@
     "name": "YooAsset.RuntimeExtension",
     "rootNamespace": "",
     "references": [
-        "GUID:e34a5702dd353724aa315fb8011f08c3",
-        "GUID:5efd170ecd8084500bed5692932fe14e",
-        "GUID:bb21d6197862c4c3e863390dec9859a7"
+        "GUID:e34a5702dd353724aa315fb8011f08c3"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,7 +1,7 @@
-﻿#if UNITY_WEBGL && DOUYINMINIGAME
+﻿#if UNITY_WEBGL && WEIXINMINIGAME
 using YooAsset;
 
-internal class RequestTiktokPackageVersionOperation : AsyncOperationBase
+internal class RequestWechatPackageVersionOperation : AsyncOperationBase
 {
     private enum ESteps
     {
@@ -10,7 +10,8 @@ internal class RequestTiktokPackageVersionOperation : AsyncOperationBase
         Done,
     }
 
-    private readonly TiktokFileSystem _fileSystem;
+    private readonly WechatFileSystem _fileSystem;
+    private readonly bool _appendTimeTicks;
     private readonly int _timeout;
     private UnityWebTextRequestOperation _webTextRequestOp;
     private int _requestCount = 0;
@@ -22,14 +23,15 @@ internal class RequestTiktokPackageVersionOperation : AsyncOperationBase
     public string PackageVersion { private set; get; }
 
     
-    public RequestTiktokPackageVersionOperation(TiktokFileSystem fileSystem, int timeout)
+    public RequestWechatPackageVersionOperation(WechatFileSystem fileSystem, bool appendTimeTicks, int timeout)
     {
         _fileSystem = fileSystem;
+        _appendTimeTicks = appendTimeTicks;
         _timeout = timeout;
     }
     internal override void InternalStart()
     {
-        _requestCount = WebRequestCounter.GetRequestFailedCount(_fileSystem.PackageName, nameof(RequestTiktokPackageVersionOperation));
+        _requestCount = WebRequestCounter.GetRequestFailedCount(_fileSystem.PackageName, nameof(RequestWechatPackageVersionOperation));
         _steps = ESteps.RequestPackageVersion;
     }
     internal override void InternalUpdate()
@@ -73,18 +75,26 @@ internal class RequestTiktokPackageVersionOperation : AsyncOperationBase
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Failed;
                 Error = _webTextRequestOp.Error;
-                WebRequestCounter.RecordRequestFailed(_fileSystem.PackageName, nameof(RequestTiktokPackageVersionOperation));
+                WebRequestCounter.RecordRequestFailed(_fileSystem.PackageName, nameof(RequestWechatPackageVersionOperation));
             }
         }
     }
 
     private string GetRequestURL(string fileName)
     {
+        string url;
+
         // 轮流返回请求地址
         if (_requestCount % 2 == 0)
-            return _fileSystem.RemoteServices.GetRemoteMainURL(fileName);
+            url = _fileSystem.RemoteServices.GetRemoteMainURL(fileName);
         else
-            return _fileSystem.RemoteServices.GetRemoteFallbackURL(fileName);
+            url = _fileSystem.RemoteServices.GetRemoteFallbackURL(fileName);
+
+        // 在URL末尾添加时间戳
+        if (_appendTimeTicks)
+            return $"{url}?{System.DateTime.UtcNow.Ticks}";
+        else
+            return url;
     }
 }
 #endif

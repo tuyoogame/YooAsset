@@ -85,7 +85,7 @@ namespace YooAsset
             {
                 if (_deserializer == null)
                 {
-                    _deserializer = new DeserializeManifestOperation(_webDataRequestOp.Result);
+                    _deserializer = new DeserializeManifestOperation(_fileSystem.ManifestServices, _webDataRequestOp.Result);
                     _deserializer.StartOperation();
                     AddChildOperation(_deserializer);
                 }

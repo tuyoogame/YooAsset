@@ -11,7 +11,7 @@ namespace YooAsset
 
         /// <summary>
         /// 在构建应用程序前自动生成内置资源目录文件。
-        /// 原理：搜索StreamingAssets目录下的所有资源文件，然后将这些文件信息写入文件，并存储在Resources目录下。
+        /// 原理：搜索StreamingAssets目录下的所有资源文件，将这些文件信息写入文件，然后在运行时做查询用途。
         /// </summary>
         public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report)
         {
@@ -21,7 +21,7 @@ namespace YooAsset
             DirectoryInfo rootDirectory = new DirectoryInfo(rootPath);
             if (rootDirectory.Exists == false)
             {
-                UnityEngine.Debug.LogWarning($"Can not found StreamingAssets root directory : {rootPath}");
+                Debug.LogWarning($"Can not found StreamingAssets root directory : {rootPath}");
                 return;
             }
 
@@ -31,10 +31,17 @@ namespace YooAsset
             {
                 string packageName = subDirectory.Name;
                 string pacakgeDirectory = subDirectory.FullName;
-                bool result = CreateBuildinCatalogFile(packageName, pacakgeDirectory);
-                if (result == false)
+                try
                 {
-                    throw new System.Exception($"Create package {packageName} catalog file failed ! See the detail error in console !");
+                    bool result = CreateBuildinCatalogFile(null, packageName, pacakgeDirectory);
+                    if (result == false)
+                    {
+                        Debug.LogError($"Create package {packageName} catalog file failed ! See the detail error in console !");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"Create package {packageName} catalog file failed ! {ex.Message}");
                 }
             }
         }
@@ -42,7 +49,7 @@ namespace YooAsset
         /// <summary>
         /// 生成包裹的内置资源目录文件
         /// </summary>
-        public static bool CreateBuildinCatalogFile(string packageName, string pacakgeDirectory)
+        public static bool CreateBuildinCatalogFile(IManifestServices services, string packageName, string pacakgeDirectory)
         {
             // 获取资源清单版本
             string packageVersion;
@@ -70,7 +77,7 @@ namespace YooAsset
                 }
 
                 var binaryData = FileUtility.ReadAllBytes(manifestFilePath);
-                packageManifest = ManifestTools.DeserializeFromBinary(binaryData);
+                packageManifest = ManifestTools.DeserializeFromBinary(binaryData, services);
             }
 
             // 获取文件名映射关系

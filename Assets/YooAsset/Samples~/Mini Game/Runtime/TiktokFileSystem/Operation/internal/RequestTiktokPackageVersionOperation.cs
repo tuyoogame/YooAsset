@@ -1,7 +1,7 @@
-﻿#if UNITY_WEBGL && WEIXINMINIGAME
+﻿#if UNITY_WEBGL && DOUYINMINIGAME
 using YooAsset;
 
-internal class RequestWechatPackageVersionOperation : AsyncOperationBase
+internal class RequestTiktokPackageVersionOperation : AsyncOperationBase
 {
     private enum ESteps
     {
@@ -10,9 +10,9 @@ internal class RequestWechatPackageVersionOperation : AsyncOperationBase
         Done,
     }
 
-    private readonly WechatFileSystem _fileSystem;
-    private readonly int _timeout;
+    private readonly TiktokFileSystem _fileSystem;
     private readonly bool _appendTimeTicks;
+    private readonly int _timeout;
     private UnityWebTextRequestOperation _webTextRequestOp;
     private int _requestCount = 0;
     private ESteps _steps = ESteps.None;
@@ -22,8 +22,8 @@ internal class RequestWechatPackageVersionOperation : AsyncOperationBase
     /// </summary>
     public string PackageVersion { private set; get; }
 
-    
-    public RequestWechatPackageVersionOperation(WechatFileSystem fileSystem, bool appendTimeTicks, int timeout)
+
+    public RequestTiktokPackageVersionOperation(TiktokFileSystem fileSystem, bool appendTimeTicks, int timeout)
     {
         _fileSystem = fileSystem;
         _appendTimeTicks = appendTimeTicks;
@@ -31,7 +31,7 @@ internal class RequestWechatPackageVersionOperation : AsyncOperationBase
     }
     internal override void InternalStart()
     {
-        _requestCount = WebRequestCounter.GetRequestFailedCount(_fileSystem.PackageName, nameof(RequestWechatPackageVersionOperation));
+        _requestCount = WebRequestCounter.GetRequestFailedCount(_fileSystem.PackageName, nameof(RequestTiktokPackageVersionOperation));
         _steps = ESteps.RequestPackageVersion;
     }
     internal override void InternalUpdate()
@@ -75,7 +75,7 @@ internal class RequestWechatPackageVersionOperation : AsyncOperationBase
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Failed;
                 Error = _webTextRequestOp.Error;
-                WebRequestCounter.RecordRequestFailed(_fileSystem.PackageName, nameof(RequestWechatPackageVersionOperation));
+                WebRequestCounter.RecordRequestFailed(_fileSystem.PackageName, nameof(RequestTiktokPackageVersionOperation));
             }
         }
     }

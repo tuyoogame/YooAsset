@@ -7,6 +7,7 @@ namespace YooAsset
         public const string INSTALL_CLEAR_MODE = "INSTALL_CLEAR_MODE";
         public const string REMOTE_SERVICES = "REMOTE_SERVICES";
         public const string DECRYPTION_SERVICES = "DECRYPTION_SERVICES";
+        public const string MANIFEST_SERVICES = "MANIFEST_SERVICES";
         public const string APPEND_FILE_EXTENSION = "APPEND_FILE_EXTENSION";
         public const string DISABLE_CATALOG_FILE = "DISABLE_CATALOG_FILE";
         public const string DISABLE_UNITY_WEB_CACHE = "DISABLE_UNITY_WEB_CACHE";

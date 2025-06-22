@@ -10,6 +10,7 @@ namespace YooAsset
         private enum ESteps
         {
             None,
+            RestoreFileData,
             DeserializeFileHeader,
             PrepareAssetList,
             DeserializeAssetList,
@@ -19,7 +20,9 @@ namespace YooAsset
             Done,
         }
 
-        private readonly BufferReader _buffer;
+        private readonly IManifestServices _services;
+        private byte[] _sourceData;
+        private BufferReader _buffer;
         private int _packageAssetCount;
         private int _packageBundleCount;
         private int _progressTotalValue;
@@ -30,13 +33,14 @@ namespace YooAsset
         /// </summary>
         public PackageManifest Manifest { private set; get; }
 
-        public DeserializeManifestOperation(byte[] binaryData)
+        public DeserializeManifestOperation(IManifestServices services, byte[] binaryData)
         {
-            _buffer = new BufferReader(binaryData);
+            _services = services;
+            _sourceData = binaryData;
         }
         internal override void InternalStart()
         {
-            _steps = ESteps.DeserializeFileHeader;
+            _steps = ESteps.RestoreFileData;
         }
         internal override void InternalUpdate()
         {
@@ -45,6 +49,19 @@ namespace YooAsset
 
             try
             {
+                if (_steps == ESteps.RestoreFileData)
+                {
+                    if (_services != null)
+                    {
+                        var resultData = _services.RestoreManifest(_sourceData);
+                        if (resultData != null)
+                            _sourceData = resultData;
+                    }
+
+                    _buffer = new BufferReader(_sourceData);
+                    _steps = ESteps.DeserializeFileHeader;
+                }
+
                 if (_steps == ESteps.DeserializeFileHeader)
                 {
                     if (_buffer.IsValid == false)

@@ -265,7 +265,7 @@ namespace YooAsset.Editor
         }
         private static string GetRuleDisplayName(string name, Type type)
         {
-            var attribute = DisplayNameAttributeHelper.GetAttribute<DisplayNameAttribute>(type);
+            var attribute = EditorTools.GetAttribute<DisplayNameAttribute>(type);
             if (attribute != null && string.IsNullOrEmpty(attribute.DisplayName) == false)
                 return attribute.DisplayName;
             else

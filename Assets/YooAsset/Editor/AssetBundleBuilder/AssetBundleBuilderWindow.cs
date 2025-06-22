@@ -19,7 +19,9 @@ namespace YooAsset.Editor
         }
 
         private string _buildPackage;
-        private EBuildPipeline _buildPipeline;
+        private string _buildPipeline;
+
+        private Dictionary<string, Type> _viewClassDic = new Dictionary<string, Type>(10);
 
         private Toolbar _toolbar;
         private ToolbarMenu _packageMenu;
@@ -69,11 +71,23 @@ namespace YooAsset.Editor
                 {
                     _pipelineMenu = new ToolbarMenu();
                     _pipelineMenu.style.width = 200;
-                    _pipelineMenu.menu.AppendAction(EBuildPipeline.EditorSimulateBuildPipeline.ToString(), PipelineMenuAction, PipelineMenuFun, EBuildPipeline.EditorSimulateBuildPipeline);
-                    _pipelineMenu.menu.AppendAction(EBuildPipeline.BuiltinBuildPipeline.ToString(), PipelineMenuAction, PipelineMenuFun, EBuildPipeline.BuiltinBuildPipeline);
-                    _pipelineMenu.menu.AppendAction(EBuildPipeline.ScriptableBuildPipeline.ToString(), PipelineMenuAction, PipelineMenuFun, EBuildPipeline.ScriptableBuildPipeline);
-                    _pipelineMenu.menu.AppendAction(EBuildPipeline.RawFileBuildPipeline.ToString(), PipelineMenuAction, PipelineMenuFun, EBuildPipeline.RawFileBuildPipeline);
                     _toolbar.Add(_pipelineMenu);
+
+                    var viewerClassTypes = EditorTools.GetAssignableTypes(typeof(BuildPipelineViewerBase));
+                    foreach (var classType in viewerClassTypes)
+                    {
+                        var buildPipelineAttribute = EditorTools.GetAttribute<BuildPipelineAttribute>(classType);
+                        string pipelineName = buildPipelineAttribute.PipelineName;
+                        if (_viewClassDic.ContainsKey(pipelineName))
+                        {
+                            Debug.LogWarning($"The pipeline has already exist : {pipelineName}");
+                        }
+                        else
+                        {
+                            _viewClassDic.Add(pipelineName, classType);
+                            _pipelineMenu.menu.AppendAction(pipelineName, PipelineMenuAction, PipelineMenuFun);
+                        }
+                    }
                 }
 
                 RefreshBuildPipelineView();
@@ -91,28 +105,18 @@ namespace YooAsset.Editor
 
             _buildPipeline = AssetBundleBuilderSetting.GetPackageBuildPipeline(_buildPackage);
             _packageMenu.text = _buildPackage;
-            _pipelineMenu.text = _buildPipeline.ToString();
+            _pipelineMenu.text = _buildPipeline;
 
-            var buildTarget = EditorUserBuildSettings.activeBuildTarget;
-            if (_buildPipeline == EBuildPipeline.EditorSimulateBuildPipeline)
+            if (_viewClassDic.TryGetValue(_buildPipeline, out Type value))
             {
-                var viewer = new EditorSimulateBuildPipelineViewer(_buildPackage, buildTarget, _container);
-            }
-            else if (_buildPipeline == EBuildPipeline.BuiltinBuildPipeline)
-            {
-                var viewer = new BuiltinBuildPipelineViewer(_buildPackage, buildTarget, _container);
-            }
-            else if (_buildPipeline == EBuildPipeline.ScriptableBuildPipeline)
-            {
-                var viewer = new ScriptableBuildPipelineViewer(_buildPackage, buildTarget, _container);
-            }
-            else if (_buildPipeline == EBuildPipeline.RawFileBuildPipeline)
-            {
-                var viewer = new RawfileBuildpipelineViewer(_buildPackage, buildTarget, _container);
+                var buildTarget = EditorUserBuildSettings.activeBuildTarget;
+                var viewer = Activator.CreateInstance(value) as BuildPipelineViewerBase;
+                viewer.InitView(_buildPackage, _buildPipeline, buildTarget);
+                viewer.CreateView(_container);
             }
             else
             {
-                throw new System.NotImplementedException(_buildPipeline.ToString());
+                Debug.LogError($"Not found build pipeline : {_buildPipeline}");
             }
         }
         private List<string> GetBuildPackageNames()
@@ -145,18 +149,16 @@ namespace YooAsset.Editor
 
         private void PipelineMenuAction(DropdownMenuAction action)
         {
-            var pipelineType = (EBuildPipeline)action.userData;
-            if (_buildPipeline != pipelineType)
+            if (_buildPipeline != action.name)
             {
-                _buildPipeline = pipelineType;
-                AssetBundleBuilderSetting.SetPackageBuildPipeline(_buildPackage, pipelineType);
+                _buildPipeline = action.name;
+                AssetBundleBuilderSetting.SetPackageBuildPipeline(_buildPackage, _buildPipeline);
                 RefreshBuildPipelineView();
             }
         }
         private DropdownMenuAction.Status PipelineMenuFun(DropdownMenuAction action)
         {
-            var pipelineType = (EBuildPipeline)action.userData;
-            if (_buildPipeline == pipelineType)
+            if (_buildPipeline == action.name)
                 return DropdownMenuAction.Status.Checked;
             else
                 return DropdownMenuAction.Status.Normal;

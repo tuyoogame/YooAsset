@@ -878,6 +878,7 @@ namespace YooAsset.Editor
                 elementTop.Add(objectField);
                 var label = objectField.Q<Label>();
                 label.style.minWidth = 63;
+                UIElementsTools.SetObjectFieldShowPath(objectField);
             }
 
             // Bottom VisualElement
@@ -967,8 +968,6 @@ namespace YooAsset.Editor
 
             var collector = selectGroup.Collectors[index];
             var collectObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(collector.CollectPath);
-            if (collectObject != null)
-                collectObject.name = collector.CollectPath;
 
             // 注意：非主资源收集器的标签栏需要被冻结
             var textTags = element.Q<TextField>("TextField1");
@@ -1002,14 +1001,14 @@ namespace YooAsset.Editor
             {
                 collector.CollectPath = AssetDatabase.GetAssetPath(evt.newValue);
                 collector.CollectorGUID = AssetDatabase.AssetPathToGUID(collector.CollectPath);
-                objectField1.value.name = collector.CollectPath;
-				
+
                 AssetBundleCollectorSettingData.ModifyCollector(selectGroup, collector);
                 if (foldout.value)
                 {
                     RefreshFoldout(foldout, selectGroup, collector);
                 }
             });
+            UIElementsTools.RefreshObjectFieldShowPath(objectField1);
 
             // Collector Type
             var popupField0 = element.Q<PopupField<string>>("PopupField0");

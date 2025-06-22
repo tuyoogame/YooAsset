@@ -58,7 +58,7 @@ namespace YooAsset.Editor
             if (processBundleDepends)
                 ProcessBuiltinBundleDependency(context, manifest);
 
-            // 创建补丁清单文本文件
+            // 创建资源清单文本文件
             {
                 string fileName = YooAssetSettingsData.GetManifestJsonFileName(buildParameters.PackageName, buildParameters.PackageVersion);
                 string filePath = $"{packageOutputDirectory}/{fileName}";
@@ -66,18 +66,18 @@ namespace YooAsset.Editor
                 BuildLogger.Log($"Create package manifest file: {filePath}");
             }
 
-            // 创建补丁清单二进制文件
+            // 创建资源清单二进制文件
             string packageHash;
             string packagePath;
             {
                 string fileName = YooAssetSettingsData.GetManifestBinaryFileName(buildParameters.PackageName, buildParameters.PackageVersion);
                 packagePath = $"{packageOutputDirectory}/{fileName}";
-                ManifestTools.SerializeToBinary(packagePath, manifest);
+                ManifestTools.SerializeToBinary(packagePath, manifest, buildParameters.ManifestServices);
                 packageHash = HashUtility.FileCRC32(packagePath);
                 BuildLogger.Log($"Create package manifest file: {packagePath}");
             }
 
-            // 创建补丁清单哈希文件
+            // 创建资源清单哈希文件
             {
                 string fileName = YooAssetSettingsData.GetPackageHashFileName(buildParameters.PackageName, buildParameters.PackageVersion);
                 string filePath = $"{packageOutputDirectory}/{fileName}";
@@ -85,7 +85,7 @@ namespace YooAsset.Editor
                 BuildLogger.Log($"Create package manifest hash file: {filePath}");
             }
 
-            // 创建补丁清单版本文件
+            // 创建资源清单版本文件
             {
                 string fileName = YooAssetSettingsData.GetPackageVersionFileName(buildParameters.PackageName);
                 string filePath = $"{packageOutputDirectory}/{fileName}";
@@ -97,7 +97,7 @@ namespace YooAsset.Editor
             {
                 ManifestContext manifestContext = new ManifestContext();
                 byte[] bytesData = FileUtility.ReadAllBytes(packagePath);
-                manifestContext.Manifest = ManifestTools.DeserializeFromBinary(bytesData);
+                manifestContext.Manifest = ManifestTools.DeserializeFromBinary(bytesData, buildParameters.ManifestServices);
                 context.SetContextObject(manifestContext);
             }
         }

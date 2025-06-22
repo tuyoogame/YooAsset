@@ -260,8 +260,11 @@ namespace YooAsset
                 StartOperation();
             }
 
-            IsWaitForAsyncComplete = true;
-            InternalWaitForAsyncComplete();
+            if (IsWaitForAsyncComplete == false)
+            {
+                IsWaitForAsyncComplete = true;
+                InternalWaitForAsyncComplete();
+            }
         }
 
         #region 调试信息

@@ -44,7 +44,7 @@ namespace YooAsset
         /// <summary>
         /// 序列化（二进制文件）
         /// </summary>
-        public static void SerializeToBinary(string savePath, PackageManifest manifest)
+        public static void SerializeToBinary(string savePath, PackageManifest manifest, IManifestServices services)
         {
             using (FileStream fs = new FileStream(savePath, FileMode.Create))
             {
@@ -96,9 +96,20 @@ namespace YooAsset
                     buffer.WriteInt32Array(packageBundle.DependBundleIDs);
                 }
 
-                // 写入文件流
-                buffer.WriteToStream(fs);
-                fs.Flush();
+                // 清单处理操作
+                if (services != null)
+                {
+                    var tempBytes = buffer.GetBytes();
+                    var resultBytes = services.ProcessManifest(tempBytes);
+                    fs.Write(resultBytes, 0, resultBytes.Length);
+                    fs.Flush();
+                }
+                else
+                {
+                    // 写入文件流
+                    buffer.WriteToStream(fs);
+                    fs.Flush();
+                }
             }
         }
 
@@ -113,10 +124,19 @@ namespace YooAsset
         /// <summary>
         /// 反序列化（二进制文件）
         /// </summary>
-        public static PackageManifest DeserializeFromBinary(byte[] binaryData)
+        public static PackageManifest DeserializeFromBinary(byte[] binaryData, IManifestServices services)
         {
             // 创建缓存器
-            BufferReader buffer = new BufferReader(binaryData);
+            BufferReader buffer;
+            if (services != null)
+            {
+                var resultBytes = services.RestoreManifest(binaryData);
+                buffer = new BufferReader(resultBytes);
+            }
+            else
+            {
+                buffer = new BufferReader(binaryData);
+            }
 
             // 读取文件标记
             uint fileSign = buffer.ReadUInt32();

@@ -2,6 +2,42 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.3.10] - 2025-06-17
+
+### Improvements
+
+- 小游戏扩展库已经独立，可以单独导入到项目工程。
+- 编辑器里的TableView视图新增了AssetObjectCell类。
+- (#552) 微信小游戏文件系统类，增加了URL合法性的初始化检测机制。
+- (#566) 重构了资源构建页面，方便扩展自定义界面。
+- (#573) 完善了AssetDependencyDB的输出日志，可以正确输出丢失的引用资产信息。
+
+### Fixed
+
+- 修复太空战机DEMO在退出运行模式时的报错。
+- (#551) 修复了Unity2019, Unity2020的代码兼容性报错。
+- (#569) 修复了TVOS平台的兼容问题。  
+- (#564) 修复了TiktokFileSystem文件系统里appendTimeTicks无效的问题。
+
+### Added
+
+- (#562) 新增了解密方法。
+
+  ```csharp
+  public interface IDecryptionServices
+  {
+      /// <summary>
+      /// 后备方式获取解密的资源包对象
+      /// 注意：当正常解密方法失败后，会触发后备加载！
+      /// 说明：建议通过LoadFromMemory()方法加载资源对象作为保底机制。
+      /// issues : https://github.com/tuyoogame/YooAsset/issues/562
+      /// </summary>
+      DecryptResult LoadAssetBundleFallback(DecryptFileInfo fileInfo);    
+  }
+  ```
+
+
+
 ## [2.3.9] - 2025-05-13
 
 ### Improvements

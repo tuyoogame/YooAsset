@@ -148,6 +148,14 @@ public class FileStreamTestDecryption : IDecryptionServices
     }
 
     /// <summary>
+    /// 后备方式获取解密的资源包对象
+    /// </summary>
+    DecryptResult IDecryptionServices.LoadAssetBundleFallback(DecryptFileInfo fileInfo)
+    {
+        return new DecryptResult();
+    }
+
+    /// <summary>
     /// 获取解密的字节数据
     /// </summary>
     byte[] IDecryptionServices.ReadFileData(DecryptFileInfo fileInfo)
@@ -196,6 +204,14 @@ public class FileOffsetTestDecryption : IDecryptionServices
         decryptResult.ManagedStream = null;
         decryptResult.CreateRequest = AssetBundle.LoadFromFileAsync(fileInfo.FileLoadPath, fileInfo.FileLoadCRC, GetFileOffset());
         return decryptResult;
+    }
+
+    /// <summary>
+    /// 后备方式获取解密的资源包对象
+    /// </summary>
+    DecryptResult IDecryptionServices.LoadAssetBundleFallback(DecryptFileInfo fileInfo)
+    {
+        return new DecryptResult();
     }
 
     /// <summary>

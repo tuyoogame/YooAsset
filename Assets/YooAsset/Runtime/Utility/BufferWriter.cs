@@ -37,6 +37,16 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 获取有效数据
+        /// </summary>
+        public byte[] GetBytes()
+        {
+            byte[] newArray = new byte[_index];
+            Buffer.BlockCopy(_buffer, 0, newArray, 0, _index);
+            return newArray;
+        }
+
+        /// <summary>
         /// 将有效数据写入文件流
         /// </summary>
         public void WriteToStream(FileStream fileStream)

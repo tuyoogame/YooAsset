@@ -15,6 +15,11 @@ namespace YooAsset
                 _loadAssetOp = BundleResultObject.LoadAssetAsync(MainAssetInfo);
                 _loadAssetOp.StartOperation();
                 AddChildOperation(_loadAssetOp);
+
+#if UNITY_WEBGL
+                if (_resManager.WebGLForceSyncLoadAsset())
+                    _loadAssetOp.WaitForAsyncComplete();
+#endif
             }
 
             if (IsWaitForAsyncComplete)

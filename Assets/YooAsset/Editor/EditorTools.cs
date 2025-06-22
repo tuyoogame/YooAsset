@@ -129,6 +129,23 @@ namespace YooAsset.Editor
         }
         #endregion
 
+        #region Attribute
+        public static T GetAttribute<T>(Type type) where T : Attribute
+        {
+            return (T)type.GetCustomAttribute(typeof(T), false);
+        }
+
+        public static T GetAttribute<T>(MethodInfo methodInfo) where T : Attribute
+        {
+            return (T)methodInfo.GetCustomAttribute(typeof(T), false);
+        }
+
+        public static T GetAttribute<T>(FieldInfo field) where T : Attribute
+        {
+            return (T)field.GetCustomAttribute(typeof(T), false);
+        }
+        #endregion
+
         #region PackageManager
         public static string GetPackageManagerYooVersion()
         {

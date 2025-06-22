@@ -42,6 +42,11 @@ namespace YooAsset
         /// 同时加载Bundle文件的最大并发数
         /// </summary>
         public int BundleLoadingMaxConcurrency = int.MaxValue;
+
+        /// <summary>
+        /// WebGL平台强制同步加载资源对象
+        /// </summary>
+        public bool WebGLForceSyncLoadAsset = false;
     }
 
     /// <summary>

@@ -88,6 +88,11 @@ namespace YooAsset
         ///  自定义参数：解密方法类
         /// </summary>
         public IDecryptionServices DecryptionServices { private set; get; }
+
+        /// <summary>
+        /// 自定义参数：资源清单服务类
+        /// </summary>
+        public IManifestServices ManifestServices { private set; get; }
         #endregion
 
 
@@ -173,6 +178,10 @@ namespace YooAsset
             else if (name == FileSystemParametersDefine.DECRYPTION_SERVICES)
             {
                 DecryptionServices = (IDecryptionServices)value;
+            }
+            else if (name == FileSystemParametersDefine.MANIFEST_SERVICES)
+            {
+                ManifestServices = (IManifestServices)value;
             }
             else
             {

@@ -15,6 +15,7 @@ namespace YooAsset
         private long _sceneCreateIndex = 0;
         private IBundleQuery _bundleQuery;
         private int _bundleLoadingMaxConcurrency;
+        private bool _webGLForceSyncLoadAsset;
 
         /// <summary>
         /// 所属包裹
@@ -43,6 +44,7 @@ namespace YooAsset
         public void Initialize(InitializeParameters parameters, IBundleQuery bundleServices)
         {
             _bundleLoadingMaxConcurrency = parameters.BundleLoadingMaxConcurrency;
+            _webGLForceSyncLoadAsset = parameters.WebGLForceSyncLoadAsset;
             _bundleQuery = bundleServices;
             SceneManager.sceneUnloaded += OnSceneUnloaded;
         }
@@ -320,6 +322,10 @@ namespace YooAsset
         internal bool BundleLoadingIsBusy()
         {
             return BundleLoadingCounter >= _bundleLoadingMaxConcurrency;
+        }
+        internal bool WebGLForceSyncLoadAsset()
+        {
+            return _webGLForceSyncLoadAsset;
         }
 
         private LoadBundleFileOperation CreateBundleFileLoaderInternal(BundleInfo bundleInfo)

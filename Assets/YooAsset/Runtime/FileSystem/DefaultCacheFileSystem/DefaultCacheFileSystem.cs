@@ -58,7 +58,7 @@ namespace YooAsset
         /// <summary>
         /// 自定义参数：远程服务接口
         /// </summary>
-        public IRemoteServices RemoteServices { private set; get; } = null;
+        public IRemoteServices RemoteServices { private set; get; }
 
         /// <summary>
         /// 自定义参数：初始化的时候缓存文件校验级别
@@ -99,6 +99,11 @@ namespace YooAsset
         ///  自定义参数：解密方法类
         /// </summary>
         public IDecryptionServices DecryptionServices { private set; get; }
+
+        /// <summary>
+        /// 自定义参数：资源清单服务类
+        /// </summary>
+        public IManifestServices ManifestServices { private set; get; }
         #endregion
 
 
@@ -220,6 +225,10 @@ namespace YooAsset
             else if (name == FileSystemParametersDefine.DECRYPTION_SERVICES)
             {
                 DecryptionServices = (IDecryptionServices)value;
+            }
+            else if (name == FileSystemParametersDefine.MANIFEST_SERVICES)
+            {
+                ManifestServices = (IManifestServices)value;
             }
             else
             {
@@ -558,6 +567,21 @@ namespace YooAsset
                 FileLoadPath = filePath,
             };
             return DecryptionServices.LoadAssetBundleAsync(fileInfo);
+        }
+
+        /// <summary>
+        /// 加载加密资源文件
+        /// </summary>
+        public DecryptResult LoadEncryptedAssetBundleFallback(PackageBundle bundle)
+        {
+            string filePath = GetCacheBundleFileLoadPath(bundle);
+            var fileInfo = new DecryptFileInfo()
+            {
+                BundleName = bundle.BundleName,
+                FileLoadCRC = bundle.UnityCRC,
+                FileLoadPath = filePath,
+            };
+            return DecryptionServices.LoadAssetBundleFallback(fileInfo);
         }
         #endregion
     }

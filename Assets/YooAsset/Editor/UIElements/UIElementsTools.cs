@@ -34,6 +34,67 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
+        /// 设置元素显示文本为资源路径
+        /// </summary>
+        public static void SetObjectFieldShowPath(ObjectField objectField)
+        {
+            string LabelClassName = "unity-object-field-display__label";
+            var nameLable = objectField.Q<Label>(className: LabelClassName);
+            if (nameLable == null)
+                return;
+
+            objectField.RegisterValueChangedCallback(evt =>
+            {
+                Object obj = evt.newValue;
+                if (obj == null)
+                {
+                    nameLable.text = "None (Object)";
+                    return;
+                }
+
+                // 获取资源路径（仅适用于项目资源）
+                string path = AssetDatabase.GetAssetPath(obj);
+                if (string.IsNullOrEmpty(path) == false)
+                {
+                    nameLable.text = path;
+                }
+                else
+                {
+                    nameLable.text = obj.name;
+                }
+            });
+        }
+
+        /// <summary>
+        /// 刷新元素显示文本内容
+        /// </summary>
+        public static void RefreshObjectFieldShowPath(ObjectField objectField)
+        {
+            string LabelClassName = "unity-object-field-display__label";
+            var nameLable = objectField.Q<Label>(className: LabelClassName);
+            if (nameLable == null)
+                return;
+
+            Object obj = objectField.value;
+            if (obj == null)
+            {
+                nameLable.text = "None (Object)";
+                return;
+            }
+
+            // 获取资源路径（仅适用于项目资源）
+            string path = AssetDatabase.GetAssetPath(obj);
+            if (string.IsNullOrEmpty(path) == false)
+            {
+                nameLable.text = path;
+            }
+            else
+            {
+                nameLable.text = obj.name;
+            }
+        }
+
+        /// <summary>
         /// 设置按钮图标
         /// </summary>
         public static void SetToolbarButtonIcon(ToolbarButton element, string iconName)

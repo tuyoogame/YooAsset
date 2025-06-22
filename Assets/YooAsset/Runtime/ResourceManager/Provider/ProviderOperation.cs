@@ -68,13 +68,14 @@ namespace YooAsset
 
 
         private ESteps _steps = ESteps.None;
+        protected readonly ResourceManager _resManager;
         private readonly LoadBundleFileOperation _mainBundleLoader;
         private readonly List<LoadBundleFileOperation> _bundleLoaders = new List<LoadBundleFileOperation>(10);
         private readonly HashSet<HandleBase> _handles = new HashSet<HandleBase>();
 
-
         public ProviderOperation(ResourceManager manager, string providerGUID, AssetInfo assetInfo)
         {
+            _resManager = manager;
             ProviderGUID = providerGUID;
             MainAssetInfo = assetInfo;
 

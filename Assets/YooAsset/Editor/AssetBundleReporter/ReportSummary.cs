@@ -71,9 +71,10 @@ namespace YooAsset.Editor
         public bool UseAssetDependencyDB;
         public bool EnableSharePackRule;
         public bool SingleReferencedPackAlone;
-        public string EncryptionClassName;
+        public string EncryptionServicesClassName;
+        public string ManifestServicesClassName;
         public EFileNameStyle FileNameStyle;
-
+        
         // 引擎参数
         public ECompressOption CompressOption;
         public bool DisableWriteTypeTree;
