@@ -3,22 +3,11 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-    /// <summary>
-    /// 下载器单元测试
-    /// 1. 下载失败重试机制
-    /// 2. 下载引用计数机制
-    /// 3. 最大下载并发机制
-    /// 4. 异步下载远端资源
-    /// 5. 同步下载远端资源
-    /// 6. 异步拷贝本地资源
-    /// 7. 同步拷贝本地资源
-    /// 9. 断点续传下载器
-    /// </summary>
     internal class DownloadCenterOperation : AsyncOperationBase
     {
         private readonly DefaultCacheFileSystem _fileSystem;
         protected readonly Dictionary<string, UnityDownloadFileOperation> _downloaders = new Dictionary<string, UnityDownloadFileOperation>(1000);
-        protected readonly List<string> _removeDownloadList = new List<string>(1000);
+        protected readonly List<string> _removeList = new List<string>(1000);
 
         public DownloadCenterOperation(DefaultCacheFileSystem fileSystem)
         {
@@ -30,29 +19,28 @@ namespace YooAsset
         internal override void InternalUpdate()
         {
             // 获取可移除的下载器集合
-            _removeDownloadList.Clear();
+            _removeList.Clear();
             foreach (var valuePair in _downloaders)
             {
                 var downloader = valuePair.Value;
                 downloader.UpdateOperation();
+                if (downloader.IsDone)
+                {
+                    _removeList.Add(valuePair.Key);
+                    continue;
+                }
 
                 // 注意：主动终止引用计数为零的下载任务
                 if (downloader.RefCount <= 0)
                 {
-                    _removeDownloadList.Add(valuePair.Key);
+                    _removeList.Add(valuePair.Key);
                     downloader.AbortOperation();
-                    continue;
-                }
-
-                if (downloader.IsDone)
-                {
-                    _removeDownloadList.Add(valuePair.Key);
                     continue;
                 }
             }
 
             // 移除下载器
-            foreach (var key in _removeDownloadList)
+            foreach (var key in _removeList)
             {
                 _downloaders.Remove(key);
             }
