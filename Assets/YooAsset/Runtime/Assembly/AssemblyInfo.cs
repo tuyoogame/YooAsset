@@ -2,6 +2,7 @@
 
 // 内部友元
 [assembly: InternalsVisibleTo("YooAsset.Editor")]
+[assembly: InternalsVisibleTo("YooAsset.Test")]
 [assembly: InternalsVisibleTo("YooAsset.Test.Editor")]
 
 // 外部友元
