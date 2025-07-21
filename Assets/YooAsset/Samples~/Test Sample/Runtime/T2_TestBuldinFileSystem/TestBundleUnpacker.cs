@@ -19,29 +19,31 @@ public class TestBundleUnpacker
         var resourceUnpacker = package.CreateResourceUnpacker("unpack", 10, 1);
         Assert.AreEqual(resourceUnpacker.TotalDownloadCount, 2);
 
+        resourceUnpacker.BeginDownload();
         yield return resourceUnpacker;
         Assert.AreEqual(EOperationStatus.Succeed, resourceUnpacker.Status);
-
-        // 等待一秒
-        yield return new WaitForSeconds(1f);
     }
 }
 
 /* 资源代码流程
- * 内置文件解压（解压器）
+ * 内置文件解压（解压器触发）
 BundleInfo::CreateDownloader()
 {
     return _buildFileSystem.DownloadFileAsync(Bundle, options);	
 }
 BuildinFileSystem::DownloadFileAsync()
 {
-	options.ImportFilePath = xxxxxx;
-	_unpackFileSystem.DownloadFileAsync(bundle, options);
+    options.ImportFilePath = GetBuildinFileLoadPath(bundle);
+	return _unpackFileSystem.DownloadFileAsync(bundle, options);
 }
 UnpackFileSystem::DownloadFileAsync()
 {
-	string mainURL = ConvertToWWWPath(options.ImportFilePath);
- 	options.SetURL(mainURL, mainURL);
- 	return new DownloadPackageBundleOperation(bundle, options);
+    if (string.IsNullOrEmpty(options.ImportFilePath) == false)
+    {
+	    string mainURL = ConvertToWWWPath(options.ImportFilePath);
+ 	    options.SetURL(mainURL, mainURL);
+ 	    var downloader = new DownloadPackageBundleOperation(bundle, options);
+        return downloader;
+    }
 }
 */

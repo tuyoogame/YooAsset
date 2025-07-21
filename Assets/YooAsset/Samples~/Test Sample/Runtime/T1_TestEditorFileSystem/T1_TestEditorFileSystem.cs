@@ -47,7 +47,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     [UnityTest]
     public IEnumerator A_InitializePackage()
     {
-        // 初始化资源包
+        // 初始化资源包 ASSET_BUNDLE
         {
             string packageRoot = string.Empty;
 #if UNITY_EDITOR
@@ -82,7 +82,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
             Assert.AreEqual(EOperationStatus.Succeed, updateManifestOp.Status);
         }
 
-        // 初始化资源包
+        // 初始化资源包 RAW_BUNDLE
         {
             string packageRoot = string.Empty;
 #if UNITY_EDITOR
@@ -119,30 +119,30 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator B1_TestLoadAsyncTask()
+    public IEnumerator B1_TestAsyncTask()
     {
-        var tester = new TestLoadPanel();
+        var tester = new TestAsyncTask();
         yield return tester.RuntimeTester();
     }
 
     [UnityTest]
-    public IEnumerator B2_TestLoadAudio()
+    public IEnumerator B2_TestLoadAsset()
     {
-        var tester = new TestLoadAudio();
+        var tester = new TestLoadAsset();
         yield return tester.RuntimeTester();
     }
 
     [UnityTest]
-    public IEnumerator B3_TestLoadImage()
+    public IEnumerator B3_TestLoadSubAssets()
     {
-        var tester = new TestLoadImage();
+        var tester = new TestLoadSubAssets();
         yield return tester.RuntimeTester();
     }
 
     [UnityTest]
-    public IEnumerator B4_TestLoadPrefab()
+    public IEnumerator B4_TestLoadAllAssets()
     {
-        var tester = new TestLoadPrefab();
+        var tester = new TestLoadAllAssets();
         yield return tester.RuntimeTester();
     }
 
@@ -182,32 +182,9 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator C_DestroyPackage()
+    public IEnumerator D_DestroyPackage()
     {
-        // 销毁旧资源包
-        {
-            var package = YooAssets.GetPackage(TestDefine.AssetBundlePackageName);
-            var destroyOp = package.DestroyAsync();
-            yield return destroyOp;
-            if (destroyOp.Status != EOperationStatus.Succeed)
-                Debug.LogError(destroyOp.Error);
-            Assert.AreEqual(EOperationStatus.Succeed, destroyOp.Status);
-
-            bool result = YooAssets.RemovePackage(TestDefine.AssetBundlePackageName);
-            Assert.IsTrue(result);
-        }
-
-        // 销毁旧资源包
-        {
-            var package = YooAssets.GetPackage(TestDefine.RawBundlePackageName);
-            var destroyOp = package.DestroyAsync();
-            yield return destroyOp;
-            if (destroyOp.Status != EOperationStatus.Succeed)
-                Debug.LogError(destroyOp.Error);
-            Assert.AreEqual(EOperationStatus.Succeed, destroyOp.Status);
-
-            bool result = YooAssets.RemovePackage(TestDefine.RawBundlePackageName);
-            Assert.IsTrue(result);
-        }
+        var tester = new TestDestroyPackage();
+        yield return tester.RuntimeTester(true);
     }
 }

@@ -92,8 +92,6 @@ public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
         }
     }
 
-
-
     [UnityTest]
     public IEnumerator B1_TestBundlePlaying()
     {
@@ -113,6 +111,13 @@ public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
     {
         var tester = new TestBundleDownloader();
         yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D_DestroyPackage()
+    {
+        var tester = new TestDestroyPackage();
+        yield return tester.RuntimeTester(false);
     }
 
     private static void CopyDirectory(string sourceDir, string targetDir)

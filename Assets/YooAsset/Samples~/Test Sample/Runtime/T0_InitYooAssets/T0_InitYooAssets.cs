@@ -89,7 +89,7 @@ public class T0_InitYooAssets : IPrebuildSetup, IPostBuildCleanup
             YooAsset.Editor.AssetBundleCollectorSettingData.CreateCollector(panelGroup, collector1);
         }
 
-        // 预制体（构建到一个AB）
+        // 预制体
         var prefabGroup = YooAsset.Editor.AssetBundleCollectorSettingData.CreateGroup(testPackage, "PrefabGroup");
         {
             var collector1 = new YooAsset.Editor.AssetBundleCollector();
@@ -166,15 +166,16 @@ public class T0_InitYooAssets : IPrebuildSetup, IPostBuildCleanup
         {
             var collector1 = new YooAsset.Editor.AssetBundleCollector();
             collector1.CollectPath = "";
-            collector1.CollectorGUID = "e082d492b9da65e499cee3495be3645d"; //TestRes3/music目录
+            collector1.CollectorGUID = "e082d492b9da65e499cee3495be3645d"; //TestRes3/encrypt目录
             collector1.CollectorType = YooAsset.Editor.ECollectorType.MainAssetCollector;
             collector1.PackRuleName = nameof(YooAsset.Editor.PackSeparately);
             YooAsset.Editor.AssetBundleCollectorSettingData.CreateCollector(encryptGroup, collector1);
 
             var collector2 = new YooAsset.Editor.AssetBundleCollector();
             collector2.CollectPath = "";
-            collector2.CollectorGUID = "8c5a1726d94498e4cbe30f5f510cc796"; //TestRes3/prefab目录
+            collector2.CollectorGUID = "35f454fb80a715047bcf0ce30c7c4f18"; //TestRes3/import目录
             collector2.CollectorType = YooAsset.Editor.ECollectorType.MainAssetCollector;
+            collector2.AssetTags = "import";
             collector2.PackRuleName = nameof(YooAsset.Editor.PackSeparately);
             YooAsset.Editor.AssetBundleCollectorSettingData.CreateCollector(encryptGroup, collector2);
 
@@ -185,14 +186,6 @@ public class T0_InitYooAssets : IPrebuildSetup, IPostBuildCleanup
             collector3.AssetTags = "unpack";
             collector3.PackRuleName = nameof(YooAsset.Editor.PackSeparately);
             YooAsset.Editor.AssetBundleCollectorSettingData.CreateCollector(encryptGroup, collector3);
-
-            var collector4 = new YooAsset.Editor.AssetBundleCollector();
-            collector4.CollectPath = "";
-            collector4.CollectorGUID = "35f454fb80a715047bcf0ce30c7c4f18"; //TestRes3/import目录
-            collector4.CollectorType = YooAsset.Editor.ECollectorType.MainAssetCollector;
-            collector4.AssetTags = "import";
-            collector4.PackRuleName = nameof(YooAsset.Editor.PackSeparately);
-            YooAsset.Editor.AssetBundleCollectorSettingData.CreateCollector(encryptGroup, collector4);
         }
     }
     private static void CreateRawBundlePackageCollector()

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7980853937325680292}
   - component: {fileID: 8207247306684829080}
   m_Layer: 0
-  m_Name: panel_b
+  m_Name: prefab_z
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78,4 +78,4 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: this is panel b !
+  m_Text: this is prefab z !

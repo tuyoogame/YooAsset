@@ -9,7 +9,7 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using YooAsset;
 
-public class TestLoadImage
+public class TestLoadSubAssets
 {
     public IEnumerator RuntimeTester()
     {
@@ -32,7 +32,6 @@ public class TestLoadImage
         // 同步加载子对象
         {
             var subAssetsHandle = package.LoadSubAssetsSync<Sprite>("image_b");
-            yield return subAssetsHandle;
             Assert.AreEqual(EOperationStatus.Succeed, subAssetsHandle.Status);
 
             var subAssetObjects = subAssetsHandle.SubAssetObjects;

@@ -10,16 +10,16 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using YooAsset;
 
-public class TestLoadPanel
+public class TestAsyncTask
 {
     public IEnumerator RuntimeTester()
     {
         ResourcePackage package = YooAssets.GetPackage(TestDefine.AssetBundlePackageName);
         Assert.IsNotNull(package);
 
-        // 异步加载面板
+        // Task异步加载面板
         {
-            var assetsHandle = package.LoadAssetAsync<GameObject>("panel_canvas");
+            var assetsHandle = package.LoadAssetAsync<GameObject>("canvas");
             var handleTask = assetsHandle.Task;
             while (!handleTask.IsCompleted)
                 yield return null;
@@ -28,7 +28,7 @@ public class TestLoadPanel
 
             var instantiateOp = assetsHandle.InstantiateAsync();
             var operationTask = instantiateOp.Task;
-            while (!handleTask.IsCompleted)
+            while (!operationTask.IsCompleted)
                 yield return null;
             yield return null;
             Assert.AreEqual(EOperationStatus.Succeed, instantiateOp.Status);

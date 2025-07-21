@@ -17,31 +17,30 @@ public class TestBundleDownloader
         Assert.IsNotNull(package);
 
         var downloader = package.CreateResourceDownloader(10, 1);
-        if (downloader.TotalDownloadCount == 0)
-        {
-            Assert.Fail($"Test downloader not found any file !");
-        }
+        Assert.AreNotEqual(downloader.TotalDownloadCount, 0);
 
         downloader.BeginDownload();
-        downloader.DownloadFinishCallback = (DownloaderFinishData data) =>
-        {
-            if (data.Succeed == false)
-                Assert.Fail($"Test downloader failed ! {downloader.Error}");
-        };
-
-        // 等待一秒
-        yield return new WaitForSeconds(1f);
+        yield return downloader;
+        Assert.AreEqual(EOperationStatus.Succeed, downloader.Status);
     }
 }
 
 /* 资源代码流程
- * 远端文件下载（下载器）
+ * 远端文件下载（下载器触发）
+BundleInfo::CreateDownloader()
+{
+    return _buildFileSystem.DownloadFileAsync(Bundle, options);	
+}
 CacheFileSystem::DownloadFileAsync()
 {
-	//RemoteServices返回CDN文件路径
-	string mainURL = RemoteServices.GetRemoteMainURL(bundle.FileName);
-    string fallbackURL = RemoteServices.GetRemoteFallbackURL(bundle.FileName);
-    options.SetURL(mainURL, fallbackURL);
-    return new DownloadPackageBundleOperation(bundle, options);
+    if (string.IsNullOrEmpty(options.ImportFilePath))
+    {
+	    //RemoteServices返回CDN文件路径
+	    string mainURL = RemoteServices.GetRemoteMainURL(bundle.FileName);
+        string fallbackURL = RemoteServices.GetRemoteFallbackURL(bundle.FileName);
+        options.SetURL(mainURL, fallbackURL);
+        var downloader = new DownloadPackageBundleOperation(bundle, options);
+        return downloader;
+    }
 }
 */

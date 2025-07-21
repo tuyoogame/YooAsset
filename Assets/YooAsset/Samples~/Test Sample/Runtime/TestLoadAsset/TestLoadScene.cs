@@ -27,11 +27,10 @@ public class TestLoadScene
             Assert.IsNotNull(scene);
         }
 
-        // 异步加载附加场景
-        yield return new WaitForSeconds(1f);
+        // 同步加载附加场景
+        yield return new WaitForSeconds(0.2f);
         {
-            var sceneHandle = package.LoadSceneAsync("scene_b", LoadSceneMode.Additive);
-            yield return sceneHandle;
+            var sceneHandle = package.LoadSceneSync("scene_b", LoadSceneMode.Additive);
             Assert.AreEqual(EOperationStatus.Succeed, sceneHandle.Status);
 
             var scene = sceneHandle.SceneObject;
@@ -39,18 +38,21 @@ public class TestLoadScene
         }
 
         // 异步加载附加场景
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.2f);
+        SceneHandle cachedHandle;
         {
-            var sceneHandle = package.LoadSceneSync("scene_c", LoadSceneMode.Additive);
-            yield return sceneHandle;
-            Assert.AreEqual(EOperationStatus.Succeed, sceneHandle.Status);
+            cachedHandle = package.LoadSceneSync("scene_c", LoadSceneMode.Additive);
+            yield return cachedHandle;
+            Assert.AreEqual(EOperationStatus.Succeed, cachedHandle.Status);
 
-            var scene = sceneHandle.SceneObject;
+            var scene = cachedHandle.SceneObject;
             Assert.IsNotNull(scene);
+        }
 
-            // 异步销毁附加场景
-            yield return new WaitForSeconds(1f);
-            var unloadSceneOp = sceneHandle.UnloadAsync();
+        // 异步销毁附加场景
+        yield return new WaitForSeconds(0.2f);
+        {
+            var unloadSceneOp = cachedHandle.UnloadAsync();
             yield return unloadSceneOp;
             Assert.AreEqual(EOperationStatus.Succeed, unloadSceneOp.Status);
         }
