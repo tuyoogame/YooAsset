@@ -15,7 +15,7 @@ internal class WXFSDownloadFileOperation : FSDownloadFileOperation
 
     private readonly WechatFileSystem _fileSystem;
     private readonly DownloadFileOptions _options;
-    private UnityWebCacheRequestOperation _unityWebCacheRequestOp;
+    private UnityWebCacheRequestOperation _webCacheRequestOp;
     private int _requestCount = 0;
     private float _tryAgainTimer;
     private int _failedTryAgain;
@@ -36,24 +36,24 @@ internal class WXFSDownloadFileOperation : FSDownloadFileOperation
         if (_steps == ESteps.CreateRequest)
         {
             string url = GetRequestURL();
-            _unityWebCacheRequestOp = new UnityWebCacheRequestOperation(url);
-            _unityWebCacheRequestOp.SetRequestHeader("wechatminigame-preload", "1");
-            _unityWebCacheRequestOp.StartOperation();
-            AddChildOperation(_unityWebCacheRequestOp);
+            _webCacheRequestOp = new UnityWebCacheRequestOperation(url);
+            _webCacheRequestOp.SetRequestHeader("wechatminigame-preload", "1");
+            _webCacheRequestOp.StartOperation();
+            AddChildOperation(_webCacheRequestOp);
             _steps = ESteps.CheckRequest;
         }
 
         // 检测下载结果
         if (_steps == ESteps.CheckRequest)
         {
-            _unityWebCacheRequestOp.UpdateOperation();
-            Progress = _unityWebCacheRequestOp.Progress;
-            DownloadProgress = _unityWebCacheRequestOp.DownloadProgress;
-            DownloadedBytes = (long)_unityWebCacheRequestOp.DownloadedBytes;
-            if (_unityWebCacheRequestOp.IsDone == false)
+            _webCacheRequestOp.UpdateOperation();
+            Progress = _webCacheRequestOp.Progress;
+            DownloadProgress = _webCacheRequestOp.DownloadProgress;
+            DownloadedBytes = (long)_webCacheRequestOp.DownloadedBytes;
+            if (_webCacheRequestOp.IsDone == false)
                 return;
 
-            if (_unityWebCacheRequestOp.Status == EOperationStatus.Succeed)
+            if (_webCacheRequestOp.Status == EOperationStatus.Succeed)
             {
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Succeed;
@@ -69,13 +69,13 @@ internal class WXFSDownloadFileOperation : FSDownloadFileOperation
                 if (_failedTryAgain > 0)
                 {
                     _steps = ESteps.TryAgain;
-                    YooLogger.Warning($"Failed download : {_unityWebCacheRequestOp.URL} Try again !");
+                    YooLogger.Warning($"Failed download : {_webCacheRequestOp.URL} Try again !");
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _unityWebCacheRequestOp.Error;
+                    Error = _webCacheRequestOp.Error;
                     YooLogger.Error(Error);
                 }
             }

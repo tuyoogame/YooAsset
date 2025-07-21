@@ -96,12 +96,6 @@ namespace YooAsset
                 }
             }
         }
-        internal override void InternalAbort()
-        {
-            _steps = ESteps.Done;
-            if (_unityWechatAssetBundleRequestOp != null)
-                _unityWechatAssetBundleRequestOp.AbortOperation();
-        }
 
         /// <summary>
         /// 获取网络请求地址

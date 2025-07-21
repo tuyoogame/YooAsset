@@ -53,9 +53,9 @@ internal class WXFSLoadBundleOperation : FSLoadBundleOperation
             }
 
             _loadWebAssetBundleOp.UpdateOperation();
+            Progress = _loadWebAssetBundleOp.Progress;
             DownloadProgress = _loadWebAssetBundleOp.DownloadProgress;
             DownloadedBytes = (long)_loadWebAssetBundleOp.DownloadedBytes;
-            Progress = DownloadProgress;
             if (_loadWebAssetBundleOp.IsDone == false)
                 return;
 
