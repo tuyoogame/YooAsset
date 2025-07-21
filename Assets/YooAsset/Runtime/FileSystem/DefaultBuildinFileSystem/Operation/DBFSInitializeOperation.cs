@@ -17,7 +17,7 @@ namespace YooAsset
         private readonly DefaultBuildinFileSystem _fileSystem;
         private CopyBuildinPackageManifestOperation _copyBuildinPackageManifestOp;
         private FSInitializeFileSystemOperation _initUnpackFIleSystemOp;
-        private LoadBuildinCatalogFileOperation _loadCatalogFileOp;
+        private LoadBuildinCatalogFileOperation _loadBuildinCatalogFileOp;
         private ESteps _steps = ESteps.None;
 
         internal DBFSInitializeOperation(DefaultBuildinFileSystem fileSystem)
@@ -103,34 +103,18 @@ namespace YooAsset
 
             if (_steps == ESteps.LoadCatalogFile)
             {
-                if (_loadCatalogFileOp == null)
+                if (_loadBuildinCatalogFileOp == null)
                 {
-#if UNITY_EDITOR
-                    /*
-                    // 兼容性初始化
-                    // 说明：内置文件系统在编辑器下运行时需要动态生成
-                    string packageRoot = _fileSystem.FileRoot;
-                    bool result = DefaultBuildinFileSystemBuild.CreateBuildinCatalogFile(_fileSystem.ManifestServices, _fileSystem.PackageName, packageRoot);
-                    if (result == false)
-                    {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Failed;
-                        Error = $"Create package catalog file failed ! See the detail error in console !";
-                        return;
-                    }
-                    */
-#endif
-
-                    _loadCatalogFileOp = new LoadBuildinCatalogFileOperation(_fileSystem);
-                    _loadCatalogFileOp.StartOperation();
-                    AddChildOperation(_loadCatalogFileOp);
+                    _loadBuildinCatalogFileOp = new LoadBuildinCatalogFileOperation(_fileSystem);
+                    _loadBuildinCatalogFileOp.StartOperation();
+                    AddChildOperation(_loadBuildinCatalogFileOp);
                 }
 
-                _loadCatalogFileOp.UpdateOperation();
-                if (_loadCatalogFileOp.IsDone == false)
+                _loadBuildinCatalogFileOp.UpdateOperation();
+                if (_loadBuildinCatalogFileOp.IsDone == false)
                     return;
 
-                if (_loadCatalogFileOp.Status == EOperationStatus.Succeed)
+                if (_loadBuildinCatalogFileOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
@@ -139,7 +123,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _loadCatalogFileOp.Error;
+                    Error = _loadBuildinCatalogFileOp.Error;
                 }
             }
         }

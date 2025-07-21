@@ -45,6 +45,7 @@ namespace YooAsset
                 string url = GetRequestURL();
                 _unityAssetBundleRequestOp = new UnityAssetBundleRequestOperation(_bundle, _disableUnityWebCache, url);
                 _unityAssetBundleRequestOp.StartOperation();
+                AddChildOperation(_unityAssetBundleRequestOp);
                 _steps = ESteps.CheckRequest;
             }
 
@@ -95,12 +96,6 @@ namespace YooAsset
                     _steps = ESteps.CreateRequest;
                 }
             }
-        }
-        internal override void InternalAbort()
-        {
-            _steps = ESteps.Done;
-            if (_unityAssetBundleRequestOp != null)
-                _unityAssetBundleRequestOp.AbortOperation();
         }
 
         /// <summary>

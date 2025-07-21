@@ -20,8 +20,8 @@ namespace YooAsset
 
         private readonly DefaultBuildinFileSystem _fileSystem;
         private RequestBuildinPackageVersionOperation _requestBuildinPackageVersionOp;
-        private UnityWebFileRequestOperation _hashFileRequestOp;
-        private UnityWebFileRequestOperation _manifestFileRequestOp;
+        private UnityWebFileRequestOperation _hashWebFileRequestOp;
+        private UnityWebFileRequestOperation _manifestWebFileRequestOp;
         private string _buildinPackageVersion;
         private ESteps _steps = ESteps.None;
 
@@ -78,21 +78,21 @@ namespace YooAsset
 
             if (_steps == ESteps.UnpackHashFile)
             {
-                if (_hashFileRequestOp == null)
+                if (_hashWebFileRequestOp == null)
                 {
                     string sourcePath = _fileSystem.GetBuildinPackageHashFilePath(_buildinPackageVersion);
                     string destPath = GetCopyPackageHashDestPath(_buildinPackageVersion);
                     string url = DownloadSystemHelper.ConvertToWWWPath(sourcePath);
-                    _hashFileRequestOp = new UnityWebFileRequestOperation(url, destPath, 60);
-                    _hashFileRequestOp.StartOperation();
-                    AddChildOperation(_hashFileRequestOp);
+                    _hashWebFileRequestOp = new UnityWebFileRequestOperation(url, destPath, 60);
+                    _hashWebFileRequestOp.StartOperation();
+                    AddChildOperation(_hashWebFileRequestOp);
                 }
 
-                _hashFileRequestOp.UpdateOperation();
-                if (_hashFileRequestOp.IsDone == false)
+                _hashWebFileRequestOp.UpdateOperation();
+                if (_hashWebFileRequestOp.IsDone == false)
                     return;
 
-                if (_hashFileRequestOp.Status == EOperationStatus.Succeed)
+                if (_hashWebFileRequestOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.CheckManifestFile;
                 }
@@ -100,7 +100,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _hashFileRequestOp.Error;
+                    Error = _hashWebFileRequestOp.Error;
                 }
             }
 
@@ -119,21 +119,21 @@ namespace YooAsset
 
             if (_steps == ESteps.UnpackManifestFile)
             {
-                if (_manifestFileRequestOp == null)
+                if (_manifestWebFileRequestOp == null)
                 {
                     string sourcePath = _fileSystem.GetBuildinPackageManifestFilePath(_buildinPackageVersion);
                     string destPath = GetCopyPackageManifestDestPath(_buildinPackageVersion);
                     string url = DownloadSystemHelper.ConvertToWWWPath(sourcePath);
-                    _manifestFileRequestOp = new UnityWebFileRequestOperation(url, destPath, 60);
-                    _manifestFileRequestOp.StartOperation();
-                    AddChildOperation(_manifestFileRequestOp);
+                    _manifestWebFileRequestOp = new UnityWebFileRequestOperation(url, destPath, 60);
+                    _manifestWebFileRequestOp.StartOperation();
+                    AddChildOperation(_manifestWebFileRequestOp);
                 }
 
-                _manifestFileRequestOp.UpdateOperation();
-                if (_manifestFileRequestOp.IsDone == false)
+                _manifestWebFileRequestOp.UpdateOperation();
+                if (_manifestWebFileRequestOp.IsDone == false)
                     return;
 
-                if (_manifestFileRequestOp.Status == EOperationStatus.Succeed)
+                if (_manifestWebFileRequestOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
@@ -142,7 +142,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _manifestFileRequestOp.Error;
+                    Error = _manifestWebFileRequestOp.Error;
                 }
             }
         }

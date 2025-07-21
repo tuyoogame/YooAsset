@@ -104,27 +104,28 @@ namespace YooAsset
                     }
                 }
 
-                if (_assetBundle != null)
+                if (_assetBundle == null)
                 {
-                    _steps = ESteps.Done;
-                    Result = new AssetBundleResult(_fileSystem, _bundle, _assetBundle, _managedStream);
-                    Status = EOperationStatus.Succeed;
-                    return;
-                }
-
-                if (_bundle.Encrypted)
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = $"Failed to load encrypted buildin asset bundle file : {_bundle.BundleName}";
-                    YooLogger.Error(Error);
+                    if (_bundle.Encrypted)
+                    {
+                        _steps = ESteps.Done;
+                        Status = EOperationStatus.Failed;
+                        Error = $"Failed to load encrypted buildin asset bundle file : {_bundle.BundleName}";
+                        YooLogger.Error(Error);
+                    }
+                    else
+                    {
+                        _steps = ESteps.Done;
+                        Status = EOperationStatus.Failed;
+                        Error = $"Failed to load buildin asset bundle file : {_bundle.BundleName}";
+                        YooLogger.Error(Error);
+                    }
                 }
                 else
                 {
                     _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = $"Failed to load buildin asset bundle file : {_bundle.BundleName}";
-                    YooLogger.Error(Error);
+                    Result = new AssetBundleResult(_fileSystem, _bundle, _assetBundle, _managedStream);
+                    Status = EOperationStatus.Succeed;
                 }
             }
         }
@@ -176,13 +177,15 @@ namespace YooAsset
 
             if (_steps == ESteps.LoadBuildinRawBundle)
             {
+                string filePath = _fileSystem.GetBuildinFileLoadPath(_bundle);
+
 #if UNITY_ANDROID
                 //TODO : 安卓平台内置文件属于APK压缩包内的文件。
                 _steps = ESteps.Done;
-                Result = new RawBundleResult(_fileSystem, _bundle);
-                Status = EOperationStatus.Succeed;
+                Status = EOperationStatus.Failed;
+                Error = $"Can not load android buildin raw bundle file : {filePath}";
+                YooLogger.Error(Error);
 #else
-                string filePath = _fileSystem.GetBuildinFileLoadPath(_bundle);
                 if (File.Exists(filePath))
                 {
                     _steps = ESteps.Done;

@@ -67,7 +67,7 @@ namespace YooAsset
                     {
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Failed;
-                        Error = $"{nameof(LoadWebAssetBundleOperation)} loaded asset bundle is null !";
+                        Error = $"{nameof(DWRFSLoadAssetBundleOperation)} loaded asset bundle is null !";
                     }
                     else
                     {

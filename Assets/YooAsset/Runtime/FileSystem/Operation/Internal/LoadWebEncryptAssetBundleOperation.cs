@@ -13,10 +13,10 @@ namespace YooAsset
             Done,
         }
 
-        private UnityWebDataRequestOperation _unityWebDataRequestOp;
         private readonly PackageBundle _bundle;
         private readonly DownloadFileOptions _options;
         private readonly IWebDecryptionServices _decryptionServices;
+        private UnityWebDataRequestOperation _unityWebDataRequestOp;
 
         protected int _requestCount = 0;
         protected float _tryAgainTimer;
@@ -53,6 +53,7 @@ namespace YooAsset
                 string url = GetRequestURL();
                 _unityWebDataRequestOp = new UnityWebDataRequestOperation(url, 0);
                 _unityWebDataRequestOp.StartOperation();
+                AddChildOperation(_unityWebDataRequestOp);
                 _steps = ESteps.CheckRequest;
             }
 
@@ -114,12 +115,6 @@ namespace YooAsset
                     _steps = ESteps.CreateRequest;
                 }
             }
-        }
-        internal override void InternalAbort()
-        {
-            _steps = ESteps.Done;
-            if (_unityWebDataRequestOp != null)
-                _unityWebDataRequestOp.AbortOperation();
         }
 
         /// <summary>
