@@ -42,7 +42,11 @@ namespace YooAsset
             // 移除下载器
             foreach (var key in _removeList)
             {
-                _downloaders.Remove(key);
+                if (_downloaders.TryGetValue(key, out var downloader))
+                {
+                    Childs.Remove(downloader);
+                    _downloaders.Remove(key);
+                }
             }
 
             // 最大并发数检测
