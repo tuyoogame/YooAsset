@@ -76,6 +76,11 @@ namespace YooAsset
         public bool AppendFileExtension { private set; get; } = false;
 
         /// <summary>
+        /// 自定义参数：禁用边玩边下机制
+        /// </summary>
+        public bool DisableOnDemandDownload { private set; get; } = false;
+
+        /// <summary>
         /// 自定义参数：最大并发连接数
         /// </summary>
         public int DownloadMaxConcurrency { private set; get; } = int.MaxValue;
@@ -221,6 +226,10 @@ namespace YooAsset
             else if (name == FileSystemParametersDefine.APPEND_FILE_EXTENSION)
             {
                 AppendFileExtension = Convert.ToBoolean(value);
+            }
+            else if (name == FileSystemParametersDefine.DISABLE_ONDEMAND_DOWNLOAD)
+            {
+                DisableOnDemandDownload = Convert.ToBoolean(value);
             }
             else if (name == FileSystemParametersDefine.DOWNLOAD_MAX_CONCURRENCY)
             {

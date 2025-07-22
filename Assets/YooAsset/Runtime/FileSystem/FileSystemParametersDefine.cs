@@ -11,6 +11,7 @@ namespace YooAsset
         public const string APPEND_FILE_EXTENSION = "APPEND_FILE_EXTENSION";
         public const string DISABLE_CATALOG_FILE = "DISABLE_CATALOG_FILE";
         public const string DISABLE_UNITY_WEB_CACHE = "DISABLE_UNITY_WEB_CACHE";
+        public const string DISABLE_ONDEMAND_DOWNLOAD = "DISABLE_ONDEMAND_DOWNLOAD    ";
         public const string DOWNLOAD_MAX_CONCURRENCY = "DOWNLOAD_MAX_CONCURRENCY";
         public const string DOWNLOAD_MAX_REQUEST_PER_FRAME = "DOWNLOAD_MAX_REQUEST_PER_FRAME";
         public const string RESUME_DOWNLOAD_MINMUM_SIZE = "RESUME_DOWNLOAD_MINMUM_SIZE";

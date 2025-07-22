@@ -49,7 +49,17 @@ namespace YooAsset
                 }
                 else
                 {
-                    _steps = ESteps.DownloadFile;
+                    if (_fileSystem.DisableOnDemandDownload)
+                    {
+                        _steps = ESteps.Done;
+                        Status = EOperationStatus.Failed;
+                        Error = $"The bundle not cached : {_bundle.BundleName}";
+                        YooLogger.Warning(Error);
+                    }
+                    else
+                    {
+                        _steps = ESteps.DownloadFile;
+                    }
                 }
             }
 
