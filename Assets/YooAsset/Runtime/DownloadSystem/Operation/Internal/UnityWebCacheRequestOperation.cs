@@ -1,4 +1,6 @@
-﻿using UnityEngine.Networking;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.Networking;
 using UnityEngine;
 
 namespace YooAsset
@@ -14,6 +16,7 @@ namespace YooAsset
         }
 
         private UnityWebRequestAsyncOperation _requestOperation;
+        private readonly Dictionary<string, string> _headers = new Dictionary<string, string>();
         private ESteps _steps = ESteps.None;
 
 
@@ -64,13 +67,22 @@ namespace YooAsset
         /// </summary>
         public void SetRequestHeader(string name, string value)
         {
-            _webRequest.SetRequestHeader(name, value);
+            _headers.Add(name, value);
         }
 
         private void CreateWebRequest()
         {
             _webRequest = DownloadSystemHelper.NewUnityWebRequestGet(_requestURL);
             _webRequest.disposeDownloadHandlerOnDispose = true;
+
+            // 设置消息头
+            foreach (var keyValuePair in _headers)
+            {
+                string name = keyValuePair.Key;
+                string value = keyValuePair.Value;
+                _webRequest.SetRequestHeader(name, value);
+            }
+
             _requestOperation = _webRequest.SendWebRequest();
         }
     }
