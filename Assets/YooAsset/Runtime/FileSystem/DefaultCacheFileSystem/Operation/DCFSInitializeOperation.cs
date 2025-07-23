@@ -111,7 +111,7 @@ namespace YooAsset
                 if (_verifyCacheFilesOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.CreateDownloadCenter;
-                    YooLogger.Log($"Package '{_fileSystem.PackageName}' cached files count : {_fileSystem.FileCount}");
+                    YooLogger.Log($"Package '{_fileSystem.PackageName}' '{_fileSystem.GetType().Name}' cached files count : {_fileSystem.FileCount}");
                 }
                 else
                 {
