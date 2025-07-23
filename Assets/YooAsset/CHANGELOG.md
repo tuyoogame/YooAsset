@@ -2,6 +2,60 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.3.13] - 2025-07-23
+
+**重要**：**所有下载相关的超时参数（timeout）已更新判定逻辑**
+
+超时不再以‘指定时间内未接收到任何数据’为判定条件，而是以‘指定时间内未完成整个下载任务’为判定条件。
+
+### Improvements
+
+- 重构了核心代码的下载逻辑，解决了同步加载触发的下载任务没有完成的问题。
+- 扩展工程里新增了PreprocessBuildCatalog类，用于处理在构建应用程序前自动生成内置资源目录文件。
+- (#592) 优化了资源清单逻辑里不必要产生的GC逻辑。
+
+### Fixed
+
+- (#590) 修复了TryUnloadUnusedAsset方法，在依赖嵌套层数过深导致没有卸载的问题。
+
+### Added
+
+- 新增了支持Google Play的文件系统扩展示例。
+
+- 新增了支持DefaultCacheFileSystem的单元测试用例。
+
+- 新增了文件系统配置参数：DISABLE_ONDEMAND_DOWNLOAD
+
+  ```csharp
+  public class FileSystemParametersDefine
+  {
+      // 禁用边玩边下机制
+      public const string DISABLE_ONDEMAND_DOWNLOAD = "DISABLE_ONDEMAND_DOWNLO";
+  }
+  ```
+
+### Changed
+
+- IManifestServices接口拆分为了IManifestProcessServices和IManifestRestoreServices
+
+  ```csharp
+  public interface IManifestProcessServices
+  {
+      /// <summary>
+      /// 处理资源清单（压缩或加密）
+      /// </summary>
+      byte[] ProcessManifest(byte[] fileData);
+  }
+  
+  public interface IManifestRestoreServices
+  {
+      /// <summary>
+      /// 还原资源清单（解压或解密）
+      /// </summary>
+      byte[] RestoreManifest(byte[] fileData);
+  }
+  ```
+
 ## [2.3.12] - 2025-07-01
 
 ### Improvements
