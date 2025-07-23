@@ -6,24 +6,31 @@ using UnityEngine;
 using NUnit.Framework;
 using YooAsset;
 
-public class TestProcessManifest : IManifestServices
+public class TestProcessManifest : IManifestProcessServices
 {
-    public byte[] ProcessManifest(byte[] fileData)
+    byte[] IManifestProcessServices.ProcessManifest(byte[] fileData)
     {
-        return XorProcess(fileData, "YOO");
+        return XorCrypto.Crypto(fileData, "YOO");
     }
-    public byte[] RestoreManifest(byte[] fileData)
-    {
-        return XorProcess(fileData, "YOO");
-    }
+}
 
+public class TestRestoreManifest : IManifestRestoreServices
+{
+    byte[] IManifestRestoreServices.RestoreManifest(byte[] fileData)
+    {
+        return XorCrypto.Crypto(fileData, "YOO");
+    }
+}
+
+public class XorCrypto
+{
     /// <summary>
     /// 使用异或加密/解密字节数组
     /// </summary>
     /// <param name="data">输入数据</param>
     /// <param name="key">加密密钥</param>
     /// <returns>处理后的字节数组</returns>
-    public static byte[] XorProcess(byte[] data, byte[] key)
+    public static byte[] Crypto(byte[] data, byte[] key)
     {
         if (data == null)
             throw new ArgumentNullException(nameof(data));
@@ -47,9 +54,9 @@ public class TestProcessManifest : IManifestServices
     /// <param name="data">输入数据</param>
     /// <param name="key">字符串密钥</param>
     /// <returns>处理后的字节数组</returns>
-    public static byte[] XorProcess(byte[] data, string key)
+    public static byte[] Crypto(byte[] data, string key)
     {
         byte[] keyBytes = System.Text.Encoding.UTF8.GetBytes(key);
-        return XorProcess(data, keyBytes);
+        return Crypto(data, keyBytes);
     }
 }
