@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [2.3.13] - 2025-07-23
+## [2.3.14] - 2025-07-23
 
 **重要**：**所有下载相关的超时参数（timeout）已更新判定逻辑**
 
