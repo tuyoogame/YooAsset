@@ -176,10 +176,10 @@ internal class TiktokFileSystem : IFileSystem
             YooLogger.Warning($"Invalid parameter : {name}");
         }
     }
-    public virtual void OnCreate(string packageName, string rootDirectory)
+    public virtual void OnCreate(string packageName, string packageRoot)
     {
         PackageName = packageName;
-        _ttCacheRoot = rootDirectory;
+        _ttCacheRoot = packageRoot;
 
         if (string.IsNullOrEmpty(_ttCacheRoot))
         {
