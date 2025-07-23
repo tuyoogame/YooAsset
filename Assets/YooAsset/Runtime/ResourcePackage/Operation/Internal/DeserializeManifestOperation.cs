@@ -20,7 +20,7 @@ namespace YooAsset
             Done,
         }
 
-        private readonly IManifestServices _services;
+        private readonly IManifestRestoreServices _services;
         private byte[] _sourceData;
         private BufferReader _buffer;
         private int _packageAssetCount;
@@ -33,7 +33,7 @@ namespace YooAsset
         /// </summary>
         public PackageManifest Manifest { private set; get; }
 
-        public DeserializeManifestOperation(IManifestServices services, byte[] binaryData)
+        public DeserializeManifestOperation(IManifestRestoreServices services, byte[] binaryData)
         {
             _services = services;
             _sourceData = binaryData;

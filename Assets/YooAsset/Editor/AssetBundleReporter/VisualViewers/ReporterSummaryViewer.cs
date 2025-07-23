@@ -67,7 +67,8 @@ namespace YooAsset.Editor
             BindListViewItem("Enable Share Pack Rule", $"{buildReport.Summary.EnableSharePackRule}");
             BindListViewItem("Single Referenced Pack Alone", $"{buildReport.Summary.SingleReferencedPackAlone}");
             BindListViewItem("Encryption Services", buildReport.Summary.EncryptionServicesClassName);
-            BindListViewItem("Manifest Services", buildReport.Summary.ManifestServicesClassName);
+            BindListViewItem("Manifest Process Services", buildReport.Summary.ManifestProcessServicesClassName);
+            BindListViewItem("Manifest Restore Services", buildReport.Summary.ManifestRestoreServicesClassName);
             BindListViewItem("FileNameStyle", $"{buildReport.Summary.FileNameStyle}");
             BindListViewItem("CompressOption", $"{buildReport.Summary.CompressOption}");
             BindListViewItem("DisableWriteTypeTree", $"{buildReport.Summary.DisableWriteTypeTree}");

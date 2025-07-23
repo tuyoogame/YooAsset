@@ -56,7 +56,7 @@ namespace YooAsset
         /// <summary>
         /// 自定义参数：资源清单服务类
         /// </summary>
-        public IManifestServices ManifestServices { private set; get; }
+        public IManifestRestoreServices ManifestServices { private set; get; }
         #endregion
 
 
@@ -118,7 +118,7 @@ namespace YooAsset
             }
             else if (name == FileSystemParametersDefine.MANIFEST_SERVICES)
             {
-                ManifestServices = (IManifestServices)value;
+                ManifestServices = (IManifestRestoreServices)value;
             }
             else
             {

@@ -44,7 +44,7 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 创建资源加密服务类实例
+        /// 创建资源包加密服务类实例
         /// </summary>
         protected IEncryptionServices CreateEncryptionServicesInstance()
         {
@@ -58,15 +58,29 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 创建资源清单服务类实例
+        /// 创建资源清单加密服务类实例
         /// </summary>
-        protected IManifestServices CreateManifestServicesInstance()
+        protected IManifestProcessServices CreateManifestProcessServicesInstance()
         {
-            var className = AssetBundleBuilderSetting.GetPackageManifestServicesClassName(PackageName, PipelineName);
-            var classTypes = EditorTools.GetAssignableTypes(typeof(IManifestServices));
+            var className = AssetBundleBuilderSetting.GetPackageManifestProcessServicesClassName(PackageName, PipelineName);
+            var classTypes = EditorTools.GetAssignableTypes(typeof(IManifestProcessServices));
             var classType = classTypes.Find(x => x.FullName.Equals(className));
             if (classType != null)
-                return (IManifestServices)Activator.CreateInstance(classType);
+                return (IManifestProcessServices)Activator.CreateInstance(classType);
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// 创建资源清单解密服务类实例
+        /// </summary>
+        protected IManifestRestoreServices CreateManifestRestoreServicesInstance()
+        {
+            var className = AssetBundleBuilderSetting.GetPackageManifestRestoreServicesClassName(PackageName, PipelineName);
+            var classTypes = EditorTools.GetAssignableTypes(typeof(IManifestRestoreServices));
+            var classType = classTypes.Find(x => x.FullName.Equals(className));
+            if (classType != null)
+                return (IManifestRestoreServices)Activator.CreateInstance(classType);
             else
                 return null;
         }
@@ -169,7 +183,7 @@ namespace YooAsset.Editor
         }
         protected PopupField<Type> CreateEncryptionServicesField(VisualElement container)
         {
-            // 加密服务类
+            // 资源包加密服务类
             var classTypes = EditorTools.GetAssignableTypes(typeof(IEncryptionServices));
             if (classTypes.Count > 0)
             {
@@ -198,22 +212,22 @@ namespace YooAsset.Editor
                 return popupField;
             }
         }
-        protected PopupField<Type> CreateManifestServicesField(VisualElement container)
+        protected PopupField<Type> CreateManifestProcessServicesField(VisualElement container)
         {
-            // 清单服务类
-            var classTypes = EditorTools.GetAssignableTypes(typeof(IManifestServices));
+            // 资源清单加密服务类
+            var classTypes = EditorTools.GetAssignableTypes(typeof(IManifestProcessServices));
             if (classTypes.Count > 0)
             {
-                var className = AssetBundleBuilderSetting.GetPackageManifestServicesClassName(PackageName, PipelineName);
+                var className = AssetBundleBuilderSetting.GetPackageManifestProcessServicesClassName(PackageName, PipelineName);
                 int defaultIndex = classTypes.FindIndex(x => x.FullName.Equals(className));
                 if (defaultIndex < 0)
                     defaultIndex = 0;
                 var popupField = new PopupField<Type>(classTypes, defaultIndex);
-                popupField.label = "Manifest Services";
+                popupField.label = "Manifest Process Services";
                 popupField.style.width = StyleWidth;
                 popupField.RegisterValueChangedCallback(evt =>
                 {
-                    AssetBundleBuilderSetting.SetPackageManifestServicesClassName(PackageName, PipelineName, popupField.value.FullName);
+                    AssetBundleBuilderSetting.SetPackageManifestProcessServicesClassName(PackageName, PipelineName, popupField.value.FullName);
                 });
                 container.Add(popupField);
                 UIElementsTools.SetElementLabelMinWidth(popupField, LabelMinWidth);
@@ -222,7 +236,38 @@ namespace YooAsset.Editor
             else
             {
                 var popupField = new PopupField<Type>();
-                popupField.label = "Manifest Services";
+                popupField.label = "Manifest Process Services";
+                popupField.style.width = StyleWidth;
+                container.Add(popupField);
+                UIElementsTools.SetElementLabelMinWidth(popupField, LabelMinWidth);
+                return popupField;
+            }
+        }
+        protected PopupField<Type> CreateManifestRestoreServicesField(VisualElement container)
+        {
+            // 资源清单加密服务类
+            var classTypes = EditorTools.GetAssignableTypes(typeof(IManifestRestoreServices));
+            if (classTypes.Count > 0)
+            {
+                var className = AssetBundleBuilderSetting.GetPackageManifestRestoreServicesClassName(PackageName, PipelineName);
+                int defaultIndex = classTypes.FindIndex(x => x.FullName.Equals(className));
+                if (defaultIndex < 0)
+                    defaultIndex = 0;
+                var popupField = new PopupField<Type>(classTypes, defaultIndex);
+                popupField.label = "Manifest Restore Services";
+                popupField.style.width = StyleWidth;
+                popupField.RegisterValueChangedCallback(evt =>
+                {
+                    AssetBundleBuilderSetting.SetPackageManifestRestoreServicesClassName(PackageName, PipelineName, popupField.value.FullName);
+                });
+                container.Add(popupField);
+                UIElementsTools.SetElementLabelMinWidth(popupField, LabelMinWidth);
+                return popupField;
+            }
+            else
+            {
+                var popupField = new PopupField<Type>();
+                popupField.label = "Manifest Restore Services";
                 popupField.style.width = StyleWidth;
                 container.Add(popupField);
                 UIElementsTools.SetElementLabelMinWidth(popupField, LabelMinWidth);

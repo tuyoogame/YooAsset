@@ -79,15 +79,27 @@ namespace YooAsset.Editor
             EditorPrefs.SetString(key, encyptionClassName);
         }
 
-        // ManifestServicesClassName
-        public static string GetPackageManifestServicesClassName(string packageName, string buildPipeline)
+        // ManifestProcessServicesClassName
+        public static string GetPackageManifestProcessServicesClassName(string packageName, string buildPipeline)
         {
-            string key = $"{Application.productName}_{packageName}_{buildPipeline}_ManifestServicesClassName";
-            return EditorPrefs.GetString(key, $"{typeof(ManifestNone).FullName}");
+            string key = $"{Application.productName}_{packageName}_{buildPipeline}_ManifestProcessServicesClassName";
+            return EditorPrefs.GetString(key, $"{typeof(ManifestProcessNone).FullName}");
         }
-        public static void SetPackageManifestServicesClassName(string packageName, string buildPipeline, string encyptionClassName)
+        public static void SetPackageManifestProcessServicesClassName(string packageName, string buildPipeline, string encyptionClassName)
         {
-            string key = $"{Application.productName}_{packageName}_{buildPipeline}_ManifestServicesClassName";
+            string key = $"{Application.productName}_{packageName}_{buildPipeline}_ManifestProcessServicesClassName";
+            EditorPrefs.SetString(key, encyptionClassName);
+        }
+
+        // ManifestRestoreServicesClassName
+        public static string GetPackageManifestRestoreServicesClassName(string packageName, string buildPipeline)
+        {
+            string key = $"{Application.productName}_{packageName}_{buildPipeline}_ManifestRestoreServicesClassName";
+            return EditorPrefs.GetString(key, $"{typeof(ManifestRestoreNone).FullName}");
+        }
+        public static void SetPackageManifestRestoreServicesClassName(string packageName, string buildPipeline, string encyptionClassName)
+        {
+            string key = $"{Application.productName}_{packageName}_{buildPipeline}_ManifestRestoreServicesClassName";
             EditorPrefs.SetString(key, encyptionClassName);
         }
 

@@ -17,7 +17,8 @@ namespace YooAsset.Editor
         protected TextField _buildOutputField;
         protected TextField _buildVersionField;
         protected PopupField<Type> _encryptionServicesField;
-        protected PopupField<Type> _manifestServicesField;
+        protected PopupField<Type> _manifestProcessServicesField;
+        protected PopupField<Type> _manifestRestoreServicesField;
         protected EnumField _outputNameStyleField;
         protected EnumField _copyBuildinFileOptionField;
         protected TextField _copyBuildinFileTagsField;
@@ -46,7 +47,8 @@ namespace YooAsset.Editor
             // 加密方法
             var popupContainer = Root.Q("PopupContainer");
             _encryptionServicesField = CreateEncryptionServicesField(popupContainer);
-            _manifestServicesField = CreateManifestServicesField(popupContainer);
+            _manifestProcessServicesField = CreateManifestProcessServicesField(popupContainer);
+            _manifestRestoreServicesField = CreateManifestRestoreServicesField(popupContainer);
 
             // 输出文件名称样式
             _outputNameStyleField = Root.Q<EnumField>("FileNameStyle");
@@ -112,7 +114,8 @@ namespace YooAsset.Editor
             buildParameters.ClearBuildCacheFiles = clearBuildCache;
             buildParameters.UseAssetDependencyDB = useAssetDependencyDB;
             buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
-            buildParameters.ManifestServices = CreateManifestServicesInstance();
+            buildParameters.ManifestProcessServices = CreateManifestProcessServicesInstance();
+            buildParameters.ManifestRestoreServices = CreateManifestRestoreServicesInstance();
 
             RawFileBuildPipeline pipeline = new RawFileBuildPipeline();
             var buildResult = pipeline.Run(buildParameters, true);

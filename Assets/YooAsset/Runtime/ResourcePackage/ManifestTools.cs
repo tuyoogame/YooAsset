@@ -44,7 +44,7 @@ namespace YooAsset
         /// <summary>
         /// 序列化（二进制文件）
         /// </summary>
-        public static void SerializeToBinary(string savePath, PackageManifest manifest, IManifestServices services)
+        public static void SerializeToBinary(string savePath, PackageManifest manifest, IManifestProcessServices services)
         {
             using (FileStream fs = new FileStream(savePath, FileMode.Create))
             {
@@ -124,7 +124,7 @@ namespace YooAsset
         /// <summary>
         /// 反序列化（二进制文件）
         /// </summary>
-        public static PackageManifest DeserializeFromBinary(byte[] binaryData, IManifestServices services)
+        public static PackageManifest DeserializeFromBinary(byte[] binaryData, IManifestRestoreServices services)
         {
             // 创建缓存器
             BufferReader buffer;

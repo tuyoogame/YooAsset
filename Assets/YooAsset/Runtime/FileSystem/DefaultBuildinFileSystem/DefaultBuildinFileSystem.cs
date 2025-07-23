@@ -92,7 +92,7 @@ namespace YooAsset
         /// <summary>
         /// 自定义参数：资源清单服务类
         /// </summary>
-        public IManifestServices ManifestServices { private set; get; }
+        public IManifestRestoreServices ManifestServices { private set; get; }
 
         /// <summary>
         /// 自定义参数：拷贝内置文件服务类
@@ -186,7 +186,7 @@ namespace YooAsset
             }
             else if (name == FileSystemParametersDefine.MANIFEST_SERVICES)
             {
-                ManifestServices = (IManifestServices)value;
+                ManifestServices = (IManifestRestoreServices)value;
             }
             else if (name == FileSystemParametersDefine.COPY_LOCAL_FILE_SERVICES)
             {
