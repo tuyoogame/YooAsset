@@ -496,7 +496,7 @@ namespace YooAsset
             if (bundleInfo.IsNeedDownloadFromRemote())
                 return true;
 
-            BundleInfo[] depends = _bundleQuery.GetDependBundleInfos(assetInfo);
+            List<BundleInfo> depends = _bundleQuery.GetDependBundleInfos(assetInfo);
             foreach (var depend in depends)
             {
                 if (depend.IsNeedDownloadFromRemote())
@@ -555,6 +555,7 @@ namespace YooAsset
 
         private RawFileHandle LoadRawFileInternal(AssetInfo assetInfo, bool waitForAsyncComplete, uint priority)
         {
+            assetInfo.LoadMethod = AssetInfo.ELoadMethod.LoadRawFile;
             var handle = _resourceManager.LoadRawFileAsync(assetInfo, priority);
             if (waitForAsyncComplete)
                 handle.WaitForAsyncComplete();

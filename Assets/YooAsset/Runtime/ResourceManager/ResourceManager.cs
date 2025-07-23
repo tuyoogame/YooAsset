@@ -62,6 +62,11 @@ namespace YooAsset
         /// </summary>
         public void TryUnloadUnusedAsset(AssetInfo assetInfo, int loopCount)
         {
+            if (assetInfo == null)
+            {
+                YooLogger.Error($"{nameof(AssetInfo)} is null !");
+                return;
+            }
             if (assetInfo.IsInvalid)
             {
                 YooLogger.Error($"Failed to unload asset ! {assetInfo.Error}");
@@ -73,31 +78,29 @@ namespace YooAsset
                 loopCount--;
 
                 // 卸载主资源包加载器
-                string mainBundleName = _bundleQuery.GetMainBundleName(assetInfo);
+                string mainBundleName = _bundleQuery.GetMainBundleName(assetInfo.Asset.BundleID);
                 var mainLoader = TryGetBundleFileLoader(mainBundleName);
                 if (mainLoader != null)
                 {
                     mainLoader.TryDestroyProviders();
                     if (mainLoader.CanDestroyLoader())
                     {
-                        string bundleName = mainLoader.LoadBundleInfo.Bundle.BundleName;
                         mainLoader.DestroyLoader();
-                        LoaderDic.Remove(bundleName);
+                        LoaderDic.Remove(mainBundleName);
                     }
                 }
 
                 // 卸载依赖资源包加载器
-                string[] dependBundleNames = _bundleQuery.GetDependBundleNames(assetInfo);
-                foreach (var dependBundleName in dependBundleNames)
+                foreach (var dependID in assetInfo.Asset.DependBundleIDs)
                 {
+                    string dependBundleName = _bundleQuery.GetMainBundleName(dependID);
                     var dependLoader = TryGetBundleFileLoader(dependBundleName);
                     if (dependLoader != null)
                     {
                         if (dependLoader.CanDestroyLoader())
                         {
-                            string bundleName = dependLoader.LoadBundleInfo.Bundle.BundleName;
                             dependLoader.DestroyLoader();
-                            LoaderDic.Remove(bundleName);
+                            LoaderDic.Remove(dependBundleName);
                         }
                     }
                 }
@@ -296,8 +299,8 @@ namespace YooAsset
         }
         internal List<LoadBundleFileOperation> CreateDependBundleFileLoaders(AssetInfo assetInfo)
         {
-            BundleInfo[] bundleInfos = _bundleQuery.GetDependBundleInfos(assetInfo);
-            List<LoadBundleFileOperation> result = new List<LoadBundleFileOperation>(bundleInfos.Length);
+            List<BundleInfo> bundleInfos = _bundleQuery.GetDependBundleInfos(assetInfo);
+            List<LoadBundleFileOperation> result = new List<LoadBundleFileOperation>(bundleInfos.Count);
             foreach (var bundleInfo in bundleInfos)
             {
                 var bundleLoader = CreateBundleFileLoaderInternal(bundleInfo);
