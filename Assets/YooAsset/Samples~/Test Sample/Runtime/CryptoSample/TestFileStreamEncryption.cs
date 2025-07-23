@@ -67,7 +67,6 @@ public class TestFileStreamDecryption : IDecryptionServices
 {
     /// <summary>
     /// 同步方式获取解密的资源包对象
-    /// 注意：加载流对象在资源包对象释放的时候会自动释放
     /// </summary>
     DecryptResult IDecryptionServices.LoadAssetBundle(DecryptFileInfo fileInfo)
     {
@@ -80,7 +79,6 @@ public class TestFileStreamDecryption : IDecryptionServices
 
     /// <summary>
     /// 异步方式获取解密的资源包对象
-    /// 注意：加载流对象在资源包对象释放的时候会自动释放
     /// </summary>
     DecryptResult IDecryptionServices.LoadAssetBundleAsync(DecryptFileInfo fileInfo)
     {
@@ -92,11 +90,17 @@ public class TestFileStreamDecryption : IDecryptionServices
     }
 
     /// <summary>
-    /// 后备方式获取解密的资源包对象
+    /// 后备方式获取解密的资源包
+    /// 注意：当正常解密方法失败后，会触发后备加载！
+    /// 说明：建议通过LoadFromMemory()方法加载资源包作为保底机制。
     /// </summary>
     DecryptResult IDecryptionServices.LoadAssetBundleFallback(DecryptFileInfo fileInfo)
     {
-        return new DecryptResult();
+        byte[] fileData = File.ReadAllBytes(fileInfo.FileLoadPath);
+        var assetBundle = AssetBundle.LoadFromMemory(fileData);
+        DecryptResult decryptResult = new DecryptResult();
+        decryptResult.Result = assetBundle;
+        return decryptResult;
     }
 
     /// <summary>
