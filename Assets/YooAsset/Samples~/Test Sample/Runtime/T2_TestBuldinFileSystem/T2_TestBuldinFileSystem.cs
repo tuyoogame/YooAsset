@@ -188,9 +188,9 @@ public class T2_TestBuldinFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator C1_TestBundleReference()
+    public IEnumerator C1_TestGetAssetInfos()
     {
-        var tester = new TestBundleReference();
+        var tester = new TestGetAssetInfos();
         yield return tester.RuntimeTester();
     }
 
@@ -205,6 +205,20 @@ public class T2_TestBuldinFileSystem : IPrebuildSetup, IPostBuildCleanup
     public IEnumerator C3_TestBundleUnpacker()
     {
         var tester = new TestBundleUnpacker();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator C4_TestBundleReference()
+    {
+        var tester = new TestBundleReference();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator C4_TestBundleUnload()
+    {
+        var tester = new TestBundleUnload();
         yield return tester.RuntimeTester();
     }
 

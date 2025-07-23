@@ -187,6 +187,31 @@ public class T0_InitYooAssets : IPrebuildSetup, IPostBuildCleanup
             collector3.PackRuleName = nameof(YooAsset.Editor.PackSeparately);
             YooAsset.Editor.AssetBundleCollectorSettingData.CreateCollector(encryptGroup, collector3);
         }
+
+        // 卸载测试文件
+        var unloadGroup = YooAsset.Editor.AssetBundleCollectorSettingData.CreateGroup(testPackage, "UnloadGroup");
+        {
+            var collector1 = new YooAsset.Editor.AssetBundleCollector();
+            collector1.CollectPath = "";
+            collector1.CollectorGUID = "c8cebdb7cd80a4044b15a1522363bb86"; //TestRes4/Enemy目录
+            collector1.CollectorType = YooAsset.Editor.ECollectorType.MainAssetCollector;
+            collector1.PackRuleName = nameof(YooAsset.Editor.PackDirectory);
+            YooAsset.Editor.AssetBundleCollectorSettingData.CreateCollector(unloadGroup, collector1);
+
+            var collector2 = new YooAsset.Editor.AssetBundleCollector();
+            collector2.CollectPath = "";
+            collector2.CollectorGUID = "3ba9252bc0a278145a7bde0cf876cbcb"; //TestRes4/EnemyImage目录
+            collector2.CollectorType = YooAsset.Editor.ECollectorType.DependAssetCollector;
+            collector2.PackRuleName = nameof(YooAsset.Editor.PackDirectory);
+            YooAsset.Editor.AssetBundleCollectorSettingData.CreateCollector(unloadGroup, collector2);
+
+            var collector3 = new YooAsset.Editor.AssetBundleCollector();
+            collector3.CollectPath = "";
+            collector3.CollectorGUID = "65cc88e038c61ec488be24b82c4e2937"; //TestRes4/EnemyMat目录
+            collector3.CollectorType = YooAsset.Editor.ECollectorType.DependAssetCollector;
+            collector3.PackRuleName = nameof(YooAsset.Editor.PackDirectory);
+            YooAsset.Editor.AssetBundleCollectorSettingData.CreateCollector(unloadGroup, collector3);
+        }
     }
     private static void CreateRawBundlePackageCollector()
     {

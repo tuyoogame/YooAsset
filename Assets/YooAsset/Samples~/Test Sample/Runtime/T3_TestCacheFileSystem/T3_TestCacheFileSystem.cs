@@ -93,21 +93,21 @@ public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator B1_TestBundlePlaying()
+    public IEnumerator C1_TestBundlePlaying()
     {
         var tester = new TestBundlePlaying();
         yield return tester.RuntimeTester();
     }
 
     [UnityTest]
-    public IEnumerator B2_TestBundleImporter()
+    public IEnumerator C2_TestBundleImporter()
     {
         var tester = new TestBundleImporter();
         yield return tester.RuntimeTester();
     }
 
     [UnityTest]
-    public IEnumerator B3_TestBundleDownloader()
+    public IEnumerator C3_TestBundleDownloader()
     {
         var tester = new TestBundleDownloader();
         yield return tester.RuntimeTester();
