@@ -1,3 +1,4 @@
+#if UNITASK_YOOASSET_SUPPORT
 using System;
 using YooAsset;
 using static Cysharp.Threading.Tasks.Internal.Error;
@@ -143,3 +144,4 @@ namespace Cysharp.Threading.Tasks
         }
     }
 }
+#endif
