@@ -8,77 +8,61 @@ using System.Runtime.CompilerServices;
 using YooAsset;
 using static Cysharp.Threading.Tasks.Internal.Error;
 
-
 namespace Cysharp.Threading.Tasks
 {
-    public static class OperationHandleBaseExtensions
+    public static class HandleBaseExtensions
     {
         public static UniTask.Awaiter GetAwaiter(this HandleBase handle)
         {
             return ToUniTask(handle).GetAwaiter();
         }
-
-        public static UniTask ToUniTask(this HandleBase handle,
-                                        IProgress<float>         progress = null,
-                                        PlayerLoopTiming         timing   = PlayerLoopTiming.Update)
+        public static UniTask ToUniTask(this HandleBase handle, IProgress<float> progress = null, PlayerLoopTiming timing = PlayerLoopTiming.Update)
         {
             ThrowArgumentNullException(handle, nameof(handle));
 
-            if(!handle.IsValid)
+            if (!handle.IsValid)
             {
                 return UniTask.CompletedTask;
             }
 
             return new UniTask(
-                OperationHandleBaserConfiguredSource.Create(
-                    handle,
-                    timing,
-                    progress,
-                    out var token
-                ),
+                HandleBaserConfiguredSource.Create(handle, timing, progress, out var token),
                 token
             );
         }
 
-        sealed class OperationHandleBaserConfiguredSource : IUniTaskSource,
-                                                            IPlayerLoopItem,
-                                                            ITaskPoolNode<OperationHandleBaserConfiguredSource>
+        sealed class HandleBaserConfiguredSource : IUniTaskSource, IPlayerLoopItem, ITaskPoolNode<HandleBaserConfiguredSource>
         {
-            private static TaskPool<OperationHandleBaserConfiguredSource> pool;
+            private static TaskPool<HandleBaserConfiguredSource> _pool;
+            private HandleBaserConfiguredSource _nextNode;
+            private readonly Action<HandleBase> _continuationAction;
+            private HandleBase _handle;
+            private IProgress<float> _progress;
+            private bool _completed;
+            private UniTaskCompletionSourceCore<AsyncUnit> _core;
 
-            private OperationHandleBaserConfiguredSource nextNode;
+            public ref HandleBaserConfiguredSource NextNode => ref _nextNode;
 
-            public ref OperationHandleBaserConfiguredSource NextNode => ref nextNode;
-
-            static OperationHandleBaserConfiguredSource()
+            static HandleBaserConfiguredSource()
             {
-                TaskPool.RegisterSizeGetter(typeof(OperationHandleBaserConfiguredSource), () => pool.Size);
+                TaskPool.RegisterSizeGetter(typeof(HandleBaserConfiguredSource), () => _pool.Size);
             }
 
-            private readonly Action<HandleBase>            continuationAction;
-            private          HandleBase                    handle;
-            private          IProgress<float>                       progress;
-            private          bool                                   completed;
-            private          UniTaskCompletionSourceCore<AsyncUnit> core;
+            HandleBaserConfiguredSource() { _continuationAction = Continuation; }
 
-            OperationHandleBaserConfiguredSource() { continuationAction = Continuation; }
-
-            public static IUniTaskSource Create(HandleBase handle,
-                                                PlayerLoopTiming    timing,
-                                                IProgress<float>    progress,
-                                                out short           token)
+            public static IUniTaskSource Create(HandleBase handle, PlayerLoopTiming timing, IProgress<float> progress, out short token)
             {
-                if(!pool.TryPop(out var result))
+                if (!_pool.TryPop(out var result))
                 {
-                    result = new OperationHandleBaserConfiguredSource();
+                    result = new HandleBaserConfiguredSource();
                 }
 
-                result.handle    = handle;
-                result.progress  = progress;
-                result.completed = false;
+                result._handle = handle;
+                result._progress = progress;
+                result._completed = false;
                 TaskTracker.TrackActiveTask(result, 3);
 
-                if(progress != null)
+                if (progress != null)
                 {
                     PlayerLoopHelper.AddAction(timing, result);
                 }
@@ -88,7 +72,7 @@ namespace Cysharp.Threading.Tasks
                 // BUG 也可能报的是 Action '1' Action '1' 的 InvalidCastException
                 // BUG 此处不得不这么修改, 如果后续 Unity 修复了这个问题, 可以恢复之前的写法 
 #if UNITY_2020_BUG
-                switch(handle)
+                switch (handle)
                 {
                     case AssetHandle asset_handle:
                         asset_handle.Completed += result.AssetContinuation;
@@ -126,37 +110,33 @@ namespace Cysharp.Threading.Tasks
                         break;
                 }
 #endif
-                token = result.core.Version;
-
+                token = result._core.Version;
                 return result;
             }
+
 #if UNITY_2020_BUG
             private void AssetContinuation(AssetHandle handle)
             {
                 handle.Completed -= AssetContinuation;
                 BaseContinuation();
             }
-
             private void SceneContinuation(SceneHandle handle)
             {
                 handle.Completed -= SceneContinuation;
                 BaseContinuation();
             }
-
             private void SubContinuation(SubAssetsHandle handle)
             {
                 handle.Completed -= SubContinuation;
                 BaseContinuation();
             }
-
             private void RawFileContinuation(RawFileHandle handle)
             {
                 handle.Completed -= RawFileContinuation;
                 BaseContinuation();
             }
-
             private void AllAssetsContinuation(AllAssetsHandle handle)
-			{
+            {
                 handle.Completed -= AllAssetsContinuation;
                 BaseContinuation();
             }
@@ -164,79 +144,73 @@ namespace Cysharp.Threading.Tasks
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private void BaseContinuation()
             {
-                if(completed)
+                if (_completed)
                 {
                     TryReturn();
                 }
                 else
                 {
-                    completed = true;
-                    if(handle.Status == EOperationStatus.Failed)
+                    _completed = true;
+                    if (_handle.Status == EOperationStatus.Failed)
                     {
-                        core.TrySetException(new Exception(handle.LastError));
+                        _core.TrySetException(new Exception(_handle.LastError));
                     }
                     else
                     {
-                        core.TrySetResult(AsyncUnit.Default);
+                        _core.TrySetResult(AsyncUnit.Default);
                     }
                 }
             }
-
             private void Continuation(HandleBase _)
             {
-                switch(handle)
+                switch (_handle)
                 {
                     case AssetHandle asset_handle:
-                        asset_handle.Completed -= continuationAction;
+                        asset_handle.Completed -= _continuationAction;
                         break;
                     case SceneHandle scene_handle:
-                        scene_handle.Completed -= continuationAction;
+                        scene_handle.Completed -= _continuationAction;
                         break;
                     case SubAssetsHandle sub_asset_handle:
-                        sub_asset_handle.Completed -= continuationAction;
+                        sub_asset_handle.Completed -= _continuationAction;
                         break;
                     case RawFileHandle raw_file_handle:
-                        raw_file_handle.Completed -= continuationAction;
+                        raw_file_handle.Completed -= _continuationAction;
                         break;
                     case AllAssetsHandle all_assets_handle:
-                        all_assets_handle.Completed -= continuationAction;
+                        all_assets_handle.Completed -= _continuationAction;
                         break;
                 }
 
                 BaseContinuation();
             }
-
-            bool TryReturn()
+            private bool TryReturn()
             {
                 TaskTracker.RemoveTracking(this);
-                core.Reset();
-                handle   = default;
-                progress = default;
-                return pool.TryPush(this);
+                _core.Reset();
+                _handle = default;
+                _progress = default;
+                return _pool.TryPush(this);
             }
 
-            public UniTaskStatus GetStatus(short token) => core.GetStatus(token);
-
+            public UniTaskStatus GetStatus(short token) => _core.GetStatus(token);
             public void OnCompleted(Action<object> continuation, object state, short token)
             {
-                core.OnCompleted(continuation, state, token);
+                _core.OnCompleted(continuation, state, token);
             }
-
-            public void GetResult(short token) { core.GetResult(token); }
-
-            public UniTaskStatus UnsafeGetStatus() => core.UnsafeGetStatus();
-
+            public void GetResult(short token) { _core.GetResult(token); }
+            public UniTaskStatus UnsafeGetStatus() => _core.UnsafeGetStatus();
             public bool MoveNext()
             {
-                if(completed)
+                if (_completed)
                 {
                     TryReturn();
                     return false;
                 }
 
-                if(handle.IsValid)
+                if (_handle.IsValid)
                 {
-                    progress?.Report(handle.Progress);
+                    _progress?.Report(_handle.Progress);
                 }
 
                 return true;

@@ -11,132 +11,110 @@ namespace Cysharp.Threading.Tasks
         {
             return ToUniTask(handle).GetAwaiter();
         }
-
-        public static UniTask ToUniTask(this AsyncOperationBase handle,
-                                        IProgress<float>        progress = null,
-                                        PlayerLoopTiming        timing   = PlayerLoopTiming.Update)
+        public static UniTask ToUniTask(this AsyncOperationBase handle, IProgress<float> progress = null, PlayerLoopTiming timing = PlayerLoopTiming.Update)
         {
             ThrowArgumentNullException(handle, nameof(handle));
 
-            if(handle.IsDone)
+            if (handle.IsDone)
             {
                 return UniTask.CompletedTask;
             }
 
             return new UniTask(
-                AsyncOperationBaserConfiguredSource.Create(
-                    handle,
-                    timing,
-                    progress,
-                    out var token
-                ),
+                AsyncOperationBaserConfiguredSource.Create(handle, timing, progress, out var token),
                 token
             );
         }
 
-        sealed class AsyncOperationBaserConfiguredSource : IUniTaskSource,
-                                                           IPlayerLoopItem,
-                                                           ITaskPoolNode<AsyncOperationBaserConfiguredSource>
+        sealed class AsyncOperationBaserConfiguredSource : IUniTaskSource, IPlayerLoopItem, ITaskPoolNode<AsyncOperationBaserConfiguredSource>
         {
-            private static TaskPool<AsyncOperationBaserConfiguredSource> pool;
+            private static TaskPool<AsyncOperationBaserConfiguredSource> _pool;
+            private AsyncOperationBaserConfiguredSource _nextNode;
+            private readonly Action<AsyncOperationBase> _continuationAction;
+            private AsyncOperationBase _handle;
+            private IProgress<float> _progress;
+            private bool _completed;
+            private UniTaskCompletionSourceCore<AsyncUnit> _core;
 
-            private AsyncOperationBaserConfiguredSource nextNode;
-
-            public ref AsyncOperationBaserConfiguredSource NextNode => ref nextNode;
+            public ref AsyncOperationBaserConfiguredSource NextNode => ref _nextNode;
 
             static AsyncOperationBaserConfiguredSource()
             {
-                TaskPool.RegisterSizeGetter(typeof(AsyncOperationBaserConfiguredSource), () => pool.Size);
+                TaskPool.RegisterSizeGetter(typeof(AsyncOperationBaserConfiguredSource), () => _pool.Size);
             }
 
-            private readonly Action<AsyncOperationBase>             continuationAction;
-            private          AsyncOperationBase                     handle;
-            private          IProgress<float>                       progress;
-            private          bool                                   completed;
-            private          UniTaskCompletionSourceCore<AsyncUnit> core;
+            AsyncOperationBaserConfiguredSource() { _continuationAction = Continuation; }
 
-            AsyncOperationBaserConfiguredSource() { continuationAction = Continuation; }
-
-            public static IUniTaskSource Create(AsyncOperationBase handle,
-                                                PlayerLoopTiming   timing,
-                                                IProgress<float>   progress,
-                                                out short          token)
+            public static IUniTaskSource Create(AsyncOperationBase handle, PlayerLoopTiming timing, IProgress<float> progress, out short token)
             {
-                if(!pool.TryPop(out var result))
+                if (!_pool.TryPop(out var result))
                 {
                     result = new AsyncOperationBaserConfiguredSource();
                 }
 
-                result.handle    = handle;
-                result.progress  = progress;
-                result.completed = false;
+                result._handle = handle;
+                result._progress = progress;
+                result._completed = false;
                 TaskTracker.TrackActiveTask(result, 3);
 
-                if(progress != null)
+                if (progress != null)
                 {
                     PlayerLoopHelper.AddAction(timing, result);
                 }
 
-                handle.Completed += result.continuationAction;
-
-                token = result.core.Version;
-
+                handle.Completed += result._continuationAction;
+                token = result._core.Version;
                 return result;
             }
-
+            
             private void Continuation(AsyncOperationBase _)
             {
-                handle.Completed -= continuationAction;
+                _handle.Completed -= _continuationAction;
 
-                if(completed)
+                if (_completed)
                 {
                     TryReturn();
                 }
                 else
                 {
-                    completed = true;
-                    if(handle.Status == EOperationStatus.Failed)
+                    _completed = true;
+                    if (_handle.Status == EOperationStatus.Failed)
                     {
-                        core.TrySetException(new Exception(handle.Error));
+                        _core.TrySetException(new Exception(_handle.Error));
                     }
                     else
                     {
-                        core.TrySetResult(AsyncUnit.Default);
+                        _core.TrySetResult(AsyncUnit.Default);
                     }
                 }
             }
-
-            bool TryReturn()
+            private bool TryReturn()
             {
                 TaskTracker.RemoveTracking(this);
-                core.Reset();
-                handle   = default;
-                progress = default;
-                return pool.TryPush(this);
+                _core.Reset();
+                _handle = default;
+                _progress = default;
+                return _pool.TryPush(this);
             }
 
-            public UniTaskStatus GetStatus(short token) => core.GetStatus(token);
-
+            public UniTaskStatus GetStatus(short token) => _core.GetStatus(token);
             public void OnCompleted(Action<object> continuation, object state, short token)
             {
-                core.OnCompleted(continuation, state, token);
+                _core.OnCompleted(continuation, state, token);
             }
-
-            public void GetResult(short token) { core.GetResult(token); }
-
-            public UniTaskStatus UnsafeGetStatus() => core.UnsafeGetStatus();
-
+            public void GetResult(short token) { _core.GetResult(token); }
+            public UniTaskStatus UnsafeGetStatus() => _core.UnsafeGetStatus();
             public bool MoveNext()
             {
-                if(completed)
+                if (_completed)
                 {
                     TryReturn();
                     return false;
                 }
 
-                if(!handle.IsDone)
+                if (!_handle.IsDone)
                 {
-                    progress?.Report(handle.Progress);
+                    _progress?.Report(_handle.Progress);
                 }
 
                 return true;
