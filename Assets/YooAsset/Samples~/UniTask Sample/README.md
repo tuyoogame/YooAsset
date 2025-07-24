@@ -41,7 +41,15 @@ public class TestTask : MonoBehaviour
 
    YooAssets/Samples/UniTask Sample/UniTask/Runtime/External/YooAsset目录
 
-4. 重启Unity引擎
+4. 添加引擎里的宏定义
+
+   Project Settings --> Player --> Scripting Define Symbols
+
+   ```
+   UNITASK_YOOASSET_SUPPORT
+   ```
+
+5. 重启Unity引擎
 
    重新打开工程后用上面的代码示例验证，看下是否有编译错误！
 
