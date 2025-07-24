@@ -1,3 +1,4 @@
+#if UNITASK_YOOASSET_SUPPORT
 #if UNITY_2020_1_OR_NEWER && ! UNITY_2021
 #define UNITY_2020_BUG
 #endif
@@ -243,3 +244,4 @@ namespace Cysharp.Threading.Tasks
         }
     }
 }
+#endif
