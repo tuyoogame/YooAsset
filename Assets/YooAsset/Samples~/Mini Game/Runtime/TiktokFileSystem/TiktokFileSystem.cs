@@ -1,10 +1,9 @@
 ﻿#if UNITY_WEBGL && DOUYINMINIGAME
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
 using TTSDK;
-using System.Linq;
-using System;
 
 public static class TiktokFileSystemCreater
 {

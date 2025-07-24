@@ -49,7 +49,7 @@ internal class WXFSDownloadFileOperation : FSDownloadFileOperation
             _webCacheRequestOp.UpdateOperation();
             Progress = _webCacheRequestOp.Progress;
             DownloadProgress = _webCacheRequestOp.DownloadProgress;
-            DownloadedBytes = (long)_webCacheRequestOp.DownloadedBytes;
+            DownloadedBytes = _webCacheRequestOp.DownloadedBytes;
             if (_webCacheRequestOp.IsDone == false)
                 return;
 

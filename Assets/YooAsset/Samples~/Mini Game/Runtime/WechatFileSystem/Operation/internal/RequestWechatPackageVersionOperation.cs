@@ -62,7 +62,7 @@ internal class RequestWechatPackageVersionOperation : AsyncOperationBase
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Wechat package version file content is empty !";
+                    Error = $"Web package version file content is empty !";
                 }
                 else
                 {

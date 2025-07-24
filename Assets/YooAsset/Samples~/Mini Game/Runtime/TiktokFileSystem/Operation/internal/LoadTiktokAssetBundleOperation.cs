@@ -16,7 +16,7 @@ namespace YooAsset
 
         private readonly PackageBundle _bundle;
         private readonly DownloadFileOptions _options;
-        private UnityTiktokAssetBundleRequestOperation _unityTiktokAssetBundleRequestOp;
+        private UnityTiktokAssetBundleRequestOperation _unityAssetBundleRequestOp;
 
         private int _requestCount = 0;
         private float _tryAgainTimer;
@@ -42,40 +42,40 @@ namespace YooAsset
             if (_steps == ESteps.CreateRequest)
             {
                 string url = GetRequestURL();
-                _unityTiktokAssetBundleRequestOp = new UnityTiktokAssetBundleRequestOperation(_bundle, url);
-                _unityTiktokAssetBundleRequestOp.StartOperation();
-                AddChildOperation(_unityTiktokAssetBundleRequestOp);
+                _unityAssetBundleRequestOp = new UnityTiktokAssetBundleRequestOperation(_bundle, url);
+                _unityAssetBundleRequestOp.StartOperation();
+                AddChildOperation(_unityAssetBundleRequestOp);
                 _steps = ESteps.CheckRequest;
             }
 
             // 检测下载结果
             if (_steps == ESteps.CheckRequest)
             {
-                _unityTiktokAssetBundleRequestOp.UpdateOperation();
-                Progress = _unityTiktokAssetBundleRequestOp.Progress;
-                DownloadProgress = _unityTiktokAssetBundleRequestOp.DownloadProgress;
-                DownloadedBytes = (long)_unityTiktokAssetBundleRequestOp.DownloadedBytes;
-                if (_unityTiktokAssetBundleRequestOp.IsDone == false)
+                _unityAssetBundleRequestOp.UpdateOperation();
+                Progress = _unityAssetBundleRequestOp.Progress;
+                DownloadProgress = _unityAssetBundleRequestOp.DownloadProgress;
+                DownloadedBytes = _unityAssetBundleRequestOp.DownloadedBytes;
+                if (_unityAssetBundleRequestOp.IsDone == false)
                     return;
 
-                if (_unityTiktokAssetBundleRequestOp.Status == EOperationStatus.Succeed)
+                if (_unityAssetBundleRequestOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
-                    Result = _unityTiktokAssetBundleRequestOp.Result;
+                    Result = _unityAssetBundleRequestOp.Result;
                 }
                 else
                 {
                     if (_failedTryAgain > 0)
                     {
                         _steps = ESteps.TryAgain;
-                        YooLogger.Warning($"Failed download : {_unityTiktokAssetBundleRequestOp.URL} Try again !");
+                        YooLogger.Warning($"Failed download : {_unityAssetBundleRequestOp.URL} Try again !");
                     }
                     else
                     {
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Failed;
-                        Error = _unityTiktokAssetBundleRequestOp.Error;
+                        Error = _unityAssetBundleRequestOp.Error;
                         YooLogger.Error(Error);
                     }
                 }

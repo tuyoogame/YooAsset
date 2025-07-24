@@ -1,5 +1,4 @@
 ﻿#if UNITY_WEBGL && DOUYINMINIGAME
-using UnityEngine;
 using YooAsset;
 
 internal class TTFSLoadBundleOperation : FSLoadBundleOperation
@@ -7,7 +6,7 @@ internal class TTFSLoadBundleOperation : FSLoadBundleOperation
     private enum ESteps
     {
         None,
-        DownloadAssetBundle,
+        LoadAssetBundle,
         Done,
     }
 
@@ -23,14 +22,14 @@ internal class TTFSLoadBundleOperation : FSLoadBundleOperation
     }
     internal override void InternalStart()
     {
-        _steps = ESteps.DownloadAssetBundle;
+        _steps = ESteps.LoadAssetBundle;
     }
     internal override void InternalUpdate()
     {
         if (_steps == ESteps.None || _steps == ESteps.Done)
             return;
 
-        if (_steps == ESteps.DownloadAssetBundle)
+        if (_steps == ESteps.LoadAssetBundle)
         {
             if (_loadWebAssetBundleOp == null)
             {
@@ -56,7 +55,7 @@ internal class TTFSLoadBundleOperation : FSLoadBundleOperation
             _loadWebAssetBundleOp.UpdateOperation();
             Progress = _loadWebAssetBundleOp.Progress;
             DownloadProgress = _loadWebAssetBundleOp.DownloadProgress;
-            DownloadedBytes = (long)_loadWebAssetBundleOp.DownloadedBytes;
+            DownloadedBytes = _loadWebAssetBundleOp.DownloadedBytes;
             if (_loadWebAssetBundleOp.IsDone == false)
                 return;
 

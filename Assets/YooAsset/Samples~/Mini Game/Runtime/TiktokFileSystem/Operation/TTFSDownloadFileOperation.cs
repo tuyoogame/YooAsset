@@ -48,7 +48,7 @@ internal class TTFSDownloadFileOperation : FSDownloadFileOperation
             _webCacheRequestOp.UpdateOperation();
             Progress = _webCacheRequestOp.Progress;
             DownloadProgress = _webCacheRequestOp.DownloadProgress;
-            DownloadedBytes = (long)_webCacheRequestOp.DownloadedBytes;
+            DownloadedBytes = _webCacheRequestOp.DownloadedBytes;
             if (_webCacheRequestOp.IsDone == false)
                 return;
 
@@ -57,7 +57,7 @@ internal class TTFSDownloadFileOperation : FSDownloadFileOperation
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Succeed;
 
-                //TODO 需要验证抖音插件请求器的下载进度
+                //TODO 需要验证插件请求器的下载进度
                 DownloadProgress = 1f;
                 DownloadedBytes = Bundle.FileSize;
                 Progress = 1f;

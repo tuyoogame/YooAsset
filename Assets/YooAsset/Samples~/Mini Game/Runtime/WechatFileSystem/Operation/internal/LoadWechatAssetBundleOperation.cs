@@ -16,7 +16,7 @@ namespace YooAsset
 
         private readonly PackageBundle _bundle;
         private readonly DownloadFileOptions _options;
-        private UnityWechatAssetBundleRequestOperation _unityWechatAssetBundleRequestOp;
+        private UnityWechatAssetBundleRequestOperation _unityAssetBundleRequestOp;
 
         private int _requestCount = 0;
         private float _tryAgainTimer;
@@ -42,40 +42,40 @@ namespace YooAsset
             if (_steps == ESteps.CreateRequest)
             {
                 string url = GetRequestURL();
-                _unityWechatAssetBundleRequestOp = new UnityWechatAssetBundleRequestOperation(_bundle, url);
-                _unityWechatAssetBundleRequestOp.StartOperation();
-                AddChildOperation(_unityWechatAssetBundleRequestOp);
+                _unityAssetBundleRequestOp = new UnityWechatAssetBundleRequestOperation(_bundle, url);
+                _unityAssetBundleRequestOp.StartOperation();
+                AddChildOperation(_unityAssetBundleRequestOp);
                 _steps = ESteps.CheckRequest;
             }
 
             // 检测下载结果
             if (_steps == ESteps.CheckRequest)
             {
-                _unityWechatAssetBundleRequestOp.UpdateOperation();
-                Progress = _unityWechatAssetBundleRequestOp.Progress;
-                DownloadProgress = _unityWechatAssetBundleRequestOp.DownloadProgress;
-                DownloadedBytes = (long)_unityWechatAssetBundleRequestOp.DownloadedBytes;
-                if (_unityWechatAssetBundleRequestOp.IsDone == false)
+                _unityAssetBundleRequestOp.UpdateOperation();
+                Progress = _unityAssetBundleRequestOp.Progress;
+                DownloadProgress = _unityAssetBundleRequestOp.DownloadProgress;
+                DownloadedBytes = _unityAssetBundleRequestOp.DownloadedBytes;
+                if (_unityAssetBundleRequestOp.IsDone == false)
                     return;
 
-                if (_unityWechatAssetBundleRequestOp.Status == EOperationStatus.Succeed)
+                if (_unityAssetBundleRequestOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
-                    Result = _unityWechatAssetBundleRequestOp.Result;
+                    Result = _unityAssetBundleRequestOp.Result;
                 }
                 else
                 {
                     if (_failedTryAgain > 0)
                     {
                         _steps = ESteps.TryAgain;
-                        YooLogger.Warning($"Failed download : {_unityWechatAssetBundleRequestOp.URL} Try again !");
+                        YooLogger.Warning($"Failed download : {_unityAssetBundleRequestOp.URL} Try again !");
                     }
                     else
                     {
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Failed;
-                        Error = _unityWechatAssetBundleRequestOp.Error;
+                        Error = _unityAssetBundleRequestOp.Error;
                         YooLogger.Error(Error);
                     }
                 }

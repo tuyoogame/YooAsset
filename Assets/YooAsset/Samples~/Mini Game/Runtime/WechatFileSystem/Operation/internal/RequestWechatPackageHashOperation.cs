@@ -62,7 +62,7 @@ internal class RequestWechatPackageHashOperation : AsyncOperationBase
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Wechat package hash file content is empty !";
+                    Error = $"Web package hash file content is empty !";
                 }
                 else
                 {

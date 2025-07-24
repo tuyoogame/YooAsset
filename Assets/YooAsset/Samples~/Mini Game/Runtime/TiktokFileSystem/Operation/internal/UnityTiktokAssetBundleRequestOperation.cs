@@ -67,7 +67,7 @@ namespace YooAsset
                         Result = assetBundle;
                         Status = EOperationStatus.Succeed;
 
-                        //TODO 需要验证抖音插件请求器的下载进度
+                        //TODO 需要验证插件请求器的下载进度
                         DownloadProgress = 1f;
                         DownloadedBytes = _packageBundle.FileSize;
                         Progress = 1f;
