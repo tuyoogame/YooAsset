@@ -1,6 +1,6 @@
 # YooAsset
 
-[![License](https://img.shields.io/github/license/tuyoogame/YooAsset)](https://github.com/tuyoogame/YooAsset/blob/master/LICENSE)[![openupm](https://img.shields.io/npm/v/com.tuyoogame.yooasset?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.tuyoogame.yooasset/)
+[![License](https://img.shields.io/github/license/tuyoogame/YooAsset)](https://github.com/tuyoogame/YooAsset/blob/master/LICENSE)[![openupm](https://img.shields.io/npm/v/com.tuyoogame.yooasset?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.tuyoogame.yooasset/)[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/tuyoogame/YooAsset)
 
 **YooAsset**是一套用于Unity3D的资源管理系统，用于帮助研发团队快速部署和交付游戏。
 
