@@ -104,7 +104,6 @@ namespace YooAsset.Editor
             var compressOption = AssetBundleBuilderSetting.GetPackageCompressOption(PackageName, PipelineName);
             var clearBuildCache = AssetBundleBuilderSetting.GetPackageClearBuildCache(PackageName, PipelineName);
             var useAssetDependencyDB = AssetBundleBuilderSetting.GetPackageUseAssetDependencyDB(PackageName, PipelineName);
-            var builtinShaderBundleName = GetBuiltinShaderBundleName();
 
             ScriptableBuildParameters buildParameters = new ScriptableBuildParameters();
             buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
@@ -122,10 +121,10 @@ namespace YooAsset.Editor
             buildParameters.CompressOption = compressOption;
             buildParameters.ClearBuildCacheFiles = clearBuildCache;
             buildParameters.UseAssetDependencyDB = useAssetDependencyDB;
-            buildParameters.BuiltinShadersBundleName = builtinShaderBundleName;
             buildParameters.EncryptionServices = CreateEncryptionServicesInstance();
             buildParameters.ManifestProcessServices = CreateManifestProcessServicesInstance();
             buildParameters.ManifestRestoreServices = CreateManifestRestoreServicesInstance();
+            buildParameters.BuiltinShadersBundleName = GetBuiltinShaderBundleName();
 
             ScriptableBuildPipeline pipeline = new ScriptableBuildPipeline();
             var buildResult = pipeline.Run(buildParameters, true);
@@ -141,6 +140,16 @@ namespace YooAsset.Editor
         {
             var uniqueBundleName = AssetBundleCollectorSettingData.Setting.UniqueBundleName;
             var packRuleResult = DefaultPackRule.CreateShadersPackRuleResult();
+            return packRuleResult.GetBundleName(PackageName, uniqueBundleName);
+        }
+
+        /// <summary>
+        /// Mono脚本的资源包名称
+        /// </summary>
+        protected string GetMonoScriptsBundleName()
+        {
+            var uniqueBundleName = AssetBundleCollectorSettingData.Setting.UniqueBundleName;
+            var packRuleResult = DefaultPackRule.CreateMonosPackRuleResult();
             return packRuleResult.GetBundleName(PackageName, uniqueBundleName);
         }
     }

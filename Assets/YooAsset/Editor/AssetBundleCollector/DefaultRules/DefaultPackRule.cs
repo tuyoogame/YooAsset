@@ -17,14 +17,23 @@ namespace YooAsset.Editor
         public const string RawFileExtension = "rawfile";
 
         /// <summary>
-        /// Unity着色器资源包名称
+        /// 默认的Unity着色器资源包名称
         /// </summary>
         public const string ShadersBundleName = "unityshaders";
 
+        /// <summary>
+        /// 默认的Unity脚本资源包名称
+        /// </summary>
+        public const string MonosBundleName = "unitymonos";
 
         public static PackRuleResult CreateShadersPackRuleResult()
         {
             PackRuleResult result = new PackRuleResult(ShadersBundleName, AssetBundleFileExtension);
+            return result;
+        }
+        public static PackRuleResult CreateMonosPackRuleResult()
+        {
+            PackRuleResult result = new PackRuleResult(MonosBundleName, AssetBundleFileExtension);
             return result;
         }
     }
