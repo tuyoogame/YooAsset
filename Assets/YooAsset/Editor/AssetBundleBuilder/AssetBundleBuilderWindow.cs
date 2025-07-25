@@ -77,6 +77,12 @@ namespace YooAsset.Editor
                     foreach (var classType in viewerClassTypes)
                     {
                         var buildPipelineAttribute = EditorTools.GetAttribute<BuildPipelineAttribute>(classType);
+                        if (buildPipelineAttribute == null)
+                        {
+                            Debug.LogWarning($"The class {classType.FullName} need attribute {nameof(BuildPipelineAttribute)}");
+                            continue;
+                        }
+
                         string pipelineName = buildPipelineAttribute.PipelineName;
                         if (_viewClassDic.ContainsKey(pipelineName))
                         {
