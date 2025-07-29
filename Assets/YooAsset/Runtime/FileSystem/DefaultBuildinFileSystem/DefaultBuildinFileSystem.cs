@@ -335,6 +335,27 @@ namespace YooAsset
 #endif
         }
 
+        /// <summary>
+        /// 是否属于解压资源包文件
+        /// </summary>
+        protected virtual bool IsUnpackBundleFile(PackageBundle bundle)
+        {
+            if (Belong(bundle) == false)
+                return false;
+
+#if UNITY_ANDROID
+            if (bundle.Encrypted)
+                return true;
+
+            if (bundle.BundleType == (int)EBuildBundleType.RawBundle)
+                return true;
+
+            return false;
+#else
+            return false;
+#endif
+        }
+
         #region 内部方法
         protected string GetDefaultBuildinPackageRoot(string packageName)
         {
@@ -368,27 +389,6 @@ namespace YooAsset
         public string GetCatalogBinaryFileLoadPath()
         {
             return PathUtility.Combine(_packageRoot, DefaultBuildinFileSystemDefine.BuildinCatalogBinaryFileName);
-        }
-
-        /// <summary>
-        /// 是否属于解压资源包文件
-        /// </summary>
-        protected bool IsUnpackBundleFile(PackageBundle bundle)
-        {
-            if (Belong(bundle) == false)
-                return false;
-
-#if UNITY_ANDROID
-            if (bundle.Encrypted)
-                return true;
-
-            if (bundle.BundleType == (int)EBuildBundleType.RawBundle)
-                return true;
-
-            return false;
-#else
-            return false;
-#endif
         }
 
         /// <summary>
