@@ -251,7 +251,7 @@ namespace YooAsset
         /// 预下载指定版本的包裹资源
         /// </summary>
         /// <param name="packageVersion">包裹版本</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
+        /// <param name="timeout">资源清单下载的超时时间（默认值：60秒）</param>
         public PreDownloadContentOperation PreDownloadContentAsync(string packageVersion, int timeout = 60)
         {
             DebugCheckInitialize(false);
