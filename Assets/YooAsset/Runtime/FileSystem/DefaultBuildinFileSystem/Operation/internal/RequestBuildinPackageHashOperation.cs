@@ -1,4 +1,5 @@
-﻿
+﻿using System.IO;
+
 namespace YooAsset
 {
     internal class RequestBuildinPackageHashOperation : AsyncOperationBase
@@ -6,7 +7,9 @@ namespace YooAsset
         private enum ESteps
         {
             None,
+            TryLoadPackageHash,
             RequestPackageHash,
+            CheckResult,
             Done,
         }
 
@@ -28,12 +31,26 @@ namespace YooAsset
         }
         internal override void InternalStart()
         {
-            _steps = ESteps.RequestPackageHash;
+            _steps = ESteps.TryLoadPackageHash;
         }
         internal override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
+
+            if (_steps == ESteps.TryLoadPackageHash)
+            {
+                string filePath = _fileSystem.GetBuildinPackageHashFilePath(_packageVersion);
+                if (File.Exists(filePath))
+                {
+                    PackageHash = File.ReadAllText(filePath);
+                    _steps = ESteps.CheckResult;
+                }
+                else
+                {
+                    _steps = ESteps.RequestPackageHash;
+                }
+            }
 
             if (_steps == ESteps.RequestPackageHash)
             {
@@ -53,23 +70,28 @@ namespace YooAsset
                 if (_webTextRequestOp.Status == EOperationStatus.Succeed)
                 {
                     PackageHash = _webTextRequestOp.Result;
-                    if (string.IsNullOrEmpty(PackageHash))
-                    {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Failed;
-                        Error = $"Buildin package hash file content is empty !";
-                    }
-                    else
-                    {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Succeed;
-                    }
+                    _steps = ESteps.CheckResult;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
                     Error = _webTextRequestOp.Error;
+                }
+            }
+
+            if (_steps == ESteps.CheckResult)
+            {
+                if (string.IsNullOrEmpty(PackageHash))
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = $"Buildin package hash file content is empty !";
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Succeed;
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿
+﻿using System.IO;
+
 namespace YooAsset
 {
     internal class LoadBuildinPackageManifestOperation : AsyncOperationBase
@@ -6,6 +7,7 @@ namespace YooAsset
         private enum ESteps
         {
             None,
+            TryLoadFileData,
             RequestFileData,
             VerifyFileData,
             LoadManifest,
@@ -17,6 +19,7 @@ namespace YooAsset
         private readonly string _packageHash;
         private UnityWebDataRequestOperation _webDataRequestOp;
         private DeserializeManifestOperation _deserializer;
+        private byte[] _fileData;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
@@ -33,12 +36,26 @@ namespace YooAsset
         }
         internal override void InternalStart()
         {
-            _steps = ESteps.RequestFileData;
+            _steps = ESteps.TryLoadFileData;
         }
         internal override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
+
+            if (_steps == ESteps.TryLoadFileData)
+            {
+                string filePath = _fileSystem.GetBuildinPackageManifestFilePath(_packageVersion);
+                if (File.Exists(filePath))
+                {
+                    _fileData = File.ReadAllBytes(filePath);
+                    _steps = ESteps.VerifyFileData;
+                }
+                else
+                {
+                    _steps = ESteps.RequestFileData;
+                }
+            }
 
             if (_steps == ESteps.RequestFileData)
             {
@@ -57,6 +74,7 @@ namespace YooAsset
 
                 if (_webDataRequestOp.Status == EOperationStatus.Succeed)
                 {
+                    _fileData = _webDataRequestOp.Result;
                     _steps = ESteps.VerifyFileData;
                 }
                 else
@@ -69,7 +87,7 @@ namespace YooAsset
 
             if (_steps == ESteps.VerifyFileData)
             {
-                if (ManifestTools.VerifyManifestData(_webDataRequestOp.Result, _packageHash))
+                if (ManifestTools.VerifyManifestData(_fileData, _packageHash))
                 {
                     _steps = ESteps.LoadManifest;
                 }
@@ -85,7 +103,7 @@ namespace YooAsset
             {
                 if (_deserializer == null)
                 {
-                    _deserializer = new DeserializeManifestOperation(_fileSystem.ManifestServices, _webDataRequestOp.Result);
+                    _deserializer = new DeserializeManifestOperation(_fileSystem.ManifestServices, _fileData);
                     _deserializer.StartOperation();
                     AddChildOperation(_deserializer);
                 }

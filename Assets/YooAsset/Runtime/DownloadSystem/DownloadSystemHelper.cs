@@ -37,6 +37,10 @@ namespace YooAsset
             string url;
 
             // 获取对应平台的URL地址
+            // 说明：苹果不同设备上操作系统不同。
+            // 说明：iPhone和iPod对应的是iOS系统。
+            // 说明：iPad对应的是iPadOS系统。
+            // 说明：AppleTV对应的是tvOS系统。
 #if UNITY_EDITOR_OSX
             url = StringUtility.Format("file://{0}", path);
 #elif UNITY_EDITOR

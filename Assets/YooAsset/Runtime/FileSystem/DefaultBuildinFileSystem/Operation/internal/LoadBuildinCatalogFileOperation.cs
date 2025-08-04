@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace YooAsset
 {
@@ -7,14 +8,21 @@ namespace YooAsset
         private enum ESteps
         {
             None,
-            RequestData,
+            TryLoadFileData,
+            RequestFileData,
             LoadCatalog,
             Done,
         }
 
         private readonly DefaultBuildinFileSystem _fileSystem;
         private UnityWebDataRequestOperation _webDataRequestOp;
+        private byte[] _fileData;
         private ESteps _steps = ESteps.None;
+
+        /// <summary>
+        /// 内置资源目录
+        /// </summary>
+        public DefaultBuildinFileCatalog Catalog;
 
         internal LoadBuildinCatalogFileOperation(DefaultBuildinFileSystem fileSystem)
         {
@@ -22,14 +30,28 @@ namespace YooAsset
         }
         internal override void InternalStart()
         {
-            _steps = ESteps.RequestData;
+            _steps = ESteps.TryLoadFileData;
         }
         internal override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.RequestData)
+            if (_steps == ESteps.TryLoadFileData)
+            {
+                string filePath = _fileSystem.GetCatalogBinaryFileLoadPath();
+                if (File.Exists(filePath))
+                {
+                    _fileData = File.ReadAllBytes(filePath);
+                    _steps = ESteps.LoadCatalog;
+                }
+                else
+                {
+                    _steps = ESteps.RequestFileData;
+                }
+            }
+
+            if (_steps == ESteps.RequestFileData)
             {
                 if (_webDataRequestOp == null)
                 {
@@ -46,6 +68,7 @@ namespace YooAsset
 
                 if (_webDataRequestOp.Status == EOperationStatus.Succeed)
                 {
+                    _fileData = _webDataRequestOp.Result;
                     _steps = ESteps.LoadCatalog;
                 }
                 else
@@ -60,22 +83,7 @@ namespace YooAsset
             {
                 try
                 {
-                    var catalog = CatalogTools.DeserializeFromBinary(_webDataRequestOp.Result);
-                    if (catalog.PackageName != _fileSystem.PackageName)
-                    {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Failed;
-                        Error = $"Catalog file package name {catalog.PackageName} cannot match the file system package name {_fileSystem.PackageName}";
-                        return;
-                    }
-
-                    foreach (var wrapper in catalog.Wrappers)
-                    {
-                        var fileWrapper = new DefaultBuildinFileSystem.FileWrapper(wrapper.FileName);
-                        _fileSystem.RecordCatalogFile(wrapper.BundleGUID, fileWrapper);
-                    }
-
-                    YooLogger.Log($"Package '{_fileSystem.PackageName}' buildin catalog files count : {catalog.Wrappers.Count}");
+                    Catalog = CatalogTools.DeserializeFromBinary(_fileData);
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
                 }
