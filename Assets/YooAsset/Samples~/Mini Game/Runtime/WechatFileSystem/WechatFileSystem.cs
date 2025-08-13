@@ -70,8 +70,6 @@ internal class WechatFileSystem : IFileSystem
     /// </summary>
     public string PackageName { private set; get; }
 
-    private readonly string _packageRoot = YooAssetSettingsData.Setting.DefaultYooFolderName;
-
     /// <summary>
     /// 文件根目录
     /// </summary>
