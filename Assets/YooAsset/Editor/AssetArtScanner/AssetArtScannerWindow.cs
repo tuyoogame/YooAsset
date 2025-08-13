@@ -294,6 +294,11 @@ namespace YooAsset.Editor
                 _scannerListView.itemsSource = filterItems;
                 _scannerListView.Rebuild();
             }
+
+            if (_lastModifyScannerIndex >= 0 && _lastModifyScannerIndex < _scannerListView.itemsSource.Count)
+            {
+                _scannerListView.selectedIndex = _lastModifyScannerIndex;
+            }
         }
         private List<AssetArtScanner> FilterScanners()
         {
