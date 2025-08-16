@@ -33,6 +33,7 @@ namespace YooAsset
         {
             get
             {
+                // NOTE : 单次调用开销约1微秒
                 return _watch.ElapsedMilliseconds - _frameTime >= MaxTimeSlice;
             }
         }
@@ -82,10 +83,11 @@ namespace YooAsset
             }
 
             // 更新进行中的异步操作
+            bool checkBusy = MaxTimeSlice < long.MaxValue;
             _frameTime = _watch.ElapsedMilliseconds;
             for (int i = 0; i < _operations.Count; i++)
             {
-                if (IsBusy)
+                if (checkBusy && IsBusy)
                     break;
 
                 var operation = _operations[i];
