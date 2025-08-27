@@ -139,13 +139,6 @@ namespace YooAsset.Editor
         /// </summary>
         public List<CollectAssetInfo> GetAllCollectAssets(CollectCommand command, AssetBundleCollectorGroup group)
         {
-            // 注意：模拟构建模式下只收集主资源
-            if (command.SimulateBuild)
-            {
-                if (CollectorType != ECollectorType.MainAssetCollector)
-                    return new List<CollectAssetInfo>();
-            }
-
             Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(1000);
 
             // 收集打包资源路径
