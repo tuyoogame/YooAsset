@@ -43,11 +43,11 @@ namespace YooAsset
             // 说明：AppleTV对应的是tvOS系统。
 #if UNITY_EDITOR_OSX
             url = StringUtility.Format("file://{0}", path);
-#elif UNITY_EDITOR
+#elif UNITY_EDITOR_WIN
             url = StringUtility.Format("file:///{0}", path);
 #elif UNITY_WEBGL
             url = path;
-#elif UNITY_IPHONE
+#elif UNITY_IOS || UNITY_IPHONE
             url = StringUtility.Format("file://{0}", path);
 #elif UNITY_ANDROID
             if (path.StartsWith("jar:file://"))
@@ -69,12 +69,17 @@ namespace YooAsset
                 else
                     url = StringUtility.Format("file://{0}", path);
             }
-#elif UNITY_STANDALONE_OSX
-            url = new System.Uri(path).ToString();
-#elif UNITY_STANDALONE || UNITY_WSA
+
+#elif UNITY_WSA
             url = StringUtility.Format("file:///{0}", path);
 #elif UNITY_TVOS
             url = StringUtility.Format("file:///{0}", path);
+#elif UNITY_STANDALONE_OSX
+            url = new System.Uri(path).ToString();
+#elif UNITY_STANDALONE_WIN
+            url = StringUtility.Format("file:///{0}", path);
+#elif UNITY_STANDALONE_LINUX
+            url = StringUtility.Format("file:///root/{0}", path);
 #else
             throw new System.NotImplementedException();
 #endif
