@@ -74,6 +74,17 @@ namespace YooAsset
         private uint _currentCrc;
 
         /// <summary>
+        /// Gets the computed hash value.
+        /// </summary>
+        public uint CRCValue
+        {
+            get
+            {
+                return _currentCrc;
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CRC32Algorithm"/> class. 
         /// </summary>
         public CRC32Algorithm()
