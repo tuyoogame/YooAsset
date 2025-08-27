@@ -343,7 +343,7 @@ namespace YooAsset
             if (Belong(bundle) == false)
                 return false;
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_OPENHARMONY
             if (bundle.Encrypted)
                 return true;
 
