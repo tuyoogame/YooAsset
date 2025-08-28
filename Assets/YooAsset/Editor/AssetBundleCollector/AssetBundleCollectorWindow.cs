@@ -38,6 +38,7 @@ namespace YooAsset.Editor
 
         private VisualElement _setting2Container;
         private Toggle _enableAddressableToogle;
+        private Toggle _supportExtensionlessToogle;
         private Toggle _locationToLowerToogle;
         private Toggle _includeAssetGUIDToogle;
         private Toggle _autoCollectShadersToogle;
@@ -127,6 +128,17 @@ namespace YooAsset.Editor
                     if (selectPackage != null)
                     {
                         selectPackage.EnableAddressable = evt.newValue;
+                        AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
+                        RefreshWindow();
+                    }
+                });
+                _supportExtensionlessToogle = root.Q<Toggle>("SupportExtensionless");
+                _supportExtensionlessToogle.RegisterValueChangedCallback(evt =>
+                {
+                    var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
+                    if (selectPackage != null)
+                    {
+                        selectPackage.SupportExtensionless = evt.newValue;
                         AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
                         RefreshWindow();
                     }
@@ -487,6 +499,7 @@ namespace YooAsset.Editor
                 _packageSettingsButton.SetEnabled(true);
                 _packageSettingsButton.text = $"{packageSettingName} ({selectPackage.PackageName})";
                 _enableAddressableToogle.SetValueWithoutNotify(selectPackage.EnableAddressable);
+                _supportExtensionlessToogle.SetValueWithoutNotify(selectPackage.SupportExtensionless);
                 _locationToLowerToogle.SetValueWithoutNotify(selectPackage.LocationToLower);
                 _includeAssetGUIDToogle.SetValueWithoutNotify(selectPackage.IncludeAssetGUID);
                 _autoCollectShadersToogle.SetValueWithoutNotify(selectPackage.AutoCollectShaders);
@@ -1017,8 +1030,8 @@ namespace YooAsset.Editor
                 var command = new CollectCommand(packageName, ignoreRule);
                 command.SimulateBuild = true;
                 command.UniqueBundleName = _uniqueBundleNameToogle.value;
-                command.UseAssetDependencyDB = true;
                 command.EnableAddressable = _enableAddressableToogle.value;
+                command.SupportExtensionless = _supportExtensionlessToogle.value;
                 command.LocationToLower = _locationToLowerToogle.value;
                 command.IncludeAssetGUID = _includeAssetGUIDToogle.value;
                 command.AutoCollectShaders = _autoCollectShadersToogle.value;

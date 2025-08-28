@@ -26,6 +26,11 @@ namespace YooAsset.Editor
         public bool EnableAddressable = false;
 
         /// <summary>
+        /// 支持无后缀名的资源定位地址
+        /// </summary>
+        public bool SupportExtensionless = true;
+
+        /// <summary>
         /// 资源定位地址大小写不敏感
         /// </summary>
         public bool LocationToLower = false;

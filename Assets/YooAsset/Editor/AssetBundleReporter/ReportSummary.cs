@@ -61,6 +61,7 @@ namespace YooAsset.Editor
         // 收集器配置
         public bool UniqueBundleName;
         public bool EnableAddressable;
+        public bool SupportExtensionless;
         public bool LocationToLower;
         public bool IncludeAssetGUID;
         public bool AutoCollectShaders;

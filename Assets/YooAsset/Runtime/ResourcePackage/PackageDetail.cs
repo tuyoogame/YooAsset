@@ -14,6 +14,11 @@ namespace YooAsset
         public bool EnableAddressable;
 
         /// <summary>
+        /// 支持无后缀名的资源定位地址
+        /// </summary>
+        public bool SupportExtensionless;
+
+        /// <summary>
         /// 资源定位地址大小写不敏感
         /// </summary>
         public bool LocationToLower;

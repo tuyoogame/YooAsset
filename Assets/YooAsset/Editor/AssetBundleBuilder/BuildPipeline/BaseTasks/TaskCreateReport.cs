@@ -32,6 +32,7 @@ namespace YooAsset.Editor
                 // 收集器配置
                 buildReport.Summary.UniqueBundleName = buildMapContext.Command.UniqueBundleName;
                 buildReport.Summary.EnableAddressable = buildMapContext.Command.EnableAddressable;
+                buildReport.Summary.SupportExtensionless = buildMapContext.Command.SupportExtensionless;
                 buildReport.Summary.LocationToLower = buildMapContext.Command.LocationToLower;
                 buildReport.Summary.IncludeAssetGUID = buildMapContext.Command.IncludeAssetGUID;
                 buildReport.Summary.AutoCollectShaders = buildMapContext.Command.AutoCollectShaders;

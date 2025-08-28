@@ -111,6 +111,7 @@ namespace YooAsset.Editor
             command.UniqueBundleName = UniqueBundleName;
             command.UseAssetDependencyDB = useAssetDependencyDB;
             command.EnableAddressable = package.EnableAddressable;
+            command.SupportExtensionless = package.SupportExtensionless;
             command.LocationToLower = package.LocationToLower;
             command.IncludeAssetGUID = package.IncludeAssetGUID;
             command.AutoCollectShaders = package.AutoCollectShaders;

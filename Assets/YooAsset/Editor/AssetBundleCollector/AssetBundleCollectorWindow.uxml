@@ -19,6 +19,7 @@
             <ui:Button text="Package Settings" display-tooltip-when-elided="true" name="PackageSettingsButton" />
             <ui:VisualElement name="PublicContainer2">
                 <ui:Toggle label="Enable Addressable" name="EnableAddressable" style="width: 196px; -unity-text-align: middle-left;" />
+                <ui:Toggle label="Support Extensionless" name="SupportExtensionless" style="width: 196px; -unity-text-align: middle-left;" />
                 <ui:Toggle label="Location To Lower" name="LocationToLower" style="width: 196px; -unity-text-align: middle-left;" />
                 <ui:Toggle label="Include Asset GUID" name="IncludeAssetGUID" style="width: 196px; -unity-text-align: middle-left;" />
                 <ui:Toggle label="Auto Collect Shaders" name="AutoCollectShaders" value="true" style="width: 196px; -unity-text-align: middle-left;" />

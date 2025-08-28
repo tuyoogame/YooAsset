@@ -32,6 +32,7 @@ namespace YooAsset.Editor
             PackageManifest manifest = new PackageManifest();
             manifest.FileVersion = ManifestDefine.FileVersion;
             manifest.EnableAddressable = buildMapContext.Command.EnableAddressable;
+            manifest.SupportExtensionless = buildMapContext.Command.SupportExtensionless;
             manifest.LocationToLower = buildMapContext.Command.LocationToLower;
             manifest.IncludeAssetGUID = buildMapContext.Command.IncludeAssetGUID;
             manifest.OutputNameStyle = (int)buildParameters.FileNameStyle;

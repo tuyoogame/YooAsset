@@ -10,7 +10,7 @@ namespace YooAsset.Editor
 {
     public class AssetBundleCollectorConfig
     {
-        public const string ConfigVersion = "v2.1";
+        public const string ConfigVersion = "v2025.8.28";
 
         public const string XmlVersion = "Version";
         public const string XmlCommon = "Common";
@@ -23,6 +23,7 @@ namespace YooAsset.Editor
         public const string XmlPackageName = "PackageName";
         public const string XmlPackageDesc = "PackageDesc";
         public const string XmlEnableAddressable = "AutoAddressable";
+        public const string XmlSupportExtensionless = "SupportExtensionless";
         public const string XmlLocationToLower = "LocationToLower";
         public const string XmlIncludeAssetGUID = "IncludeAssetGUID";
         public const string XmlIgnoreRuleName = "IgnoreRuleName";
@@ -99,6 +100,7 @@ namespace YooAsset.Editor
                 package.PackageName = packageElement.GetAttribute(XmlPackageName);
                 package.PackageDesc = packageElement.GetAttribute(XmlPackageDesc);
                 package.EnableAddressable = packageElement.GetAttribute(XmlEnableAddressable) == "True" ? true : false;
+                package.SupportExtensionless = packageElement.GetAttribute(XmlSupportExtensionless) == "True" ? true : false;
                 package.LocationToLower = packageElement.GetAttribute(XmlLocationToLower) == "True" ? true : false;
                 package.IncludeAssetGUID = packageElement.GetAttribute(XmlIncludeAssetGUID) == "True" ? true : false;
                 package.IgnoreRuleName = packageElement.GetAttribute(XmlIgnoreRuleName);
@@ -211,6 +213,7 @@ namespace YooAsset.Editor
                 packageElement.SetAttribute(XmlPackageName, package.PackageName);
                 packageElement.SetAttribute(XmlPackageDesc, package.PackageDesc);
                 packageElement.SetAttribute(XmlEnableAddressable, package.EnableAddressable.ToString());
+                packageElement.SetAttribute(XmlSupportExtensionless, package.SupportExtensionless.ToString());
                 packageElement.SetAttribute(XmlLocationToLower, package.LocationToLower.ToString());
                 packageElement.SetAttribute(XmlIncludeAssetGUID, package.IncludeAssetGUID.ToString());
                 packageElement.SetAttribute(XmlIgnoreRuleName, package.IgnoreRuleName);
@@ -272,6 +275,23 @@ namespace YooAsset.Editor
 
                 // 更新版本
                 root.SetAttribute(XmlVersion, "v2.1");
+                return UpdateXmlConfig(xmlDoc);
+            }
+
+            // v2.1 -> v2025.8.28
+            if (configVersion == "v2.1")
+            {
+                // 读取包裹配置
+                var packageNodeList = root.GetElementsByTagName(XmlPackage);
+                foreach (var packageNode in packageNodeList)
+                {
+                    XmlElement packageElement = packageNode as XmlElement;
+                    if (packageElement.HasAttribute(XmlSupportExtensionless) == false)
+                        packageElement.SetAttribute(XmlSupportExtensionless, "True");
+                }
+
+                // 更新版本
+                root.SetAttribute(XmlVersion, "v2025.8.28");
                 return UpdateXmlConfig(xmlDoc);
             }
 

@@ -96,6 +96,7 @@ namespace YooAsset
                     Manifest = new PackageManifest();
                     Manifest.FileVersion = fileVersion;
                     Manifest.EnableAddressable = _buffer.ReadBool();
+                    Manifest.SupportExtensionless = _buffer.ReadBool();
                     Manifest.LocationToLower = _buffer.ReadBool();
                     Manifest.IncludeAssetGUID = _buffer.ReadBool();
                     Manifest.OutputNameStyle = _buffer.ReadInt32();
