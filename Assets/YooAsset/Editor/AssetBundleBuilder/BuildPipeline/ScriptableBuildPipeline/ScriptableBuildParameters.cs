@@ -15,7 +15,7 @@ namespace YooAsset.Editor
         public ECompressOption CompressOption = ECompressOption.Uncompressed;
 
         /// <summary>
-        /// 从AssetBundle文件头里剥离Unity版本信息
+        /// 从文件头里剥离Unity版本信息
         /// </summary>
         public bool StripUnityVersion = false;
 
@@ -25,7 +25,7 @@ namespace YooAsset.Editor
         public bool DisableWriteTypeTree = false;
 
         /// <summary>
-        /// 忽略类型树变化
+        /// 忽略类型树变化（无效参数）
         /// </summary>
         public bool IgnoreTypeTreeChanges = true;
 
@@ -76,10 +76,9 @@ namespace YooAsset.Editor
                 throw new System.NotImplementedException(CompressOption.ToString());
 
             if (StripUnityVersion)
-                buildParams.ContentBuildFlags |= UnityEditor.Build.Content.ContentBuildFlags.StripUnityVersion;
-
+                buildParams.ContentBuildFlags |= UnityEditor.Build.Content.ContentBuildFlags.StripUnityVersion; // Build Flag to indicate the Unity Version should not be written to the serialized file.
             if (DisableWriteTypeTree)
-                buildParams.ContentBuildFlags |= UnityEditor.Build.Content.ContentBuildFlags.DisableWriteTypeTree;
+                buildParams.ContentBuildFlags |= UnityEditor.Build.Content.ContentBuildFlags.DisableWriteTypeTree; //Do not include type information within the built content.
 
             buildParams.UseCache = true;
             buildParams.CacheServerHost = CacheServerHost;
