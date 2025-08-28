@@ -27,10 +27,10 @@ namespace YooAsset.Editor
             string filePath = bundleInfo.PackageSourceFilePath;
             return HashUtility.FileMD5(filePath);
         }
-        protected override string GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
+        protected override uint GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
         {
             string filePath = bundleInfo.PackageSourceFilePath;
-            return HashUtility.FileCRC32(filePath);
+            return HashUtility.FileCRC32Value(filePath);
         }
         protected override long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
         {

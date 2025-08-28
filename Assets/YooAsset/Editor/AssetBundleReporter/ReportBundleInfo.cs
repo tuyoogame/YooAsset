@@ -26,7 +26,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 文件校验码
         /// </summary>
-        public string FileCRC;
+        public uint FileCRC;
 
         /// <summary>
         /// 文件大小（字节数）

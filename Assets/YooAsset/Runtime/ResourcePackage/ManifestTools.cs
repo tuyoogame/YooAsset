@@ -89,7 +89,7 @@ namespace YooAsset
                     buffer.WriteUTF8(packageBundle.BundleName);
                     buffer.WriteUInt32(packageBundle.UnityCRC);
                     buffer.WriteUTF8(packageBundle.FileHash);
-                    buffer.WriteUTF8(packageBundle.FileCRC);
+                    buffer.WriteUInt32(packageBundle.FileCRC);
                     buffer.WriteInt64(packageBundle.FileSize);
                     buffer.WriteBool(packageBundle.Encrypted);
                     buffer.WriteUTF8Array(packageBundle.Tags);
@@ -190,7 +190,7 @@ namespace YooAsset
                     packageBundle.BundleName = buffer.ReadUTF8();
                     packageBundle.UnityCRC = buffer.ReadUInt32();
                     packageBundle.FileHash = buffer.ReadUTF8();
-                    packageBundle.FileCRC = buffer.ReadUTF8();
+                    packageBundle.FileCRC = buffer.ReadUInt32();
                     packageBundle.FileSize = buffer.ReadInt64();
                     packageBundle.Encrypted = buffer.ReadBool();
                     packageBundle.Tags = buffer.ReadUTF8Array();

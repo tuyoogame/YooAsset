@@ -159,7 +159,7 @@ namespace YooAsset
                         packageBundle.BundleName = _buffer.ReadUTF8();
                         packageBundle.UnityCRC = _buffer.ReadUInt32();
                         packageBundle.FileHash = _buffer.ReadUTF8();
-                        packageBundle.FileCRC = _buffer.ReadUTF8();
+                        packageBundle.FileCRC = _buffer.ReadUInt32();
                         packageBundle.FileSize = _buffer.ReadInt64();
                         packageBundle.Encrypted = _buffer.ReadBool();
                         packageBundle.Tags = _buffer.ReadUTF8Array();

@@ -63,7 +63,7 @@ namespace YooAsset.Editor
         protected abstract string GetUnityHash(BuildBundleInfo bundleInfo, BuildContext context);
         protected abstract uint GetUnityCRC(BuildBundleInfo bundleInfo, BuildContext context);
         protected abstract string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
-        protected abstract string GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
+        protected abstract uint GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
         protected abstract long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
     }
 }

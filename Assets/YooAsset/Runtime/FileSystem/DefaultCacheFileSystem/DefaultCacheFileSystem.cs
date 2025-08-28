@@ -505,22 +505,22 @@ namespace YooAsset
         }
 
         private readonly BufferWriter _sharedBuffer = new BufferWriter(1024);
-        public void WriteBundleInfoFile(string filePath, string dataFileCRC, long dataFileSize)
+        public void WriteBundleInfoFile(string filePath, uint dataFileCRC, long dataFileSize)
         {
             using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
             {
                 _sharedBuffer.Clear();
-                _sharedBuffer.WriteUTF8(dataFileCRC);
+                _sharedBuffer.WriteUInt32(dataFileCRC);
                 _sharedBuffer.WriteInt64(dataFileSize);
                 _sharedBuffer.WriteToStream(fs);
                 fs.Flush();
             }
         }
-        public void ReadBundleInfoFile(string filePath, out string dataFileCRC, out long dataFileSize)
+        public void ReadBundleInfoFile(string filePath, out uint dataFileCRC, out long dataFileSize)
         {
             byte[] binaryData = FileUtility.ReadAllBytes(filePath);
             BufferReader buffer = new BufferReader(binaryData);
-            dataFileCRC = buffer.ReadUTF8();
+            dataFileCRC = buffer.ReadUInt32();
             dataFileSize = buffer.ReadInt64();
         }
         #endregion

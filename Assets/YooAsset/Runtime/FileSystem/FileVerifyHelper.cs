@@ -8,7 +8,7 @@ namespace YooAsset
         /// <summary>
         /// 文件校验
         /// </summary>
-        public static EFileVerifyResult FileVerify(string filePath, long fileSize, string fileCRC, EFileVerifyLevel verifyLevel)
+        public static EFileVerifyResult FileVerify(string filePath, long fileSize, uint fileCRC, EFileVerifyLevel verifyLevel)
         {
             try
             {
@@ -25,7 +25,7 @@ namespace YooAsset
                 // 再验证文件CRC
                 if (verifyLevel == EFileVerifyLevel.High)
                 {
-                    string crc = HashUtility.FileCRC32(filePath);
+                    uint crc = HashUtility.FileCRC32Value(filePath);
                     if (crc == fileCRC)
                         return EFileVerifyResult.Succeed;
                     else

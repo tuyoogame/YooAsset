@@ -10,7 +10,7 @@ namespace YooAsset
         public string DataFilePath { private set; get; }
         public string InfoFilePath { private set; get; }
 
-        public string DataFileCRC;
+        public uint DataFileCRC;
         public long DataFileSize;
 
         /// <summary>

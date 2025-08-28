@@ -24,9 +24,9 @@ namespace YooAsset.Editor
             string filePath = bundleInfo.PackageSourceFilePath;
             return GetFilePathTempHash(filePath);
         }
-        protected override string GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
+        protected override uint GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
         {
-            return "00000000"; //8位
+            return 0;
         }
         protected override long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
         {

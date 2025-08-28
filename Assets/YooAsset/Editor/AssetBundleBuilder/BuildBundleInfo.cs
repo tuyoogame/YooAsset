@@ -27,7 +27,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 文件哈希值
         /// </summary>
-        public string PackageFileCRC { set; get; }
+        public uint PackageFileCRC { set; get; }
 
         /// <summary>
         /// 文件哈希值

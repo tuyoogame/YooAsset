@@ -16,6 +16,6 @@ namespace YooAsset
         /// <summary>
         /// 文件格式版本
         /// </summary>
-        public const string FileVersion = "2.3.1";
+        public const string FileVersion = "2025.8.28";
     }
 }
