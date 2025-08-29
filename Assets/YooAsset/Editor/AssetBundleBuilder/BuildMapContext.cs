@@ -14,6 +14,11 @@ namespace YooAsset.Editor
         private readonly Dictionary<string, BuildBundleInfo> _bundleInfoDic = new Dictionary<string, BuildBundleInfo>(10000);
 
         /// <summary>
+        /// 图集资源集合
+        /// </summary>
+        public readonly List<BuildAssetInfo> SpriteAtlasAssetList = new List<BuildAssetInfo>(10000);
+
+        /// <summary>
         /// 未被依赖的资源列表
         /// </summary>
         public readonly List<ReportIndependAsset> IndependAssets = new List<ReportIndependAsset>(1000);
@@ -59,6 +64,12 @@ namespace YooAsset.Editor
                 BuildBundleInfo newBundleInfo = new BuildBundleInfo(bundleName);
                 newBundleInfo.PackAsset(assetInfo);
                 _bundleInfoDic.Add(bundleName, newBundleInfo);
+            }
+
+            // 统计所有的精灵图集
+            if (assetInfo.AssetInfo.IsSpriteAtlas())
+            {
+                SpriteAtlasAssetList.Add(assetInfo);
             }
         }
 

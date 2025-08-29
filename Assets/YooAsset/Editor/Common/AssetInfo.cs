@@ -62,6 +62,17 @@ namespace YooAsset.Editor
                 return false;
         }
 
+        /// <summary>
+        /// 是否为图集资源
+        /// </summary>
+        public bool IsSpriteAtlas()
+        {
+            if (AssetType == typeof(UnityEngine.U2D.SpriteAtlas))
+                return true;
+            else
+                return false;
+        }
+
         public int CompareTo(AssetInfo other)
         {
             return this.AssetPath.CompareTo(other.AssetPath);
