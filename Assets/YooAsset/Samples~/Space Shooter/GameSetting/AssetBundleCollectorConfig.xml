@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<root Version="v2.1">
+<root Version="v2025.8.28">
   <Common ShowPackageView="False" ShowEditorAlias="False" UniqueBundleName="False" />
-  <Package PackageName="DefaultPackage" PackageDesc="" AutoAddressable="True" LocationToLower="False" IncludeAssetGUID="False" IgnoreRuleName="NormalIgnoreRule">
+  <Package PackageName="DefaultPackage" PackageDesc="" AutoAddressable="True" SupportExtensionless="True" LocationToLower="False" IncludeAssetGUID="False" IgnoreRuleName="NormalIgnoreRule">
     <Group GroupActiveRule="EnableGroup" GroupName="battle" GroupDesc="战斗" AssetTags="">
       <Collector CollectPath="Assets/Samples/Space Shooter/GameRes/Effect" CollectGUID="80d76514758554baaa96a9efffe9f3ef" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" UserData="" AssetTags="" />
       <Collector CollectPath="Assets/Samples/Space Shooter/GameRes/Entity" CollectGUID="4d7c84745db8e884f8020a8c5356e67c" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" UserData="" AssetTags="" />

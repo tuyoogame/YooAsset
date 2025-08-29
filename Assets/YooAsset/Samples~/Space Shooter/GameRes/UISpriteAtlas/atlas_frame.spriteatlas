@@ -6,7 +6,7 @@ SpriteAtlas:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: atlas_icon
+  m_Name: atlas_frame
   m_EditorData:
     serializedVersion: 2
     textureSettings:
@@ -32,23 +32,17 @@ SpriteAtlas:
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
-    - {fileID: 102900000, guid: e41a9b5f04378154f9bd69ac5d52ec44, type: 3}
+    - {fileID: 102900000, guid: 9b4f533c5ce702848a2d979731b313a5, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
-    - 379c45e0c5ba5e54e8df03f52e4c7680: 21300000
-    - fcab35236e33438448805a9211b0cc19: 21300000
-    - 3b8db7241fc8ff54e9dea6fc64cfd7e5: 21300000
+    - ddd541edadc7b104393f8973da3a3f7f: 21300000
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
-  - {fileID: 21300000, guid: 379c45e0c5ba5e54e8df03f52e4c7680, type: 3}
-  - {fileID: 21300000, guid: fcab35236e33438448805a9211b0cc19, type: 3}
-  - {fileID: 21300000, guid: 3b8db7241fc8ff54e9dea6fc64cfd7e5, type: 3}
+  - {fileID: 21300000, guid: ddd541edadc7b104393f8973da3a3f7f, type: 3}
   m_PackedSpriteNamesToIndex:
-  - pause
-  - bullet
-  - rocket
+  - frame
   m_RenderDataMap: {}
-  m_Tag: atlas_icon
+  m_Tag: atlas_frame
   m_IsVariant: 0

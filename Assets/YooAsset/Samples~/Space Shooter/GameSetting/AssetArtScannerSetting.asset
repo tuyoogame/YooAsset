@@ -22,3 +22,11 @@ MonoBehaviour:
     - CollectPath: Assets/Samples/Space Shooter/GameRes/EffectArt
     WhiteList:
     - 1c89236d45255234ebd1d39657ff7e02
+  - ScannerGUID: e5322d5d-394f-47ea-82ab-82199f8d20d8
+    ScannerName: Default Scanner
+    ScannerDesc: 
+    ScannerSchema: 5c2e5b350351d674891ef1a046654bcf
+    SaveDirectory: 
+    Collectors:
+    - CollectPath: 
+    WhiteList: []
