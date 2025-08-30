@@ -182,10 +182,10 @@ internal class AlipayFileSystem : IFileSystem
 
         if (string.IsNullOrEmpty(_aliCacheRoot))
         {
-            throw new System.Exception("请配置支付宝小游戏的缓存根目录！");
+            throw new System.Exception("请配置小游戏的缓存根目录！");
         }
 
-        // 注意：CDN服务未启用的情况下，使用支付宝WEB服务器
+        // 注意：CDN服务未启用的情况下，使用WEB服务器
         if (RemoteServices == null)
         {
             string webRoot = PathUtility.Combine(Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName, packageName);

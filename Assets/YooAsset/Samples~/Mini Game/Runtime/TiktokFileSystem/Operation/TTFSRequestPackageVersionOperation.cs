@@ -13,7 +13,7 @@ internal class TTFSRequestPackageVersionOperation : FSRequestPackageVersionOpera
     private readonly TiktokFileSystem _fileSystem;
     private readonly bool _appendTimeTicks;
     private readonly int _timeout;
-    private RequestTiktokPackageVersionOperation _requestPackageVersionOp;
+    private RequestWebPackageVersionOperation _requestPackageVersionOp;
     private ESteps _steps = ESteps.None;
 
 
@@ -36,7 +36,7 @@ internal class TTFSRequestPackageVersionOperation : FSRequestPackageVersionOpera
         {
             if (_requestPackageVersionOp == null)
             {
-                _requestPackageVersionOp = new RequestTiktokPackageVersionOperation(_fileSystem, _appendTimeTicks, _timeout);
+                _requestPackageVersionOp = new RequestWebPackageVersionOperation(_fileSystem.RemoteServices, _fileSystem.PackageName, _appendTimeTicks, _timeout);
                 _requestPackageVersionOp.StartOperation();
                 AddChildOperation(_requestPackageVersionOp);
             }

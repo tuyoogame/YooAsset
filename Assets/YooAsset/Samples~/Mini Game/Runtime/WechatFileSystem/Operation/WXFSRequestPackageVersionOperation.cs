@@ -13,7 +13,7 @@ internal class WXFSRequestPackageVersionOperation : FSRequestPackageVersionOpera
     private readonly WechatFileSystem _fileSystem;
     private readonly bool _appendTimeTicks;
     private readonly int _timeout;
-    private RequestWechatPackageVersionOperation _requestWebPackageVersionOp;
+    private RequestWebPackageVersionOperation _requestWebPackageVersionOp;
     private ESteps _steps = ESteps.None;
 
 
@@ -36,7 +36,7 @@ internal class WXFSRequestPackageVersionOperation : FSRequestPackageVersionOpera
         {
             if (_requestWebPackageVersionOp == null)
             {
-                _requestWebPackageVersionOp = new RequestWechatPackageVersionOperation(_fileSystem, _appendTimeTicks, _timeout);
+                _requestWebPackageVersionOp = new RequestWebPackageVersionOperation(_fileSystem.RemoteServices, _fileSystem.PackageName, _appendTimeTicks, _timeout);
                 _requestWebPackageVersionOp.StartOperation();
                 AddChildOperation(_requestWebPackageVersionOp);
             }

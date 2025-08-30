@@ -14,8 +14,8 @@ internal class APFSLoadPackageManifestOperation : FSLoadPackageManifestOperation
     private readonly AlipayFileSystem _fileSystem;
     private readonly string _packageVersion;
     private readonly int _timeout;
-    private RequestAlipayPackageHashOperation _requestPackageHashOp;
-    private LoadAlipayPackageManifestOperation _loadPackageManifestOp;
+    private RequestWebPackageHashOperation _requestPackageHashOp;
+    private LoadWebPackageManifestOperation _loadPackageManifestOp;
     private ESteps _steps = ESteps.None;
 
 
@@ -38,7 +38,7 @@ internal class APFSLoadPackageManifestOperation : FSLoadPackageManifestOperation
         {
             if (_requestPackageHashOp == null)
             {
-                _requestPackageHashOp = new RequestAlipayPackageHashOperation(_fileSystem, _packageVersion, _timeout);
+                _requestPackageHashOp = new RequestWebPackageHashOperation(_fileSystem.RemoteServices, _fileSystem.PackageName, _packageVersion, _timeout);
                 _requestPackageHashOp.StartOperation();
                 AddChildOperation(_requestPackageHashOp);
             }
@@ -64,7 +64,10 @@ internal class APFSLoadPackageManifestOperation : FSLoadPackageManifestOperation
             if (_loadPackageManifestOp == null)
             {
                 string packageHash = _requestPackageHashOp.PackageHash;
-                _loadPackageManifestOp = new LoadAlipayPackageManifestOperation(_fileSystem, _packageVersion, packageHash, _timeout);
+                string packageName = _fileSystem.PackageName;
+                var manifestServices = _fileSystem.ManifestServices;
+                var remoteServices = _fileSystem.RemoteServices;
+                _loadPackageManifestOp = new LoadWebPackageManifestOperation(manifestServices, remoteServices, packageName, _packageVersion, packageHash, _timeout);
                 _loadPackageManifestOp.StartOperation();
                 AddChildOperation(_loadPackageManifestOp);
             }

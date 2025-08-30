@@ -196,10 +196,10 @@ internal class WechatFileSystem : IFileSystem
 
         if (string.IsNullOrEmpty(_wxCacheRoot))
         {
-            throw new System.Exception("请配置微信小游戏缓存根目录！");
+            throw new System.Exception("请配置小游戏缓存根目录！");
         }
 
-        // 注意：CDN服务未启用的情况下，使用微信WEB服务器
+        // 注意：CDN服务未启用的情况下，使用WEB服务器
         if (RemoteServices == null)
         {
             string webRoot = PathUtility.Combine(Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName, packageName);

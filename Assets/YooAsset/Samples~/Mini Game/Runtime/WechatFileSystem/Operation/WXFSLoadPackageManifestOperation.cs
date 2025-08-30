@@ -14,11 +14,11 @@ internal class WXFSLoadPackageManifestOperation : FSLoadPackageManifestOperation
     private readonly WechatFileSystem _fileSystem;
     private readonly string _packageVersion;
     private readonly int _timeout;
-    private RequestWechatPackageHashOperation _requestPackageHashOp;
-    private LoadWechatPackageManifestOperation _loadPackageManifestOp;
+    private RequestWebPackageHashOperation _requestPackageHashOp;
+    private LoadWebPackageManifestOperation _loadPackageManifestOp;
     private ESteps _steps = ESteps.None;
 
-    
+
     public WXFSLoadPackageManifestOperation(WechatFileSystem fileSystem, string packageVersion, int timeout)
     {
         _fileSystem = fileSystem;
@@ -38,7 +38,7 @@ internal class WXFSLoadPackageManifestOperation : FSLoadPackageManifestOperation
         {
             if (_requestPackageHashOp == null)
             {
-                _requestPackageHashOp = new RequestWechatPackageHashOperation(_fileSystem, _packageVersion, _timeout);
+                _requestPackageHashOp = new RequestWebPackageHashOperation(_fileSystem.RemoteServices, _fileSystem.PackageName, _packageVersion, _timeout);
                 _requestPackageHashOp.StartOperation();
                 AddChildOperation(_requestPackageHashOp);
             }
@@ -64,7 +64,10 @@ internal class WXFSLoadPackageManifestOperation : FSLoadPackageManifestOperation
             if (_loadPackageManifestOp == null)
             {
                 string packageHash = _requestPackageHashOp.PackageHash;
-                _loadPackageManifestOp = new LoadWechatPackageManifestOperation(_fileSystem, _packageVersion, packageHash, _timeout);
+                string packageName = _fileSystem.PackageName;
+                var manifestServices = _fileSystem.ManifestServices;
+                var remoteServices = _fileSystem.RemoteServices;
+                _loadPackageManifestOp = new LoadWebPackageManifestOperation(manifestServices, remoteServices, packageName, _packageVersion, packageHash, _timeout);
                 _loadPackageManifestOp.StartOperation();
                 AddChildOperation(_loadPackageManifestOp);
             }
