@@ -29,6 +29,11 @@ namespace YooAsset.Editor
         /// </summary>
         public bool IgnoreTypeTreeChanges = true;
 
+        /// <summary>
+        /// 自动建立资源对象对图集的依赖关系
+        /// </summary>
+        public bool TrackSpriteAtlasDependencies = false;
+
 
         /// <summary>
         /// 生成代码防裁剪配置
