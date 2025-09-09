@@ -172,7 +172,7 @@ namespace YooAsset
             else if (name == FileSystemParametersDefine.FILE_VERIFY_MAX_CONCURRENCY)
             {
                 int convertValue = Convert.ToInt32(value);
-                FileVerifyMaxConcurrency = Math.Clamp(convertValue, 1, int.MaxValue);
+                FileVerifyMaxConcurrency = Mathf.Clamp(convertValue, 1, int.MaxValue);
             }
             else if (name == FileSystemParametersDefine.APPEND_FILE_EXTENSION)
             {

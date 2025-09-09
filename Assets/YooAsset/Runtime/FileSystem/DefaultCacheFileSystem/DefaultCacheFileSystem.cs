@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace YooAsset
 {
@@ -231,7 +232,7 @@ namespace YooAsset
             else if (name == FileSystemParametersDefine.FILE_VERIFY_MAX_CONCURRENCY)
             {
                 int convertValue = Convert.ToInt32(value);
-                FileVerifyMaxConcurrency = Math.Clamp(convertValue, 1, int.MaxValue);
+                FileVerifyMaxConcurrency = Mathf.Clamp(convertValue, 1, int.MaxValue);
             }
             else if (name == FileSystemParametersDefine.APPEND_FILE_EXTENSION)
             {
@@ -244,12 +245,12 @@ namespace YooAsset
             else if (name == FileSystemParametersDefine.DOWNLOAD_MAX_CONCURRENCY)
             {
                 int convertValue = Convert.ToInt32(value);
-                DownloadMaxConcurrency = Math.Clamp(convertValue, 1, int.MaxValue);
+                DownloadMaxConcurrency = Mathf.Clamp(convertValue, 1, int.MaxValue);
             }
             else if (name == FileSystemParametersDefine.DOWNLOAD_MAX_REQUEST_PER_FRAME)
             {
                 int convertValue = Convert.ToInt32(value);
-                DownloadMaxRequestPerFrame = Math.Clamp(convertValue, 1, int.MaxValue);
+                DownloadMaxRequestPerFrame = Mathf.Clamp(convertValue, 1, int.MaxValue);
             }
             else if (name == FileSystemParametersDefine.RESUME_DOWNLOAD_MINMUM_SIZE)
             {
