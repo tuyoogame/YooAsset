@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System;
 
 namespace YooAsset
 {
@@ -72,6 +73,7 @@ namespace YooAsset
         private readonly LoadBundleFileOperation _mainBundleLoader;
         private readonly List<LoadBundleFileOperation> _bundleLoaders = new List<LoadBundleFileOperation>(10);
         private readonly HashSet<HandleBase> _handles = new HashSet<HandleBase>();
+        private readonly LinkedList<WeakReference<HandleBase>> _weakReferences = new LinkedList<WeakReference<HandleBase>>();
 
         public ProviderOperation(ResourceManager manager, string providerGUID, AssetInfo assetInfo)
         {
@@ -210,6 +212,11 @@ namespace YooAsset
             if (_steps == ESteps.ProcessBundleResult)
                 return false;
 
+            if (_resManager.UseWeakReferenceHandle)
+            {
+                TryCleanupWeakReference();
+            }
+
             return RefCount <= 0;
         }
 
@@ -222,7 +229,15 @@ namespace YooAsset
             RefCount++;
 
             HandleBase handle = HandleFactory.CreateHandle(this, typeof(T));
-            _handles.Add(handle);
+            if (_resManager.UseWeakReferenceHandle)
+            {
+                var weakRef = new WeakReference<HandleBase>(handle);
+                _weakReferences.AddLast(weakRef);
+            }
+            else
+            {
+                _handles.Add(handle);
+            }
             return handle as T;
         }
 
@@ -234,8 +249,16 @@ namespace YooAsset
             if (RefCount <= 0)
                 throw new System.Exception("Should never get here !");
 
-            if (_handles.Remove(handle) == false)
-                throw new System.Exception("Should never get here !");
+            if (_resManager.UseWeakReferenceHandle)
+            {
+                if (RemoveWeakReference(handle) == false)
+                    throw new System.Exception("Should never get here !");
+            }
+            else
+            {
+                if (_handles.Remove(handle) == false)
+                    throw new System.Exception("Should never get here !");
+            }
 
             // 引用计数减少
             RefCount--;
@@ -246,10 +269,24 @@ namespace YooAsset
         /// </summary>
         public void ReleaseAllHandles()
         {
-            List<HandleBase> tempers = _handles.ToList();
-            foreach (var handle in tempers)
+            if (_resManager.UseWeakReferenceHandle)
             {
-                handle.Release();
+                List<WeakReference<HandleBase>> tempers = _weakReferences.ToList();
+                foreach (var weakRef in tempers)
+                {
+                    if (weakRef.TryGetTarget(out HandleBase target))
+                    {
+                        target.Release();
+                    }
+                }
+            }
+            else
+            {
+                List<HandleBase> tempers = _handles.ToList();
+                foreach (var handle in tempers)
+                {
+                    handle.Release();
+                }
             }
         }
 
@@ -264,12 +301,29 @@ namespace YooAsset
 
             // 注意：创建临时列表是为了防止外部逻辑在回调函数内创建或者释放资源句柄。
             // 注意：回调方法如果发生异常，会阻断列表里的后续回调方法！
-            List<HandleBase> tempers = _handles.ToList();
-            foreach (var hande in tempers)
+            if (_resManager.UseWeakReferenceHandle)
             {
-                if (hande.IsValid)
+                List<WeakReference<HandleBase>> tempers = _weakReferences.ToList();
+                foreach (var weakRef in tempers)
                 {
-                    hande.InvokeCallback();
+                    if (weakRef.TryGetTarget(out HandleBase target))
+                    {
+                        if (target.IsValid)
+                        {
+                            target.InvokeCallback();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                List<HandleBase> tempers = _handles.ToList();
+                foreach (var handle in tempers)
+                {
+                    if (handle.IsValid)
+                    {
+                        handle.InvokeCallback();
+                    }
                 }
             }
         }
@@ -292,6 +346,50 @@ namespace YooAsset
             status.IsDone = status.DownloadedBytes == status.TotalBytes;
             status.Progress = (float)status.DownloadedBytes / status.TotalBytes;
             return status;
+        }
+
+        /// <summary>
+        /// 移除指定句柄的弱引用对象
+        /// </summary>
+        private bool RemoveWeakReference(HandleBase handle)
+        {
+            bool removed = false;
+            var currentNode = _weakReferences.First;
+            while (currentNode != null)
+            {
+                var nextNode = currentNode.Next;
+                if (currentNode.Value.TryGetTarget(out HandleBase target))
+                {
+                    if (ReferenceEquals(target, handle))
+                    {
+                        _weakReferences.Remove(currentNode);
+                        removed = true;
+                        break;
+                    }
+                }
+                currentNode = nextNode;
+            }
+            return removed;
+        }
+
+        /// <summary>
+        /// 清理所有失效的弱引用
+        /// </summary>
+        private void TryCleanupWeakReference()
+        {
+            var currentNode = _weakReferences.First;
+            while (currentNode != null)
+            {
+                var nextNode = currentNode.Next;
+                if (currentNode.Value.TryGetTarget(out HandleBase target) == false)
+                {
+                    _weakReferences.Remove(currentNode);
+
+                    // 引用计数减少
+                    RefCount--;
+                }
+                currentNode = nextNode;
+            }
         }
 
         #region 调试信息

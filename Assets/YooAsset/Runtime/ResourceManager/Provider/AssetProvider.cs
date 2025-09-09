@@ -17,7 +17,7 @@ namespace YooAsset
                 AddChildOperation(_loadAssetOp);
 
 #if UNITY_WEBGL
-                if (_resManager.WebGLForceSyncLoadAsset())
+                if (_resManager.WebGLForceSyncLoadAsset)
                     _loadAssetOp.WaitForAsyncComplete();
 #endif
             }
