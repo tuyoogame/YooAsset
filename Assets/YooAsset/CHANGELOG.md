@@ -69,7 +69,9 @@ All notable changes to this package will be documented in this file.
 
 - (#617) 新增资源收集配置参数：SupportExtensionless
 
-  在不需要模糊加载模式的前提下，开启此选项，可以降低运行时内存大小。
+  在不需要模糊加载模式的前提下，关闭此选项，可以降低运行时内存大小。
+
+  该选项默认开启！
 
   ```csharp
   public class CollectCommand
