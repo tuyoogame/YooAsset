@@ -83,7 +83,17 @@ namespace YooAsset
             {
                 if (IsWaitForAsyncComplete)
                 {
-                    _steps = ESteps.CheckResult;
+                    if (_fileSystem.VirtualWebGLMode)
+                    {
+                        _steps = ESteps.Done;
+                        Status = EOperationStatus.Failed;
+                        Error = "Virtual WebGL Mode only support asyn load method !";
+                        YooLogger.Error(Error);
+                    }
+                    else
+                    {
+                        _steps = ESteps.CheckResult;
+                    }
                 }
                 else
                 {

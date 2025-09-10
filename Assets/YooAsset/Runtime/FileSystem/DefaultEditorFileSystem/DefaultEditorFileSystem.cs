@@ -40,6 +40,11 @@ namespace YooAsset
 
         #region 自定义参数
         /// <summary>
+        /// 模拟WebGL平台模式
+        /// </summary>
+        public bool VirtualWebGLMode { private set; get; } = false;
+
+        /// <summary>
         /// 模拟虚拟下载模式
         /// </summary>
         public bool VirtualDownloadMode { private set; get; } = false;
@@ -107,6 +112,10 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
+            if (name == FileSystemParametersDefine.VIRTUAL_WEBGL_MODE)
+            {
+                VirtualWebGLMode = Convert.ToBoolean(value);
+            }
             if (name == FileSystemParametersDefine.VIRTUAL_DOWNLOAD_MODE)
             {
                 VirtualDownloadMode = Convert.ToBoolean(value);
