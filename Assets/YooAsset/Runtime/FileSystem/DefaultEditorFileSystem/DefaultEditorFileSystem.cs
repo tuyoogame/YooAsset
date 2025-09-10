@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace YooAsset
 {
@@ -7,6 +8,7 @@ namespace YooAsset
     /// </summary>
     internal class DefaultEditorFileSystem : IFileSystem
     {
+        protected readonly HashSet<string> _records = new HashSet<string>();
         protected string _packageRoot;
 
         /// <summary>
@@ -38,14 +40,24 @@ namespace YooAsset
 
         #region 自定义参数
         /// <summary>
+        /// 模拟虚拟下载模式
+        /// </summary>
+        public bool VirtualDownloadMode { private set; get; } = false;
+
+        /// <summary>
+        /// 模拟虚拟下载的网速（单位：字节）
+        /// </summary>
+        public int VirtualDownloadSpeed { private set; get; } = 1024;
+
+        /// <summary>
         /// 异步模拟加载最小帧数
         /// </summary>
-        public int _asyncSimulateMinFrame = 1;
+        public int AsyncSimulateMinFrame { private set; get; } = 1;
 
         /// <summary>
         /// 异步模拟加载最大帧数
         /// </summary>
-        public int _asyncSimulateMaxFrame = 1;
+        public int AsyncSimulateMaxFrame { private set; get; } = 1;
         #endregion
 
         public DefaultEditorFileSystem()
@@ -73,7 +85,10 @@ namespace YooAsset
         }
         public virtual FSDownloadFileOperation DownloadFileAsync(PackageBundle bundle, DownloadFileOptions options)
         {
-            throw new System.NotImplementedException();
+            string mainURL = bundle.BundleName;
+            options.SetURL(mainURL, mainURL);
+            var downloader = new DownloadVirtualBundleOperation(this, bundle, options);
+            return downloader;
         }
         public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
         {
@@ -92,13 +107,21 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == FileSystemParametersDefine.ASYNC_SIMULATE_MIN_FRAME)
+            if (name == FileSystemParametersDefine.VIRTUAL_DOWNLOAD_MODE)
             {
-                _asyncSimulateMinFrame = Convert.ToInt32(value);
+                VirtualDownloadMode = Convert.ToBoolean(value);
+            }
+            else if (name == FileSystemParametersDefine.VIRTUAL_DOWNLOAD_SPEED)
+            {
+                VirtualDownloadSpeed = Convert.ToInt32(value);
+            }
+            else if (name == FileSystemParametersDefine.ASYNC_SIMULATE_MIN_FRAME)
+            {
+                AsyncSimulateMinFrame = Convert.ToInt32(value);
             }
             else if (name == FileSystemParametersDefine.ASYNC_SIMULATE_MAX_FRAME)
             {
-                _asyncSimulateMaxFrame = Convert.ToInt32(value);
+                AsyncSimulateMaxFrame = Convert.ToInt32(value);
             }
             else
             {
@@ -124,11 +147,21 @@ namespace YooAsset
         }
         public virtual bool Exists(PackageBundle bundle)
         {
-            return true;
+            if (VirtualDownloadMode)
+            {
+                return _records.Contains(bundle.BundleGUID);
+            }
+            else
+            {
+                return true;
+            }
         }
         public virtual bool NeedDownload(PackageBundle bundle)
         {
-            return false;
+            if (Belong(bundle) == false)
+                return false;
+
+            return Exists(bundle) == false;
         }
         public virtual bool NeedUnpack(PackageBundle bundle)
         {
@@ -165,6 +198,11 @@ namespace YooAsset
         }
 
         #region 内部方法
+        public void RecordDownloadFile(string bundleName)
+        {
+            if (_records.Contains(bundleName) == false)
+                _records.Add(bundleName);
+        }
         public string GetEditorPackageVersionFilePath()
         {
             string fileName = YooAssetSettingsData.GetPackageVersionFileName(PackageName);
@@ -182,12 +220,12 @@ namespace YooAsset
         }
         public int GetAsyncSimulateFrame()
         {
-            if (_asyncSimulateMinFrame > _asyncSimulateMaxFrame)
+            if (AsyncSimulateMinFrame > AsyncSimulateMaxFrame)
             {
-                _asyncSimulateMinFrame = _asyncSimulateMaxFrame;
+                AsyncSimulateMinFrame = AsyncSimulateMaxFrame;
             }
 
-            return UnityEngine.Random.Range(_asyncSimulateMinFrame, _asyncSimulateMaxFrame + 1);
+            return UnityEngine.Random.Range(AsyncSimulateMinFrame, AsyncSimulateMaxFrame + 1);
         }
         #endregion
     }

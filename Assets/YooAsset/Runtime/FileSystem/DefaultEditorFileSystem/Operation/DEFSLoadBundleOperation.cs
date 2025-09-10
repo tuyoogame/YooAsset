@@ -6,6 +6,7 @@ namespace YooAsset
         protected enum ESteps
         {
             None,
+            CheckExist,
             DownloadFile,
             LoadAssetBundle,
             CheckResult,
@@ -14,6 +15,7 @@ namespace YooAsset
 
         private readonly DefaultEditorFileSystem _fileSystem;
         private readonly PackageBundle _bundle;
+        protected FSDownloadFileOperation _downloadFileOp;
         private int _asyncSimulateFrame;
         private ESteps _steps = ESteps.None;
 
@@ -24,19 +26,57 @@ namespace YooAsset
         }
         internal override void InternalStart()
         {
-            _steps = ESteps.DownloadFile;
+            _steps = ESteps.CheckExist;
+            _asyncSimulateFrame = _fileSystem.GetAsyncSimulateFrame();
         }
         internal override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
+            if (_steps == ESteps.CheckExist)
+            {
+                if (_fileSystem.Exists(_bundle))
+                {
+                    DownloadProgress = 1f;
+                    DownloadedBytes = _bundle.FileSize;
+                    _steps = ESteps.LoadAssetBundle;
+                }
+                else
+                {
+                    _steps = ESteps.DownloadFile;
+                }
+            }
+
             if (_steps == ESteps.DownloadFile)
             {
-                _asyncSimulateFrame = _fileSystem.GetAsyncSimulateFrame();
-                DownloadProgress = 1f;
-                DownloadedBytes = _bundle.FileSize;
-                _steps = ESteps.LoadAssetBundle;
+                if (_downloadFileOp == null)
+                {
+                    DownloadFileOptions options = new DownloadFileOptions(int.MaxValue);
+                    _downloadFileOp = _fileSystem.DownloadFileAsync(_bundle, options);
+                    _downloadFileOp.StartOperation();
+                    AddChildOperation(_downloadFileOp);
+                }
+
+                if (IsWaitForAsyncComplete)
+                    _downloadFileOp.WaitForAsyncComplete();
+
+                _downloadFileOp.UpdateOperation();
+                DownloadProgress = _downloadFileOp.DownloadProgress;
+                DownloadedBytes = _downloadFileOp.DownloadedBytes;
+                if (_downloadFileOp.IsDone == false)
+                    return;
+
+                if (_downloadFileOp.Status == EOperationStatus.Succeed)
+                {
+                    _steps = ESteps.LoadAssetBundle;
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = _downloadFileOp.Error;
+                }
             }
 
             if (_steps == ESteps.LoadAssetBundle)
