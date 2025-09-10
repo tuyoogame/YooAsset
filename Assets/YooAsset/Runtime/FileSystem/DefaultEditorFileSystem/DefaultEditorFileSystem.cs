@@ -8,7 +8,7 @@ namespace YooAsset
     /// </summary>
     internal class DefaultEditorFileSystem : IFileSystem
     {
-        protected readonly HashSet<string> _records = new HashSet<string>();
+        protected readonly Dictionary<string, string> _records = new Dictionary<string, string>(10000);
         protected string _packageRoot;
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace YooAsset
         {
             if (VirtualDownloadMode)
             {
-                return _records.Contains(bundle.BundleGUID);
+                return _records.ContainsKey(bundle.BundleGUID);
             }
             else
             {
@@ -198,10 +198,10 @@ namespace YooAsset
         }
 
         #region 内部方法
-        public void RecordDownloadFile(string bundleName)
+        public void RecordDownloadFile(PackageBundle bundle)
         {
-            if (_records.Contains(bundleName) == false)
-                _records.Add(bundleName);
+            if (_records.ContainsKey(bundle.BundleGUID) == false)
+                _records.Add(bundle.BundleGUID, bundle.BundleName);
         }
         public string GetEditorPackageVersionFilePath()
         {

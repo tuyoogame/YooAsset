@@ -92,7 +92,7 @@ namespace YooAsset
 
                 if (_unityDownloadFileOp.Status == EOperationStatus.Succeed)
                 {
-                    _fileSystem.RecordDownloadFile(Bundle.BundleName);
+                    _fileSystem.RecordDownloadFile(Bundle);
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
                 }
