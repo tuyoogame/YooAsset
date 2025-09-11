@@ -109,6 +109,13 @@ namespace YooAsset
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
+            // 注意：未在加载中的任务可以挂起！
+            if (_steps != ESteps.ProcessBundleResult)
+            {
+                if (RefCount <= 0)
+                    return;
+            }
+
             if (_steps == ESteps.StartBundleLoader)
             {
                 foreach (var bundleLoader in _bundleLoaders)
@@ -192,8 +199,9 @@ namespace YooAsset
             // 检测是否为正常销毁
             if (IsDone == false)
             {
-                Error = "User abort !";
+                _steps = ESteps.Done;
                 Status = EOperationStatus.Failed;
+                Error = "User abort !";
             }
 
             // 减少引用计数
@@ -208,7 +216,7 @@ namespace YooAsset
         /// </summary>
         public bool CanDestroyProvider()
         {
-            // 注意：在进行资源加载过程时不可以销毁
+            // 注意：正在加载中的任务不可以销毁
             if (_steps == ESteps.ProcessBundleResult)
                 return false;
 

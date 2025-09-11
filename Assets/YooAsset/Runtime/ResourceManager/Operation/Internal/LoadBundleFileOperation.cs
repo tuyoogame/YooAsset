@@ -83,6 +83,7 @@ namespace YooAsset
             {
                 if (_loadBundleOp == null)
                 {
+                    // 统计计数增加
                     _resManager.BundleLoadingCounter++;
                     _loadBundleOp = LoadBundleInfo.LoadBundleFile();
                     _loadBundleOp.StartOperation();
@@ -163,11 +164,12 @@ namespace YooAsset
         {
             IsDestroyed = true;
 
-            // Check fatal
+            // 注意：正在加载中的任务不可以销毁
+            if (_steps == ESteps.LoadBundleFile)
+                throw new Exception($"Bundle file loader is not done : {LoadBundleInfo.Bundle.BundleName}");
+
             if (RefCount > 0)
                 throw new Exception($"Bundle file loader ref is not zero : {LoadBundleInfo.Bundle.BundleName}");
-            if (IsDone == false)
-                throw new Exception($"Bundle file loader is not done : {LoadBundleInfo.Bundle.BundleName}");
 
             if (Result != null)
                 Result.UnloadBundleFile();
@@ -178,7 +180,8 @@ namespace YooAsset
         /// </summary>
         public bool CanDestroyLoader()
         {
-            if (IsDone == false)
+            // 注意：正在加载中的任务不可以销毁
+            if (_steps == ESteps.LoadBundleFile)
                 return false;
 
             if (RefCount > 0)
