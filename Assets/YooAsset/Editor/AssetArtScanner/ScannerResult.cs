@@ -19,6 +19,11 @@ namespace YooAsset.Editor
         public string ErrorInfo { private set; get; }
 
         /// <summary>
+        /// 错误堆栈
+        /// </summary>
+        public string ErrorStack { private set; get; }
+
+        /// <summary>
         /// 是否成功
         /// </summary>
         public bool Succeed
@@ -33,9 +38,10 @@ namespace YooAsset.Editor
         }
 
 
-        public ScannerResult(string error)
+        public ScannerResult(string error, string stack)
         {
             ErrorInfo = error;
+            ErrorStack = stack;
         }
         public ScannerResult(string filePath, ScanReport report)
         {
