@@ -67,6 +67,16 @@ namespace YooAsset
         /// </summary>
         public bool IsDestroyed { private set; get; } = false;
 
+        /// <summary>
+        /// 加载任务是否进行中
+        /// </summary>
+        private bool IsLoading
+        {
+            get
+            {
+                return _steps == ESteps.WaitBundleLoader || _steps == ESteps.ProcessBundleResult;
+            }
+        }
 
         private ESteps _steps = ESteps.None;
         protected readonly ResourceManager _resManager;
@@ -110,7 +120,7 @@ namespace YooAsset
                 return;
 
             // 注意：未在加载中的任务可以挂起！
-            if (_steps != ESteps.ProcessBundleResult)
+            if (IsLoading == false)
             {
                 if (RefCount <= 0)
                     return;
@@ -217,7 +227,7 @@ namespace YooAsset
         public bool CanDestroyProvider()
         {
             // 注意：正在加载中的任务不可以销毁
-            if (_steps == ESteps.ProcessBundleResult)
+            if (IsLoading)
                 return false;
 
             if (_resManager.UseWeakReferenceHandle)
