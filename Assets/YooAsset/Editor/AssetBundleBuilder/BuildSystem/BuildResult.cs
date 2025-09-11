@@ -22,6 +22,11 @@ namespace YooAsset.Editor
         public string ErrorInfo;
 
         /// <summary>
+        /// 构建失败的堆栈
+        /// </summary>
+        public string ErrorStack;
+
+        /// <summary>
         /// 输出的补丁包目录
         /// </summary>
         public string OutputPackageDirectory;

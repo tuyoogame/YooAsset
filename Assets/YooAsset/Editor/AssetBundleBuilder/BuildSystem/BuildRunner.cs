@@ -51,6 +51,7 @@ namespace YooAsset.Editor
                     EditorTools.ClearProgressBar();
                     buildResult.FailedTask = task.GetType().Name;
                     buildResult.ErrorInfo = e.ToString();
+                    buildResult.ErrorStack = e.StackTrace;
                     buildResult.Success = false;
                     break;
                 }
