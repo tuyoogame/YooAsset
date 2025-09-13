@@ -139,6 +139,20 @@ namespace YooAsset.Editor
         /// </summary>
         public List<CollectAssetInfo> GetAllCollectAssets(CollectCommand command, AssetBundleCollectorGroup group)
         {
+            bool ignoreStaticCollector = command.IsFlagSet(ECollectFlags.IgnoreStaticCollector);
+            if (ignoreStaticCollector)
+            {
+                if (CollectorType == ECollectorType.StaticAssetCollector)
+                    return new List<CollectAssetInfo>();
+            }
+
+            bool ignoreDependCollector = command.IsFlagSet(ECollectFlags.IgnoreDependCollector);
+            if (ignoreDependCollector)
+            {
+                if (CollectorType == ECollectorType.DependAssetCollector)
+                    return new List<CollectAssetInfo>();
+            }
+
             Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(1000);
 
             // 收集打包资源路径
@@ -262,8 +276,8 @@ namespace YooAsset.Editor
         }
         private List<AssetInfo> GetAllDependencies(CollectCommand command, string mainAssetPath)
         {
-            // 注意：模拟构建模式下不需要收集依赖资源
-            if (command.SimulateBuild)
+            bool ignoreGetDependencies = command.IsFlagSet(ECollectFlags.IgnoreGetDependencies);
+            if (ignoreGetDependencies)
                 return new List<AssetInfo>();
 
             string[] depends = command.AssetDependency.GetDependencies(mainAssetPath, true);

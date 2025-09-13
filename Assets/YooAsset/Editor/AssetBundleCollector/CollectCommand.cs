@@ -1,6 +1,26 @@
 ﻿
 namespace YooAsset.Editor
 {
+    public enum ECollectFlags
+    {
+        None = 0,
+
+        /// <summary>
+        /// 不收集依赖资源
+        /// </summary>
+        IgnoreGetDependencies = 1 << 0,
+
+        /// <summary>
+        /// 忽略静态收集器
+        /// </summary>
+        IgnoreStaticCollector = 1 << 1,
+
+        /// <summary>
+        /// 忽略依赖收集器
+        /// </summary>
+        IgnoreDependCollector = 1 << 2,
+    }
+
     public class CollectCommand
     {
         /// <summary>
@@ -17,7 +37,20 @@ namespace YooAsset.Editor
         /// <summary>
         /// 模拟构建模式
         /// </summary>
-        public bool SimulateBuild { set; get; }
+        public bool SimulateBuild
+        {
+            set
+            {
+                SetFlag(ECollectFlags.IgnoreGetDependencies, value);
+                SetFlag(ECollectFlags.IgnoreStaticCollector, value);
+                SetFlag(ECollectFlags.IgnoreDependCollector, value);
+            }
+        }
+
+        /// <summary>
+        /// 窗口收集模式
+        /// </summary>
+        public int CollectFlags { set; get; } = 0;
 
         /// <summary>
         /// 资源包名唯一化
@@ -69,6 +102,25 @@ namespace YooAsset.Editor
         {
             PackageName = packageName;
             IgnoreRule = ignoreRule;
+        }
+
+        /// <summary>
+        /// 设置标记位
+        /// </summary>
+        public void SetFlag(ECollectFlags flag, bool isOn)
+        {
+            if (isOn)
+                CollectFlags |= (int)flag;  // 开启指定标志位
+            else
+                CollectFlags &= ~(int)flag; // 关闭指定标志位
+        }
+
+        /// <summary>
+        /// 查询标记位
+        /// </summary>
+        public bool IsFlagSet(ECollectFlags flag)
+        {
+            return (CollectFlags & (int)flag) != 0;
         }
     }
 }

@@ -1028,7 +1028,7 @@ namespace YooAsset.Editor
                 IIgnoreRule ignoreRule = AssetBundleCollectorSettingData.GetIgnoreRuleInstance(_ignoreRulePopupField.value.ClassName);
                 string packageName = _packageNameTxt.value;
                 var command = new CollectCommand(packageName, ignoreRule);
-                command.SimulateBuild = true;
+                command.SetFlag(ECollectFlags.IgnoreGetDependencies, true);
                 command.UniqueBundleName = _uniqueBundleNameToogle.value;
                 command.EnableAddressable = _enableAddressableToogle.value;
                 command.SupportExtensionless = _supportExtensionlessToogle.value;
