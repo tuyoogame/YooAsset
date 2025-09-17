@@ -50,21 +50,27 @@ namespace YooAsset
             if (_watchDogAborted)
                 return;
 
+#if UNITY_2020_3_OR_NEWER
+            double realtimeSinceStartup = UnityEngine.Time.realtimeSinceStartupAsDouble;
+#else
+            double realtimeSinceStartup = UnityEngine.Time.realtimeSinceStartup;
+#endif
+
             if (_watchDogInit == false)
             {
                 _watchDogInit = true;
                 _lastDownloadBytes = 0;
-                _lastGetDataTime = UnityEngine.Time.realtimeSinceStartupAsDouble;
+                _lastGetDataTime = realtimeSinceStartup;
             }
 
             if (_webRequest.downloadedBytes != _lastDownloadBytes)
             {
                 _lastDownloadBytes = _webRequest.downloadedBytes;
-                _lastGetDataTime = UnityEngine.Time.realtimeSinceStartupAsDouble;
+                _lastGetDataTime = realtimeSinceStartup;
             }
             else
             {
-                double deltaTime = UnityEngine.Time.realtimeSinceStartupAsDouble - _lastGetDataTime;
+                double deltaTime = realtimeSinceStartup - _lastGetDataTime;
                 if (deltaTime > _fileSystem.DownloadWatchDogTime)
                 {
                     _watchDogAborted = true;
