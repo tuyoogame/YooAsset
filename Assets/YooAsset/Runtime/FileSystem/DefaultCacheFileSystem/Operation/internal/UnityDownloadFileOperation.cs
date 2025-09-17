@@ -17,6 +17,11 @@ namespace YooAsset
         protected readonly PackageBundle _bundle;
         protected readonly string _tempFilePath;
 
+        private bool _watchDogInit = false;
+        private bool _watchDogAborted = false;
+        private ulong _lastDownloadBytes;
+        private double _lastGetDataTime;
+
         /// <summary>
         /// 引用计数
         /// </summary>
@@ -31,6 +36,41 @@ namespace YooAsset
         internal override string InternalGetDesc()
         {
             return $"RefCount : {RefCount}";
+        }
+
+        /// <summary>
+        /// 更新看门狗监测
+        /// 说明：监控时间范围内，如果没有接收到任何下载数据，那么直接终止任务！
+        /// </summary>
+        protected void UpdateWatchDog()
+        {
+            if (_fileSystem.DownloadWatchDogTime == int.MaxValue)
+                return;
+
+            if (_watchDogAborted)
+                return;
+
+            if (_watchDogInit == false)
+            {
+                _watchDogInit = true;
+                _lastDownloadBytes = 0;
+                _lastGetDataTime = UnityEngine.Time.realtimeSinceStartupAsDouble;
+            }
+
+            if (_webRequest.downloadedBytes != _lastDownloadBytes)
+            {
+                _lastDownloadBytes = _webRequest.downloadedBytes;
+                _lastGetDataTime = UnityEngine.Time.realtimeSinceStartupAsDouble;
+            }
+            else
+            {
+                double deltaTime = UnityEngine.Time.realtimeSinceStartupAsDouble - _lastGetDataTime;
+                if (deltaTime > _fileSystem.DownloadWatchDogTime)
+                {
+                    _watchDogAborted = true;
+                    InternalAbort(); //终止网络请求
+                }
+            }
         }
 
         /// <summary>

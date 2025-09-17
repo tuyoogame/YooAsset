@@ -56,6 +56,8 @@ namespace YooAsset
                 DownloadProgress = _webRequest.downloadProgress;
                 DownloadedBytes = _fileOriginLength + (long)_webRequest.downloadedBytes;
                 Progress = DownloadProgress;
+
+                UpdateWatchDog();
                 if (_webRequest.isDone == false)
                     return;
 

@@ -39,6 +39,8 @@ namespace YooAsset
                 DownloadProgress = _webRequest.downloadProgress;
                 DownloadedBytes = (long)_webRequest.downloadedBytes;
                 Progress = DownloadProgress;
+
+                UpdateWatchDog();
                 if (_webRequest.isDone == false)
                     return;
 

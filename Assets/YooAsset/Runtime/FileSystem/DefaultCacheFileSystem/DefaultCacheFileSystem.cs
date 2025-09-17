@@ -97,6 +97,11 @@ namespace YooAsset
         public int DownloadMaxRequestPerFrame { private set; get; } = int.MaxValue;
 
         /// <summary>
+        /// 自定义参数：下载任务的看门狗机制监控时间
+        /// </summary>
+        public int DownloadWatchDogTime { private set; get; } = int.MaxValue;
+
+        /// <summary>
         /// 自定义参数：启用断点续传的最小尺寸
         /// </summary>
         public long ResumeDownloadMinimumSize { private set; get; } = long.MaxValue;
@@ -251,6 +256,11 @@ namespace YooAsset
             {
                 int convertValue = Convert.ToInt32(value);
                 DownloadMaxRequestPerFrame = Mathf.Clamp(convertValue, 1, int.MaxValue);
+            }
+            else if (name == FileSystemParametersDefine.DOWNLOAD_WATCH_DOG_TIME)
+            {
+                int convertValue = Convert.ToInt32(value);
+                DownloadWatchDogTime = Mathf.Clamp(convertValue, 1, int.MaxValue);
             }
             else if (name == FileSystemParametersDefine.RESUME_DOWNLOAD_MINMUM_SIZE)
             {

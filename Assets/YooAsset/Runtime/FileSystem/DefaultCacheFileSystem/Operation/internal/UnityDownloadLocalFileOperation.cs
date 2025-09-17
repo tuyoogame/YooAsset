@@ -4,7 +4,7 @@ using UnityEngine.Networking;
 
 namespace YooAsset
 {
-    internal class UnityDownloadLocalFileOperation : UnityDownloadFileOperation
+    internal sealed class UnityDownloadLocalFileOperation : UnityDownloadFileOperation
     {
         private VerifyTempFileOperation _verifyOperation;
         private ESteps _steps = ESteps.None;
@@ -42,6 +42,8 @@ namespace YooAsset
                 DownloadProgress = _webRequest.downloadProgress;
                 DownloadedBytes = (long)_webRequest.downloadedBytes;
                 Progress = DownloadProgress;
+
+                UpdateWatchDog();
                 if (_webRequest.isDone == false)
                     return;
 
