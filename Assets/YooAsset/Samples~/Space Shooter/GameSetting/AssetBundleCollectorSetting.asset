@@ -35,7 +35,7 @@ MonoBehaviour:
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackSeparately
-        FilterRuleName: CollectAll
+        FilterRuleName: CollectPrefab
         AssetTags: 
         UserData: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/Entity
@@ -43,7 +43,7 @@ MonoBehaviour:
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackSeparately
-        FilterRuleName: CollectAll
+        FilterRuleName: CollectPrefab
         AssetTags: 
         UserData: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/Audio
@@ -101,7 +101,7 @@ MonoBehaviour:
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackSeparately
-        FilterRuleName: CollectAll
+        FilterRuleName: CollectScene
         AssetTags: 
         UserData: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/SceneArt
@@ -122,7 +122,7 @@ MonoBehaviour:
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackSeparately
-        FilterRuleName: CollectAll
+        FilterRuleName: CollectPrefab
         AssetTags: 
         UserData: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/UIPanelArt
@@ -146,7 +146,7 @@ MonoBehaviour:
         CollectorType: 1
         AddressRuleName: AddressByFileName
         PackRuleName: PackDirectory
-        FilterRuleName: CollectAll
+        FilterRuleName: CollectSprite
         AssetTags: 
         UserData: 
       - CollectPath: Assets/Samples/Space Shooter/GameRes/UISpriteAtlas
