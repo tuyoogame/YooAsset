@@ -2,6 +2,88 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.3.16] - 2025-09-17
+
+### Improvements
+
+- (#638) 优化了Provider加载机制，引用计数为零时自动挂起！
+
+### Fixed
+
+- (#644) [**严重**] 修复了2.3.15版本，资产量巨大的情况下，编辑器下模拟模式初始化耗时很久的问题。
+
+### Added
+
+- (#639) 新增了文件系统参数：VIRTUAL_DOWNLOAD_MODE 和 VIRTUAL_DOWNLOAD_SPEED 
+
+  编辑器下不需要构建AB，也可以模拟远端资源下载，等同真机运行环境。
+
+  ```csharp
+  class DefaultEditorFIleSystem
+  {
+      /// <summary>
+      /// 模拟虚拟下载模式
+      /// </summary>
+      public bool VirtualDownloadMode { private set; get; } = false;
+  
+      /// <summary>
+      /// 模拟虚拟下载的网速（单位：字节）
+      /// </summary>
+      public int VirtualDownloadSpeed { private set; get; } = 1024;
+  }
+  ```
+
+- (#640) 新增了文件系统参数：VIRTUAL_WEBGL_MODE 
+
+  编辑器下不需要构建AB，也可以模拟小游戏开发环境，等同真机运行环境。
+
+  ```csharp
+  class DefaultEditorFIleSystem
+  {
+      /// <summary>
+      /// 模拟WebGL平台模式
+      /// </summary>
+      public bool VirtualWebGLMode { private set; get; } = false;
+  }
+  ```
+
+- (#642) 新增了文件系统参数：DOWNLOAD_WATCH_DOG_TIME
+
+  监控时间范围内，如果没有接收到任何下载数据，那么直接终止任务！
+
+  ```csharp
+  class DefaultCacheFIleSystem
+  {
+      /// <summary>
+      /// 自定义参数：下载任务的看门狗机制监控时间
+      /// </summary>
+      public int DownloadWatchDogTime { private set; get; } = int.MaxValue;
+  }
+  ```
+
+### Changed
+
+- 下载器参数timeout移除。
+
+  可以使用文件系统的看门狗机制代替。
+
+- (#632) IFilterRule接口变动。
+
+  收集器可以指定搜寻的资源类型，在收集目录资产量巨大的情况下，可以极大加快打包速度！
+
+  ```csharp
+  public interface IFilterRule
+  {
+      /// <summary>
+      /// 搜寻的资源类型
+      /// 说明：使用引擎方法搜索获取所有资源列表
+      /// </summary>
+      string FindAssetType { get; } 
+  }
+  ```
+
+  
+
 ## [2.3.15] - 2025-09-09
 
 **重要**：升级了资源清单版本，不兼容老版本。建议重新提审安装包。
