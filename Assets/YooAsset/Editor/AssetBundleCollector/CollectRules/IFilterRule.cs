@@ -23,7 +23,13 @@ namespace YooAsset.Editor
     public interface IFilterRule
     {
         /// <summary>
-        /// 是否为收集资源
+        /// 搜寻的资源类型
+        /// 说明：使用引擎方法搜索获取所有资源列表
+        /// </summary>
+        string FindAssetType { get; }
+
+        /// <summary>
+        /// 验证搜寻的资源是否为收集资源
         /// </summary>
         /// <returns>如果收集该资源返回TRUE</returns>
         bool IsCollectAsset(FilterRuleData data);

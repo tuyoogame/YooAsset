@@ -159,8 +159,10 @@ namespace YooAsset.Editor
             List<string> findAssets = new List<string>();
             if (AssetDatabase.IsValidFolder(CollectPath))
             {
-                string collectDirectory = CollectPath;
-                string[] findResult = EditorTools.FindAssets(EAssetSearchType.All, collectDirectory);
+                IFilterRule filterRuleInstance = AssetBundleCollectorSettingData.GetFilterRuleInstance(FilterRuleName);
+                string findAssetType = filterRuleInstance.FindAssetType;
+                string searchFolder = CollectPath;
+                string[] findResult = EditorTools.FindAssets(findAssetType, searchFolder);
                 findAssets.AddRange(findResult);
             }
             else

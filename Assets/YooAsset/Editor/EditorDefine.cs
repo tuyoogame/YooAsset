@@ -39,6 +39,7 @@ namespace YooAsset.Editor
         Shader,
         Sprite,
         Texture,
+        RenderTexture,
         VideoClip,
     }
 

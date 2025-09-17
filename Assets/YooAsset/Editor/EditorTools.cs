@@ -170,6 +170,28 @@ namespace YooAsset.Editor
         /// <returns>返回搜集到的资源路径列表</returns>
         public static string[] FindAssets(EAssetSearchType searchType, string[] searchInFolders)
         {
+            return FindAssets(searchType.ToString(), searchInFolders);
+        }
+
+        /// <summary>
+        /// 搜集资源
+        /// </summary>
+        /// <param name="searchType">搜集的资源类型</param>
+        /// <param name="searchInFolder">指定搜索的文件夹</param>
+        /// <returns>返回搜集到的资源路径列表</returns>
+        public static string[] FindAssets(EAssetSearchType searchType, string searchInFolder)
+        {
+            return FindAssets(searchType.ToString(), new string[] { searchInFolder });
+        }
+
+        /// <summary>
+        /// 搜集资源
+        /// </summary>
+        /// <param name="searchType">搜集的资源类型</param>
+        /// <param name="searchInFolders">指定搜索的文件夹列表</param>
+        /// <returns>返回搜集到的资源路径列表</returns>
+        public static string[] FindAssets(string searchType, string[] searchInFolders)
+        {
             // 注意：AssetDatabase.FindAssets()不支持末尾带分隔符的文件夹路径
             for (int i = 0; i < searchInFolders.Length; i++)
             {
@@ -179,7 +201,7 @@ namespace YooAsset.Editor
 
             // 注意：获取指定目录下的所有资源对象（包括子文件夹）
             string[] guids;
-            if (searchType == EAssetSearchType.All)
+            if (string.IsNullOrEmpty(searchType) || searchType == EAssetSearchType.All.ToString())
                 guids = AssetDatabase.FindAssets(string.Empty, searchInFolders);
             else
                 guids = AssetDatabase.FindAssets($"t:{searchType}", searchInFolders);
@@ -206,7 +228,7 @@ namespace YooAsset.Editor
         /// <param name="searchType">搜集的资源类型</param>
         /// <param name="searchInFolder">指定搜索的文件夹</param>
         /// <returns>返回搜集到的资源路径列表</returns>
-        public static string[] FindAssets(EAssetSearchType searchType, string searchInFolder)
+        public static string[] FindAssets(string searchType, string searchInFolder)
         {
             return FindAssets(searchType, new string[] { searchInFolder });
         }
