@@ -101,8 +101,7 @@ namespace YooAsset
         /// </summary>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(int downloadingMaxNumber, int failedTryAgain)
         {
             if (Status != EOperationStatus.Succeed)
             {
@@ -121,8 +120,7 @@ namespace YooAsset
         /// <param name="tag">资源标签</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain)
         {
             if (Status != EOperationStatus.Succeed)
             {
@@ -141,8 +139,7 @@ namespace YooAsset
         /// <param name="tags">资源标签列表</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain)
         {
             if (Status != EOperationStatus.Succeed)
             {
@@ -161,8 +158,7 @@ namespace YooAsset
         /// <param name="location">资源定位地址</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateBundleDownloader(string location, bool recursiveDownload, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateBundleDownloader(string location, bool recursiveDownload, int downloadingMaxNumber, int failedTryAgain)
         {
             if (Status != EOperationStatus.Succeed)
             {
@@ -185,8 +181,7 @@ namespace YooAsset
         /// <param name="locations">资源定位地址列表</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateBundleDownloader(string[] locations, bool recursiveDownload, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateBundleDownloader(string[] locations, bool recursiveDownload, int downloadingMaxNumber, int failedTryAgain)
         {
             if (Status != EOperationStatus.Succeed)
             {
