@@ -116,7 +116,7 @@ namespace YooAsset
             {
                 VirtualWebGLMode = Convert.ToBoolean(value);
             }
-            if (name == FileSystemParametersDefine.VIRTUAL_DOWNLOAD_MODE)
+            else if (name == FileSystemParametersDefine.VIRTUAL_DOWNLOAD_MODE)
             {
                 VirtualDownloadMode = Convert.ToBoolean(value);
             }
