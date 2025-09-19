@@ -90,7 +90,7 @@ namespace YooAsset
         public string CopyBuildinPackageManifestDestRoot { private set; get; }
 
         /// <summary>
-        ///  自定义参数：解密方法类
+        ///  自定义参数：解密服务接口的实例类
         /// </summary>
         public IDecryptionServices DecryptionServices { private set; get; }
 
@@ -100,7 +100,7 @@ namespace YooAsset
         public IManifestRestoreServices ManifestServices { private set; get; }
 
         /// <summary>
-        /// 自定义参数：拷贝内置文件服务类
+        /// 自定义参数：拷贝内置文件接口的实例类
         /// </summary>
         public ICopyLocalFileServices CopyLocalFileServices { private set; get; }
         #endregion

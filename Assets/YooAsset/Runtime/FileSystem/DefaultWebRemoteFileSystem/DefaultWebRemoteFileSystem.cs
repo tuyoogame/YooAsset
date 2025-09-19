@@ -44,12 +44,12 @@ namespace YooAsset
         public bool DisableUnityWebCache { private set; get; } = false;
 
         /// <summary>
-        /// 自定义参数：跨域下载服务接口
+        /// 自定义参数：远程服务接口的实例类（支持跨域下载）
         /// </summary>
         public IRemoteServices RemoteServices { private set; get; }
 
         /// <summary>
-        ///  自定义参数：解密方法类
+        ///  自定义参数：解密服务接口的实例类
         /// </summary>
         public IWebDecryptionServices DecryptionServices { private set; get; }
 
