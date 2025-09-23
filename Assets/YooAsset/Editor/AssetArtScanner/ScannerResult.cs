@@ -4,11 +4,6 @@ namespace YooAsset.Editor
     public class ScannerResult
     {
         /// <summary>
-        /// 生成的报告文件路径
-        /// </summary>
-        public string ReprotFilePath { private set; get; }
-
-        /// <summary>
         /// 报告对象
         /// </summary>
         public ScanReport Report { private set; get; }
@@ -43,11 +38,9 @@ namespace YooAsset.Editor
             ErrorInfo = error;
             ErrorStack = stack;
         }
-        public ScannerResult(string filePath, ScanReport report)
+        public ScannerResult(ScanReport report)
         {
-            ReprotFilePath = filePath;
             Report = report;
-            ErrorInfo = string.Empty;
         }
 
         /// <summary>
@@ -60,6 +53,20 @@ namespace YooAsset.Editor
                 var reproterWindow = AssetArtReporterWindow.OpenWindow();
                 reproterWindow.ImportSingleReprotFile(Report);
             }
+        }
+
+        /// <summary>
+        /// 保存报告文件
+        /// </summary>
+        public void SaveReportFile(string saveDirectory)
+        {
+            if (Report == null)
+                throw new System.Exception("Scan report is invalid !");
+
+            if (string.IsNullOrEmpty(saveDirectory))
+                saveDirectory = "Assets/";
+            string filePath = $"{saveDirectory}/{Report.ReportName}_{Report.ReportDesc}.json";
+            ScanReportConfig.ExportJsonConfig(filePath, Report);
         }
     }
 }

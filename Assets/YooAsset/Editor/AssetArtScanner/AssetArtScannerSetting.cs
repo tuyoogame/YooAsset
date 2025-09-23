@@ -32,17 +32,10 @@ namespace YooAsset.Editor
 
                 // 开始扫描工作
                 ScanReport report = scanner.RunScanner();
-
-                // 检测报告合法性
                 report.CheckError();
 
-                // 保存扫描结果
-                string saveDirectory = scanner.SaveDirectory;
-                if (string.IsNullOrEmpty(saveDirectory))
-                    saveDirectory = "Assets/";
-                string filePath = $"{saveDirectory}/{scanner.ScannerName}_{scanner.ScannerDesc}.json";
-                ScanReportConfig.ExportJsonConfig(filePath, report);
-                return new ScannerResult(filePath, report);
+                // 返回扫描结果
+                return new ScannerResult(report);
             }
             catch (Exception e)
             {
