@@ -106,6 +106,9 @@ public static class ShaderVariantCollector
 
         if (_steps == ESteps.CollectSleeping)
         {
+            if (ShaderUtil.anythingCompiling)
+                return;
+
             if (_elapsedTime.ElapsedMilliseconds > SleepMilliseconds)
             {
                 DestroyAllSpheres();
