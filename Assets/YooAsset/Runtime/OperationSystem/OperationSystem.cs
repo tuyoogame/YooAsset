@@ -36,6 +36,9 @@ namespace YooAsset
         {
             get
             {
+                if (_watch == null)
+                    return false;
+
                 // NOTE : 单次调用开销约1微秒
                 return _watch.ElapsedMilliseconds - _frameTime >= MaxTimeSlice;
             }
