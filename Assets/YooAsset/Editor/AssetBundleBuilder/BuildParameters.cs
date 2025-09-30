@@ -19,7 +19,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 内置文件的根目录
         /// </summary>
-        public string BuildinFileRoot;
+        public string BuiltinFileRoot;
 
         /// <summary>
         /// 构建管线名称
@@ -86,12 +86,12 @@ namespace YooAsset.Editor
         /// <summary>
         /// 内置文件的拷贝选项
         /// </summary>
-        public EBuildinFileCopyOption BuildinFileCopyOption = EBuildinFileCopyOption.None;
+        public EBuiltinFileCopyOption BuiltinFileCopyOption = EBuiltinFileCopyOption.None;
 
         /// <summary>
         /// 内置文件的拷贝参数
         /// </summary>
-        public string BuildinFileCopyParams;
+        public string BuiltinFileCopyParams;
 
         /// <summary>
         /// 资源包加密服务类
@@ -111,7 +111,7 @@ namespace YooAsset.Editor
         private string _pipelineOutputDirectory = string.Empty;
         private string _packageOutputDirectory = string.Empty;
         private string _packageRootDirectory = string.Empty;
-        private string _buildinRootDirectory = string.Empty;
+        private string _builtinRootDirectory = string.Empty;
 
         /// <summary>
         /// 检测构建参数是否合法
@@ -136,9 +136,9 @@ namespace YooAsset.Editor
                 string message = BuildLogger.GetErrorMessage(ErrorCode.BuildOutputRootIsNullOrEmpty, "Build output root is null or empty !");
                 throw new Exception(message);
             }
-            if (string.IsNullOrEmpty(BuildinFileRoot))
+            if (string.IsNullOrEmpty(BuiltinFileRoot))
             {
-                string message = BuildLogger.GetErrorMessage(ErrorCode.BuildinFileRootIsNullOrEmpty, "Buildin file root is null or empty !");
+                string message = BuildLogger.GetErrorMessage(ErrorCode.BuiltinFileRootIsNullOrEmpty, "Builtin file root is null or empty !");
                 throw new Exception(message);
             }
             if (string.IsNullOrEmpty(BuildPipeline))
@@ -210,13 +210,13 @@ namespace YooAsset.Editor
         /// <summary>
         /// 获取内置资源的根目录
         /// </summary>
-        public virtual string GetBuildinRootDirectory()
+        public virtual string GetBuiltinRootDirectory()
         {
-            if (string.IsNullOrEmpty(_buildinRootDirectory))
+            if (string.IsNullOrEmpty(_builtinRootDirectory))
             {
-                _buildinRootDirectory = $"{BuildinFileRoot}/{PackageName}";
+                _builtinRootDirectory = $"{BuiltinFileRoot}/{PackageName}";
             }
-            return _buildinRootDirectory;
+            return _builtinRootDirectory;
         }
     }
 }

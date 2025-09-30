@@ -4,7 +4,7 @@ namespace YooAsset.Editor
     /// <summary>
     /// 首包资源文件的拷贝方式
     /// </summary>
-    public enum EBuildinFileCopyOption
+    public enum EBuiltinFileCopyOption
     {
         /// <summary>
         /// 不拷贝任何文件

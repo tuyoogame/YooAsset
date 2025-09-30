@@ -35,7 +35,7 @@ namespace YooAsset.Editor
                     new TaskCreateManifest_BBP(),
                     new TaskCreateReport_BBP(),
                     new TaskCreatePackage_BBP(),
-                    new TaskCopyBuildinFiles_BBP(),
+                    new TaskCopyBuiltinFiles_BBP(),
                     new TaskCreateCatalog_BBP()
                 };
             return pipeline;

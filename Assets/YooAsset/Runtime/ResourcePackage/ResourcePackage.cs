@@ -112,12 +112,12 @@ namespace YooAsset
             else if (_playMode == EPlayMode.OfflinePlayMode)
             {
                 var initializeParameters = parameters as OfflinePlayModeParameters;
-                initializeOperation = playModeImpl.InitializeAsync(initializeParameters.BuildinFileSystemParameters);
+                initializeOperation = playModeImpl.InitializeAsync(initializeParameters.BuiltinFileSystemParameters);
             }
             else if (_playMode == EPlayMode.HostPlayMode)
             {
                 var initializeParameters = parameters as HostPlayModeParameters;
-                initializeOperation = playModeImpl.InitializeAsync(initializeParameters.BuildinFileSystemParameters, initializeParameters.CacheFileSystemParameters);
+                initializeOperation = playModeImpl.InitializeAsync(initializeParameters.BuiltinFileSystemParameters, initializeParameters.CacheFileSystemParameters);
             }
             else if (_playMode == EPlayMode.WebPlayMode)
             {

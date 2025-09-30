@@ -6,16 +6,15 @@ using UnityEngine;
 
 namespace YooAsset.Editor
 {
-    public class TaskCopyBuildinFiles_RFBP : TaskCopyBuildinFiles, IBuildTask
+    public class TaskCopyBuiltinFiles_BBP : TaskCopyBuiltinFiles, IBuildTask
     {
         void IBuildTask.Run(BuildContext context)
         {
             var buildParametersContext = context.GetContextObject<BuildParametersContext>();
-            var buildParameters = buildParametersContext.Parameters;
             var manifestContext = context.GetContextObject<ManifestContext>();
-            if (buildParameters.BuildinFileCopyOption != EBuildinFileCopyOption.None)
+            if (buildParametersContext.Parameters.BuiltinFileCopyOption != EBuiltinFileCopyOption.None)
             {
-                CopyBuildinFilesToStreaming(buildParametersContext, manifestContext.Manifest);
+                CopyBuiltinFilesToStreaming(buildParametersContext, manifestContext.Manifest);
             }
         }
     }

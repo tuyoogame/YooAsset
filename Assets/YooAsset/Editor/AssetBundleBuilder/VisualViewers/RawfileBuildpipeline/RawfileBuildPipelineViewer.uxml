@@ -6,8 +6,8 @@
         <ui:Toggle label="Use Asset Depend DB" name="UseAssetDependency" />
         <ui:VisualElement name="PopupContainer" style="flex-grow: 1;" />
         <uie:EnumField label="File Name Style" value="Center" name="FileNameStyle" />
-        <uie:EnumField label="Copy Buildin File Option" value="Center" name="CopyBuildinFileOption" />
-        <ui:TextField picking-mode="Ignore" label="Copy Buildin File Param" name="CopyBuildinFileParam" />
+        <uie:EnumField label="Copy Builtin File Option" value="Center" name="CopyBuiltinFileOption" />
+        <ui:TextField picking-mode="Ignore" label="Copy Builtin File Param" name="CopyBuiltinFileParam" />
         <ui:VisualElement name="ExtensionContainer" />
         <ui:Button text="Click Build" display-tooltip-when-elided="true" name="Build" style="height: 50px; background-color: rgb(40, 106, 42); margin-top: 10px;" />
     </ui:VisualElement>

@@ -16,7 +16,7 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultBuildinFileSystem _fileSystem;
+        private readonly DefaultBuiltinFileSystem _fileSystem;
         private readonly PackageBundle _bundle;
         private AssetBundleCreateRequest _createRequest;
         private AssetBundle _assetBundle;
@@ -24,7 +24,7 @@ namespace YooAsset
         private ESteps _steps = ESteps.None;
 
 
-        internal DBFSLoadAssetBundleOperation(DefaultBuildinFileSystem fileSystem, PackageBundle bundle)
+        internal DBFSLoadAssetBundleOperation(DefaultBuiltinFileSystem fileSystem, PackageBundle bundle)
         {
             _fileSystem = fileSystem;
             _bundle = bundle;
@@ -64,7 +64,7 @@ namespace YooAsset
                     }
                     else
                     {
-                        string filePath = _fileSystem.GetBuildinFileLoadPath(_bundle);
+                        string filePath = _fileSystem.GetBuiltinFileLoadPath(_bundle);
                         _assetBundle = AssetBundle.LoadFromFile(filePath);
                     }
                 }
@@ -78,7 +78,7 @@ namespace YooAsset
                     }
                     else
                     {
-                        string filePath = _fileSystem.GetBuildinFileLoadPath(_bundle);
+                        string filePath = _fileSystem.GetBuiltinFileLoadPath(_bundle);
                         _createRequest = AssetBundle.LoadFromFileAsync(filePath);
                     }
                 }
@@ -110,14 +110,14 @@ namespace YooAsset
                     {
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Failed;
-                        Error = $"Failed to load encrypted buildin asset bundle file : {_bundle.BundleName}";
+                        Error = $"Failed to load encrypted builtin asset bundle file : {_bundle.BundleName}";
                         YooLogger.Error(Error);
                     }
                     else
                     {
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Failed;
-                        Error = $"Failed to load buildin asset bundle file : {_bundle.BundleName}";
+                        Error = $"Failed to load builtin asset bundle file : {_bundle.BundleName}";
                         YooLogger.Error(Error);
                     }
                 }
@@ -150,16 +150,16 @@ namespace YooAsset
         private enum ESteps
         {
             None,
-            LoadBuildinRawBundle,
+            LoadBuiltinRawBundle,
             Done,
         }
 
-        private readonly DefaultBuildinFileSystem _fileSystem;
+        private readonly DefaultBuiltinFileSystem _fileSystem;
         private readonly PackageBundle _bundle;
         private ESteps _steps = ESteps.None;
 
 
-        internal DBFSLoadRawBundleOperation(DefaultBuildinFileSystem fileSystem, PackageBundle bundle)
+        internal DBFSLoadRawBundleOperation(DefaultBuiltinFileSystem fileSystem, PackageBundle bundle)
         {
             _fileSystem = fileSystem;
             _bundle = bundle;
@@ -168,22 +168,22 @@ namespace YooAsset
         {
             DownloadProgress = 1f;
             DownloadedBytes = _bundle.FileSize;
-            _steps = ESteps.LoadBuildinRawBundle;
+            _steps = ESteps.LoadBuiltinRawBundle;
         }
         internal override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.LoadBuildinRawBundle)
+            if (_steps == ESteps.LoadBuiltinRawBundle)
             {
-                string filePath = _fileSystem.GetBuildinFileLoadPath(_bundle);
+                string filePath = _fileSystem.GetBuiltinFileLoadPath(_bundle);
 
 #if UNITY_ANDROID
                 //TODO : 安卓平台内置文件属于APK压缩包内的文件。
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Failed;
-                Error = $"Can not load android buildin raw bundle file : {filePath}";
+                Error = $"Can not load android builtin raw bundle file : {filePath}";
                 YooLogger.Error(Error);
 #else
                 if (File.Exists(filePath))
@@ -196,7 +196,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Can not found buildin raw bundle file : {filePath}";
+                    Error = $"Can not found builtin raw bundle file : {filePath}";
                     YooLogger.Error(Error);
                 }
 #endif

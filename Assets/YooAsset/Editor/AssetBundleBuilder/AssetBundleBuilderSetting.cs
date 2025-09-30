@@ -43,28 +43,28 @@ namespace YooAsset.Editor
             EditorPrefs.SetInt(key, (int)fileNameStyle);
         }
 
-        // EBuildinFileCopyOption
-        public static EBuildinFileCopyOption GetPackageBuildinFileCopyOption(string packageName, string buildPipeline)
+        // EBuiltinFileCopyOption
+        public static EBuiltinFileCopyOption GetPackageBuiltinFileCopyOption(string packageName, string buildPipeline)
         {
-            string key = $"{Application.productName}_{packageName}_{buildPipeline}_{nameof(EBuildinFileCopyOption)}";
-            return (EBuildinFileCopyOption)EditorPrefs.GetInt(key, (int)EBuildinFileCopyOption.None);
+            string key = $"{Application.productName}_{packageName}_{buildPipeline}_{nameof(EBuiltinFileCopyOption)}";
+            return (EBuiltinFileCopyOption)EditorPrefs.GetInt(key, (int)EBuiltinFileCopyOption.None);
         }
-        public static void SetPackageBuildinFileCopyOption(string packageName, string buildPipeline, EBuildinFileCopyOption buildinFileCopyOption)
+        public static void SetPackageBuiltinFileCopyOption(string packageName, string buildPipeline, EBuiltinFileCopyOption builtinFileCopyOption)
         {
-            string key = $"{Application.productName}_{packageName}_{buildPipeline}_{nameof(EBuildinFileCopyOption)}";
-            EditorPrefs.SetInt(key, (int)buildinFileCopyOption);
+            string key = $"{Application.productName}_{packageName}_{buildPipeline}_{nameof(EBuiltinFileCopyOption)}";
+            EditorPrefs.SetInt(key, (int)builtinFileCopyOption);
         }
 
         // BuildFileCopyParams
-        public static string GetPackageBuildinFileCopyParams(string packageName, string buildPipeline)
+        public static string GetPackageBuiltinFileCopyParams(string packageName, string buildPipeline)
         {
             string key = $"{Application.productName}_{packageName}_{buildPipeline}_BuildFileCopyParams";
             return EditorPrefs.GetString(key, string.Empty);
         }
-        public static void SetPackageBuildinFileCopyParams(string packageName, string buildPipeline, string buildinFileCopyParams)
+        public static void SetPackageBuiltinFileCopyParams(string packageName, string buildPipeline, string builtinFileCopyParams)
         {
             string key = $"{Application.productName}_{packageName}_{buildPipeline}_BuildFileCopyParams";
-            EditorPrefs.SetString(key, buildinFileCopyParams);
+            EditorPrefs.SetString(key, builtinFileCopyParams);
         }
 
         // EncyptionServicesClassName

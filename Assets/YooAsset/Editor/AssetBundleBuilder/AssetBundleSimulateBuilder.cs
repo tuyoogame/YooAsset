@@ -17,15 +17,15 @@ namespace YooAsset.Editor
             {
                 var buildParameters = new EditorSimulateBuildParameters();
                 buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
-                buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
+                buildParameters.BuiltinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
                 buildParameters.BuildPipeline = EBuildPipeline.EditorSimulateBuildPipeline.ToString();
                 buildParameters.BuildBundleType = (int)EBuildBundleType.VirtualBundle;
                 buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
                 buildParameters.PackageName = packageName;
                 buildParameters.PackageVersion = "Simulate";
                 buildParameters.FileNameStyle = EFileNameStyle.HashName;
-                buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
-                buildParameters.BuildinFileCopyParams = string.Empty;
+                buildParameters.BuiltinFileCopyOption = EBuiltinFileCopyOption.None;
+                buildParameters.BuiltinFileCopyParams = string.Empty;
                 buildParameters.UseAssetDependencyDB = true;
 
                 var pipeline = new EditorSimulateBuildPipeline();

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace YooAsset
 {
-    internal class CopyBuildinFileOperation : AsyncOperationBase
+    internal class CopyBuiltinFileOperation : AsyncOperationBase
     {
         private enum ESteps
         {
@@ -19,7 +19,7 @@ namespace YooAsset
         private readonly string _destFilePath;
         private ESteps _steps = ESteps.None;
 
-        public CopyBuildinFileOperation(string sourceFilePath, string destFilePath)
+        public CopyBuiltinFileOperation(string sourceFilePath, string destFilePath)
         {
             _sourceFilePath = sourceFilePath;
             _destFilePath = destFilePath;
@@ -61,7 +61,7 @@ namespace YooAsset
                     }
                     catch (Exception ex)
                     {
-                        YooLogger.Warning($"Failed copy buildin file : {ex.Message}");
+                        YooLogger.Warning($"Failed copy builtin file : {ex.Message}");
                         _steps = ESteps.UnpackFile;
                     }
                 }

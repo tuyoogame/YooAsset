@@ -4,12 +4,12 @@ namespace YooAsset
 {
     internal class DefaultUnpackRemoteServices : IRemoteServices
     {
-        private readonly string _buildinPackageRoot;
+        private readonly string _builtinPackageRoot;
         protected readonly Dictionary<string, string> _mapping = new Dictionary<string, string>(10000);
 
-        public DefaultUnpackRemoteServices(string buildinPackRoot)
+        public DefaultUnpackRemoteServices(string builtinPackRoot)
         {
-            _buildinPackageRoot = buildinPackRoot;
+            _builtinPackageRoot = builtinPackRoot;
         }
         string IRemoteServices.GetRemoteMainURL(string fileName)
         {
@@ -24,7 +24,7 @@ namespace YooAsset
         {
             if (_mapping.TryGetValue(fileName, out string url) == false)
             {
-                string filePath = PathUtility.Combine(_buildinPackageRoot, fileName);
+                string filePath = PathUtility.Combine(_builtinPackageRoot, fileName);
                 url = DownloadSystemHelper.ConvertToWWWPath(filePath);
                 _mapping.Add(fileName, url);
             }

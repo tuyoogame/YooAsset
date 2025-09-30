@@ -8,23 +8,23 @@ namespace YooAsset
         private enum ESteps
         {
             None,
-            LoadBuildinPackageVersion,
-            CopyBuildinPackageHash,
-            CopyBuildinPackageManifest,
+            LoadBuiltinPackageVersion,
+            CopyBuiltinPackageHash,
+            CopyBuiltinPackageManifest,
             InitUnpackFileSystem,
             LoadCatalogFile,
             Done,
         }
 
-        private readonly DefaultBuildinFileSystem _fileSystem;
-        private RequestBuildinPackageVersionOperation _requestBuildinPackageVersionOp;
-        private CopyBuildinFileOperation _copyBuildinHashFileOp;
-        private CopyBuildinFileOperation _copyBuildinManifestFileOp;
+        private readonly DefaultBuiltinFileSystem _fileSystem;
+        private RequestBuiltinPackageVersionOperation _requestBuiltinPackageVersionOp;
+        private CopyBuiltinFileOperation _copyBuiltinHashFileOp;
+        private CopyBuiltinFileOperation _copyBuiltinManifestFileOp;
         private FSInitializeFileSystemOperation _initUnpackFIleSystemOp;
-        private LoadBuildinCatalogFileOperation _loadBuildinCatalogFileOp;
+        private LoadBuiltinCatalogFileOperation _loadBuiltinCatalogFileOp;
         private ESteps _steps = ESteps.None;
 
-        internal DBFSInitializeOperation(DefaultBuildinFileSystem fileSystem)
+        internal DBFSInitializeOperation(DefaultBuiltinFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
         }
@@ -33,10 +33,10 @@ namespace YooAsset
 #if UNITY_WEBGL
             _steps = ESteps.Done;
             Status = EOperationStatus.Failed;
-            Error = $"{nameof(DefaultBuildinFileSystem)} is not support WEBGL platform !";
+            Error = $"{nameof(DefaultBuiltinFileSystem)} is not support WEBGL platform !";
 #else
-            if (_fileSystem.CopyBuildinPackageManifest)
-                _steps = ESteps.LoadBuildinPackageVersion;
+            if (_fileSystem.CopyBuiltinPackageManifest)
+                _steps = ESteps.LoadBuiltinPackageVersion;
             else
                 _steps = ESteps.InitUnpackFileSystem;
 #endif
@@ -46,76 +46,76 @@ namespace YooAsset
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.LoadBuildinPackageVersion)
+            if (_steps == ESteps.LoadBuiltinPackageVersion)
             {
-                if (_requestBuildinPackageVersionOp == null)
+                if (_requestBuiltinPackageVersionOp == null)
                 {
-                    _requestBuildinPackageVersionOp = new RequestBuildinPackageVersionOperation(_fileSystem);
-                    _requestBuildinPackageVersionOp.StartOperation();
-                    AddChildOperation(_requestBuildinPackageVersionOp);
+                    _requestBuiltinPackageVersionOp = new RequestBuiltinPackageVersionOperation(_fileSystem);
+                    _requestBuiltinPackageVersionOp.StartOperation();
+                    AddChildOperation(_requestBuiltinPackageVersionOp);
                 }
 
-                _requestBuildinPackageVersionOp.UpdateOperation();
-                if (_requestBuildinPackageVersionOp.IsDone == false)
+                _requestBuiltinPackageVersionOp.UpdateOperation();
+                if (_requestBuiltinPackageVersionOp.IsDone == false)
                     return;
 
-                if (_requestBuildinPackageVersionOp.Status == EOperationStatus.Succeed)
+                if (_requestBuiltinPackageVersionOp.Status == EOperationStatus.Succeed)
                 {
-                    _steps = ESteps.CopyBuildinPackageHash;
+                    _steps = ESteps.CopyBuiltinPackageHash;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _requestBuildinPackageVersionOp.Error;
+                    Error = _requestBuiltinPackageVersionOp.Error;
                 }
             }
 
-            if (_steps == ESteps.CopyBuildinPackageHash)
+            if (_steps == ESteps.CopyBuiltinPackageHash)
             {
-                if (_copyBuildinHashFileOp == null)
+                if (_copyBuiltinHashFileOp == null)
                 {
-                    string packageVersion = _requestBuildinPackageVersionOp.PackageVersion;
+                    string packageVersion = _requestBuiltinPackageVersionOp.PackageVersion;
                     string destFilePath = GetCopyPackageHashDestPath(packageVersion);
-                    string sourceFilePath = _fileSystem.GetBuildinPackageHashFilePath(packageVersion);
-                    _copyBuildinHashFileOp = new CopyBuildinFileOperation(sourceFilePath, destFilePath);
-                    _copyBuildinHashFileOp.StartOperation();
-                    AddChildOperation(_copyBuildinHashFileOp);
+                    string sourceFilePath = _fileSystem.GetBuiltinPackageHashFilePath(packageVersion);
+                    _copyBuiltinHashFileOp = new CopyBuiltinFileOperation(sourceFilePath, destFilePath);
+                    _copyBuiltinHashFileOp.StartOperation();
+                    AddChildOperation(_copyBuiltinHashFileOp);
                 }
 
-                _copyBuildinHashFileOp.UpdateOperation();
-                if (_copyBuildinHashFileOp.IsDone == false)
+                _copyBuiltinHashFileOp.UpdateOperation();
+                if (_copyBuiltinHashFileOp.IsDone == false)
                     return;
 
-                if (_copyBuildinHashFileOp.Status == EOperationStatus.Succeed)
+                if (_copyBuiltinHashFileOp.Status == EOperationStatus.Succeed)
                 {
-                    _steps = ESteps.CopyBuildinPackageManifest;
+                    _steps = ESteps.CopyBuiltinPackageManifest;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _copyBuildinHashFileOp.Error;
+                    Error = _copyBuiltinHashFileOp.Error;
                 }
             }
 
-            if (_steps == ESteps.CopyBuildinPackageManifest)
+            if (_steps == ESteps.CopyBuiltinPackageManifest)
             {
-                if (_copyBuildinManifestFileOp == null)
+                if (_copyBuiltinManifestFileOp == null)
                 {
-                    string packageVersion = _requestBuildinPackageVersionOp.PackageVersion;
+                    string packageVersion = _requestBuiltinPackageVersionOp.PackageVersion;
                     string destFilePath = GetCopyPackageManifestDestPath(packageVersion);
-                    string sourceFilePath = _fileSystem.GetBuildinPackageManifestFilePath(packageVersion);
-                    _copyBuildinManifestFileOp = new CopyBuildinFileOperation(sourceFilePath, destFilePath);
-                    _copyBuildinManifestFileOp.StartOperation();
-                    AddChildOperation(_copyBuildinManifestFileOp);
+                    string sourceFilePath = _fileSystem.GetBuiltinPackageManifestFilePath(packageVersion);
+                    _copyBuiltinManifestFileOp = new CopyBuiltinFileOperation(sourceFilePath, destFilePath);
+                    _copyBuiltinManifestFileOp.StartOperation();
+                    AddChildOperation(_copyBuiltinManifestFileOp);
                 }
 
-                _copyBuildinManifestFileOp.UpdateOperation();
-                if (_copyBuildinManifestFileOp.IsDone == false)
+                _copyBuiltinManifestFileOp.UpdateOperation();
+                if (_copyBuiltinManifestFileOp.IsDone == false)
                     return;
 
-                if (_copyBuildinManifestFileOp.Status == EOperationStatus.Succeed)
+                if (_copyBuiltinManifestFileOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.InitUnpackFileSystem;
                 }
@@ -123,7 +123,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _copyBuildinManifestFileOp.Error;
+                    Error = _copyBuiltinManifestFileOp.Error;
                 }
             }
 
@@ -163,20 +163,20 @@ namespace YooAsset
 
             if (_steps == ESteps.LoadCatalogFile)
             {
-                if (_loadBuildinCatalogFileOp == null)
+                if (_loadBuiltinCatalogFileOp == null)
                 {
-                    _loadBuildinCatalogFileOp = new LoadBuildinCatalogFileOperation(_fileSystem);
-                    _loadBuildinCatalogFileOp.StartOperation();
-                    AddChildOperation(_loadBuildinCatalogFileOp);
+                    _loadBuiltinCatalogFileOp = new LoadBuiltinCatalogFileOperation(_fileSystem);
+                    _loadBuiltinCatalogFileOp.StartOperation();
+                    AddChildOperation(_loadBuiltinCatalogFileOp);
                 }
 
-                _loadBuildinCatalogFileOp.UpdateOperation();
-                if (_loadBuildinCatalogFileOp.IsDone == false)
+                _loadBuiltinCatalogFileOp.UpdateOperation();
+                if (_loadBuiltinCatalogFileOp.IsDone == false)
                     return;
 
-                if (_loadBuildinCatalogFileOp.Status == EOperationStatus.Succeed)
+                if (_loadBuiltinCatalogFileOp.Status == EOperationStatus.Succeed)
                 {
-                    var catalog = _loadBuildinCatalogFileOp.Catalog;
+                    var catalog = _loadBuiltinCatalogFileOp.Catalog;
                     if (catalog == null)
                     {
                         _steps = ESteps.Done;
@@ -195,11 +195,11 @@ namespace YooAsset
 
                     foreach (var wrapper in catalog.Wrappers)
                     {
-                        var fileWrapper = new DefaultBuildinFileSystem.FileWrapper(wrapper.FileName);
+                        var fileWrapper = new DefaultBuiltinFileSystem.FileWrapper(wrapper.FileName);
                         _fileSystem.RecordCatalogFile(wrapper.BundleGUID, fileWrapper);
                     }
 
-                    YooLogger.Log($"Package '{_fileSystem.PackageName}' buildin catalog files count : {catalog.Wrappers.Count}");
+                    YooLogger.Log($"Package '{_fileSystem.PackageName}' builtin catalog files count : {catalog.Wrappers.Count}");
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
                 }
@@ -207,14 +207,14 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _loadBuildinCatalogFileOp.Error;
+                    Error = _loadBuiltinCatalogFileOp.Error;
                 }
             }
         }
 
         private string GetCopyManifestFileRoot()
         {
-            string destRoot = _fileSystem.CopyBuildinPackageManifestDestRoot;
+            string destRoot = _fileSystem.CopyBuiltinPackageManifestDestRoot;
             if (string.IsNullOrEmpty(destRoot))
             {
                 string defaultCacheRoot = YooAssetSettingsData.GetYooDefaultCacheRoot();

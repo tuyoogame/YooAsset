@@ -2,61 +2,59 @@
 
 namespace YooAsset
 {
-    internal class RequestBuildinPackageHashOperation : AsyncOperationBase
+    internal class RequestBuiltinPackageVersionOperation : AsyncOperationBase
     {
         private enum ESteps
         {
             None,
-            TryLoadPackageHash,
-            RequestPackageHash,
+            TryLoadPackageVersion,
+            RequestPackageVersion,
             CheckResult,
             Done,
         }
 
-        private readonly DefaultBuildinFileSystem _fileSystem;
-        private readonly string _packageVersion;
+        private readonly DefaultBuiltinFileSystem _fileSystem;
         private UnityWebTextRequestOperation _webTextRequestOp;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
-        /// 包裹哈希值
+        /// 包裹版本
         /// </summary>
-        public string PackageHash { private set; get; }
+        public string PackageVersion { private set; get; }
 
 
-        internal RequestBuildinPackageHashOperation(DefaultBuildinFileSystem fileSystem, string packageVersion)
+        internal RequestBuiltinPackageVersionOperation(DefaultBuiltinFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            _packageVersion = packageVersion;
         }
         internal override void InternalStart()
         {
-            _steps = ESteps.TryLoadPackageHash;
+            _steps = ESteps.TryLoadPackageVersion;
         }
         internal override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.TryLoadPackageHash)
+            if (_steps == ESteps.TryLoadPackageVersion)
             {
-                string filePath = _fileSystem.GetBuildinPackageHashFilePath(_packageVersion);
+                string filePath = _fileSystem.GetBuiltinPackageVersionFilePath();
                 if (File.Exists(filePath))
                 {
-                    PackageHash = File.ReadAllText(filePath);
+                    PackageVersion = File.ReadAllText(filePath);
                     _steps = ESteps.CheckResult;
                 }
                 else
                 {
-                    _steps = ESteps.RequestPackageHash;
+                    _steps = ESteps.RequestPackageVersion;
                 }
             }
 
-            if (_steps == ESteps.RequestPackageHash)
+            if (_steps == ESteps.RequestPackageVersion)
             {
                 if (_webTextRequestOp == null)
                 {
-                    string filePath = _fileSystem.GetBuildinPackageHashFilePath(_packageVersion);
+                    string filePath = _fileSystem.GetBuiltinPackageVersionFilePath();
                     string url = DownloadSystemHelper.ConvertToWWWPath(filePath);
                     _webTextRequestOp = new UnityWebTextRequestOperation(url, 60);
                     _webTextRequestOp.StartOperation();
@@ -69,7 +67,7 @@ namespace YooAsset
 
                 if (_webTextRequestOp.Status == EOperationStatus.Succeed)
                 {
-                    PackageHash = _webTextRequestOp.Result;
+                    PackageVersion = _webTextRequestOp.Result;
                     _steps = ESteps.CheckResult;
                 }
                 else
@@ -82,11 +80,11 @@ namespace YooAsset
 
             if (_steps == ESteps.CheckResult)
             {
-                if (string.IsNullOrEmpty(PackageHash))
+                if (string.IsNullOrEmpty(PackageVersion))
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Buildin package hash file content is empty !";
+                    Error = $"Builtin package version file content is empty !";
                 }
                 else
                 {

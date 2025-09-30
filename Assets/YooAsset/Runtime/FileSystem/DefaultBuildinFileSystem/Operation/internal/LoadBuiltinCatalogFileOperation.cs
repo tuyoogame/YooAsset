@@ -3,7 +3,7 @@ using System.IO;
 
 namespace YooAsset
 {
-    internal sealed class LoadBuildinCatalogFileOperation : AsyncOperationBase
+    internal sealed class LoadBuiltinCatalogFileOperation : AsyncOperationBase
     {
         private enum ESteps
         {
@@ -14,7 +14,7 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultBuildinFileSystem _fileSystem;
+        private readonly DefaultBuiltinFileSystem _fileSystem;
         private UnityWebDataRequestOperation _webDataRequestOp;
         private byte[] _fileData;
         private ESteps _steps = ESteps.None;
@@ -22,9 +22,9 @@ namespace YooAsset
         /// <summary>
         /// 内置资源目录
         /// </summary>
-        public DefaultBuildinFileCatalog Catalog;
+        public DefaultBuiltinFileCatalog Catalog;
 
-        internal LoadBuildinCatalogFileOperation(DefaultBuildinFileSystem fileSystem)
+        internal LoadBuiltinCatalogFileOperation(DefaultBuiltinFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
         }

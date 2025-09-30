@@ -21,8 +21,8 @@ namespace YooAsset.Editor
         protected PopupField<Type> _manifestRestoreServicesField;
         protected EnumField _compressionField;
         protected EnumField _outputNameStyleField;
-        protected EnumField _copyBuildinFileOptionField;
-        protected TextField _copyBuildinFileTagsField;
+        protected EnumField _copyBuiltinFileOptionField;
+        protected TextField _copyBuiltinFileTagsField;
         protected Toggle _clearBuildCacheToggle;
         protected Toggle _useAssetDependencyDBToggle;
 
@@ -60,13 +60,13 @@ namespace YooAsset.Editor
             SetOutputNameStyleField(_outputNameStyleField);
 
             // 首包文件拷贝参数
-            _copyBuildinFileTagsField = Root.Q<TextField>("CopyBuildinFileParam");
-            SetCopyBuildinFileTagsField(_copyBuildinFileTagsField);
-            SetCopyBuildinFileTagsVisible(_copyBuildinFileTagsField);
+            _copyBuiltinFileTagsField = Root.Q<TextField>("CopyBuiltinFileParam");
+            SetCopyBuiltinFileTagsField(_copyBuiltinFileTagsField);
+            SetCopyBuiltinFileTagsVisible(_copyBuiltinFileTagsField);
 
             // 首包文件拷贝选项
-            _copyBuildinFileOptionField = Root.Q<EnumField>("CopyBuildinFileOption");
-            SetCopyBuildinFileOptionField(_copyBuildinFileOptionField, _copyBuildinFileTagsField);
+            _copyBuiltinFileOptionField = Root.Q<EnumField>("CopyBuiltinFileOption");
+            SetCopyBuiltinFileOptionField(_copyBuiltinFileOptionField, _copyBuiltinFileTagsField);
 
             // 清理构建缓存
             _clearBuildCacheToggle = Root.Q<Toggle>("ClearBuildCache");
@@ -99,15 +99,15 @@ namespace YooAsset.Editor
         protected virtual void ExecuteBuild()
         {
             var fileNameStyle = AssetBundleBuilderSetting.GetPackageFileNameStyle(PackageName, PipelineName);
-            var buildinFileCopyOption = AssetBundleBuilderSetting.GetPackageBuildinFileCopyOption(PackageName, PipelineName);
-            var buildinFileCopyParams = AssetBundleBuilderSetting.GetPackageBuildinFileCopyParams(PackageName, PipelineName);
+            var builtinFileCopyOption = AssetBundleBuilderSetting.GetPackageBuiltinFileCopyOption(PackageName, PipelineName);
+            var builtinFileCopyParams = AssetBundleBuilderSetting.GetPackageBuiltinFileCopyParams(PackageName, PipelineName);
             var compressOption = AssetBundleBuilderSetting.GetPackageCompressOption(PackageName, PipelineName);
             var clearBuildCache = AssetBundleBuilderSetting.GetPackageClearBuildCache(PackageName, PipelineName);
             var useAssetDependencyDB = AssetBundleBuilderSetting.GetPackageUseAssetDependencyDB(PackageName, PipelineName);
 
             BuiltinBuildParameters buildParameters = new BuiltinBuildParameters();
             buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
-            buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
+            buildParameters.BuiltinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
             buildParameters.BuildPipeline = PipelineName.ToString();
             buildParameters.BuildBundleType = (int)EBuildBundleType.AssetBundle;
             buildParameters.BuildTarget = BuildTarget;
@@ -116,8 +116,8 @@ namespace YooAsset.Editor
             buildParameters.EnableSharePackRule = true;
             buildParameters.VerifyBuildingResult = true;
             buildParameters.FileNameStyle = fileNameStyle;
-            buildParameters.BuildinFileCopyOption = buildinFileCopyOption;
-            buildParameters.BuildinFileCopyParams = buildinFileCopyParams;
+            buildParameters.BuiltinFileCopyOption = builtinFileCopyOption;
+            buildParameters.BuiltinFileCopyParams = builtinFileCopyParams;
             buildParameters.CompressOption = compressOption;
             buildParameters.ClearBuildCacheFiles = clearBuildCache;
             buildParameters.UseAssetDependencyDB = useAssetDependencyDB;

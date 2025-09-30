@@ -8,7 +8,7 @@ namespace YooAsset
     /// <summary>
     /// 内置文件系统
     /// </summary>
-    internal class DefaultBuildinFileSystem : IFileSystem
+    internal class DefaultBuiltinFileSystem : IFileSystem
     {
         public class FileWrapper
         {
@@ -21,7 +21,7 @@ namespace YooAsset
         }
 
         protected readonly Dictionary<string, FileWrapper> _wrappers = new Dictionary<string, FileWrapper>(10000);
-        protected readonly Dictionary<string, string> _buildinFilePathMapping = new Dictionary<string, string>(10000);
+        protected readonly Dictionary<string, string> _builtinFilePathMapping = new Dictionary<string, string>(10000);
         protected IFileSystem _unpackFileSystem;
         protected string _packageRoot;
 
@@ -81,13 +81,13 @@ namespace YooAsset
         /// <summary>
         /// 自定义参数：拷贝内置清单
         /// </summary>
-        public bool CopyBuildinPackageManifest { private set; get; } = false;
+        public bool CopyBuiltinPackageManifest { private set; get; } = false;
 
         /// <summary>
         /// 自定义参数：拷贝内置清单的目标目录
         /// 注意：该参数为空的时候，会获取默认的沙盒目录！
         /// </summary>
-        public string CopyBuildinPackageManifestDestRoot { private set; get; }
+        public string CopyBuiltinPackageManifestDestRoot { private set; get; }
 
         /// <summary>
         ///  自定义参数：解密服务接口的实例类
@@ -106,7 +106,7 @@ namespace YooAsset
         #endregion
 
 
-        public DefaultBuildinFileSystem()
+        public DefaultBuiltinFileSystem()
         {
         }
         public virtual FSInitializeFileSystemOperation InitializeFileSystemAsync()
@@ -131,7 +131,7 @@ namespace YooAsset
         public virtual FSDownloadFileOperation DownloadFileAsync(PackageBundle bundle, DownloadFileOptions options)
         {
             // 注意：业务层的解压器会依赖该方法
-            options.ImportFilePath = GetBuildinFileLoadPath(bundle);
+            options.ImportFilePath = GetBuiltinFileLoadPath(bundle);
             return _unpackFileSystem.DownloadFileAsync(bundle, options);
         }
         public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
@@ -153,7 +153,7 @@ namespace YooAsset
             }
             else
             {
-                string error = $"{nameof(DefaultBuildinFileSystem)} not support load bundle type : {bundle.BundleType}";
+                string error = $"{nameof(DefaultBuiltinFileSystem)} not support load bundle type : {bundle.BundleType}";
                 var operation = new FSLoadBundleCompleteOperation(error);
                 return operation;
             }
@@ -184,11 +184,11 @@ namespace YooAsset
             }
             else if (name == FileSystemParametersDefine.COPY_BUILDIN_PACKAGE_MANIFEST)
             {
-                CopyBuildinPackageManifest = Convert.ToBoolean(value);
+                CopyBuiltinPackageManifest = Convert.ToBoolean(value);
             }
             else if (name == FileSystemParametersDefine.COPY_BUILDIN_PACKAGE_MANIFEST_DEST_ROOT)
             {
-                CopyBuildinPackageManifestDestRoot = (string)value;
+                CopyBuiltinPackageManifestDestRoot = (string)value;
             }
             else if (name == FileSystemParametersDefine.DECRYPTION_SERVICES)
             {
@@ -212,7 +212,7 @@ namespace YooAsset
             PackageName = packageName;
 
             if (string.IsNullOrEmpty(packageRoot))
-                _packageRoot = GetDefaultBuildinPackageRoot(packageName);
+                _packageRoot = GetDefaultBuiltinPackageRoot(packageName);
             else
                 _packageRoot = packageRoot;
 
@@ -269,7 +269,7 @@ namespace YooAsset
             if (IsUnpackBundleFile(bundle))
                 return _unpackFileSystem.GetBundleFilePath(bundle);
 
-            return GetBuildinFileLoadPath(bundle);
+            return GetBuiltinFileLoadPath(bundle);
         }
         public virtual byte[] ReadBundleFileData(PackageBundle bundle)
         {
@@ -281,7 +281,7 @@ namespace YooAsset
 
 #if UNITY_ANDROID
             //TODO : 安卓平台内置文件属于APK压缩包内的文件。
-            YooLogger.Error($"Android platform not support read buildin bundle file data !");
+            YooLogger.Error($"Android platform not support read builtin bundle file data !");
             return null;
 #else
             if (bundle.Encrypted)
@@ -292,7 +292,7 @@ namespace YooAsset
                     return null;
                 }
 
-                string filePath = GetBuildinFileLoadPath(bundle);
+                string filePath = GetBuiltinFileLoadPath(bundle);
                 var fileInfo = new DecryptFileInfo()
                 {
                     BundleName = bundle.BundleName,
@@ -303,7 +303,7 @@ namespace YooAsset
             }
             else
             {
-                string filePath = GetBuildinFileLoadPath(bundle);
+                string filePath = GetBuiltinFileLoadPath(bundle);
                 return FileUtility.ReadAllBytes(filePath);
             }
 #endif
@@ -318,7 +318,7 @@ namespace YooAsset
 
 #if UNITY_ANDROID
             //TODO : 安卓平台内置文件属于APK压缩包内的文件。
-            YooLogger.Error($"Android platform not support read buildin bundle file text !");
+            YooLogger.Error($"Android platform not support read builtin bundle file text !");
             return null;
 #else
             if (bundle.Encrypted)
@@ -329,7 +329,7 @@ namespace YooAsset
                     return null;
                 }
 
-                string filePath = GetBuildinFileLoadPath(bundle);
+                string filePath = GetBuiltinFileLoadPath(bundle);
                 var fileInfo = new DecryptFileInfo()
                 {
                     BundleName = bundle.BundleName,
@@ -340,7 +340,7 @@ namespace YooAsset
             }
             else
             {
-                string filePath = GetBuildinFileLoadPath(bundle);
+                string filePath = GetBuiltinFileLoadPath(bundle);
                 return FileUtility.ReadAllText(filePath);
             }
 #endif
@@ -368,38 +368,38 @@ namespace YooAsset
         }
 
         #region 内部方法
-        protected string GetDefaultBuildinPackageRoot(string packageName)
+        protected string GetDefaultBuiltinPackageRoot(string packageName)
         {
-            string rootDirectory = YooAssetSettingsData.GetYooDefaultBuildinRoot();
+            string rootDirectory = YooAssetSettingsData.GetYooDefaultBuiltinRoot();
             return PathUtility.Combine(rootDirectory, packageName);
         }
-        public string GetBuildinFileLoadPath(PackageBundle bundle)
+        public string GetBuiltinFileLoadPath(PackageBundle bundle)
         {
-            if (_buildinFilePathMapping.TryGetValue(bundle.BundleGUID, out string filePath) == false)
+            if (_builtinFilePathMapping.TryGetValue(bundle.BundleGUID, out string filePath) == false)
             {
                 filePath = PathUtility.Combine(_packageRoot, bundle.FileName);
-                _buildinFilePathMapping.Add(bundle.BundleGUID, filePath);
+                _builtinFilePathMapping.Add(bundle.BundleGUID, filePath);
             }
             return filePath;
         }
-        public string GetBuildinPackageVersionFilePath()
+        public string GetBuiltinPackageVersionFilePath()
         {
             string fileName = YooAssetSettingsData.GetPackageVersionFileName(PackageName);
             return PathUtility.Combine(_packageRoot, fileName);
         }
-        public string GetBuildinPackageHashFilePath(string packageVersion)
+        public string GetBuiltinPackageHashFilePath(string packageVersion)
         {
             string fileName = YooAssetSettingsData.GetPackageHashFileName(PackageName, packageVersion);
             return PathUtility.Combine(_packageRoot, fileName);
         }
-        public string GetBuildinPackageManifestFilePath(string packageVersion)
+        public string GetBuiltinPackageManifestFilePath(string packageVersion)
         {
             string fileName = YooAssetSettingsData.GetManifestBinaryFileName(PackageName, packageVersion);
             return PathUtility.Combine(_packageRoot, fileName);
         }
         public string GetCatalogBinaryFileLoadPath()
         {
-            return PathUtility.Combine(_packageRoot, DefaultBuildinFileSystemDefine.BuildinCatalogBinaryFileName);
+            return PathUtility.Combine(_packageRoot, DefaultBuiltinFileSystemDefine.BuiltinCatalogBinaryFileName);
         }
 
         /// <summary>
@@ -409,7 +409,7 @@ namespace YooAsset
         {
             if (_wrappers.ContainsKey(bundleGUID))
             {
-                YooLogger.Error($"{nameof(DefaultBuildinFileSystem)} has element : {bundleGUID}");
+                YooLogger.Error($"{nameof(DefaultBuiltinFileSystem)} has element : {bundleGUID}");
                 return false;
             }
 
@@ -430,7 +430,7 @@ namespace YooAsset
         /// </summary>
         public DecryptResult LoadEncryptedAssetBundle(PackageBundle bundle)
         {
-            string filePath = GetBuildinFileLoadPath(bundle);
+            string filePath = GetBuiltinFileLoadPath(bundle);
             var fileInfo = new DecryptFileInfo()
             {
                 BundleName = bundle.BundleName,
@@ -445,7 +445,7 @@ namespace YooAsset
         /// </summary>
         public DecryptResult LoadEncryptedAssetBundleAsync(PackageBundle bundle)
         {
-            string filePath = GetBuildinFileLoadPath(bundle);
+            string filePath = GetBuiltinFileLoadPath(bundle);
             var fileInfo = new DecryptFileInfo()
             {
                 BundleName = bundle.BundleName,

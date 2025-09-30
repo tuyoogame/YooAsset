@@ -83,9 +83,9 @@ namespace YooAsset
         /// </summary>
         /// <param name="decryptionServices">加密文件解密服务类</param>
         /// <param name="packageRoot">文件系统的根目录</param>
-        public static FileSystemParameters CreateDefaultBuildinFileSystemParameters(IDecryptionServices decryptionServices = null, string packageRoot = null)
+        public static FileSystemParameters CreateDefaultBuiltinFileSystemParameters(IDecryptionServices decryptionServices = null, string packageRoot = null)
         {
-            string fileSystemClass = typeof(DefaultBuildinFileSystem).FullName;
+            string fileSystemClass = typeof(DefaultBuiltinFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
             fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
             return fileSystemParams;

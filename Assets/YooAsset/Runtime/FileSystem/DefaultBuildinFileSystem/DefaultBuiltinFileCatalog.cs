@@ -8,7 +8,7 @@ namespace YooAsset
     /// 内置资源清单目录
     /// </summary>
     [Serializable]
-    internal class DefaultBuildinFileCatalog
+    internal class DefaultBuiltinFileCatalog
     {
         [Serializable]
         public class FileWrapper

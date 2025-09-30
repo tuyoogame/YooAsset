@@ -2,7 +2,7 @@
 
 namespace YooAsset
 {
-    internal class LoadBuildinPackageManifestOperation : AsyncOperationBase
+    internal class LoadBuiltinPackageManifestOperation : AsyncOperationBase
     {
         private enum ESteps
         {
@@ -14,7 +14,7 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultBuildinFileSystem _fileSystem;
+        private readonly DefaultBuiltinFileSystem _fileSystem;
         private readonly string _packageVersion;
         private readonly string _packageHash;
         private UnityWebDataRequestOperation _webDataRequestOp;
@@ -28,7 +28,7 @@ namespace YooAsset
         public PackageManifest Manifest { private set; get; }
 
 
-        internal LoadBuildinPackageManifestOperation(DefaultBuildinFileSystem fileSystem, string packageVersion, string packageHash)
+        internal LoadBuiltinPackageManifestOperation(DefaultBuiltinFileSystem fileSystem, string packageVersion, string packageHash)
         {
             _fileSystem = fileSystem;
             _packageVersion = packageVersion;
@@ -45,7 +45,7 @@ namespace YooAsset
 
             if (_steps == ESteps.TryLoadFileData)
             {
-                string filePath = _fileSystem.GetBuildinPackageManifestFilePath(_packageVersion);
+                string filePath = _fileSystem.GetBuiltinPackageManifestFilePath(_packageVersion);
                 if (File.Exists(filePath))
                 {
                     _fileData = File.ReadAllBytes(filePath);
@@ -61,7 +61,7 @@ namespace YooAsset
             {
                 if (_webDataRequestOp == null)
                 {
-                    string filePath = _fileSystem.GetBuildinPackageManifestFilePath(_packageVersion);
+                    string filePath = _fileSystem.GetBuiltinPackageManifestFilePath(_packageVersion);
                     string url = DownloadSystemHelper.ConvertToWWWPath(filePath);
                     _webDataRequestOp = new UnityWebDataRequestOperation(url, 60);
                     _webDataRequestOp.StartOperation();
@@ -95,7 +95,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = "Failed to verify buildin package manifest file !";
+                    Error = "Failed to verify builtin package manifest file !";
                 }
             }
 

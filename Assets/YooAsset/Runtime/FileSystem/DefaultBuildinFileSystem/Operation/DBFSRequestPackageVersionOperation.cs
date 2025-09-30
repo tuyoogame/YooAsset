@@ -10,12 +10,12 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultBuildinFileSystem _fileSystem;
-        private RequestBuildinPackageVersionOperation _requestBuildinPackageVersionOp;
+        private readonly DefaultBuiltinFileSystem _fileSystem;
+        private RequestBuiltinPackageVersionOperation _requestBuiltinPackageVersionOp;
         private ESteps _steps = ESteps.None;
 
 
-        internal DBFSRequestPackageVersionOperation(DefaultBuildinFileSystem fileSystem)
+        internal DBFSRequestPackageVersionOperation(DefaultBuiltinFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
         }
@@ -30,28 +30,28 @@ namespace YooAsset
 
             if (_steps == ESteps.RequestPackageVersion)
             {
-                if (_requestBuildinPackageVersionOp == null)
+                if (_requestBuiltinPackageVersionOp == null)
                 {
-                    _requestBuildinPackageVersionOp = new RequestBuildinPackageVersionOperation(_fileSystem);
-                    _requestBuildinPackageVersionOp.StartOperation();
-                    AddChildOperation(_requestBuildinPackageVersionOp);
+                    _requestBuiltinPackageVersionOp = new RequestBuiltinPackageVersionOperation(_fileSystem);
+                    _requestBuiltinPackageVersionOp.StartOperation();
+                    AddChildOperation(_requestBuiltinPackageVersionOp);
                 }
 
-                _requestBuildinPackageVersionOp.UpdateOperation();
-                if (_requestBuildinPackageVersionOp.IsDone == false)
+                _requestBuiltinPackageVersionOp.UpdateOperation();
+                if (_requestBuiltinPackageVersionOp.IsDone == false)
                     return;
 
-                if (_requestBuildinPackageVersionOp.Status == EOperationStatus.Succeed)
+                if (_requestBuiltinPackageVersionOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
-                    PackageVersion = _requestBuildinPackageVersionOp.PackageVersion;
+                    PackageVersion = _requestBuiltinPackageVersionOp.PackageVersion;
                     Status = EOperationStatus.Succeed;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _requestBuildinPackageVersionOp.Error;
+                    Error = _requestBuiltinPackageVersionOp.Error;
                 }
             }
         }

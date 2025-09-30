@@ -71,7 +71,7 @@ namespace YooAsset
     /// </summary>
     public class OfflinePlayModeParameters : InitializeParameters
     {
-        public FileSystemParameters BuildinFileSystemParameters;
+        public FileSystemParameters BuiltinFileSystemParameters;
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ namespace YooAsset
     /// </summary>
     public class HostPlayModeParameters : InitializeParameters
     {
-        public FileSystemParameters BuildinFileSystemParameters;
+        public FileSystemParameters BuiltinFileSystemParameters;
         public FileSystemParameters CacheFileSystemParameters;
     }
 

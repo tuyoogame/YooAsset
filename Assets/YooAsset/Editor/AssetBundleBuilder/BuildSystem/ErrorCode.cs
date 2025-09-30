@@ -10,7 +10,7 @@ namespace YooAsset.Editor
         PackageNameIsNullOrEmpty = 111,
         PackageVersionIsNullOrEmpty = 112,
         BuildOutputRootIsNullOrEmpty = 113,
-        BuildinFileRootIsNullOrEmpty = 114,
+        BuiltinFileRootIsNullOrEmpty = 114,
         PackageOutputDirectoryExists = 115,
         BuildPipelineIsNullOrEmpty = 116,
         BuildBundleTypeIsUnknown = 117,

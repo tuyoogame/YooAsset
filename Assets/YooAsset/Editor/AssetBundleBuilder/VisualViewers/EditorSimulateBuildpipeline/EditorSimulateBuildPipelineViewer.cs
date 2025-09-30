@@ -59,12 +59,12 @@ namespace YooAsset.Editor
         protected virtual void ExecuteBuild()
         {
             var fileNameStyle = AssetBundleBuilderSetting.GetPackageFileNameStyle(PackageName, PipelineName);
-            var buildinFileCopyOption = AssetBundleBuilderSetting.GetPackageBuildinFileCopyOption(PackageName, PipelineName);
-            var buildinFileCopyParams = AssetBundleBuilderSetting.GetPackageBuildinFileCopyParams(PackageName, PipelineName);
+            var builtinFileCopyOption = AssetBundleBuilderSetting.GetPackageBuiltinFileCopyOption(PackageName, PipelineName);
+            var builtinFileCopyParams = AssetBundleBuilderSetting.GetPackageBuiltinFileCopyParams(PackageName, PipelineName);
 
             EditorSimulateBuildParameters buildParameters = new EditorSimulateBuildParameters();
             buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
-            buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
+            buildParameters.BuiltinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
             buildParameters.BuildPipeline = PipelineName.ToString();
             buildParameters.BuildBundleType = (int)EBuildBundleType.VirtualBundle;
             buildParameters.BuildTarget = BuildTarget;
@@ -72,8 +72,8 @@ namespace YooAsset.Editor
             buildParameters.PackageVersion = _buildVersionField.value;
             buildParameters.VerifyBuildingResult = true;
             buildParameters.FileNameStyle = fileNameStyle;
-            buildParameters.BuildinFileCopyOption = buildinFileCopyOption;
-            buildParameters.BuildinFileCopyParams = buildinFileCopyParams;
+            buildParameters.BuiltinFileCopyOption = builtinFileCopyOption;
+            buildParameters.BuiltinFileCopyParams = builtinFileCopyParams;
 
             EditorSimulateBuildPipeline pipeline = new EditorSimulateBuildPipeline();
             var buildResult = pipeline.Run(buildParameters, true);

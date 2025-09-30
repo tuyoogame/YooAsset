@@ -12,10 +12,10 @@ namespace YooAsset.Editor
         /// </summary>
         internal void CreateCatalogFile(BuildParametersContext buildParametersContext)
         {
-            string buildinRootDirectory = buildParametersContext.GetBuildinRootDirectory();
+            string builtinRootDirectory = buildParametersContext.GetBuiltinRootDirectory();
             string buildPackageName = buildParametersContext.Parameters.PackageName;
             var manifestServices = buildParametersContext.Parameters.ManifestRestoreServices;
-            CatalogTools.CreateCatalogFile(manifestServices, buildPackageName, buildinRootDirectory);
+            CatalogTools.CreateCatalogFile(manifestServices, buildPackageName, builtinRootDirectory);
 
             // 刷新目录
             AssetDatabase.Refresh();

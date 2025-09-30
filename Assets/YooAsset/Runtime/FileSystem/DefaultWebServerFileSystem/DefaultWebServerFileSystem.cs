@@ -180,7 +180,7 @@ namespace YooAsset
         #region 内部方法
         protected string GetDefaultWebPackageRoot(string packageName)
         {
-            string rootDirectory = YooAssetSettingsData.GetYooDefaultBuildinRoot();
+            string rootDirectory = YooAssetSettingsData.GetYooDefaultBuiltinRoot();
             return PathUtility.Combine(rootDirectory, packageName);
         }
         public string GetWebFileLoadPath(PackageBundle bundle)
@@ -209,7 +209,7 @@ namespace YooAsset
         }
         public string GetCatalogBinaryFileLoadPath()
         {
-            return PathUtility.Combine(_webPackageRoot, DefaultBuildinFileSystemDefine.BuildinCatalogBinaryFileName);
+            return PathUtility.Combine(_webPackageRoot, DefaultBuiltinFileSystemDefine.BuiltinCatalogBinaryFileName);
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace YooAsset.Editor
         void IBuildTask.Run(BuildContext context)
         {
             var buildParametersContext = context.GetContextObject<BuildParametersContext>();
-            if (buildParametersContext.Parameters.BuildinFileCopyOption != EBuildinFileCopyOption.None)
+            if (buildParametersContext.Parameters.BuiltinFileCopyOption != EBuiltinFileCopyOption.None)
             {
                 CreateCatalogFile(buildParametersContext);
             }

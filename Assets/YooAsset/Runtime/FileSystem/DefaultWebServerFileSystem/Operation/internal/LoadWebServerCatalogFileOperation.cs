@@ -77,7 +77,7 @@ namespace YooAsset
                         _fileSystem.RecordCatalogFile(wrapper.BundleGUID, fileWrapper);
                     }
 
-                    YooLogger.Log($"Package '{_fileSystem.PackageName}' buildin catalog files count : {catalog.Wrappers.Count}");
+                    YooLogger.Log($"Package '{_fileSystem.PackageName}' builtin catalog files count : {catalog.Wrappers.Count}");
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
                 }

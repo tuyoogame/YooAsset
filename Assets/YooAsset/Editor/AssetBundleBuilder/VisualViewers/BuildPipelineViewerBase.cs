@@ -127,35 +127,35 @@ namespace YooAsset.Editor
             });
             UIElementsTools.SetElementLabelMinWidth(enumField, LabelMinWidth);
         }
-        protected void SetCopyBuildinFileOptionField(EnumField enumField, TextField tagField)
+        protected void SetCopyBuiltinFileOptionField(EnumField enumField, TextField tagField)
         {
             // 首包文件拷贝选项
-            var buildinFileCopyOption = AssetBundleBuilderSetting.GetPackageBuildinFileCopyOption(PackageName, PipelineName);
-            enumField.Init(buildinFileCopyOption);
-            enumField.SetValueWithoutNotify(buildinFileCopyOption);
+            var builtinFileCopyOption = AssetBundleBuilderSetting.GetPackageBuiltinFileCopyOption(PackageName, PipelineName);
+            enumField.Init(builtinFileCopyOption);
+            enumField.SetValueWithoutNotify(builtinFileCopyOption);
             enumField.style.width = StyleWidth;
             enumField.RegisterValueChangedCallback(evt =>
             {
-                AssetBundleBuilderSetting.SetPackageBuildinFileCopyOption(PackageName, PipelineName, (EBuildinFileCopyOption)enumField.value);
+                AssetBundleBuilderSetting.SetPackageBuiltinFileCopyOption(PackageName, PipelineName, (EBuiltinFileCopyOption)enumField.value);
 
                 // 设置内置资源标签显隐
-                SetCopyBuildinFileTagsVisible(tagField);
+                SetCopyBuiltinFileTagsVisible(tagField);
             });
             UIElementsTools.SetElementLabelMinWidth(enumField, LabelMinWidth);
         }
-        protected void SetCopyBuildinFileTagsVisible(TextField tagField)
+        protected void SetCopyBuiltinFileTagsVisible(TextField tagField)
         {
-            var option = AssetBundleBuilderSetting.GetPackageBuildinFileCopyOption(PackageName, PipelineName);
-            tagField.visible = option == EBuildinFileCopyOption.ClearAndCopyByTags || option == EBuildinFileCopyOption.OnlyCopyByTags;
+            var option = AssetBundleBuilderSetting.GetPackageBuiltinFileCopyOption(PackageName, PipelineName);
+            tagField.visible = option == EBuiltinFileCopyOption.ClearAndCopyByTags || option == EBuiltinFileCopyOption.OnlyCopyByTags;
         }
-        protected void SetCopyBuildinFileTagsField(TextField textField)
+        protected void SetCopyBuiltinFileTagsField(TextField textField)
         {
             // 首包文件拷贝参数
-            var buildinFileCopyParams = AssetBundleBuilderSetting.GetPackageBuildinFileCopyParams(PackageName, PipelineName);
-            textField.SetValueWithoutNotify(buildinFileCopyParams);
+            var builtinFileCopyParams = AssetBundleBuilderSetting.GetPackageBuiltinFileCopyParams(PackageName, PipelineName);
+            textField.SetValueWithoutNotify(builtinFileCopyParams);
             textField.RegisterValueChangedCallback(evt =>
             {
-                AssetBundleBuilderSetting.SetPackageBuildinFileCopyParams(PackageName, PipelineName, textField.value);
+                AssetBundleBuilderSetting.SetPackageBuiltinFileCopyParams(PackageName, PipelineName, textField.value);
             });
             UIElementsTools.SetElementLabelMinWidth(textField, LabelMinWidth);
         }

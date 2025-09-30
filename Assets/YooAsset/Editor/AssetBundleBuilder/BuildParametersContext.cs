@@ -55,9 +55,9 @@ namespace YooAsset.Editor
         /// <summary>
         /// 获取内置资源的根目录
         /// </summary>
-        public string GetBuildinRootDirectory()
+        public string GetBuiltinRootDirectory()
         {
-            return Parameters.GetBuildinRootDirectory();
+            return Parameters.GetBuiltinRootDirectory();
         }
     }
 }
