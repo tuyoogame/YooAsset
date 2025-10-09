@@ -37,6 +37,11 @@ namespace YooAsset
         public bool IncludeAssetGUID;
 
         /// <summary>
+        /// 使用可寻址地址代替资源路径
+        /// </summary>
+        public bool ReplaceAssetPathWithAddress;
+
+        /// <summary>
         /// 文件名称样式
         /// </summary>
         public int OutputNameStyle;
@@ -114,6 +119,38 @@ namespace YooAsset
 
 
         /// <summary>
+        /// 初始化资源清单
+        /// </summary>
+        public void Initialize()
+        {
+            // 填充资源包内包含的主资源列表
+            foreach (var packageAsset in AssetList)
+            {
+                int bundleID = packageAsset.BundleID;
+                if (bundleID >= 0 && bundleID < BundleList.Count)
+                {
+                    var packageBundle = BundleList[bundleID];
+                    packageBundle.IncludeMainAssets.Add(packageAsset);
+                }
+                else
+                {
+                    throw new Exception($"Invalid bundle id : {bundleID} Asset path : {packageAsset.AssetPath}");
+                }
+            }
+
+            // 填充资源包引用关系
+            for (int index = 0; index < BundleList.Count; index++)
+            {
+                var sourceBundle = BundleList[index];
+                foreach (int dependIndex in sourceBundle.DependBundleIDs)
+                {
+                    var dependBundle = BundleList[dependIndex];
+                    dependBundle.AddReferenceBundleID(index);
+                }
+            }
+        }
+
+        /// <summary>
         /// 获取包裹的详细信息
         /// </summary>
         public PackageDetails GetPackageDetails()
@@ -124,6 +161,7 @@ namespace YooAsset
             details.SupportExtensionless = SupportExtensionless;
             details.LocationToLower = LocationToLower;
             details.IncludeAssetGUID = IncludeAssetGUID;
+            details.ReplaceAssetPathWithAddress = ReplaceAssetPathWithAddress;
             details.OutputNameStyle = OutputNameStyle;
             details.BuildBundleType = BuildBundleType;
             details.BuildPipeline = BuildPipeline;

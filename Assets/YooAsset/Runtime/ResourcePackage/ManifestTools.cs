@@ -62,6 +62,7 @@ namespace YooAsset
                 buffer.WriteBool(manifest.SupportExtensionless);
                 buffer.WriteBool(manifest.LocationToLower);
                 buffer.WriteBool(manifest.IncludeAssetGUID);
+                buffer.WriteBool(manifest.ReplaceAssetPathWithAddress);
                 buffer.WriteInt32(manifest.OutputNameStyle);
                 buffer.WriteInt32(manifest.BuildBundleType);
                 buffer.WriteUTF8(manifest.BuildPipeline);
@@ -129,7 +130,7 @@ namespace YooAsset
             }
 
             // 初始化资源清单
-            InitManifest(manifest);
+            manifest.Initialize();
             return manifest;
         }
 
@@ -142,38 +143,6 @@ namespace YooAsset
             operation.StartOperation();
             operation.WaitForAsyncComplete();
             return operation.Manifest;
-        }
-
-        /// <summary>
-        /// 初始化资源清单
-        /// </summary>
-        public static void InitManifest(PackageManifest manifest)
-        {
-            // 填充资源包内包含的主资源列表
-            foreach (var packageAsset in manifest.AssetList)
-            {
-                int bundleID = packageAsset.BundleID;
-                if (bundleID >= 0 && bundleID < manifest.BundleList.Count)
-                {
-                    var packageBundle = manifest.BundleList[bundleID];
-                    packageBundle.IncludeMainAssets.Add(packageAsset);
-                }
-                else
-                {
-                    throw new Exception($"Invalid bundle id : {bundleID} Asset path : {packageAsset.AssetPath}");
-                }
-            }
-
-            // 填充资源包引用关系
-            for (int index = 0; index < manifest.BundleList.Count; index++)
-            {
-                var sourceBundle = manifest.BundleList[index];
-                foreach (int dependIndex in sourceBundle.DependBundleIDs)
-                {
-                    var dependBundle = manifest.BundleList[dependIndex];
-                    dependBundle.AddReferenceBundleID(index);
-                }
-            }
         }
 
         /// <summary>

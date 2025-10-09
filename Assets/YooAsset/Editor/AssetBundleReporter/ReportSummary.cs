@@ -81,6 +81,7 @@ namespace YooAsset.Editor
         public ECompressOption CompressOption;
         public bool DisableWriteTypeTree;
         public bool IgnoreTypeTreeChanges;
+        public bool ReplaceAssetPathWithAddress;
         public bool WriteLinkXML = true;
         public string CacheServerHost;
         public int CacheServerPort;

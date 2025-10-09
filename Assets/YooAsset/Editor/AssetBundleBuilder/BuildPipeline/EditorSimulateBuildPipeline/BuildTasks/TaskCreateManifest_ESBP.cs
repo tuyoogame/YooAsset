@@ -7,7 +7,7 @@ namespace YooAsset.Editor
     {
         void IBuildTask.Run(BuildContext context)
         {
-            CreateManifestFile(false, false, context);
+            CreateManifestFile(false, false, false, context);
         }
 
         protected override string[] GetBundleDepends(BuildContext context, string bundleName)

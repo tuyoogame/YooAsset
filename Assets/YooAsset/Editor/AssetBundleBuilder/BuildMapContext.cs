@@ -96,12 +96,12 @@ namespace YooAsset.Editor
         /// <summary>
         /// 获取构建管线里需要的数据
         /// </summary>
-        public UnityEditor.AssetBundleBuild[] GetPipelineBuilds()
+        public UnityEditor.AssetBundleBuild[] GetPipelineBuilds(bool replaceAssetPathWithAddres)
         {
             List<UnityEditor.AssetBundleBuild> builds = new List<UnityEditor.AssetBundleBuild>(_bundleInfoDic.Count);
             foreach (var bundleInfo in _bundleInfoDic.Values)
             {
-                builds.Add(bundleInfo.CreatePipelineBuild());
+                builds.Add(bundleInfo.CreatePipelineBuild(replaceAssetPathWithAddres));
             }
             return builds.ToArray();
         }

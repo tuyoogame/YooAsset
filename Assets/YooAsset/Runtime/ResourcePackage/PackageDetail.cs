@@ -29,6 +29,11 @@ namespace YooAsset
         public bool IncludeAssetGUID;
 
         /// <summary>
+        /// 使用可寻址地址代替资源路径
+        /// </summary>
+        public bool ReplaceAssetPathWithAddress;
+
+        /// <summary>
         /// 文件名称样式
         /// </summary>
         public int OutputNameStyle;

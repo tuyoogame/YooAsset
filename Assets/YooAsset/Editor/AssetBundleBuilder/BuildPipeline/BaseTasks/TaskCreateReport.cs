@@ -54,6 +54,7 @@ namespace YooAsset.Editor
                     buildReport.Summary.CompressOption = builtinBuildParameters.CompressOption;
                     buildReport.Summary.DisableWriteTypeTree = builtinBuildParameters.DisableWriteTypeTree;
                     buildReport.Summary.IgnoreTypeTreeChanges = builtinBuildParameters.IgnoreTypeTreeChanges;
+                    buildReport.Summary.ReplaceAssetPathWithAddress = builtinBuildParameters.ReplaceAssetPathWithAddress;
                 }
                 else if (buildParameters is ScriptableBuildParameters)
                 {
@@ -61,6 +62,7 @@ namespace YooAsset.Editor
                     buildReport.Summary.CompressOption = scriptableBuildParameters.CompressOption;
                     buildReport.Summary.DisableWriteTypeTree = scriptableBuildParameters.DisableWriteTypeTree;
                     buildReport.Summary.IgnoreTypeTreeChanges = scriptableBuildParameters.IgnoreTypeTreeChanges;
+                    buildReport.Summary.ReplaceAssetPathWithAddress = scriptableBuildParameters.ReplaceAssetPathWithAddress;
                     buildReport.Summary.WriteLinkXML = scriptableBuildParameters.WriteLinkXML;
                     buildReport.Summary.CacheServerHost = scriptableBuildParameters.CacheServerHost;
                     buildReport.Summary.CacheServerPort = scriptableBuildParameters.CacheServerPort;

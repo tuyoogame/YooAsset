@@ -13,7 +13,10 @@ namespace YooAsset.Editor
 
         void IBuildTask.Run(BuildContext context)
         {
-            CreateManifestFile(true, true, context);
+            var buildParametersContext = context.GetContextObject<BuildParametersContext>();
+            var scriptableBuildParameters = buildParametersContext.Parameters as ScriptableBuildParameters;
+            bool replaceAssetPathWithAddress = scriptableBuildParameters.ReplaceAssetPathWithAddress;
+            CreateManifestFile(true, true, replaceAssetPathWithAddress, context);
         }
 
         protected override string[] GetBundleDepends(BuildContext context, string bundleName)

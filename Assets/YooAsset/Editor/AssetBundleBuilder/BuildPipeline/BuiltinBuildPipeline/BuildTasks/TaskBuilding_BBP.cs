@@ -23,7 +23,8 @@ namespace YooAsset.Editor
             // 开始构建
             string pipelineOutputDirectory = buildParametersContext.GetPipelineOutputDirectory();
             BuildAssetBundleOptions buildOptions = builtinBuildParameters.GetBundleBuildOptions();
-            AssetBundleManifest unityManifest = BuildPipeline.BuildAssetBundles(pipelineOutputDirectory, buildMapContext.GetPipelineBuilds(), buildOptions, buildParametersContext.Parameters.BuildTarget);
+            var bundleBuilds = buildMapContext.GetPipelineBuilds(builtinBuildParameters.ReplaceAssetPathWithAddress);
+            AssetBundleManifest unityManifest = BuildPipeline.BuildAssetBundles(pipelineOutputDirectory, bundleBuilds, buildOptions, buildParametersContext.Parameters.BuildTarget);
             if (unityManifest == null)
             {
                 string message = BuildLogger.GetErrorMessage(ErrorCode.UnityEngineBuildFailed, "UnityEngine build failed !");

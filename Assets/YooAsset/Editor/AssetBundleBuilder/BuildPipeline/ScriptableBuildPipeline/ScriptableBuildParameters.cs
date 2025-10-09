@@ -30,6 +30,12 @@ namespace YooAsset.Editor
         public bool IgnoreTypeTreeChanges = true;
 
         /// <summary>
+        /// 使用可寻址地址代替资源路径
+        /// 说明：开启此项可以节省运行时清单占用的内存！
+        /// </summary>
+        public bool ReplaceAssetPathWithAddress = false;
+
+        /// <summary>
         /// 自动建立资源对象对图集的依赖关系
         /// </summary>
         public bool TrackSpriteAtlasDependencies = false;

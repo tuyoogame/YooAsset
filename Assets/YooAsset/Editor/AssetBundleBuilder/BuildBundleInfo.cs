@@ -106,7 +106,27 @@ namespace YooAsset.Editor
         /// </summary>
         public string[] GetAllPackAssetPaths()
         {
-            return AllPackAssets.Select(t => t.AssetInfo.AssetPath).ToArray();
+            List<string> results = new List<string>(AllPackAssets.Count);
+            for (int i = 0; i < AllPackAssets.Count; i++)
+            {
+                var packAsset = AllPackAssets[i];
+                results.Add(packAsset.AssetInfo.AssetPath);
+            }
+            return results.ToArray();
+        }
+
+        /// <summary>
+        /// 获取构建的资源可寻址列表
+        /// </summary>
+        public string[] GetAllPackAssetAddress()
+        {
+            List<string> results = new List<string>(AllPackAssets.Count);
+            for (int i = 0; i < AllPackAssets.Count; i++)
+            {
+                var packAsset = AllPackAssets[i];
+                results.Add(packAsset.Address);
+            }
+            return results.ToArray();
         }
 
         /// <summary>
@@ -153,13 +173,15 @@ namespace YooAsset.Editor
         /// <summary>
         /// 创建AssetBundleBuild类
         /// </summary>
-        public UnityEditor.AssetBundleBuild CreatePipelineBuild()
+        public UnityEditor.AssetBundleBuild CreatePipelineBuild(bool replaceAssetPathWithAddress)
         {
             // 注意：我们不再支持AssetBundle的变种机制
             AssetBundleBuild build = new AssetBundleBuild();
             build.assetBundleName = BundleName;
             build.assetBundleVariant = string.Empty;
             build.assetNames = GetAllPackAssetPaths();
+            if (replaceAssetPathWithAddress)
+                build.addressableNames = GetAllPackAssetAddress();
             return build;
         }
 

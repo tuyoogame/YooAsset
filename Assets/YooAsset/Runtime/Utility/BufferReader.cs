@@ -120,6 +120,15 @@ namespace YooAsset
             return (ulong)ReadInt64();
         }
 
+        public void SkipUTF8()
+        {
+            ushort count = ReadUInt16();
+            if (count == 0)
+                return;
+
+            CheckReaderIndex(count);
+            _index += count;
+        }
         public string ReadUTF8()
         {
             ushort count = ReadUInt16();

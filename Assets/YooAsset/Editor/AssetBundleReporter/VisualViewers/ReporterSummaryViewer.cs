@@ -74,6 +74,7 @@ namespace YooAsset.Editor
             BindListViewItem("CompressOption", $"{buildReport.Summary.CompressOption}");
             BindListViewItem("DisableWriteTypeTree", $"{buildReport.Summary.DisableWriteTypeTree}");
             BindListViewItem("IgnoreTypeTreeChanges", $"{buildReport.Summary.IgnoreTypeTreeChanges}");
+            BindListViewItem("ReplaceAssetPathWithAddress", $"{buildReport.Summary.ReplaceAssetPathWithAddress}");
             BindListViewItem(string.Empty, string.Empty);
 
             BindListViewHeader("Build Results");

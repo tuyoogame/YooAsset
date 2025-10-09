@@ -84,7 +84,10 @@ namespace YooAsset
 
                     // 读取文件版本
                     string fileVersion = _buffer.ReadUTF8();
-                    if (fileVersion != ManifestDefine.FileVersion)
+                    Version fileVer = new Version(fileVersion);
+                    Version ver2025_8_28 = new Version(ManifestDefine.VERSION_2025_8_28);
+                    Version ver2025_9_30 = new Version(ManifestDefine.VERSION_2025_9_30);
+                    if (fileVer < ver2025_8_28)
                     {
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Failed;
@@ -99,6 +102,10 @@ namespace YooAsset
                     Manifest.SupportExtensionless = _buffer.ReadBool();
                     Manifest.LocationToLower = _buffer.ReadBool();
                     Manifest.IncludeAssetGUID = _buffer.ReadBool();
+                    if (fileVer >= ver2025_9_30)
+                        Manifest.ReplaceAssetPathWithAddress = _buffer.ReadBool();
+                    else
+                        Manifest.ReplaceAssetPathWithAddress = false;
                     Manifest.OutputNameStyle = _buffer.ReadInt32();
                     Manifest.BuildBundleType = _buffer.ReadInt32();
                     Manifest.BuildPipeline = _buffer.ReadUTF8();
@@ -109,6 +116,8 @@ namespace YooAsset
                     // 检测配置
                     if (Manifest.EnableAddressable && Manifest.LocationToLower)
                         throw new System.Exception("Addressable not support location to lower !");
+                    if (Manifest.EnableAddressable == false && Manifest.ReplaceAssetPathWithAddress)
+                        throw new System.Exception("Replace asset path with address need enable Addressable !");
 
                     _steps = ESteps.PrepareAssetList;
                 }
@@ -122,16 +131,31 @@ namespace YooAsset
                 }
                 if (_steps == ESteps.DeserializeAssetList)
                 {
+                    bool replaceAssetPath = false;
+                    if (UnityEngine.Application.isPlaying)
+                    {
+                        if (Manifest.EnableAddressable && Manifest.ReplaceAssetPathWithAddress)
+                            replaceAssetPath = true;
+                    }
+
                     while (_packageAssetCount > 0)
                     {
                         var packageAsset = new PackageAsset();
                         packageAsset.Address = _buffer.ReadUTF8();
-                        packageAsset.AssetPath = _buffer.ReadUTF8();
+                        if (replaceAssetPath)
+                        {
+                            packageAsset.AssetPath = packageAsset.Address;
+                            _buffer.SkipUTF8(); //跳过解析AssetPath
+                        }
+                        else
+                        {
+                            packageAsset.AssetPath = _buffer.ReadUTF8();
+                        }
                         packageAsset.AssetGUID = _buffer.ReadUTF8();
                         packageAsset.AssetTags = _buffer.ReadUTF8Array();
                         packageAsset.BundleID = _buffer.ReadInt32();
                         packageAsset.DependBundleIDs = _buffer.ReadInt32Array();
-                        FillAssetCollection(Manifest, packageAsset);
+                        FillAssetCollection(Manifest, packageAsset, replaceAssetPath);
 
                         _packageAssetCount--;
                         Progress = 1f - _packageAssetCount / _progressTotalValue;
@@ -181,7 +205,7 @@ namespace YooAsset
 
                 if (_steps == ESteps.InitManifest)
                 {
-                    ManifestTools.InitManifest(Manifest);
+                    Manifest.Initialize();
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
                 }
@@ -228,7 +252,7 @@ namespace YooAsset
             else
                 manifest.AssetPathMapping2 = new Dictionary<string, string>();
         }
-        private void FillAssetCollection(PackageManifest manifest, PackageAsset packageAsset)
+        private void FillAssetCollection(PackageManifest manifest, PackageAsset packageAsset, bool replaceAssetPath)
         {
             // 添加到列表集合
             manifest.AssetList.Add(packageAsset);
@@ -274,7 +298,7 @@ namespace YooAsset
             }
 
             // 添加可寻址地址
-            if (manifest.EnableAddressable)
+            if (manifest.EnableAddressable && replaceAssetPath == false)
             {
                 string location = packageAsset.Address;
                 if (string.IsNullOrEmpty(location) == false)
