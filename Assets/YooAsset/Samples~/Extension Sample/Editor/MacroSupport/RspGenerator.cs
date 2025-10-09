@@ -6,7 +6,7 @@ using System.Xml;
 using UnityEditor;
 using UnityEngine;
 
-#if YOO_ASSET_EXPERIMENT
+#if YOO_MACRO_SUPPORT
 namespace YooAsset.Editor.Experiment
 {
     [InitializeOnLoad]

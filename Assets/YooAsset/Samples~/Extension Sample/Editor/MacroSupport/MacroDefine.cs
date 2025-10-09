@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-#if YOO_ASSET_EXPERIMENT
+#if YOO_MACRO_SUPPORT
 namespace YooAsset.Editor
 {
     public class MacroDefine
