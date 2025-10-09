@@ -309,6 +309,17 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 尝试卸载资源包
+        /// </summary>
+        public void TryUnloadBundle()
+        {
+            if (_resManager.AutoUnloadBundleWhenUnused)
+            {
+                _resManager.TryUnloadUnusedAsset(MainAssetInfo, 10);
+            }
+        }
+
+        /// <summary>
         /// 结束流程
         /// </summary>
         protected void InvokeCompletion(string error, EOperationStatus status)

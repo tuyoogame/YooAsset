@@ -23,6 +23,11 @@ namespace YooAsset
             if (IsValidWithWarning == false)
                 return;
             Provider.ReleaseHandle(this);
+
+            // 主动卸载零引用的资源包
+            if (Provider.RefCount == 0)
+                Provider.TryUnloadBundle();
+
             Provider = null;
         }
 
@@ -146,11 +151,11 @@ namespace YooAsset
         /// </summary>
         public System.Threading.Tasks.Task Task
         {
-            get 
+            get
             {
                 if (IsValidWithWarning == false)
                     return null;
-                return Provider.Task; 
+                return Provider.Task;
             }
         }
 
