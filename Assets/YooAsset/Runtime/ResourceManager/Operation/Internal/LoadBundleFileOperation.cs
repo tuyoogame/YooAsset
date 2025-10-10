@@ -180,11 +180,7 @@ namespace YooAsset
         /// </summary>
         public bool CanDestroyLoader()
         {
-            // 注意：正在加载中的任务不可以销毁
-            if (_steps == ESteps.LoadBundleFile)
-                return false;
-
-            if (RefCount > 0)
+            if (CanReleasableLoader() == false)
                 return false;
 
             // YOOASSET_LEGACY_DEPENDENCY
@@ -194,10 +190,30 @@ namespace YooAsset
             {
                 foreach (var bundleID in LoadBundleInfo.Bundle.ReferenceBundleIDs)
                 {
+#if YOOASSET_EXPERIMENTAL
+                    if (_resManager.CheckBundleReleasable(bundleID) == false)
+                        return false;
+#else
                     if (_resManager.CheckBundleDestroyed(bundleID) == false)
                         return false;
+#endif
                 }
             }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 是否可以释放
+        /// </summary>
+        public bool CanReleasableLoader()
+        {
+            // 注意：正在加载中的任务不可以销毁
+            if (_steps == ESteps.LoadBundleFile)
+                return false;
+
+            if (RefCount > 0)
+                return false;
 
             return true;
         }

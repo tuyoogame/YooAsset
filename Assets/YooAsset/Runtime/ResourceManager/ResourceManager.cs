@@ -329,6 +329,14 @@ namespace YooAsset
                 return true;
             return bundleFileLoader.IsDestroyed;
         }
+        internal bool CheckBundleReleasable(int bundleID)
+        {
+            string bundleName = _bundleQuery.GetMainBundleName(bundleID);
+            var bundleFileLoader = TryGetBundleFileLoader(bundleName);
+            if (bundleFileLoader == null)
+                return true;
+            return bundleFileLoader.CanReleasableLoader();
+        }
         internal bool HasAnyLoader()
         {
             return LoaderDic.Count > 0;
