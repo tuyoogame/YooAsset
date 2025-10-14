@@ -16,7 +16,7 @@ namespace YooAsset
         }
 
         private readonly DefaultCacheFileSystem _fileSystem;
-        private IEnumerator<DirectoryInfo> _filesEnumerator = null;
+        private IEnumerator<string> _filesEnumerator = null;
         private float _verifyStartTime;
         private ESteps _steps = ESteps.None;
 
@@ -42,11 +42,11 @@ namespace YooAsset
 
             if (_steps == ESteps.Prepare)
             {
-                DirectoryInfo rootDirectory = new DirectoryInfo(_fileSystem.GetCacheBundleFilesRoot());
-                if (rootDirectory.Exists)
+                string rootDirectory = _fileSystem.GetCacheBundleFilesRoot();
+                if (Directory.Exists(rootDirectory))
                 {
-                    var directorieInfos = rootDirectory.EnumerateDirectories();
-                    _filesEnumerator = directorieInfos.GetEnumerator();
+                    var directories = Directory.EnumerateDirectories(rootDirectory);
+                    _filesEnumerator = directories.GetEnumerator();
                 }
                 _steps = ESteps.SearchFiles;
             }
@@ -76,15 +76,15 @@ namespace YooAsset
                     break;
 
                 var rootFoder = _filesEnumerator.Current;
-                var childDirectories = rootFoder.GetDirectories();
+                var childDirectories = Directory.EnumerateDirectories(rootFoder);
                 foreach (var chidDirectory in childDirectories)
                 {
-                    string bundleGUID = chidDirectory.Name;
+                    string bundleGUID = Path.GetFileName(chidDirectory);
                     if (_fileSystem.IsRecordBundleFile(bundleGUID))
                         continue;
 
                     // 创建验证元素类
-                    string fileRootPath = chidDirectory.FullName;
+                    string fileRootPath = chidDirectory;
                     string dataFilePath = $"{fileRootPath}/{DefaultCacheFileSystemDefine.BundleDataFileName}";
                     string infoFilePath = $"{fileRootPath}/{DefaultCacheFileSystemDefine.BundleInfoFileName}";
 
@@ -108,17 +108,14 @@ namespace YooAsset
 
             return isFindItem;
         }
-        private string FindDataFileExtension(DirectoryInfo directoryInfo)
+        private string FindDataFileExtension(string directory)
         {
             string dataFileExtension = string.Empty;
-            var fileInfos = directoryInfo.GetFiles();
-            foreach (var fileInfo in fileInfos)
+            var files = Directory.EnumerateFiles(directory, DefaultCacheFileSystemDefine.BundleDataFileName + "*");
+            foreach (var file in files)
             {
-                if (fileInfo.Name.StartsWith(DefaultCacheFileSystemDefine.BundleDataFileName))
-                {
-                    dataFileExtension = fileInfo.Extension;
-                    break;
-                }
+                dataFileExtension = Path.GetExtension(file);
+                break;
             }
             return dataFileExtension;
         }
