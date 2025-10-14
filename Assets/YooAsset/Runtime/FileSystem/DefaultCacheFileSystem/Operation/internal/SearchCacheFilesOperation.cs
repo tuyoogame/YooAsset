@@ -111,10 +111,11 @@ namespace YooAsset
         private string FindDataFileExtension(string directory)
         {
             string dataFileExtension = string.Empty;
-            var files = Directory.EnumerateFiles(directory, DefaultCacheFileSystemDefine.BundleDataFileName + "*");
-            foreach (var file in files)
+            string searchPattern = DefaultCacheFileSystemDefine.BundleDataFileName + "*";
+            var dataFiles = Directory.EnumerateFiles(directory, searchPattern);
+            foreach (var filePath in dataFiles)
             {
-                dataFileExtension = Path.GetExtension(file);
+                dataFileExtension = Path.GetExtension(filePath);
                 break;
             }
             return dataFileExtension;
