@@ -236,6 +236,7 @@ namespace YooAsset.Editor
 
                 // 包裹名称
                 _packageNameTxt = root.Q<TextField>("PackageName");
+                _packageNameTxt.isDelayed = true;
                 _packageNameTxt.RegisterValueChangedCallback(evt =>
                 {
                     var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
@@ -249,6 +250,7 @@ namespace YooAsset.Editor
 
                 // 包裹备注
                 _packageDescTxt = root.Q<TextField>("PackageDesc");
+                _packageDescTxt.isDelayed = true;
                 _packageDescTxt.RegisterValueChangedCallback(evt =>
                 {
                     var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
@@ -286,6 +288,7 @@ namespace YooAsset.Editor
 
                 // 分组名称
                 _groupNameTxt = root.Q<TextField>("GroupName");
+                _groupNameTxt.isDelayed = true;
                 _groupNameTxt.RegisterValueChangedCallback(evt =>
                 {
                     var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
@@ -300,6 +303,7 @@ namespace YooAsset.Editor
 
                 // 分组备注
                 _groupDescTxt = root.Q<TextField>("GroupDesc");
+                _groupDescTxt.isDelayed = true;
                 _groupDescTxt.RegisterValueChangedCallback(evt =>
                 {
                     var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
@@ -314,6 +318,7 @@ namespace YooAsset.Editor
 
                 // 分组的资源标签
                 _groupTagsTxt = root.Q<TextField>("GroupTags");
+                _groupTagsTxt.isDelayed = true;
                 _groupTagsTxt.RegisterValueChangedCallback(evt =>
                 {
                     var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
@@ -817,6 +822,7 @@ namespace YooAsset.Editor
                 var textField = new TextField();
                 textField.name = "TextField0";
                 textField.label = "User Data";
+                textField.isDelayed = true;
                 textField.style.width = 200;
                 elementBottom.Add(textField);
                 var label = textField.Q<Label>();
@@ -826,6 +832,7 @@ namespace YooAsset.Editor
                 var textField = new TextField();
                 textField.name = "TextField1";
                 textField.label = "Asset Tags";
+                textField.isDelayed = true;
                 textField.style.width = 100;
                 textField.style.marginLeft = 20;
                 textField.style.flexGrow = 1;
