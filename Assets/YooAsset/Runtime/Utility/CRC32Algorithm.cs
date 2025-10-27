@@ -76,13 +76,7 @@ namespace YooAsset
         /// <summary>
         /// Gets the computed hash value.
         /// </summary>
-        public uint CRCValue
-        {
-            get
-            {
-                return _currentCrc;
-            }
-        }
+        public uint CRCValue { private set; get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CRC32Algorithm"/> class. 
@@ -115,6 +109,8 @@ namespace YooAsset
         /// </summary>
         protected override byte[] HashFinal()
         {
+            CRCValue = _currentCrc;
+
             if (BitConverter.IsLittleEndian)
                 return new[] { (byte)_currentCrc, (byte)(_currentCrc >> 8), (byte)(_currentCrc >> 16), (byte)(_currentCrc >> 24) };
             else
