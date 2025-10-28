@@ -63,14 +63,19 @@ namespace YooAsset
             {
                 "link.xml",
                 "buildlogtep.json",
-                $"{packageName}.version",
-                $"{packageName}_{packageVersion}.bytes",
-                $"{packageName}_{packageVersion}.hash",
-                $"{packageName}_{packageVersion}.json",
-                $"{packageName}_{packageVersion}.report",
                 DefaultBuildinFileSystemDefine.BuildinCatalogJsonFileName,
                 DefaultBuildinFileSystemDefine.BuildinCatalogBinaryFileName
             };
+            string packageVersionFileName = YooAssetSettingsData.GetPackageVersionFileName(packageName);
+            string packageHashFileName = YooAssetSettingsData.GetPackageHashFileName(packageName, packageVersion);
+            string manifestBinaryFIleName = YooAssetSettingsData.GetManifestBinaryFileName(packageName, packageVersion);
+            string manifestJsonFIleName = YooAssetSettingsData.GetManifestJsonFileName(packageName, packageVersion);
+            string reportFileName = YooAssetSettingsData.GetBuildReportFileName(packageName, packageVersion);
+            whiteFileList.Add(packageVersionFileName);
+            whiteFileList.Add(packageHashFileName);
+            whiteFileList.Add(manifestBinaryFIleName);
+            whiteFileList.Add(manifestJsonFIleName);
+            whiteFileList.Add(reportFileName);
 
             // 记录所有内置资源文件
             DirectoryInfo rootDirectory = new DirectoryInfo(packageDirectory);
