@@ -8,6 +8,7 @@ namespace YooAsset
             None,
             CheckExist,
             DownloadFile,
+            AbortDownload,
             LoadAssetBundle,
             CheckResult,
             Done,
@@ -50,6 +51,17 @@ namespace YooAsset
 
             if (_steps == ESteps.DownloadFile)
             {
+                // 中断下载
+                if (AbortDownloadFile)
+                {
+                    if (_downloadFileOp != null)
+                        _downloadFileOp.AbortOperation();
+                    _steps = ESteps.AbortDownload;
+                }
+            }
+
+            if (_steps == ESteps.DownloadFile)
+            {
                 if (_downloadFileOp == null)
                 {
                     DownloadFileOptions options = new DownloadFileOptions(int.MaxValue);
@@ -77,6 +89,23 @@ namespace YooAsset
                     Status = EOperationStatus.Failed;
                     Error = _downloadFileOp.Error;
                 }
+            }
+
+            if (_steps == ESteps.AbortDownload)
+            {
+                if (_downloadFileOp != null)
+                {
+                    if (IsWaitForAsyncComplete)
+                        _downloadFileOp.WaitForAsyncComplete();
+
+                    _downloadFileOp.UpdateOperation();
+                    if (_downloadFileOp.IsDone == false)
+                        return;
+                }
+
+                _steps = ESteps.Done;
+                Status = EOperationStatus.Failed;
+                Error = "Abort download file !";
             }
 
             if (_steps == ESteps.LoadAssetBundle)

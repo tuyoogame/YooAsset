@@ -17,6 +17,11 @@ namespace YooAsset
         /// 下载大小
         /// </summary>
         public long DownloadedBytes { protected set; get; } = 0;
+
+        /// <summary>
+        /// 终止下载文件
+        /// </summary>
+        public bool AbortDownloadFile = false;
     }
 
     internal sealed class FSLoadBundleCompleteOperation : FSLoadBundleOperation

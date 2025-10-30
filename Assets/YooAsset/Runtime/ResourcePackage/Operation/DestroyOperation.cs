@@ -13,13 +13,15 @@ namespace YooAsset
         }
 
         private readonly ResourcePackage _resourcePackage;
+        private readonly UnloadAllAssetsOptions _options;
         private UnloadAllAssetsOperation _unloadAllAssetsOp;
         private ESteps _steps = ESteps.None;
 
 
-        public DestroyOperation(ResourcePackage resourcePackage)
+        public DestroyOperation(ResourcePackage resourcePackage, UnloadAllAssetsOptions options)
         {
             _resourcePackage = resourcePackage;
+            _options = options;
         }
 
         internal override void InternalStart()
@@ -64,7 +66,7 @@ namespace YooAsset
             {
                 if (_unloadAllAssetsOp == null)
                 {
-                    _unloadAllAssetsOp = _resourcePackage.UnloadAllAssetsAsync();
+                    _unloadAllAssetsOp = _resourcePackage.UnloadAllAssetsAsync(_options);
                     _unloadAllAssetsOp.StartOperation();
                     AddChildOperation(_unloadAllAssetsOp);
                 }

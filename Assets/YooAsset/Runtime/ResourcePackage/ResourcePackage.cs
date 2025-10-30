@@ -209,7 +209,10 @@ namespace YooAsset
         /// </summary>
         public DestroyOperation DestroyAsync()
         {
-            var operation = new DestroyOperation(this);
+            var options = new UnloadAllAssetsOptions();
+            options.ReleaseAllHandles = true;
+            options.LockLoadOperation = true;
+            var operation = new DestroyOperation(this, options);
             OperationSystem.StartOperation(null, operation);
             return operation;
         }

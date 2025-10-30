@@ -173,6 +173,13 @@ namespace YooAsset
 
             if (Result != null)
                 Result.UnloadBundleFile();
+
+            if (IsDone == false)
+            {
+                _steps = ESteps.Done;
+                Status = EOperationStatus.Failed;
+                Error = "Bundle loader destroyed !";
+            }
         }
 
         /// <summary>
@@ -254,6 +261,29 @@ namespace YooAsset
             {
                 _resManager.RemoveBundleProviders(_removeList);
                 _removeList.Clear();
+            }
+        }
+
+        /// <summary>
+        /// 尝试终止加载器
+        /// </summary>
+        public void TryAbortLoader()
+        {
+            if (IsDone == false)
+            {
+                if (_steps == ESteps.CheckConcurrency)
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = "Abort bundle loader !";
+                }
+
+                if (_steps == ESteps.LoadBundleFile)
+                {
+                    // 注意：终止下载器
+                    if (_loadBundleOp != null)
+                        _loadBundleOp.AbortDownloadFile = true;
+                }
             }
         }
     }
