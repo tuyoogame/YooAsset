@@ -2,6 +2,67 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.3.17] - 2025-10-30
+
+**非常重要**：修复了#627优化导致的资源清单CRC值为空的问题。
+
+该问题会导致下载的损坏文件验证通过。
+
+影响范围：v2.3.15版本，v2.3.16版本。
+
+**非常重要**：(#661) 修复了Package销毁过程中，遇到正在加载的AssetBundle会导致无法卸载的问题。
+
+该问题是偶现，引擎会提示AssetBundle已经加载，无法加载新的文件，导致资源对象加载失败！
+
+影响范围：所有版本！
+
+### Improvements
+
+- 重构并统一了资源清单的反序列化逻辑。
+
+### Fixed
+
+- (#645) 修复了着色器变种收集工具，在极端情况下变种收集不完整的问题。
+- (#646) 修复了EditorSimulateMode模式下开启模拟下载tag不生效的问题。
+- (#667) 修复了所有编辑器窗口针对中文IME的输入问题。
+- (#670) 修复了Catalog文件生成过程中白名单未考虑自定义清单前缀名。
+
+### Improvements
+
+- (#650) 解决互相依赖的资源包无法卸载的问题。需要开启宏定义：YOOASSET_EXPERIMENTAL
+- (#655) 优化了初始化的时候，缓存文件搜索效率。安卓平台性能提升1倍，IOS平台性能提升3倍。
+
+### Added
+
+- (#643) 新增构建参数，可以节省资源清单运行时内存
+
+  ```csharp
+  class ScriptableBuildParameters
+  {
+      /// <summary>
+      /// 使用可寻址地址代替资源路径
+      /// 说明：开启此项可以节省运行时清单占用的内存！
+      /// </summary>
+      public bool ReplaceAssetPathWithAddress = false;
+  }
+  ```
+
+- (#648) 新增初始化参数，可以自动释放引用计数为零的资源包
+
+  ```csharp
+  class InitializeParameters
+  {
+      /// <summary>
+      /// 当资源引用计数为零的时候自动释放资源包
+      /// </summary>
+      public bool AutoUnloadBundleWhenUnused = false;
+  }
+  ```
+
+### Changed
+
+- 程序集宏定义代码转移到扩展工程。参考MacroSupport文件夹。
+
 ## [2.3.16] - 2025-09-17
 
 ### Improvements
