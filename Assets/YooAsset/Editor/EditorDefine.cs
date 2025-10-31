@@ -41,6 +41,8 @@ namespace YooAsset.Editor
         Texture,
         RenderTexture,
         VideoClip,
+        PlayableAsset,
+        TimelineAsset
     }
 
     /// <summary>
