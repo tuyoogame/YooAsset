@@ -88,8 +88,8 @@ namespace YooAsset.Editor
             }
             catch (Exception ex)
             {
-                ClearDatabase(true);
                 Debug.LogError($"Failed to load cache database : {ex.Message}");
+                ClearDatabase(true);
             }
             finally
             {
@@ -169,7 +169,8 @@ namespace YooAsset.Editor
                     File.Delete(_databaseFilePath);
             }
 
-            _database.Clear();
+            if (_database != null)
+                _database.Clear();
         }
 
         /// <summary>
