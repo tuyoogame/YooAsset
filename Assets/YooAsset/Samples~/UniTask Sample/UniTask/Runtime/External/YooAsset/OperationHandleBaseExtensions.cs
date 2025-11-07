@@ -94,19 +94,19 @@ namespace Cysharp.Threading.Tasks
                 switch (handle)
                 {
                     case AssetHandle asset_handle:
-                        asset_handle.Completed += result.continuationAction;
+                        asset_handle.Completed += result._continuationAction;
                         break;
                     case SceneHandle scene_handle:
-                        scene_handle.Completed += result.continuationAction;
+                        scene_handle.Completed += result._continuationAction;
                         break;
                     case SubAssetsHandle sub_asset_handle:
-                        sub_asset_handle.Completed += result.continuationAction;
+                        sub_asset_handle.Completed += result._continuationAction;
                         break;
                     case RawFileHandle raw_file_handle:
-                        raw_file_handle.Completed += result.continuationAction;
+                        raw_file_handle.Completed += result._continuationAction;
                         break;
                     case AllAssetsHandle all_assets_handle:
-                        all_assets_handle.Completed += result.continuationAction;
+                        all_assets_handle.Completed += result._continuationAction;
                         break;
                 }
 #endif
