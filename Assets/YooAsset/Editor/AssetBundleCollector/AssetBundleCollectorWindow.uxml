@@ -30,7 +30,7 @@
         <ui:VisualElement name="PackageContainer" style="width: 200px; flex-grow: 0; background-color: rgb(67, 67, 67); border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">
             <ui:Label text="Packages" display-tooltip-when-elided="true" name="PackageTitle" style="background-color: rgb(89, 89, 89); -unity-text-align: upper-center; -unity-font-style: bold; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px; font-size: 12px;" />
             <ui:ListView focusable="true" name="PackageListView" item-height="20" virtualization-method="DynamicHeight" reorderable="true" reorder-mode="Animated" style="flex-grow: 1;" />
-            <ui:VisualElement name="PackageAddContainer" style="height: 20px; flex-direction: row; justify-content: center;">
+            <ui:VisualElement name="PackageAddContainer" style="height: 20px; flex-direction: row; justify-content: center; flex-shrink: 0;">
                 <ui:Button text=" - " display-tooltip-when-elided="true" name="RemoveBtn" />
                 <ui:Button text=" + " display-tooltip-when-elided="true" name="AddBtn" />
             </ui:VisualElement>
@@ -40,7 +40,7 @@
             <ui:TextField picking-mode="Ignore" label="Package Name" name="PackageName" style="flex-direction: column;" />
             <ui:TextField picking-mode="Ignore" label="Package Desc" name="PackageDesc" style="flex-direction: column;" />
             <ui:ListView focusable="true" name="GroupListView" item-height="20" virtualization-method="DynamicHeight" reorderable="true" reorder-mode="Animated" style="flex-grow: 1;" />
-            <ui:VisualElement name="GroupAddContainer" style="height: 20px; flex-direction: row; justify-content: center;">
+            <ui:VisualElement name="GroupAddContainer" style="height: 20px; flex-direction: row; justify-content: center; flex-shrink: 0;">
                 <ui:Button text=" - " display-tooltip-when-elided="true" name="RemoveBtn" />
                 <ui:Button text=" + " display-tooltip-when-elided="true" name="AddBtn" />
             </ui:VisualElement>
