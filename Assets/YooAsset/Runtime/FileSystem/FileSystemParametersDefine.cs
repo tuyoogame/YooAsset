@@ -26,5 +26,6 @@ namespace YooAsset
         public const string COPY_BUILDIN_PACKAGE_MANIFEST = "COPY_BUILDIN_PACKAGE_MANIFEST";
         public const string COPY_BUILDIN_PACKAGE_MANIFEST_DEST_ROOT = "COPY_BUILDIN_PACKAGE_MANIFEST_DEST_ROOT";
         public const string COPY_LOCAL_FILE_SERVICES = "COPY_LOCAL_FILE_SERVICES";
+        public const string UNPACK_FILE_SYSTEM_ROOT = "UNPACK_FILE_SYSTEM_ROOT";
     }
 }
