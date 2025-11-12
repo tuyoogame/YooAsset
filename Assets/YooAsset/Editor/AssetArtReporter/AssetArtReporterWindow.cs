@@ -261,14 +261,14 @@ namespace YooAsset.Editor
             catch (System.Exception e)
             {
                 _reportCombiner = null;
-                _titleLabel.text = "导入报告失败！";
+                _titleLabel.text = "Failed to import report!";
                 _descLabel.text = e.Message;
                 UnityEngine.Debug.LogError(e.StackTrace);
             }
         }
         private void FixAllBtn_clicked()
         {
-            if (EditorUtility.DisplayDialog("提示", "修复全部资源（排除白名单和隐藏元素）", "Yes", "No"))
+            if (EditorUtility.DisplayDialog("Info", "Fix all resources (excluding whitelist and hidden elements)", "Yes", "No"))
             {
                 if (_reportCombiner != null)
                     _reportCombiner.FixAll();
@@ -276,7 +276,7 @@ namespace YooAsset.Editor
         }
         private void FixSelectBtn_clicked()
         {
-            if (EditorUtility.DisplayDialog("提示", "修复勾选资源（包含白名单和隐藏元素）", "Yes", "No"))
+            if (EditorUtility.DisplayDialog("Info", "Fix selected resources (including whitelist and hidden elements)", "Yes", "No"))
             {
                 if (_reportCombiner != null)
                     _reportCombiner.FixSelect();
@@ -302,7 +302,7 @@ namespace YooAsset.Editor
         }
         private void ExportFilesBtn_clicked()
         {
-            string selectFolderPath = EditorUtility.OpenFolderPanel("导入所有选中资源", EditorTools.GetProjectPath(), string.Empty);
+            string selectFolderPath = EditorUtility.OpenFolderPanel("Export all selected resources", EditorTools.GetProjectPath(), string.Empty);
             if (string.IsNullOrEmpty(selectFolderPath) == false)
             {
                 if (_reportCombiner != null)

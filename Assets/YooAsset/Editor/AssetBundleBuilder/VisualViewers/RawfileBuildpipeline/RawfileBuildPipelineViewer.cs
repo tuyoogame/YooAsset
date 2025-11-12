@@ -77,14 +77,14 @@ namespace YooAsset.Editor
         }
         private void BuildButton_clicked()
         {
-            if (EditorUtility.DisplayDialog("提示", $"开始构建资源包[{PackageName}]！", "Yes", "No"))
+            if (EditorUtility.DisplayDialog("Info", $"Start building resource package [{PackageName}]!", "Yes", "No"))
             {
                 EditorTools.ClearUnityConsole();
                 EditorApplication.delayCall += ExecuteBuild;
             }
             else
             {
-                Debug.LogWarning("[Build] 打包已经取消");
+                Debug.LogWarning("[Build] Packaging has been canceled.");
             }
         }
 
