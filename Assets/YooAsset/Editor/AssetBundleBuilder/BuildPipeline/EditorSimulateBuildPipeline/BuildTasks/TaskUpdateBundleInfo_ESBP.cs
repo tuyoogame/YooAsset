@@ -19,16 +19,16 @@ namespace YooAsset.Editor
         {
             return 0;
         }
-        protected override string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
+        protected override string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildContext context)
         {
             string filePath = bundleInfo.PackageSourceFilePath;
             return GetFilePathTempHash(filePath);
         }
-        protected override uint GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
+        protected override uint GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildContext context)
         {
             return 0;
         }
-        protected override long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
+        protected override long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildContext context)
         {
             return GetBundleTempSize(bundleInfo);
         }

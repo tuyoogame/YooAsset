@@ -44,9 +44,9 @@ namespace YooAsset.Editor
             {
                 bundleInfo.PackageUnityHash = GetUnityHash(bundleInfo, context);
                 bundleInfo.PackageUnityCRC = GetUnityCRC(bundleInfo, context);
-                bundleInfo.PackageFileHash = GetBundleFileHash(bundleInfo, buildParametersContext);
-                bundleInfo.PackageFileCRC = GetBundleFileCRC(bundleInfo, buildParametersContext);
-                bundleInfo.PackageFileSize = GetBundleFileSize(bundleInfo, buildParametersContext);
+                bundleInfo.PackageFileHash = GetBundleFileHash(bundleInfo, context);
+                bundleInfo.PackageFileCRC = GetBundleFileCRC(bundleInfo, context);
+                bundleInfo.PackageFileSize = GetBundleFileSize(bundleInfo, context);
             }
 
             // 4.更新补丁包输出的文件路径
@@ -62,8 +62,8 @@ namespace YooAsset.Editor
 
         protected abstract string GetUnityHash(BuildBundleInfo bundleInfo, BuildContext context);
         protected abstract uint GetUnityCRC(BuildBundleInfo bundleInfo, BuildContext context);
-        protected abstract string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
-        protected abstract uint GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
-        protected abstract long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext);
+        protected abstract string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildContext context);
+        protected abstract uint GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildContext context);
+        protected abstract long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildContext context);
     }
 }

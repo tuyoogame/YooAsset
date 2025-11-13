@@ -40,17 +40,17 @@ namespace YooAsset.Editor
                 throw new Exception(message);
             }
         }
-        protected override string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
+        protected override string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildContext context)
         {
             string filePath = bundleInfo.PackageSourceFilePath;
             return HashUtility.FileMD5(filePath);
         }
-        protected override uint GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
+        protected override uint GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildContext context)
         {
             string filePath = bundleInfo.PackageSourceFilePath;
             return HashUtility.FileCRC32Value(filePath);
         }
-        protected override long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildParametersContext buildParametersContext)
+        protected override long GetBundleFileSize(BuildBundleInfo bundleInfo, BuildContext context)
         {
             string filePath = bundleInfo.PackageSourceFilePath;
             return FileUtility.GetFileSize(filePath);
