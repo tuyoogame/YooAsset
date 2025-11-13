@@ -8,7 +8,7 @@ namespace YooAsset.Editor
     {
         static PackageImporterWindow _thisInstance;
 
-        [MenuItem("Tools/补丁包导入工具", false, 101)]
+        [MenuItem("Tools/补丁包导入工具", false, 104)]
         static void ShowWindow()
         {
             if (_thisInstance == null)

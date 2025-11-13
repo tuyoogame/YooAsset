@@ -118,6 +118,34 @@ namespace YooAsset
             Debug.Log($"Succeed to save catalog file : {binaryFilePath}");
             return true;
         }
+
+        /// <summary>
+        /// 生成空的包裹内置自由目录文件
+        /// </summary>
+        public static bool CreateEmptyCatalogFile(string packageName, string packageVersion, string outputPath)
+        {
+            // 创建内置清单实例
+            var buildinFileCatalog = new DefaultBuildinFileCatalog();
+            buildinFileCatalog.FileVersion = CatalogDefine.FileVersion;
+            buildinFileCatalog.PackageName = packageName;
+            buildinFileCatalog.PackageVersion = packageVersion;
+
+            // 创建输出文件
+            string jsonFilePath = $"{outputPath}/{DefaultBuildinFileSystemDefine.BuildinCatalogJsonFileName}";
+            if (File.Exists(jsonFilePath))
+                File.Delete(jsonFilePath);
+            SerializeToJson(jsonFilePath, buildinFileCatalog);
+
+            // 创建输出文件
+            string binaryFilePath = $"{outputPath}/{DefaultBuildinFileSystemDefine.BuildinCatalogBinaryFileName}";
+            if (File.Exists(binaryFilePath))
+                File.Delete(binaryFilePath);
+            SerializeToBinary(binaryFilePath, buildinFileCatalog);
+
+            UnityEditor.AssetDatabase.Refresh();
+            Debug.Log($"Succeed to save catalog file : {binaryFilePath}");
+            return true;
+        }
 #endif
 
         /// <summary>
