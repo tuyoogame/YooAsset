@@ -17,6 +17,12 @@ namespace YooAsset
         ClearUnusedBundleFiles,
 
         /// <summary>
+        /// 清理指定地址的文件
+        /// 说明：需要指定参数，可选：string, string[], List<string>
+        /// </summary>
+        ClearBundleFilesByLocations,
+
+        /// <summary>
         /// 清理指定标签的文件
         /// 说明：需要指定参数，可选：string, string[], List<string>
         /// </summary>
