@@ -158,6 +158,11 @@ namespace YooAsset
                 var operation = new ClearUnusedCacheBundleFilesOperation(this, manifest);
                 return operation;
             }
+            else if (options.ClearMode == EFileClearMode.ClearBundleFilesByLocations.ToString())
+            {
+                var operation = new ClearCacheBundleFilesByLocationsOperaiton(this, manifest, options.ClearParam);
+                return operation;
+            }
             else if (options.ClearMode == EFileClearMode.ClearBundleFilesByTags.ToString())
             {
                 var operation = new ClearCacheBundleFilesByTagsOperaiton(this, manifest, options.ClearParam);
