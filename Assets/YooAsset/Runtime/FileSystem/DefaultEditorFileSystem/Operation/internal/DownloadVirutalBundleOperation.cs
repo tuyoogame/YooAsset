@@ -20,7 +20,7 @@ namespace YooAsset
         protected UnityVirtualBundleRequestOperation _unityDownloadFileOp;
 
         protected int _requestCount = 0;
-        protected float _tryAgainTimer;
+        protected float _tryAgainTimer = 0;
         protected int _failedTryAgain;
         private ESteps _steps = ESteps.None;
 

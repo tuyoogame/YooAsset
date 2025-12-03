@@ -18,9 +18,9 @@ namespace YooAsset
         private readonly bool _disableUnityWebCache;
         private UnityAssetBundleRequestOperation _unityAssetBundleRequestOp;
 
-        protected int _requestCount = 0;
-        protected float _tryAgainTimer;
-        protected int _failedTryAgain;
+        private int _requestCount = 0;
+        private float _tryAgainTimer = 0;
+        private int _failedTryAgain;
         private ESteps _steps = ESteps.None;
 
 
@@ -28,6 +28,7 @@ namespace YooAsset
         {
             _bundle = bundle;
             _options = options;
+            _failedTryAgain = options.FailedTryAgain;
             _disableUnityWebCache = disableUnityWebCache;
         }
         internal override void InternalStart()

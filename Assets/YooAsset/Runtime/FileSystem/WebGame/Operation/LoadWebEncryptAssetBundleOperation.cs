@@ -18,15 +18,16 @@ namespace YooAsset
         private readonly IWebDecryptionServices _decryptionServices;
         private UnityWebDataRequestOperation _unityWebDataRequestOp;
 
-        protected int _requestCount = 0;
-        protected float _tryAgainTimer;
-        protected int _failedTryAgain;
+        private int _requestCount = 0;
+        private float _tryAgainTimer = 0;
+        private int _failedTryAgain;
         private ESteps _steps = ESteps.None;
 
         internal LoadWebEncryptAssetBundleOperation(PackageBundle bundle, DownloadFileOptions options, IWebDecryptionServices decryptionServices)
         {
             _bundle = bundle;
             _options = options;
+            _failedTryAgain = options.FailedTryAgain;
             _decryptionServices = decryptionServices;
         }
         internal override void InternalStart()

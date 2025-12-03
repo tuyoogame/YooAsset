@@ -16,8 +16,9 @@ internal class WXFSDownloadFileOperation : FSDownloadFileOperation
     private readonly WechatFileSystem _fileSystem;
     private readonly DownloadFileOptions _options;
     private UnityWebCacheRequestOperation _webCacheRequestOp;
+
     private int _requestCount = 0;
-    private float _tryAgainTimer;
+    private float _tryAgainTimer = 0;
     private int _failedTryAgain;
     private ESteps _steps = ESteps.None;
 
@@ -25,6 +26,7 @@ internal class WXFSDownloadFileOperation : FSDownloadFileOperation
     {
         _fileSystem = fileSystem;
         _options = options;
+        _failedTryAgain = options.FailedTryAgain;
     }
     internal override void InternalStart()
     {
