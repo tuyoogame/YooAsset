@@ -73,8 +73,10 @@ namespace YooAsset
 
         /// <summary>
         /// 自定义参数：初始化的时候缓存文件校验最大并发数
+        /// 默认值：32（推荐范围 1-128）
+        /// 说明：过大的值可能导致线程池任务过多，影响系统稳定性 
         /// </summary>
-        public int FileVerifyMaxConcurrency { private set; get; } = int.MaxValue;
+        public int FileVerifyMaxConcurrency { private set; get; } = 32;
 
         /// <summary>
         /// 自定义参数：数据文件追加文件格式
@@ -88,13 +90,17 @@ namespace YooAsset
 
         /// <summary>
         /// 自定义参数：最大并发连接数
+        /// 默认值：10（推荐范围 1-32）
+        /// 说明：过大的并发数可能被服务器限流，也会增加本地资源消耗 
         /// </summary>
-        public int DownloadMaxConcurrency { private set; get; } = int.MaxValue;
+        public int DownloadMaxConcurrency { private set; get; } = 10;
 
         /// <summary>
         /// 自定义参数：每帧发起的最大请求数
+        /// 默认值：5（推荐范围 1-10） 
+        /// 说明：避免单帧发起过多请求导致卡顿 
         /// </summary>
-        public int DownloadMaxRequestPerFrame { private set; get; } = int.MaxValue;
+        public int DownloadMaxRequestPerFrame { private set; get; } = 5;
 
         /// <summary>
         /// 自定义参数：下载任务的看门狗机制监控时间
@@ -242,7 +248,14 @@ namespace YooAsset
             else if (name == FileSystemParametersDefine.FILE_VERIFY_MAX_CONCURRENCY)
             {
                 int convertValue = Convert.ToInt32(value);
-                FileVerifyMaxConcurrency = Mathf.Clamp(convertValue, 1, int.MaxValue);
+                if (convertValue > 256)
+                {
+                    YooLogger.Warning($"FILE_VERIFY_MAX_CONCURRENCY value {convertValue} is too large, clamped to 256. Recommended range: 1 - 128.");
+                }
+
+                // 限制在合理范围内：1-256                                                                             
+                // 超过 256 的并发数对于文件验证来说没有意义，反而会增加线程池压力  
+                FileVerifyMaxConcurrency = Mathf.Clamp(convertValue, 1, 256);
             }
             else if (name == FileSystemParametersDefine.APPEND_FILE_EXTENSION)
             {
@@ -255,12 +268,22 @@ namespace YooAsset
             else if (name == FileSystemParametersDefine.DOWNLOAD_MAX_CONCURRENCY)
             {
                 int convertValue = Convert.ToInt32(value);
-                DownloadMaxConcurrency = Mathf.Clamp(convertValue, 1, int.MaxValue);
+                if (convertValue > 64)
+                {
+                    YooLogger.Warning($"DOWNLOAD_MAX_CONCURRENCY value {convertValue} is too large, clamped to 64. Recommended range: 1 - 32.");
+                }
+
+                DownloadMaxConcurrency = Mathf.Clamp(convertValue, 1, 64);
             }
             else if (name == FileSystemParametersDefine.DOWNLOAD_MAX_REQUEST_PER_FRAME)
             {
                 int convertValue = Convert.ToInt32(value);
-                DownloadMaxRequestPerFrame = Mathf.Clamp(convertValue, 1, int.MaxValue);
+                if (convertValue > 20)
+                {
+                    YooLogger.Warning($"DOWNLOAD_MAX_REQUEST_PER_FRAME value {convertValue} is too large, clamped to 20. Recommended range: 1 - 10.");
+                }
+
+                DownloadMaxRequestPerFrame = Mathf.Clamp(convertValue, 1, 20);
             }
             else if (name == FileSystemParametersDefine.DOWNLOAD_WATCH_DOG_TIME)
             {
