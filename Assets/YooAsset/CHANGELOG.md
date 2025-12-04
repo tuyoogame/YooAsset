@@ -2,6 +2,57 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.3.18] - 2025-12-04
+
+### Fixed
+
+- (#676) 修复了UniTask扩展包的编译报错。
+- (#684) 修复了资源配置窗口Group列表数量过多的时候，添加和删除按钮会变小的问题。
+- (#700) [**严重**] 修复了小游戏扩展库的下载器再失败后重试逻辑不起效的问题。
+
+### Added
+
+- (#683) 新增了内置文件系统类初始化参数：UNPACK_FILE_SYSTEM_ROOT
+
+  ```csharp
+  class FileSystemParametersDefine
+  {
+      // 指定解压文件的根目录
+      public const string UNPACK_FILE_SYSTEM_ROOT = "UNPACK_FILE_SYSTEM_ROOT";
+  }
+  ```
+
+- (#682) 原生文件构建管线新增构建参数：IncludePathInHash
+
+  ```csharp
+  class RawFileBuildParameters : BuildParameters
+  {
+      /// <summary>
+      /// 文件哈希值计算包含路径信息
+      /// </summary>
+      public bool IncludePathInHash = false;
+  }
+  ```
+
+- (#671) 新增扩展工具，可以生成空的包裹内置资源目录文件。
+
+  ```csharp
+  public class CreateEmptyCatalogWindow : EditorWindow
+  ```
+
+- (#694) 新增资源清理方式：ClearBundleFilesByLocations
+
+  ```csharp
+  public enum EFileClearMode
+  {
+      /// <summary>
+      /// 清理指定地址的文件
+      /// 说明：需要指定参数，可选：string, string[], List<string>
+      /// </summary>
+      ClearBundleFilesByLocations,
+  }
+  ```
+
 ## [2.3.17] - 2025-10-30
 
 **非常重要**：修复了#627优化导致的资源清单CRC值为空的问题。
@@ -16,10 +67,6 @@ All notable changes to this package will be documented in this file.
 
 影响范围：所有版本！
 
-### Improvements
-
-- 重构并统一了资源清单的反序列化逻辑。
-
 ### Fixed
 
 - (#645) 修复了着色器变种收集工具，在极端情况下变种收集不完整的问题。
@@ -29,6 +76,7 @@ All notable changes to this package will be documented in this file.
 
 ### Improvements
 
+- 重构并统一了资源清单的反序列化逻辑。
 - (#650) 解决互相依赖的资源包无法卸载的问题。需要开启宏定义：YOOASSET_EXPERIMENTAL
 - (#655) 优化了初始化的时候，缓存文件搜索效率。安卓平台性能提升1倍，IOS平台性能提升3倍。
 
