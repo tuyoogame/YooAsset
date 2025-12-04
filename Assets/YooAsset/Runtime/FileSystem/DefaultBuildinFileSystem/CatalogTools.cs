@@ -120,7 +120,7 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 生成空的包裹内置自由目录文件
+        /// 生成空的包裹内置资源目录文件
         /// </summary>
         public static bool CreateEmptyCatalogFile(string packageName, string packageVersion, string outputPath)
         {
