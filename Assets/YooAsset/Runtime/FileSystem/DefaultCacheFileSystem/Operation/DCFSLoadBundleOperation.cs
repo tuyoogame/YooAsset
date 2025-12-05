@@ -320,11 +320,11 @@ namespace YooAsset
                             File.Move(recordFileElement.DataFilePath, filePath);
                             _steps = ESteps.LoadCacheRawBundle;
                         }
-                        catch (Exception e)
+                        catch (Exception ex)
                         {
                             _steps = ESteps.Done;
                             Status = EOperationStatus.Failed;
-                            Error = $"Faild rename raw data file : {e.Message}";
+                            Error = $"Faild rename raw data file : {ex.Message}";
                         }
                     }
                     else

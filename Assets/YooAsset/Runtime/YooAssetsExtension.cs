@@ -612,7 +612,7 @@ namespace YooAsset
         private static void DebugCheckDefaultPackageValid()
         {
             if (_defaultPackage == null)
-                throw new Exception($"Default package is null. Please use {nameof(YooAssets.SetDefaultPackage)} !");
+                throw new YooInitializeException($"Default package is null. Please use {nameof(YooAssets.SetDefaultPackage)} !");
         }
         #endregion
     }

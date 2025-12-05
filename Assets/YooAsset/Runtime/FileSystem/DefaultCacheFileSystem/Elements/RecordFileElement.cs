@@ -37,9 +37,9 @@ namespace YooAsset
                     return false;
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                YooLogger.Error($"Failed to delete cache file ! {e.Message}");
+                YooLogger.Error($"Failed to delete cache file ! {ex.Message}");
                 return false;
             }
         }

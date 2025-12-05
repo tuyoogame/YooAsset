@@ -117,7 +117,7 @@ namespace YooAsset
         {
             CheckException(packageName);
             if (ContainsPackage(packageName))
-                throw new Exception($"Package {packageName} already existed !");
+                throw new YooPackageException(packageName, $"Package {packageName} already existed ! Cannot create duplicate packages.");
 
             YooLogger.Log($"Create resource package : {packageName}");
             ResourcePackage package = new ResourcePackage(packageName);
@@ -223,18 +223,18 @@ namespace YooAsset
         private static void CheckException(string packageName)
         {
             if (_isInitialize == false)
-                throw new Exception($"{nameof(YooAssets)} not initialize !");
+                throw new YooInitializeException($"{nameof(YooAssets)} not initialized ! Please call  {nameof(YooAssets.Initialize)} first.");
 
             if (string.IsNullOrEmpty(packageName))
-                throw new Exception("Package name is null or empty !");
+                throw new YooInitializeException("Package name cannot be null or empty !");
         }
         private static void CheckException(ResourcePackage package)
         {
             if (_isInitialize == false)
-                throw new Exception($"{nameof(YooAssets)} not initialize !");
+                throw new YooInitializeException($"{nameof(YooAssets)} not initialized ! Please call  {nameof(YooAssets.Initialize)} first.");
 
             if (package == null)
-                throw new Exception("Package instance is null !");
+                throw new YooInitializeException("Package instance cannot be null !");
         }
 
         #region 系统参数

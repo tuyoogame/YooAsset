@@ -133,7 +133,7 @@ namespace YooAsset
         {
 #if UNITY_EDITOR
             if (Childs.Contains(child))
-                throw new Exception($"The child node {child.GetType().Name} already exists !");
+                throw new YooInternalException($"The child node {child.GetType().Name} already exists !");
 #endif
 
             Childs.Add(child);

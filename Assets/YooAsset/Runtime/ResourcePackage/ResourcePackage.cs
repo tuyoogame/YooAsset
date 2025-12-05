@@ -152,19 +152,19 @@ namespace YooAsset
         private void CheckInitializeParameters(InitializeParameters parameters)
         {
             if (_isInitialize)
-                throw new Exception($"{nameof(ResourcePackage)} is initialized yet.");
+                throw new YooPackageException(PackageName, $"Package '{PackageName}' is already initialized !");
 
             if (parameters == null)
-                throw new Exception($"{nameof(ResourcePackage)} create parameters is null.");
+                throw new YooPackageException(PackageName, $"Initialize parameters cannot be null.");
 
 #if !UNITY_EDITOR
             if (parameters is EditorSimulateModeParameters)
-                throw new Exception($"Editor simulate mode only support unity editor.");
+                throw new YooPlatformNotSupportedException($"Editor simulate mode only support unity editor.");
 #endif
 
             // 检测初始化参数
             if (parameters.BundleLoadingMaxConcurrency <= 0)
-                throw new Exception($"{nameof(parameters.BundleLoadingMaxConcurrency)} value must be greater than zero.");
+                throw new YooPackageException(PackageName, $"{nameof(parameters.BundleLoadingMaxConcurrency)} value must be greater than zero.");
 
             // 鉴定运行模式
             if (parameters is EditorSimulateModeParameters)
@@ -186,12 +186,12 @@ namespace YooAsset
 #if UNITY_WEBGL
                 if (_playMode != EPlayMode.WebPlayMode)
                 {
-                    throw new Exception($"{_playMode} can not support WebGL plateform !");
+                    throw new YooPlatformNotSupportedException($"{_playMode} can not support WebGL plateform !");
                 }
 #else
                 if (_playMode == EPlayMode.WebPlayMode)
                 {
-                    throw new Exception($"{nameof(EPlayMode.WebPlayMode)} only support WebGL plateform !");
+                    throw new YooPlatformNotSupportedException($"{nameof(EPlayMode.WebPlayMode)} only support WebGL plateform !");
                 }
 #endif
             }
@@ -1158,14 +1158,14 @@ namespace YooAsset
         private void DebugCheckInitialize(bool checkActiveManifest = true)
         {
             if (_initializeStatus == EOperationStatus.None)
-                throw new Exception("Package initialize not completed !");
+                throw new YooPackageException(PackageName, "Package initialize not completed !");
             else if (_initializeStatus == EOperationStatus.Failed)
-                throw new Exception($"Package initialize failed ! {_initializeError}");
+                throw new YooPackageException(PackageName, $"Package initialize failed ! {_initializeError}");
 
             if (checkActiveManifest)
             {
                 if (_playModeImpl.ActiveManifest == null)
-                    throw new Exception("Can not found active package manifest !");
+                    throw new YooPackageException(PackageName, "Can not found active package manifest !");
             }
         }
 
@@ -1177,12 +1177,12 @@ namespace YooAsset
 
             if (typeof(UnityEngine.Behaviour).IsAssignableFrom(type))
             {
-                throw new Exception($"Load asset type is invalid : {type.FullName} !");
+                throw new YooLoadException($"Load asset type is invalid : {type.FullName} !");
             }
 
             if (typeof(UnityEngine.Object).IsAssignableFrom(type) == false)
             {
-                throw new Exception($"Load asset type is invalid : {type.FullName} !");
+                throw new YooLoadException($"Load asset type is invalid : {type.FullName} !");
             }
         }
         #endregion

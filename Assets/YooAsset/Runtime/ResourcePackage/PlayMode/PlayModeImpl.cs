@@ -156,7 +156,7 @@ namespace YooAsset
         private BundleInfo CreateBundleInfo(PackageBundle packageBundle)
         {
             if (packageBundle == null)
-                throw new Exception("Should never get here !");
+                throw new YooInternalException();
 
             var fileSystem = GetBelongFileSystem(packageBundle);
             if (fileSystem != null)
@@ -165,12 +165,12 @@ namespace YooAsset
                 return bundleInfo;
             }
 
-            throw new Exception($"Can not found belong file system : {packageBundle.BundleName}");
+            throw new YooFileSystemException($"Can not found belong file system : {packageBundle.BundleName}");
         }
         BundleInfo IBundleQuery.GetMainBundleInfo(AssetInfo assetInfo)
         {
             if (assetInfo == null || assetInfo.IsInvalid)
-                throw new Exception("Should never get here !");
+                throw new YooInternalException();
 
             // 注意：如果清单里未找到资源包会抛出异常！
             var packageBundle = ActiveManifest.GetMainPackageBundle(assetInfo.Asset);
@@ -179,7 +179,7 @@ namespace YooAsset
         List<BundleInfo> IBundleQuery.GetDependBundleInfos(AssetInfo assetInfo)
         {
             if (assetInfo == null || assetInfo.IsInvalid)
-                throw new Exception("Should never get here !");
+                throw new YooInternalException();
 
             // 注意：如果清单里未找到资源包会抛出异常！
             List<PackageBundle> depends;

@@ -499,7 +499,7 @@ namespace YooAsset
         {
             if (_records.ContainsKey(bundle.BundleGUID))
             {
-                throw new Exception("Should never get here !");
+                throw new YooInternalException();
             }
 
             string infoFilePath = GetBundleInfoFilePath(bundle);
@@ -521,9 +521,9 @@ namespace YooAsset
                 // 写入文件信息
                 WriteBundleInfoFile(infoFilePath, bundle.FileCRC, bundle.FileSize);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                YooLogger.Error($"Failed to write cache file ! {e.Message}");
+                YooLogger.Error($"Failed to write cache file ! {ex.Message}");
                 return false;
             }
 

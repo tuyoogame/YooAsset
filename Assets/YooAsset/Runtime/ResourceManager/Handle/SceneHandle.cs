@@ -23,7 +23,7 @@ namespace YooAsset
             add
             {
                 if (IsValidWithWarning == false)
-                    throw new System.Exception($"{nameof(SceneHandle)} is invalid !");
+                    throw new YooHandleException($"{nameof(SceneHandle)} is invalid. It may have been released or the provider was destroyed.");
                 if (Provider.IsDone)
                     value.Invoke(this);
                 else
@@ -32,7 +32,7 @@ namespace YooAsset
             remove
             {
                 if (IsValidWithWarning == false)
-                    throw new System.Exception($"{nameof(SceneHandle)} is invalid !");
+                    throw new YooHandleException($"{nameof(SceneHandle)} is invalid. It may have been released or the provider was destroyed.");
                 _callback -= value;
             }
         }

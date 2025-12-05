@@ -102,7 +102,7 @@ namespace YooAsset
         internal AssetInfo(string packageName, PackageAsset packageAsset, System.Type assetType)
         {
             if (packageAsset == null)
-                throw new System.Exception("Should never get here !");
+                throw new YooInternalException("Package asset can not be null.");
 
             _providerGUID = string.Empty;
             _packageAsset = packageAsset;

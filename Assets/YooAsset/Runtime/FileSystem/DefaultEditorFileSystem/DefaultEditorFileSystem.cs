@@ -142,7 +142,7 @@ namespace YooAsset
             PackageName = packageName;
 
             if (string.IsNullOrEmpty(packageRoot))
-                throw new Exception($"{nameof(DefaultEditorFileSystem)} root directory is null or empty !");
+                throw new YooFileSystemException($"{nameof(DefaultEditorFileSystem)} package root is null or empty !");
 
             _packageRoot = packageRoot;
         }

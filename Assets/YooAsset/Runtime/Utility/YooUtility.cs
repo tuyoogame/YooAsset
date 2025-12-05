@@ -242,9 +242,9 @@ namespace YooAsset
             {
                 return FileSHA1(filePath);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                YooLogger.Exception(e);
+                YooLogger.Exception(ex);
                 return string.Empty;
             }
         }
@@ -302,9 +302,9 @@ namespace YooAsset
             {
                 return FileMD5(filePath);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                YooLogger.Exception(e);
+                YooLogger.Exception(ex);
                 return string.Empty;
             }
         }
@@ -372,9 +372,9 @@ namespace YooAsset
             {
                 return FileCRC32(filePath);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                YooLogger.Exception(e);
+                YooLogger.Exception(ex);
                 return string.Empty;
             }
         }
@@ -384,9 +384,9 @@ namespace YooAsset
             {
                 return FileCRC32Value(filePath);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                YooLogger.Exception(e);
+                YooLogger.Exception(ex);
                 return 0;
             }
         }

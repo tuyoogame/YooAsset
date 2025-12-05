@@ -115,9 +115,9 @@ namespace YooAsset
 
                     // 检测配置
                     if (Manifest.EnableAddressable && Manifest.LocationToLower)
-                        throw new System.Exception("Addressable not support location to lower !");
+                        throw new YooManifestException("Addressable not support location to lower !");
                     if (Manifest.EnableAddressable == false && Manifest.ReplaceAssetPathWithAddress)
-                        throw new System.Exception("Replace asset path with address need enable Addressable !");
+                        throw new YooManifestException("Replace asset path with address need enable Addressable !");
 
                     _steps = ESteps.PrepareAssetList;
                 }
@@ -216,12 +216,12 @@ namespace YooAsset
                     Status = EOperationStatus.Succeed;
                 }
             }
-            catch (System.Exception e)
+            catch (System.Exception ex)
             {
                 Manifest = null;
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Failed;
-                Error = e.Message;
+                Error = ex.Message;
             }
         }
         internal override void InternalWaitForAsyncComplete()
@@ -266,7 +266,7 @@ namespace YooAsset
             // 注意：我们不允许原始路径存在重名
             string assetPath = packageAsset.AssetPath;
             if (manifest.AssetDic.ContainsKey(assetPath))
-                throw new System.Exception($"AssetPath have existed : {assetPath}");
+                throw new YooManifestException($"AssetPath have existed : {assetPath}");
             else
                 manifest.AssetDic.Add(assetPath, packageAsset);
 
@@ -276,7 +276,7 @@ namespace YooAsset
 
                 // 添加原生路径的映射
                 if (manifest.AssetPathMapping1.ContainsKey(location))
-                    throw new System.Exception($"Location have existed : {location}");
+                    throw new YooManifestException($"Location have existed : {location}");
                 else
                     manifest.AssetPathMapping1.Add(location, packageAsset.AssetPath);
 
@@ -298,7 +298,7 @@ namespace YooAsset
             if (manifest.IncludeAssetGUID)
             {
                 if (manifest.AssetPathMapping2.ContainsKey(packageAsset.AssetGUID))
-                    throw new System.Exception($"AssetGUID have existed : {packageAsset.AssetGUID}");
+                    throw new YooManifestException($"AssetGUID have existed : {packageAsset.AssetGUID}");
                 else
                     manifest.AssetPathMapping2.Add(packageAsset.AssetGUID, packageAsset.AssetPath);
             }
@@ -310,7 +310,7 @@ namespace YooAsset
                 if (string.IsNullOrEmpty(location) == false)
                 {
                     if (manifest.AssetPathMapping1.ContainsKey(location))
-                        throw new System.Exception($"Location have existed : {location}");
+                        throw new YooManifestException($"Location have existed : {location}");
                     else
                         manifest.AssetPathMapping1.Add(location, packageAsset.AssetPath);
                 }

@@ -87,11 +87,11 @@ namespace YooAsset
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Failed to load catalog file : {e.Message}";
+                    Error = $"Failed to load catalog file : {ex.Message}";
                 }
             }
         }
