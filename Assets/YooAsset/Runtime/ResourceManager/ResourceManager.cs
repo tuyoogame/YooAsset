@@ -19,7 +19,6 @@ namespace YooAsset
         // 开发者配置选项
         public bool AutoUnloadBundleWhenUnused { private set; get; }
         public bool WebGLForceSyncLoadAsset { private set; get; }
-        public bool UseWeakReferenceHandle { private set; get; }
 
         /// <summary>
         /// 所属包裹
@@ -50,7 +49,6 @@ namespace YooAsset
             _bundleLoadingMaxConcurrency = parameters.BundleLoadingMaxConcurrency;
             AutoUnloadBundleWhenUnused = parameters.AutoUnloadBundleWhenUnused;
             WebGLForceSyncLoadAsset = parameters.WebGLForceSyncLoadAsset;
-            UseWeakReferenceHandle = parameters.UseWeakReferenceHandle;
             _bundleQuery = bundleServices;
             SceneManager.sceneUnloaded += OnSceneUnloaded;
         }

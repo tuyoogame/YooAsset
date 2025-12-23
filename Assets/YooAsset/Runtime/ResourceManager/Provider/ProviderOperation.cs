@@ -83,7 +83,6 @@ namespace YooAsset
         private readonly LoadBundleFileOperation _mainBundleLoader;
         private readonly List<LoadBundleFileOperation> _bundleLoaders = new List<LoadBundleFileOperation>(10);
         private readonly HashSet<HandleBase> _handles = new HashSet<HandleBase>();
-        private readonly LinkedList<WeakReference<HandleBase>> _weakReferences = new LinkedList<WeakReference<HandleBase>>();
 
         public ProviderOperation(ResourceManager manager, string providerGUID, AssetInfo assetInfo)
         {
@@ -230,11 +229,6 @@ namespace YooAsset
             if (IsLoading)
                 return false;
 
-            if (_resManager.UseWeakReferenceHandle)
-            {
-                TryCleanupWeakReference();
-            }
-
             return RefCount <= 0;
         }
 
@@ -247,15 +241,7 @@ namespace YooAsset
             RefCount++;
 
             HandleBase handle = HandleFactory.CreateHandle(this, typeof(T));
-            if (_resManager.UseWeakReferenceHandle)
-            {
-                var weakRef = new WeakReference<HandleBase>(handle);
-                _weakReferences.AddLast(weakRef);
-            }
-            else
-            {
-                _handles.Add(handle);
-            }
+            _handles.Add(handle);
             return handle as T;
         }
 
@@ -267,17 +253,8 @@ namespace YooAsset
             if (RefCount <= 0)
                 throw new YooInternalException($"Attempting to release handle when RefCount is already zero. Asset : {MainAssetInfo.AssetPath}");
 
-            if (_resManager.UseWeakReferenceHandle)
-            {
-                // TODO 高危风险：如果移除弱引用失败，会导致资源永远无法释放。
-                if (RemoveWeakReference(handle) == false)
-                    throw new YooInternalException($"Handle not found in weak reference list. Asset: {MainAssetInfo.AssetPath}");
-            }
-            else
-            {
-                if (_handles.Remove(handle) == false)
-                    throw new YooInternalException($"Handle not found in cache list. Asset: {MainAssetInfo.AssetPath}");
-            }
+            if (_handles.Remove(handle) == false)
+                throw new YooInternalException($"Handle not found in cache list. Asset: {MainAssetInfo.AssetPath}");
 
             // 引用计数减少
             RefCount--;
@@ -288,24 +265,10 @@ namespace YooAsset
         /// </summary>
         public void ReleaseAllHandles()
         {
-            if (_resManager.UseWeakReferenceHandle)
+            List<HandleBase> tempers = _handles.ToList();
+            foreach (var handle in tempers)
             {
-                List<WeakReference<HandleBase>> tempers = _weakReferences.ToList();
-                foreach (var weakRef in tempers)
-                {
-                    if (weakRef.TryGetTarget(out HandleBase target))
-                    {
-                        target.Release();
-                    }
-                }
-            }
-            else
-            {
-                List<HandleBase> tempers = _handles.ToList();
-                foreach (var handle in tempers)
-                {
-                    handle.Release();
-                }
+                handle.Release();
             }
         }
 
@@ -330,43 +293,18 @@ namespace YooAsset
             Status = status;
 
             // 注意：创建临时列表是为了防止外部逻辑在回调函数内创建或者释放资源句柄。
-            // 注意：回调方法如果发生异常，会阻断列表里的后续回调方法！
-            if (_resManager.UseWeakReferenceHandle)
+            List<HandleBase> tempers = _handles.ToList();
+            foreach (var handle in tempers)
             {
-                List<WeakReference<HandleBase>> tempers = _weakReferences.ToList();
-                foreach (var weakRef in tempers)
+                if (handle.IsValid)
                 {
-                    if (weakRef.TryGetTarget(out HandleBase handle))
+                    try
                     {
-                        if (handle.IsValid)
-                        {
-                            try
-                            {
-                                handle.InvokeCallback();
-                            }
-                            catch (Exception ex)
-                            {
-                                YooLogger.Error($"Exception in completion callback: {ex}");
-                            }
-                        }
+                        handle.InvokeCallback();
                     }
-                }
-            }
-            else
-            {
-                List<HandleBase> tempers = _handles.ToList();
-                foreach (var handle in tempers)
-                {
-                    if (handle.IsValid)
+                    catch (Exception ex)
                     {
-                        try
-                        {
-                            handle.InvokeCallback();
-                        }
-                        catch (Exception ex)
-                        {
-                            YooLogger.Error($"Exception in completion callback: {ex}");
-                        }
+                        YooLogger.Error($"Exception in completion callback: {ex}");
                     }
                 }
             }
@@ -390,50 +328,6 @@ namespace YooAsset
             status.IsDone = status.DownloadedBytes == status.TotalBytes;
             status.Progress = (float)status.DownloadedBytes / status.TotalBytes;
             return status;
-        }
-
-        /// <summary>
-        /// 移除指定句柄的弱引用对象
-        /// </summary>
-        private bool RemoveWeakReference(HandleBase handle)
-        {
-            bool removed = false;
-            var currentNode = _weakReferences.First;
-            while (currentNode != null)
-            {
-                var nextNode = currentNode.Next;
-                if (currentNode.Value.TryGetTarget(out HandleBase target))
-                {
-                    if (ReferenceEquals(target, handle))
-                    {
-                        _weakReferences.Remove(currentNode);
-                        removed = true;
-                        break;
-                    }
-                }
-                currentNode = nextNode;
-            }
-            return removed;
-        }
-
-        /// <summary>
-        /// 清理所有失效的弱引用
-        /// </summary>
-        private void TryCleanupWeakReference()
-        {
-            var currentNode = _weakReferences.First;
-            while (currentNode != null)
-            {
-                var nextNode = currentNode.Next;
-                if (currentNode.Value.TryGetTarget(out HandleBase target) == false)
-                {
-                    _weakReferences.Remove(currentNode);
-
-                    // 引用计数减少
-                    RefCount--;
-                }
-                currentNode = nextNode;
-            }
         }
 
         #region 调试信息
