@@ -94,8 +94,12 @@ namespace YooAsset
         public static bool IsRequestLocalFile(string url)
         {
             //TODO UNITY_STANDALONE_OSX平台目前无法确定
+
+            // 本地文件传输协议
             if (url.StartsWith("file:"))
                 return true;
+
+            // JAR文件协议
             if (url.StartsWith("jar:file:"))
                 return true;
 

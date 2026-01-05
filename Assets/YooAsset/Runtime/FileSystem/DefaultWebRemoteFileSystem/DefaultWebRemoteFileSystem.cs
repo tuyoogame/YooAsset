@@ -11,6 +11,11 @@ namespace YooAsset
     internal class DefaultWebRemoteFileSystem : IFileSystem
     {
         /// <summary>
+        /// 下载后台接口
+        /// </summary>
+        public IDownloadBackend DownloadBackend { private set; get; }
+
+        /// <summary>
         /// 包裹名称
         /// </summary>
         public string PackageName { private set; get; }
@@ -128,6 +133,10 @@ namespace YooAsset
         public virtual void OnCreate(string packageName, string packageRoot)
         {
             PackageName = packageName;
+
+            // 创建默认的下载后台接口
+            if (DownloadBackend == null)
+                DownloadBackend = new UnityWebRequestBackend(DownloadSystemHelper.UnityWebRequestCreater);
         }
         public virtual void OnDestroy()
         {

@@ -140,6 +140,19 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 移除子任务
+        /// </summary>
+        internal void RemoveChildOperation(AsyncOperationBase child)
+        {
+#if UNITY_EDITOR
+            if (Childs.Contains(child) == false)
+                throw new YooInternalException($"The child node {child.GetType().Name} not exists !");
+#endif
+
+            Childs.Remove(child);
+        }
+
+        /// <summary>
         /// 获取异步操作说明
         /// </summary>
         internal string GetOperationDesc()

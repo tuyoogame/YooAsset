@@ -14,7 +14,7 @@ namespace YooAsset
 
         private readonly DefaultWebServerFileSystem _fileSystem;
         private readonly int _timeout;
-        private UnityWebDataRequestOperation _webDataRequestOp;
+        private IDownloadBytesRequest _webDataRequestOp;
         private ESteps _steps = ESteps.None;
 
         internal LoadWebServerCatalogFileOperation(DefaultWebServerFileSystem fileSystem, int timeout)
@@ -37,16 +37,15 @@ namespace YooAsset
                 {
                     string filePath = _fileSystem.GetCatalogBinaryFileLoadPath();
                     string url = DownloadSystemHelper.ConvertToWWWPath(filePath);
-                    _webDataRequestOp = new UnityWebDataRequestOperation(url, _timeout);
-                    _webDataRequestOp.StartOperation();
-                    AddChildOperation(_webDataRequestOp);
+                    var args = new DownloadDataRequestArgs(url, _timeout, 0);
+                    _webDataRequestOp = _fileSystem.DownloadBackend.CreateBytesRequest(args);
+                    _webDataRequestOp.SendRequest();
                 }
 
-                _webDataRequestOp.UpdateOperation();
                 if (_webDataRequestOp.IsDone == false)
                     return;
 
-                if (_webDataRequestOp.Status == EOperationStatus.Succeed)
+                if (_webDataRequestOp.Status == EDownloadRequestStatus.Succeed)
                 {
                     _steps = ESteps.LoadCatalog;
                 }

@@ -17,7 +17,7 @@ namespace YooAsset
         // 下载参数
         protected readonly DefaultEditorFileSystem _fileSystem;
         protected readonly DownloadFileOptions _options;
-        protected UnityVirtualBundleRequestOperation _unityDownloadFileOp;
+        protected IDownloadFileRequest _downloadFileOp;
 
         protected int _requestCount = 0;
         protected float _tryAgainTimer = 0;
@@ -68,29 +68,22 @@ namespace YooAsset
 
                 string url = GetRequestURL();
                 int speed = _fileSystem.VirtualDownloadSpeed;
-                _unityDownloadFileOp = new UnityVirtualBundleRequestOperation(Bundle, speed, url);
-                _unityDownloadFileOp.StartOperation();
+                var args = new DownloadSimulateRequestArgs(url, Bundle.FileSize, speed);
+                _downloadFileOp = _fileSystem.DownloadBackend.CreateSimulateRequest(args);
+                _downloadFileOp.SendRequest();
                 _steps = ESteps.CheckRequest;
             }
 
             // 检测下载结果
             if (_steps == ESteps.CheckRequest)
             {
-                if (IsWaitForAsyncComplete)
-                    _unityDownloadFileOp.WaitForAsyncComplete();
-
-                // 因为并发数量限制，下载器可能被挂起！
-                if (_unityDownloadFileOp.Status == EOperationStatus.None)
+                Progress = _downloadFileOp.DownloadProgress;
+                DownloadedBytes = _downloadFileOp.DownloadedBytes;
+                DownloadProgress = _downloadFileOp.DownloadProgress;
+                if (_downloadFileOp.IsDone == false)
                     return;
 
-                _unityDownloadFileOp.UpdateOperation();
-                Progress = _unityDownloadFileOp.Progress;
-                DownloadedBytes = _unityDownloadFileOp.DownloadedBytes;
-                DownloadProgress = _unityDownloadFileOp.DownloadProgress;
-                if (_unityDownloadFileOp.IsDone == false)
-                    return;
-
-                if (_unityDownloadFileOp.Status == EOperationStatus.Succeed)
+                if (_downloadFileOp.Status == EDownloadRequestStatus.Succeed)
                 {
                     _fileSystem.RecordDownloadFile(Bundle);
                     _steps = ESteps.Done;
@@ -101,13 +94,13 @@ namespace YooAsset
                     if (IsWaitForAsyncComplete == false && _failedTryAgain > 0)
                     {
                         _steps = ESteps.TryAgain;
-                        YooLogger.Warning($"Failed download : {_unityDownloadFileOp.URL} Try again !");
+                        YooLogger.Warning($"Failed download : {_downloadFileOp.URL} Try again !");
                     }
                     else
                     {
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Failed;
-                        Error = _unityDownloadFileOp.Error;
+                        Error = _downloadFileOp.Error;
                         YooLogger.Error(Error);
                     }
                 }
@@ -130,13 +123,11 @@ namespace YooAsset
         }
         internal override void InternalWaitForAsyncComplete()
         {
-            while (true)
+            if (_steps != ESteps.Done)
             {
-                if (ExecuteWhileDone())
-                {
-                    _steps = ESteps.Done;
-                    break;
-                }
+                _steps = ESteps.Done;
+                Status = EOperationStatus.Failed;
+                Error = $"Try load bundle {Bundle.BundleName} from remote !";
             }
         }
 

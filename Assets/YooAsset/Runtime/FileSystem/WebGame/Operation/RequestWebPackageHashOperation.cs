@@ -10,10 +10,11 @@ internal class RequestWebPackageHashOperation : AsyncOperationBase
     }
 
     private readonly IRemoteServices _remoteServices;
+    private readonly IDownloadBackend _downloadBackend;
     private readonly string _packageName;
     private readonly string _packageVersion;
     private readonly int _timeout;
-    private UnityWebTextRequestOperation _webTextRequestOp;
+    private IDownloadTextRequest _webTextRequestOp;
     private int _requestCount = 0;
     private ESteps _steps = ESteps.None;
 
@@ -23,9 +24,10 @@ internal class RequestWebPackageHashOperation : AsyncOperationBase
     public string PackageHash { private set; get; }
 
 
-    public RequestWebPackageHashOperation(IRemoteServices remoteServices, string packageName, string packageVersion, int timeout)
+    public RequestWebPackageHashOperation(IRemoteServices remoteServices, IDownloadBackend downloadBackend, string packageName, string packageVersion, int timeout)
     {
         _remoteServices = remoteServices;
+        _downloadBackend = downloadBackend;
         _packageName = packageName;
         _packageVersion = packageVersion;
         _timeout = timeout;
@@ -46,17 +48,16 @@ internal class RequestWebPackageHashOperation : AsyncOperationBase
             {
                 string fileName = YooAssetSettingsData.GetPackageHashFileName(_packageName, _packageVersion);
                 string url = GetRequestURL(fileName);
-                _webTextRequestOp = new UnityWebTextRequestOperation(url, _timeout);
-                _webTextRequestOp.StartOperation();
-                AddChildOperation(_webTextRequestOp);
+                var args = new DownloadDataRequestArgs(url, _timeout, 0);
+                _webTextRequestOp = _downloadBackend.CreateTextRequest(args);
+                _webTextRequestOp.SendRequest();
             }
 
-            _webTextRequestOp.UpdateOperation();
-            Progress = _webTextRequestOp.Progress;
+            Progress = _webTextRequestOp.DownloadProgress;
             if (_webTextRequestOp.IsDone == false)
                 return;
 
-            if (_webTextRequestOp.Status == EOperationStatus.Succeed)
+            if (_webTextRequestOp.Status == EDownloadRequestStatus.Succeed)
             {
                 PackageHash = _webTextRequestOp.Result;
                 if (string.IsNullOrEmpty(PackageHash))

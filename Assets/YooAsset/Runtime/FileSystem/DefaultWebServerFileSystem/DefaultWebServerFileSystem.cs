@@ -25,6 +25,11 @@ namespace YooAsset
         protected string _webPackageRoot = string.Empty;
 
         /// <summary>
+        /// 下载后台接口
+        /// </summary>
+        public IDownloadBackend DownloadBackend { private set; get; }
+
+        /// <summary>
         /// 包裹名称
         /// </summary>
         public string PackageName { private set; get; }
@@ -138,6 +143,10 @@ namespace YooAsset
                 _webPackageRoot = GetDefaultWebPackageRoot(packageName);
             else
                 _webPackageRoot = packageRoot;
+
+            // 创建默认的下载后台接口
+            if (DownloadBackend == null)
+                DownloadBackend = new UnityWebRequestBackend(DownloadSystemHelper.UnityWebRequestCreater);
         }
         public virtual void OnDestroy()
         {

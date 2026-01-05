@@ -15,7 +15,7 @@ namespace YooAsset
         private readonly DefaultCacheFileSystem _fileSystem;
         private readonly string _packageVersion;
         private readonly int _timeout;
-        private UnityWebFileRequestOperation _webFileRequestOp;
+        private IDownloadFileRequest _webFileRequestOp;
         private int _requestCount = 0;
         private ESteps _steps = ESteps.None;
 
@@ -57,16 +57,16 @@ namespace YooAsset
                     string savePath = _fileSystem.GetCachePackageManifestFilePath(_packageVersion);
                     string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_fileSystem.PackageName, _packageVersion);
                     string webURL = GetDownloadRequestURL(fileName);
-                    _webFileRequestOp = new UnityWebFileRequestOperation(webURL, savePath, _timeout);
-                    _webFileRequestOp.StartOperation();
-                    AddChildOperation(_webFileRequestOp);
+                    int watchdogTime = _fileSystem.DownloadWatchDogTime;
+                    var args = new DownloadFileRequestArgs(webURL, savePath, _timeout, watchdogTime);
+                    _webFileRequestOp = _fileSystem.DownloadBackend.CreateFileRequest(args);
+                    _webFileRequestOp.SendRequest();
                 }
 
-                _webFileRequestOp.UpdateOperation();
                 if (_webFileRequestOp.IsDone == false)
                     return;
 
-                if (_webFileRequestOp.Status == EOperationStatus.Succeed)
+                if (_webFileRequestOp.Status == EDownloadRequestStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;

@@ -21,14 +21,16 @@ public class CopyBuildinManifestOperation : GameAsyncOperation
 
     private readonly string _packageName;
     private readonly string _packageVersion;
+    private readonly IDownloadBackend _backend;
+    private IDownloadFileRequest _hashFileRequestOp;
+    private IDownloadFileRequest _manifestFileRequestOp;
     private ESteps _steps = ESteps.None;
-    private UnityWebFileRequestOperation _hashFileRequestOp;
-    private UnityWebFileRequestOperation _manifestFileRequestOp;
 
     public CopyBuildinManifestOperation(string packageName, string packageVersion)
     {
         _packageName = packageName;
         _packageVersion = packageVersion;
+        _backend = new UnityWebRequestBackend();
     }
     protected override void OnStart()
     {
@@ -58,14 +60,15 @@ public class CopyBuildinManifestOperation : GameAsyncOperation
                 string sourcePath = GetBuildinHashFilePath();
                 string destPath = GetCacheHashFilePath();
                 string url = DownloadSystemHelper.ConvertToWWWPath(sourcePath);
-                _hashFileRequestOp = new UnityWebFileRequestOperation(url, destPath, 60);
-                OperationSystem.StartOperation(_packageName, _hashFileRequestOp);
+                var args = new DownloadFileRequestArgs(url, destPath, 60, 0);
+                _hashFileRequestOp = _backend.CreateFileRequest(args);
+                _hashFileRequestOp.SendRequest();
             }
 
             if (_hashFileRequestOp.IsDone == false)
                 return;
 
-            if (_hashFileRequestOp.Status == EOperationStatus.Succeed)
+            if (_hashFileRequestOp.Status == EDownloadRequestStatus.Succeed)
             {
                 _steps = ESteps.CheckManifestFile;
             }
@@ -97,14 +100,15 @@ public class CopyBuildinManifestOperation : GameAsyncOperation
                 string sourcePath = GetBuildinManifestFilePath();
                 string destPath = GetCacheManifestFilePath();
                 string url = DownloadSystemHelper.ConvertToWWWPath(sourcePath);
-                _manifestFileRequestOp = new UnityWebFileRequestOperation(url, destPath, 60);
-                OperationSystem.StartOperation(_packageName, _manifestFileRequestOp);
+                var args = new DownloadFileRequestArgs(url, destPath, 60, 0);
+                _manifestFileRequestOp = _backend.CreateFileRequest(args);
+                _manifestFileRequestOp.SendRequest();
             }
 
             if (_manifestFileRequestOp.IsDone == false)
                 return;
 
-            if (_manifestFileRequestOp.Status == EOperationStatus.Succeed)
+            if (_manifestFileRequestOp.Status == EDownloadRequestStatus.Succeed)
             {
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Succeed;

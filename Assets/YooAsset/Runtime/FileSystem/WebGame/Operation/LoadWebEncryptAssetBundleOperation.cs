@@ -16,19 +16,21 @@ namespace YooAsset
         private readonly PackageBundle _bundle;
         private readonly DownloadFileOptions _options;
         private readonly IWebDecryptionServices _decryptionServices;
-        private UnityWebDataRequestOperation _unityWebDataRequestOp;
+        private readonly IDownloadBackend _downloadBackend;
+        private IDownloadBytesRequest _unityWebDataRequestOp;
 
         private int _requestCount = 0;
         private float _tryAgainTimer = 0;
         private int _failedTryAgain;
         private ESteps _steps = ESteps.None;
 
-        internal LoadWebEncryptAssetBundleOperation(PackageBundle bundle, DownloadFileOptions options, IWebDecryptionServices decryptionServices)
+        internal LoadWebEncryptAssetBundleOperation(PackageBundle bundle, DownloadFileOptions options, IWebDecryptionServices decryptionServices, IDownloadBackend downloadBackend)
         {
             _bundle = bundle;
             _options = options;
             _failedTryAgain = options.FailedTryAgain;
             _decryptionServices = decryptionServices;
+            _downloadBackend = downloadBackend;
         }
         internal override void InternalStart()
         {
@@ -52,24 +54,23 @@ namespace YooAsset
                 }
 
                 string url = GetRequestURL();
-                _unityWebDataRequestOp = new UnityWebDataRequestOperation(url, 0);
-                _unityWebDataRequestOp.StartOperation();
-                AddChildOperation(_unityWebDataRequestOp);
+                var args = new DownloadDataRequestArgs(url, 0, 0);
+                _unityWebDataRequestOp = _downloadBackend.CreateBytesRequest(args);
+                _unityWebDataRequestOp.SendRequest();
                 _steps = ESteps.CheckRequest;
             }
 
             // 检测下载结果
             if (_steps == ESteps.CheckRequest)
             {
-                _unityWebDataRequestOp.UpdateOperation();
-                Progress = _unityWebDataRequestOp.Progress;
+                Progress = _unityWebDataRequestOp.DownloadProgress;
                 DownloadProgress = _unityWebDataRequestOp.DownloadProgress;
                 DownloadedBytes = _unityWebDataRequestOp.DownloadedBytes;
                 if (_unityWebDataRequestOp.IsDone == false)
                     return;
 
                 // 检查网络错误
-                if (_unityWebDataRequestOp.Status == EOperationStatus.Succeed)
+                if (_unityWebDataRequestOp.Status == EDownloadRequestStatus.Succeed)
                 {
                     AssetBundle assetBundle = LoadEncryptedAssetBundle(_unityWebDataRequestOp.Result);
                     if (assetBundle == null)

@@ -38,7 +38,7 @@ namespace YooAsset
             {
                 if (_requestWebPackageHashOp == null)
                 {
-                    _requestWebPackageHashOp = new RequestWebPackageHashOperation(_fileSystem.RemoteServices, _fileSystem.PackageName, _packageVersion, _timeout);
+                    _requestWebPackageHashOp = new RequestWebPackageHashOperation(_fileSystem.RemoteServices, _fileSystem.DownloadBackend, _fileSystem.PackageName, _packageVersion, _timeout);
                     _requestWebPackageHashOp.StartOperation();
                     AddChildOperation(_requestWebPackageHashOp);
                 }
@@ -67,7 +67,8 @@ namespace YooAsset
                     string packageName = _fileSystem.PackageName;
                     var manifestServices = _fileSystem.ManifestServices;
                     var remoteServices = _fileSystem.RemoteServices;
-                    _loadWebPackageManifestOp = new LoadWebPackageManifestOperation(manifestServices, remoteServices, packageName, _packageVersion, packageHash, _timeout);
+                    var downloadBackend = _fileSystem.DownloadBackend;
+                    _loadWebPackageManifestOp = new LoadWebPackageManifestOperation(manifestServices, remoteServices, downloadBackend, packageName, _packageVersion, packageHash, _timeout);
                     _loadWebPackageManifestOp.StartOperation();
                     AddChildOperation(_loadWebPackageManifestOp);
                 }

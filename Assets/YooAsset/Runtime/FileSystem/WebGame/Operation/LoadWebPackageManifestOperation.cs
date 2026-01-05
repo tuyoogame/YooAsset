@@ -13,11 +13,12 @@ internal class LoadWebPackageManifestOperation : AsyncOperationBase
 
     private readonly IManifestRestoreServices _manifestServices;
     private readonly IRemoteServices _remoteServices;
+    private readonly IDownloadBackend _downloadBackend;
     private readonly string _packageName;
     private readonly string _packageVersion;
     private readonly string _packageHash;
     private readonly int _timeout;
-    private UnityWebDataRequestOperation _webDataRequestOp;
+    private IDownloadBytesRequest _webDataRequestOp;
     private DeserializeManifestOperation _deserializer;
     private int _requestCount = 0;
     private ESteps _steps = ESteps.None;
@@ -28,11 +29,12 @@ internal class LoadWebPackageManifestOperation : AsyncOperationBase
     public PackageManifest Manifest { private set; get; }
 
 
-    internal LoadWebPackageManifestOperation(IManifestRestoreServices manifestServices, IRemoteServices remoteServices,
+    internal LoadWebPackageManifestOperation(IManifestRestoreServices manifestServices, IRemoteServices remoteServices, IDownloadBackend downloadBackend,
         string packageName, string packageVersion, string packageHash, int timeout)
     {
         _manifestServices = manifestServices;
         _remoteServices = remoteServices;
+        _downloadBackend = downloadBackend;
         _packageName = packageName;
         _packageVersion = packageVersion;
         _packageHash = packageHash;
@@ -54,17 +56,16 @@ internal class LoadWebPackageManifestOperation : AsyncOperationBase
             {
                 string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_packageName, _packageVersion);
                 string url = GetRequestURL(fileName);
-                _webDataRequestOp = new UnityWebDataRequestOperation(url, _timeout);
-                _webDataRequestOp.StartOperation();
-                AddChildOperation(_webDataRequestOp);
+                var args = new DownloadDataRequestArgs(url, _timeout, 0);
+                _webDataRequestOp = _downloadBackend.CreateBytesRequest(args);
+                _webDataRequestOp.SendRequest();
             }
 
-            _webDataRequestOp.UpdateOperation();
-            Progress = _webDataRequestOp.Progress;
+            Progress = _webDataRequestOp.DownloadProgress;
             if (_webDataRequestOp.IsDone == false)
                 return;
 
-            if (_webDataRequestOp.Status == EOperationStatus.Succeed)
+            if (_webDataRequestOp.Status == EDownloadRequestStatus.Succeed)
             {
                 _steps = ESteps.VerifyFileData;
             }

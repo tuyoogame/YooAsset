@@ -12,6 +12,11 @@ namespace YooAsset
         protected string _packageRoot;
 
         /// <summary>
+        /// 下载后台接口
+        /// </summary>
+        public IDownloadBackend DownloadBackend { private set; get; }
+
+        /// <summary>
         /// 包裹名称
         /// </summary>
         public string PackageName { private set; get; }
@@ -145,6 +150,10 @@ namespace YooAsset
                 throw new YooFileSystemException($"{nameof(DefaultEditorFileSystem)} package root is null or empty !");
 
             _packageRoot = packageRoot;
+
+            // 创建默认的下载后台接口
+            if (DownloadBackend == null)
+                DownloadBackend = new UnityWebRequestBackend(DownloadSystemHelper.UnityWebRequestCreater);
         }
         public virtual void OnDestroy()
         {

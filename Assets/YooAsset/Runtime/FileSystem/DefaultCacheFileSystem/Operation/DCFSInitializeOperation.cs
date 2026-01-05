@@ -9,7 +9,7 @@ namespace YooAsset
             CheckAppFootPrint,
             SearchCacheFiles,
             VerifyCacheFiles,
-            CreateDownloadCenter,
+            CreateDownloadScheduler,
             Done,
         }
 
@@ -110,7 +110,7 @@ namespace YooAsset
 
                 if (_verifyCacheFilesOp.Status == EOperationStatus.Succeed)
                 {
-                    _steps = ESteps.CreateDownloadCenter;
+                    _steps = ESteps.CreateDownloadScheduler;
                     YooLogger.Log($"Package '{_fileSystem.PackageName}' '{_fileSystem.GetType().Name}' cached files count : {_fileSystem.FileCount}");
                 }
                 else
@@ -121,13 +121,13 @@ namespace YooAsset
                 }
             }
 
-            if (_steps == ESteps.CreateDownloadCenter)
+            if (_steps == ESteps.CreateDownloadScheduler)
             {
                 // 注意：下载中心作为独立任务运行！
-                if (_fileSystem.DownloadCenter == null)
+                if (_fileSystem.DownloadScheduler == null)
                 {
-                    _fileSystem.DownloadCenter = new DownloadCenterOperation(_fileSystem);
-                    OperationSystem.StartOperation(_fileSystem.PackageName, _fileSystem.DownloadCenter);
+                    _fileSystem.DownloadScheduler = new DownloadSchedulerOperation(_fileSystem);
+                    OperationSystem.StartOperation(_fileSystem.PackageName, _fileSystem.DownloadScheduler);
                 }
 
                 _steps = ESteps.Done;

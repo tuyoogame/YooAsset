@@ -15,7 +15,7 @@ namespace YooAsset
 
         private readonly DefaultBuildinFileSystem _fileSystem;
         private readonly string _packageVersion;
-        private UnityWebTextRequestOperation _webTextRequestOp;
+        private IDownloadTextRequest _webTextRequestOp;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
@@ -58,16 +58,15 @@ namespace YooAsset
                 {
                     string filePath = _fileSystem.GetBuildinPackageHashFilePath(_packageVersion);
                     string url = DownloadSystemHelper.ConvertToWWWPath(filePath);
-                    _webTextRequestOp = new UnityWebTextRequestOperation(url, 60);
-                    _webTextRequestOp.StartOperation();
-                    AddChildOperation(_webTextRequestOp);
+                    var args = new DownloadDataRequestArgs(url, 60, 0);
+                    _webTextRequestOp = _fileSystem.DownloadBackend.CreateTextRequest(args);
+                    _webTextRequestOp.SendRequest();
                 }
 
-                _webTextRequestOp.UpdateOperation();
                 if (_webTextRequestOp.IsDone == false)
                     return;
 
-                if (_webTextRequestOp.Status == EOperationStatus.Succeed)
+                if (_webTextRequestOp.Status == EDownloadRequestStatus.Succeed)
                 {
                     PackageHash = _webTextRequestOp.Result;
                     _steps = ESteps.CheckResult;

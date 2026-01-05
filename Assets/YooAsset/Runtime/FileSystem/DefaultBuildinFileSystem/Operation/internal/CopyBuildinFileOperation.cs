@@ -14,13 +14,15 @@ namespace YooAsset
             Done,
         }
 
-        private UnityWebFileRequestOperation _webFileRequestOp;
+        private readonly DefaultBuildinFileSystem _fileSystem;
         private readonly string _sourceFilePath;
         private readonly string _destFilePath;
+        private IDownloadFileRequest _webFileRequestOp;
         private ESteps _steps = ESteps.None;
 
-        public CopyBuildinFileOperation(string sourceFilePath, string destFilePath)
+        public CopyBuildinFileOperation(DefaultBuildinFileSystem fileSystem, string sourceFilePath, string destFilePath)
         {
+            _fileSystem = fileSystem;
             _sourceFilePath = sourceFilePath;
             _destFilePath = destFilePath;
         }
@@ -76,16 +78,15 @@ namespace YooAsset
                 if (_webFileRequestOp == null)
                 {
                     string url = DownloadSystemHelper.ConvertToWWWPath(_sourceFilePath);
-                    _webFileRequestOp = new UnityWebFileRequestOperation(url, _destFilePath, 60);
-                    _webFileRequestOp.StartOperation();
-                    AddChildOperation(_webFileRequestOp);
+                    var args = new DownloadFileRequestArgs(url, _destFilePath, 60, 0);
+                    _webFileRequestOp = _fileSystem.DownloadBackend.CreateFileRequest(args);
+                    _webFileRequestOp.SendRequest();
                 }
 
-                _webFileRequestOp.UpdateOperation();
                 if (_webFileRequestOp.IsDone == false)
                     return;
 
-                if (_webFileRequestOp.Status == EOperationStatus.Succeed)
+                if (_webFileRequestOp.Status == EDownloadRequestStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;

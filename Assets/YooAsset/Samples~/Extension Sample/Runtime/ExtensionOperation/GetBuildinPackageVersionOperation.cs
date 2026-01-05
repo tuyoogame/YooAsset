@@ -17,7 +17,8 @@ public class GetBuildinPackageVersionOperation : GameAsyncOperation
     }
 
     private readonly string _packageName;
-    private UnityWebTextRequestOperation _versionFileRequestOp;
+    private readonly IDownloadBackend _backend;
+    private IDownloadTextRequest _versionFileRequestOp;
     private ESteps _steps = ESteps.None;
 
     /// <summary>
@@ -28,6 +29,7 @@ public class GetBuildinPackageVersionOperation : GameAsyncOperation
     public GetBuildinPackageVersionOperation(string packageName)
     {
         _packageName = packageName;
+        _backend = new UnityWebRequestBackend();
     }
     protected override void OnStart()
     {
@@ -44,14 +46,15 @@ public class GetBuildinPackageVersionOperation : GameAsyncOperation
             {
                 string filePath = GetBuildinPackageVersionFilePath();
                 string url = DownloadSystemHelper.ConvertToWWWPath(filePath);
-                _versionFileRequestOp = new UnityWebTextRequestOperation(url, 60);
-                OperationSystem.StartOperation(_packageName, _versionFileRequestOp);
+                var args = new DownloadDataRequestArgs(url, 60, 0);
+                _versionFileRequestOp = _backend.CreateTextRequest(args);
+                _versionFileRequestOp.SendRequest();
             }
 
             if (_versionFileRequestOp.IsDone == false)
                 return;
 
-            if (_versionFileRequestOp.Status == EOperationStatus.Succeed)
+            if (_versionFileRequestOp.Status == EDownloadRequestStatus.Succeed)
             {
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Succeed;

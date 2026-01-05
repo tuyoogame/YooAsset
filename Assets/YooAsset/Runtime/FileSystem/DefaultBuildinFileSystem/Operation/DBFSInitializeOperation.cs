@@ -78,7 +78,7 @@ namespace YooAsset
                     string packageVersion = _requestBuildinPackageVersionOp.PackageVersion;
                     string destFilePath = GetCopyPackageHashDestPath(packageVersion);
                     string sourceFilePath = _fileSystem.GetBuildinPackageHashFilePath(packageVersion);
-                    _copyBuildinHashFileOp = new CopyBuildinFileOperation(sourceFilePath, destFilePath);
+                    _copyBuildinHashFileOp = new CopyBuildinFileOperation(_fileSystem, sourceFilePath, destFilePath);
                     _copyBuildinHashFileOp.StartOperation();
                     AddChildOperation(_copyBuildinHashFileOp);
                 }
@@ -106,7 +106,7 @@ namespace YooAsset
                     string packageVersion = _requestBuildinPackageVersionOp.PackageVersion;
                     string destFilePath = GetCopyPackageManifestDestPath(packageVersion);
                     string sourceFilePath = _fileSystem.GetBuildinPackageManifestFilePath(packageVersion);
-                    _copyBuildinManifestFileOp = new CopyBuildinFileOperation(sourceFilePath, destFilePath);
+                    _copyBuildinManifestFileOp = new CopyBuildinFileOperation(_fileSystem, sourceFilePath, destFilePath);
                     _copyBuildinManifestFileOp.StartOperation();
                     AddChildOperation(_copyBuildinManifestFileOp);
                 }

@@ -26,6 +26,11 @@ namespace YooAsset
         protected string _packageRoot;
 
         /// <summary>
+        /// 下载后台接口
+        /// </summary>
+        public IDownloadBackend DownloadBackend { private set; get; }
+
+        /// <summary>
         /// 包裹名称
         /// </summary>
         public string PackageName { private set; get; }
@@ -66,7 +71,7 @@ namespace YooAsset
         /// <summary>
         /// 自定义参数：初始化的时候缓存文件校验最大并发数
         /// </summary>
-        public int FileVerifyMaxConcurrency { private set; get; } = int.MaxValue;
+        public int FileVerifyMaxConcurrency { private set; get; } = 32;
 
         /// <summary>
         /// 自定义参数：数据文件追加文件格式
@@ -156,6 +161,13 @@ namespace YooAsset
                 var operation = new DBFSLoadRawBundleOperation(this, bundle);
                 return operation;
             }
+#if TUANJIE_1_7_OR_NEWER
+            else if (bundle.BundleType == (int)EBuildBundleType.InstantBundle)
+            {
+                var operation = new DBFSLoadInstantBundleOperation(this, bundle);
+                return operation;
+            }
+#endif
             else
             {
                 string error = $"{nameof(DefaultBuildinFileSystem)} not support load bundle type : {bundle.BundleType}";
@@ -224,6 +236,10 @@ namespace YooAsset
                 _packageRoot = GetDefaultBuildinPackageRoot(packageName);
             else
                 _packageRoot = packageRoot;
+
+            // 创建默认的下载后台接口
+            if (DownloadBackend == null)
+                DownloadBackend = new UnityWebRequestBackend(DownloadSystemHelper.UnityWebRequestCreater);
 
             // 创建解压文件系统
             var remoteServices = new DefaultUnpackRemoteServices(_packageRoot);

@@ -41,13 +41,13 @@ namespace YooAsset
 
                     if (_bundle.Encrypted)
                     {
-                        _loadWebAssetBundleOp = new LoadWebEncryptAssetBundleOperation(_bundle, options, _fileSystem.DecryptionServices);
+                        _loadWebAssetBundleOp = new LoadWebEncryptAssetBundleOperation(_bundle, options, _fileSystem.DecryptionServices, _fileSystem.DownloadBackend);
                         _loadWebAssetBundleOp.StartOperation();
                         AddChildOperation(_loadWebAssetBundleOp);
                     }
                     else
                     {
-                        _loadWebAssetBundleOp = new LoadWebNormalAssetBundleOperation(_bundle, options, _fileSystem.DisableUnityWebCache);
+                        _loadWebAssetBundleOp = new LoadWebNormalAssetBundleOperation(_bundle, options, _fileSystem.DisableUnityWebCache, _fileSystem.DownloadBackend);
                         _loadWebAssetBundleOp.StartOperation();
                         AddChildOperation(_loadWebAssetBundleOp);
                     }

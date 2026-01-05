@@ -36,7 +36,7 @@ namespace YooAsset
             {
                 if (_requestWebPackageVersionOp == null)
                 {
-                    _requestWebPackageVersionOp = new RequestWebPackageVersionOperation(_fileSystem.RemoteServices, _fileSystem.PackageName, _appendTimeTicks, _timeout);
+                    _requestWebPackageVersionOp = new RequestWebPackageVersionOperation(_fileSystem.RemoteServices, _fileSystem.DownloadBackend, _fileSystem.PackageName, _appendTimeTicks, _timeout);
                     _requestWebPackageVersionOp.StartOperation();
                     AddChildOperation(_requestWebPackageVersionOp);
                 }

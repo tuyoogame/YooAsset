@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 
 namespace YooAsset
 {
@@ -17,7 +18,7 @@ namespace YooAsset
         // 下载参数
         protected readonly DefaultCacheFileSystem _fileSystem;
         protected readonly DownloadFileOptions _options;
-        private UnityDownloadFileOperation _unityDownloadFileOp;
+        private DownloadAndCacheFileOperation _downloadFileOp;
 
         protected int _requestCount = 0;
         protected float _tryAgainTimer = 0;
@@ -67,7 +68,7 @@ namespace YooAsset
                 }
 
                 string url = GetRequestURL();
-                _unityDownloadFileOp = _fileSystem.DownloadCenter.DownloadFileAsync(Bundle, url);
+                _downloadFileOp = _fileSystem.DownloadScheduler.DownloadAndCacheFileAsync(Bundle, url);
                 _steps = ESteps.CheckRequest;
             }
 
@@ -75,20 +76,16 @@ namespace YooAsset
             if (_steps == ESteps.CheckRequest)
             {
                 if (IsWaitForAsyncComplete)
-                    _unityDownloadFileOp.WaitForAsyncComplete();
+                    _downloadFileOp.WaitForAsyncComplete();
 
-                // 因为并发数量限制，下载器可能被挂起！
-                if (_unityDownloadFileOp.Status == EOperationStatus.None)
+                _downloadFileOp.UpdateOperation();
+                Progress = _downloadFileOp.Progress;
+                DownloadedBytes = _downloadFileOp.DownloadedBytes;
+                DownloadProgress = _downloadFileOp.DownloadProgress;
+                if (_downloadFileOp.IsDone == false)
                     return;
 
-                _unityDownloadFileOp.UpdateOperation();
-                Progress = _unityDownloadFileOp.Progress;
-                DownloadedBytes = _unityDownloadFileOp.DownloadedBytes;
-                DownloadProgress = _unityDownloadFileOp.DownloadProgress;
-                if (_unityDownloadFileOp.IsDone == false)
-                    return;
-
-                if (_unityDownloadFileOp.Status == EOperationStatus.Succeed)
+                if (_downloadFileOp.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
@@ -98,13 +95,13 @@ namespace YooAsset
                     if (IsWaitForAsyncComplete == false && _failedTryAgain > 0)
                     {
                         _steps = ESteps.TryAgain;
-                        YooLogger.Warning($"Failed download : {_unityDownloadFileOp.URL} Try again !");
+                        YooLogger.Warning($"Failed download : {_downloadFileOp.URL} Try again !");
                     }
                     else
                     {
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Failed;
-                        Error = _unityDownloadFileOp.Error;
+                        Error = _downloadFileOp.Error;
                         YooLogger.Error(Error);
                     }
                 }
@@ -141,9 +138,9 @@ namespace YooAsset
             // 注意：取消下载任务的时候引用计数减一
             if (_steps != ESteps.Done)
             {
-                if (_unityDownloadFileOp != null)
+                if (_downloadFileOp != null)
                 {
-                    _unityDownloadFileOp.Release();
+                    _downloadFileOp.Release();
                 }
             }
         }

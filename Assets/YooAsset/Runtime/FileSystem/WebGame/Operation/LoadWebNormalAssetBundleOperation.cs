@@ -16,7 +16,8 @@ namespace YooAsset
         private readonly PackageBundle _bundle;
         private readonly DownloadFileOptions _options;
         private readonly bool _disableUnityWebCache;
-        private UnityAssetBundleRequestOperation _unityAssetBundleRequestOp;
+        private readonly IDownloadBackend _downloadBackend;
+        private IDownloadAssetBundleRequest _unityAssetBundleRequestOp;
 
         private int _requestCount = 0;
         private float _tryAgainTimer = 0;
@@ -24,12 +25,13 @@ namespace YooAsset
         private ESteps _steps = ESteps.None;
 
 
-        internal LoadWebNormalAssetBundleOperation(PackageBundle bundle, DownloadFileOptions options, bool disableUnityWebCache)
+        internal LoadWebNormalAssetBundleOperation(PackageBundle bundle, DownloadFileOptions options, bool disableUnityWebCache, IDownloadBackend downloadBackend)
         {
             _bundle = bundle;
             _options = options;
             _failedTryAgain = options.FailedTryAgain;
             _disableUnityWebCache = disableUnityWebCache;
+            _downloadBackend = downloadBackend;
         }
         internal override void InternalStart()
         {
@@ -44,23 +46,22 @@ namespace YooAsset
             if (_steps == ESteps.CreateRequest)
             {
                 string url = GetRequestURL();
-                _unityAssetBundleRequestOp = new UnityAssetBundleRequestOperation(_bundle, _disableUnityWebCache, url);
-                _unityAssetBundleRequestOp.StartOperation();
-                AddChildOperation(_unityAssetBundleRequestOp);
+                var args = new DownloadAssetBundleRequestArgs(url, 0, 0, _disableUnityWebCache, _bundle.FileHash, _bundle.UnityCRC);
+                _unityAssetBundleRequestOp = _downloadBackend.CreateAssetBundleRequest(args);
+                _unityAssetBundleRequestOp.SendRequest();
                 _steps = ESteps.CheckRequest;
             }
 
             // 检测下载结果
             if (_steps == ESteps.CheckRequest)
             {
-                _unityAssetBundleRequestOp.UpdateOperation();
-                Progress = _unityAssetBundleRequestOp.Progress;
+                Progress = _unityAssetBundleRequestOp.DownloadProgress;
                 DownloadedBytes = _unityAssetBundleRequestOp.DownloadedBytes;
                 DownloadProgress = _unityAssetBundleRequestOp.DownloadProgress;
                 if (_unityAssetBundleRequestOp.IsDone == false)
                     return;
 
-                if (_unityAssetBundleRequestOp.Status == EOperationStatus.Succeed)
+                if (_unityAssetBundleRequestOp.Status == EDownloadRequestStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
