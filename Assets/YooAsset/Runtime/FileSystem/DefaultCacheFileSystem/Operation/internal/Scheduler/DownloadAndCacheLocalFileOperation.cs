@@ -183,13 +183,15 @@ namespace YooAsset
         {
             while (true)
             {
-                //TODO 等待导入或解压本地文件完毕，该操作会挂起主线程！
+                //TODO 更新下载后台，防止无限挂起
                 _fileSystem.DownloadBackend.Update();
+
+                //TODO 等待导入或解压本地文件完毕，该操作会挂起主线程！
                 InternalUpdate();
                 if (IsDone)
                     break;
 
-                // 短暂休眠避免完全卡死
+                //TODO 短暂休眠避免完全卡死
                 System.Threading.Thread.Sleep(1);
             }
         }

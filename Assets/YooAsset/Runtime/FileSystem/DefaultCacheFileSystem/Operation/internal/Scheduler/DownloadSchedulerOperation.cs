@@ -113,6 +113,10 @@ namespace YooAsset
                 }
             }
         }
+        internal override string InternalGetDesc()
+        {
+            return $"{_fileSystem.GetType().FullName}";
+        }
 
         /// <summary>
         /// 中止所有下载任务

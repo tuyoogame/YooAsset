@@ -128,6 +128,7 @@ namespace YooAsset
                 _steps = ESteps.Done;
                 Status = EOperationStatus.Failed;
                 Error = $"Try load bundle {Bundle.BundleName} from remote !";
+                YooLogger.Error(Error);
             }
         }
 
