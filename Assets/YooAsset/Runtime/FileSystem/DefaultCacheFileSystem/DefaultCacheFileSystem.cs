@@ -61,6 +61,11 @@ namespace YooAsset
 
         #region 自定义参数
         /// <summary>
+        /// 自定义参数：UnityWebRequest 创建委托
+        /// </summary>
+        public UnityWebRequestCreator WebRequestCreator { private set; get; }
+
+        /// <summary>
         /// 自定义参数：远程服务接口的实例类
         /// </summary>
         public IRemoteServices RemoteServices { private set; get; }
@@ -237,7 +242,15 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == FileSystemParametersDefine.REMOTE_SERVICES)
+            if (name == FileSystemParametersDefine.DOWNLOAD_BACKEND)
+            {
+                DownloadBackend = (IDownloadBackend)value;
+            }
+            else if (name == FileSystemParametersDefine.UNITY_WEB_REQUEST_CREATOR)
+            {
+                WebRequestCreator = (UnityWebRequestCreator)value;
+            }
+            else if (name == FileSystemParametersDefine.REMOTE_SERVICES)
             {
                 RemoteServices = (IRemoteServices)value;
             }
@@ -334,7 +347,7 @@ namespace YooAsset
 
             // 创建默认的下载后台接口
             if (DownloadBackend == null)
-                DownloadBackend = new UnityWebRequestBackend(DownloadSystemHelper.UnityWebRequestCreater);
+                DownloadBackend = new UnityWebRequestBackend(WebRequestCreator);
         }
         public virtual void OnDestroy()
         {
@@ -342,6 +355,12 @@ namespace YooAsset
             {
                 DownloadScheduler.Dispose();
                 DownloadScheduler = null;
+            }
+
+            if (DownloadBackend != null)
+            {
+                DownloadBackend.Dispose();
+                DownloadBackend = null;
             }
         }
 

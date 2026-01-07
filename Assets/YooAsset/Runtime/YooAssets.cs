@@ -241,9 +241,10 @@ namespace YooAsset
         /// <summary>
         /// 设置下载系统参数，自定义下载请求
         /// </summary>
-        public static void SetDownloadSystemUnityWebRequest(UnityWebRequestDelegate createDelegate)
+        [Obsolete("This method is deprecated. Please use FileSystemParametersDefine.UNITY_WEB_REQUEST_CREATOR instead.", true)]
+        public static void SetDownloadSystemUnityWebRequest(UnityWebRequestCreator createDelegate)
         {
-            DownloadSystemHelper.UnityWebRequestCreater = createDelegate;
+            throw new NotImplementedException();
         }
 
         /// <summary>

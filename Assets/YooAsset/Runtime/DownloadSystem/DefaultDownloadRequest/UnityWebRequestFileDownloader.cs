@@ -26,7 +26,7 @@ namespace YooAsset
         /// </summary>
         /// <param name="args">文件下载参数</param>
         /// <param name="webRequestCreator">UnityWebRequest 创建器（可选）</param>
-        public UnityWebRequestFileDownloader(DownloadFileRequestArgs args, UnityWebRequestDelegate webRequestCreator)
+        public UnityWebRequestFileDownloader(DownloadFileRequestArgs args, UnityWebRequestCreator webRequestCreator)
             : base(args.URL, webRequestCreator)
         {
             _args = args;

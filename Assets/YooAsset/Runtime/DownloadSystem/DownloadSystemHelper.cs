@@ -3,32 +3,8 @@ using UnityEngine;
 
 namespace YooAsset
 {
-    /// <summary>
-    /// 自定义下载器的请求委托
-    /// </summary>
-    public delegate UnityWebRequest UnityWebRequestDelegate(string url);
-
     internal class DownloadSystemHelper
     {
-#if UNITY_EDITOR
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void OnRuntimeInitialize()
-        {
-            UnityWebRequestCreater = null;
-        }
-#endif
-
-        public static UnityWebRequestDelegate UnityWebRequestCreater = null;
-        public static UnityWebRequest NewUnityWebRequestGet(string requestURL)
-        {
-            UnityWebRequest webRequest;
-            if (UnityWebRequestCreater != null)
-                webRequest = UnityWebRequestCreater.Invoke(requestURL);
-            else
-                webRequest = new UnityWebRequest(requestURL, UnityWebRequest.kHttpVerbGET);
-            return webRequest;
-        }
-
         /// <summary>
         /// 获取WWW加载本地资源的路径
         /// </summary>

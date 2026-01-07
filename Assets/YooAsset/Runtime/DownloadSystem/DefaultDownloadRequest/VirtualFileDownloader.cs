@@ -75,6 +75,7 @@ namespace YooAsset
         public VirtualFileDownloader(DownloadSimulateRequestArgs args)
         {
             _args = args;
+            URL = args.URL;
             Status = EDownloadRequestStatus.None;
         }
 
@@ -142,7 +143,7 @@ namespace YooAsset
 #if UNITY_2020_3_OR_NEWER
             return UnityEngine.Time.realtimeSinceStartupAsDouble;
 #else
-            return = UnityEngine.Time.realtimeSinceStartup;
+            return UnityEngine.Time.realtimeSinceStartup;
 #endif
         }
     }

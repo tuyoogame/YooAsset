@@ -13,7 +13,7 @@ namespace YooAsset
     /// </remarks>
     internal abstract class UnityWebRequestDownloaderBase : IDownloadRequest
     {
-        private readonly UnityWebRequestDelegate _webRequestCreator;
+        private readonly UnityWebRequestCreator _webRequestCreator;
         protected UnityWebRequest _webRequest;
 
         // 看门狗相关
@@ -76,7 +76,7 @@ namespace YooAsset
         /// </summary>
         /// <param name="url">请求地址</param>
         /// <param name="webRequestCreator">UnityWebRequest 创建器（可选）</param>
-        protected UnityWebRequestDownloaderBase(string url, UnityWebRequestDelegate webRequestCreator)
+        protected UnityWebRequestDownloaderBase(string url, UnityWebRequestCreator webRequestCreator)
         {
             URL = url;
             _webRequestCreator = webRequestCreator;

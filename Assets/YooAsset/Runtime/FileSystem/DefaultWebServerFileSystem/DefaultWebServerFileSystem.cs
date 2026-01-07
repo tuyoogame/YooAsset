@@ -58,6 +58,11 @@ namespace YooAsset
 
         #region 自定义参数
         /// <summary>
+        /// 自定义参数：UnityWebRequest 创建委托
+        /// </summary>
+        public UnityWebRequestCreator WebRequestCreator { private set; get; }
+
+        /// <summary>
         /// 禁用Unity的网络缓存
         /// </summary>
         public bool DisableUnityWebCache { private set; get; } = false;
@@ -118,7 +123,15 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == FileSystemParametersDefine.DISABLE_UNITY_WEB_CACHE)
+            if (name == FileSystemParametersDefine.DOWNLOAD_BACKEND)
+            {
+                DownloadBackend = (IDownloadBackend)value;
+            }
+            else if (name == FileSystemParametersDefine.UNITY_WEB_REQUEST_CREATOR)
+            {
+                WebRequestCreator = (UnityWebRequestCreator)value;
+            }
+            else if (name == FileSystemParametersDefine.DISABLE_UNITY_WEB_CACHE)
             {
                 DisableUnityWebCache = Convert.ToBoolean(value);
             }
@@ -146,10 +159,15 @@ namespace YooAsset
 
             // 创建默认的下载后台接口
             if (DownloadBackend == null)
-                DownloadBackend = new UnityWebRequestBackend(DownloadSystemHelper.UnityWebRequestCreater);
+                DownloadBackend = new UnityWebRequestBackend(WebRequestCreator);
         }
         public virtual void OnDestroy()
         {
+            if (DownloadBackend != null)
+            {
+                DownloadBackend.Dispose();
+                DownloadBackend = null;
+            }
         }
 
         public virtual bool Belong(PackageBundle bundle)

@@ -354,6 +354,17 @@ var webRemoteParams = FileSystemParameters.CreateDefaultWebRemoteFileSystemParam
 ```csharp
 var cacheParams = FileSystemParameters.CreateDefaultCacheFileSystemParameters(remoteServices);
 
+// 设置 UnityWebRequest 创建委托（用于证书/代理/自定义 Header 等）
+cacheParams.AddParameter(FileSystemParametersDefine.UNITY_WEB_REQUEST_CREATOR, (UnityWebRequestCreator)((url) =>
+{
+    var request = new UnityEngine.Networking.UnityWebRequest(url, UnityEngine.Networking.UnityWebRequest.kHttpVerbGET);
+    // 自定义配置...
+    return request;
+}));
+
+// 设置自定义下载后端（若设置则不再创建默认 UnityWebRequestBackend）
+// cacheParams.AddParameter(FileSystemParametersDefine.DOWNLOAD_BACKEND, myDownloadBackend);
+
 // 设置文件校验级别
 cacheParams.AddParameter(FileSystemParametersDefine.FILE_VERIFY_LEVEL, EFileVerifyLevel.High);
 

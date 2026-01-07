@@ -12,7 +12,7 @@ namespace YooAsset
     /// </remarks>
     internal sealed class UnityWebRequestBackend : IDownloadBackend
     {
-        private readonly UnityWebRequestDelegate _webRequestCreator;
+        private readonly UnityWebRequestCreator _webRequestCreator;
 
         /// <summary>
         /// 后端名称
@@ -36,7 +36,7 @@ namespace YooAsset
         /// 自定义 UnityWebRequest 创建委托（可选）。
         /// 如果为 null，则使用默认的 UnityWebRequest 构造方式。
         /// </param>
-        public UnityWebRequestBackend(UnityWebRequestDelegate webRequestCreator)
+        public UnityWebRequestBackend(UnityWebRequestCreator webRequestCreator)
         {
             _webRequestCreator = webRequestCreator;
         }

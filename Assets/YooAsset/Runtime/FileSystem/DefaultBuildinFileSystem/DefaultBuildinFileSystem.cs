@@ -59,6 +59,11 @@ namespace YooAsset
 
         #region 自定义参数
         /// <summary>
+        /// 自定义参数：UnityWebRequest 创建委托
+        /// </summary>
+        public UnityWebRequestCreator WebRequestCreator { private set; get; }
+
+        /// <summary>
         /// 自定义参数：覆盖安装缓存清理模式
         /// </summary>
         public EOverwriteInstallClearMode InstallClearMode { private set; get; } = EOverwriteInstallClearMode.ClearAllManifestFiles;
@@ -178,7 +183,15 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            if (name == FileSystemParametersDefine.INSTALL_CLEAR_MODE)
+            if (name == FileSystemParametersDefine.DOWNLOAD_BACKEND)
+            {
+                DownloadBackend = (IDownloadBackend)value;
+            }
+            else if (name == FileSystemParametersDefine.UNITY_WEB_REQUEST_CREATOR)
+            {
+                WebRequestCreator = (UnityWebRequestCreator)value;
+            }
+            else if (name == FileSystemParametersDefine.INSTALL_CLEAR_MODE)
             {
                 InstallClearMode = (EOverwriteInstallClearMode)value;
             }
@@ -239,12 +252,14 @@ namespace YooAsset
 
             // 创建默认的下载后台接口
             if (DownloadBackend == null)
-                DownloadBackend = new UnityWebRequestBackend(DownloadSystemHelper.UnityWebRequestCreater);
+                DownloadBackend = new UnityWebRequestBackend(WebRequestCreator);
 
             // 创建解压文件系统
             var remoteServices = new DefaultUnpackRemoteServices(_packageRoot);
             _unpackFileSystem = new DefaultUnpackFileSystem();
             _unpackFileSystem.SetParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
+            _unpackFileSystem.SetParameter(FileSystemParametersDefine.DOWNLOAD_BACKEND, DownloadBackend);
+            _unpackFileSystem.SetParameter(FileSystemParametersDefine.UNITY_WEB_REQUEST_CREATOR, WebRequestCreator);
             _unpackFileSystem.SetParameter(FileSystemParametersDefine.INSTALL_CLEAR_MODE, InstallClearMode);
             _unpackFileSystem.SetParameter(FileSystemParametersDefine.FILE_VERIFY_LEVEL, FileVerifyLevel);
             _unpackFileSystem.SetParameter(FileSystemParametersDefine.FILE_VERIFY_MAX_CONCURRENCY, FileVerifyMaxConcurrency);
@@ -255,6 +270,17 @@ namespace YooAsset
         }
         public virtual void OnDestroy()
         {
+            if (_unpackFileSystem != null)
+            {
+                _unpackFileSystem.OnDestroy();
+                _unpackFileSystem = null;
+            }
+
+            if (DownloadBackend != null)
+            {
+                DownloadBackend.Dispose();
+                DownloadBackend = null;
+            }
         }
 
         public virtual bool Belong(PackageBundle bundle)

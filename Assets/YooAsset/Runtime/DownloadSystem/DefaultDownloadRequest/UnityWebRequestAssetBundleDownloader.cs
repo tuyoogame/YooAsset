@@ -26,7 +26,7 @@ namespace YooAsset
         /// </summary>
         /// <param name="args">AssetBundle 下载参数</param>
         /// <param name="webRequestCreator">UnityWebRequest 创建器（可选）</param>
-        public UnityWebRequestAssetBundleDownloader(DownloadAssetBundleRequestArgs args, UnityWebRequestDelegate webRequestCreator)
+        public UnityWebRequestAssetBundleDownloader(DownloadAssetBundleRequestArgs args, UnityWebRequestCreator webRequestCreator)
             : base(args.URL, webRequestCreator)
         {
             _args = args;
@@ -75,16 +75,11 @@ namespace YooAsset
             }
             else
             {
-                // 使用 Unity 缓存（需要 FileHash）
-                // The file hash defining the version of the asset bundle.
+                // 使用 Unity 缓存
+                // 说明：The file hash defining the version of the asset bundle.
                 Hash128 fileHash = Hash128.Parse(_args.FileHash);
                 handler = new DownloadHandlerAssetBundle(URL, fileHash, _args.UnityCRC);
             }
-
-#if UNITY_2020_3_OR_NEWER
-            // 禁用自动加载，允许手动控制加载时机
-            handler.autoLoadAssetBundle = false;
-#endif
 
             return handler;
         }

@@ -2,7 +2,7 @@
 
 ## 模块概述
 
-DownloadSystem 是 YooAsset 资源管理系统的**底层网络下载层**，负责处理所有 HTTP 网络请求。该模块提供了统一的下载接口抽象，支持文件下载、断点续传、并发控制、看门狗监控等功能。
+DownloadSystem 是 YooAsset 资源管理系统的**底层网络下载层**，负责处理所有 HTTP 网络请求。该模块提供了统一的下载接口抽象，支持文件下载、断点续传、并发请求（由上层调度）、看门狗监控等功能。
 
 ### 核心职责
 
@@ -14,13 +14,23 @@ DownloadSystem 是 YooAsset 资源管理系统的**底层网络下载层**，负
 
 ---
 
+## 边界与上层协作
+
+DownloadSystem 的职责是提供“可替换后端 + 统一请求接口 + 轮询式生命周期”的基础能力：
+
+- **本模块不负责并发队列/限流调度**：并发通常由上层同时创建多个 request 并自行控制并发数。
+- **本模块不负责重试/回退策略**：失败后的重试、切换 CDN、降级等策略通常由上层系统实现。
+- **本模块不负责持久化下载任务**：断点续传依赖本地已有文件与 `Range` 请求头，并由上层管理断点信息。
+
+---
+
 ## 设计目标
 
 | 目标 | 说明 |
 |------|------|
 | **可扩展性** | 支持可插拔的网络库后端（UnityWebRequest/BestHTTP/自研） |
 | **鲁棒性** | 看门狗超时保护、自动清理失败文件、完整错误信息 |
-| **高性能** | 轮询模式无阻塞、支持多并发请求 |
+| **高性能** | 轮询模式无阻塞、支持并发请求（并发数由上层调度） |
 | **易用性** | 流畅的参数构建 API、清晰的状态转换 |
 
 ---
@@ -70,7 +80,8 @@ DownloadSystem/
 │   └── IDownloadRequest.cs                   # 请求接口层次结构
 │
 ├── DefaultDownloadBackend/                   # 默认后端实现
-│   └── UnityWebRequestBackend.cs             # UnityWebRequest 后端
+│   ├── UnityWebRequestBackend.cs             # UnityWebRequest 后端
+│   └── UnityWebRequestCreator.cs             # UnityWebRequest 创建委托
 │
 ├── DefaultDownloadRequest/                   # 默认请求实现
 │   ├── UnityWebRequestDownloaderBase.cs      # 基础下载器（抽象类）
@@ -256,13 +267,15 @@ public struct DownloadSimulateRequestArgs
 - 无需手动调用 Update()，UnityWebRequest 自动驱动
 
 ```csharp
-// 自定义 UnityWebRequest 创建
-DownloadSystemHelper.UnityWebRequestCreater = (url) =>
+// 自定义 UnityWebRequest 创建（建议通过 backend 构造函数传入）
+UnityWebRequestCreator creator = (url) =>
 {
     var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET);
     // 自定义配置...
     return request;
 };
+
+IDownloadBackend backend = new UnityWebRequestBackend(creator);
 ```
 
 ### UnityWebRequestDownloaderBase
@@ -303,12 +316,11 @@ None ──► SendRequest() ──► Running ──► PollingRequest() ──
 ```csharp
 // 1. 创建后端和请求
 IDownloadBackend backend = new UnityWebRequestBackend();
-var args = new DownloadFileRequestArgs
-{
-    URL = "https://example.com/file.zip",
-    SavePath = "/path/to/save/file.zip",
-    Timeout = 30
-};
+var args = new DownloadFileRequestArgs(
+    url: "https://example.com/file.zip",
+    savePath: "/path/to/save/file.zip",
+    timeout: 30,
+    watchdogTime: 0);
 IDownloadFileRequest request = backend.CreateFileRequest(args);
 
 // 2. 发起并轮询
@@ -340,14 +352,14 @@ request.Dispose();
 // 获取已下载的文件大小
 long existingFileSize = new FileInfo(savePath).Length;
 
-var args = new DownloadFileRequestArgs
-{
-    URL = url,
-    SavePath = savePath,
-    ResumeFromBytes = existingFileSize,   // 断点位置
-    AppendToFile = true,                   // 追加写入
-    RemoveFileOnAbort = false              // 中止时保留文件
-};
+var args = new DownloadFileRequestArgs(
+    url: url,
+    savePath: savePath,
+    timeout: 30,
+    watchdogTime: 0,
+    appendToFile: true,                 // 追加写入
+    removeFileOnAbort: false,           // 中止时保留文件
+    resumeFromBytes: existingFileSize); // 断点位置
 
 IDownloadFileRequest request = backend.CreateFileRequest(args);
 request.SendRequest();
@@ -357,12 +369,11 @@ request.SendRequest();
 ### 看门狗保护
 
 ```csharp
-var args = new DownloadFileRequestArgs
-{
-    URL = url,
-    SavePath = path,
-    WatchdogTime = 30   // 30秒无数据自动中止
-};
+var args = new DownloadFileRequestArgs(
+    url: url,
+    savePath: path,
+    timeout: 30,
+    watchdogTime: 30); // 30秒无数据自动中止
 
 IDownloadFileRequest request = backend.CreateFileRequest(args);
 request.SendRequest();
@@ -382,10 +393,10 @@ if (request.Status == EDownloadRequestStatus.Aborted)
 ### HEAD 请求获取文件信息
 
 ```csharp
-var args = new DownloadDataRequestArgs
-{
-    URL = "https://example.com/file.zip"
-};
+var args = new DownloadDataRequestArgs(
+    url: "https://example.com/file.zip",
+    timeout: 30,
+    watchdogTime: 0);
 
 IDownloadHeadRequest request = backend.CreateHeadRequest(args);
 request.SendRequest();
@@ -408,10 +419,10 @@ if (request.Status == EDownloadRequestStatus.Succeed)
 ### 下载字节数据
 
 ```csharp
-var args = new DownloadDataRequestArgs
-{
-    URL = "https://example.com/data.json"
-};
+var args = new DownloadDataRequestArgs(
+    url: "https://example.com/data.json",
+    timeout: 30,
+    watchdogTime: 0);
 
 IDownloadBytesRequest request = backend.CreateBytesRequest(args);
 request.SendRequest();
@@ -519,9 +530,9 @@ VirtualFileDownloader (独立实现) ──► IDownloadFileRequest
 
 提供跨平台的工具函数：
 
-| 方法 | 说明 |
+| 成员 | 说明 |
 |------|------|
-| `NewUnityWebRequestGet()` | 创建 GET 请求（支持自定义工厂） |
+| `UnityWebRequestCreater` | 兼容保留的全局 UnityWebRequest 创建委托（默认文件系统不再读取，推荐改为 FileSystemParameters 注入） |
 | `ConvertToWWWPath()` | 转换本地路径为 WWW 协议 URL |
 | `IsRequestLocalFile()` | 判断是否本地文件请求 |
 
@@ -543,6 +554,9 @@ int count = WebRequestCounter.GetRequestFailedCount(packageName, eventName);
 
 1. **资源释放**：使用完毕后务必调用 `Dispose()` 释放资源
 2. **断点续传**：需要服务器支持 `Range` 请求头和 `206 Partial Content` 响应
+   - 若服务端不支持 Range 仍返回 200，全量内容可能会被追加写入，导致文件损坏
 3. **看门狗超时**：设置为 0 表示禁用，建议根据网络环境设置合理值
 4. **内存下载**：`IDownloadBytesRequest` 会将整个响应体加载到内存，不适合大文件
-5. **线程安全**：所有下载请求的创建和轮询应在主线程进行
+5. **驱动更新**：部分第三方网络库实现的 backend 可能需要每帧调用 `IDownloadBackend.Update()` 进行驱动
+6. **中止语义**：`Aborted` 可能来自用户主动 `AbortRequest()` 或看门狗超时；中止场景下 `HttpCode/Error` 可能为默认值（例如 0/空）
+7. **线程安全**：所有下载请求的创建和轮询应在主线程进行
