@@ -41,9 +41,9 @@ namespace YooAsset
         public static int GetRequestFailedCount(string packageName, string eventName)
         {
             string key = $"{packageName}_{eventName}";
-            if (_requestFailedRecorder.ContainsKey(key) == false)
-                _requestFailedRecorder.Add(key, 0);
-            return _requestFailedRecorder[key];
+            if (_requestFailedRecorder.TryGetValue(key, out int count))
+                return count;
+            return 0;
         }
     }
 }

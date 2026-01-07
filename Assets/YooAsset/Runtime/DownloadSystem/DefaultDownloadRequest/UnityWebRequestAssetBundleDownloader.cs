@@ -75,6 +75,9 @@ namespace YooAsset
             }
             else
             {
+                if (string.IsNullOrEmpty(_args.FileHash))
+                    throw new YooInternalException("File hash is null or empty !");
+
                 // 使用 Unity 缓存
                 // 说明：The file hash defining the version of the asset bundle.
                 Hash128 fileHash = Hash128.Parse(_args.FileHash);

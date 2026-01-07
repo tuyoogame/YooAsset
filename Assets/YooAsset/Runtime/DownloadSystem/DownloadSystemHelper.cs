@@ -57,7 +57,7 @@ namespace YooAsset
 #elif UNITY_STANDALONE_LINUX
             url = StringUtility.Format("file:///root/{0}", path);
 #else
-            throw new System.NotImplementedException();
+            throw new System.NotSupportedException($"[{nameof(DownloadSystemHelper.ConvertToWWWPath)}] not implemented platform: {UnityEngine.Application.platform}");
 #endif
 
             // For some special cases when users have special characters in their devices, url paths can not be identified correctly.

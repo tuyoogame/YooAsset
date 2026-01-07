@@ -530,9 +530,8 @@ VirtualFileDownloader (独立实现) ──► IDownloadFileRequest
 
 提供跨平台的工具函数：
 
-| 成员 | 说明 |
+| 方法 | 说明 |
 |------|------|
-| `UnityWebRequestCreater` | 兼容保留的全局 UnityWebRequest 创建委托（默认文件系统不再读取，推荐改为 FileSystemParameters 注入） |
 | `ConvertToWWWPath()` | 转换本地路径为 WWW 协议 URL |
 | `IsRequestLocalFile()` | 判断是否本地文件请求 |
 
