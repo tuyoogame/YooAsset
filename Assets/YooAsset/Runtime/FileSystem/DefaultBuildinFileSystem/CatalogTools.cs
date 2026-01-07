@@ -205,6 +205,9 @@ namespace YooAsset
         /// </summary>
         public static DefaultBuildinFileCatalog DeserializeFromBinary(byte[] binaryData)
         {
+            if (binaryData == null || binaryData.Length == 0)
+                throw new Exception("Catalog file data is null or empty !");
+
             // 创建缓存器
             BufferReader buffer = new BufferReader(binaryData);
 

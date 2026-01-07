@@ -46,16 +46,7 @@ namespace YooAsset
         /// </summary>
         protected override void OnRequestSucceed()
         {
-            var fileData = _webRequest.downloadHandler.data;
-            if (fileData == null || fileData.Length == 0)
-            {
-                Status = EDownloadRequestStatus.Failed;
-                Error = $"[{GetType().Name}] URL: {URL} - Download bytes data is null or empty !";
-            }
-            else
-            {
-                Result = fileData;
-            }
+            Result = _webRequest.downloadHandler.data;
         }
     }
 }

@@ -202,7 +202,7 @@ namespace YooAsset
         protected UnityWebRequest CreateUnityWebRequestGet(string requestUrl)
         {
             if (_webRequestCreator != null)
-                return _webRequestCreator.Invoke(requestUrl);
+                return _webRequestCreator.Invoke(requestUrl, UnityWebRequest.kHttpVerbGET);
 
             return new UnityWebRequest(requestUrl, UnityWebRequest.kHttpVerbGET);
         }
@@ -214,6 +214,9 @@ namespace YooAsset
         /// <returns>UnityWebRequest 实例</returns>
         protected UnityWebRequest CreateUnityWebRequestHead(string requestUrl)
         {
+            if (_webRequestCreator != null)
+                return _webRequestCreator.Invoke(requestUrl, UnityWebRequest.kHttpVerbHEAD);
+
             return new UnityWebRequest(requestUrl, UnityWebRequest.kHttpVerbHEAD);
         }
 

@@ -268,9 +268,9 @@ public struct DownloadSimulateRequestArgs
 
 ```csharp
 // 自定义 UnityWebRequest 创建（建议通过 backend 构造函数传入）
-UnityWebRequestCreator creator = (url) =>
+UnityWebRequestCreator creator = (url, method) =>
 {
-    var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET);
+    var request = new UnityWebRequest(url, method);
     // 自定义配置...
     return request;
 };
@@ -540,6 +540,10 @@ VirtualFileDownloader (独立实现) ──► IDownloadFileRequest
 
 请求失败计数器，用于诊断统计：
 
+- 线程安全：内部使用 `Dictionary` 且未加锁，约定只在主线程调用；如需多线程统计请在外层加锁或改造实现
+- Key 规则：`$"{packageName}_{eventName}"`
+- 统计口径：**仅统计网络请求失败**（`IDownloadRequest.Status != Succeed` 时记录），不统计内容为空、校验失败、解析失败等业务层失败
+
 ```csharp
 // 记录失败
 WebRequestCounter.RecordRequestFailed(packageName, eventName);
@@ -553,6 +557,8 @@ int count = WebRequestCounter.GetRequestFailedCount(packageName, eventName);
 ## 注意事项
 
 1. **资源释放**：使用完毕后务必调用 `Dispose()` 释放资源
+   - `AbortRequest()` 仅用于中止请求与切换状态，不等同于释放资源；无论成功/失败/中止都需要 `Dispose()`
+   - 推荐使用 `try/finally` 确保释放（尤其是上层可能提前中止的场景）
 2. **断点续传**：需要服务器支持 `Range` 请求头和 `206 Partial Content` 响应
    - 若服务端不支持 Range 仍返回 200，全量内容可能会被追加写入，导致文件损坏
 3. **看门狗超时**：设置为 0 表示禁用，建议根据网络环境设置合理值
