@@ -109,6 +109,7 @@ namespace YooAsset
             foreach (var operation in _newList)
             {
                 operation.AbortOperation();
+                operation.FinishOperation(); //注意：强制收尾，确保Task能完成
             }
             _newList.Clear();
 
@@ -116,6 +117,7 @@ namespace YooAsset
             foreach (var operation in _operations)
             {
                 operation.AbortOperation();
+                operation.FinishOperation(); //注意：强制收尾，确保Task能完成
             }
             _operations.Clear();
         }
@@ -131,14 +133,14 @@ namespace YooAsset
             // 包含正在执行的任务
             foreach (var operation in _operations)
             {
-                var operationInfo = OperationSystem.GetDebugOperationInfo(operation);
+                var operationInfo = operation.GetDebugOperationInfo();
                 result.Add(operationInfo);
             }
 
             // 包含待处理的新任务
             foreach (var operation in _newList)
             {
-                var operationInfo = OperationSystem.GetDebugOperationInfo(operation);
+                var operationInfo = operation.GetDebugOperationInfo();
                 result.Add(operationInfo);
             }
 

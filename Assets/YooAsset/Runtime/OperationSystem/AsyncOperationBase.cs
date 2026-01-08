@@ -224,12 +224,12 @@ namespace YooAsset
                 InternalAbort();
                 Status = EOperationStatus.Failed;
                 Error = "user abort";
-                YooLogger.Warning($"Async operaiton {this.GetType().Name} has been abort !");
+                YooLogger.Warning($"Async operation {this.GetType().Name} has been aborted !");
             }
         }
 
         /// <summary>
-        /// 结束异步任务
+        /// 强制结束异步任务
         /// </summary>
         internal void FinishOperation()
         {
@@ -347,6 +347,25 @@ namespace YooAsset
             float m = UnityEngine.Mathf.FloorToInt(spawnTime / 60f - h * 60f);
             float s = UnityEngine.Mathf.FloorToInt(spawnTime - m * 60f - h * 3600f);
             return h.ToString("00") + ":" + m.ToString("00") + ":" + s.ToString("00");
+        }
+
+        internal DebugOperationInfo GetDebugOperationInfo()
+        {
+            var operationInfo = new DebugOperationInfo();
+            operationInfo.OperationName = this.GetType().Name;
+            operationInfo.OperationDesc = GetOperationDesc();
+            operationInfo.Priority = Priority;
+            operationInfo.Progress = Progress;
+            operationInfo.BeginTime = BeginTime;
+            operationInfo.ProcessTime = ProcessTime;
+            operationInfo.Status = Status.ToString();
+            operationInfo.Childs = new List<DebugOperationInfo>(Childs.Count);
+            foreach (var child in Childs)
+            {
+                var childInfo = child.GetDebugOperationInfo();
+                operationInfo.Childs.Add(childInfo);
+            }
+            return operationInfo;
         }
         #endregion
 

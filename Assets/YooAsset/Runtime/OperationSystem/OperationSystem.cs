@@ -229,25 +229,6 @@ namespace YooAsset
 
             return new List<DebugOperationInfo>();
         }
-
-        internal static DebugOperationInfo GetDebugOperationInfo(AsyncOperationBase operation)
-        {
-            var operationInfo = new DebugOperationInfo();
-            operationInfo.OperationName = operation.GetType().Name;
-            operationInfo.OperationDesc = operation.GetOperationDesc();
-            operationInfo.Priority = operation.Priority;
-            operationInfo.Progress = operation.Progress;
-            operationInfo.BeginTime = operation.BeginTime;
-            operationInfo.ProcessTime = operation.ProcessTime;
-            operationInfo.Status = operation.Status.ToString();
-            operationInfo.Childs = new List<DebugOperationInfo>(operation.Childs.Count);
-            foreach (var child in operation.Childs)
-            {
-                var childInfo = GetDebugOperationInfo(child);
-                operationInfo.Childs.Add(childInfo);
-            }
-            return operationInfo;
-        }
         #endregion
     }
 }
