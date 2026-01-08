@@ -108,9 +108,6 @@ namespace YooAsset
             _downloadingMaxNumber = UnityEngine.Mathf.Clamp(downloadingMaxNumber, 1, MAX_LOADER_COUNT); ;
             _failedTryAgain = failedTryAgain;
 
-            // 设置包裹名称 (fix #210)
-            SetPackageName(packageName);
-
             // 统计下载信息
             CalculatDownloaderInfo();
         }

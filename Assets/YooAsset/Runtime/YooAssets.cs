@@ -115,6 +115,16 @@ namespace YooAsset
         /// <param name="packageName">包裹名称</param>
         public static ResourcePackage CreatePackage(string packageName)
         {
+            return CreatePackage(packageName, 0);
+        }
+
+        /// <summary>
+        /// 创建资源包裹
+        /// </summary>
+        /// <param name="packageName">包裹名称</param>
+        /// <param name="packagePriority">包裹优先级（值越大越优先更新）</param>
+        public static ResourcePackage CreatePackage(string packageName, int packagePriority)
+        {
             CheckException(packageName);
             if (ContainsPackage(packageName))
                 throw new YooPackageException(packageName, $"Package {packageName} already existed ! Cannot create duplicate packages.");
@@ -122,6 +132,10 @@ namespace YooAsset
             YooLogger.Log($"Create resource package : {packageName}");
             ResourcePackage package = new ResourcePackage(packageName);
             _packages.Add(package);
+
+            // 注册包裹调度器
+            OperationSystem.CreatePackageScheduler(packageName, packagePriority);
+
             return package;
         }
 
@@ -185,6 +199,10 @@ namespace YooAsset
             }
 
             YooLogger.Log($"Remove resource package : {packageName}");
+
+            // 先销毁调度器，再移除包裹
+            OperationSystem.DestroyPackageScheduler(packageName);
+
             _packages.Remove(package);
             return true;
         }

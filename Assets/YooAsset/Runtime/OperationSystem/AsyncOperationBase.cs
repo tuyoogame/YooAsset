@@ -9,7 +9,6 @@ namespace YooAsset
     public abstract class AsyncOperationBase : IEnumerator, IComparable<AsyncOperationBase>
     {
         private Action<AsyncOperationBase> _callback;
-        private string _packageName = null;
         private int _whileFrame = 1000;
 
         /// <summary>
@@ -48,17 +47,6 @@ namespace YooAsset
         public float Progress { get; protected set; }
 
         /// <summary>
-        /// 所属包裹名称
-        /// </summary>
-        public string PackageName
-        {
-            get
-            {
-                return _packageName;
-            }
-        }
-
-        /// <summary>
         /// 是否已经完成
         /// </summary>
         public bool IsDone
@@ -76,10 +64,24 @@ namespace YooAsset
         {
             add
             {
+                if (value == null)
+                    return;
+
                 if (IsDone)
-                    value.Invoke(this);
+                {
+                    try
+                    {
+                        value.Invoke(this);
+                    }
+                    catch (Exception ex)
+                    {
+                        YooLogger.Error($"Exception in completion callback: {ex}");
+                    }
+                }
                 else
+                {
                     _callback += value;
+                }
             }
             remove
             {
@@ -116,14 +118,6 @@ namespace YooAsset
         internal virtual string InternalGetDesc()
         {
             return string.Empty;
-        }
-
-        /// <summary>
-        /// 设置包裹名称
-        /// </summary>
-        internal void SetPackageName(string packageName)
-        {
-            _packageName = packageName;
         }
 
         /// <summary>
@@ -194,8 +188,6 @@ namespace YooAsset
             if (IsDone && IsFinish == false)
             {
                 IsFinish = true;
-
-                // 进度百分百完成
                 Progress = 1f;
 
                 // 结束记录
@@ -229,10 +221,28 @@ namespace YooAsset
 
             if (IsDone == false)
             {
+                InternalAbort();
                 Status = EOperationStatus.Failed;
                 Error = "user abort";
                 YooLogger.Warning($"Async operaiton {this.GetType().Name} has been abort !");
-                InternalAbort();
+            }
+        }
+
+        /// <summary>
+        /// 结束异步任务
+        /// </summary>
+        internal void FinishOperation()
+        {
+            if (IsFinish == false)
+            {
+                IsFinish = true;
+                Progress = 1f;
+
+                // 结束记录
+                DebugEndRecording();
+
+                if (_taskCompletionSource != null)
+                    _taskCompletionSource.TrySetResult(null);
             }
         }
 

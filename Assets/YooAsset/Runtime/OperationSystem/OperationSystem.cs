@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,8 +15,14 @@ namespace YooAsset
         }
 #endif
 
-        private static readonly List<AsyncOperationBase> _operations = new List<AsyncOperationBase>(1000);
-        private static readonly List<AsyncOperationBase> _newList = new List<AsyncOperationBase>(1000);
+        // 全局调度器名称
+        public const string GLOBAL_SCHEDULER_NAME = "";
+
+        private static readonly Dictionary<string, OperationScheduler> _schedulerDic = new Dictionary<string, OperationScheduler>(100);
+        private static readonly List<OperationScheduler> _schedulerList = new List<OperationScheduler>(100);
+        private static bool _schedulerListDirty = false;
+        private static int _createIndex = 0;
+
         private static Action<string, AsyncOperationBase> _startCallback = null;
         private static Action<string, AsyncOperationBase> _finishCallback = null;
 
@@ -25,12 +31,12 @@ namespace YooAsset
         private static long _frameTime;
 
         /// <summary>
-        /// 异步操作的最小时间片段
+        /// 异步操作系统的每帧最大执行预算（毫秒）
         /// </summary>
         public static long MaxTimeSlice { set; get; } = long.MaxValue;
 
         /// <summary>
-        /// 处理器是否繁忙
+        /// 异步操作系统是否繁忙
         /// </summary>
         public static bool IsBusy
         {
@@ -39,7 +45,10 @@ namespace YooAsset
                 if (_watch == null)
                     return false;
 
-                // NOTE : 单次调用开销约1微秒
+                if (MaxTimeSlice == long.MaxValue)
+                    return false;
+
+                // 注意 : 单次调用开销约1微秒
                 return _watch.ElapsedMilliseconds - _frameTime >= MaxTimeSlice;
             }
         }
@@ -51,6 +60,9 @@ namespace YooAsset
         public static void Initialize()
         {
             _watch = Stopwatch.StartNew();
+
+            // 创建全局调度器
+            CreatePackageScheduler(GLOBAL_SCHEDULER_NAME, 0);
         }
 
         /// <summary>
@@ -58,54 +70,23 @@ namespace YooAsset
         /// </summary>
         public static void Update()
         {
-            // 移除已经完成的异步操作
-            // 注意：移除上一帧完成的异步操作，方便调试器接收到完整的信息！
-            for (int i = _operations.Count - 1; i >= 0; i--)
+            // 重新排序调度器
+            if (_schedulerListDirty)
             {
-                var operation = _operations[i];
-                if (operation.IsFinish)
-                {
-                    _operations.RemoveAt(i);
-
-                    if (_finishCallback != null)
-                        _finishCallback.Invoke(operation.PackageName, operation);
-                }
+                _schedulerListDirty = false;
+                _schedulerList.Sort();
             }
 
-            // 添加新增的异步操作
-            if (_newList.Count > 0)
-            {
-                bool sorting = false;
-                foreach (var operation in _newList)
-                {
-                    if (operation.Priority > 0)
-                    {
-                        sorting = true;
-                        break;
-                    }
-                }
-
-                _operations.AddRange(_newList);
-                _newList.Clear();
-
-                // 重新排序优先级
-                if (sorting)
-                    _operations.Sort();
-            }
-
-            // 更新进行中的异步操作
-            bool checkBusy = MaxTimeSlice < long.MaxValue;
+            // 更新帧时间
             _frameTime = _watch.ElapsedMilliseconds;
-            for (int i = 0; i < _operations.Count; i++)
+
+            // 更新调度器
+            for (int i = 0; i < _schedulerList.Count; i++)
             {
-                if (checkBusy && IsBusy)
+                if (IsBusy)
                     break;
 
-                var operation = _operations[i];
-                if (operation.IsFinish)
-                    continue;
-
-                operation.UpdateOperation();
+                _schedulerList[i].Update();
             }
         }
 
@@ -114,8 +95,16 @@ namespace YooAsset
         /// </summary>
         public static void DestroyAll()
         {
-            _operations.Clear();
-            _newList.Clear();
+            // 清空所有调度器
+            foreach (var scheduler in _schedulerList)
+            {
+                scheduler.ClearAll();
+            }
+            _schedulerDic.Clear();
+            _schedulerList.Clear();
+            _schedulerListDirty = false;
+            _createIndex = 0;
+
             _startCallback = null;
             _finishCallback = null;
             _watch = null;
@@ -124,27 +113,47 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 创建包裹调度器
+        /// </summary>
+        internal static void CreatePackageScheduler(string packageName, int priority)
+        {
+            if (_schedulerDic.ContainsKey(packageName))
+            {
+                throw new YooInternalException($"Package scheduler already exists: {packageName}");
+            }
+
+            var scheduler = new OperationScheduler(packageName, priority, _createIndex++);
+            _schedulerDic.Add(packageName, scheduler);
+            _schedulerList.Add(scheduler);
+            _schedulerListDirty = true;
+        }
+
+        /// <summary>
+        /// 销毁包裹调度器
+        /// </summary>
+        internal static void DestroyPackageScheduler(string packageName)
+        {
+            // 不允许销毁默认调度器
+            if (packageName == GLOBAL_SCHEDULER_NAME)
+            {
+                throw new YooInternalException("Cannot destroy the global package scheduler!");
+            }
+
+            if (_schedulerDic.TryGetValue(packageName, out var scheduler))
+            {
+                scheduler.ClearAll();
+                _schedulerDic.Remove(packageName);
+                _schedulerList.Remove(scheduler);
+            }
+        }
+
+        /// <summary>
         /// 销毁包裹的所有任务
         /// </summary>
         public static void ClearPackageOperation(string packageName)
         {
-            // 终止临时队列里的任务
-            foreach (var operation in _newList)
-            {
-                if (operation.PackageName == packageName)
-                {
-                    operation.AbortOperation();
-                }
-            }
-
-            // 终止正在进行的任务
-            foreach (var operation in _operations)
-            {
-                if (operation.PackageName == packageName)
-                {
-                    operation.AbortOperation();
-                }
-            }
+            var scheduler = GetScheduler(packageName);
+            scheduler.ClearAll();
         }
 
         /// <summary>
@@ -152,12 +161,8 @@ namespace YooAsset
         /// </summary>
         public static void StartOperation(string packageName, AsyncOperationBase operation)
         {
-            _newList.Add(operation);
-            operation.SetPackageName(packageName);
-            operation.StartOperation();
-
-            if (_startCallback != null)
-                _startCallback.Invoke(packageName, operation);
+            var scheduler = GetScheduler(packageName);
+            scheduler.StartOperation(operation);
         }
 
         /// <summary>
@@ -176,20 +181,55 @@ namespace YooAsset
             _finishCallback = callback;
         }
 
+        /// <summary>
+        /// 触发任务开始回调
+        /// </summary>
+        internal static void InvokeStartCallback(string packageName, AsyncOperationBase operation)
+        {
+            _startCallback?.Invoke(packageName, operation);
+        }
+
+        /// <summary>
+        /// 触发任务完成回调
+        /// </summary>
+        internal static void InvokeFinishCallback(string packageName, AsyncOperationBase operation)
+        {
+            _finishCallback?.Invoke(packageName, operation);
+        }
+
+        /// <summary>
+        /// 获取调度器（严格模式）
+        /// </summary>
+        private static OperationScheduler GetScheduler(string packageName)
+        {
+            // 空包名路由到默认调度器
+            if (string.IsNullOrEmpty(packageName))
+                packageName = GLOBAL_SCHEDULER_NAME;
+
+            if (_schedulerDic.TryGetValue(packageName, out var scheduler))
+            {
+                return scheduler;
+            }
+
+            // 严格模式：非默认包裹必须先创建调度器
+            throw new YooInternalException($"Package scheduler not found: {packageName}. Please call YooAssets.CreatePackage() first!");
+        }
+
         #region 调试信息
         internal static List<DebugOperationInfo> GetDebugOperationInfos(string packageName)
         {
-            List<DebugOperationInfo> result = new List<DebugOperationInfo>(_operations.Count);
-            foreach (var operation in _operations)
+            // 空包名路由到默认调度器
+            if (string.IsNullOrEmpty(packageName))
+                packageName = GLOBAL_SCHEDULER_NAME;
+
+            if (_schedulerDic.TryGetValue(packageName, out var scheduler))
             {
-                if (operation.PackageName == packageName)
-                {
-                    var operationInfo = GetDebugOperationInfo(operation);
-                    result.Add(operationInfo);
-                }
+                return scheduler.GetDebugOperationInfos();
             }
-            return result;
+
+            return new List<DebugOperationInfo>();
         }
+
         internal static DebugOperationInfo GetDebugOperationInfo(AsyncOperationBase operation)
         {
             var operationInfo = new DebugOperationInfo();
