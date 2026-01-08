@@ -64,7 +64,7 @@ namespace YooAsset
                     string bundleGUID = _unusedBundleGUIDs[i];
                     _fileSystem.DeleteCacheBundleFile(bundleGUID);
                     _unusedBundleGUIDs.RemoveAt(i);
-                    if (OperationSystem.IsBusy)
+                    if (IsBusy)
                         break;
                 }
 

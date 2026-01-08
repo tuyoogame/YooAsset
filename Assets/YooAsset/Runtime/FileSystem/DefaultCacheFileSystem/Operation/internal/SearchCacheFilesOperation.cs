@@ -102,7 +102,7 @@ namespace YooAsset
                     Result.Add(element);
                 }
 
-                if (OperationSystem.IsBusy)
+                if (IsBusy)
                     break;
             }
 

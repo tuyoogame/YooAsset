@@ -159,11 +159,8 @@ namespace YooAsset
 
                         _packageAssetCount--;
                         Progress = 1f - _packageAssetCount / _progressTotalValue;
-                        if (IsWaitForAsyncComplete == false)
-                        {
-                            if (OperationSystem.IsBusy)
-                                break;
-                        }
+                        if (IsBusy)
+                            break;
                     }
 
                     if (_packageAssetCount <= 0)
@@ -196,11 +193,8 @@ namespace YooAsset
 
                         _packageBundleCount--;
                         Progress = 1f - _packageBundleCount / _progressTotalValue;
-                        if (IsWaitForAsyncComplete == false)
-                        {
-                            if (OperationSystem.IsBusy)
-                                break;
-                        }
+                        if (IsBusy)
+                            break;
                     }
 
                     if (_packageBundleCount <= 0)

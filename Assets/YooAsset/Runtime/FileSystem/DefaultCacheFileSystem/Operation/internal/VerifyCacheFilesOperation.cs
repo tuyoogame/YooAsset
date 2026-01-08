@@ -90,7 +90,7 @@ namespace YooAsset
 
                 for (int i = _waitingList.Count - 1; i >= 0; i--)
                 {
-                    if (OperationSystem.IsBusy)
+                    if (IsBusy)
                         break;
 
                     if (_verifyingList.Count >= _verifyMaxNum)

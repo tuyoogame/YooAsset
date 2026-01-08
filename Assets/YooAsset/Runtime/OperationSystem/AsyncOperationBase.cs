@@ -8,13 +8,9 @@ namespace YooAsset
 {
     public abstract class AsyncOperationBase : IEnumerator, IComparable<AsyncOperationBase>
     {
+        private List<AsyncOperationBase> _childs;
         private Action<AsyncOperationBase> _callback;
         private int _whileFrame = 1000;
-
-        /// <summary>
-        /// 所有子任务
-        /// </summary>
-        internal readonly List<AsyncOperationBase> Childs = new List<AsyncOperationBase>(10);
 
         /// <summary>
         /// 等待异步执行完成
@@ -25,6 +21,19 @@ namespace YooAsset
         /// 是否已经完成
         /// </summary>
         internal bool IsFinish { private set; get; } = false;
+
+        /// <summary>
+        /// 异步系统是否繁忙
+        /// </summary>
+        internal bool IsBusy
+        {
+            get
+            {
+                if (IsWaitForAsyncComplete)
+                    return false;
+                return OperationSystem.IsBusy;
+            }
+        }
 
         /// <summary>
         /// 任务优先级
@@ -125,12 +134,15 @@ namespace YooAsset
         /// </summary>
         internal void AddChildOperation(AsyncOperationBase child)
         {
+            if (_childs == null)
+                _childs = new List<AsyncOperationBase>(10);
+
 #if UNITY_EDITOR
-            if (Childs.Contains(child))
+            if (_childs.Contains(child))
                 throw new YooInternalException($"The child node {child.GetType().Name} already exists !");
 #endif
 
-            Childs.Add(child);
+            _childs.Add(child);
         }
 
         /// <summary>
@@ -138,12 +150,15 @@ namespace YooAsset
         /// </summary>
         internal void RemoveChildOperation(AsyncOperationBase child)
         {
+            if (_childs == null)
+                return;
+
 #if UNITY_EDITOR
-            if (Childs.Contains(child) == false)
+            if (_childs.Contains(child) == false)
                 throw new YooInternalException($"The child node {child.GetType().Name} not exists !");
 #endif
 
-            Childs.Remove(child);
+            _childs.Remove(child);
         }
 
         /// <summary>
@@ -187,25 +202,7 @@ namespace YooAsset
 
             if (IsDone && IsFinish == false)
             {
-                IsFinish = true;
-                Progress = 1f;
-
-                // 结束记录
-                DebugEndRecording();
-
-                try
-                {
-                    _callback?.Invoke(this);
-                }
-                catch (Exception ex)
-                {
-                    YooLogger.Error($"Exception in completion callback: {ex}");
-                }
-                finally
-                {
-                    if (_taskCompletionSource != null)
-                        _taskCompletionSource.TrySetResult(null);
-                }
+                FinishOperation();
             }
         }
 
@@ -214,9 +211,12 @@ namespace YooAsset
         /// </summary>
         internal void AbortOperation()
         {
-            foreach (var child in Childs)
+            if (_childs != null)
             {
-                child.AbortOperation();
+                foreach (var child in _childs)
+                {
+                    child.AbortOperation();
+                }
             }
 
             if (IsDone == false)
@@ -241,8 +241,20 @@ namespace YooAsset
                 // 结束记录
                 DebugEndRecording();
 
-                if (_taskCompletionSource != null)
-                    _taskCompletionSource.TrySetResult(null);
+                try
+                {
+                    _callback?.Invoke(this);
+                }
+                catch (Exception ex)
+                {
+                    YooLogger.Error($"Exception in completion callback: {ex}");
+                }
+                finally
+                {
+                    _callback = null;
+                    if (_taskCompletionSource != null)
+                        _taskCompletionSource.TrySetResult(null);
+                }
             }
         }
 
@@ -269,14 +281,6 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 清空完成回调
-        /// </summary>
-        protected void ClearCompletedCallback()
-        {
-            _callback = null;
-        }
-
-        /// <summary>
         /// 等待异步执行完毕
         /// </summary>
         public void WaitForAsyncComplete()
@@ -295,6 +299,11 @@ namespace YooAsset
             {
                 IsWaitForAsyncComplete = true;
                 InternalWaitForAsyncComplete();
+
+#if UNITY_EDITOR
+                if (IsDone == false)
+                    throw new YooInternalException($"WaitForAsyncComplete() must complete operation: {this.GetType().Name}");
+#endif
             }
         }
 
@@ -359,12 +368,21 @@ namespace YooAsset
             operationInfo.BeginTime = BeginTime;
             operationInfo.ProcessTime = ProcessTime;
             operationInfo.Status = Status.ToString();
-            operationInfo.Childs = new List<DebugOperationInfo>(Childs.Count);
-            foreach (var child in Childs)
+
+            if (_childs == null)
             {
-                var childInfo = child.GetDebugOperationInfo();
-                operationInfo.Childs.Add(childInfo);
+                operationInfo.Childs = new List<DebugOperationInfo>();
             }
+            else
+            {
+                operationInfo.Childs = new List<DebugOperationInfo>(_childs.Count);
+                foreach (var child in _childs)
+                {
+                    var childInfo = child.GetDebugOperationInfo();
+                    operationInfo.Childs.Add(childInfo);
+                }
+            }
+
             return operationInfo;
         }
         #endregion

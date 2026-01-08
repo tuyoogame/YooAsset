@@ -40,11 +40,8 @@ namespace YooAsset
                     _loopCounter--;
                     LoopUnloadUnused();
 
-                    if (IsWaitForAsyncComplete == false)
-                    {
-                        if (OperationSystem.IsBusy)
-                            break;
-                    }
+                    if (IsBusy)
+                        break;
                 }
 
                 if (_loopCounter <= 0)
