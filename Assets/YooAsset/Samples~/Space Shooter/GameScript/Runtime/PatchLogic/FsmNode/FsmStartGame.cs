@@ -2,19 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
+using YooAsset;
 
 internal class FsmStartGame : IStateNode
 {
-    private PatchOperation _owner;
-
     void IStateNode.OnCreate(StateMachine machine)
     {
-        _owner = machine.Owner as PatchOperation;
     }
     void IStateNode.OnEnter()
     {
         PatchEventDefine.PatchStepsChange.SendEventMessage("开始游戏！");
-        _owner.SetFinish();
+
+        // 设置默认的资源包
+        GameManager.Instance.GamePakcage  = YooAssets.GetPackage("DefaultPackage");
+
+        // 切换到主页面场景
+        SceneEventDefine.ChangeToHomeScene.SendEventMessage();
     }
     void IStateNode.OnUpdate()
     {

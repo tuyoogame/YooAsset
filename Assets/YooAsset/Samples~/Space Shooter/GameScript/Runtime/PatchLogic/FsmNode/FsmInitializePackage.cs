@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,18 +32,22 @@ internal class FsmInitializePackage : IStateNode
         var packageName = (string)_machine.GetBlackboardValue("PackageName");
 
         // 创建资源包裹类
-        var package = YooAssets.TryGetPackage(packageName);
-        if (package == null)
+        if (!YooAssets.TryGetPackage(packageName, out var package))
             package = YooAssets.CreatePackage(packageName);
 
         // 编辑器下的模拟模式
         InitializationOperation initializationOperation = null;
         if (playMode == EPlayMode.EditorSimulateMode)
         {
-            var buildResult = EditorSimulateModeHelper.SimulateBuild(packageName);
+            var buildResult = EditorSimulateBuildInvoker.Build(packageName, (int)EBundleType.VirtualBundle);
             var packageRoot = buildResult.PackageRootDirectory;
             var createParameters = new EditorSimulateModeParameters();
             createParameters.EditorFileSystemParameters = FileSystemParameters.CreateDefaultEditorFileSystemParameters(packageRoot);
+            createParameters.EditorFileSystemParameters.AddParameter(EFileSystemParameter.VirtualWebglMode, true);
+            createParameters.EditorFileSystemParameters.AddParameter(EFileSystemParameter.VirtualDownloadMode, true);
+            createParameters.EditorFileSystemParameters.AddParameter(EFileSystemParameter.VirtualDownloadSpeed, 1024 * 1000);
+            createParameters.EditorFileSystemParameters.AddParameter(EFileSystemParameter.AsyncSimulateMinFrame, 5);
+            createParameters.EditorFileSystemParameters.AddParameter(EFileSystemParameter.AsyncSimulateMaxFrame, 10);
             initializationOperation = package.InitializeAsync(createParameters);
         }
 
@@ -51,7 +55,7 @@ internal class FsmInitializePackage : IStateNode
         if (playMode == EPlayMode.OfflinePlayMode)
         {
             var createParameters = new OfflinePlayModeParameters();
-            createParameters.BuildinFileSystemParameters = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
+            createParameters.BuiltinFileSystemParameters = FileSystemParameters.CreateDefaultBuiltinFileSystemParameters();
             initializationOperation = package.InitializeAsync(createParameters);
         }
 
@@ -60,10 +64,14 @@ internal class FsmInitializePackage : IStateNode
         {
             string defaultHostServer = GetHostServerURL();
             string fallbackHostServer = GetHostServerURL();
-            IRemoteServices remoteServices = new RemoteServices(defaultHostServer, fallbackHostServer);
+            IRemoteService remoteService = new RemoteService(defaultHostServer, fallbackHostServer);
             var createParameters = new HostPlayModeParameters();
-            createParameters.BuildinFileSystemParameters = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
-            createParameters.CacheFileSystemParameters = FileSystemParameters.CreateDefaultCacheFileSystemParameters(remoteServices);
+            createParameters.BuiltinFileSystemParameters = FileSystemParameters.CreateDefaultBuiltinFileSystemParameters();
+            createParameters.BuiltinFileSystemParameters.AddParameter(EFileSystemParameter.CopyBuiltinPackageManifest, true);
+            createParameters.CacheFileSystemParameters = FileSystemParameters.CreateDefaultSandboxFileSystemParameters(remoteService);
+            createParameters.CacheFileSystemParameters.AddParameter(EFileSystemParameter.DownloadMaxConcurrency, 5);
+            createParameters.CacheFileSystemParameters.AddParameter(EFileSystemParameter.DownloadMaxRequestPerFrame, 1);
+            createParameters.CacheFileSystemParameters.AddParameter(EFileSystemParameter.DownloadWatchdogTimeout, 10);
             initializationOperation = package.InitializeAsync(createParameters);
         }
 
@@ -75,8 +83,8 @@ internal class FsmInitializePackage : IStateNode
 			string defaultHostServer = GetHostServerURL();
             string fallbackHostServer = GetHostServerURL();
             string packageRoot = $"{WeChatWASM.WX.env.USER_DATA_PATH}/__GAME_FILE_CACHE"; //注意：如果有子目录，请修改此处！
-            IRemoteServices remoteServices = new RemoteServices(defaultHostServer, fallbackHostServer);
-            createParameters.WebServerFileSystemParameters = WechatFileSystemCreater.CreateFileSystemParameters(packageRoot, remoteServices);
+            IRemoteService remoteService = new RemoteService(defaultHostServer, fallbackHostServer);
+            createParameters.WebServerFileSystemParameters = WechatFileSystemCreater.CreateFileSystemParameters(packageRoot, remoteService);
             initializationOperation = package.InitializeAsync(createParameters);
 #else
             var createParameters = new WebPlayModeParameters();
@@ -88,7 +96,7 @@ internal class FsmInitializePackage : IStateNode
         yield return initializationOperation;
 
         // 如果初始化失败弹出提示界面
-        if (initializationOperation.Status != EOperationStatus.Succeed)
+        if (initializationOperation.Status != EOperationStatus.Succeeded)
         {
             Debug.LogWarning($"{initializationOperation.Error}");
             PatchEventDefine.InitializeFailed.SendEventMessage();
@@ -132,23 +140,22 @@ internal class FsmInitializePackage : IStateNode
     /// <summary>
     /// 远端资源地址查询服务类
     /// </summary>
-    private class RemoteServices : IRemoteServices
+    private class RemoteService : IRemoteService
     {
         private readonly string _defaultHostServer;
         private readonly string _fallbackHostServer;
 
-        public RemoteServices(string defaultHostServer, string fallbackHostServer)
+        public RemoteService(string defaultHostServer, string fallbackHostServer)
         {
             _defaultHostServer = defaultHostServer;
             _fallbackHostServer = fallbackHostServer;
         }
-        string IRemoteServices.GetRemoteMainURL(string fileName)
+        public IReadOnlyList<string> GetRemoteUrls(string fileName)
         {
-            return $"{_defaultHostServer}/{fileName}";
-        }
-        string IRemoteServices.GetRemoteFallbackURL(string fileName)
-        {
-            return $"{_fallbackHostServer}/{fileName}";
+            List<string> result = new List<string>();
+            result.Add($"{_defaultHostServer}/{fileName}");
+            result.Add($"{_fallbackHostServer}/{fileName}");
+            return result;
         }
     }
 }

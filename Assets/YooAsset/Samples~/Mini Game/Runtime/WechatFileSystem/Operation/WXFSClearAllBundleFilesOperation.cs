@@ -1,11 +1,8 @@
-﻿#if UNITY_WEBGL && WEIXINMINIGAME
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+#if UNITY_WEBGL && WEIXINMINIGAME
 using YooAsset;
 using WeChatWASM;
 
-internal class WXFSClearAllBundleFilesOperation : FSClearCacheFilesOperation
+internal sealed class WXFSClearAllBundleFilesOperation : FSClearCacheOperation
 {
     private enum ESteps
     {
@@ -22,11 +19,11 @@ internal class WXFSClearAllBundleFilesOperation : FSClearCacheFilesOperation
     {
         _fileSystem = fileSystem;
     }
-    internal override void InternalStart()
+    protected override void InternalStart()
     {
         _steps = ESteps.ClearAllCacheFiles;
     }
-    internal override void InternalUpdate()
+    protected override void InternalUpdate()
     {
         if (_steps == ESteps.None || _steps == ESteps.Done)
             return;
@@ -41,14 +38,13 @@ internal class WXFSClearAllBundleFilesOperation : FSClearCacheFilesOperation
                 {
                     YooLogger.Log("微信缓存清理成功！");
                     _steps = ESteps.Done;
-                    Status = EOperationStatus.Succeed;
+                    SetResult();
                 }
                 else
                 {
                     YooLogger.Log("微信缓存清理失败！");
                     _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = "微信缓存清理失败！";
+                    SetError("微信缓存清理失败！");
                 }
             });
         }

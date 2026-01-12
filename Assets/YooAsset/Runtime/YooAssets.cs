@@ -7,60 +7,66 @@ using UnityEngine;
 
 namespace YooAsset
 {
+    /// <summary>
+    /// 资源系统的主入口
+    /// </summary>
     public static partial class YooAssets
     {
 #if UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void OnRuntimeInitialize()
         {
-            _isInitialize = false;
-            _packages.Clear();
-            _defaultPackage = null;
+            s_isInitialized = false;
+            s_driver = null;
+            s_packages.Clear();
         }
 #endif
 
-        private static bool _isInitialize = false;
-        private static GameObject _driver = null;
-        private static readonly List<ResourcePackage> _packages = new List<ResourcePackage>();
+        private static bool s_isInitialized;
+        private static GameObject s_driver;
+        private static readonly Dictionary<string, ResourcePackage> s_packages = new Dictionary<string, ResourcePackage>(10);
 
         /// <summary>
         /// 是否已经初始化
         /// </summary>
-        public static bool Initialized
+        public static bool IsInitialized
         {
-            get { return _isInitialize; }
+            get { return s_isInitialized; }
+        }
+
+        /// <summary>
+        /// 初始化资源系统
+        /// </summary>
+        public static void Initialize()
+        {
+            Initialize(null);
         }
 
         /// <summary>
         /// 初始化资源系统
         /// </summary>
         /// <param name="logger">自定义日志处理</param>
-        public static void Initialize(ILogger logger = null)
+        public static void Initialize(ILogger logger)
         {
-            if (_isInitialize)
-            {
-                UnityEngine.Debug.LogWarning($"{nameof(YooAssets)} is initialized !");
-                return;
-            }
+            if (s_isInitialized)
+                throw new System.InvalidOperationException("YooAssets is already initialized.");
 
-            if (_isInitialize == false)
-            {
-                YooLogger.Logger = logger;
+            YooLogger.Current = logger;
 
-                // 创建驱动器
-                _isInitialize = true;
-                _driver = new UnityEngine.GameObject($"[{nameof(YooAssets)}]");
-                _driver.AddComponent<YooAssetsDriver>();
-                UnityEngine.Object.DontDestroyOnLoad(_driver);
-                YooLogger.Log($"{nameof(YooAssets)} initialize !");
+            // 创建驱动器
+            s_driver = new UnityEngine.GameObject($"[{nameof(YooAssets)}]");
+            s_driver.AddComponent<YooAssetsDriver>();
+            UnityEngine.Object.DontDestroyOnLoad(s_driver);
 
 #if DEBUG
-                // 添加远程调试脚本
-                _driver.AddComponent<RemoteDebuggerInRuntime>();
+            // 添加远程调试脚本
+            s_driver.AddComponent<DiagnosticBehaviour>();
 #endif
 
-                OperationSystem.Initialize();
-            }
+            // 初始化异步操作系统
+            AsyncOperationSystem.Initialize();
+
+            s_isInitialized = true;
         }
 
         /// <summary>
@@ -68,21 +74,26 @@ namespace YooAsset
         /// </summary>
         public static void Destroy()
         {
-            if (_isInitialize)
+            if (s_isInitialized)
             {
-                _isInitialize = false;
+                s_isInitialized = false;
 
-                if (_driver != null)
-                    GameObject.Destroy(_driver);
+                // 销毁驱动器
+                if (s_driver != null)
+                {
+                    GameObject.Destroy(s_driver);
+                    s_driver = null;
+                }
 
-                // 终止并清空所有包裹的异步操作
-                ClearAllPackageOperation();
-
-                // 卸载所有AssetBundle
-                AssetBundle.UnloadAllAssetBundles(true);
+                // 销毁异步操作系统
+                AsyncOperationSystem.Shutdown();
 
                 // 清空资源包裹列表
-                _packages.Clear();
+                foreach (var kv in s_packages)
+                {
+                    kv.Value.InternalDestroy();
+                }
+                s_packages.Clear();
             }
         }
 
@@ -91,28 +102,17 @@ namespace YooAsset
         /// </summary>
         internal static void Update()
         {
-            if (_isInitialize)
+            if (s_isInitialized)
             {
-                OperationSystem.Update();
+                AsyncOperationSystem.Update();
             }
-        }
-
-        /// <summary>
-        /// 终止并清空所有包裹的异步操作
-        /// </summary>
-        internal static void ClearAllPackageOperation()
-        {
-            foreach (var package in _packages)
-            {
-                OperationSystem.ClearPackageOperation(package.PackageName);
-            }
-            OperationSystem.DestroyAll();
         }
 
         /// <summary>
         /// 创建资源包裹
         /// </summary>
         /// <param name="packageName">包裹名称</param>
+        /// <returns>新创建的资源包裹实例</returns>
         public static ResourcePackage CreatePackage(string packageName)
         {
             return CreatePackage(packageName, 0);
@@ -123,18 +123,18 @@ namespace YooAsset
         /// </summary>
         /// <param name="packageName">包裹名称</param>
         /// <param name="packagePriority">包裹优先级（值越大越优先更新）</param>
-        public static ResourcePackage CreatePackage(string packageName, int packagePriority)
+        /// <returns>新创建的资源包裹实例</returns>
+        public static ResourcePackage CreatePackage(string packageName, uint packagePriority)
         {
-            CheckException(packageName);
+            CheckInitialized(packageName);
             if (ContainsPackage(packageName))
-                throw new YooPackageException(packageName, $"Package {packageName} already existed ! Cannot create duplicate packages.");
+                throw new System.InvalidOperationException($"Resource package '{packageName}' already exists.");
 
-            YooLogger.Log($"Create resource package : {packageName}");
             ResourcePackage package = new ResourcePackage(packageName);
-            _packages.Add(package);
+            s_packages.Add(packageName, package);
 
             // 注册包裹调度器
-            OperationSystem.CreatePackageScheduler(packageName, packagePriority);
+            AsyncOperationSystem.CreatePackageScheduler(packageName, packagePriority);
 
             return package;
         }
@@ -143,12 +143,13 @@ namespace YooAsset
         /// 获取资源包裹
         /// </summary>
         /// <param name="packageName">包裹名称</param>
+        /// <returns>指定名称的资源包裹实例</returns>
         public static ResourcePackage GetPackage(string packageName)
         {
-            CheckException(packageName);
+            CheckInitialized(packageName);
             var package = GetPackageInternal(packageName);
             if (package == null)
-                YooLogger.Error($"Can not found resource package : {packageName}");
+                throw new System.InvalidOperationException($"Could not find resource package: '{packageName}'.");
             return package;
         }
 
@@ -156,139 +157,101 @@ namespace YooAsset
         /// 尝试获取资源包裹
         /// </summary>
         /// <param name="packageName">包裹名称</param>
-        public static ResourcePackage TryGetPackage(string packageName)
+        /// <param name="package">获取到的资源包裹，如果不存在则为null。</param>
+        /// <returns>如果资源包裹存在返回true，否则返回false。</returns>
+        public static bool TryGetPackage(string packageName, out ResourcePackage package)
         {
-            CheckException(packageName);
-            return GetPackageInternal(packageName);
+            CheckInitialized(packageName);
+            package = GetPackageInternal(packageName);
+            return package != null;
         }
 
         /// <summary>
         /// 获取所有资源包裹
         /// </summary>
-        public static List<ResourcePackage> GetAllPackages()
+        /// <returns>当前已注册的所有资源包裹的只读列表</returns>
+        public static IReadOnlyList<ResourcePackage> GetPackages()
         {
-            return _packages.ToList();
+            CheckInitialized();
+            return s_packages.Values.ToList().AsReadOnly();
         }
 
         /// <summary>
         /// 移除资源包裹
         /// </summary>
         /// <param name="packageName">包裹名称</param>
-        public static bool RemovePackage(string packageName)
+        public static void RemovePackage(string packageName)
         {
-            CheckException(packageName);
+            CheckInitialized(packageName);
             ResourcePackage package = GetPackageInternal(packageName);
             if (package == null)
-                return false;
+                throw new System.InvalidOperationException($"Could not find resource package: '{packageName}'.");
 
-            return RemovePackage(package);
-        }
-
-        /// <summary>
-        /// 移除资源包裹
-        /// </summary>
-        /// <param name="package">包裹实例对象</param>
-        public static bool RemovePackage(ResourcePackage package)
-        {
-            CheckException(package);
-            string packageName = package.PackageName;
             if (package.InitializeStatus != EOperationStatus.None)
-            {
-                YooLogger.Error($"The resource package {packageName} has not been destroyed, please call the method {nameof(ResourcePackage.DestroyAsync)} to destroy!");
-                return false;
-            }
-
-            YooLogger.Log($"Remove resource package : {packageName}");
+                throw new System.InvalidOperationException($"Resource package '{packageName}' has not been destroyed. Call {nameof(ResourcePackage.DestroyPackageAsync)} before removing it.");
 
             // 先销毁调度器，再移除包裹
-            OperationSystem.DestroyPackageScheduler(packageName);
-
-            _packages.Remove(package);
-            return true;
+            AsyncOperationSystem.DestroyPackageScheduler(packageName);
+            s_packages.Remove(packageName);
         }
 
         /// <summary>
         /// 检测资源包裹是否存在
         /// </summary>
         /// <param name="packageName">包裹名称</param>
+        /// <returns>如果资源包裹存在返回true，否则返回false。</returns>
         public static bool ContainsPackage(string packageName)
         {
-            CheckException(packageName);
+            CheckInitialized(packageName);
             var package = GetPackageInternal(packageName);
             return package != null;
         }
 
         /// <summary>
-        /// 开启一个异步操作
+        /// 设置异步系统参数，每帧执行消耗的最大时间切片。
         /// </summary>
-        /// <param name="operation">异步操作对象</param>
-        public static void StartOperation(GameAsyncOperation operation)
+        /// <param name="milliseconds">最大时间切片（单位：毫秒），不能为负数。</param>
+        public static void SetAsyncOperationMaxTimeSlice(long milliseconds)
         {
-            // 注意：游戏业务逻辑的包裹填写为空
-            OperationSystem.StartOperation(string.Empty, operation);
+            if (milliseconds < 0)
+                throw new System.ArgumentOutOfRangeException(nameof(milliseconds), milliseconds, "Max time slice cannot be negative.");
+            AsyncOperationSystem.MaxTimeSlice = milliseconds;
         }
-
 
         private static ResourcePackage GetPackageInternal(string packageName)
         {
-            foreach (var package in _packages)
-            {
-                if (package.PackageName == packageName)
-                    return package;
-            }
-            return null;
+            s_packages.TryGetValue(packageName, out var package);
+            return package;
         }
-        private static void CheckException(string packageName)
+
+        #region 调试方法
+        private static void CheckInitialized()
         {
-            if (_isInitialize == false)
-                throw new YooInitializeException($"{nameof(YooAssets)} not initialized ! Please call  {nameof(YooAssets.Initialize)} first.");
+            if (s_isInitialized == false)
+                throw new System.InvalidOperationException($"YooAssets is not initialized. Please call {nameof(YooAssets.Initialize)} first.");
+        }
+
+        private static void CheckInitialized(string packageName)
+        {
+            CheckInitialized();
 
             if (string.IsNullOrEmpty(packageName))
-                throw new YooInitializeException("Package name cannot be null or empty !");
-        }
-        private static void CheckException(ResourcePackage package)
-        {
-            if (_isInitialize == false)
-                throw new YooInitializeException($"{nameof(YooAssets)} not initialized ! Please call  {nameof(YooAssets.Initialize)} first.");
-
-            if (package == null)
-                throw new YooInitializeException("Package instance cannot be null !");
-        }
-
-        #region 系统参数
-        /// <summary>
-        /// 设置下载系统参数，自定义下载请求
-        /// </summary>
-        [Obsolete("This method is deprecated. Please use FileSystemParametersDefine.UNITY_WEB_REQUEST_CREATOR instead.", true)]
-        public static void SetDownloadSystemUnityWebRequest(UnityWebRequestCreator createDelegate)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 设置异步系统参数，每帧执行消耗的最大时间切片（单位：毫秒）
-        /// </summary>
-        public static void SetOperationSystemMaxTimeSlice(long milliseconds)
-        {
-            if (milliseconds < 10)
-            {
-                milliseconds = 10;
-                YooLogger.Warning($"MaxTimeSlice minimum value is 10 milliseconds.");
-            }
-            OperationSystem.MaxTimeSlice = milliseconds;
+                throw new System.ArgumentException("Package name cannot be null or empty.", nameof(packageName));
         }
         #endregion
 
         #region 调试信息
-        internal static DebugReport GetDebugReport()
+        /// <summary>
+        /// 收集所有资源包裹的诊断数据
+        /// </summary>
+        /// <returns>包含所有资源包裹诊断数据的报告</returns>
+        internal static DiagnosticReport GetDiagnosticReport()
         {
-            DebugReport report = new DebugReport();
-            report.FrameCount = Time.frameCount;
-
-            foreach (var package in _packages)
+            DiagnosticReport report = DiagnosticReport.Create();
+            foreach (var kv in s_packages)
             {
-                var packageData = package.GetDebugPackageData();
-                report.PackageDatas.Add(packageData);
+                var packageData = kv.Value.GetDiagnosticData();
+                report.PackageDataList.Add(packageData);
             }
             return report;
         }

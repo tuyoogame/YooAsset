@@ -20,6 +20,11 @@ public class GameManager
     private readonly EventGroup _eventGroup = new EventGroup();
 
     /// <summary>
+    /// 游戏包裹
+    /// </summary>
+    public ResourcePackage GamePakcage;
+
+    /// <summary>
     /// 协程启动器
     /// </summary>
     public MonoBehaviour Behaviour;
@@ -47,11 +52,11 @@ public class GameManager
     {
         if (message is SceneEventDefine.ChangeToHomeScene)
         {
-            YooAssets.LoadSceneAsync("scene_home");
+            GamePakcage.LoadSceneAsync("scene_home");
         }
         else if (message is SceneEventDefine.ChangeToBattleScene)
         {
-            YooAssets.LoadSceneAsync("scene_battle");
+            GamePakcage.LoadSceneAsync("scene_battle");
         }
     }
 }

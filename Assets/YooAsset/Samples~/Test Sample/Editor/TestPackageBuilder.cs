@@ -8,27 +8,27 @@ public static class TestPackageBuilder
     /// <summary>
     /// 构建资源包
     /// </summary>
-    public static PackageInvokeBuildResult BuildPackage(PackageInvokeBuildParam buildParam)
+    internal static PackageBuildResult BuildPackage(PackageBuildParameters buildParam)
     {
         string packageName = buildParam.PackageName;
         string buildPipelineName = buildParam.BuildPipelineName;
 
         if (buildPipelineName == EBuildPipeline.EditorSimulateBuildPipeline.ToString())
         {
-            string projectPath = EditorTools.GetProjectPath();
+            string projectPath = EditorPathUtility.GetProjectPath();
             string outputRoot = $"{projectPath}/Bundles/Tester_ESBP";
 
             var buildParameters = new EditorSimulateBuildParameters();
             buildParameters.BuildOutputRoot = outputRoot;
-            buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
+            buildParameters.BundledFileRoot = BundleBuilderHelper.GetStreamingAssetsRoot();
             buildParameters.BuildPipeline = EBuildPipeline.EditorSimulateBuildPipeline.ToString();
-            buildParameters.BuildBundleType = (int)EBuildBundleType.VirtualBundle;
+            buildParameters.BuildBundleType = buildParam.BuildBundleType;
             buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
             buildParameters.PackageName = packageName;
             buildParameters.PackageVersion = "TestVersion";
             buildParameters.FileNameStyle = EFileNameStyle.HashName;
-            buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
-            buildParameters.BuildinFileCopyParams = string.Empty;
+            buildParameters.BundledCopyOption = EBundledCopyOption.None;
+            buildParameters.BundledCopyParams = string.Empty;
             buildParameters.ClearBuildCacheFiles = true;
             buildParameters.UseAssetDependencyDB = true;
 
@@ -36,9 +36,9 @@ public static class TestPackageBuilder
             BuildResult buildResult = pipeline.Run(buildParameters, false);
             if (buildResult.Success)
             {
-                var reulst = new PackageInvokeBuildResult();
-                reulst.PackageRootDirectory = buildResult.OutputPackageDirectory;
-                return reulst;
+                var packageResult = new PackageBuildResult();
+                packageResult.PackageRootDirectory = buildResult.OutputPackageDirectory;
+                return packageResult;
             }
             else
             {
@@ -48,7 +48,7 @@ public static class TestPackageBuilder
         }
         else if (buildPipelineName == EBuildPipeline.ScriptableBuildPipeline.ToString())
         {
-            string projectPath = EditorTools.GetProjectPath();
+            string projectPath = EditorPathUtility.GetProjectPath();
             string outputRoot = $"{projectPath}/Bundles/Tester_SBP";
 
             // 内置着色器资源包名称
@@ -56,32 +56,37 @@ public static class TestPackageBuilder
             var buildParameters = new ScriptableBuildParameters();
 
             buildParameters.BuildOutputRoot = outputRoot;
-            buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
+            buildParameters.BundledFileRoot = BundleBuilderHelper.GetStreamingAssetsRoot();
             buildParameters.BuildPipeline = EBuildPipeline.ScriptableBuildPipeline.ToString();
-            buildParameters.BuildBundleType = (int)EBuildBundleType.AssetBundle;
+            buildParameters.BuildBundleType = (int)EBundleType.AssetBundle;
             buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
             buildParameters.PackageName = packageName;
             buildParameters.PackageVersion = "TestVersion";
             buildParameters.EnableSharePackRule = true;
             buildParameters.VerifyBuildingResult = true;
             buildParameters.FileNameStyle = EFileNameStyle.HashName;
-            buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
-            buildParameters.BuildinFileCopyParams = string.Empty;
+            buildParameters.BundledCopyOption = EBundledCopyOption.None;
+            buildParameters.BundledCopyParams = string.Empty;
             buildParameters.CompressOption = ECompressOption.LZ4;
             buildParameters.ClearBuildCacheFiles = true;
             buildParameters.UseAssetDependencyDB = true;
             buildParameters.BuiltinShadersBundleName = builtinShaderBundleName;
-            buildParameters.EncryptionServices = new TestFileStreamEncryption();
-            buildParameters.ManifestProcessServices = new TestProcessManifest();
-            buildParameters.ManifestRestoreServices = new TestRestoreManifest();
+            buildParameters.BundleEncryptor = new TestFileStreamEncryption();
+            buildParameters.ManifestEncryptor = new TestManifestEncryptor();
+            buildParameters.ManifestDecryptor = new TestManifestDecryptor();
 
             var pipeline = new ScriptableBuildPipeline();
             BuildResult buildResult = pipeline.Run(buildParameters, false);
             if (buildResult.Success)
             {
-                var reulst = new PackageInvokeBuildResult();
-                reulst.PackageRootDirectory = buildResult.OutputPackageDirectory;
-                return reulst;
+                string packageRoot = buildResult.OutputPackageDirectory;
+                bool result = BuiltinCatalogHelper.CreateFile(new TestManifestDecryptor(), packageName, packageRoot);
+                if (result == false)
+                    Debug.LogError($"Create package {packageName} catalog file failed ! See the detail error in console !");
+
+                var packageResult = new PackageBuildResult();
+                packageResult.PackageRootDirectory = packageRoot;
+                return packageResult;
             }
             else
             {
@@ -89,62 +94,67 @@ public static class TestPackageBuilder
                 throw new System.Exception($"{nameof(ScriptableBuildPipeline)} build failed !");
             }
         }
-        else if (buildPipelineName == EBuildPipeline.BuiltinBuildPipeline.ToString())
+        else if (buildPipelineName == EBuildPipeline.LegacyBuildPipeline.ToString())
         {
-            string projectPath = EditorTools.GetProjectPath();
-            string outputRoot = $"{projectPath}/Bundles/Tester_BBP";
+            string projectPath = EditorPathUtility.GetProjectPath();
+            string outputRoot = $"{projectPath}/Bundles/Tester_LBP";
 
-            var buildParameters = new BuiltinBuildParameters();
+            var buildParameters = new LegacyBuildParameters();
             buildParameters.BuildOutputRoot = outputRoot;
-            buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
+            buildParameters.BundledFileRoot = BundleBuilderHelper.GetStreamingAssetsRoot();
             buildParameters.BuildPipeline = EBuildPipeline.ScriptableBuildPipeline.ToString();
-            buildParameters.BuildBundleType = (int)EBuildBundleType.AssetBundle;
+            buildParameters.BuildBundleType = (int)EBundleType.AssetBundle;
             buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
             buildParameters.PackageName = packageName;
             buildParameters.PackageVersion = "TestVersion";
             buildParameters.EnableSharePackRule = true;
             buildParameters.VerifyBuildingResult = true;
             buildParameters.FileNameStyle = EFileNameStyle.HashName;
-            buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
-            buildParameters.BuildinFileCopyParams = string.Empty;
+            buildParameters.BundledCopyOption = EBundledCopyOption.None;
+            buildParameters.BundledCopyParams = string.Empty;
             buildParameters.CompressOption = ECompressOption.LZ4;
             buildParameters.ClearBuildCacheFiles = true;
             buildParameters.UseAssetDependencyDB = true;
-            buildParameters.EncryptionServices = new TestFileStreamEncryption();
-            buildParameters.ManifestProcessServices = new TestProcessManifest();
-            buildParameters.ManifestRestoreServices = new TestRestoreManifest();
+            buildParameters.BundleEncryptor = new TestFileStreamEncryption();
+            buildParameters.ManifestEncryptor = new TestManifestEncryptor();
+            buildParameters.ManifestDecryptor = new TestManifestDecryptor();
 
-            var pipeline = new BuiltinBuildPipeline();
+            var pipeline = new LegacyBuildPipeline();
             BuildResult buildResult = pipeline.Run(buildParameters, false);
             if (buildResult.Success)
             {
-                var reulst = new PackageInvokeBuildResult();
-                reulst.PackageRootDirectory = buildResult.OutputPackageDirectory;
-                return reulst;
+                string packageRoot = buildResult.OutputPackageDirectory;
+                bool result = BuiltinCatalogHelper.CreateFile(new TestManifestDecryptor(), packageName, packageRoot);
+                if (result == false)
+                    Debug.LogError($"Create package {packageName} catalog file failed ! See the detail error in console !");
+
+                var packageResult = new PackageBuildResult();
+                packageResult.PackageRootDirectory = packageRoot;
+                return packageResult;
             }
             else
             {
                 Debug.LogError(buildResult.ErrorInfo);
-                throw new System.Exception($"{nameof(BuiltinBuildPipeline)} build failed !");
+                throw new System.Exception($"{nameof(LegacyBuildPipeline)} build failed !");
             }
         }
         else if (buildPipelineName == EBuildPipeline.RawFileBuildPipeline.ToString())
         {
-            string projectPath = EditorTools.GetProjectPath();
+            string projectPath = EditorPathUtility.GetProjectPath();
             string outputRoot = $"{projectPath}/Bundles/Tester_RFBP";
 
             var buildParameters = new RawFileBuildParameters();
             buildParameters.BuildOutputRoot = outputRoot;
-            buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
+            buildParameters.BundledFileRoot = BundleBuilderHelper.GetStreamingAssetsRoot();
             buildParameters.BuildPipeline = EBuildPipeline.RawFileBuildPipeline.ToString();
-            buildParameters.BuildBundleType = (int)EBuildBundleType.RawBundle;
+            buildParameters.BuildBundleType = (int)EBundleType.RawBundle;
             buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
             buildParameters.PackageName = packageName;
             buildParameters.PackageVersion = "TestVersion";
             buildParameters.VerifyBuildingResult = true;
             buildParameters.FileNameStyle = EFileNameStyle.HashName;
-            buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
-            buildParameters.BuildinFileCopyParams = string.Empty;
+            buildParameters.BundledCopyOption = EBundledCopyOption.None;
+            buildParameters.BundledCopyParams = string.Empty;
             buildParameters.ClearBuildCacheFiles = true;
             buildParameters.UseAssetDependencyDB = true;
 
@@ -152,9 +162,14 @@ public static class TestPackageBuilder
             BuildResult buildResult = pipeline.Run(buildParameters, false);
             if (buildResult.Success)
             {
-                var reulst = new PackageInvokeBuildResult();
-                reulst.PackageRootDirectory = buildResult.OutputPackageDirectory;
-                return reulst;
+                string packageRoot = buildResult.OutputPackageDirectory;
+                bool result = BuiltinCatalogHelper.CreateFile(null, packageName, packageRoot);
+                if (result == false)
+                    Debug.LogError($"Create package {packageName} catalog file failed ! See the detail error in console !");
+
+                var packageResult = new PackageBuildResult();
+                packageResult.PackageRootDirectory = packageRoot;
+                return packageResult;
             }
             else
             {
@@ -174,8 +189,8 @@ public static class TestPackageBuilder
     /// </summary>
     private static string GetBuiltinShaderBundleName(string packageName)
     {
-        var uniqueBundleName = AssetBundleCollectorSettingData.Setting.UniqueBundleName;
-        var packRuleResult = DefaultPackRule.CreateShadersPackRuleResult();
+        var uniqueBundleName = BundleCollectorSettingData.Setting.UniqueBundleName;
+        var packRuleResult = DefaultBundlePackRule.CreateShadersPackRuleResult();
         return packRuleResult.GetBundleName(packageName, uniqueBundleName);
     }
 }

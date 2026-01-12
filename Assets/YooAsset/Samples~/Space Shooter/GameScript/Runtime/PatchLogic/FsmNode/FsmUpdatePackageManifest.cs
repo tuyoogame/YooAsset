@@ -32,7 +32,7 @@ public class FsmUpdatePackageManifest : IStateNode
         var operation = package.UpdatePackageManifestAsync(packageVersion);
         yield return operation;
 
-        if (operation.Status != EOperationStatus.Succeed)
+        if (operation.Status != EOperationStatus.Succeeded)
         {
             Debug.LogWarning(operation.Error);
             PatchEventDefine.PackageManifestUpdateFailed.SendEventMessage();

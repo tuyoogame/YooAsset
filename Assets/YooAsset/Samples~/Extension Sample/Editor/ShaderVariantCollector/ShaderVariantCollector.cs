@@ -50,14 +50,14 @@ public static class ShaderVariantCollector
 
         // 注意：先删除再保存，否则ShaderVariantCollection内容将无法及时刷新
         AssetDatabase.DeleteAsset(savePath);
-        EditorTools.CreateFileDirectory(savePath);
+        EditorFileUtility.CreateFileDirectory(savePath);
         _savePath = savePath;
         _packageName = packageName;
         _processMaxNum = processMaxNum;
         _completedCallback = completedCallback;
 
         // 聚焦到游戏窗口
-        EditorTools.FocusUnityGameWindow();
+        EditorWindowUtility.FocusUnityGameWindow();
 
         // 创建临时测试场景
         CreateTempScene();
@@ -142,7 +142,7 @@ public static class ShaderVariantCollector
     private static List<string> GetAllMaterials()
     {
         // 获取所有打包的资源
-        CollectResult collectResult = AssetBundleCollectorSettingData.Setting.BeginCollect(_packageName, false, false);
+        CollectResult collectResult = BundleCollectorSettingData.Setting.BeginCollect(_packageName, false, false);
 
         // 搜集所有材质球
         int progressValue = 0;
@@ -164,9 +164,9 @@ public static class ShaderVariantCollector
                         result.Add(assetPath);
                 }
             }
-            EditorTools.DisplayProgressBar("搜集所有材质球", ++progressValue, collectResult.CollectAssets.Count);
+            EditorDialogUtility.DisplayProgressBar("搜集所有材质球", ++progressValue, collectResult.CollectAssets.Count);
         }
-        EditorTools.ClearProgressBar();
+        EditorDialogUtility.ClearProgressBar();
 
         // 返回结果
         return result.ToList();
@@ -208,9 +208,9 @@ public static class ShaderVariantCollector
             {
                 x++;
             }
-            EditorTools.DisplayProgressBar("照射所有材质球", ++progressValue, materials.Count);
+            EditorDialogUtility.DisplayProgressBar("照射所有材质球", ++progressValue, materials.Count);
         }
-        EditorTools.ClearProgressBar();
+        EditorDialogUtility.ClearProgressBar();
     }
     private static GameObject CreateSphere(string assetPath, Vector3 position, int index)
     {

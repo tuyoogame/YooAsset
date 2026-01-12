@@ -1,5 +1,4 @@
-﻿#if UNITY_2019_4_OR_NEWER
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -7,12 +6,17 @@ using UnityEngine;
 
 namespace YooAsset.Editor
 {
+    /// <summary>
+    /// 默认的表格搜索系统，负责解析搜索表达式并执行数据过滤
+    /// </summary>
     public static class DefaultSearchSystem
     {
         /// <summary>
-        /// 解析搜索命令
+        /// 解析搜索表达式为命令列表
         /// </summary>
-        public static List<ISearchCommand> ParseCommand(string commandContent)
+        /// <param name="commandContent">搜索表达式字符串，支持关键字、比较运算符等语法</param>
+        /// <returns>解析后的搜索命令集合</returns>
+        public static IList<ISearchCommand> ParseCommand(string commandContent)
         {
             if (string.IsNullOrEmpty(commandContent))
                 return new List<ISearchCommand>();
@@ -21,6 +25,9 @@ namespace YooAsset.Editor
             string[] commands = Regex.Split(commandContent, @"\s+");
             foreach (var command in commands)
             {
+                if (string.IsNullOrEmpty(command))
+                    continue;
+
                 if (command.Contains("!="))
                 {
                     var splits = command.Split(new string[] { "!=" }, StringSplitOptions.None);
@@ -118,7 +125,7 @@ namespace YooAsset.Editor
         {
             if (splits.Length != 2)
             {
-                Debug.LogWarning($"Invalid search command : {command}");
+                Debug.LogWarning($"Invalid search command: '{command}'.");
                 return false;
             }
 
@@ -131,39 +138,96 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 搜索匹配
+        /// 根据搜索表达式过滤数据源的可见性
         /// </summary>
-        public static void Search(List<ITableData> sourceDatas, string command)
+        /// <remarks>
+        /// 搜索流程分为两个阶段：先按关键字过滤，再对通过的数据执行数值比较过滤。
+        /// </remarks>
+        /// <param name="sourceDatas">待过滤的表格数据集合</param>
+        /// <param name="command">搜索表达式字符串</param>
+        /// <param name="logic">同类搜索命令的组内组合逻辑</param>
+        public static void Search(IList<ITableData> sourceDatas, string command, ESearchLogic logic)
         {
             var searchCmds = ParseCommand(command);
+            var searchKeywordCmds = searchCmds.Where(cmd => cmd is SearchKeyword).ToList();
+            var searchCompareCmds = searchCmds.Where(cmd => cmd is SearchCompare).ToList();
+
             foreach (var tableData in sourceDatas)
             {
-                tableData.Visible = Search(tableData, searchCmds);
+                if (searchCmds.Count == 0)
+                {
+                    tableData.Visible = true;
+                    continue;
+                }
+
+                // 优先匹配关键字
+                if (SearchKeyword(tableData, searchKeywordCmds, logic) == false)
+                {
+                    tableData.Visible = false;
+                    continue;
+                }
+
+                // 其次匹配数值
+                if (SearchCompare(tableData, searchCompareCmds, logic) == false)
+                {
+                    tableData.Visible = false;
+                    continue;
+                }
+
+                tableData.Visible = true;
             }
         }
-        private static bool Search(ITableData tableData, List<ISearchCommand> commands)
+
+        private static bool SearchKeyword(ITableData tableData, IList<ISearchCommand> commands, ESearchLogic logic)
         {
             if (commands.Count == 0)
                 return true;
 
-            // 先匹配字符串
-            var searchKeywordCmds = commands.Where(cmd => cmd is SearchKeyword).ToList();
-            if (SearchKeyword(tableData, searchKeywordCmds) == false)
-                return false;
+            if (logic == ESearchLogic.AND)
+                return SearchKeywordAnd(tableData, commands);
+            else if (logic == ESearchLogic.OR)
+                return SearchKeywordOr(tableData, commands);
+            else
+                throw new System.NotImplementedException(logic.ToString());
+        }
+        private static bool SearchKeywordAnd(ITableData tableData, IList<ISearchCommand> commands)
+        {
+            foreach (var cmd in commands)
+            {
+                var searchKeywordCmd = cmd as SearchKeyword;
+                bool matched = false;
+                foreach (var tableCell in tableData.Cells)
+                {
+                    if (tableCell is StringValueCell stringValueCell)
+                    {
+                        if (string.IsNullOrEmpty(searchKeywordCmd.SearchTag) == false)
+                        {
+                            if (searchKeywordCmd.SearchTag == stringValueCell.SearchTag
+                                && searchKeywordCmd.CompareTo(stringValueCell.StringValue))
+                            {
+                                matched = true;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (searchKeywordCmd.CompareTo(stringValueCell.StringValue))
+                            {
+                                matched = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (matched == false)
+                    return false;
+            }
 
-            // 后匹配数值
-            var searchCompareCmds = commands.Where(cmd => cmd is SearchCompare).ToList();
-            if (SearchCompare(tableData, searchCompareCmds) == false)
-                return false;
-
+            // 匹配成功
             return true;
         }
-        private static bool SearchKeyword(ITableData tableData, List<ISearchCommand> commands)
+        private static bool SearchKeywordOr(ITableData tableData, IList<ISearchCommand> commands)
         {
-            if (commands.Count == 0)
-                return true;
-
-            // 匹配规则：任意字符串列匹配成果
             foreach (var tableCell in tableData.Cells)
             {
                 foreach (var cmd in commands)
@@ -173,11 +237,9 @@ namespace YooAsset.Editor
                     {
                         if (string.IsNullOrEmpty(searchKeywordCmd.SearchTag) == false)
                         {
-                            if (searchKeywordCmd.SearchTag == stringValueCell.SearchTag)
-                            {
-                                if (searchKeywordCmd.CompareTo(stringValueCell.StringValue))
-                                    return true;
-                            }
+                            if (searchKeywordCmd.SearchTag == stringValueCell.SearchTag
+                                && searchKeywordCmd.CompareTo(stringValueCell.StringValue))
+                                return true;
                         }
                         else
                         {
@@ -191,12 +253,55 @@ namespace YooAsset.Editor
             // 匹配失败
             return false;
         }
-        private static bool SearchCompare(ITableData tableData, List<ISearchCommand> commands)
+
+        private static bool SearchCompare(ITableData tableData, IList<ISearchCommand> commands, ESearchLogic logic)
         {
             if (commands.Count == 0)
                 return true;
 
-            // 匹配规则：任意指定数值列匹配成果
+            if (logic == ESearchLogic.AND)
+                return SearchCompareAnd(tableData, commands);
+            else if (logic == ESearchLogic.OR)
+                return SearchCompareOr(tableData, commands);
+            else
+                throw new System.NotImplementedException(logic.ToString());
+        }
+        private static bool SearchCompareAnd(ITableData tableData, IList<ISearchCommand> commands)
+        {
+            foreach (var cmd in commands)
+            {
+                var searchCompareCmd = cmd as SearchCompare;
+                bool matched = false;
+                foreach (var tableCell in tableData.Cells)
+                {
+                    if (tableCell is IntegerValueCell integerValueCell)
+                    {
+                        if (searchCompareCmd.HeaderTitle == integerValueCell.SearchTag
+                            && searchCompareCmd.CompareTo(integerValueCell.IntegerValue))
+                        {
+                            matched = true;
+                            break;
+                        }
+                    }
+                    else if (tableCell is SingleValueCell singleValueCell)
+                    {
+                        if (searchCompareCmd.HeaderTitle == singleValueCell.SearchTag
+                            && searchCompareCmd.CompareTo(singleValueCell.SingleValue))
+                        {
+                            matched = true;
+                            break;
+                        }
+                    }
+                }
+                if (matched == false)
+                    return false;
+            }
+
+            // 匹配成功
+            return true;
+        }
+        private static bool SearchCompareOr(ITableData tableData, IList<ISearchCommand> commands)
+        {
             foreach (var tableCell in tableData.Cells)
             {
                 foreach (var cmd in commands)
@@ -204,19 +309,15 @@ namespace YooAsset.Editor
                     var searchCompareCmd = cmd as SearchCompare;
                     if (tableCell is IntegerValueCell integerValueCell)
                     {
-                        if (searchCompareCmd.HeaderTitle == integerValueCell.SearchTag)
-                        {
-                            if (searchCompareCmd.CompareTo(integerValueCell.IntegerValue))
-                                return true;
-                        }
+                        if (searchCompareCmd.HeaderTitle == integerValueCell.SearchTag
+                            && searchCompareCmd.CompareTo(integerValueCell.IntegerValue))
+                            return true;
                     }
                     else if (tableCell is SingleValueCell singleValueCell)
                     {
-                        if (searchCompareCmd.HeaderTitle == singleValueCell.SearchTag)
-                        {
-                            if (searchCompareCmd.CompareTo(singleValueCell.SingleValue))
-                                return true;
-                        }
+                        if (searchCompareCmd.HeaderTitle == singleValueCell.SearchTag
+                            && searchCompareCmd.CompareTo(singleValueCell.SingleValue))
+                            return true;
                     }
                 }
             }
@@ -226,4 +327,3 @@ namespace YooAsset.Editor
         }
     }
 }
-#endif

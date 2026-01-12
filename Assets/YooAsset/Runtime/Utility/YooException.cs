@@ -3,154 +3,95 @@ using System;
 namespace YooAsset
 {
     /// <summary>
-    /// YooAsset 异常基类
+    /// Base exception for all YooAsset custom exceptions.
     /// </summary>
+    /// <remarks>
+    /// Use catch (YooException) to handle all YooAsset-related exceptions.
+    /// </remarks>
     [Serializable]
     public class YooException : Exception
     {
         public YooException() : base() { }
+
+        /// <param name="message">The error message that describes the reason for the exception.</param>
         public YooException(string message) : base(message) { }
+
+        /// <param name="message">The error message that describes the reason for the exception.</param>
+        /// <param name="inner">The exception that caused the current exception.</param>
         public YooException(string message, Exception inner) : base(message, inner) { }
     }
 
     /// <summary>
-    /// 内部错误异常
-    /// 当发生不应该发生的内部错误时抛出（通常表示代码逻辑错误）
-    /// 这类异常通常表示需要修复代码，而不是用户使用错误
+    /// The exception that is thrown when an internal logic error occurs in YooAsset.
     /// </summary>
+    /// <remarks>
+    /// <para>Thrown when an unexpected internal error occurs, typically indicating a code defect that needs to be fixed.</para>
+    /// <para>The message is automatically prefixed with "An internal error occurred: " for identification.</para>
+    /// </remarks>
     [Serializable]
     public class YooInternalException : YooException
     {
-        public YooInternalException() : base($"Internal error (should never happen)") { }
-        public YooInternalException(string message) : base($"Internal error (should never happen) {message}") { }
-        public YooInternalException(Exception inner) : base($"Internal error (should never happen)", inner) { }
-        public YooInternalException(string message, Exception inner) : base($"Internal error (should never happen) {message}", inner) { }
+        public YooInternalException() : base("Internal error occurred. This indicates a bug in the code.") { }
+        public YooInternalException(string message) : base($"Internal error occurred: {message}") { }
+        public YooInternalException(Exception inner) : base("Internal error occurred. This indicates a bug in the code.", inner) { }
+        public YooInternalException(string message, Exception inner) : base($"Internal error occurred: {message}", inner) { }
     }
 
     /// <summary>
-    /// 初始化相关异常
-    /// 当 YooAsset 系统初始化失败或未初始化时访问功能时抛出
+    /// The exception that is thrown when a resource package is in an invalid state.
     /// </summary>
+    /// <remarks>
+    /// Thrown when the package is not initialized, initialization is incomplete,
+    /// initialization has failed, or the active manifest is unavailable.
+    /// </remarks>
     [Serializable]
-    public class YooInitializeException : YooException
-    {
-        public YooInitializeException() : base() { }
-        public YooInitializeException(string message) : base(message) { }
-        public YooInitializeException(string message, Exception inner) : base(message, inner) { }
-    }
-
-    /// <summary>
-    /// 平台不支持异常
-    /// 当功能在当前平台不支持时抛出
-    /// </summary>
-    [Serializable]
-    public class YooPlatformNotSupportedException : YooException
-    {
-        public YooPlatformNotSupportedException() : base()
-        {
-        }
-        public YooPlatformNotSupportedException(string message) : base(message)
-        {
-        }
-        public YooPlatformNotSupportedException(string message, Exception inner) : base(message, inner) { }
-    }
-
-    /// <summary>
-    /// 包裹管理异常
-    /// 当包裹创建、销毁、初始化等操作失败时抛出
-    /// </summary>
-    [Serializable]
-    public class YooPackageException : YooException
+    public class YooPackageInvalidException : YooException
     {
         /// <summary>
-        /// 包裹名称
+        /// Gets the name of the package that caused the exception.
         /// </summary>
         public string PackageName { get; }
 
-        public YooPackageException(string packageName) : base()
+        public YooPackageInvalidException(string packageName) : base()
         {
             PackageName = packageName;
         }
-        public YooPackageException(string packageName, string message) : base(message)
+        public YooPackageInvalidException(string packageName, string message) : base(message)
         {
             PackageName = packageName;
         }
-        public YooPackageException(string packageName, string message, Exception inner) : base(message, inner)
+        public YooPackageInvalidException(string packageName, string message, Exception inner) : base(message, inner)
         {
             PackageName = packageName;
         }
     }
 
     /// <summary>
-    /// 资源清单文件异常
-    /// 当资源清单加载、数据无效或损坏时抛出
+    /// The exception that is thrown when the resource manifest data is invalid.
     /// </summary>
+    /// <remarks>
+    /// Thrown when the manifest contains configuration conflicts, duplicate paths, duplicate GUIDs, or other logical errors.
+    /// </remarks>
     [Serializable]
-    public class YooManifestException : YooException
+    public class YooManifestInvalidException : YooException
     {
-        public YooManifestException() : base()
-        {
-        }
-        public YooManifestException(string message) : base(message)
-        {
-        }
-        public YooManifestException(string message, Exception inner) : base(message, inner)
-        {
-        }
+        public YooManifestInvalidException() : base() { }
+        public YooManifestInvalidException(string message) : base(message) { }
+        public YooManifestInvalidException(string message, Exception inner) : base(message, inner) { }
     }
 
     /// <summary>
-    /// 资源加载异常
-    /// 当资源加载类型不匹配时抛出
+    /// The exception that is thrown when a resource handle is invalid.
     /// </summary>
+    /// <remarks>
+    /// Thrown when attempting to operate on a handle that has been released or whose associated provider has been destroyed.
+    /// </remarks>
     [Serializable]
-    public class YooLoadException : YooException
+    public class YooHandleInvalidException : YooException
     {
-        public YooLoadException() : base()
-        {
-        }
-        public YooLoadException(string message) : base(message)
-        {
-        }
-        public YooLoadException(string message, Exception inner)
-            : base(message, inner)
-        {
-        }
+        public YooHandleInvalidException() : base() { }
+        public YooHandleInvalidException(string message) : base(message) { }
+        public YooHandleInvalidException(string message, Exception inner) : base(message, inner) { }
     }
 
-    /// <summary>
-    /// 资源句柄异常
-    /// 当句柄无效或操作句柄失败时抛出
-    /// </summary>
-    [Serializable]
-    public class YooHandleException : YooException
-    {
-        public YooHandleException() : base()
-        {
-        }
-        public YooHandleException(string message) : base(message)
-        {
-        }
-        public YooHandleException(string message, Exception inner) : base(message, inner)
-        {
-        }
-    }
-
-    /// <summary>
-    /// 文件系统异常
-    /// 当文件读写、验证、缓存操作失败时抛出
-    /// </summary>
-    [Serializable]
-    public class YooFileSystemException : YooException
-    {
-        public YooFileSystemException() : base()
-        {
-        }
-        public YooFileSystemException(string message) : base(message)
-        {
-        }
-        public YooFileSystemException(string message, Exception inner) : base(message, inner)
-        {
-        }
-    }
 }

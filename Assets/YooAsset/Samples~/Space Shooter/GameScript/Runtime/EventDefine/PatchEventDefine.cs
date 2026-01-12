@@ -57,7 +57,7 @@ public class PatchEventDefine
         public long TotalDownloadSizeBytes;
         public long CurrentDownloadSizeBytes;
 
-        public static void SendEventMessage(DownloadUpdateData updateData)
+        public static void SendEventMessage(DownloadProgressChangedEventArgs updateData)
         {
             var msg = new DownloadUpdate();
             msg.TotalDownloadCount = updateData.TotalDownloadCount;
@@ -100,7 +100,7 @@ public class PatchEventDefine
         public string FileName;
         public string Error;
 
-        public static void SendEventMessage(DownloadErrorData errorData)
+        public static void SendEventMessage(DownloadErrorEventArgs errorData)
         {
             var msg = new WebFileDownloadFailed();
             msg.FileName = errorData.FileName;

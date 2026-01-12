@@ -1,5 +1,4 @@
-﻿#if UNITY_2019_4_OR_NEWER
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +10,11 @@ using UnityEngine.UIElements;
 namespace YooAsset.Editor
 {
     /// <summary>
-    /// Unity2022版本以上推荐官方类：MultiColumnListView组件
+    /// 多列表格视图
     /// </summary>
+    /// <remarks>
+    /// Unity 2022 及以上版本推荐使用官方 MultiColumnListView 组件替代。
+    /// </remarks>
     public class TableViewer : VisualElement
     {
         public new class UxmlFactory : UxmlFactory<TableViewer, UxmlTraits>
@@ -23,8 +25,8 @@ namespace YooAsset.Editor
         private readonly ListView _listView;
 
         private readonly List<TableColumn> _columns = new List<TableColumn>(10);
-        private List<ITableData> _itemsSource;
-        private List<ITableData> _sortingDatas;
+        private IList<ITableData> _itemsSource;
+        private IList<ITableData> _sortingDatas;
 
         // 排序相关
         private string _sortingHeader;
@@ -33,7 +35,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 数据源
         /// </summary>
-        public List<ITableData> itemsSource
+        public IList<ITableData> ItemsSource
         {
             get
             {
@@ -52,7 +54,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 选中的数据列表
         /// </summary>
-        public List<ITableData> selectedItems
+        public IReadOnlyList<ITableData> SelectedItems
         {
             get
             {
@@ -67,21 +69,24 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 单元视图交互事件
+        /// 当点击表格数据行时触发
         /// </summary>
-        public Action<PointerDownEvent, ITableData> ClickTableDataEvent;
+        public event Action<PointerDownEvent, ITableData> TableDataClicked;
 
         /// <summary>
-        /// 单元视图交互事件
+        /// 当点击表格标题列时触发
         /// </summary>
-        public Action<TableColumn> ClickTableHeadEvent;
+        public event Action<TableColumn> TableHeadClicked;
 
         /// <summary>
-        /// 单元视图变化事件
+        /// 当选中项变化时触发
         /// </summary>
-        public Action<ITableData> SelectionChangedEvent;
+        public event Action<ITableData> SelectionChanged;
 
 
+        /// <summary>
+        /// 创建表格视图实例
+        /// </summary>
         public TableViewer()
         {
             this.style.flexShrink = 1f;
@@ -112,8 +117,10 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 获取标题UI元素
+        /// 获取指定名称的标题栏元素
         /// </summary>
+        /// <param name="elementName">标题栏元素名称</param>
+        /// <returns>匹配的 ToolbarButton 元素，未找到时返回 null。</returns>
         public VisualElement GetHeaderElement(string elementName)
         {
             return _toolbar.Q<ToolbarButton>(elementName);
@@ -122,6 +129,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 添加单元列
         /// </summary>
+        /// <param name="column">要添加的列定义</param>
         public void AddColumn(TableColumn column)
         {
             var toolbarBtn = new ToolbarButton();
@@ -167,8 +175,9 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 添加单元列集合
+        /// 批量添加单元列
         /// </summary>
+        /// <param name="columns">要添加的列定义集合</param>
         public void AddColumns(IList<TableColumn> columns)
         {
             foreach (var column in columns)
@@ -192,16 +201,15 @@ namespace YooAsset.Editor
             _listView.itemsSource = itemsSource.ToList();
             _listView.Rebuild();
 
-            // 刷新标题栏
-            RefreshToobar();
+            RefreshToolbar();
         }
-        private void RefreshToobar()
+        private void RefreshToolbar()
         {
             // 设置为原始标题
             foreach (var column in _columns)
             {
-                var toobarButton = _toolbar.Q<ToolbarButton>(column.ElementName);
-                toobarButton.text = column.HeaderTitle;
+                var toolbarButton = _toolbar.Q<ToolbarButton>(column.ElementName);
+                toolbarButton.text = column.HeaderTitle;
             }
 
             // 设置元素数量
@@ -209,8 +217,10 @@ namespace YooAsset.Editor
             {
                 if (column.ColumnStyle.Counter)
                 {
-                    var toobarButton = GetHeaderElement(column.ElementName) as ToolbarButton;
-                    toobarButton.text = $"{toobarButton.text} ({itemsSource.Count()})";
+                    var toolbarButton = GetHeaderElement(column.ElementName) as ToolbarButton;
+                    int visibleCount = _listView.itemsSource.Count;
+                    int totalCount = ItemsSource.Count;
+                    toolbarButton.text = $"{toolbarButton.text} ({visibleCount}/{totalCount})";
                 }
             }
 
@@ -219,25 +229,27 @@ namespace YooAsset.Editor
             {
                 if (string.IsNullOrEmpty(column.ColumnStyle.Units) == false)
                 {
-                    var toobarButton = GetHeaderElement(column.ElementName) as ToolbarButton;
-                    toobarButton.text = $"{toobarButton.text} ({column.ColumnStyle.Units})";
+                    var toolbarButton = GetHeaderElement(column.ElementName) as ToolbarButton;
+                    toolbarButton.text = $"{toolbarButton.text} ({column.ColumnStyle.Units})";
                 }
             }
 
             // 设置升降符号
             if (string.IsNullOrEmpty(_sortingHeader) == false)
             {
-                var _toobarButton = _toolbar.Q<ToolbarButton>(_sortingHeader);
+                var _toolbarButton = _toolbar.Q<ToolbarButton>(_sortingHeader);
                 if (_descendingSort)
-                    _toobarButton.text = $"{_toobarButton.text} ↓";
+                    _toolbarButton.text = $"{_toolbarButton.text} ↓";
                 else
-                    _toobarButton.text = $"{_toobarButton.text} ↑";
+                    _toolbarButton.text = $"{_toolbarButton.text} ↑";
             }
         }
 
         /// <summary>
-        /// 清空所有数据
+        /// 清空表格数据
         /// </summary>
+        /// <param name="clearColumns">是否同时清空列定义</param>
+        /// <param name="clearSource">是否同时清空数据源</param>
         public void ClearAll(bool clearColumns, bool clearSource)
         {
             if (clearColumns)
@@ -263,7 +275,7 @@ namespace YooAsset.Editor
             if (selectData == null)
                 return;
 
-            ClickTableDataEvent?.Invoke(evt, selectData);
+            TableDataClicked?.Invoke(evt, selectData);
         }
         private void OnClickTableHead(EventBase eventBase)
         {
@@ -275,7 +287,7 @@ namespace YooAsset.Editor
             if (clickedColumn == null)
                 return;
 
-            ClickTableHeadEvent?.Invoke(clickedColumn);
+            TableHeadClicked?.Invoke(clickedColumn);
             if (clickedColumn.ColumnStyle.Sortable == false)
                 return;
 
@@ -295,7 +307,6 @@ namespace YooAsset.Editor
             else
                 _sortingDatas = _itemsSource.OrderBy(tableData => tableData.Cells[clickedColumn.ColumnIndex]).ToList();
 
-            // 刷新数据表
             RebuildView();
         }
         private void OnSelectionChanged(IEnumerable<object> items)
@@ -303,12 +314,12 @@ namespace YooAsset.Editor
             foreach (var item in items)
             {
                 var tableData = item as ITableData;
-                SelectionChangedEvent?.Invoke(tableData);
+                SelectionChanged?.Invoke(tableData);
                 break;
             }
         }
 
-        private bool CheckItemsSource(List<ITableData> itemsSource)
+        private bool CheckItemsSource(IList<ITableData> itemsSource)
         {
             if (itemsSource == null)
                 return false;
@@ -321,17 +332,17 @@ namespace YooAsset.Editor
                     var tableData = itemsSource[i];
                     if (tableData == null)
                     {
-                        Debug.LogWarning($"Items source has null instance !");
+                        Debug.LogWarning("Items source contains a null instance.");
                         return false;
                     }
                     if (tableData.Cells == null || tableData.Cells.Count == 0)
                     {
-                        Debug.LogWarning($"Items source data has empty cells !");
+                        Debug.LogWarning("Items source data has empty cells.");
                         return false;
                     }
                     if (tableData.Cells.Count != cellCount)
                     {
-                        Debug.LogWarning($"Items source data has inconsisten cells count ! Item index {i}");
+                        Debug.LogWarning($"Inconsistent cell count in items source. Item index: {i}.");
                         return false;
                     }
                 }
@@ -361,11 +372,11 @@ namespace YooAsset.Editor
         {
             var sourceDatas = _listView.itemsSource as List<ITableData>;
             var tableData = sourceDatas[index];
-            foreach (var colum in _columns)
+            foreach (var column in _columns)
             {
-                var cellElement = listViewElement.Q(colum.ElementName);
-                var tableCell = tableData.Cells[colum.ColumnIndex];
-                colum.BindCell.Invoke(cellElement, tableData, tableCell);
+                var cellElement = listViewElement.Q(column.ElementName);
+                var tableCell = tableData.Cells[column.ColumnIndex];
+                column.BindCell.Invoke(cellElement, tableData, tableCell);
             }
         }
         private void SetCellElementStyle(VisualElement element)
@@ -383,4 +394,3 @@ namespace YooAsset.Editor
         }
     }
 }
-#endif

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +7,7 @@ using YooAsset;
 /// <summary>
 /// 拷贝内置清单文件到沙盒目录
 /// </summary>
-public class CopyBuildinManifestOperation : GameAsyncOperation
+public class CopyBuildinManifestOperation : AsyncOperationBase
 {
     private enum ESteps
     {
@@ -22,8 +22,8 @@ public class CopyBuildinManifestOperation : GameAsyncOperation
     private readonly string _packageName;
     private readonly string _packageVersion;
     private readonly IDownloadBackend _backend;
-    private IDownloadFileRequest _hashFileRequestOp;
-    private IDownloadFileRequest _manifestFileRequestOp;
+    private IDownloadFileRequest _hashFileRequest;
+    private IDownloadFileRequest _manifestFileRequest;
     private ESteps _steps = ESteps.None;
 
     public CopyBuildinManifestOperation(string packageName, string packageVersion)
@@ -32,11 +32,11 @@ public class CopyBuildinManifestOperation : GameAsyncOperation
         _packageVersion = packageVersion;
         _backend = new UnityWebRequestBackend();
     }
-    protected override void OnStart()
+    protected override void InternalStart()
     {
         _steps = ESteps.CheckHashFile;
     }
-    protected override void OnUpdate()
+    protected override void InternalUpdate()
     {
         if (_steps == ESteps.None || _steps == ESteps.Done)
             return;
@@ -55,28 +55,27 @@ public class CopyBuildinManifestOperation : GameAsyncOperation
 
         if (_steps == ESteps.UnpackHashFile)
         {
-            if(_hashFileRequestOp == null)
+            if(_hashFileRequest == null)
             {
                 string sourcePath = GetBuildinHashFilePath();
                 string destPath = GetCacheHashFilePath();
-                string url = DownloadSystemHelper.ConvertToWWWPath(sourcePath);
-                var args = new DownloadFileRequestArgs(url, destPath, 60, 0);
-                _hashFileRequestOp = _backend.CreateFileRequest(args);
-                _hashFileRequestOp.SendRequest();
+                string url = DownloadUrlHelper.ToLocalFileUrl(sourcePath);
+                var args = new DownloadFileRequestArgs(url, 60, 0, destPath);
+                _hashFileRequest = _backend.CreateFileRequest(args);
+                _hashFileRequest.SendRequest();
             }
 
-            if (_hashFileRequestOp.IsDone == false)
+            if (_hashFileRequest.IsDone == false)
                 return;
 
-            if (_hashFileRequestOp.Status == EDownloadRequestStatus.Succeed)
+            if (_hashFileRequest.Status == EDownloadRequestStatus.Succeeded)
             {
                 _steps = ESteps.CheckManifestFile;
             }
             else
             {
                 _steps = ESteps.Done;
-                Status = EOperationStatus.Failed;
-                Error = _hashFileRequestOp.Error;
+                SetError(_hashFileRequest.Error);
             }
         }
 
@@ -86,7 +85,7 @@ public class CopyBuildinManifestOperation : GameAsyncOperation
             if (File.Exists(manifestFilePath))
             {
                 _steps = ESteps.Done;
-                Status = EOperationStatus.Succeed;
+                SetResult();
                 return;
             }
 
@@ -95,67 +94,63 @@ public class CopyBuildinManifestOperation : GameAsyncOperation
 
         if (_steps == ESteps.UnpackManifestFile)
         {
-            if (_manifestFileRequestOp == null)
+            if (_manifestFileRequest == null)
             {
                 string sourcePath = GetBuildinManifestFilePath();
                 string destPath = GetCacheManifestFilePath();
-                string url = DownloadSystemHelper.ConvertToWWWPath(sourcePath);
-                var args = new DownloadFileRequestArgs(url, destPath, 60, 0);
-                _manifestFileRequestOp = _backend.CreateFileRequest(args);
-                _manifestFileRequestOp.SendRequest();
+                string url = DownloadUrlHelper.ToLocalFileUrl(sourcePath);
+                var args = new DownloadFileRequestArgs(url, 60, 0, destPath);
+                _manifestFileRequest = _backend.CreateFileRequest(args);
+                _manifestFileRequest.SendRequest();
             }
 
-            if (_manifestFileRequestOp.IsDone == false)
+            if (_manifestFileRequest.IsDone == false)
                 return;
 
-            if (_manifestFileRequestOp.Status == EDownloadRequestStatus.Succeed)
+            if (_manifestFileRequest.Status == EDownloadRequestStatus.Succeeded)
             {
                 _steps = ESteps.Done;
-                Status = EOperationStatus.Succeed;
+                SetResult();
             }
             else
             {
                 _steps = ESteps.Done;
-                Status = EOperationStatus.Failed;
-                Error = _manifestFileRequestOp.Error;
+                SetError(_manifestFileRequest.Error);
             }
         }
-    }
-    protected override void OnAbort()
-    {
     }
 
     private string GetBuildinYooRoot()
     {
-        return YooAssetSettingsData.GetYooDefaultBuildinRoot();
+        return YooAssetConfiguration.GetDefaultBuiltinRoot();
     }
     private string GetBuildinHashFilePath()
     {
         string fileRoot = GetBuildinYooRoot();
-        string fileName = YooAssetSettingsData.GetPackageHashFileName(_packageName, _packageVersion);
+        string fileName = YooAssetConfiguration.GetPackageHashFileName(_packageName, _packageVersion);
         return PathUtility.Combine(fileRoot, _packageName, fileName);
     }
     private string GetBuildinManifestFilePath()
     {
         string fileRoot = GetBuildinYooRoot();
-        string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_packageName, _packageVersion);
+        string fileName = YooAssetConfiguration.GetManifestBinaryFileName(_packageName, _packageVersion);
         return PathUtility.Combine(fileRoot, _packageName, fileName);
     }
 
     private string GetCacheYooRoot()
     {
-        return YooAssetSettingsData.GetYooDefaultCacheRoot();
+        return YooAssetConfiguration.GetDefaultCacheRoot();
     }
     private string GetCacheHashFilePath()
     {
         string fileRoot = GetCacheYooRoot();
-        string fileName = YooAssetSettingsData.GetPackageHashFileName(_packageName, _packageVersion);
+        string fileName = YooAssetConfiguration.GetPackageHashFileName(_packageName, _packageVersion);
         return PathUtility.Combine(fileRoot, _packageName, fileName);
     }
     private string GetCacheManifestFilePath()
     {
         string fileRoot = GetCacheYooRoot();
-        string fileName = YooAssetSettingsData.GetManifestBinaryFileName(_packageName, _packageVersion);
+        string fileName = YooAssetConfiguration.GetManifestBinaryFileName(_packageName, _packageVersion);
         return PathUtility.Combine(fileRoot, _packageName, fileName);
     }
 }

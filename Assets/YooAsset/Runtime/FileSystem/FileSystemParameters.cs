@@ -1,64 +1,82 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace YooAsset
 {
     /// <summary>
-    /// 文件系统参数
+    /// 提供文件系统的创建参数与工厂方法
     /// </summary>
     public class FileSystemParameters
     {
-        internal readonly Dictionary<string, object> CreateParameters = new Dictionary<string, object>(100);
+        internal readonly Dictionary<string, object> _createParameters = new Dictionary<string, object>(100);
 
         /// <summary>
-        /// 文件系统类
-        /// 格式: "namespace.class,assembly"
-        /// 格式: "命名空间.类型名,程序集"
+        /// 文件系统的完整类型名称
         /// </summary>
-        public string FileSystemClass { private set; get; }
+        /// <remarks>
+        /// 格式: "命名空间.类型名,程序集" (例如 "namespace.class,assembly")
+        /// </remarks>
+        public string FileSystemTypeName { get; private set; }
 
         /// <summary>
         /// 文件系统的根目录
         /// </summary>
-        public string PackageRoot { private set; get; }
+        public string PackageRoot { get; private set; }
 
-
-        public FileSystemParameters(string fileSystemClass, string packageRoot)
+        /// <summary>
+        /// 创建实例
+        /// </summary>
+        /// <param name="fileSystemTypeName">文件系统的完整类型名称</param>
+        /// <param name="packageRoot">文件系统的根目录</param>
+        public FileSystemParameters(string fileSystemTypeName, string packageRoot)
         {
-            FileSystemClass = fileSystemClass;
+            FileSystemTypeName = fileSystemTypeName;
             PackageRoot = packageRoot;
         }
 
         /// <summary>
         /// 添加自定义参数
         /// </summary>
-        public void AddParameter(string name, object value)
+        /// <param name="paramName">参数名称</param>
+        /// <param name="value">参数值</param>
+        public void AddParameter(string paramName, object value)
         {
-            CreateParameters.Add(name, value);
+            _createParameters.Add(paramName, value);
         }
 
         /// <summary>
-        /// 创建文件系统
+        /// 添加自定义参数
         /// </summary>
+        /// <param name="paramType">参数类型</param>
+        /// <param name="value">参数值</param>
+        public void AddParameter(Enum paramType, object value)
+        {
+            _createParameters.Add(paramType.ToString(), value);
+        }
+
+        /// <summary>
+        /// 根据配置创建文件系统实例
+        /// </summary>
+        /// <param name="packageName">包裹名称</param>
+        /// <returns>创建的文件系统实例</returns>
         internal IFileSystem CreateFileSystem(string packageName)
         {
-            YooLogger.Log($"The package {packageName} create file system : {FileSystemClass}");
+            YooLogger.Log($"Package '{packageName}' created file system: '{FileSystemTypeName}'.");
 
-            Type classType = Type.GetType(FileSystemClass);
+            Type classType = Type.GetType(FileSystemTypeName);
             if (classType == null)
             {
-                YooLogger.Error($"Can not found file system class type {FileSystemClass}");
-                return null;
+                throw new InvalidOperationException($"Could not find file system class type: '{FileSystemTypeName}'.");
             }
 
-            var instance = (IFileSystem)System.Activator.CreateInstance(classType, true);
+            var instance = Activator.CreateInstance(classType, true) as IFileSystem;
             if (instance == null)
             {
-                YooLogger.Error($"Failed to create file system instance {FileSystemClass}");
-                return null;
+                throw new InvalidOperationException(
+                    $"Failed to create file system instance: '{FileSystemTypeName}'. Type must implement {nameof(IFileSystem)}.");
             }
 
-            foreach (var param in CreateParameters)
+            foreach (var param in _createParameters)
             {
                 instance.SetParameter(param.Key, param.Value);
             }
@@ -69,11 +87,12 @@ namespace YooAsset
         #region 创建默认的文件系统类
         /// <summary>
         /// 创建默认的编辑器文件系统参数
-        /// <param name="packageRoot">文件系统的根目录</param>
         /// </summary>
+        /// <param name="packageRoot">文件系统的根目录</param>
+        /// <returns>配置好的文件系统参数实例</returns>
         public static FileSystemParameters CreateDefaultEditorFileSystemParameters(string packageRoot)
         {
-            string fileSystemClass = typeof(DefaultEditorFileSystem).FullName;
+            string fileSystemClass = typeof(EditorFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
             return fileSystemParams;
         }
@@ -81,58 +100,54 @@ namespace YooAsset
         /// <summary>
         /// 创建默认的内置文件系统参数
         /// </summary>
-        /// <param name="decryptionServices">加密文件解密服务类</param>
         /// <param name="packageRoot">文件系统的根目录</param>
-        public static FileSystemParameters CreateDefaultBuildinFileSystemParameters(IDecryptionServices decryptionServices = null, string packageRoot = null)
+        /// <returns>配置好的文件系统参数实例</returns>
+        public static FileSystemParameters CreateDefaultBuiltinFileSystemParameters(string packageRoot = null)
         {
-            string fileSystemClass = typeof(DefaultBuildinFileSystem).FullName;
+            string fileSystemClass = typeof(BuiltinFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
-            fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
             return fileSystemParams;
         }
 
         /// <summary>
-        /// 创建默认的缓存文件系统参数
+        /// 创建默认的沙盒文件系统参数
         /// </summary>
-        /// <param name="remoteServices">远端资源地址查询服务类</param>
-        /// <param name="decryptionServices">加密文件解密服务类</param>
+        /// <param name="remoteService">远端资源地址查询服务类</param>
         /// <param name="packageRoot">文件系统的根目录</param>
-        public static FileSystemParameters CreateDefaultCacheFileSystemParameters(IRemoteServices remoteServices, IDecryptionServices decryptionServices = null, string packageRoot = null)
+        /// <returns>配置好的文件系统参数实例</returns>
+        public static FileSystemParameters CreateDefaultSandboxFileSystemParameters(IRemoteService remoteService, string packageRoot = null)
         {
-            string fileSystemClass = typeof(DefaultCacheFileSystem).FullName;
+            string fileSystemClass = typeof(SandboxFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
-            fileSystemParams.AddParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
-            fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
+            fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
             return fileSystemParams;
         }
 
         /// <summary>
         /// 创建默认的WebServer文件系统参数
         /// </summary>
-        /// <param name="decryptionServices">加密文件解密服务类</param>
         /// <param name="disableUnityWebCache">禁用Unity的网络缓存</param>
-        public static FileSystemParameters CreateDefaultWebServerFileSystemParameters(IWebDecryptionServices decryptionServices = null, bool disableUnityWebCache = false)
+        /// <returns>配置好的文件系统参数实例</returns>
+        public static FileSystemParameters CreateDefaultWebServerFileSystemParameters(bool disableUnityWebCache = false)
         {
-            string fileSystemClass = typeof(DefaultWebServerFileSystem).FullName;
+            string fileSystemClass = typeof(WebServerFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
-            fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
-            fileSystemParams.AddParameter(FileSystemParametersDefine.DISABLE_UNITY_WEB_CACHE, disableUnityWebCache);
+            fileSystemParams.AddParameter(EFileSystemParameter.DisableUnityWebCache, disableUnityWebCache);
             return fileSystemParams;
         }
 
         /// <summary>
         /// 创建默认的WebRemote文件系统参数
         /// </summary>
-        /// <param name="remoteServices">远端资源地址查询服务类</param>
-        /// <param name="decryptionServices">加密文件解密服务类</param>
+        /// <param name="remoteService">远端资源地址查询服务类</param>
         /// <param name="disableUnityWebCache">禁用Unity的网络缓存</param>
-        public static FileSystemParameters CreateDefaultWebRemoteFileSystemParameters(IRemoteServices remoteServices, IWebDecryptionServices decryptionServices = null, bool disableUnityWebCache = false)
+        /// <returns>配置好的文件系统参数实例</returns>
+        public static FileSystemParameters CreateDefaultWebRemoteFileSystemParameters(IRemoteService remoteService, bool disableUnityWebCache = false)
         {
-            string fileSystemClass = typeof(DefaultWebRemoteFileSystem).FullName;
+            string fileSystemClass = typeof(WebRemoteFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
-            fileSystemParams.AddParameter(FileSystemParametersDefine.REMOTE_SERVICES, remoteServices);
-            fileSystemParams.AddParameter(FileSystemParametersDefine.DECRYPTION_SERVICES, decryptionServices);
-            fileSystemParams.AddParameter(FileSystemParametersDefine.DISABLE_UNITY_WEB_CACHE, disableUnityWebCache);
+            fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
+            fileSystemParams.AddParameter(EFileSystemParameter.DisableUnityWebCache, disableUnityWebCache);
             return fileSystemParams;
         }
         #endregion

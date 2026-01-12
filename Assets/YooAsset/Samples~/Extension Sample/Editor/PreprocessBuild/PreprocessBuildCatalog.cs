@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using YooAsset.Editor;
 
 namespace YooAsset
 {
@@ -16,7 +17,7 @@ namespace YooAsset
         {
             YooLogger.Log("Begin to create catalog file !");
 
-            string rootPath = YooAssetSettingsData.GetYooDefaultBuildinRoot();
+            string rootPath = BundleBuilderHelper.GetStreamingAssetsRoot();
             DirectoryInfo rootDirectory = new DirectoryInfo(rootPath);
             if (rootDirectory.Exists == false)
             {
@@ -32,7 +33,7 @@ namespace YooAsset
                 string pacakgeDirectory = subDirectory.FullName;
                 try
                 {
-                    bool result = CatalogTools.CreateCatalogFile(null, packageName, pacakgeDirectory); //TODO 自行处理解密
+                    bool result = BuiltinCatalogHelper.CreateFile(null, packageName, pacakgeDirectory); //TODO 自行处理解密
                     if (result == false)
                     {
                         Debug.LogError($"Create package {packageName} catalog file failed ! See the detail error in console !");

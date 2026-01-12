@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 using YooAsset.Editor;
 
 [BuildPipelineAttribute("CustomBuildPipeline")]
-internal class CustomBuildPipelineViewer : BuiltinBuildPipelineViewer
+internal class CustomBuildPipelineViewer : LegacyBuildPipelineViewer
 {
     protected override string GetDefaultPackageVersion()
     {

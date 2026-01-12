@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,35 +7,49 @@ using UnityEngine.SceneManagement;
 
 namespace YooAsset
 {
+    /// <summary>
+    /// 资源管理器，负责管理资源的加载、卸载和句柄创建。
+    /// </summary>
+    /// <remarks>
+    /// 此类不是线程安全的，所有方法必须在 Unity 主线程调用。
+    /// </remarks>
     internal class ResourceManager
     {
-        internal readonly Dictionary<string, ProviderOperation> ProviderDic = new Dictionary<string, ProviderOperation>(5000);
-        internal readonly Dictionary<string, LoadBundleFileOperation> LoaderDic = new Dictionary<string, LoadBundleFileOperation>(5000);
-        internal readonly List<SceneHandle> SceneHandles = new List<SceneHandle>(100);
-        private long _sceneCreateIndex = 0;
-        private IBundleQuery _bundleQuery;
+        private readonly Dictionary<string, ProviderBase> _providerDict = new Dictionary<string, ProviderBase>(5000);
+        private readonly Dictionary<string, LoadBundleOperation> _bundleLoaderDict = new Dictionary<string, LoadBundleOperation>(5000);
+        private readonly List<SceneHandle> _sceneHandles = new List<SceneHandle>(100);
+        private readonly List<SceneHandle> _tempSceneHandles = new List<SceneHandle>(100);
+        private readonly List<LoadBundleOperation> _tempRemoveLoaders = new List<LoadBundleOperation>(100);
+        private FileSystemHost _fileSystemHost;
         private int _bundleLoadingMaxConcurrency;
-
-        // 开发者配置选项
-        public bool AutoUnloadBundleWhenUnused { private set; get; }
-        public bool WebGLForceSyncLoadAsset { private set; get; }
+        private int _bundleLoadingCounter;
+        private long _sceneInstanceCounter;
 
         /// <summary>
-        /// 所属包裹
+        /// 当资源句柄引用计数为零时，是否自动卸载对应的资源包。
+        /// </summary>
+        public bool AutoUnloadBundleWhenUnused { get; private set; }
+
+        /// <summary>
+        /// WebGL 平台是否强制同步加载资源
+        /// </summary>
+        public bool WebGLForceSyncLoadAsset { get; private set; }
+
+        /// <summary>
+        /// 所属包裹名称
         /// </summary>
         public readonly string PackageName;
 
         /// <summary>
-        /// 锁定加载操作
+        /// 加载操作是否被锁定
         /// </summary>
-        public bool LockLoadOperation = false;
+        public bool IsLoadingLocked { get; set; } = false;
+
 
         /// <summary>
-        /// 统计正在加载的Bundle文件数量
+        /// 创建资源管理器实例
         /// </summary>
-        public int BundleLoadingCounter = 0;
-
-
+        /// <param name="packageName">包裹名称</param>
         public ResourceManager(string packageName)
         {
             PackageName = packageName;
@@ -44,12 +58,14 @@ namespace YooAsset
         /// <summary>
         /// 初始化
         /// </summary>
-        public void Initialize(InitializeParameters parameters, IBundleQuery bundleServices)
+        /// <param name="options">初始化配置选项</param>
+        /// <param name="host">文件系统宿主</param>
+        public void Initialize(InitializePackageOptions options, FileSystemHost host)
         {
-            _bundleLoadingMaxConcurrency = parameters.BundleLoadingMaxConcurrency;
-            AutoUnloadBundleWhenUnused = parameters.AutoUnloadBundleWhenUnused;
-            WebGLForceSyncLoadAsset = parameters.WebGLForceSyncLoadAsset;
-            _bundleQuery = bundleServices;
+            _fileSystemHost = host;
+            _bundleLoadingMaxConcurrency = options.BundleLoadingMaxConcurrency;
+            AutoUnloadBundleWhenUnused = options.AutoUnloadBundleWhenUnused;
+            WebGLForceSyncLoadAsset = options.WebGLForceSyncLoadAsset;
             SceneManager.sceneUnloaded += OnSceneUnloaded;
         }
 
@@ -59,129 +75,151 @@ namespace YooAsset
         public void Destroy()
         {
             SceneManager.sceneUnloaded -= OnSceneUnloaded;
+            ForceDestroyAllBundleLoaders();
         }
 
         /// <summary>
         /// 尝试卸载指定资源的资源包（包括依赖资源）
         /// </summary>
+        /// <param name="assetInfo">要卸载的资源信息</param>
+        /// <param name="loopCount">循环尝试次数，用于处理复杂依赖链。</param>
         public void TryUnloadUnusedAsset(AssetInfo assetInfo, int loopCount)
         {
             if (assetInfo == null)
             {
-                YooLogger.Error($"{nameof(AssetInfo)} is null !");
+                YooLogger.LogError($"{nameof(AssetInfo)} is null.");
                 return;
             }
-            if (assetInfo.IsInvalid)
+            if (assetInfo.IsValid == false)
             {
-                YooLogger.Error($"Failed to unload asset ! {assetInfo.Error}");
+                YooLogger.LogError($"Failed to unload asset. Error: {assetInfo.Error}");
                 return;
             }
 
+            // 多次循环尝试卸载，以处理复杂的依赖链
+            // 例如：A依赖B，B依赖C，需要多次循环才能完全卸载
             while (loopCount > 0)
             {
                 loopCount--;
+                bool hasUnloaded = false;
 
                 // 卸载主资源包加载器
-                string mainBundleName = _bundleQuery.GetMainBundleName(assetInfo.Asset.BundleID);
-                var mainLoader = TryGetBundleFileLoader(mainBundleName);
+                string mainBundleName = _fileSystemHost.GetMainBundleName(assetInfo.Asset.BundleID);
+                var mainLoader = GetBundleLoader(mainBundleName);
                 if (mainLoader != null)
                 {
                     mainLoader.TryDestroyProviders();
                     if (mainLoader.CanDestroyLoader())
                     {
                         mainLoader.DestroyLoader();
-                        LoaderDic.Remove(mainBundleName);
+                        _bundleLoaderDict.Remove(mainBundleName);
+                        hasUnloaded = true;
                     }
                 }
 
                 // 卸载依赖资源包加载器
-                foreach (var dependID in assetInfo.Asset.DependBundleIDs)
+                foreach (var dependID in assetInfo.Asset.DependentBundleIDs)
                 {
-                    string dependBundleName = _bundleQuery.GetMainBundleName(dependID);
-                    var dependLoader = TryGetBundleFileLoader(dependBundleName);
+                    string dependBundleName = _fileSystemHost.GetMainBundleName(dependID);
+                    var dependLoader = GetBundleLoader(dependBundleName);
                     if (dependLoader != null)
                     {
                         if (dependLoader.CanDestroyLoader())
                         {
                             dependLoader.DestroyLoader();
-                            LoaderDic.Remove(dependBundleName);
+                            _bundleLoaderDict.Remove(dependBundleName);
+                            hasUnloaded = true;
                         }
                     }
                 }
+
+                // 如果本次循环没有卸载任何资源，提前退出
+                if (hasUnloaded == false)
+                    break;
             }
         }
 
         /// <summary>
         /// 加载场景对象
-        /// 注意：返回的场景句柄是唯一的，每个场景句柄对应自己的场景提供者对象。
-        /// 注意：业务逻辑层应该避免同时加载一个子场景。
         /// </summary>
-        public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneParameters loadSceneParams, bool suspendLoad, uint priority)
+        /// <remarks>
+        /// <para>返回的场景句柄是唯一的，每个场景句柄对应自己的场景提供者对象。</para>
+        /// <para>业务逻辑层应该避免同时加载一个子场景。</para>
+        /// </remarks>
+        /// <param name="assetInfo">场景资源信息</param>
+        /// <param name="loadSceneParams">场景加载参数</param>
+        /// <param name="allowSceneActivation">是否允许场景加载完成后自动激活</param>
+        /// <param name="priority">加载优先级</param>
+        /// <returns>场景句柄</returns>
+        public SceneHandle LoadSceneAsync(AssetInfo assetInfo, LoadSceneParameters loadSceneParams, bool allowSceneActivation, uint priority)
         {
-            if (LockLoadOperation)
+            if (IsLoadingLocked)
             {
-                string error = $"The load operation locked !";
-                YooLogger.Error(error);
-                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
-                completedProvider.SetCompletedWithError(error);
-                return completedProvider.CreateHandle<SceneHandle>();
+                string error = $"Loading is currently locked. New load requests are rejected.";
+                YooLogger.LogError(error);
+                ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
+                errorProvider.SetCompletedWithError(error);
+                return errorProvider.CreateHandle<SceneHandle>();
             }
 
-            if (assetInfo.IsInvalid)
+            if (assetInfo.IsValid == false)
             {
-                YooLogger.Error($"Failed to load scene ! {assetInfo.Error}");
-                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
-                completedProvider.SetCompletedWithError(assetInfo.Error);
-                return completedProvider.CreateHandle<SceneHandle>();
+                YooLogger.LogError($"Failed to load scene. Error: {assetInfo.Error}");
+                ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
+                errorProvider.SetCompletedWithError(assetInfo.Error);
+                return errorProvider.CreateHandle<SceneHandle>();
             }
 
-            // 注意：同一个场景的ProviderGUID每次加载都会变化
-            string providerGUID = $"{assetInfo.GUID}-{++_sceneCreateIndex}";
-            ProviderOperation provider;
+            // 注意：同一个场景的ProviderKey每次加载都会变化
+            string providerKey = $"{assetInfo.AssetKey}-{++_sceneInstanceCounter}";
+            ProviderBase provider;
             {
-                provider = new SceneProvider(this, providerGUID, assetInfo, loadSceneParams, suspendLoad);
+                provider = new SceneProvider(this, providerKey, assetInfo, loadSceneParams, allowSceneActivation);
                 provider.InitProviderDebugInfo();
-                ProviderDic.Add(providerGUID, provider);
-                OperationSystem.StartOperation(PackageName, provider);
+                _providerDict.Add(providerKey, provider);
+                AsyncOperationSystem.StartOperation(PackageName, provider);
             }
 
             provider.Priority = priority;
             var handle = provider.CreateHandle<SceneHandle>();
             handle.PackageName = PackageName;
-            SceneHandles.Add(handle);
+            _sceneHandles.Add(handle);
             return handle;
         }
 
         /// <summary>
         /// 加载资源对象
         /// </summary>
+        /// <param name="assetInfo">资源信息</param>
+        /// <param name="priority">加载优先级</param>
+        /// <returns>资源句柄</returns>
         public AssetHandle LoadAssetAsync(AssetInfo assetInfo, uint priority)
         {
-            if (LockLoadOperation)
+            if (IsLoadingLocked)
             {
-                string error = $"The load operation locked !";
-                YooLogger.Error(error);
-                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
-                completedProvider.SetCompletedWithError(error);
-                return completedProvider.CreateHandle<AssetHandle>();
+                string error = $"Loading is currently locked. New load requests are rejected.";
+                YooLogger.LogError(error);
+                ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
+                errorProvider.SetCompletedWithError(error);
+                return errorProvider.CreateHandle<AssetHandle>();
             }
 
-            if (assetInfo.IsInvalid)
+            if (assetInfo.IsValid == false)
             {
-                YooLogger.Error($"Failed to load asset ! {assetInfo.Error}");
-                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
-                completedProvider.SetCompletedWithError(assetInfo.Error);
-                return completedProvider.CreateHandle<AssetHandle>();
+                YooLogger.LogError($"Failed to load asset. Error: {assetInfo.Error}");
+                ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
+                errorProvider.SetCompletedWithError(assetInfo.Error);
+                return errorProvider.CreateHandle<AssetHandle>();
             }
 
-            string providerGUID = nameof(LoadAssetAsync) + assetInfo.GUID;
-            ProviderOperation provider = TryGetAssetProvider(providerGUID);
+            string providerKey = nameof(LoadAssetAsync) + assetInfo.AssetKey;
+            ProviderBase provider = GetAssetProvider(providerKey);
             if (provider == null)
             {
-                provider = new AssetProvider(this, providerGUID, assetInfo);
+                provider = new AssetProvider(this, providerKey, assetInfo);
                 provider.InitProviderDebugInfo();
-                ProviderDic.Add(providerGUID, provider);
-                OperationSystem.StartOperation(PackageName, provider);
+                _providerDict.Add(providerKey, provider);
+                AsyncOperationSystem.StartOperation(PackageName, provider);
             }
 
             provider.Priority = priority;
@@ -191,33 +229,36 @@ namespace YooAsset
         /// <summary>
         /// 加载子资源对象
         /// </summary>
+        /// <param name="assetInfo">资源信息</param>
+        /// <param name="priority">加载优先级</param>
+        /// <returns>子资源句柄</returns>
         public SubAssetsHandle LoadSubAssetsAsync(AssetInfo assetInfo, uint priority)
         {
-            if (LockLoadOperation)
+            if (IsLoadingLocked)
             {
-                string error = $"The load operation locked !";
-                YooLogger.Error(error);
-                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
-                completedProvider.SetCompletedWithError(error);
-                return completedProvider.CreateHandle<SubAssetsHandle>();
+                string error = $"Loading is currently locked. New load requests are rejected.";
+                YooLogger.LogError(error);
+                ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
+                errorProvider.SetCompletedWithError(error);
+                return errorProvider.CreateHandle<SubAssetsHandle>();
             }
 
-            if (assetInfo.IsInvalid)
+            if (assetInfo.IsValid == false)
             {
-                YooLogger.Error($"Failed to load sub assets ! {assetInfo.Error}");
-                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
-                completedProvider.SetCompletedWithError(assetInfo.Error);
-                return completedProvider.CreateHandle<SubAssetsHandle>();
+                YooLogger.LogError($"Failed to load sub assets. Error: {assetInfo.Error}");
+                ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
+                errorProvider.SetCompletedWithError(assetInfo.Error);
+                return errorProvider.CreateHandle<SubAssetsHandle>();
             }
 
-            string providerGUID = nameof(LoadSubAssetsAsync) + assetInfo.GUID;
-            ProviderOperation provider = TryGetAssetProvider(providerGUID);
+            string providerKey = nameof(LoadSubAssetsAsync) + assetInfo.AssetKey;
+            ProviderBase provider = GetAssetProvider(providerKey);
             if (provider == null)
             {
-                provider = new SubAssetsProvider(this, providerGUID, assetInfo);
+                provider = new SubAssetsProvider(this, providerKey, assetInfo);
                 provider.InitProviderDebugInfo();
-                ProviderDic.Add(providerGUID, provider);
-                OperationSystem.StartOperation(PackageName, provider);
+                _providerDict.Add(providerKey, provider);
+                AsyncOperationSystem.StartOperation(PackageName, provider);
             }
 
             provider.Priority = priority;
@@ -227,33 +268,36 @@ namespace YooAsset
         /// <summary>
         /// 加载所有资源对象
         /// </summary>
+        /// <param name="assetInfo">资源信息</param>
+        /// <param name="priority">加载优先级</param>
+        /// <returns>全资源句柄</returns>
         public AllAssetsHandle LoadAllAssetsAsync(AssetInfo assetInfo, uint priority)
         {
-            if (LockLoadOperation)
+            if (IsLoadingLocked)
             {
-                string error = $"The load operation locked !";
-                YooLogger.Error(error);
-                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
-                completedProvider.SetCompletedWithError(error);
-                return completedProvider.CreateHandle<AllAssetsHandle>();
+                string error = $"Loading is currently locked. New load requests are rejected.";
+                YooLogger.LogError(error);
+                ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
+                errorProvider.SetCompletedWithError(error);
+                return errorProvider.CreateHandle<AllAssetsHandle>();
             }
 
-            if (assetInfo.IsInvalid)
+            if (assetInfo.IsValid == false)
             {
-                YooLogger.Error($"Failed to load all assets ! {assetInfo.Error}");
-                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
-                completedProvider.SetCompletedWithError(assetInfo.Error);
-                return completedProvider.CreateHandle<AllAssetsHandle>();
+                YooLogger.LogError($"Failed to load all assets. Error: {assetInfo.Error}");
+                ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
+                errorProvider.SetCompletedWithError(assetInfo.Error);
+                return errorProvider.CreateHandle<AllAssetsHandle>();
             }
 
-            string providerGUID = nameof(LoadAllAssetsAsync) + assetInfo.GUID;
-            ProviderOperation provider = TryGetAssetProvider(providerGUID);
+            string providerKey = nameof(LoadAllAssetsAsync) + assetInfo.AssetKey;
+            ProviderBase provider = GetAssetProvider(providerKey);
             if (provider == null)
             {
-                provider = new AllAssetsProvider(this, providerGUID, assetInfo);
+                provider = new AllAssetsProvider(this, providerKey, assetInfo);
                 provider.InitProviderDebugInfo();
-                ProviderDic.Add(providerGUID, provider);
-                OperationSystem.StartOperation(PackageName, provider);
+                _providerDict.Add(providerKey, provider);
+                AsyncOperationSystem.StartOperation(PackageName, provider);
             }
 
             provider.Priority = priority;
@@ -263,175 +307,356 @@ namespace YooAsset
         /// <summary>
         /// 加载原生文件
         /// </summary>
+        /// <param name="assetInfo">资源信息</param>
+        /// <param name="priority">加载优先级</param>
+        /// <returns>原生文件句柄</returns>
         public RawFileHandle LoadRawFileAsync(AssetInfo assetInfo, uint priority)
         {
-            if (LockLoadOperation)
+            if (IsLoadingLocked)
             {
-                string error = $"The load operation locked !";
-                YooLogger.Error(error);
-                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
-                completedProvider.SetCompletedWithError(error);
-                return completedProvider.CreateHandle<RawFileHandle>();
+                string error = $"Loading is currently locked. New load requests are rejected.";
+                YooLogger.LogError(error);
+                ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
+                errorProvider.SetCompletedWithError(error);
+                return errorProvider.CreateHandle<RawFileHandle>();
             }
 
-            if (assetInfo.IsInvalid)
+            if (assetInfo.IsValid == false)
             {
-                YooLogger.Error($"Failed to load raw file ! {assetInfo.Error}");
-                CompletedProvider completedProvider = new CompletedProvider(this, assetInfo);
-                completedProvider.SetCompletedWithError(assetInfo.Error);
-                return completedProvider.CreateHandle<RawFileHandle>();
+                YooLogger.LogError($"Failed to load raw file. Error: {assetInfo.Error}");
+                ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
+                errorProvider.SetCompletedWithError(assetInfo.Error);
+                return errorProvider.CreateHandle<RawFileHandle>();
             }
 
-            string providerGUID = nameof(LoadRawFileAsync) + assetInfo.GUID;
-            ProviderOperation provider = TryGetAssetProvider(providerGUID);
+            string providerKey = nameof(LoadRawFileAsync) + assetInfo.AssetKey;
+            ProviderBase provider = GetAssetProvider(providerKey);
             if (provider == null)
             {
-                provider = new RawFileProvider(this, providerGUID, assetInfo);
+                provider = new RawFileProvider(this, providerKey, assetInfo);
                 provider.InitProviderDebugInfo();
-                ProviderDic.Add(providerGUID, provider);
-                OperationSystem.StartOperation(PackageName, provider);
+                _providerDict.Add(providerKey, provider);
+                AsyncOperationSystem.StartOperation(PackageName, provider);
             }
 
             provider.Priority = priority;
             return provider.CreateHandle<RawFileHandle>();
         }
 
-        internal LoadBundleFileOperation CreateMainBundleFileLoader(AssetInfo assetInfo)
+        /// <summary>
+        /// 获取或创建主资源包加载器
+        /// </summary>
+        internal LoadBundleOperation GetOrCreateMainBundleLoader(AssetInfo assetInfo)
         {
-            BundleInfo bundleInfo = _bundleQuery.GetMainBundleInfo(assetInfo);
-            return CreateBundleFileLoaderInternal(bundleInfo);
+            BundleInfo bundleInfo = _fileSystemHost.GetMainBundleInfo(assetInfo);
+            return GetOrCreateBundleLoader(bundleInfo);
         }
-        internal List<LoadBundleFileOperation> CreateDependBundleFileLoaders(AssetInfo assetInfo)
+
+        /// <summary>
+        /// 获取或创建依赖资源包加载器列表
+        /// </summary>
+        internal List<LoadBundleOperation> GetOrCreateDependBundleLoaders(AssetInfo assetInfo)
         {
-            List<BundleInfo> bundleInfos = _bundleQuery.GetDependBundleInfos(assetInfo);
-            List<LoadBundleFileOperation> result = new List<LoadBundleFileOperation>(bundleInfos.Count);
+            List<BundleInfo> bundleInfos = _fileSystemHost.GetDependentBundleInfos(assetInfo);
+            List<LoadBundleOperation> result = new List<LoadBundleOperation>(bundleInfos.Count);
             foreach (var bundleInfo in bundleInfos)
             {
-                var bundleLoader = CreateBundleFileLoaderInternal(bundleInfo);
+                var bundleLoader = GetOrCreateBundleLoader(bundleInfo);
                 result.Add(bundleLoader);
             }
             return result;
         }
-        internal void RemoveBundleProviders(List<ProviderOperation> removeList)
+
+        /// <summary>
+        /// 从字典中移除指定的资源提供者
+        /// </summary>
+        internal void RemoveBundleProviders(List<ProviderBase> removeList)
         {
             foreach (var provider in removeList)
             {
-                ProviderDic.Remove(provider.ProviderGUID);
+                _providerDict.Remove(provider.ProviderKey);
             }
         }
+
+        /// <summary>
+        /// 检查指定资源包是否已销毁
+        /// </summary>
         internal bool CheckBundleDestroyed(int bundleID)
         {
-            string bundleName = _bundleQuery.GetMainBundleName(bundleID);
-            var bundleFileLoader = TryGetBundleFileLoader(bundleName);
+            string bundleName = _fileSystemHost.GetMainBundleName(bundleID);
+            var bundleFileLoader = GetBundleLoader(bundleName);
             if (bundleFileLoader == null)
                 return true;
             return bundleFileLoader.IsDestroyed;
         }
+
+        /// <summary>
+        /// 检查指定资源包是否可以释放
+        /// </summary>
         internal bool CheckBundleReleasable(int bundleID)
         {
-            string bundleName = _bundleQuery.GetMainBundleName(bundleID);
-            var bundleFileLoader = TryGetBundleFileLoader(bundleName);
+            string bundleName = _fileSystemHost.GetMainBundleName(bundleID);
+            var bundleFileLoader = GetBundleLoader(bundleName);
             if (bundleFileLoader == null)
                 return true;
-            return bundleFileLoader.CanReleasableLoader();
-        }
-        internal bool HasAnyLoader()
-        {
-            return LoaderDic.Count > 0;
-        }
-        internal bool BundleLoadingIsBusy()
-        {
-            return BundleLoadingCounter >= _bundleLoadingMaxConcurrency;
+            return bundleFileLoader.IsReleasable();
         }
 
-        private LoadBundleFileOperation CreateBundleFileLoaderInternal(BundleInfo bundleInfo)
+        /// <summary>
+        /// 检查是否存在任何资源包加载器
+        /// </summary>
+        internal bool HasAnyLoader()
+        {
+            return _bundleLoaderDict.Count > 0;
+        }
+
+        /// <summary>
+        /// 释放所有 Provider 持有的句柄
+        /// </summary>
+        internal void ReleaseAllHandles()
+        {
+            // 注意：创建快照是因为释放句柄可能触发 TryUnloadBundle 逻辑，进而修改字典容器。
+            var snapshot = new List<ProviderBase>(_providerDict.Values);
+            foreach (var provider in snapshot)
+            {
+                provider.ReleaseAllHandles();
+            }
+        }
+
+        /// <summary>
+        /// 检查是否所有 Provider 都已完成
+        /// </summary>
+        internal bool AreAllProvidersDone()
+        {
+            foreach (var provider in _providerDict.Values)
+            {
+                if (provider.IsDone == false)
+                    return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 销毁所有 Provider 并清空字典
+        /// </summary>
+        internal void DestroyAllProviders()
+        {
+            foreach (var provider in _providerDict.Values)
+            {
+                provider.DestroyProvider();
+            }
+            _providerDict.Clear();
+        }
+
+        /// <summary>
+        /// 尝试终止所有 BundleLoader
+        /// </summary>
+        internal void TryAbortAllBundleLoaders()
+        {
+            foreach (var loader in _bundleLoaderDict.Values)
+            {
+                loader.TryAbortLoader();
+            }
+        }
+
+        /// <summary>
+        /// 销毁所有 BundleLoader 并清空字典
+        /// </summary>
+        internal void DestroyAllBundleLoaders()
+        {
+            foreach (var loader in _bundleLoaderDict.Values)
+            {
+                loader.DestroyLoader();
+            }
+            _bundleLoaderDict.Clear();
+        }
+
+        /// <summary>
+        /// 强制销毁所有 BundleLoader 并清空字典（仅用于全局 Destroy 场景）
+        /// </summary>
+        internal void ForceDestroyAllBundleLoaders()
+        {
+            foreach (var loader in _bundleLoaderDict.Values)
+            {
+                loader.ForceDestroyLoader();
+            }
+            _bundleLoaderDict.Clear();
+        }
+
+        /// <summary>
+        /// 销毁未使用的 Bundle
+        /// </summary>
+        internal void DestroyUnusedBundle()
+        {
+            // 注意：优先销毁资源提供者
+            foreach (var loader in _bundleLoaderDict.Values)
+            {
+                loader.TryDestroyProviders();
+            }
+
+            // 获取销毁列表
+            _tempRemoveLoaders.Clear();
+            foreach (var loader in _bundleLoaderDict.Values)
+            {
+                if (loader.CanDestroyLoader())
+                    _tempRemoveLoaders.Add(loader);
+            }
+
+            // 销毁文件加载器
+            foreach (var loader in _tempRemoveLoaders)
+            {
+                loader.DestroyLoader();
+                _bundleLoaderDict.Remove(loader.LoadBundleInfo.Bundle.BundleName);
+            }
+            _tempRemoveLoaders.Clear();
+        }
+
+        /// <summary>
+        /// 清空场景句柄列表
+        /// </summary>
+        internal void ClearSceneHandles()
+        {
+            _sceneHandles.Clear();
+        }
+
+        /// <summary>
+        /// 增加资源包加载计数器
+        /// </summary>
+        internal void IncrementBundleLoadingCounter()
+        {
+            _bundleLoadingCounter++;
+        }
+
+        /// <summary>
+        /// 减少资源包加载计数器
+        /// </summary>
+        internal void DecrementBundleLoadingCounter()
+        {
+            _bundleLoadingCounter--;
+            if (_bundleLoadingCounter < 0)
+            {
+                YooLogger.LogError("Bundle loading counter became negative and was reset to zero.");
+                _bundleLoadingCounter = 0;
+            }
+        }
+
+        /// <summary>
+        /// 获取当前资源包加载计数
+        /// </summary>
+        internal int GetBundleLoadingCounter()
+        {
+            return _bundleLoadingCounter;
+        }
+
+        /// <summary>
+        /// 检查资源包加载是否繁忙（达到并发上限）
+        /// </summary>
+        internal bool IsBundleLoadingBusy()
+        {
+            return _bundleLoadingCounter >= _bundleLoadingMaxConcurrency;
+        }
+
+        private LoadBundleOperation GetOrCreateBundleLoader(BundleInfo bundleInfo)
         {
             // 如果加载器已经存在
             string bundleName = bundleInfo.Bundle.BundleName;
-            LoadBundleFileOperation loaderOperation = TryGetBundleFileLoader(bundleName);
+            LoadBundleOperation loaderOperation = GetBundleLoader(bundleName);
             if (loaderOperation != null)
                 return loaderOperation;
 
             // 新增下载需求
-            loaderOperation = new LoadBundleFileOperation(this, bundleInfo);
-            LoaderDic.Add(bundleName, loaderOperation);
+            loaderOperation = new LoadBundleOperation(this, bundleInfo);
+            _bundleLoaderDict.Add(bundleName, loaderOperation);
             return loaderOperation;
         }
-        private LoadBundleFileOperation TryGetBundleFileLoader(string bundleName)
+        private LoadBundleOperation GetBundleLoader(string bundleName)
         {
-            if (LoaderDic.TryGetValue(bundleName, out LoadBundleFileOperation value))
+            if (_bundleLoaderDict.TryGetValue(bundleName, out LoadBundleOperation value))
                 return value;
             else
                 return null;
         }
-        private ProviderOperation TryGetAssetProvider(string providerGUID)
+        private ProviderBase GetAssetProvider(string providerKey)
         {
-            if (ProviderDic.TryGetValue(providerGUID, out ProviderOperation value))
+            if (_providerDict.TryGetValue(providerKey, out ProviderBase value))
                 return value;
             else
                 return null;
         }
         private void OnSceneUnloaded(Scene scene)
         {
-            List<SceneHandle> removeList = new List<SceneHandle>();
-            foreach (var sceneHandle in SceneHandles)
+            _tempSceneHandles.Clear();
+            foreach (var sceneHandle in _sceneHandles)
             {
-                if (sceneHandle.IsValid)
+                if (sceneHandle.IsValid == false)
                 {
-                    if (sceneHandle.SceneObject == scene)
-                    {
-                        sceneHandle.Release();
-                        removeList.Add(sceneHandle);
-                    }
+                    _tempSceneHandles.Add(sceneHandle);
+                    continue;
+                }
+                if (sceneHandle.SceneObject == scene)
+                {
+                    sceneHandle.Release();
+                    _tempSceneHandles.Add(sceneHandle);
                 }
             }
-            foreach (var sceneHandle in removeList)
+            foreach (var sceneHandle in _tempSceneHandles)
             {
-                SceneHandles.Remove(sceneHandle);
+                _sceneHandles.Remove(sceneHandle);
             }
         }
 
         #region 调试信息
-        internal List<DebugProviderInfo> GetDebugProviderInfos()
+        /// <summary>
+        /// 获取所有资源提供者的调试信息
+        /// </summary>
+        internal List<DiagnosticProviderInfo> DebugGetProviderInfos()
         {
-            List<DebugProviderInfo> result = new List<DebugProviderInfo>(ProviderDic.Count);
-            foreach (var provider in ProviderDic.Values)
+            List<DiagnosticProviderInfo> result = new List<DiagnosticProviderInfo>(_providerDict.Count);
+            foreach (var provider in _providerDict.Values)
             {
-                DebugProviderInfo providerInfo = new DebugProviderInfo();
+                DiagnosticProviderInfo providerInfo = new DiagnosticProviderInfo();
                 providerInfo.AssetPath = provider.MainAssetInfo.AssetPath;
-                providerInfo.SpawnScene = provider.SpawnScene;
-                providerInfo.BeginTime = provider.BeginTime;
-                providerInfo.LoadingTime = provider.ProcessTime;
-                providerInfo.RefCount = provider.RefCount;
+                providerInfo.SceneName = provider.SceneName;
+                providerInfo.StartTime = provider.StartTime;
+                providerInfo.ElapsedMilliseconds = provider.ElapsedMilliseconds;
+                providerInfo.ReferenceCount = provider.RefCount;
                 providerInfo.Status = provider.Status.ToString();
-                providerInfo.DependBundles = provider.GetDebugDependBundles();
+                providerInfo.Dependencies = provider.GetDebugDependBundles();
                 result.Add(providerInfo);
             }
             return result;
         }
-        internal List<DebugBundleInfo> GetDebugBundleInfos()
+
+        /// <summary>
+        /// 获取所有资源包加载器的调试信息
+        /// </summary>
+        internal List<DiagnosticBundleInfo> DebugGetBundleInfos()
         {
-            List<DebugBundleInfo> result = new List<DebugBundleInfo>(LoaderDic.Values.Count);
-            foreach (var bundleLoader in LoaderDic.Values)
+            List<DiagnosticBundleInfo> result = new List<DiagnosticBundleInfo>(_bundleLoaderDict.Values.Count);
+            foreach (var bundleLoader in _bundleLoaderDict.Values)
             {
                 var packageBundle = bundleLoader.LoadBundleInfo.Bundle;
-                var bundleInfo = new DebugBundleInfo();
+                var bundleInfo = new DiagnosticBundleInfo();
                 bundleInfo.BundleName = packageBundle.BundleName;
-                bundleInfo.RefCount = bundleLoader.RefCount;
+                bundleInfo.ReferenceCount = bundleLoader.RefCount;
                 bundleInfo.Status = bundleLoader.Status.ToString();
-                bundleInfo.ReferenceBundles = FilterReferenceBundles(packageBundle);
+                bundleInfo.Referencers = FilterReferenceBundles(packageBundle);
                 result.Add(bundleInfo);
             }
             return result;
         }
-        internal List<string> FilterReferenceBundles(PackageBundle packageBundle)
+
+        /// <summary>
+        /// 过滤出当前已加载的引用资源包
+        /// </summary>
+        private List<string> FilterReferenceBundles(PackageBundle packageBundle)
         {
             // 注意：引用的资源包不一定在内存中，所以需要过滤
-            var referenceBundles = packageBundle.GetDebugReferenceBundles();
-            List<string> result = new List<string>(referenceBundles.Count);
-            foreach (var bundleName in referenceBundles)
+            var referrerBundleNames = packageBundle.DebugGetReferrerBundleNames();
+            List<string> result = new List<string>(referrerBundleNames.Count);
+            foreach (var bundleName in referrerBundleNames)
             {
-                if (LoaderDic.ContainsKey(bundleName))
+                if (_bundleLoaderDict.ContainsKey(bundleName))
                     result.Add(bundleName);
             }
             return result;

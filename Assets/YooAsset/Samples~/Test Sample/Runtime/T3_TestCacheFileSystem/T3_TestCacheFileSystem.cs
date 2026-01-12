@@ -1,14 +1,21 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.U2D;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using YooAsset;
 
+/// <summary>
+/// Cache（联机）模式测试套件
+/// </summary>
+/// <remarks>
+/// 复用 T2 构建产物，拷贝到本地 HTTP 服务器目录，通过 HostPlayModeOptions 初始化。
+/// 覆盖边玩边下、资源导入、资源下载、缓存清理、清单清理等 T3 专属用例。
+/// 前置依赖: 需要本地 HTTP 服务器（见 TestConsts.TestServerURL）。
+/// </remarks>
 public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
 {
     public void Setup()
@@ -24,97 +31,110 @@ public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
         // 清空旧的缓存目录
         string projectPath = Path.GetDirectoryName(Application.dataPath);
         string cacheRoot = $"{projectPath}/yoo";
-        Directory.Delete(cacheRoot, true);
+        if (Directory.Exists(cacheRoot))
+            Directory.Delete(cacheRoot, true);
 
         // 拷贝打包资源到本地服务器
         {
             string packageRoot = string.Empty;
 #if UNITY_EDITOR
-            packageRoot = UnityEditor.EditorPrefs.GetString(T2_TestBuldinFileSystem.ASSET_BUNDLE_PACKAGE_ROOT_KEY);
+            packageRoot = UnityEditor.EditorPrefs.GetString(T2_TestBuiltinFileSystem.ASSET_BUNDLE_PACKAGE_ROOT_KEY);
 #endif
             if (Directory.Exists(packageRoot) == false)
                 throw new Exception($"Not found package root : {packageRoot}");
 
-            string testServerDirectory = "C://xampp/htdocs/CDN/Android/Test";
-            CopyDirectory(packageRoot, testServerDirectory);
+            CopyDirectory(packageRoot, TestConsts.TestServerDirectory);
         }
 
         // 初始化资源包 ASSET_BUNDLE
         {
-            var package = YooAssets.CreatePackage(TestDefine.AssetBundlePackageName);
+            var package = YooAssets.CreatePackage(TestConsts.AssetBundlePackageName);
 
             // 初始化资源包
-            var initParams = new HostPlayModeParameters();
-            var fileDecryption = new TestFileStreamDecryption();
-            var manifestServices = new TestRestoreManifest();
+            var initParams = new HostPlayModeOptions();
+            var manifestServices = new TestManifestDecryptor();
 
-            string hostServerIP = "http://127.0.0.1/CDN/Android/Test/";
-            var remoteServices = new TestRemoteServices(hostServerIP);
-            initParams.BuildinFileSystemParameters = null;
-            initParams.CacheFileSystemParameters = FileSystemParameters.CreateDefaultCacheFileSystemParameters(remoteServices, fileDecryption);
-            initParams.CacheFileSystemParameters.AddParameter(FileSystemParametersDefine.MANIFEST_SERVICES, manifestServices);
-            var initializeOp = package.InitializeAsync(initParams);
+            var remoteService = new TestRemoteService(TestConsts.TestServerURL);
+            initParams.BuiltinFileSystemParameters = null;
+            initParams.CacheFileSystemParameters = FileSystemParameters.CreateDefaultSandboxFileSystemParameters(remoteService);
+            initParams.CacheFileSystemParameters.AddParameter(EFileSystemParameter.ManifestDecryptor, manifestServices);
+            initParams.CacheFileSystemParameters.AddParameter(EFileSystemParameter.AssetbundleDecryptor, new TestFileStreamDecryption());
+            var initializeOp = package.InitializePackageAsync(initParams);
             yield return initializeOp;
-            if (initializeOp.Status != EOperationStatus.Succeed)
+            if (initializeOp.Status != EOperationStatus.Succeeded)
                 Debug.LogError(initializeOp.Error);
-            Assert.AreEqual(EOperationStatus.Succeed, initializeOp.Status);
+            Assert.AreEqual(EOperationStatus.Succeeded, initializeOp.Status);
 
             // 请求资源版本
-            var requetVersionOp = package.RequestPackageVersionAsync();
-            yield return requetVersionOp;
-            if (requetVersionOp.Status != EOperationStatus.Succeed)
-                Debug.LogError(requetVersionOp.Error);
-            Assert.AreEqual(EOperationStatus.Succeed, requetVersionOp.Status);
+            var requestVersionOp = package.RequestPackageVersionAsync();
+            yield return requestVersionOp;
+            if (requestVersionOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(requestVersionOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, requestVersionOp.Status);
 
             // 更新资源清单
-            var updateManifestOp = package.UpdatePackageManifestAsync(requetVersionOp.PackageVersion);
-            yield return updateManifestOp;
-            if (updateManifestOp.Status != EOperationStatus.Succeed)
-                Debug.LogError(updateManifestOp.Error);
-            Assert.AreEqual(EOperationStatus.Succeed, updateManifestOp.Status);
+            var loadPackageManifestOptions = new LoadPackageManifestOptions(requestVersionOp.PackageVersion, 60);
+            var loadPackageManifestOp = package.LoadPackageManifestAsync(loadPackageManifestOptions);
+            yield return loadPackageManifestOp;
+            if (loadPackageManifestOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(loadPackageManifestOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, loadPackageManifestOp.Status);
         }
     }
-    private class TestRemoteServices : IRemoteServices
+    private class TestRemoteService : IRemoteService
     {
         private readonly string _localServerRoot;
 
-        public TestRemoteServices(string localServerRoot)
+        public TestRemoteService(string localServerRoot)
         {
             _localServerRoot = localServerRoot;
         }
-        string IRemoteServices.GetRemoteMainURL(string fileName)
+
+        public IReadOnlyList<string> GetRemoteUrls(string fileName)
         {
-            return $"{_localServerRoot}/{fileName}";
-        }
-        string IRemoteServices.GetRemoteFallbackURL(string fileName)
-        {
-            return $"{_localServerRoot}/{fileName}";
+            List<string> urls = new List<string>();
+            urls.Add($"{_localServerRoot}/{fileName}");
+            return urls;
         }
     }
 
     [UnityTest]
-    public IEnumerator C1_TestBundlePlaying()
+    public IEnumerator C01_TestBundlePlaying()
     {
         var tester = new TestBundlePlaying();
         yield return tester.RuntimeTester();
     }
 
     [UnityTest]
-    public IEnumerator C2_TestBundleImporter()
+    public IEnumerator C02_TestResourceImporter()
     {
-        var tester = new TestBundleImporter();
+        var tester = new TestResourceImporter();
         yield return tester.RuntimeTester();
     }
 
     [UnityTest]
-    public IEnumerator C3_TestBundleDownloader()
+    public IEnumerator C03_TestResourceDownloader()
     {
-        var tester = new TestBundleDownloader();
+        var tester = new TestResourceDownloader();
         yield return tester.RuntimeTester();
     }
 
     [UnityTest]
-    public IEnumerator D_DestroyPackage()
+    public IEnumerator C04_TestClearCache()
+    {
+        var tester = new TestClearCache();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator C05_TestClearManifest()
+    {
+        var tester = new TestClearManifest();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator Z_DestroyPackage()
     {
         var tester = new TestDestroyPackage();
         yield return tester.RuntimeTester(false);

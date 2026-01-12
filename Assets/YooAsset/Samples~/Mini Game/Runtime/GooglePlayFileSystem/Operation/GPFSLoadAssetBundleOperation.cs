@@ -1,10 +1,11 @@
 #if UNITY_ANDROID && GOOGLE_PLAY
-using System.IO;
-using UnityEngine;
 using YooAsset;
 using Google.Play.AssetDelivery;
 
-internal class GPFSLoadAssetBundleOperation : FSLoadBundleOperation
+/// <summary>
+/// Loads an AssetBundle through Google Play Asset Delivery API.
+/// </summary>
+internal sealed class GPFSLoadPackageBundleOperation : FSLoadPackageBundleOperation
 {
     private enum ESteps
     {
@@ -15,39 +16,35 @@ internal class GPFSLoadAssetBundleOperation : FSLoadBundleOperation
     }
 
     private readonly GooglePlayFileSystem _fileSystem;
-    private readonly PackageBundle _bundle;
+    private readonly FSLoadPackageBundleOptions _options;
     private PlayAssetBundleRequest _bundleRequest;
     private ESteps _steps = ESteps.None;
 
-
-    internal GPFSLoadAssetBundleOperation(GooglePlayFileSystem fileSystem, PackageBundle bundle)
+    internal GPFSLoadPackageBundleOperation(GooglePlayFileSystem fileSystem, FSLoadPackageBundleOptions options)
     {
         _fileSystem = fileSystem;
-        _bundle = bundle;
+        _options = options;
     }
-    internal override void InternalStart()
+    protected override void InternalStart()
     {
-        DownloadProgress = 1f;
-        DownloadedBytes = _bundle.FileSize;
         _steps = ESteps.LoadAssetBundle;
     }
-    internal override void InternalUpdate()
+    protected override void InternalUpdate()
     {
         if (_steps == ESteps.None || _steps == ESteps.Done)
             return;
 
         if (_steps == ESteps.LoadAssetBundle)
         {
-            if (_bundle.Encrypted)
+            if (_options.Bundle.IsEncrypted)
             {
                 _steps = ESteps.Done;
-                Status = EOperationStatus.Failed;
-                Error = $"The {nameof(GooglePlayFileSystem)} not support bundle encrypted !";
-                YooLogger.Error(Error);
+                SetError($"{nameof(GooglePlayFileSystem)} does not support encrypted bundles.");
+                YooLogger.LogError(Error);
                 return;
             }
 
-            _bundleRequest = PlayAssetDelivery.RetrieveAssetBundleAsync(_bundle.FileName);
+            _bundleRequest = PlayAssetDelivery.RetrieveAssetBundleAsync(_options.Bundle.GetFileName());
             _steps = ESteps.CheckResult;
         }
 
@@ -59,26 +56,24 @@ internal class GPFSLoadAssetBundleOperation : FSLoadBundleOperation
             if (_bundleRequest.Error != AssetDeliveryErrorCode.NoError)
             {
                 _steps = ESteps.Done;
-                Status = EOperationStatus.Failed;
-                Error = $"Failed to load delivery asset bundle file : {_bundle.BundleName} Error : {_bundleRequest.Error}";
-                YooLogger.Error(Error);
+                SetError($"Failed to load asset bundle via Play Asset Delivery: {_options.Bundle.BundleName} Error: {_bundleRequest.Error}");
+                YooLogger.LogError(Error);
             }
             else
             {
                 _steps = ESteps.Done;
-                Status = EOperationStatus.Succeed;
-                Result = new AssetBundleResult(_fileSystem, _bundle, _bundleRequest.AssetBundle, null);
+                SetResult();
+                BundleHandle = new AssetBundleHandle(string.Empty, _options.Bundle, _bundleRequest.AssetBundle, null);
             }
         }
     }
-    internal override void InternalWaitForAsyncComplete()
+    protected override void InternalWaitForCompletion()
     {
         if (_steps != ESteps.Done)
         {
             _steps = ESteps.Done;
-            Status = EOperationStatus.Failed;
-            Error = $"{nameof(GooglePlayFileSystem)} not support sync load method !";
-            UnityEngine.Debug.LogError(Error);
+            SetError($"{nameof(GooglePlayFileSystem)} does not support synchronous loading.");
+            YooLogger.LogError(Error);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 // 外部友元
 [assembly: InternalsVisibleTo("YooAsset.EditorExtension")]

@@ -1,8 +1,11 @@
-﻿using System;
+using System;
 using System.Linq;
 
 namespace YooAsset
 {
+    /// <summary>
+    /// 清单中的资源描述
+    /// </summary>
     [Serializable]
     internal class PackageAsset
     {
@@ -19,7 +22,7 @@ namespace YooAsset
         /// <summary>
         /// 资源GUID
         /// </summary>
-        public string AssetGUID;
+        public string AssetGuid;
 
         /// <summary>
         /// 资源的分类标签
@@ -35,18 +38,20 @@ namespace YooAsset
         /// 依赖的资源包ID集合
         /// 说明：框架层收集查询结果
         /// </summary>
-        public int[] DependBundleIDs;
+        public int[] DependentBundleIDs;
 
         /// <summary>
         /// 临时数据对象（仅编辑器有效）
         /// </summary>
         [NonSerialized]
-        public object TempDataInEditor;
+        public object EditorUserData;
 
         /// <summary>
-        /// 是否包含Tag
+        /// 是否包含指定的标签
         /// </summary>
-        public bool HasTag(string[] tags)
+        /// <param name="tags">要检查的标签数组</param>
+        /// <returns>如果包含任意一个标签返回true，否则返回false。</returns>
+        public bool HasAnyTag(string[] tags)
         {
             if (tags == null || tags.Length == 0)
                 return false;

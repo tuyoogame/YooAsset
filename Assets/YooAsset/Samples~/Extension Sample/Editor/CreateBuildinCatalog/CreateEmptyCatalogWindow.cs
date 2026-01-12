@@ -34,7 +34,7 @@ namespace YooAsset.Editor
             {
                 if (GUILayout.Button("生成空的Catalog文件", GUILayout.MaxWidth(150)))
                 {
-                    string outputPath = EditorTools.OpenFolderPanel("输出目录", "Assets/");
+                    string outputPath = EditorDialogUtility.OpenFolderPanel("输出目录", "Assets/");
                     if (string.IsNullOrEmpty(outputPath) == false)
                     {
                         CreateEmptyCatalogFile(outputPath);
@@ -47,7 +47,7 @@ namespace YooAsset.Editor
         {
             try
             {
-                bool result = CatalogTools.CreateEmptyCatalogFile(_packageName, string.Empty, outputPath);
+                bool result = BuiltinCatalogHelper.CreateEmptyFile(_packageName, string.Empty, outputPath);
                 if (result == false)
                 {
                     Debug.LogError($"Create package {_packageName} catalog file failed ! See the detail error in console !");

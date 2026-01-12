@@ -1,76 +1,97 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace YooAsset
 {
     /// <summary>
-    /// 自定义日志处理
+    /// 自定义日志处理接口
     /// </summary>
     public interface ILogger
     {
+        /// <summary>
+        /// 输出普通日志
+        /// </summary>
         void Log(string message);
-        void Warning(string message);
-        void Error(string message);
-        void Exception(System.Exception exception);
+
+        /// <summary>
+        /// 输出警告日志
+        /// </summary>
+        void LogWarning(string message);
+
+        /// <summary>
+        /// 输出错误日志
+        /// </summary>
+        void LogError(string message);
+
+        /// <summary>
+        /// 输出异常日志
+        /// </summary>
+        void LogException(System.Exception exception);
     }
 
+    /// <summary>
+    /// YooAsset内部日志系统
+    /// </summary>
     internal static class YooLogger
     {
-        public static ILogger Logger = null;
+        /// <summary>
+        /// 自定义日志处理器实例
+        /// </summary>
+        public static ILogger Current { get; set; }
 
         /// <summary>
-        /// 日志
+        /// 输出调试日志（仅在 DEBUG 模式下生效）
         /// </summary>
         [Conditional("DEBUG")]
-        public static void Log(string info)
+        public static void Log(string message)
         {
-            if (Logger != null)
+            if (Current != null)
             {
-                Logger.Log(info);
+                Current.Log(message);
             }
             else
             {
-                UnityEngine.Debug.Log(info);
+                UnityEngine.Debug.Log(message);
             }
         }
 
         /// <summary>
-        /// 警告
+        /// 输出警告日志
         /// </summary>
-        public static void Warning(string info)
+        public static void LogWarning(string message)
         {
-            if (Logger != null)
+            if (Current != null)
             {
-                Logger.Warning(info);
+                Current.LogWarning(message);
             }
             else
             {
-                UnityEngine.Debug.LogWarning(info);
+                UnityEngine.Debug.LogWarning(message);
             }
         }
 
         /// <summary>
-        /// 错误
+        /// 输出错误日志
         /// </summary>
-        public static void Error(string info)
+        public static void LogError(string message)
         {
-            if (Logger != null)
+            if (Current != null)
             {
-                Logger.Error(info);
+                Current.LogError(message);
             }
             else
             {
-                UnityEngine.Debug.LogError(info);
+                UnityEngine.Debug.LogError(message);
             }
         }
 
         /// <summary>
-        /// 异常
+        /// 输出异常日志
         /// </summary>
-        public static void Exception(System.Exception exception)
+        public static void LogException(System.Exception exception)
         {
-            if (Logger != null)
+            if (Current != null)
             {
-                Logger.Exception(exception);
+                Current.LogException(exception);
             }
             else
             {

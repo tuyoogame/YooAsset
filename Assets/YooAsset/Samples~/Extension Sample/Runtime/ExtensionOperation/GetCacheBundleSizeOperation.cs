@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +7,7 @@ using YooAsset;
 /// <summary>
 /// 获取沙盒目录里缓存文件大小
 /// </summary>
-public class GetCacheBundleSizeOperation : GameAsyncOperation
+public class GetCacheBundleSizeOperation : AsyncOperationBase
 {
     private enum ESteps
     {
@@ -29,11 +29,11 @@ public class GetCacheBundleSizeOperation : GameAsyncOperation
     {
         _packageName = packageName;
     }
-    protected override void OnStart()
+    protected override void InternalStart()
     {
         _steps = ESteps.GetCacheFiles;
     }
-    protected override void OnUpdate()
+    protected override void InternalUpdate()
     {
         if (_steps == ESteps.None || _steps == ESteps.Done)
             return;
@@ -54,17 +54,14 @@ public class GetCacheBundleSizeOperation : GameAsyncOperation
 
             TotalSize = totalSize;
             _steps = ESteps.Done;
-            Status = EOperationStatus.Succeed;
+            SetResult();
         }
-    }
-    protected override void OnAbort()
-    {
     }
 
     private string GetCacheDirectoryRoot()
     {
-        string rootDirectory = YooAssetSettingsData.GetYooDefaultCacheRoot();
+        string rootDirectory = YooAssetConfiguration.GetDefaultCacheRoot();
         string packageRoot = PathUtility.Combine(rootDirectory, _packageName);
-        return PathUtility.Combine(packageRoot, DefaultCacheFileSystemDefine.BundleFilesFolderName);
+        return PathUtility.Combine(packageRoot, SandboxFileSystemConsts.BundleFilesFolderName);
     }
 }

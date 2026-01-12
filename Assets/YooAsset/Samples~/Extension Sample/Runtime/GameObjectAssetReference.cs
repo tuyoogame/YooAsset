@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using YooAsset;
 
 #if UNITY_EDITOR
@@ -50,7 +50,7 @@ public class GameObjectAssetReference : MonoBehaviour
     public void Start()
     {
         var package = YooAssets.GetPackage("DefaultPackage");
-        var assetInfo = package.GetAssetInfoByGUID(AssetGUID);
+        var assetInfo = package.GetAssetInfoByGuid(AssetGUID);
         _handle = package.LoadAssetAsync(assetInfo);
         _handle.Completed += Handle_Completed;
     }
@@ -65,7 +65,7 @@ public class GameObjectAssetReference : MonoBehaviour
 
     private void Handle_Completed(AssetHandle handle)
     {
-        if (handle.Status == EOperationStatus.Succeed)
+        if (handle.Status == EOperationStatus.Succeeded)
         {
             handle.InstantiateSync(this.transform);
         }

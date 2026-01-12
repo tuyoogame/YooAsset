@@ -1,6 +1,9 @@
-﻿
+
 namespace YooAsset
 {
+    /// <summary>
+    /// 远端资源文件命名风格
+    /// </summary>
     public enum EFileNameStyle
     {
         /// <summary>

@@ -55,7 +55,7 @@ namespace YooAsset.Editor
                 string packageName = directoryInfo.Name;
                 try
                 {
-                    bool result = CatalogTools.CreateCatalogFile(null, packageName, packageRoot); //TODO 自行处理解密
+                    bool result = BuiltinCatalogHelper.CreateFile(null, packageName, packageRoot); //TODO 自行处理解密
                     if (result == false)
                     {
                         Debug.LogError($"Create package {packageName} catalog file failed ! See the detail error in console !");

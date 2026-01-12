@@ -11,19 +11,19 @@ public static class ShaderVariantCollectionHelper
 {
     public static void ClearCurrentShaderVariantCollection()
     {
-        EditorTools.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "ClearCurrentShaderVariantCollection");
+        EditorAssemblyUtility.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "ClearCurrentShaderVariantCollection");
     }
     public static void SaveCurrentShaderVariantCollection(string savePath)
     {
-        EditorTools.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "SaveCurrentShaderVariantCollection", savePath);
+        EditorAssemblyUtility.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "SaveCurrentShaderVariantCollection", savePath);
     }
     public static int GetCurrentShaderVariantCollectionShaderCount()
     {
-        return (int)EditorTools.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "GetCurrentShaderVariantCollectionShaderCount");
+        return (int)EditorAssemblyUtility.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "GetCurrentShaderVariantCollectionShaderCount");
     }
     public static int GetCurrentShaderVariantCollectionVariantCount()
     {
-        return (int)EditorTools.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "GetCurrentShaderVariantCollectionVariantCount");
+        return (int)EditorAssemblyUtility.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "GetCurrentShaderVariantCollectionVariantCount");
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public static class ShaderVariantCollectionHelper
     public static string GetShaderVariantCount(string assetPath)
     {
         Shader shader = AssetDatabase.LoadAssetAtPath<Shader>(assetPath);
-        var variantCount = EditorTools.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "GetVariantCount", shader, true);
+        var variantCount = EditorAssemblyUtility.InvokeNonPublicStaticMethod(typeof(ShaderUtil), "GetVariantCount", shader, true);
         return variantCount.ToString();
     }
 }

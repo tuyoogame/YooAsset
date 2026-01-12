@@ -1,19 +1,22 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace YooAsset
 {
+    /// <summary>
+    /// 资源系统的驱动器
+    /// </summary>
     internal class YooAssetsDriver : MonoBehaviour
     {
 #if UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void OnRuntimeInitialize()
         {
-            LastestUpdateFrame = 0;
+            s_latestUpdateFrame = 0;
         }
 #endif
 
-        private static int LastestUpdateFrame = 0;
+        private static int s_latestUpdateFrame = 0;
 
         void Update()
         {
@@ -24,21 +27,21 @@ namespace YooAsset
 #if UNITY_EDITOR
         void OnApplicationQuit()
         {
-            // 说明：在编辑器下确保播放被停止时IO类操作被终止。
-            YooAssets.ClearAllPackageOperation();
+            // 注意：在编辑器下确保播放被停止时IO类操作被终止。
+            YooAssets.Destroy();
         }
 #endif
 
         [Conditional("DEBUG")]
         private void DebugCheckDuplicateDriver()
         {
-            if (LastestUpdateFrame > 0)
+            if (s_latestUpdateFrame > 0)
             {
-                if (LastestUpdateFrame == Time.frameCount)
-                    YooLogger.Warning($"There are two {nameof(YooAssetsDriver)} in the scene. Please ensure there is always exactly one driver in the scene.");
+                if (s_latestUpdateFrame == Time.frameCount)
+                    YooLogger.LogWarning($"Duplicate {nameof(YooAssetsDriver)} detected in the scene. Ensure there is always exactly one driver.");
             }
 
-            LastestUpdateFrame = Time.frameCount;
+            s_latestUpdateFrame = Time.frameCount;
         }
     }
 }

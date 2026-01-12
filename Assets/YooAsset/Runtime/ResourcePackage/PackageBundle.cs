@@ -1,9 +1,12 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
 namespace YooAsset
 {
+    /// <summary>
+    /// 清单中的资源包描述
+    /// </summary>
     [Serializable]
     internal class PackageBundle
     {
@@ -15,7 +18,7 @@ namespace YooAsset
         /// <summary>
         /// Unity引擎生成的CRC
         /// </summary>
-        public uint UnityCRC;
+        public uint UnityCrc;
 
         /// <summary>
         /// 文件哈希值
@@ -25,7 +28,7 @@ namespace YooAsset
         /// <summary>
         /// 文件校验码
         /// </summary>
-        public uint FileCRC;
+        public uint FileCrc;
 
         /// <summary>
         /// 文件大小（字节数）
@@ -35,7 +38,7 @@ namespace YooAsset
         /// <summary>
         /// 文件是否加密
         /// </summary>
-        public bool Encrypted;
+        public bool IsEncrypted;
 
         /// <summary>
         /// 资源包的分类标签
@@ -46,71 +49,40 @@ namespace YooAsset
         /// 依赖的资源包ID集合
         /// 注意：引擎层构建查询结果
         /// </summary>
-        public int[] DependBundleIDs;
+        public int[] DependentBundleIDs;
 
         /// <summary>
-        /// 资源包GUID
+        /// 资源包唯一标识符
         /// </summary>
-        public string BundleGUID
+        /// <remarks>使用FileHash作为GUID</remarks>
+        public string BundleGuid
         {
             get { return FileHash; }
         }
 
         /// <summary>
-        /// 资源包类型
-        /// </summary>
-        public int BundleType
-        {
-            get
-            {
-                return _bundleType;
-            }
-        }
-        private int _bundleType;
-
-        /// <summary>
-        /// 文件名称
-        /// </summary>  
-        public string FileName
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_fileName))
-                    throw new YooInternalException("File name can not be null or empty.");
-                return _fileName;
-            }
-        }
-        private string _fileName;
-
-        /// <summary>
-        /// 文件后缀名
-        /// </summary>
-        public string FileExtension
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_fileExtension))
-                    throw new YooInternalException("File extension can not be null or empty.");
-                return _fileExtension;
-            }
-        }
-        private string _fileExtension;
-
-        /// <summary>
         /// 包含的主资源集合
         /// </summary>
         [NonSerialized]
-        public readonly List<PackageAsset> IncludeMainAssets = new List<PackageAsset>(10);
+        public readonly List<PackageAsset> MainAssets = new List<PackageAsset>(10);
 
         /// <summary>
         /// 引用该资源包的资源包列表
         /// 说明：谁引用了该资源包
         /// </summary>
         [NonSerialized]
-        public readonly List<int> ReferenceBundleIDs = new List<int>(10);
-        private readonly HashSet<int> _referenceBundleIDs = new HashSet<int>();
+        public readonly List<int> ReferrerBundleIDs = new List<int>(10);
+        private readonly HashSet<int> _referrerBundleIDs = new HashSet<int>();
+
+        private PackageManifest _manifest;
+        private bool _isInitialized;
+        private int _bundleType;
+        private string _fileName;
 
 
+        /// <summary>
+        /// 创建资源包实例
+        /// </summary>
         public PackageBundle()
         {
         }
@@ -118,31 +90,58 @@ namespace YooAsset
         /// <summary>
         /// 初始化资源包
         /// </summary>
-        public void InitBundle(PackageManifest manifest)
+        /// <param name="manifest">所属的资源清单</param>
+        public void Initialize(PackageManifest manifest)
         {
-            _mainfest = manifest;
+            _isInitialized = true;
+            _manifest = manifest;
             _bundleType = manifest.BuildBundleType;
-            _fileExtension = ManifestTools.GetRemoteBundleFileExtension(BundleName);
-            _fileName = ManifestTools.GetRemoteBundleFileName(manifest.OutputNameStyle, BundleName, _fileExtension, FileHash);
+            string fileExtension = PackageManifestHelper.GetRemoteBundleFileExtension(BundleName);
+            _fileName = PackageManifestHelper.GetRemoteBundleFileName(manifest.OutputNameStyle, BundleName, fileExtension, FileHash);
+        }
+
+        /// <summary>
+        /// 获取资源包类型
+        /// </summary>
+        /// <returns>返回资源包类型</returns>
+        public int GetBundleType()
+        {
+            if (_isInitialized == false)
+                throw new YooInternalException("PackageBundle is not initialized.");
+            return _bundleType;
+        }
+
+        /// <summary>
+        /// 获取文件名称
+        /// </summary>
+        /// <returns>返回资源包文件名称</returns>
+        public string GetFileName()
+        {
+            if (_isInitialized == false)
+                throw new YooInternalException("PackageBundle is not initialized.");
+            return _fileName;
         }
 
         /// <summary>
         /// 添加引用该资源包的资源包ID
-        /// 说明：谁引用了该资源包
         /// </summary>
-        public void AddReferenceBundleID(int bundleID)
+        /// <param name="bundleID">引用该资源包的资源包ID</param>
+        /// <remarks>记录谁引用了该资源包</remarks>
+        public void AddReferrerBundleID(int bundleID)
         {
-            if (_referenceBundleIDs.Contains(bundleID) == false)
+            if (_referrerBundleIDs.Contains(bundleID) == false)
             {
-                _referenceBundleIDs.Add(bundleID);
-                ReferenceBundleIDs.Add(bundleID);
+                _referrerBundleIDs.Add(bundleID);
+                ReferrerBundleIDs.Add(bundleID);
             }
         }
 
         /// <summary>
-        /// 是否包含Tag
+        /// 是否包含指定的标签
         /// </summary>
-        public bool HasTag(string[] tags)
+        /// <param name="tags">要检查的标签数组</param>
+        /// <returns>如果包含任意一个标签返回true，否则返回false。</returns>
+        public bool HasAnyTag(string[] tags)
         {
             if (tags == null || tags.Length == 0)
                 return false;
@@ -158,42 +157,34 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 是否包含任意Tags
+        /// 是否包含分类标签
         /// </summary>
-        public bool HasAnyTags()
+        /// <returns>如果包含至少一个标签返回true，否则返回false。</returns>
+        public bool IsTagged()
         {
-            if (Tags != null && Tags.Length > 0)
-                return true;
-            else
-                return false;
-        }
-
-        /// <summary>
-        /// 检测资源包文件内容是否相同
-        /// </summary>
-        public bool Equals(PackageBundle otherBundle)
-        {
-            if (FileHash == otherBundle.FileHash)
-                return true;
-
-            return false;
+            return Tags != null && Tags.Length > 0;
         }
 
         #region 调试信息
-        private PackageManifest _mainfest;
-        private List<string> _debugReferenceBundles;
-        public List<string> GetDebugReferenceBundles()
+        private List<string> _debugReferrerBundleNames;
+
+        /// <summary>
+        /// 获取引用该资源包的资源包名称列表
+        /// </summary>
+        /// <returns>返回引用该资源包的所有资源包名称列表</returns>
+        /// <remarks>仅用于调试目的，结果会被缓存。</remarks>
+        public List<string> DebugGetReferrerBundleNames()
         {
-            if (_debugReferenceBundles == null)
+            if (_debugReferrerBundleNames == null)
             {
-                _debugReferenceBundles = new List<string>(ReferenceBundleIDs.Count);
-                foreach (int bundleID in ReferenceBundleIDs)
+                _debugReferrerBundleNames = new List<string>(ReferrerBundleIDs.Count);
+                foreach (int bundleID in ReferrerBundleIDs)
                 {
-                    var packageBundle = _mainfest.BundleList[bundleID];
-                    _debugReferenceBundles.Add(packageBundle.BundleName);
+                    var packageBundle = _manifest.BundleList[bundleID];
+                    _debugReferrerBundleNames.Add(packageBundle.BundleName);
                 }
             }
-            return _debugReferenceBundles;
+            return _debugReferrerBundleNames;
         }
         #endregion
     }

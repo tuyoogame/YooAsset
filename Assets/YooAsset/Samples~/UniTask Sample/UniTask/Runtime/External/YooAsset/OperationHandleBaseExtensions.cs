@@ -153,7 +153,7 @@ namespace Cysharp.Threading.Tasks
                     _completed = true;
                     if (_handle.Status == EOperationStatus.Failed)
                     {
-                        _core.TrySetException(new Exception(_handle.LastError));
+                        _core.TrySetException(new Exception(_handle.Error));
                     }
                     else
                     {

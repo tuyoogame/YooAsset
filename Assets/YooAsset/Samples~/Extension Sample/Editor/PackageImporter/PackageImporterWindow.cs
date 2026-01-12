@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using UnityEngine;
 using UnityEditor;
 
@@ -39,8 +39,8 @@ namespace YooAsset.Editor
             {
                 if (GUILayout.Button("导入补丁包（全部文件）", GUILayout.MaxWidth(150)))
                 {
-                    string streamingAssetsRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
-                    EditorTools.ClearFolder(streamingAssetsRoot);
+                    string streamingAssetsRoot = BundleBuilderHelper.GetStreamingAssetsRoot();
+                    EditorFileUtility.ClearFolder(streamingAssetsRoot);
                     CopyPackageFiles(_manifestPath);
                 }
             }
@@ -54,33 +54,33 @@ namespace YooAsset.Editor
             // 拷贝核心文件
             {
                 string sourcePath = $"{outputDirectory}/{manifestFileName}.bytes";
-                string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{manifestFileName}.bytes";
-                EditorTools.CopyFile(sourcePath, destPath, true);
+                string destPath = $"{BundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{manifestFileName}.bytes";
+                EditorFileUtility.CopyFile(sourcePath, destPath, true);
             }
             {
                 string sourcePath = $"{outputDirectory}/{manifestFileName}.hash";
-                string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{manifestFileName}.hash";
-                EditorTools.CopyFile(sourcePath, destPath, true);
+                string destPath = $"{BundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{manifestFileName}.hash";
+                EditorFileUtility.CopyFile(sourcePath, destPath, true);
             }
             {
-                string fileName = YooAssetSettingsData.GetPackageVersionFileName(_packageName);
+                string fileName = YooAssetConfiguration.GetPackageVersionFileName(_packageName);
                 string sourcePath = $"{outputDirectory}/{fileName}";
-                string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{fileName}";
-                EditorTools.CopyFile(sourcePath, destPath, true);
+                string destPath = $"{BundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{fileName}";
+                EditorFileUtility.CopyFile(sourcePath, destPath, true);
             }
 
             // 加载补丁清单
             byte[] bytesData = FileUtility.ReadAllBytes(manifestFilePath);
-            PackageManifest manifest = ManifestTools.DeserializeFromBinary(bytesData, null); //TODO 自行处理解密
+            PackageManifest manifest = PackageManifestHelper.DeserializeManifestFromBinary(bytesData, null); //TODO 自行处理解密
 
             // 拷贝文件列表
             int fileCount = 0;
             foreach (var packageBundle in manifest.BundleList)
             {
                 fileCount++;
-                string sourcePath = $"{outputDirectory}/{packageBundle.FileName}";
-                string destPath = $"{AssetBundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{packageBundle.FileName}";
-                EditorTools.CopyFile(sourcePath, destPath, true);
+                string sourcePath = $"{outputDirectory}/{packageBundle.GetFileName()}";
+                string destPath = $"{BundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{packageBundle.GetFileName()}";
+                EditorFileUtility.CopyFile(sourcePath, destPath, true);
             }
 
             Debug.Log($"补丁包拷贝完成，一共拷贝了{fileCount}个资源文件");

@@ -6,8 +6,6 @@ public static class OperationMonitor
 {
     public static void RegisterOperationCallback()
     {
-        OperationSystem.RegisterStartCallback(OperationStartCallback);
-        OperationSystem.RegisterFinishCallback(OperationFinishCallback);
     }
 
     private static void OperationStartCallback(string packageName, AsyncOperationBase operation)

@@ -1,5 +1,4 @@
-﻿#if UNITY_2019_4_OR_NEWER
-using System;
+﻿using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.UIElements;
@@ -7,6 +6,9 @@ using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
+    /// <summary>
+    /// 可拖拽的水平尺寸调节手柄，用于控制目标元素宽度
+    /// </summary>
     public class ResizeHandle : VisualElement
     {
         public new class UxmlFactory : UxmlFactory<ResizeHandle, UxmlTraits>
@@ -33,10 +35,13 @@ namespace YooAsset.Editor
         public int ControlMaxWidth { get; set; }
 
         /// <summary>
-        /// 尺寸发生变化
+        /// 当控制元素宽度变化时触发
         /// </summary>
-        public Action<float> ResizeChanged { get; set; }
+        public event Action<float> ResizeChanged;
 
+        /// <summary>
+        /// 创建默认宽度的调节手柄实例
+        /// </summary>
         public ResizeHandle()
         {
             int defaultWidth = 5;
@@ -50,6 +55,14 @@ namespace YooAsset.Editor
             this.RegisterCallback<MouseMoveEvent>(OnMouseMove);
             this.RegisterCallback<MouseUpEvent>(OnMouseUp);
         }
+
+        /// <summary>
+        /// 创建指定宽度的调节手柄实例
+        /// </summary>
+        /// <param name="handleWidth">手柄自身的像素宽度</param>
+        /// <param name="controlTarget">被控制的目标元素</param>
+        /// <param name="controlMinWidth">目标元素的最小宽度</param>
+        /// <param name="controlMaxWidth">目标元素的最大宽度</param>
         public ResizeHandle(int handleWidth, VisualElement controlTarget, int controlMinWidth, int controlMaxWidth)
         {
             ControlTarget = controlTarget;
@@ -105,4 +118,3 @@ namespace YooAsset.Editor
         }
     }
 }
-#endif

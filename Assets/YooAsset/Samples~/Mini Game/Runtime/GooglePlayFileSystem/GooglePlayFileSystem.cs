@@ -1,9 +1,5 @@
-﻿#if UNITY_ANDROID && GOOGLE_PLAY
-using System.Collections.Generic;
-using UnityEngine;
+#if UNITY_ANDROID && GOOGLE_PLAY
 using YooAsset;
-using System.Linq;
-using System;
 
 public static class GooglePlayFileSystemCreater
 {
@@ -16,27 +12,21 @@ public static class GooglePlayFileSystemCreater
 }
 
 /// <summary>
-/// 兼容谷歌Play Asset Delivery的文件系统
+/// Google Play Asset Delivery file system.
+/// Loads asset bundles via PlayAssetDelivery instead of local file I/O.
+/// See: https://developer.android.com/guide/playcore/asset-delivery
 /// </summary>
-internal class GooglePlayFileSystem : DefaultBuildinFileSystem
+internal class GooglePlayFileSystem : BuiltinFileSystem, IFileSystem
 {
-    public GooglePlayFileSystem()
+    /// <summary>
+    /// Override bundle loading to use Play Asset Delivery.
+    /// Re-implements <see cref="IFileSystem.LoadPackageBundleAsync"/> so the
+    /// interface dispatch reaches this method instead of the base class version.
+    /// </summary>
+    public new FSLoadPackageBundleOperation LoadPackageBundleAsync(FSLoadPackageBundleOptions options)
     {
-    }
-
-    public override FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
-    {
-        if (bundle.BundleType == (int)EBuildBundleType.AssetBundle)
-        {
-            var operation = new GPFSLoadAssetBundleOperation(this, bundle);
-            return operation;
-        }
-        else
-        {
-            string error = $"{nameof(GooglePlayFileSystem)} not support load bundle type : {bundle.BundleType}";
-            var operation = new FSLoadBundleCompleteOperation(error);
-            return operation;
-        }
+        var operation = new GPFSLoadPackageBundleOperation(this, options);
+        return operation;
     }
 }
 #endif

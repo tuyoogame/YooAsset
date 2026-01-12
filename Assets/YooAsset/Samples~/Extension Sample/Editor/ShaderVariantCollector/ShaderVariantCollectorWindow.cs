@@ -1,5 +1,4 @@
-﻿#if UNITY_2019_4_OR_NEWER
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEditor;
@@ -34,7 +33,7 @@ public class ShaderVariantCollectorWindow : EditorWindow
             VisualElement root = this.rootVisualElement;
 
             // 加载布局文件
-            var visualAsset = UxmlLoader.LoadWindowUXML<ShaderVariantCollectorWindow>();
+            var visualAsset = UxmlLoader.LoadWindowUxml<ShaderVariantCollectorWindow>();
             if (visualAsset == null)
                 return;
 
@@ -140,11 +139,10 @@ public class ShaderVariantCollectorWindow : EditorWindow
     private List<string> GetBuildPackageNames()
     {
         List<string> result = new List<string>();
-        foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
+        foreach (var package in BundleCollectorSettingData.Setting.Packages)
         {
             result.Add(package.PackageName);
         }
         return result;
     }
 }
-#endif

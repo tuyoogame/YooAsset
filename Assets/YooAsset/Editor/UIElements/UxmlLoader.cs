@@ -1,6 +1,7 @@
-﻿#if UNITY_2019_4_OR_NEWER
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.UIElements;
@@ -8,48 +9,53 @@ using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
+    /// <summary>
+    /// UXML 布局文件加载器
+    /// </summary>
     public class UxmlLoader
     {
-        private readonly static Dictionary<System.Type, string> _uxmlDic = new Dictionary<System.Type, string>();
+        private readonly static Dictionary<Type, string> s_uxmlDic = new Dictionary<Type, string>();
 
         /// <summary>
-        /// 加载窗口的布局文件
+        /// 加载窗口的 UXML 布局文件
         /// </summary>
-        public static UnityEngine.UIElements.VisualTreeAsset LoadWindowUXML<TWindow>() where TWindow : class
+        /// <typeparam name="TWindow">窗口类型</typeparam>
+        /// <returns>加载到的 VisualTreeAsset 布局资源</returns>
+        public static VisualTreeAsset LoadWindowUxml<TWindow>() where TWindow : class
         {
             var windowType = typeof(TWindow);
 
             // 缓存里查询并加载
-            if (_uxmlDic.TryGetValue(windowType, out string uxmlGUID))
+            if (s_uxmlDic.TryGetValue(windowType, out string uxmlGuid))
             {
-                string assetPath = AssetDatabase.GUIDToAssetPath(uxmlGUID);
+                string assetPath = AssetDatabase.GUIDToAssetPath(uxmlGuid);
                 if (string.IsNullOrEmpty(assetPath))
                 {
-                    _uxmlDic.Clear();
-                    throw new System.Exception($"Invalid UXML GUID : {uxmlGUID} ! Please close the window and open it again !");
+                    s_uxmlDic.Clear();
+                    throw new InvalidOperationException($"Invalid UXML GUID: '{uxmlGuid}'. Please close the window and reopen it.");
                 }
-                var treeAsset = AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.VisualTreeAsset>(assetPath);
+                var treeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(assetPath);
                 return treeAsset;
             }
 
-            // 全局搜索并加载
-            string[] guids = AssetDatabase.FindAssets(windowType.Name);
+            // 全局搜索并加载（使用类型过滤器缩小范围）
+            string[] guids = AssetDatabase.FindAssets($"t:VisualTreeAsset {windowType.Name}");
             if (guids.Length == 0)
-                throw new System.Exception($"Not found any assets : {windowType.Name}");
+                throw new InvalidOperationException($"Could not find any assets: '{windowType.Name}'.");
 
-            foreach (string assetGUID in guids)
+            foreach (string assetGuid in guids)
             {
-                string assetPath = AssetDatabase.GUIDToAssetPath(assetGUID);
-                var assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-                if (assetType == typeof(UnityEngine.UIElements.VisualTreeAsset))
-                {
-                    _uxmlDic.Add(windowType, assetGUID);
-                    var treeAsset = AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.VisualTreeAsset>(assetPath);
-                    return treeAsset;
-                }
+                string assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
+                string fileName = Path.GetFileNameWithoutExtension(assetPath);
+                if (fileName != windowType.Name)
+                    continue;
+
+                s_uxmlDic.Add(windowType, assetGuid);
+                var treeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(assetPath);
+                return treeAsset;
             }
-            throw new System.Exception($"Not found UXML file : {windowType.Name}");
+
+            throw new InvalidOperationException($"UXML file not found: '{windowType.Name}'.");
         }
     }
 }
-#endif

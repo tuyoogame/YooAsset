@@ -14,7 +14,7 @@ namespace YooAsset.Editor
             UnityEditor.Build.Pipeline.Utilities.BuildCache.PurgeCache(false);
 
             // 删除AssetDependDB文件
-            string projectPath = YooAsset.Editor.EditorTools.GetProjectPath();
+            string projectPath = YooAsset.Editor.EditorPathUtility.GetProjectPath();
             string databaseFilePath = $"{projectPath}/Library/AssetDependencyDB";
             if (File.Exists(databaseFilePath))
             {

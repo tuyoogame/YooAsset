@@ -100,7 +100,7 @@ public class BattleRoom
             if (_startWaitTimer.Update(Time.deltaTime))
             {
                 // 生成实体
-                var assetHandle = YooAssets.LoadAssetAsync<GameObject>("player_ship");
+                var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("player_ship");
                 assetHandle.Completed += (AssetHandle handle) =>
                 {
                     handle.InstantiateSync(_roomRoot.transform);
@@ -117,7 +117,7 @@ public class BattleRoom
             Quaternion spawnRotation = Quaternion.identity;
 
             // 生成实体
-            var assetHandle = YooAssets.LoadAssetAsync<GameObject>(enemyLocation);
+            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>(enemyLocation);
             assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(spawnPosition, spawnRotation, _roomRoot.transform);
@@ -166,7 +166,7 @@ public class BattleRoom
             var msg = message as BattleEventDefine.PlayerDead;
 
             // 创建爆炸效果
-            var assetHandle = YooAssets.LoadAssetAsync<GameObject>("explosion_player");
+            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("explosion_player");
             assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
@@ -181,7 +181,7 @@ public class BattleRoom
             var msg = message as BattleEventDefine.EnemyDead;
 
             // 创建爆炸效果
-            var assetHandle = YooAssets.LoadAssetAsync<GameObject>("explosion_enemy");
+            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("explosion_enemy");
             assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
@@ -196,7 +196,7 @@ public class BattleRoom
             var msg = message as BattleEventDefine.AsteroidExplosion;
 
             // 创建爆炸效果
-            var assetHandle = YooAssets.LoadAssetAsync<GameObject>("explosion_asteroid");
+            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("explosion_asteroid");
             assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
@@ -211,7 +211,7 @@ public class BattleRoom
             var msg = message as BattleEventDefine.PlayerFireBullet;
 
             // 创建子弹实体
-            var assetHandle = YooAssets.LoadAssetAsync<GameObject>("player_bullet");
+            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("player_bullet");
             assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
@@ -223,7 +223,7 @@ public class BattleRoom
             var msg = message as BattleEventDefine.EnemyFireBullet;
 
             // 创建子弹实体
-            var assetHandle = YooAssets.LoadAssetAsync<GameObject>("enemy_bullet");
+            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("enemy_bullet");
             assetHandle.Completed += (AssetHandle handle) =>
             {
                 handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);

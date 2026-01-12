@@ -19,7 +19,7 @@ public class Boot : MonoBehaviour
         Application.runInBackground = true;
         DontDestroyOnLoad(this.gameObject);
     }
-    IEnumerator Start()
+    void Start()
     {
         // 游戏管理器
         GameManager.Instance.Behaviour = this;
@@ -34,16 +34,12 @@ public class Boot : MonoBehaviour
         var go = Resources.Load<GameObject>("PatchWindow");
         GameObject.Instantiate(go);
 
-        // 开始补丁更新流程
-        var operation = new PatchOperation("DefaultPackage", PlayMode);
-        YooAssets.StartOperation(operation);
-        yield return operation;
-
-        // 设置默认的资源包
-        var gamePackage = YooAssets.GetPackage("DefaultPackage");
-        YooAssets.SetDefaultPackage(gamePackage);
-
-        // 切换到主页面场景
-        SceneEventDefine.ChangeToHomeScene.SendEventMessage();
+        // 补丁更新流程
+        PatchManager.Create("DefaultPackage", PlayMode);
+        PatchManager.Start();
+    }
+    private void Update()
+    {
+        PatchManager.Update();
     }
 }

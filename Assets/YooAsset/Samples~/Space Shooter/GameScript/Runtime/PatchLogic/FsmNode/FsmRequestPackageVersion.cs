@@ -31,7 +31,7 @@ internal class FsmRequestPackageVersion : IStateNode
         var operation = package.RequestPackageVersionAsync();
         yield return operation;
 
-        if (operation.Status != EOperationStatus.Succeed)
+        if (operation.Status != EOperationStatus.Succeeded)
         {
             Debug.LogWarning(operation.Error);
             PatchEventDefine.PackageVersionRequestFailed.SendEventMessage();

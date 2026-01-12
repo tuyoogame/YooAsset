@@ -1,0 +1,314 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+
+namespace YooAsset.Editor
+{
+    /// <summary>
+    /// 资源收集器
+    /// </summary>
+    [Serializable]
+    public class BundleCollector
+    {
+        /// <summary>
+        /// 收集路径
+        /// </summary>
+        /// <remarks>支持文件夹或单个资源文件</remarks>
+        public string CollectPath = string.Empty;
+
+        /// <summary>
+        /// 收集器的GUID
+        /// </summary>
+        public string CollectorGUID = string.Empty;
+
+        /// <summary>
+        /// 收集器类型
+        /// </summary>
+        public ECollectorType CollectorType = ECollectorType.MainAssetCollector;
+
+        /// <summary>
+        /// 寻址规则类名
+        /// </summary>
+        public string AddressRuleName = nameof(AddressByFileName);
+
+        /// <summary>
+        /// 打包规则类名
+        /// </summary>
+        public string PackRuleName = nameof(PackDirectory);
+
+        /// <summary>
+        /// 过滤规则类名
+        /// </summary>
+        public string FilterRuleName = nameof(CollectAll);
+
+        /// <summary>
+        /// 资源分类标签
+        /// </summary>
+        public string AssetTags = string.Empty;
+
+        /// <summary>
+        /// 用户自定义数据
+        /// </summary>
+        public string UserData = string.Empty;
+
+
+        /// <summary>
+        /// 收集器是否有效
+        /// </summary>
+        /// <returns>如果收集器配置有效返回 true</returns>
+        public bool IsValid()
+        {
+            if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(CollectPath) == null)
+                return false;
+
+            if (CollectorType == ECollectorType.None)
+                return false;
+
+            if (BundleCollectorSettingData.HasAddressRuleName(AddressRuleName) == false)
+                return false;
+
+            if (BundleCollectorSettingData.HasBundlePackRuleName(PackRuleName) == false)
+                return false;
+
+            if (BundleCollectorSettingData.HasAssetFilterRuleName(FilterRuleName) == false)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// 检测配置错误
+        /// </summary>
+        public void CheckConfigError()
+        {
+            string assetGUID = AssetDatabase.AssetPathToGUID(CollectPath);
+            if (string.IsNullOrEmpty(assetGUID))
+                throw new InvalidOperationException($"Collect path is invalid: '{CollectPath}'.");
+
+            if (CollectorType == ECollectorType.None)
+                throw new InvalidOperationException($"{nameof(ECollectorType)}.{ECollectorType.None} is invalid in collector: '{CollectPath}'.");
+
+            if (BundleCollectorSettingData.HasBundlePackRuleName(PackRuleName) == false)
+                throw new InvalidOperationException($"Invalid {nameof(IBundlePackRule)} class type: '{PackRuleName}' in collector: '{CollectPath}'.");
+
+            if (BundleCollectorSettingData.HasAssetFilterRuleName(FilterRuleName) == false)
+                throw new InvalidOperationException($"Invalid {nameof(IAssetFilterRule)} class type: '{FilterRuleName}' in collector: '{CollectPath}'.");
+
+            if (BundleCollectorSettingData.HasAddressRuleName(AddressRuleName) == false)
+                throw new InvalidOperationException($"Invalid {nameof(IAddressRule)} class type: '{AddressRuleName}' in collector: '{CollectPath}'.");
+        }
+
+        /// <summary>
+        /// 修复配置错误
+        /// </summary>
+        /// <returns>如果修复了配置错误返回 true</returns>
+        public bool FixConfigError()
+        {
+            bool isFixed = false;
+
+            if (string.IsNullOrEmpty(CollectorGUID) == false)
+            {
+                string convertAssetPath = AssetDatabase.GUIDToAssetPath(CollectorGUID);
+                if (string.IsNullOrEmpty(convertAssetPath))
+                {
+                    Debug.LogWarning($"Collector GUID '{CollectorGUID}' is invalid and has been auto removed.");
+                    CollectorGUID = string.Empty;
+                    isFixed = true;
+                }
+                else
+                {
+                    if (CollectPath != convertAssetPath)
+                    {
+                        string oldPath = CollectPath;
+                        CollectPath = convertAssetPath;
+                        isFixed = true;
+                        Debug.LogWarning($"Collect path has been fixed: '{oldPath}' -> '{convertAssetPath}'.");
+                    }
+                }
+            }
+
+            /*
+            string convertGUID = AssetDatabase.AssetPathToGUID(CollectPath);
+            if(string.IsNullOrEmpty(convertGUID) == false)
+            {
+                CollectorGUID = convertGUID;
+            }
+            */
+
+            return isFixed;
+        }
+
+        /// <summary>
+        /// 获取打包收集的资源文件
+        /// </summary>
+        /// <param name="command">收集命令</param>
+        /// <param name="group">所属分组</param>
+        /// <returns>收集到的资源信息列表</returns>
+        public List<CollectAssetInfo> GetAllCollectAssets(CollectCommand command, BundleCollectorGroup group)
+        {
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
+            if (group == null)
+                throw new ArgumentNullException(nameof(group));
+
+            bool ignoreStaticCollector = command.IsFlagSet(ECollectFlags.IgnoreStaticCollector);
+            if (ignoreStaticCollector)
+            {
+                if (CollectorType == ECollectorType.StaticAssetCollector)
+                    return new List<CollectAssetInfo>();
+            }
+
+            bool ignoreDependCollector = command.IsFlagSet(ECollectFlags.IgnoreDependCollector);
+            if (ignoreDependCollector)
+            {
+                if (CollectorType == ECollectorType.DependAssetCollector)
+                    return new List<CollectAssetInfo>();
+            }
+
+            Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(1000);
+
+            // 收集打包资源路径
+            List<string> findAssets = new List<string>();
+            if (AssetDatabase.IsValidFolder(CollectPath))
+            {
+                IAssetFilterRule filterRuleInstance = BundleCollectorSettingData.GetAssetFilterRuleInstance(FilterRuleName);
+                string findAssetType = filterRuleInstance.FindAssetType;
+                string searchFolder = CollectPath;
+                string[] findResult = EditorAssetUtility.FindAssets(findAssetType, searchFolder);
+                findAssets.AddRange(findResult);
+            }
+            else
+            {
+                string assetPath = CollectPath;
+                findAssets.Add(assetPath);
+            }
+
+            // 收集打包资源信息
+            foreach (string assetPath in findAssets)
+            {
+                var assetInfo = new EditorAssetInfo(assetPath);
+                if (command.IgnoreRule.IsIgnoreAsset(assetInfo) == false && IsCollectAsset(group, assetInfo))
+                {
+                    if (result.ContainsKey(assetPath) == false)
+                    {
+                        var collectAssetInfo = CreateCollectAssetInfo(command, group, assetInfo);
+                        result.Add(assetPath, collectAssetInfo);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Collecting asset file already exists: '{assetPath}' in collector: '{CollectPath}'.");
+                    }
+                }
+            }
+
+            // 检测可寻址地址是否重复
+            if (command.EnableAddressable)
+            {
+                var addressLookup = new Dictionary<string, string>();
+                foreach (var collectInfoPair in result)
+                {
+                    if (collectInfoPair.Value.CollectorType == ECollectorType.MainAssetCollector)
+                    {
+                        string address = collectInfoPair.Value.Address;
+                        string assetPath = collectInfoPair.Value.AssetInfo.AssetPath;
+                        if (string.IsNullOrEmpty(address))
+                            continue;
+
+                        if (address.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase))
+                            throw new InvalidOperationException($"Address cannot be an asset path in collector: '{CollectPath}' \nAssetPath: '{assetPath}'.");
+
+                        if (addressLookup.TryGetValue(address, out var existed) == false)
+                            addressLookup.Add(address, assetPath);
+                        else
+                            throw new InvalidOperationException($"Address already exists: '{address}' in collector: '{CollectPath}' \nAssetPath:\n     '{existed}'\n     '{assetPath}'.");
+                    }
+                }
+            }
+
+            // 返回列表
+            return result.Values.ToList();
+        }
+
+
+        /// <summary>
+        /// 创建收集资源信息对象
+        /// </summary>
+        private CollectAssetInfo CreateCollectAssetInfo(CollectCommand command, BundleCollectorGroup group, EditorAssetInfo assetInfo)
+        {
+            string address = GetAddress(command, group, assetInfo);
+            string bundleName = GetBundleName(command, group, assetInfo);
+            List<string> assetTags = GetAssetTags(group);
+            CollectAssetInfo collectAssetInfo = new CollectAssetInfo(CollectorType, bundleName, address, assetInfo, assetTags);
+            collectAssetInfo.DependAssets = GetAllDependencies(command, assetInfo.AssetPath);
+            return collectAssetInfo;
+        }
+
+        private bool IsCollectAsset(BundleCollectorGroup group, EditorAssetInfo assetInfo)
+        {
+            // 根据规则设置过滤资源文件
+            IAssetFilterRule filterRuleInstance = BundleCollectorSettingData.GetAssetFilterRuleInstance(FilterRuleName);
+            return filterRuleInstance.IsCollectAsset(new AssetFilterRuleData(assetInfo.AssetPath, CollectPath, group.GroupName, UserData));
+        }
+        private string GetAddress(CollectCommand command, BundleCollectorGroup group, EditorAssetInfo assetInfo)
+        {
+            if (command.EnableAddressable == false)
+                return string.Empty;
+
+            if (CollectorType != ECollectorType.MainAssetCollector)
+                return string.Empty;
+
+            IAddressRule addressRuleInstance = BundleCollectorSettingData.GetAddressRuleInstance(AddressRuleName);
+            string addressValue = addressRuleInstance.GetAssetAddress(new AddressRuleData(assetInfo.AssetPath, CollectPath, group.GroupName, UserData));
+            return addressValue;
+        }
+        private string GetBundleName(CollectCommand command, BundleCollectorGroup group, EditorAssetInfo assetInfo)
+        {
+            if (command.AutoCollectShaders)
+            {
+                if (assetInfo.IsShaderAsset())
+                {
+                    // 获取着色器打包规则结果
+                    BundlePackRuleResult shaderPackRuleResult = DefaultBundlePackRule.CreateShadersPackRuleResult();
+                    return shaderPackRuleResult.GetBundleName(command.PackageName, command.UniqueBundleName);
+                }
+            }
+
+            // 获取其它资源打包规则结果
+            IBundlePackRule packRuleInstance = BundleCollectorSettingData.GetBundlePackRuleInstance(PackRuleName);
+            BundlePackRuleResult defaultPackRuleResult = packRuleInstance.GetPackRuleResult(new BundlePackRuleData(assetInfo.AssetPath, CollectPath, group.GroupName, UserData));
+            return defaultPackRuleResult.GetBundleName(command.PackageName, command.UniqueBundleName);
+        }
+        private List<string> GetAssetTags(BundleCollectorGroup group)
+        {
+            List<string> result = EditorStringUtility.SplitToList(AssetTags, ';');
+            if (CollectorType == ECollectorType.MainAssetCollector)
+            {
+                List<string> temps = EditorStringUtility.SplitToList(group.AssetTags, ';');
+                result.AddRange(temps);
+            }
+            return result;
+        }
+        private List<EditorAssetInfo> GetAllDependencies(CollectCommand command, string mainAssetPath)
+        {
+            bool ignoreGetDependencies = command.IsFlagSet(ECollectFlags.IgnoreGetDependencies);
+            if (ignoreGetDependencies)
+                return new List<EditorAssetInfo>();
+
+            string[] depends = command.AssetDependency.GetDependencies(mainAssetPath, true);
+            List<EditorAssetInfo> result = new List<EditorAssetInfo>(depends.Length);
+            foreach (string assetPath in depends)
+            {
+                // 注意：排除主资源对象
+                if (assetPath == mainAssetPath)
+                    continue;
+
+                EditorAssetInfo assetInfo = new EditorAssetInfo(assetPath);
+                if (command.IgnoreRule.IsIgnoreAsset(assetInfo) == false)
+                    result.Add(assetInfo);
+            }
+            return result;
+        }
+    }
+}
