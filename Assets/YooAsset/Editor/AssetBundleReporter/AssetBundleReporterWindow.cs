@@ -137,6 +137,7 @@ namespace YooAsset.Editor
             {
                 _assetListViewer.RebuildView(_searchKeyWord);
                 _bundleListViewer.RebuildView(_searchKeyWord);
+                _graphViewer.RebuildView(_searchKeyWord);
             }
         }
 

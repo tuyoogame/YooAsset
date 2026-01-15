@@ -45,8 +45,8 @@ namespace YooAsset.Editor
 
         private TreeViewer _treeViewer;
 
-        private readonly Dictionary<string, List<string>>
-            _bundleInfos = new Dictionary<string, List<string>>(); // key是目录，value是目录下的bundle
+        private readonly Dictionary<string, List<ReportBundleInfo>> _treeData =
+            new Dictionary<string, List<ReportBundleInfo>>();
 
         private GraphViewer _graphView;
 
@@ -56,6 +56,7 @@ namespace YooAsset.Editor
             public bool IsBundle;
             public int BundleCount;
             public int BundleActualCount; // 当前目录下去掉冗余后的bundle数量
+            public long BundleSize; // 当前目录下包含的bundle总大小
         }
 
         /// <summary>
@@ -124,7 +125,7 @@ namespace YooAsset.Editor
             _root.RemoveFromHierarchy();
         }
 
-        public void RefreshView(string searchKeyWord)
+        public void RebuildView(string searchKeyWord)
         {
             ReportBundleInfo bundleInfo;
 
@@ -154,7 +155,7 @@ namespace YooAsset.Editor
             FillIncludeListView(bundleInfo);
         }
 
-        private void RefreshView(ReportBundleInfo bundleInfo)
+        private void RebuildView(ReportBundleInfo bundleInfo)
         {
             if (bundleInfo == null)
             {
@@ -239,7 +240,7 @@ namespace YooAsset.Editor
             _buildReport = buildReport;
             _reportFilePath = reprotFilePath;
 
-            InitBundleInfos();
+            InitTreeData();
             InitTreeViewer();
         }
 
@@ -515,7 +516,7 @@ namespace YooAsset.Editor
 
         #endregion
 
-        protected void OnClickDependToolbar1()
+        private void OnClickDependToolbar1()
         {
             if (_dependSortMode != EDependSortMode.BundleName)
             {
@@ -530,7 +531,7 @@ namespace YooAsset.Editor
             }
         }
 
-        protected void OnClickDependToolbar3()
+        private void OnClickDependToolbar3()
         {
             if (_dependSortMode != EDependSortMode.BundleSize)
             {
@@ -547,9 +548,12 @@ namespace YooAsset.Editor
 
         #region 树状视图相关
 
-        private void InitBundleInfos()
+        /// <summary>
+        /// 初始化树状视图数据
+        /// </summary>
+        private void InitTreeData()
         {
-            _bundleInfos.Clear();
+            _treeData.Clear();
 
             foreach (var bundleInfo in _buildReport.BundleInfos)
             {
@@ -575,21 +579,24 @@ namespace YooAsset.Editor
                 // 记录当前bundle存在的目录
                 foreach (var key in keys)
                 {
-                    if (!_bundleInfos.ContainsKey(key))
+                    if (!_treeData.ContainsKey(key))
                     {
-                        _bundleInfos[key] = new List<string> { bundleInfo.BundleName };
+                        _treeData[key] = new List<ReportBundleInfo> { bundleInfo };
                     }
                     else
                     {
-                        if (!_bundleInfos[key].Contains(bundleInfo.BundleName))
+                        if (!_treeData[key].Contains(bundleInfo))
                         {
-                            _bundleInfos[key].Add(bundleInfo.BundleName);
+                            _treeData[key].Add(bundleInfo);
                         }
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// 初始化树状视图
+        /// </summary>
         private void InitTreeViewer()
         {
             _treeViewer.ClearAll();
@@ -598,23 +605,24 @@ namespace YooAsset.Editor
             TreeNode root = InitTreeNode(assetsPath);
             if (root != null)
             {
-                GetActualBundleCount(root);
+                GetBundleActualCount(root);
                 _treeViewer.SetRootItem(root);
                 _treeViewer.RebuildView();
             }
         }
 
         /// <summary>
-        /// 递归初始化每个节点，记录节点对应的目录或Bundle名，以及当前目录下的Bundle数量
+        /// 递归初始化每个节点
         /// </summary>
         private TreeNode InitTreeNode(string path)
         {
             TreeNode root;
             int bundleCount = 0;
+            long bundleSize = 0;
             List<string> dirs = Directory.GetDirectories(path).ToList();
             List<TreeNode> children = new List<TreeNode>();
 
-            // 构建子目录节点
+            // 构建子节点
             foreach (var dir in dirs)
             {
                 TreeNode child = InitTreeNode(dir);
@@ -627,37 +635,52 @@ namespace YooAsset.Editor
                 if (userData != null)
                 {
                     bundleCount += userData.BundleCount;
+                    bundleSize += userData.BundleSize;
                 }
 
                 children.Add(child);
             }
 
-            // 构建bundle节点
-            string key = path.Substring(path.IndexOf("Assets")).Replace('\\', '/');
-            if (_bundleInfos.ContainsKey(key))
+            // 构建当前节点
+            string key = path.Substring(path.IndexOf("Assets", StringComparison.Ordinal)).Replace('\\', '/');
+            // 该目录下有bundle
+            if (_treeData.ContainsKey(key))
             {
-                bundleCount += _bundleInfos[key].Count;
+                List<TreeNodeData> childrenData = new List<TreeNodeData>();
+                foreach (var bundleInfo in _treeData[key])
+                {
+                    TreeNodeData userDataBundle = new TreeNodeData();
+                    userDataBundle.Name = bundleInfo.BundleName;
+                    userDataBundle.IsBundle = true;
+                    userDataBundle.BundleCount = 1;
+                    userDataBundle.BundleSize = bundleInfo.FileSize;
+                    childrenData.Add(userDataBundle);
+
+                    bundleSize += userDataBundle.BundleSize;
+                }
+
+                bundleCount += _treeData[key].Count;
 
                 TreeNodeData userDataDir = new TreeNodeData();
                 userDataDir.Name = Path.GetFileName(path);
                 userDataDir.IsBundle = false;
                 userDataDir.BundleCount = bundleCount;
+                userDataDir.BundleSize = bundleSize;
                 root = new TreeNode(userDataDir);
 
-                foreach (var bundleName in _bundleInfos[key])
+                foreach (var childData in childrenData)
                 {
-                    TreeNodeData userDataBundle = new TreeNodeData();
-                    userDataBundle.Name = bundleName;
-                    userDataBundle.IsBundle = true;
-                    root.AddChild(new TreeNode(userDataBundle));
+                    root.AddChild(new TreeNode(childData));
                 }
             }
+            // 该目录下只有子目录
             else
             {
                 TreeNodeData userDataDir = new TreeNodeData();
                 userDataDir.Name = Path.GetFileName(path);
                 userDataDir.IsBundle = false;
                 userDataDir.BundleCount = bundleCount;
+                userDataDir.BundleSize = bundleSize;
                 root = new TreeNode(userDataDir);
             }
 
@@ -671,16 +694,16 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 获取实际Bundle数量
+        /// 递归获取每个目录下的实际Bundle数量
         /// </summary>
-        private HashSet<string> GetActualBundleCount(TreeNode root)
+        private HashSet<string> GetBundleActualCount(TreeNode root)
         {
             HashSet<string> uniqueBundleNames = new HashSet<string>();
 
             // 先遍历完所有子节点，更新uniqueBundleNames
             foreach (var child in root.Children)
             {
-                uniqueBundleNames.UnionWith(GetActualBundleCount(child));
+                uniqueBundleNames.UnionWith(GetBundleActualCount(child));
             }
 
             TreeNodeData userData = root.UserData as TreeNodeData;
@@ -701,21 +724,10 @@ namespace YooAsset.Editor
 
         private void MakeTreeViewerItem(VisualElement container)
         {
-            var label = new Label();
-            label.name = "Label";
-            label.RegisterCallback<MouseDownEvent>(evt =>
+            var label = new Label
             {
-                if (evt.button == 1) // 1 表示右键
-                {
-                    // 阻止事件冒泡，防止触发父级菜单
-                    evt.StopPropagation();
-                    evt.PreventDefault();
-
-                    GenericMenu menu = new GenericMenu();
-                    menu.AddItem(new GUIContent("复制文本"), false, () => { GUIUtility.systemCopyBuffer = label.text; });
-                    menu.ShowAsContext();
-                }
-            });
+                name = "Label"
+            };
             container.Add(label);
         }
 
@@ -723,8 +735,7 @@ namespace YooAsset.Editor
         {
             var label = container.Q<Label>("Label");
 
-            TreeNodeData treeNodeData = userData as TreeNodeData;
-            if (treeNodeData != null)
+            if (userData is TreeNodeData treeNodeData)
             {
                 if (treeNodeData.IsBundle)
                 {
@@ -732,7 +743,8 @@ namespace YooAsset.Editor
                 }
                 else
                 {
-                    label.text = $"{treeNodeData.Name} ({treeNodeData.BundleCount}) ({treeNodeData.BundleActualCount})";
+                    label.text =
+                        $"{treeNodeData.Name} ({treeNodeData.BundleActualCount}) ({treeNodeData.BundleSize})";
                 }
             }
 
@@ -750,7 +762,7 @@ namespace YooAsset.Editor
                     if (treeNodeData != null)
                     {
                         ReportBundleInfo bundleInfo = _buildReport.GetBundleInfo(treeNodeData.Name);
-                        RefreshView(bundleInfo);
+                        RebuildView(bundleInfo);
                     }
                 }
 
