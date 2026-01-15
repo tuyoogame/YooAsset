@@ -29,6 +29,10 @@ namespace YooAsset.Editor
         /// </summary>
         public Action<VisualElement, object> bindItem { get; set; }
 
+        /// <summary>
+        /// 绑定点击事件
+        /// </summary>
+        public Action<IEnumerable<object>> onSelectionChange { get; set; }
 
         public TreeViewer()
         {
@@ -42,6 +46,11 @@ namespace YooAsset.Editor
             _listView.itemsSource = _flattenList;
             _listView.makeItem = MakeItemInternal;
             _listView.bindItem = BindItemInternal;
+#if UNITY_2020_1_OR_NEWER
+            _listView.onSelectionChange += OnSelectionChangeInternal;
+#else
+            _listView.onSelectionChanged += OnSelectionChangeInternal;
+#endif
             this.Add(_listView);
         }
 
@@ -79,6 +88,7 @@ namespace YooAsset.Editor
             {
                 FlattenTree(treeRoot, 0);
             }
+
             _listView.Rebuild();
         }
 
@@ -125,6 +135,7 @@ namespace YooAsset.Editor
 
             return container;
         }
+
         private void BindItemInternal(VisualElement item, int index)
         {
             var treeNode = _flattenList[index];
@@ -140,12 +151,21 @@ namespace YooAsset.Editor
             {
                 toggle.style.visibility = Visibility.Hidden;
             }
+            else
+            {
+                toggle.style.visibility = Visibility.Visible;
+            }
 
             // 用户自定义元素
             if (bindItem != null)
             {
                 bindItem.Invoke(item, treeNode.UserData);
             }
+        }
+
+        private void OnSelectionChangeInternal(IEnumerable<object> objs)
+        {
+            onSelectionChange(objs);
         }
     }
 }

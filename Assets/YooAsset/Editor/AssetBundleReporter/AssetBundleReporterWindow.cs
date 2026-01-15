@@ -12,7 +12,8 @@ namespace YooAsset.Editor
         [MenuItem("YooAsset/AssetBundle Reporter", false, 103)]
         public static void OpenWindow()
         {
-            AssetBundleReporterWindow window = GetWindow<AssetBundleReporterWindow>("AssetBundle Reporter", true, WindowsDefine.DockedWindowTypes);
+            AssetBundleReporterWindow window =
+                GetWindow<AssetBundleReporterWindow>("AssetBundle Reporter", true, WindowsDefine.DockedWindowTypes);
             window.minSize = new Vector2(800, 600);
         }
 
@@ -35,12 +36,18 @@ namespace YooAsset.Editor
             /// 资源包视图
             /// </summary>
             BundleView,
+
+            /// <summary>
+            /// 网状视图
+            /// </summary>
+            GraphView,
         }
 
         private ToolbarMenu _viewModeMenu;
         private ReporterSummaryViewer _summaryViewer;
         private ReporterAssetListViewer _assetListViewer;
         private ReporterBundleListViewer _bundleListViewer;
+        private ReporterGraphViewer _graphViewer;
 
         private EViewMode _viewMode;
         private BuildReport _buildReport;
@@ -70,6 +77,7 @@ namespace YooAsset.Editor
                 _viewModeMenu.menu.AppendAction(EViewMode.Summary.ToString(), ViewModeMenuAction0, ViewModeMenuFun0);
                 _viewModeMenu.menu.AppendAction(EViewMode.AssetView.ToString(), ViewModeMenuAction1, ViewModeMenuFun1);
                 _viewModeMenu.menu.AppendAction(EViewMode.BundleView.ToString(), ViewModeMenuAction2, ViewModeMenuFun2);
+                _viewModeMenu.menu.AppendAction(EViewMode.GraphView.ToString(), ViewModeMenuAction3, ViewModeMenuFun3);
 
                 // 搜索栏
                 var searchField = root.Q<ToolbarSearchField>("SearchField");
@@ -87,6 +95,10 @@ namespace YooAsset.Editor
                 _bundleListViewer = new ReporterBundleListViewer();
                 _bundleListViewer.InitViewer();
 
+                // 加载视图
+                _graphViewer = new ReporterGraphViewer();
+                _graphViewer.InitViewer();
+
                 // 显示视图
                 _viewMode = EViewMode.Summary;
                 _viewModeMenu.text = EViewMode.Summary.ToString();
@@ -97,6 +109,7 @@ namespace YooAsset.Editor
                 Debug.LogError(e.ToString());
             }
         }
+
         public void OnDestroy()
         {
             AssetBundleRecorder.UnloadAll();
@@ -114,7 +127,9 @@ namespace YooAsset.Editor
             _summaryViewer.FillViewData(_buildReport);
             _assetListViewer.FillViewData(_buildReport, _reportFilePath);
             _bundleListViewer.FillViewData(_buildReport, _reportFilePath);
+            _graphViewer.FillViewData(_buildReport, _reportFilePath);
         }
+
         private void OnSearchKeyWordChange(ChangeEvent<string> e)
         {
             _searchKeyWord = e.newValue;
@@ -124,6 +139,7 @@ namespace YooAsset.Editor
                 _bundleListViewer.RebuildView(_searchKeyWord);
             }
         }
+
         private void ViewModeMenuAction0(DropdownMenuAction action)
         {
             if (_viewMode != EViewMode.Summary)
@@ -134,8 +150,10 @@ namespace YooAsset.Editor
                 _summaryViewer.AttachParent(root);
                 _assetListViewer.DetachParent();
                 _bundleListViewer.DetachParent();
+                _graphViewer.DetachParent();
             }
         }
+
         private void ViewModeMenuAction1(DropdownMenuAction action)
         {
             if (_viewMode != EViewMode.AssetView)
@@ -146,8 +164,10 @@ namespace YooAsset.Editor
                 _summaryViewer.DetachParent();
                 _assetListViewer.AttachParent(root);
                 _bundleListViewer.DetachParent();
+                _graphViewer.DetachParent();
             }
         }
+
         private void ViewModeMenuAction2(DropdownMenuAction action)
         {
             if (_viewMode != EViewMode.BundleView)
@@ -158,8 +178,24 @@ namespace YooAsset.Editor
                 _summaryViewer.DetachParent();
                 _assetListViewer.DetachParent();
                 _bundleListViewer.AttachParent(root);
+                _graphViewer.DetachParent();
             }
         }
+
+        private void ViewModeMenuAction3(DropdownMenuAction action)
+        {
+            if (_viewMode != EViewMode.GraphView)
+            {
+                _viewMode = EViewMode.GraphView;
+                VisualElement root = this.rootVisualElement;
+                _viewModeMenu.text = EViewMode.GraphView.ToString();
+                _summaryViewer.DetachParent();
+                _assetListViewer.DetachParent();
+                _bundleListViewer.DetachParent();
+                _graphViewer.AttachParent(root);
+            }
+        }
+
         private DropdownMenuAction.Status ViewModeMenuFun0(DropdownMenuAction action)
         {
             if (_viewMode == EViewMode.Summary)
@@ -167,6 +203,7 @@ namespace YooAsset.Editor
             else
                 return DropdownMenuAction.Status.Normal;
         }
+
         private DropdownMenuAction.Status ViewModeMenuFun1(DropdownMenuAction action)
         {
             if (_viewMode == EViewMode.AssetView)
@@ -174,9 +211,18 @@ namespace YooAsset.Editor
             else
                 return DropdownMenuAction.Status.Normal;
         }
+
         private DropdownMenuAction.Status ViewModeMenuFun2(DropdownMenuAction action)
         {
             if (_viewMode == EViewMode.BundleView)
+                return DropdownMenuAction.Status.Checked;
+            else
+                return DropdownMenuAction.Status.Normal;
+        }
+
+        private DropdownMenuAction.Status ViewModeMenuFun3(DropdownMenuAction action)
+        {
+            if (_viewMode == EViewMode.GraphView)
                 return DropdownMenuAction.Status.Checked;
             else
                 return DropdownMenuAction.Status.Normal;
