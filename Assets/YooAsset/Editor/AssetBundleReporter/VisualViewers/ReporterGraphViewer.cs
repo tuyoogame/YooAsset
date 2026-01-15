@@ -56,7 +56,8 @@ namespace YooAsset.Editor
             public bool IsBundle;
             public int BundleCount;
             public int BundleActualCount; // 当前目录下去掉冗余后的bundle数量
-            public long BundleSize; // 当前目录下包含的bundle总大小
+            public long BundleSize;
+            public long BundleActualSize; // 当前目录下去掉冗余后的bundle总大小
         }
 
         /// <summary>
@@ -605,7 +606,7 @@ namespace YooAsset.Editor
             TreeNode root = InitTreeNode(assetsPath);
             if (root != null)
             {
-                GetBundleActualCount(root);
+                GetBundleActualData(root);
                 _treeViewer.SetRootItem(root);
                 _treeViewer.RebuildView();
             }
@@ -694,16 +695,27 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 递归获取每个目录下的实际Bundle数量
+        /// 递归获取每个目录下的实际Bundle数量和大小
         /// </summary>
-        private HashSet<string> GetBundleActualCount(TreeNode root)
+        private HashSet<ReportBundleInfo> GetBundleActualData(TreeNode root)
         {
-            HashSet<string> uniqueBundleNames = new HashSet<string>();
+            long GetBundleActualSize(HashSet<ReportBundleInfo> uniqueBundles)
+            {
+                long size = 0;
+                foreach (var bundle in uniqueBundles)
+                {
+                    size += bundle.FileSize;
+                }
 
-            // 先遍历完所有子节点，更新uniqueBundleNames
+                return size;
+            }
+
+            HashSet<ReportBundleInfo> uniqueBundles = new HashSet<ReportBundleInfo>();
+
+            // 先遍历完所有子节点，更新uniqueBundles
             foreach (var child in root.Children)
             {
-                uniqueBundleNames.UnionWith(GetBundleActualCount(child));
+                uniqueBundles.UnionWith(GetBundleActualData(child));
             }
 
             TreeNodeData userData = root.UserData as TreeNodeData;
@@ -711,15 +723,16 @@ namespace YooAsset.Editor
             {
                 if (userData.IsBundle)
                 {
-                    uniqueBundleNames.Add(userData.Name);
+                    uniqueBundles.Add(_buildReport.GetBundleInfo(userData.Name));
                 }
                 else
                 {
-                    userData.BundleActualCount = uniqueBundleNames.Count;
+                    userData.BundleActualCount = uniqueBundles.Count;
+                    userData.BundleActualSize = GetBundleActualSize(uniqueBundles);
                 }
             }
 
-            return uniqueBundleNames;
+            return uniqueBundles;
         }
 
         private void MakeTreeViewerItem(VisualElement container)
@@ -744,7 +757,7 @@ namespace YooAsset.Editor
                 else
                 {
                     label.text =
-                        $"{treeNodeData.Name} ({treeNodeData.BundleActualCount}) ({treeNodeData.BundleSize})";
+                        $"{treeNodeData.Name} ({treeNodeData.BundleActualCount}) ({EditorUtility.FormatBytes(treeNodeData.BundleActualSize)})";
                 }
             }
 
