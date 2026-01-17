@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -43,13 +44,6 @@ namespace YooAsset.Editor
         private List<ReportAssetInfo> _includeList = new List<ReportAssetInfo>();
         private List<DependInfo> _dependList = new List<DependInfo>();
 
-        private TreeViewer _treeViewer;
-
-        private readonly Dictionary<string, List<ReportBundleInfo>> _treeData =
-            new Dictionary<string, List<ReportBundleInfo>>();
-
-        private GraphViewer _graphView;
-
         private class TreeNodeData
         {
             public string Name;
@@ -59,6 +53,12 @@ namespace YooAsset.Editor
             public long BundleSize;
             public long BundleActualSize; // 当前目录下去掉冗余后的bundle总大小
         }
+
+        private TreeViewer _treeViewer;
+        private Dictionary<string, List<ReportBundleInfo>> _treeData = new Dictionary<string, List<ReportBundleInfo>>();
+
+        private GraphViewer _graphViewer;
+
 
         /// <summary>
         /// 初始化页面
@@ -89,13 +89,15 @@ namespace YooAsset.Editor
             _dependToolbar3 = _root.Q<ToolbarButton>("BottomBar3");
             _dependToolbar3.clicked += OnClickDependToolbar3;
 
+            // 树状视图
             _treeViewer = _root.Q<TreeViewer>("FileExplorer");
             _treeViewer.makeItem = MakeTreeViewerItem;
             _treeViewer.bindItem = BindTreeViewerItem;
             _treeViewer.onSelectionChange = OnSelectionChange;
 
             // 网状视图
-            _graphView = _root.Q<GraphViewer>("GraphView");
+            _graphViewer = _root.Q<GraphViewer>("GraphView");
+            _graphViewer.MakeGraphNode = MakeGraphNode;
 
             var split1 = _root.Q<TwoPaneSplitView>("TwoPaneSplitView1");
             split1.orientation = TwoPaneSplitViewOrientation.Vertical;
@@ -149,8 +151,8 @@ namespace YooAsset.Editor
                 return;
             }
 
-            GraphNode root = new GraphNode(bundleInfo, this);
-            _graphView.SetRootNode(root);
+            GraphNode root = new GraphNode(bundleInfo);
+            _graphViewer.SetRootNode(root);
 
             FillDependListView(bundleInfo);
             FillIncludeListView(bundleInfo);
@@ -163,74 +165,11 @@ namespace YooAsset.Editor
                 return;
             }
 
-            GraphNode root = new GraphNode(bundleInfo, this);
-            _graphView.SetRootNode(root);
+            GraphNode root = new GraphNode(bundleInfo);
+            _graphViewer.SetRootNode(root);
 
             FillDependListView(bundleInfo);
             FillIncludeListView(bundleInfo);
-        }
-
-        public void AddChildren(GraphNode parent)
-        {
-            List<string> dependList = new List<string>();
-            List<ReportAssetInfo> assetList = new List<ReportAssetInfo>();
-
-            // 首先获得bundle包含的asset
-            foreach (var assetInfo in _buildReport.AssetInfos)
-            {
-                if (assetInfo.MainBundleName == parent.BundleInfo.BundleName)
-                {
-                    assetList.Add(assetInfo);
-                }
-            }
-
-            // 然后找到每个asset依赖的bundle，添加到dependList中
-            foreach (var assetInfo in assetList)
-            {
-                foreach (string dependBundleName in assetInfo.DependBundles)
-                {
-                    if (dependList.Contains(dependBundleName) == false)
-                    {
-                        dependList.Add(dependBundleName);
-                    }
-                }
-            }
-
-            foreach (var item in dependList)
-            {
-                _graphView.AddChildAndEdge(parent, new GraphNode(_buildReport.GetBundleInfo(item), this));
-            }
-
-            _graphView.schedule.Execute(() => { _graphView.LayoutGraphView(); }).StartingIn(10);
-        }
-
-        public int GetDependencyCount(GraphNode node)
-        {
-            List<string> dependList = new List<string>();
-            List<ReportAssetInfo> assetList = new List<ReportAssetInfo>();
-
-            // 首先获得bundle包含的asset
-            foreach (var assetInfo in _buildReport.AssetInfos)
-            {
-                if (assetInfo.MainBundleName == node.BundleInfo.BundleName)
-                {
-                    assetList.Add(assetInfo);
-                }
-            }
-
-            // 然后找到每个asset依赖的bundle，添加到dependList中
-            foreach (var assetInfo in assetList)
-            {
-                foreach (string dependBundleName in assetInfo.DependBundles)
-                {
-                    if (dependList.Contains(dependBundleName) == false)
-                    {
-                        dependList.Add(dependBundleName);
-                    }
-                }
-            }
-
-            return dependList.Count;
         }
 
         /// <summary>
@@ -739,7 +678,11 @@ namespace YooAsset.Editor
         {
             var label = new Label
             {
-                name = "Label"
+                name = "Label",
+                style =
+                {
+                    unityTextAlign = TextAnchor.MiddleLeft
+                }
             };
             container.Add(label);
         }
@@ -760,8 +703,6 @@ namespace YooAsset.Editor
                         $"{treeNodeData.Name} ({treeNodeData.BundleActualCount}) ({EditorUtility.FormatBytes(treeNodeData.BundleActualSize)})";
                 }
             }
-
-            label.style.unityTextAlign = TextAnchor.MiddleLeft;
         }
 
         private void OnSelectionChange(IEnumerable<object> objs)
@@ -780,6 +721,145 @@ namespace YooAsset.Editor
                 }
 
                 break;
+            }
+        }
+
+        #endregion
+
+        #region 网状视图相关
+
+        private void MakeGraphNode(GraphNode graphNode)
+        {
+            // 添加输入输出端口
+            GraphPort inputPort = new GraphPort("Input", Orientation.Horizontal, Direction.Input, Port.Capacity.Single,
+                typeof(float));
+            GraphPort outputPort = new GraphPort("Output", Orientation.Horizontal, Direction.Output,
+                Port.Capacity.Single,
+                typeof(float));
+            graphNode.AddGraphPort(inputPort);
+            graphNode.AddGraphPort(outputPort);
+
+            // 添加自定义元素
+            var graphNodeData = graphNode.UserData as ReportBundleInfo;
+            if (graphNodeData == null)
+            {
+                return;
+            }
+
+            // 标题文本
+            graphNode.title = graphNodeData.BundleName;
+
+            // Bundle大小
+            var labelFileSize = new Label($"File Size: {EditorUtility.FormatBytes(graphNodeData.FileSize)}")
+            {
+                name = "FileSize",
+                style =
+                {
+                    flexGrow = 1
+                }
+            };
+            graphNode.mainContainer.Add(labelFileSize);
+
+            // 依赖Bundle数量
+            var labelDependCount = new Label($"Depend Count: {graphNodeData.DependBundles.Count}")
+            {
+                name = "DependCount",
+                style =
+                {
+                    flexGrow = 1
+                }
+            };
+            graphNode.mainContainer.Add(labelDependCount);
+
+            // 被依赖Bundle数量
+            var labelReferenceCount = new Label($"Reference Count: {graphNodeData.ReferenceBundles.Count}")
+            {
+                name = "ReferenceCount",
+                style =
+                {
+                    flexGrow = 1
+                }
+            };
+            graphNode.mainContainer.Add(labelReferenceCount);
+
+            var btnContainer = new VisualElement
+            {
+                name = "BtnContainer",
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    height = 30
+                }
+            };
+            graphNode.mainContainer.Add(btnContainer);
+
+            var btnShowInfo = new Button
+            {
+                name = "BtnShowInfo",
+                text = "Show Info",
+                style =
+                {
+                    width = 100,
+                    flexGrow = 1
+                }
+            };
+            btnShowInfo.clicked += () =>
+            {
+                FillDependListView(graphNodeData);
+                FillIncludeListView(graphNodeData);
+            };
+            btnContainer.Add(btnShowInfo);
+
+            if (graphNodeData.DependBundles.Count > 0)
+            {
+                var btnChildren = new Button
+                {
+                    name = "BtnChildren",
+                    text = "Show Children",
+                    style =
+                    {
+                        width = 100,
+                        flexGrow = 1
+                    }
+                };
+                btnChildren.clicked += () =>
+                {
+                    if (graphNode.IsExpanded == false)
+                    {
+                        if (graphNode.Children.Count > 0)
+                        {
+                            graphNode.ShowChildren();
+                        }
+                        else
+                        {
+                            graphNode.IsExpanded = !graphNode.IsExpanded;
+
+                            List<GraphNode> children = new List<GraphNode>();
+                            foreach (var bundleName in graphNodeData.DependBundles)
+                            {
+                                children.Add(new GraphNode(_buildReport.GetBundleInfo(bundleName)));
+                            }
+
+                            _graphViewer.AddChildren(graphNode, children);
+                            foreach (var child in children)
+                            {
+                                _graphViewer.AddEdge(graphNode, child, 0, 0);
+                            }
+
+                            _graphViewer.RebuildView();
+
+                            btnChildren.text = "Hide Children";
+                        }
+                    }
+                    else
+                    {
+                        graphNode.HideChildren();
+                    }
+                };
+                btnContainer.Add(btnChildren);
+
+                graphNode.ShowChildrenCallBack = () => btnChildren.text = "Hide Children";
+                graphNode.HideChildrenCallBack = () => btnChildren.text = "Show Children";
             }
         }
 

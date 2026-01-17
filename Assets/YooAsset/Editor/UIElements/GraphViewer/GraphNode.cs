@@ -1,100 +1,95 @@
-﻿#if UNITY_2019_4_OR_NEWER
+#if UNITY_2019_4_OR_NEWER
+using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
-    internal class GraphNode : Node
+    public class GraphNode : Node
     {
-        private readonly ReporterGraphViewer _viewer;
-        private readonly List<Port> _inputPorts = new List<Port>(5);
-        private readonly List<Port> _outputPorts = new List<Port>(5);
-        private readonly List<Edge> _edges = new List<Edge>();
-        public new readonly List<GraphNode> Children = new List<GraphNode>(10);
+        /// <summary>
+        /// 子节点集合
+        /// </summary>
+        public new List<GraphNode> Children = new List<GraphNode>(10);
 
-        private bool _isExpanded = false;
-        private readonly Button _btnChildren;
-
+        /// <summary>
+        /// 父节点
+        /// </summary>
         public GraphNode Parent { get; set; }
-        public Vector2 Position { get; set; }
-        public ReportBundleInfo BundleInfo { get; set; }
 
-        // 当前节点是父节点的第几个子节点
-        public int SiblingIndex
+        /// <summary>
+        /// 输入端口
+        /// </summary>
+        public List<GraphPort> InputPorts = new List<GraphPort>(5);
+
+        /// <summary>
+        /// 输出端口
+        /// </summary>
+        public List<GraphPort> OutputPorts = new List<GraphPort>(5);
+
+        /// <summary>
+        /// 节点与子节点连接的边
+        /// </summary>
+        private List<Edge> _edges = new List<Edge>();
+
+        /// <summary>
+        /// 用户数据
+        /// </summary>
+        public object UserData { get; set; }
+
+        /// <summary>
+        /// 是否展开
+        /// </summary>
+        public bool IsExpanded { get; set; } = false;
+
+        /// <summary>
+        /// 节点坐标
+        /// </summary>
+        public Vector2 Position { get; set; }
+
+        private Action<GraphNode> _makeGraphNode;
+        private Action<GraphNode> _bindGraphNode;
+
+        /// <summary>
+        /// 制作节点元素
+        /// </summary>
+        public Action<GraphNode> MakeGraphNode
         {
-            get
+            get => _makeGraphNode;
+            set
             {
-                if (Parent == null)
+                if (_makeGraphNode == value)
                 {
-                    return 0;
+                    return;
                 }
 
-                return Parent.Children.IndexOf(this);
+                _makeGraphNode = value;
+                _makeGraphNode.Invoke(this);
             }
         }
 
-        public GraphNode(ReportBundleInfo bundleInfo, ReporterGraphViewer viewer)
+        /// <summary>
+        /// 绑定节点数据
+        /// </summary>
+        public Action<GraphNode> BindGraphNode
         {
-            _viewer = viewer;
-            BundleInfo = bundleInfo;
-            title = BundleInfo.BundleName;
-
-            // 添加输入端口
-            var inputPort = Port.Create<Edge>(Orientation.Horizontal, Direction.Input, Port.Capacity.Single,
-                typeof(float));
-            inputPort.portName = "Input";
-            inputContainer.Add(inputPort);
-            _inputPorts.Add(inputPort);
-
-            // 添加输出端口
-            var outputPort = Port.Create<Edge>(Orientation.Horizontal, Direction.Output, Port.Capacity.Single,
-                typeof(float));
-            outputPort.portName = "Output";
-            outputContainer.Add(outputPort);
-            _outputPorts.Add(outputPort);
-
-            // 添加内容区域
-            var labelSize = new Label($"Size: {EditorUtility.FormatBytes(BundleInfo.FileSize)}");
-            labelSize.style.flexGrow = 1;
-            mainContainer.Add(labelSize);
-
-            int dependCount = _viewer.GetDependencyCount(this);
-            var labelDependCount = new Label($"Depend Count: {dependCount}");
-            labelDependCount.style.flexGrow = 1;
-            mainContainer.Add(labelDependCount);
-
-            var labelHash = new Label($"Hash: {BundleInfo.FileHash}");
-            labelHash.style.flexGrow = 1;
-            mainContainer.Add(labelHash);
-
-            // var labelTags = new Label($"Tags: {BundleInfo.GetTagsString()}");
-            // labelTags.style.flexGrow = 1;
-            // mainContainer.Add(labelTags);
-
-            var container = new VisualElement();
-            container.style.flexDirection = FlexDirection.Row;
-            container.style.height = 30;
-            mainContainer.Add(container);
-
-            var buttonShowInfo = new Button();
-            buttonShowInfo.text = "Show Info";
-            buttonShowInfo.style.width = 100;
-            buttonShowInfo.style.flexGrow = 1;
-            buttonShowInfo.clicked += OnBtnShowInfoClicked;
-            container.Add(buttonShowInfo);
-
-            if (dependCount > 0)
+            get => _bindGraphNode;
+            set
             {
-                _btnChildren = new Button();
-                _btnChildren.text = "Show Children";
-                _btnChildren.style.width = 100;
-                _btnChildren.style.flexGrow = 1;
-                _btnChildren.clicked += OnBtnChildrenClicked;
-                container.Add(_btnChildren);
+                if (_bindGraphNode == value)
+                    return;
+                _bindGraphNode = value;
+                _bindGraphNode.Invoke(this);
             }
+        }
+
+        public Action ShowChildrenCallBack;
+        public Action HideChildrenCallBack;
+
+        public GraphNode(object userData)
+        {
+            UserData = userData;
         }
 
         /// <summary>
@@ -144,60 +139,41 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 获取端口
+        /// 节点是父节点的第几个子节点
         /// </summary>
-        public Port GetPort(Direction direction, int index)
+        public int GetSiblingIndex()
         {
-            if (direction == Direction.Input)
+            if (Parent == null)
             {
-                return _inputPorts[index];
+                return 0;
+            }
+
+            return Parent.Children.IndexOf(this);
+        }
+
+        /// <summary>
+        /// 添加端口
+        /// </summary>
+        public void AddGraphPort(GraphPort graphPort)
+        {
+            if (graphPort.Port.direction == Direction.Input)
+            {
+                inputContainer.Add(graphPort.Port);
+                InputPorts.Add(graphPort);
             }
             else
             {
-                return _outputPorts[index];
+                outputContainer.Add(graphPort.Port);
+                OutputPorts.Add(graphPort);
             }
         }
 
-        private void OnBtnShowInfoClicked()
+        /// <summary>
+        /// 隐藏所有子孙节点
+        /// </summary>
+        public void HideChildren()
         {
-            _viewer.FillDependListView(BundleInfo);
-            _viewer.FillIncludeListView(BundleInfo);
-        }
-
-        private void OnBtnChildrenClicked()
-        {
-            if (_isExpanded == false)
-            {
-                if (_btnChildren != null)
-                {
-                    _btnChildren.text = "Hide Children";
-                }
-
-                if (Children.Count > 0)
-                {
-                    ShowChildren();
-                }
-                else
-                {
-                    _viewer.AddChildren(this);
-                }
-
-                _isExpanded = !_isExpanded;
-            }
-            else
-            {
-                HideChildren();
-            }
-        }
-
-        private void HideChildren()
-        {
-            if (_btnChildren != null)
-            {
-                _btnChildren.text = "Show Children";
-            }
-
-            _isExpanded = !_isExpanded;
+            IsExpanded = !IsExpanded;
 
             foreach (var child in Children)
             {
@@ -209,10 +185,17 @@ namespace YooAsset.Editor
             {
                 edge.visible = false;
             }
+
+            HideChildrenCallBack?.Invoke();
         }
 
-        private void ShowChildren()
+        /// <summary>
+        /// 显示子节点
+        /// </summary>
+        public void ShowChildren()
         {
+            IsExpanded = !IsExpanded;
+
             foreach (var child in Children)
             {
                 child.visible = true;
@@ -222,6 +205,8 @@ namespace YooAsset.Editor
             {
                 edge.visible = true;
             }
+
+            ShowChildrenCallBack?.Invoke();
         }
     }
 }

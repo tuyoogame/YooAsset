@@ -1,4 +1,5 @@
 ﻿#if UNITY_2019_4_OR_NEWER
+using System;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -16,78 +17,105 @@ namespace YooAsset.Editor
         private readonly List<GraphNode> _nodes = new List<GraphNode>();
         private readonly List<Edge> _edges = new List<Edge>();
 
+        /// <summary>
+        /// 制作节点元素
+        /// </summary>
+        public Action<GraphNode> MakeGraphNode { get; set; }
+
+        /// <summary>
+        /// 绑定节点数据
+        /// </summary>
+        public Action<GraphNode> BindGraphNode { get; set; }
+
         public GraphViewer()
         {
             this.AddManipulator(new ContentZoomer());
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
-
-            // var grid = new ABDVGraphViewGirdBg();
-            // Insert(0, grid);
-            // grid.StretchToParentSize();
         }
 
         public void SetRootNode(GraphNode root)
         {
-            // 重新设置根节点时清空GraphView
-            ClearGraphView();
+            // 重新设置根节点时清空GraphViewer
+            ClearGraphViewer();
 
             _roots.Add(root);
             _nodes.Add(root);
-            AddElement(root);
+            AddNode(root);
         }
 
         public void SetRootNodes(List<GraphNode> roots)
         {
-            // 重新设置根节点时清空GraphView
-            ClearGraphView();
+            // 重新设置根节点时清空GraphViewer
+            ClearGraphViewer();
 
             _roots.AddRange(roots);
             _nodes.AddRange(roots);
             foreach (var root in roots)
             {
-                AddElement(root);
+                AddNode(root);
             }
         }
 
-        private void ClearGraphView()
+        private void ClearGraphViewer()
         {
             foreach (var edge in _edges)
             {
                 RemoveElement(edge);
             }
 
-            _edges.Clear();
             foreach (var node in _nodes)
             {
                 RemoveElement(node);
             }
 
+            _edges.Clear();
             _nodes.Clear();
             _roots.Clear();
         }
 
         /// <summary>
-        /// 添加子节点同时添加边
+        /// 添加节点
         /// </summary>
-        public void AddChildAndEdge(GraphNode parent, GraphNode child)
+        private void AddNode(GraphNode graphNode)
         {
-            _nodes.Add(child);
-            AddElement(child);
-            parent.AddChild(child);
+            AddElement(graphNode);
+            graphNode.MakeGraphNode = MakeGraphNode;
+            graphNode.BindGraphNode = BindGraphNode;
+        }
 
-            AddEdge(parent, child, 0, 0);
+        /// <summary>
+        /// 添加子节点
+        /// </summary>
+        public void AddChildren(GraphNode parentNode, List<GraphNode> children)
+        {
+            foreach (var child in children)
+            {
+                AddChild(parentNode, child);
+            }
+        }
+
+        /// <summary>
+        /// 添加子节点
+        /// </summary>
+        public void AddChild(GraphNode parentNode, GraphNode child)
+        {
+            AddNode(child);
+            _nodes.Add(child);
+            parentNode.AddChild(child);
         }
 
         /// <summary>
         /// 添加边
         /// </summary>
-        private void AddEdge(GraphNode inputNode, GraphNode outputNode, int inputIndex, int outputIndex)
+        public void AddEdge(GraphNode parentNode, GraphNode child, int inputIndex, int outputIndex)
         {
-            var outputPort = inputNode.GetPort(Direction.Output, inputIndex);
-            var inputPort = outputNode.GetPort(Direction.Input, outputIndex);
             Edge edge = new Edge();
+
+            Port outputPort = parentNode.OutputPorts[inputIndex].Port;
+            Port inputPort = child.InputPorts[outputIndex].Port;
+
             edge.output = outputPort;
             edge.input = inputPort;
 
@@ -96,26 +124,17 @@ namespace YooAsset.Editor
 
             AddElement(edge);
             _edges.Add(edge);
-            inputNode.AddEdge(edge);
-        }
-
-        public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
-        {
-            var compatiblePorts = new List<Port>();
-            ports.ForEach(port =>
-            {
-                if (startPort != port && startPort.node != port.node && startPort.direction != port.direction)
-                {
-                    compatiblePorts.Add(port);
-                }
-            });
-
-            return compatiblePorts;
+            parentNode.AddEdge(edge);
         }
 
         #region 自动布局相关
 
-        public void LayoutGraphView()
+        public void RebuildView()
+        {
+            schedule.Execute(LayoutGraphView).StartingIn(10);
+        }
+
+        private void LayoutGraphView()
         {
             foreach (var root in _roots)
             {
@@ -152,7 +171,7 @@ namespace YooAsset.Editor
                     }
 
                     float baseY = node.Parent.Position.y - (node.Parent.Children.Count - 1) * 100;
-                    node.Position = new Vector2(x, baseY + node.SiblingIndex * 200);
+                    node.Position = new Vector2(x, baseY + node.GetSiblingIndex() * 200);
                 }
 
                 node.SetPosition(new Rect(node.Position.x, node.Position.y, 0, 0));
