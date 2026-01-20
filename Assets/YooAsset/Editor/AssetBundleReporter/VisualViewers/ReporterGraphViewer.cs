@@ -13,36 +13,10 @@ namespace YooAsset.Editor
 {
     internal class ReporterGraphViewer
     {
-        private class DependInfo
+        private class BundleTableData : DefaultTableData
         {
             public ReportBundleInfo BundleInfo;
-            public string AssetPath;
         }
-
-        private enum EDependSortMode
-        {
-            BundleName,
-            BundleSize,
-        }
-
-        private EDependSortMode _dependSortMode = EDependSortMode.BundleName;
-        private bool _dependDescendingSort = false;
-
-        private VisualTreeAsset _visualAsset;
-        private TemplateContainer _root;
-
-        private ListView _includeListView;
-        private ListView _dependListView;
-
-        private BuildReport _buildReport;
-        private string _reportFilePath;
-
-        private ToolbarButton _dependToolbar1;
-        private ToolbarButton _dependToolbar3;
-
-        private ReportBundleInfo _bundleInfo;
-        private List<ReportAssetInfo> _includeList = new List<ReportAssetInfo>();
-        private List<DependInfo> _dependList = new List<DependInfo>();
 
         private class TreeNodeData
         {
@@ -54,11 +28,17 @@ namespace YooAsset.Editor
             public long BundleActualSize; // 当前目录下去掉冗余后的bundle总大小
         }
 
+        private VisualTreeAsset _visualAsset;
+        private TemplateContainer _root;
+
+        private TableViewer _dependTableView;
+        private TableViewer _referenceTableView;
         private TreeViewer _treeViewer;
         private Dictionary<string, List<ReportBundleInfo>> _treeData = new Dictionary<string, List<ReportBundleInfo>>();
-
         private GraphViewer _graphViewer;
 
+        private BuildReport _buildReport;
+        private string _reportFilePath;
 
         /// <summary>
         /// 初始化页面
@@ -73,21 +53,15 @@ namespace YooAsset.Editor
             _root = _visualAsset.CloneTree();
             _root.style.flexGrow = 1f;
 
-            // 包含列表
-            _includeListView = _root.Q<ListView>("MidListView");
-            _includeListView.makeItem = MakeIncludeListViewItem;
-            _includeListView.bindItem = BindIncludeListViewItem;
+            // 依赖Bundle列表
+            _dependTableView = _root.Q<TableViewer>("LeftTableView");
+            _dependTableView.ClickTableDataEvent = OnClickTableView;
+            CreateTableViewColumns(_dependTableView);
 
-            // 依赖列表
-            _dependListView = _root.Q<ListView>("BottomListView");
-            _dependListView.makeItem = MakeDependListViewItem;
-            _dependListView.bindItem = BindDependListViewItem;
-
-            _dependToolbar1 = _root.Q<ToolbarButton>("BottomBar1");
-            _dependToolbar1.clicked += OnClickDependToolbar1;
-
-            _dependToolbar3 = _root.Q<ToolbarButton>("BottomBar3");
-            _dependToolbar3.clicked += OnClickDependToolbar3;
+            // 被依赖Bundle列表
+            _referenceTableView = _root.Q<TableViewer>("RightTableView");
+            _referenceTableView.ClickTableDataEvent = OnClickTableView;
+            CreateTableViewColumns(_referenceTableView);
 
             // 树状视图
             _treeViewer = _root.Q<TreeViewer>("FileExplorer");
@@ -154,8 +128,8 @@ namespace YooAsset.Editor
             GraphNode root = new GraphNode(bundleInfo);
             _graphViewer.SetRootNode(root);
 
-            FillDependListView(bundleInfo);
-            FillIncludeListView(bundleInfo);
+            FillInDependTableView(bundleInfo);
+            FillInReferenceTableView(bundleInfo);
         }
 
         private void RebuildView(ReportBundleInfo bundleInfo)
@@ -168,8 +142,8 @@ namespace YooAsset.Editor
             GraphNode root = new GraphNode(bundleInfo);
             _graphViewer.SetRootNode(root);
 
-            FillDependListView(bundleInfo);
-            FillIncludeListView(bundleInfo);
+            FillInDependTableView(bundleInfo);
+            FillInReferenceTableView(bundleInfo);
         }
 
         /// <summary>
@@ -180,311 +154,145 @@ namespace YooAsset.Editor
             _buildReport = buildReport;
             _reportFilePath = reprotFilePath;
 
+            // 清空旧数据
+            _dependTableView.ClearAll(false, true);
+            _referenceTableView.ClearAll(false, true);
+
             InitTreeData();
             InitTreeViewer();
         }
 
-        /// <summary>
-        /// 填充包含窗口
-        /// </summary>
-        public void FillIncludeListView(ReportBundleInfo bundleInfo)
+        #region 表格视图相关
+
+        private void CreateTableViewColumns(TableViewer tableViewer)
         {
-            _includeList.Clear();
-            HashSet<string> mainAssetDic = new HashSet<string>();
-            foreach (var assetInfo in _buildReport.AssetInfos)
+            //BundleName
             {
-                if (assetInfo.MainBundleName == bundleInfo.BundleName)
+                var columnStyle = new ColumnStyle(600, 500, 1000);
+                columnStyle.Stretchable = true;
+                columnStyle.Searchable = true;
+                columnStyle.Sortable = true;
+                columnStyle.Counter = true;
+                var headerTitle = tableViewer.name == "LeftTableView" ? "Depend Bundle Name" : "Reference Bundle Name";
+                var column = new TableColumn("BundleName", headerTitle, columnStyle);
+                column.MakeCell = () =>
                 {
-                    mainAssetDic.Add(assetInfo.AssetPath);
-                    _includeList.Add(assetInfo);
-                }
+                    var label = new Label();
+                    label.style.unityTextAlign = TextAnchor.MiddleLeft;
+                    return label;
+                };
+                column.BindCell = (VisualElement element, ITableData data, ITableCell cell) =>
+                {
+                    var infoLabel = element as Label;
+                    infoLabel.text = (string)cell.GetDisplayObject();
+                };
+                tableViewer.AddColumn(column);
             }
 
-            foreach (var item in bundleInfo.BundleContents)
+            // FileSize
             {
-                if (mainAssetDic.Contains(item.AssetPath) == false)
+                var columnStyle = new ColumnStyle(100);
+                columnStyle.Stretchable = false;
+                columnStyle.Searchable = true;
+                columnStyle.Sortable = true;
+                var column = new TableColumn("FileSize", "File Size", columnStyle);
+                column.MakeCell = () =>
                 {
-                    var assetInfo = new ReportAssetInfo();
-                    assetInfo.AssetPath = item.AssetPath;
-                    assetInfo.AssetGUID = "--";
-                    _includeList.Add(assetInfo);
-                }
+                    var label = new Label();
+                    label.style.unityTextAlign = TextAnchor.MiddleLeft;
+                    return label;
+                };
+                column.BindCell = (VisualElement element, ITableData data, ITableCell cell) =>
+                {
+                    var infoLabel = element as Label;
+                    long fileSize = (long)cell.CellValue;
+                    infoLabel.text = EditorUtility.FormatBytes(fileSize);
+                };
+                tableViewer.AddColumn(column);
             }
 
-            _includeListView.Clear();
-            _includeListView.ClearSelection();
-            _includeListView.itemsSource = _includeList;
-            _includeListView.Refresh();
-            _root.Q<ToolbarButton>("MidBar1").text = $"Include Assets ({_includeList.Count})";
+            //Tags
+            {
+                var columnStyle = new ColumnStyle(150, 100, 1000);
+                columnStyle.Stretchable = true;
+                columnStyle.Searchable = true;
+                columnStyle.Sortable = true;
+                var column = new TableColumn("Tags", "Tags", columnStyle);
+                column.MakeCell = () =>
+                {
+                    var label = new Label();
+                    label.style.unityTextAlign = TextAnchor.MiddleLeft;
+                    return label;
+                };
+                column.BindCell = (VisualElement element, ITableData data, ITableCell cell) =>
+                {
+                    var infoLabel = element as Label;
+                    infoLabel.text = (string)cell.GetDisplayObject();
+                };
+                tableViewer.AddColumn(column);
+            }
         }
 
-        /// <summary>
-        /// 填充依赖窗口
-        /// </summary>
-        public void FillDependListView(ReportBundleInfo bundleInfo)
+        private void FillInDependTableView(ReportBundleInfo bundleInfo)
         {
-            bool DependListContainsBundle(string bundleName, out int i)
-            {
-                for (int j = 0; j < _dependList.Count; j++)
-                {
-                    if (_dependList[j].BundleInfo.BundleName == bundleName)
-                    {
-                        i = j;
-                        return true;
-                    }
-                }
+            var sourceDatas = new List<ITableData>(bundleInfo.DependBundles.Count);
 
-                i = 0;
-                return false;
+            foreach (var bundleName in bundleInfo.DependBundles)
+            {
+                var dependBundleInfo = _buildReport.GetBundleInfo(bundleName);
+                var rowData = new BundleTableData();
+                rowData.BundleInfo = dependBundleInfo;
+                rowData.AddStringValueCell("BundleName", dependBundleInfo.BundleName);
+                rowData.AddLongValueCell("FileSize", dependBundleInfo.FileSize);
+                rowData.AddStringValueCell("Tags", string.Join(";", dependBundleInfo.Tags));
+                sourceDatas.Add(rowData);
             }
 
-            _dependList.Clear();
-            List<ReportAssetInfo> assetList = new List<ReportAssetInfo>();
-
-            // 首先获得bundle包含的asset
-            foreach (var assetInfo in _buildReport.AssetInfos)
-            {
-                if (assetInfo.MainBundleName == bundleInfo.BundleName)
-                {
-                    assetList.Add(assetInfo);
-                }
-            }
-
-            // 然后找到每个asset依赖的bundle，添加到dependList中
-            foreach (var assetInfo in assetList)
-            {
-                foreach (string dependBundleName in assetInfo.DependBundles)
-                {
-                    int i = 0;
-                    if (DependListContainsBundle(dependBundleName, out i))
-                    {
-                        _dependList[i].AssetPath += $";{Path.GetFileName(assetInfo.AssetPath)}";
-                    }
-                    else
-                    {
-                        DependInfo dependInfo = new DependInfo();
-                        dependInfo.BundleInfo = _buildReport.GetBundleInfo(dependBundleName);
-                        dependInfo.AssetPath = Path.GetFileName(assetInfo.AssetPath);
-                        _dependList.Add(dependInfo);
-                    }
-                }
-            }
-
-            RefreshDependListView();
+            _dependTableView.itemsSource = sourceDatas;
+            _dependTableView.RebuildView();
         }
 
-        /// <summary>
-        /// 刷新依赖窗口
-        /// </summary>
-        private void RefreshDependListView()
+        private void FillInReferenceTableView(ReportBundleInfo bundleInfo)
         {
-            _dependListView.Clear();
-            _dependListView.ClearSelection();
-            _dependListView.itemsSource = SortDependListView();
-            _dependListView.Refresh();
+            var sourceDatas = new List<ITableData>(bundleInfo.ReferenceBundles.Count);
 
-            RefreshSortingSymbol();
+            foreach (var bundleName in bundleInfo.ReferenceBundles)
+            {
+                var referenceBundleInfo = _buildReport.GetBundleInfo(bundleName);
+                var rowData = new BundleTableData();
+                rowData.BundleInfo = referenceBundleInfo;
+                rowData.AddStringValueCell("BundleName", referenceBundleInfo.BundleName);
+                rowData.AddLongValueCell("FileSize", referenceBundleInfo.FileSize);
+                rowData.AddStringValueCell("Tags", string.Join(";", referenceBundleInfo.Tags));
+                sourceDatas.Add(rowData);
+            }
+
+            _referenceTableView.itemsSource = sourceDatas;
+            _referenceTableView.RebuildView();
         }
 
-        /// <summary>
-        /// 排序依赖窗口
-        /// </summary>
-        private List<DependInfo> SortDependListView()
+        private void OnClickTableView(PointerDownEvent evt, ITableData data)
         {
-            if (_dependSortMode == EDependSortMode.BundleName)
+            // 鼠标双击后检视
+            if (evt.clickCount != 2)
+                return;
+
+            var bundleTableData = data as BundleTableData;
+            if (bundleTableData.BundleInfo.Encrypted)
+                return;
+
+            if (_buildReport.Summary.BuildBundleType == (int)EBuildBundleType.AssetBundle)
             {
-                if (_dependDescendingSort)
-                    return _dependList.OrderByDescending(a => a.BundleInfo.BundleName).ToList();
+                string rootDirectory = Path.GetDirectoryName(_reportFilePath);
+                string filePath = $"{rootDirectory}/{bundleTableData.BundleInfo.FileName}";
+                if (File.Exists(filePath))
+                    Selection.activeObject = AssetBundleRecorder.GetAssetBundle(filePath);
                 else
-                    return _dependList.OrderBy(a => a.BundleInfo.BundleName).ToList();
+                    Selection.activeObject = null;
             }
-            else if (_dependSortMode == EDependSortMode.BundleSize)
-            {
-                if (_dependDescendingSort)
-                    return _dependList.OrderByDescending(a => a.BundleInfo.FileSize).ToList();
-                else
-                    return _dependList.OrderBy(a => a.BundleInfo.FileSize).ToList();
-            }
-            else
-            {
-                throw new System.NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// 刷新排序符号
-        /// </summary>
-        private void RefreshSortingSymbol()
-        {
-            // 刷新符号
-            _dependToolbar1.text = $"Depend Bundles ({_dependList.Count})";
-            _dependToolbar3.text = "Size";
-
-            if (_dependSortMode == EDependSortMode.BundleName)
-            {
-                if (_dependDescendingSort)
-                    _dependToolbar1.text = $"Depend Bundles ({_dependListView.itemsSource.Count}) ↓";
-                else
-                    _dependToolbar1.text = $"Depend Bundles ({_dependListView.itemsSource.Count}) ↑";
-            }
-            else if (_dependSortMode == EDependSortMode.BundleSize)
-            {
-                if (_dependDescendingSort)
-                    _dependToolbar3.text = "Size ↓";
-                else
-                    _dependToolbar3.text = "Size ↑";
-            }
-            else
-            {
-                throw new System.NotImplementedException();
-            }
-        }
-
-        #region ListView相关
-
-        protected VisualElement MakeIncludeListViewItem()
-        {
-            VisualElement element = new VisualElement();
-            element.style.flexDirection = FlexDirection.Row;
-
-            {
-                var label = new Label();
-                label.name = "Label1";
-                label.style.unityTextAlign = TextAnchor.MiddleLeft;
-                label.style.marginLeft = 3f;
-                label.style.flexGrow = 1f;
-                label.style.width = 280;
-                element.Add(label);
-            }
-
-            {
-                var label = new Label();
-                label.name = "Label2";
-                label.style.unityTextAlign = TextAnchor.MiddleLeft;
-                label.style.marginLeft = 3f;
-                //label.style.flexGrow = 1f;
-                label.style.width = 100;
-                element.Add(label);
-            }
-
-            {
-                var label = new Label();
-                label.name = "Label3";
-                label.style.unityTextAlign = TextAnchor.MiddleLeft;
-                label.style.marginLeft = 3f;
-                //label.style.flexGrow = 1f;
-                label.style.width = 280;
-                element.Add(label);
-            }
-
-            return element;
-        }
-
-        protected void BindIncludeListViewItem(VisualElement element, int index)
-        {
-            List<ReportAssetInfo> containsList = _includeListView.itemsSource as List<ReportAssetInfo>;
-            ReportAssetInfo assetInfo = containsList[index];
-
-            // Asset Path
-            var label1 = element.Q<Label>("Label1");
-            label1.text = assetInfo.AssetPath;
-
-            // Asset Source
-            var label2 = element.Q<Label>("Label2");
-            label2.text = assetInfo.AssetGUID != "--" ? "Main Asset" : "Builtin Asset";
-
-            // GUID
-            var label3 = element.Q<Label>("Label3");
-            label3.text = assetInfo.AssetGUID;
-        }
-
-        protected VisualElement MakeDependListViewItem()
-        {
-            VisualElement element = new VisualElement();
-            element.style.flexDirection = FlexDirection.Row;
-
-            {
-                var label = new Label();
-                label.name = "Label1";
-                label.style.unityTextAlign = TextAnchor.MiddleLeft;
-                label.style.marginLeft = 3f;
-                label.style.flexGrow = 1f;
-                label.style.width = 280;
-                element.Add(label);
-            }
-
-            {
-                var label = new Label();
-                label.name = "Label2";
-                label.style.unityTextAlign = TextAnchor.MiddleLeft;
-                label.style.marginLeft = 3f;
-                label.style.flexGrow = 2f;
-                label.style.width = 280;
-                element.Add(label);
-            }
-
-            {
-                var label = new Label();
-                label.name = "Label3";
-                label.style.unityTextAlign = TextAnchor.MiddleLeft;
-                label.style.marginLeft = 3f;
-                //label.style.flexGrow = 1f;
-                label.style.width = 100;
-                element.Add(label);
-            }
-
-            return element;
-        }
-
-        protected void BindDependListViewItem(VisualElement element, int index)
-        {
-            List<DependInfo> containsList = _dependListView.itemsSource as List<DependInfo>;
-            DependInfo dependInfo = containsList[index];
-
-            // Depend Bundles
-            var label1 = element.Q<Label>("Label1");
-            label1.text = dependInfo.BundleInfo.BundleName;
-
-            // Assets That Cause Dependence
-            var label2 = element.Q<Label>("Label2");
-            label2.text = dependInfo.AssetPath;
-
-            // Size
-            var label3 = element.Q<Label>("Label3");
-            label3.text = EditorUtility.FormatBytes(dependInfo.BundleInfo.FileSize);
         }
 
         #endregion
-
-        private void OnClickDependToolbar1()
-        {
-            if (_dependSortMode != EDependSortMode.BundleName)
-            {
-                _dependSortMode = EDependSortMode.BundleName;
-                _dependDescendingSort = false;
-                RefreshDependListView();
-            }
-            else
-            {
-                _dependDescendingSort = !_dependDescendingSort;
-                RefreshDependListView();
-            }
-        }
-
-        private void OnClickDependToolbar3()
-        {
-            if (_dependSortMode != EDependSortMode.BundleSize)
-            {
-                _dependSortMode = EDependSortMode.BundleSize;
-                _dependDescendingSort = false;
-                RefreshDependListView();
-            }
-            else
-            {
-                _dependDescendingSort = !_dependDescendingSort;
-                RefreshDependListView();
-            }
-        }
 
         #region 树状视图相关
 
@@ -805,8 +613,8 @@ namespace YooAsset.Editor
             };
             btnShowInfo.clicked += () =>
             {
-                FillDependListView(graphNodeData);
-                FillIncludeListView(graphNodeData);
+                FillInDependTableView(graphNodeData);
+                FillInReferenceTableView(graphNodeData);
             };
             btnContainer.Add(btnShowInfo);
 
