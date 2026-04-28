@@ -9,7 +9,7 @@ namespace YooAsset
     /// <summary>
     /// 资源包裹类
     /// </summary>
-    public class ResourcePackage
+    public partial class ResourcePackage
     {
         private InitializePackageOperation _initializeOp;
         private ResourceManager _resourceManager;
@@ -120,7 +120,7 @@ namespace YooAsset
         public DestroyPackageOperation DestroyPackageAsync()
         {
             var options = new UnloadAllAssetsOptions(true, true);
-            var operation = new DestroyPackageOperation(this, options);
+            var operation = new DestroyPackageOperation(this, _resourceManager, options);
             AsyncOperationSystem.StartOperation(AsyncOperationSystem.GlobalSchedulerName, operation);
             return operation;
         }

@@ -401,7 +401,7 @@ namespace YooAsset
         /// <summary>
         /// 将资源GUID转换为资源信息
         /// </summary>
-        /// <param name="assetGUID">资源GUID</param>
+        /// <param name="assetGuid">资源GUID</param>
         /// <param name="assetType">资源类型</param>
         /// <returns>返回资源信息对象，如果转换失败会返回一个无效的资源信息。</returns>
         public AssetInfo ConvertAssetGuidToAssetInfo(string assetGuid, System.Type assetType)

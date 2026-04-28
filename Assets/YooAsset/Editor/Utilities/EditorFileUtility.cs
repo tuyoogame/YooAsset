@@ -119,28 +119,6 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 清空文件夹
-        /// </summary>
-        /// <param name="directoryPath">要清理的文件夹路径</param>
-        public static void ClearFolder(string directoryPath)
-        {
-            if (Directory.Exists(directoryPath) == false)
-                return;
-
-            string[] allFiles = Directory.GetFiles(directoryPath);
-            for (int i = 0; i < allFiles.Length; i++)
-            {
-                File.Delete(allFiles[i]);
-            }
-
-            string[] allFolders = Directory.GetDirectories(directoryPath);
-            for (int i = 0; i < allFolders.Length; i++)
-            {
-                Directory.Delete(allFolders[i], true);
-            }
-        }
-
-        /// <summary>
         /// 获取文件字节大小
         /// </summary>
         /// <param name="filePath">文件路径</param>

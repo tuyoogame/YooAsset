@@ -8,7 +8,7 @@ namespace YooAsset
     /// <summary>
     /// 异步操作基类
     /// </summary>
-    public abstract class AsyncOperationBase : IEnumerator, IComparable<AsyncOperationBase>
+    public abstract partial class AsyncOperationBase : IEnumerator, IComparable<AsyncOperationBase>
     {
         private List<AsyncOperationBase> _children;
         private Action<AsyncOperationBase> _completedCallback;

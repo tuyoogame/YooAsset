@@ -17,7 +17,6 @@ public class GetBuildinPackageVersionOperation : AsyncOperationBase
     }
 
     private readonly string _packageName;
-    private readonly IDownloadBackend _backend;
     private IDownloadTextRequest _downloadTextRequest;
     private ESteps _steps = ESteps.None;
 
@@ -26,10 +25,16 @@ public class GetBuildinPackageVersionOperation : AsyncOperationBase
     /// </summary>
     public string PackageVersion { private set; get; }
 
+    /// <summary>
+    /// 创建内置资源清单版本查询操作实例
+    /// </summary>
+    /// <param name="packageName">资源包裹名称</param>
     public GetBuildinPackageVersionOperation(string packageName)
     {
+        if (string.IsNullOrEmpty(packageName))
+            throw new System.ArgumentNullException(nameof(packageName));
+
         _packageName = packageName;
-        _backend = new UnityWebRequestBackend();
     }
     protected override void InternalStart()
     {
@@ -47,7 +52,7 @@ public class GetBuildinPackageVersionOperation : AsyncOperationBase
                 string filePath = GetBuildinPackageVersionFilePath();
                 string url = DownloadUrlHelper.ToLocalFileUrl(filePath);
                 var args = new DownloadDataRequestArgs(url, 60, 0);
-                _downloadTextRequest = _backend.CreateTextRequest(args);
+                _downloadTextRequest = new UnityWebRequestText(args, null);
                 _downloadTextRequest.SendRequest();
             }
 
@@ -65,6 +70,14 @@ public class GetBuildinPackageVersionOperation : AsyncOperationBase
                 _steps = ESteps.Done;
                 SetError(_downloadTextRequest.Error);
             }
+        }
+    }
+    protected override void InternalDispose()
+    {
+        if (_downloadTextRequest != null)
+        {
+            _downloadTextRequest.Dispose();
+            _downloadTextRequest = null;
         }
     }
 

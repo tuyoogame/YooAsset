@@ -4,7 +4,7 @@ namespace YooAsset
     /// <summary>
     /// 原生文件句柄，用于访问未经 Unity 处理的原始文件。
     /// </summary>
-    public sealed class RawFileHandle : HandleBase
+    public sealed partial class RawFileHandle : HandleBase
     {
         private System.Action<RawFileHandle> _callback;
 

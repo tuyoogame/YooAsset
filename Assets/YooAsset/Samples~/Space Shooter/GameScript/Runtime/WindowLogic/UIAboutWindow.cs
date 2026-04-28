@@ -1,5 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,10 +6,10 @@ public class UIAboutWindow : MonoBehaviour
     private void Awake()
     {
         var maskBtn = this.transform.Find("mask").GetComponent<Button>();
-        maskBtn.onClick.AddListener(OnClicMaskBtn);
+        maskBtn.onClick.AddListener(OnClickMaskBtn);
     }
 
-    private void OnClicMaskBtn()
+    private void OnClickMaskBtn()
     {
         GameObject.Destroy(this.gameObject);
     }

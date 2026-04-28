@@ -6,7 +6,7 @@ namespace YooAsset
     /// 按资源地址清理缓存文件
     /// </summary>
     /// <remarks>
-    /// ClearParameter 类型：string / string[] / List<string>
+    /// ClearParameter 类型：string / array / list
     /// </remarks>
     internal class EvictionByLocationsPolicy : ICacheEvictionPolicy
     {

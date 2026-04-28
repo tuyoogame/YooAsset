@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EntityAsteroid : MonoBehaviour
@@ -20,7 +18,7 @@ public class EntityAsteroid : MonoBehaviour
         var name = other.gameObject.name;
         if (name.StartsWith("player"))
         {
-            BattleEventDefine.AsteroidExplosion.SendEventMessage(this.transform.position, this.transform.rotation);
+            BattleAsteroidExplosionEvent.SendEventMessage(this.transform.position, this.transform.rotation);
             GameObject.Destroy(this.gameObject);
         }
     }

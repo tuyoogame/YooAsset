@@ -20,7 +20,7 @@ namespace YooAsset
             public int WatchdogTimeout { get; }
 
             /// <summary>
-            /// 禁用Unity的网络缓存
+            /// 禁用 Unity 内置网络缓存
             /// </summary>
             public bool DisableUnityWebCache { get; }
 

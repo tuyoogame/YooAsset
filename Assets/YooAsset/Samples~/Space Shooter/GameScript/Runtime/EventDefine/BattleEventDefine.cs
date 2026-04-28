@@ -1,119 +1,131 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Event;
 
-public class BattleEventDefine
+/// <summary>
+/// Battle score changed event.
+/// </summary>
+public sealed class BattleScoreChangedEvent : IEventMessage
 {
-    /// <summary>
-    /// 分数改变
-    /// </summary>
-    public class ScoreChange : IEventMessage
-    {
-        public int CurrentScores;
+    public int CurrentScores { get; }
 
-        public static void SendEventMessage(int currentScores)
-        {
-            var msg = new ScoreChange();
-            msg.CurrentScores = currentScores;
-            UniEvent.SendMessage(msg);
-        }
+    private BattleScoreChangedEvent(int currentScores)
+    {
+        CurrentScores = currentScores;
     }
 
-    /// <summary>
-    /// 游戏结束
-    /// </summary>
-    public class GameOver : IEventMessage
+    public static void SendEventMessage(int currentScores)
     {
-        public static void SendEventMessage()
-        {
-            var msg = new GameOver();
-            UniEvent.SendMessage(msg);
-        }
+        UniEvent.SendMessage(new BattleScoreChangedEvent(currentScores));
+    }
+}
+
+/// <summary>
+/// Battle game over event.
+/// </summary>
+public sealed class BattleGameOverEvent : IEventMessage
+{
+    public static void SendEventMessage()
+    {
+        UniEvent.SendMessage(new BattleGameOverEvent());
+    }
+}
+
+/// <summary>
+/// Battle enemy dead event.
+/// </summary>
+public sealed class BattleEnemyDeadEvent : IEventMessage
+{
+    public Vector3 Position { get; }
+    public Quaternion Rotation { get; }
+
+    private BattleEnemyDeadEvent(Vector3 position, Quaternion rotation)
+    {
+        Position = position;
+        Rotation = rotation;
     }
 
-    /// <summary>
-    /// 敌人死亡
-    /// </summary>
-    public class EnemyDead : IEventMessage
+    public static void SendEventMessage(Vector3 position, Quaternion rotation)
     {
-        public Vector3 Position;
-        public Quaternion Rotation;
+        UniEvent.SendMessage(new BattleEnemyDeadEvent(position, rotation));
+    }
+}
 
-        public static void SendEventMessage(Vector3 position, Quaternion rotation)
-        {
-            var msg = new EnemyDead();
-            msg.Position = position;
-            msg.Rotation = rotation;
-            UniEvent.SendMessage(msg);
-        }
+/// <summary>
+/// Battle player dead event.
+/// </summary>
+public sealed class BattlePlayerDeadEvent : IEventMessage
+{
+    public Vector3 Position { get; }
+    public Quaternion Rotation { get; }
+
+    private BattlePlayerDeadEvent(Vector3 position, Quaternion rotation)
+    {
+        Position = position;
+        Rotation = rotation;
     }
 
-    /// <summary>
-    /// 玩家死亡
-    /// </summary>
-    public class PlayerDead : IEventMessage
+    public static void SendEventMessage(Vector3 position, Quaternion rotation)
     {
-        public Vector3 Position;
-        public Quaternion Rotation;
+        UniEvent.SendMessage(new BattlePlayerDeadEvent(position, rotation));
+    }
+}
 
-        public static void SendEventMessage(Vector3 position, Quaternion rotation)
-        {
-            var msg = new PlayerDead();
-            msg.Position = position;
-            msg.Rotation = rotation;
-            UniEvent.SendMessage(msg);
-        }
+/// <summary>
+/// Battle asteroid explosion event.
+/// </summary>
+public sealed class BattleAsteroidExplosionEvent : IEventMessage
+{
+    public Vector3 Position { get; }
+    public Quaternion Rotation { get; }
+
+    private BattleAsteroidExplosionEvent(Vector3 position, Quaternion rotation)
+    {
+        Position = position;
+        Rotation = rotation;
     }
 
-    /// <summary>
-    /// 小行星爆炸
-    /// </summary>
-    public class AsteroidExplosion : IEventMessage
+    public static void SendEventMessage(Vector3 position, Quaternion rotation)
     {
-        public Vector3 Position;
-        public Quaternion Rotation;
+        UniEvent.SendMessage(new BattleAsteroidExplosionEvent(position, rotation));
+    }
+}
 
-        public static void SendEventMessage(Vector3 position, Quaternion rotation)
-        {
-            var msg = new AsteroidExplosion();
-            msg.Position = position;
-            msg.Rotation = rotation;
-            UniEvent.SendMessage(msg);
-        }
+/// <summary>
+/// Battle enemy fire bullet event.
+/// </summary>
+public sealed class BattleEnemyFireBulletEvent : IEventMessage
+{
+    public Vector3 Position { get; }
+    public Quaternion Rotation { get; }
+
+    private BattleEnemyFireBulletEvent(Vector3 position, Quaternion rotation)
+    {
+        Position = position;
+        Rotation = rotation;
     }
 
-    /// <summary>
-    /// 敌人发射子弹
-    /// </summary>
-    public class EnemyFireBullet : IEventMessage
+    public static void SendEventMessage(Vector3 position, Quaternion rotation)
     {
-        public Vector3 Position;
-        public Quaternion Rotation;
+        UniEvent.SendMessage(new BattleEnemyFireBulletEvent(position, rotation));
+    }
+}
 
-        public static void SendEventMessage(Vector3 position, Quaternion rotation)
-        {
-            var msg = new EnemyFireBullet();
-            msg.Position = position;
-            msg.Rotation = rotation;
-            UniEvent.SendMessage(msg);
-        }
+/// <summary>
+/// Battle player fire bullet event.
+/// </summary>
+public sealed class BattlePlayerFireBulletEvent : IEventMessage
+{
+    public Vector3 Position { get; }
+    public Quaternion Rotation { get; }
+
+    private BattlePlayerFireBulletEvent(Vector3 position, Quaternion rotation)
+    {
+        Position = position;
+        Rotation = rotation;
     }
 
-    /// <summary>
-    /// 玩家发射子弹
-    /// </summary>
-    public class PlayerFireBullet : IEventMessage
+    public static void SendEventMessage(Vector3 position, Quaternion rotation)
     {
-        public Vector3 Position;
-        public Quaternion Rotation;
-
-        public static void SendEventMessage(Vector3 position, Quaternion rotation)
-        {
-            var msg = new PlayerFireBullet();
-            msg.Position = position;
-            msg.Rotation = rotation;
-            UniEvent.SendMessage(msg);
-        }
+        UniEvent.SendMessage(new BattlePlayerFireBulletEvent(position, rotation));
     }
 }

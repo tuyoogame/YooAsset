@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Collections;
 using UnityEngine.TestTools;
@@ -233,17 +233,6 @@ public class T0_InitYooAssets : IPrebuildSetup, IPostBuildCleanup
             collector1.CollectorType = YooAsset.Editor.ECollectorType.MainAssetCollector;
             collector1.PackRuleName = nameof(YooAsset.Editor.PackRawFile);
             YooAsset.Editor.BundleCollectorSettingData.CreateCollector(rawFileGroup, collector1);
-        }
-
-        // 视频文件
-        var videoFileGroup = YooAsset.Editor.BundleCollectorSettingData.CreateGroup(rawPackage, "VideoFileGroup");
-        {
-            var collector1 = new YooAsset.Editor.BundleCollector();
-            collector1.CollectPath = "";
-            collector1.CollectorGUID = "9028a60fd472239448b89453084bfa0a"; //TestRes/RawVideo目录
-            collector1.CollectorType = YooAsset.Editor.ECollectorType.MainAssetCollector;
-            collector1.PackRuleName = nameof(YooAsset.Editor.PackVideoFile);
-            YooAsset.Editor.BundleCollectorSettingData.CreateCollector(videoFileGroup, collector1);
         }
     }
 #endif

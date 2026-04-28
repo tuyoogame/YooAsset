@@ -42,10 +42,12 @@ namespace YooAsset
                 throw new YooInternalException($"Unexpected provider type: '{provider.GetType().Name}'.");
             }
         }
+        /// <inheritdoc />
         protected override void InternalStart()
         {
             _steps = ESteps.CheckError;
         }
+        /// <inheritdoc />
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
@@ -106,6 +108,7 @@ namespace YooAsset
                 SetResult();
             }
         }
+        /// <inheritdoc />
         protected override string InternalGetDescription()
         {
             return $"SceneName: {_provider.LoadedSceneName}";

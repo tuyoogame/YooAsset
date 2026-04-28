@@ -1,6 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UniFramework.Machine;
 using YooAsset;
 
@@ -11,13 +8,13 @@ internal class FsmStartGame : IStateNode
     }
     void IStateNode.OnEnter()
     {
-        PatchEventDefine.PatchStepsChange.SendEventMessage("开始游戏！");
+        PatchStepChangedEvent.SendEventMessage("Starting game.");
 
-        // 设置默认的资源包
-        GameManager.Instance.GamePakcage  = YooAssets.GetPackage("DefaultPackage");
+        // Set default package.
+        GameManager.Instance.SetGamePackage(YooAssets.GetPackage("DefaultPackage"));
 
-        // 切换到主页面场景
-        SceneEventDefine.ChangeToHomeScene.SendEventMessage();
+        // Change to home scene.
+        SceneChangeToHomeEvent.SendEventMessage();
     }
     void IStateNode.OnUpdate()
     {

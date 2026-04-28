@@ -26,7 +26,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
         {
             var buildParams = new PackageBuildParameters(TestConsts.AssetBundlePackageName);
             buildParams.BuildPipelineName = "ScriptableBuildPipeline";
-            buildParams.AssemblyName = "YooAsset.Test.Editor";
+            buildParams.AssemblyName = "YooAsset.Tests.Editor";
             buildParams.TypeFullName = "TestPackageBuilder";
             buildParams.MethodName = "BuildPackage";
             var simulateResult = PackageBuildInvoker.InvokeBuild(buildParams);
@@ -37,7 +37,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
         {
             var buildParams = new PackageBuildParameters(TestConsts.RawBundlePackageName);
             buildParams.BuildPipelineName = "RawFileBuildPipeline";
-            buildParams.AssemblyName = "YooAsset.Test.Editor";
+            buildParams.AssemblyName = "YooAsset.Tests.Editor";
             buildParams.TypeFullName = "TestPackageBuilder";
             buildParams.MethodName = "BuildPackage";
             var simulateResult = PackageBuildInvoker.InvokeBuild(buildParams);
@@ -198,11 +198,11 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
         var tester = new TestLoadRawFile();
         yield return tester.RuntimeTester();
     }
-    
+
     [UnityTest]
-    public IEnumerator B11_TestLoadRawVideo()
+    public IEnumerator B11_TestUniTask()
     {
-        var tester = new TestLoadRawVideo();
+        var tester = new TestUniTask();
         yield return tester.RuntimeTester();
     }
 

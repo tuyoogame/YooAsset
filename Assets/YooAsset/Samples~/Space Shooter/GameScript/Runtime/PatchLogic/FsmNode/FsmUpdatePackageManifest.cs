@@ -1,10 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
 using YooAsset;
 
-public class FsmUpdatePackageManifest : IStateNode
+internal class FsmUpdatePackageManifest : IStateNode
 {
     private StateMachine _machine;
 
@@ -14,7 +13,7 @@ public class FsmUpdatePackageManifest : IStateNode
     }
     void IStateNode.OnEnter()
     {
-        PatchEventDefine.PatchStepsChange.SendEventMessage("更新资源清单！");
+        PatchStepChangedEvent.SendEventMessage("Updating package manifest.");
         GameManager.Instance.StartCoroutine(UpdateManifest());
     }
     void IStateNode.OnUpdate()
@@ -29,13 +28,14 @@ public class FsmUpdatePackageManifest : IStateNode
         var packageName = (string)_machine.GetBlackboardValue("PackageName");
         var packageVersion = (string)_machine.GetBlackboardValue("PackageVersion");
         var package = YooAssets.GetPackage(packageName);
-        var operation = package.UpdatePackageManifestAsync(packageVersion);
+        var options = new LoadPackageManifestOptions(packageVersion, 60);
+        var operation = package.LoadPackageManifestAsync(options);
         yield return operation;
 
         if (operation.Status != EOperationStatus.Succeeded)
         {
             Debug.LogWarning(operation.Error);
-            PatchEventDefine.PackageManifestUpdateFailed.SendEventMessage();
+            PatchPackageManifestUpdateFailedEvent.SendEventMessage();
             yield break;
         }
         else

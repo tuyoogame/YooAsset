@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,6 +8,9 @@ using UnityEditor;
 #if YOO_MACRO_SUPPORT
 namespace YooAsset.Editor
 {
+    /// <summary>
+    /// 在生成 C# 工程文件时注入 YooAsset 版本宏定义
+    /// </summary>
     [InitializeOnLoad]
     public class MacroProcessor : AssetPostprocessor
     {
@@ -41,7 +44,7 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 处理宏定义
+        /// 处理工程文件中的宏定义
         /// </summary>
         private static bool ProcessDefineConstants(XmlElement element)
         {
@@ -76,7 +79,7 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 检测工程是否引用了YooAsset
+        /// 检查工程是否引用了 YooAsset
         /// </summary>
         private static bool IsCSProjectReferenced(XmlElement element)
         {
@@ -93,7 +96,11 @@ namespace YooAsset.Editor
                     if (childNode.Name != "Reference" && childNode.Name != "ProjectReference")
                         continue;
 
-                    string include = childNode.Attributes["Include"].Value;
+                    XmlAttribute includeAttribute = childNode.Attributes["Include"];
+                    if (includeAttribute == null)
+                        continue;
+
+                    string include = includeAttribute.Value;
                     if (include.Contains("YooAsset"))
                         return true;
                 }

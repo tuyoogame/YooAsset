@@ -1,62 +1,87 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UniFramework.Event;
 using YooAsset;
 
 public class GameManager
 {
-    private static GameManager _instance;
+    private static GameManager s_instance;
     public static GameManager Instance
     {
         get
         {
-            if (_instance == null)
-                _instance = new GameManager();
-            return _instance;
+            if (s_instance == null)
+                s_instance = new GameManager();
+            return s_instance;
         }
     }
 
     private readonly EventGroup _eventGroup = new EventGroup();
+    private ResourcePackage _gamePackage;
+    private MonoBehaviour _behaviour;
 
     /// <summary>
-    /// 游戏包裹
+    /// Game package.
     /// </summary>
-    public ResourcePackage GamePakcage;
+    public ResourcePackage GamePackage
+    {
+        get
+        {
+            if (_gamePackage == null)
+                throw new InvalidOperationException("Game package has not been set. Call SetGamePackage before loading game assets.");
+            return _gamePackage;
+        }
+    }
 
     /// <summary>
-    /// 协程启动器
+    /// Sets the game package.
     /// </summary>
-    public MonoBehaviour Behaviour;
+    public void SetGamePackage(ResourcePackage gamePackage)
+    {
+        _gamePackage = gamePackage ?? throw new ArgumentNullException(nameof(gamePackage));
+    }
 
+    /// <summary>
+    /// Sets the coroutine runner.
+    /// </summary>
+    public void SetBehaviour(MonoBehaviour behaviour)
+    {
+        _behaviour = behaviour ?? throw new ArgumentNullException(nameof(behaviour));
+    }
 
     private GameManager()
     {
-        // 注册监听事件
-        _eventGroup.AddListener<SceneEventDefine.ChangeToHomeScene>(OnHandleEventMessage);
-        _eventGroup.AddListener<SceneEventDefine.ChangeToBattleScene>(OnHandleEventMessage);
+        // Register event listeners.
+        _eventGroup.AddListener<SceneChangeToHomeEvent>(OnHandleEventMessage);
+        _eventGroup.AddListener<SceneChangeToBattleEvent>(OnHandleEventMessage);
     }
 
     /// <summary>
-    /// 开启一个协程
+    /// Starts a coroutine.
     /// </summary>
     public void StartCoroutine(IEnumerator enumerator)
     {
-        Behaviour.StartCoroutine(enumerator);
+        if (enumerator == null)
+            throw new ArgumentNullException(nameof(enumerator));
+        if (_behaviour == null)
+            throw new InvalidOperationException("Coroutine runner has not been set. Call SetBehaviour before starting coroutines.");
+
+        _behaviour.StartCoroutine(enumerator);
     }
 
     /// <summary>
-    /// 接收事件
+    /// Handles event messages.
     /// </summary>
     private void OnHandleEventMessage(IEventMessage message)
     {
-        if (message is SceneEventDefine.ChangeToHomeScene)
+        if (message is SceneChangeToHomeEvent)
         {
-            GamePakcage.LoadSceneAsync("scene_home");
+            GamePackage.LoadSceneAsync("scene_home");
         }
-        else if (message is SceneEventDefine.ChangeToBattleScene)
+        else if (message is SceneChangeToBattleEvent)
         {
-            GamePakcage.LoadSceneAsync("scene_battle");
+            GamePackage.LoadSceneAsync("scene_battle");
         }
     }
 }

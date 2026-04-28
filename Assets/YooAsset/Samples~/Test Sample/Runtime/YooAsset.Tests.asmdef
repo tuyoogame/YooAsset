@@ -1,0 +1,25 @@
+{
+    "name": "YooAsset.Tests",
+    "rootNamespace": "",
+    "references": [
+        "YooAsset",
+        "YooAsset.Editor",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "UniTask.YooAsset",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

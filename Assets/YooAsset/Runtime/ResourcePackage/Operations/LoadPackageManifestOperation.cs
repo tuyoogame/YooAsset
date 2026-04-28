@@ -25,10 +25,12 @@ namespace YooAsset
             _host = host;
             _options = options;
         }
+        /// <inheritdoc />
         protected override void InternalStart()
         {
             _steps = ESteps.CheckParams;
         }
+        /// <inheritdoc />
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
@@ -95,6 +97,7 @@ namespace YooAsset
                 }
             }
         }
+        /// <inheritdoc />
         protected override string InternalGetDescription()
         {
             return $"PackageVersion: {_options.PackageVersion}";

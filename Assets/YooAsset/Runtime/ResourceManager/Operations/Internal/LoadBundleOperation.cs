@@ -34,6 +34,11 @@ namespace YooAsset
         public bool IsDestroyed { private set; get; } = false;
 
         /// <summary>
+        /// 是否已收到强制销毁请求
+        /// </summary>
+        public bool ForceDestroyRequested { private set; get; } = false;
+
+        /// <summary>
         /// 引用计数
         /// </summary>
         public int RefCount { private set; get; } = 0;
@@ -56,6 +61,25 @@ namespace YooAsset
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
+
+            if (ForceDestroyRequested)
+            {
+                if (_steps == ESteps.CheckConcurrency)
+                {
+                    _steps = ESteps.Done;
+                    SetError("Bundle loader force destroyed during package destruction.");
+                    return;
+                }
+
+                if (_steps == ESteps.LoadBundleFile)
+                {
+                    // 注意：终止下载器
+                    if (_loadPackageBundleOp != null)
+                        _loadPackageBundleOp.ShouldAbortDownload = true;
+                }
+
+                // 注意：其它条件的情况下，继续往下走，等底层操作自然退出。
+            }
 
             if (_steps == ESteps.CheckConcurrency)
             {
@@ -141,8 +165,14 @@ namespace YooAsset
         /// <summary>
         /// 销毁资源包加载器并释放资源包
         /// </summary>
+        /// <remarks>
+        /// 该方法是幂等的，重复调用不会重复释放资源。
+        /// </remarks>
         public void DestroyLoader()
         {
+            if (IsDestroyed)
+                return;
+
             IsDestroyed = true;
 
             // 注意：正在加载中的任务不可以销毁
@@ -163,10 +193,16 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 强制销毁资源包加载器（仅用于全局 Destroy 场景）
+        /// 强制销毁资源包加载器
         /// </summary>
+        /// <remarks>
+        /// 该方法是幂等的，仅用于全局 Destroy 场景，重复调用不会重复释放资源。
+        /// </remarks>
         public void ForceDestroyLoader()
         {
+            if (IsDestroyed)
+                return;
+
             IsDestroyed = true;
 
             if (_steps == ESteps.LoadBundleFile)
@@ -184,6 +220,14 @@ namespace YooAsset
                 _steps = ESteps.Done;
                 SetError("Bundle loader destroyed.");
             }
+        }
+
+        /// <summary>
+        /// 请求强制销毁
+        /// </summary>
+        public void RequestForceDestroy()
+        {
+            ForceDestroyRequested = true;
         }
 
         /// <summary>
@@ -271,26 +315,5 @@ namespace YooAsset
             }
         }
 
-        /// <summary>
-        /// 尝试终止加载器
-        /// </summary>
-        public void TryAbortLoader()
-        {
-            if (IsDone == false)
-            {
-                if (_steps == ESteps.CheckConcurrency)
-                {
-                    _steps = ESteps.Done;
-                    SetError("Bundle loader aborted.");
-                }
-
-                if (_steps == ESteps.LoadBundleFile)
-                {
-                    // 注意：终止下载器
-                    if (_loadPackageBundleOp != null)
-                        _loadPackageBundleOp.ShouldAbortDownload = true;
-                }
-            }
-        }
     }
 }

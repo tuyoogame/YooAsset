@@ -31,9 +31,9 @@ namespace YooAsset
 
         #region 自定义参数
         /// <summary>
-        /// 自定义参数：是否禁用 Unity 内置网络缓存
+        /// 自定义参数：禁用 Unity 内置网络缓存
         /// </summary>
-        public bool DisableUnityWebCache { get; private set; } = false;
+        public bool DisableUnityWebCache { get; private set; } = true;
 
         /// <summary>
         /// 自定义参数：下载看门狗超时时间（秒）
@@ -165,7 +165,7 @@ namespace YooAsset
 
             // 创建默认的下载后台接口
             if (DownloadBackend == null)
-                DownloadBackend = new UnityWebRequestBackend(null);
+                DownloadBackend = new UnityWebRequestBackend();
 
             // 创建默认的下载重试策略
             if (DownloadRetryPolicy == null)

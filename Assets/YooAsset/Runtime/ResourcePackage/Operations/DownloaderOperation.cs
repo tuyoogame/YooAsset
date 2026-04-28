@@ -6,7 +6,7 @@ namespace YooAsset
     /// <summary>
     /// 下载操作基类，提供资源下载、暂停、恢复和取消功能。
     /// </summary>
-    public abstract class DownloaderOperation : AsyncOperationBase
+    public abstract partial class DownloaderOperation : AsyncOperationBase
     {
         private enum ESteps
         {
@@ -99,11 +99,13 @@ namespace YooAsset
             // 统计下载信息
             CalculateStatistics();
         }
+        /// <inheritdoc />
         protected override void InternalStart()
         {
             YooLogger.Log($"Beginning download of {TotalDownloadCount} files ({TotalDownloadBytes} bytes).");
             _steps = ESteps.Check;
         }
+        /// <inheritdoc />
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)

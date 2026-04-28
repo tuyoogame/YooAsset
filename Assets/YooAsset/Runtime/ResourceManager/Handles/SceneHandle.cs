@@ -5,7 +5,7 @@ namespace YooAsset
     /// <summary>
     /// 场景句柄，用于管理场景的加载、激活和卸载。
     /// </summary>
-    public sealed class SceneHandle : HandleBase
+    public sealed partial class SceneHandle : HandleBase
     {
         private System.Action<SceneHandle> _callback;
 

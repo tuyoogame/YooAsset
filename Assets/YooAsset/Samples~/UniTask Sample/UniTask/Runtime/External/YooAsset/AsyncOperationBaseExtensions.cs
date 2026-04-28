@@ -1,7 +1,7 @@
 #if UNITASK_YOOASSET_SUPPORT
 using System;
+using System.Threading;
 using YooAsset;
-using static Cysharp.Threading.Tasks.Internal.Error;
 
 namespace Cysharp.Threading.Tasks
 {
@@ -11,113 +11,167 @@ namespace Cysharp.Threading.Tasks
         {
             return ToUniTask(handle).GetAwaiter();
         }
-        public static UniTask ToUniTask(this AsyncOperationBase handle, IProgress<float> progress = null, PlayerLoopTiming timing = PlayerLoopTiming.Update)
+
+        public static UniTask WithCancellation(this AsyncOperationBase handle, CancellationToken cancellationToken, bool cancelImmediately = false)
         {
-            ThrowArgumentNullException(handle, nameof(handle));
-
-            if (handle.IsDone)
-            {
-                return UniTask.CompletedTask;
-            }
-
-            return new UniTask(
-                AsyncOperationBaserConfiguredSource.Create(handle, timing, progress, out var token),
-                token
-            );
+            return ToUniTask(handle, cancellationToken: cancellationToken, cancelImmediately: cancelImmediately);
         }
 
-        sealed class AsyncOperationBaserConfiguredSource : IUniTaskSource, IPlayerLoopItem, ITaskPoolNode<AsyncOperationBaserConfiguredSource>
+        public static UniTask ToUniTask(this AsyncOperationBase handle, IProgress<float> progress = null, PlayerLoopTiming timing = PlayerLoopTiming.Update, CancellationToken cancellationToken = default, bool cancelImmediately = false)
         {
-            private static TaskPool<AsyncOperationBaserConfiguredSource> _pool;
-            private AsyncOperationBaserConfiguredSource _nextNode;
-            private readonly Action<AsyncOperationBase> _continuationAction;
-            private AsyncOperationBase _handle;
-            private IProgress<float> _progress;
-            private bool _completed;
-            private UniTaskCompletionSourceCore<AsyncUnit> _core;
+            if (cancellationToken.IsCancellationRequested) return UniTask.FromCanceled(cancellationToken);
+            if (handle.IsDone) return UniTask.CompletedTask;
 
-            public ref AsyncOperationBaserConfiguredSource NextNode => ref _nextNode;
+            return new UniTask(AsyncOperationBaseConfiguredSource.Create(handle, timing, progress, cancellationToken, cancelImmediately, out var token), token);
+        }
 
-            static AsyncOperationBaserConfiguredSource()
+        sealed class AsyncOperationBaseConfiguredSource : IUniTaskSource, IPlayerLoopItem, ITaskPoolNode<AsyncOperationBaseConfiguredSource>
+        {
+            static TaskPool<AsyncOperationBaseConfiguredSource> pool;
+            AsyncOperationBaseConfiguredSource nextNode;
+            public ref AsyncOperationBaseConfiguredSource NextNode => ref nextNode;
+
+            static AsyncOperationBaseConfiguredSource()
             {
-                TaskPool.RegisterSizeGetter(typeof(AsyncOperationBaserConfiguredSource), () => _pool.Size);
+                TaskPool.RegisterSizeGetter(typeof(AsyncOperationBaseConfiguredSource), () => pool.Size);
             }
 
-            AsyncOperationBaserConfiguredSource() { _continuationAction = Continuation; }
+            readonly Action<AsyncOperationBase> completedCallback;
+            AsyncOperationBase handle;
+            CancellationToken cancellationToken;
+            CancellationTokenRegistration cancellationTokenRegistration;
+            IProgress<float> progress;
+            bool cancelImmediately;
+            bool completed;
 
-            public static IUniTaskSource Create(AsyncOperationBase handle, PlayerLoopTiming timing, IProgress<float> progress, out short token)
+            UniTaskCompletionSourceCore<AsyncUnit> core;
+
+            AsyncOperationBaseConfiguredSource()
             {
-                if (!_pool.TryPop(out var result))
+                completedCallback = HandleCompleted;
+            }
+
+            public static IUniTaskSource Create(AsyncOperationBase handle, PlayerLoopTiming timing, IProgress<float> progress, CancellationToken cancellationToken, bool cancelImmediately, out short token)
+            {
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    result = new AsyncOperationBaserConfiguredSource();
+                    return AutoResetUniTaskCompletionSource.CreateFromCanceled(cancellationToken, out token);
                 }
 
-                result._handle = handle;
-                result._progress = progress;
-                result._completed = false;
+                if (!pool.TryPop(out var result))
+                {
+                    result = new AsyncOperationBaseConfiguredSource();
+                }
+
+                result.handle = handle;
+                result.progress = progress;
+                result.cancellationToken = cancellationToken;
+                result.cancelImmediately = cancelImmediately;
+                result.completed = false;
+
+                if (cancelImmediately && cancellationToken.CanBeCanceled)
+                {
+                    result.cancellationTokenRegistration = cancellationToken.RegisterWithoutCaptureExecutionContext(state =>
+                    {
+                        var source = (AsyncOperationBaseConfiguredSource)state;
+                        source.core.TrySetCanceled(source.cancellationToken);
+                    }, result);
+                }
+
                 TaskTracker.TrackActiveTask(result, 3);
+                PlayerLoopHelper.AddAction(timing, result);
 
-                if (progress != null)
-                {
-                    PlayerLoopHelper.AddAction(timing, result);
-                }
+                handle.Completed += result.completedCallback;
 
-                handle.Completed += result._continuationAction;
-                token = result._core.Version;
+                token = result.core.Version;
                 return result;
             }
-            
-            private void Continuation(AsyncOperationBase _)
-            {
-                _handle.Completed -= _continuationAction;
 
-                if (_completed)
+            void HandleCompleted(AsyncOperationBase _)
+            {
+                if (handle != null)
                 {
-                    TryReturn();
+                    handle.Completed -= completedCallback;
+                }
+
+                if (completed) return;
+
+                completed = true;
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    core.TrySetCanceled(cancellationToken);
                 }
                 else
                 {
-                    _completed = true;
-                    if (_handle.Status == EOperationStatus.Failed)
-                    {
-                        _core.TrySetException(new Exception(_handle.Error));
-                    }
-                    else
-                    {
-                        _core.TrySetResult(AsyncUnit.Default);
-                    }
+                    core.TrySetResult(AsyncUnit.Default);
                 }
             }
-            private bool TryReturn()
-            {
-                TaskTracker.RemoveTracking(this);
-                _core.Reset();
-                _handle = default;
-                _progress = default;
-                return _pool.TryPush(this);
-            }
 
-            public UniTaskStatus GetStatus(short token) => _core.GetStatus(token);
-            public void OnCompleted(Action<object> continuation, object state, short token)
+            public void GetResult(short token)
             {
-                _core.OnCompleted(continuation, state, token);
-            }
-            public void GetResult(short token) { _core.GetResult(token); }
-            public UniTaskStatus UnsafeGetStatus() => _core.UnsafeGetStatus();
-            public bool MoveNext()
-            {
-                if (_completed)
+                try
+                {
+                    core.GetResult(token);
+                }
+                finally
                 {
                     TryReturn();
+                }
+            }
+
+            public UniTaskStatus GetStatus(short token)
+            {
+                return core.GetStatus(token);
+            }
+
+            public UniTaskStatus UnsafeGetStatus()
+            {
+                return core.UnsafeGetStatus();
+            }
+
+            public void OnCompleted(Action<object> continuation, object state, short token)
+            {
+                core.OnCompleted(continuation, state, token);
+            }
+
+            public bool MoveNext()
+            {
+                if (completed)
+                {
                     return false;
                 }
 
-                if (!_handle.IsDone)
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    _progress?.Report(_handle.Progress);
+                    completed = true;
+                    core.TrySetCanceled(cancellationToken);
+                    return false;
+                }
+
+                if (handle == null || handle.IsDone)
+                {
+                    completed = true;
+                    core.TrySetResult(AsyncUnit.Default);
+                    return false;
+                }
+
+                if (progress != null)
+                {
+                    progress.Report(handle.Progress);
                 }
 
                 return true;
+            }
+
+            bool TryReturn()
+            {
+                TaskTracker.RemoveTracking(this);
+                core.Reset();
+                handle = default;
+                progress = default;
+                cancellationToken = default;
+                cancellationTokenRegistration.Dispose();
+                return pool.TryPush(this);
             }
         }
     }

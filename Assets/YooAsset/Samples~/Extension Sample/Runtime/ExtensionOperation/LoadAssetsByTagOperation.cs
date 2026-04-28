@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
 
+/// <summary>
+/// 按资源标签加载一组资源对象
+/// </summary>
+/// <typeparam name="TObject">资源对象的 Unity 类型</typeparam>
 public class LoadAssetsByTagOperation<TObject> : AsyncOperationBase where TObject : UnityEngine.Object
 {
     private enum ESteps
@@ -18,15 +22,26 @@ public class LoadAssetsByTagOperation<TObject> : AsyncOperationBase where TObjec
     private readonly string _tag;
     private ESteps _steps = ESteps.None;
     private List<AssetHandle> _handles;
+    private List<TObject> _assetObjects;
 
     /// <summary>
-    /// 资源对象集合
+    /// 加载成功的资源对象集合
     /// </summary>
-    public List<TObject> AssetObjects { private set; get; }
+    public IReadOnlyList<TObject> AssetObjects { get { return _assetObjects; } }
 
 
+    /// <summary>
+    /// 创建按标签加载资源对象的操作实例
+    /// </summary>
+    /// <param name="packageName">资源包裹名称</param>
+    /// <param name="tag">资源标签</param>
     public LoadAssetsByTagOperation(string packageName, string tag)
     {
+        if (string.IsNullOrEmpty(packageName))
+            throw new System.ArgumentNullException(nameof(packageName));
+        if (string.IsNullOrEmpty(tag))
+            throw new System.ArgumentNullException(nameof(tag));
+
         _packageName = packageName;
         _tag = tag;
     }
@@ -65,7 +80,7 @@ public class LoadAssetsByTagOperation<TObject> : AsyncOperationBase where TObjec
                 index++;
             }
 
-            AssetObjects = new List<TObject>(_handles.Count);
+            _assetObjects = new List<TObject>(_handles.Count);
             foreach (var handle in _handles)
             {
                 if (handle.Status == EOperationStatus.Succeeded)
@@ -73,21 +88,21 @@ public class LoadAssetsByTagOperation<TObject> : AsyncOperationBase where TObjec
                     var assetObject = handle.AssetObject as TObject;
                     if (assetObject != null)
                     {
-                        AssetObjects.Add(assetObject);
+                        _assetObjects.Add(assetObject);
                     }
                     else
                     {
-                        string error = $"资源类型转换失败：{handle.AssetObject.name}";
-                        Debug.LogError($"{error}");
-                        AssetObjects.Clear();
+                        string error = $"Asset type cast failed: {handle.AssetObject.name}";
+                        Debug.LogError(error);
+                        _assetObjects.Clear();
                         SetFailed(error);
                         return;
                     }
                 }
                 else
                 {
-                    Debug.LogError($"{handle.Error}");
-                    AssetObjects.Clear();
+                    Debug.LogError(handle.Error);
+                    _assetObjects.Clear();
                     SetFailed(handle.Error);
                     return;
                 }
@@ -108,10 +123,13 @@ public class LoadAssetsByTagOperation<TObject> : AsyncOperationBase where TObjec
     }
 
     /// <summary>
-    /// 释放资源句柄
+    /// 释放加载过程中创建的资源句柄
     /// </summary>
     public void ReleaseHandle()
     {
+        if (_handles == null)
+            return;
+
         foreach (var handle in _handles)
         {
             handle.Release();

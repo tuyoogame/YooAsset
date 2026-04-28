@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using YooAsset;
 
 public class SceneHome : MonoBehaviour
 {
     public GameObject CanvasDesktop;
+
     private AssetHandle _windowHandle;
 
     void Start()
@@ -16,12 +14,12 @@ public class SceneHome : MonoBehaviour
 
     private async void AsyncLoad()
     {
-        // 加载主页面
-        _windowHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("UIHome");
+        // Load home window.
+        _windowHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("UIHome");
         await _windowHandle;
-        _windowHandle.InstantiateSync(CanvasDesktop.transform);
+        _windowHandle.InstantiateSync(new InstantiateOptions(true, CanvasDesktop.transform, false));
 
-        // 切换场景的时候释放资源
+        // Release unused assets after changing scenes.
         var package = YooAssets.GetPackage("DefaultPackage");
         var operation = package.UnloadUnusedAssetsAsync();
         await operation;
@@ -29,7 +27,7 @@ public class SceneHome : MonoBehaviour
 
     private void OnDestroy()
     {
-        // 释放资源句柄
+        // Release asset handle.
         if (_windowHandle != null)
         {
             _windowHandle.Release();

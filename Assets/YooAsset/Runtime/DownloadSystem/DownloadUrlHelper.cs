@@ -19,24 +19,11 @@ namespace YooAsset
             if (string.IsNullOrEmpty(filePath))
                 throw new YooInternalException("File path is null or empty.");
 
-            if (IsLocalFileUrl(filePath))
-                return EscapeSpecialCharacters(filePath);
-
             string url;
-
-#if UNITY_WEBGL
-            url = filePath;
-#elif UNITY_ANDROID
-            url = new System.Uri(filePath).ToString();
-#elif UNITY_OPENHARMONY
-            // 注意：由于鸿蒙系统的特殊性，需要判断双形态
-            if (UnityEngine.Application.streamingAssetsPath.StartsWith("jar:file://"))
-                url = StringUtility.Format("jar:file://{0}", filePath);
+            if (IsLocalFileUrl(filePath))
+                url = filePath;
             else
-                url = new System.Uri(filePath).ToString();
-#else
-            url = new System.Uri(filePath).ToString();
-#endif
+                url = CreateLocalFileUrl(filePath);
 
             return EscapeSpecialCharacters(url);
         }
@@ -60,6 +47,20 @@ namespace YooAsset
             return false;
         }
 
+        private static string CreateLocalFileUrl(string filePath)
+        {
+#if UNITY_WEBGL
+            return filePath;
+#elif UNITY_OPENHARMONY
+            // 注意：由于鸿蒙系统的特殊性，需要判断双形态
+            if (UnityEngine.Application.streamingAssetsPath.StartsWith("jar:file://"))
+                return $"jar:file://{filePath}";
+            else
+                return new System.Uri(filePath).ToString();
+#else
+            return new System.Uri(filePath).ToString();
+#endif
+        }
         private static string EscapeSpecialCharacters(string url)
         {
             // 处理特殊字符：用户设备路径可能包含特殊字符导致 URL 无法正确识别

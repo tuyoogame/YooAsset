@@ -1,22 +1,23 @@
-﻿using UniFramework.Event;
+using UniFramework.Event;
 
-public class SceneEventDefine
+/// <summary>
+/// Change to home scene event.
+/// </summary>
+public sealed class SceneChangeToHomeEvent : IEventMessage
 {
-    public class ChangeToHomeScene : IEventMessage
+    public static void SendEventMessage()
     {
-        public static void SendEventMessage()
-        {
-            var msg = new ChangeToHomeScene();
-            UniEvent.SendMessage(msg);
-        }
+        UniEvent.SendMessage(new SceneChangeToHomeEvent());
     }
+}
 
-    public class ChangeToBattleScene : IEventMessage
+/// <summary>
+/// Change to battle scene event.
+/// </summary>
+public sealed class SceneChangeToBattleEvent : IEventMessage
+{
+    public static void SendEventMessage()
     {
-        public static void SendEventMessage()
-        {
-            var msg = new ChangeToBattleScene();
-            UniEvent.SendMessage(msg);
-        }
+        UniEvent.SendMessage(new SceneChangeToBattleEvent());
     }
 }

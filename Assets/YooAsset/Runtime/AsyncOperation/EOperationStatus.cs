@@ -25,5 +25,13 @@ namespace YooAsset
         /// 已失败
         /// </summary>
         Failed,
+
+#if YOOASSET_LEGACY_API
+        /// <summary>
+        /// v2.3 兼容别名
+        /// </summary>
+        [System.Obsolete("Use Succeeded instead.")]
+        Succeed = Succeeded,
+#endif
     }
 }

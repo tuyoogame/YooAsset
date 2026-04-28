@@ -42,7 +42,7 @@ namespace YooAsset
         public UnityWebRequestCreator WebRequestCreator { get; private set; }
 
         /// <summary>
-        /// 自定义参数：禁用Unity的网络缓存
+        /// 自定义参数：禁用 Unity 内置网络缓存
         /// </summary>
         public bool DisableUnityWebCache { get; private set; } = false;
 

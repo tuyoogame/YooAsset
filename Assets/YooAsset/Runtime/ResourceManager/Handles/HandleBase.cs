@@ -6,7 +6,7 @@ namespace YooAsset
     /// <summary>
     /// 资源句柄基类，提供资源加载状态查询和释放功能。
     /// </summary>
-    public abstract class HandleBase : IEnumerator, IDisposable
+    public abstract partial class HandleBase : IEnumerator, IDisposable
     {
         private readonly AssetInfo _assetInfo;
 

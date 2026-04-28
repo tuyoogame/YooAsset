@@ -22,16 +22,6 @@ namespace YooAsset
         InstallCleanupMode,
 
         /// <summary>
-        /// 远端资源地址查询服务类 <see cref="IRemoteService"/>
-        /// </summary>
-        RemoteService,
-
-        /// <summary>
-        /// AssetBundle 解密器 <see cref="IBundleDecryptor"/>
-        /// </summary>
-        AssetbundleDecryptor,
-
-        /// <summary>
         /// 禁用Unity的网络缓存 <see cref="bool"/>
         /// </summary>
         DisableUnityWebCache,
@@ -110,6 +100,16 @@ namespace YooAsset
         /// 解压文件系统的根目录 <see cref="string"/>
         /// </summary>
         UnpackFileSystemRoot,
+
+        /// <summary>
+        /// 远端资源地址查询服务类 <see cref="IRemoteService"/>
+        /// </summary>
+        RemoteService,
+
+        /// <summary>
+        /// AssetBundle 解密器 <see cref="IBundleDecryptor"/>
+        /// </summary>
+        AssetbundleDecryptor,
 
         /// <summary>
         /// RawBundle 解密器 <see cref="IBundleDecryptor"/>

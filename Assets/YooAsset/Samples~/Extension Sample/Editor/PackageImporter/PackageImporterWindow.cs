@@ -4,16 +4,19 @@ using UnityEditor;
 
 namespace YooAsset.Editor
 {
+    /// <summary>
+    /// 提供补丁包导入工具窗口
+    /// </summary>
     public class PackageImporterWindow : EditorWindow
     {
         static PackageImporterWindow _thisInstance;
 
-        [MenuItem("Tools/补丁包导入工具", false, 104)]
+        [MenuItem("Tools/Patch Package Importer", false, 104)]
         static void ShowWindow()
         {
             if (_thisInstance == null)
             {
-                _thisInstance = EditorWindow.GetWindow(typeof(PackageImporterWindow), false, "补丁包导入工具", true) as PackageImporterWindow;
+                _thisInstance = EditorWindow.GetWindow(typeof(PackageImporterWindow), false, "Patch Package Importer", true) as PackageImporterWindow;
                 _thisInstance.minSize = new Vector2(800, 600);
             }
             _thisInstance.Show();
@@ -26,7 +29,12 @@ namespace YooAsset.Editor
         {
             GUILayout.Space(10);
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("选择补丁包", GUILayout.MaxWidth(150)))
+            _packageName = EditorGUILayout.TextField("Package Name", _packageName);
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Select Patch Package", GUILayout.MaxWidth(150)))
             {
                 string resultPath = EditorUtility.OpenFilePanel("Find", "Assets/", "bytes");
                 if (!string.IsNullOrEmpty(resultPath))
@@ -37,54 +45,84 @@ namespace YooAsset.Editor
 
             if (string.IsNullOrEmpty(_manifestPath) == false)
             {
-                if (GUILayout.Button("导入补丁包（全部文件）", GUILayout.MaxWidth(150)))
+                if (GUILayout.Button("Import Patch Package (All Files)", GUILayout.MaxWidth(150)))
                 {
-                    string streamingAssetsRoot = BundleBuilderHelper.GetStreamingAssetsRoot();
-                    EditorFileUtility.ClearFolder(streamingAssetsRoot);
-                    CopyPackageFiles(_manifestPath);
+                    if (string.IsNullOrEmpty(_packageName))
+                    {
+                        Debug.LogError("Package name is empty.");
+                        return;
+                    }
+
+                    try
+                    {
+                        CopyPackageFiles(_manifestPath);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogError($"Failed to import patch package '{_packageName}': {ex.Message}.");
+                    }
+                    finally
+                    {
+                        AssetDatabase.Refresh();
+                    }
                 }
             }
         }
 
         private void CopyPackageFiles(string manifestFilePath)
         {
-            string manifestFileName = Path.GetFileNameWithoutExtension(manifestFilePath);
-            string outputDirectory = Path.GetDirectoryName(manifestFilePath);
+            string sourceRoot = Path.GetDirectoryName(manifestFilePath);
+            if (string.IsNullOrEmpty(sourceRoot))
+                throw new DirectoryNotFoundException("Patch package directory does not exist.");
+
+            string versionFileName = YooAssetConfiguration.GetPackageVersionFileName(_packageName);
+            string versionSourcePath = Path.Combine(sourceRoot, versionFileName);
+            string packageVersion = File.ReadAllText(versionSourcePath).Trim();
+            string manifestFileName = YooAssetConfiguration.GetManifestBinaryFileName(_packageName, packageVersion);
+            string hashFileName = YooAssetConfiguration.GetPackageHashFileName(_packageName, packageVersion);
+            string selectedFileName = Path.GetFileName(manifestFilePath);
+            if (selectedFileName != manifestFileName)
+                throw new InvalidDataException($"Selected manifest file '{selectedFileName}' does not match expected manifest file '{manifestFileName}'.");
+
+            string destRoot = Path.Combine(BundleBuilderHelper.GetStreamingAssetsRoot(), _packageName);
+
+            // 清空旧目录
+            EditorFileUtility.DeleteDirectory(destRoot);
+            EditorFileUtility.CreateDirectory(destRoot);
 
             // 拷贝核心文件
             {
-                string sourcePath = $"{outputDirectory}/{manifestFileName}.bytes";
-                string destPath = $"{BundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{manifestFileName}.bytes";
+                string sourcePath = Path.Combine(sourceRoot, manifestFileName);
+                string destPath = Path.Combine(destRoot, manifestFileName);
                 EditorFileUtility.CopyFile(sourcePath, destPath, true);
             }
             {
-                string sourcePath = $"{outputDirectory}/{manifestFileName}.hash";
-                string destPath = $"{BundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{manifestFileName}.hash";
+                string sourcePath = Path.Combine(sourceRoot, hashFileName);
+                string destPath = Path.Combine(destRoot, hashFileName);
                 EditorFileUtility.CopyFile(sourcePath, destPath, true);
             }
             {
-                string fileName = YooAssetConfiguration.GetPackageVersionFileName(_packageName);
-                string sourcePath = $"{outputDirectory}/{fileName}";
-                string destPath = $"{BundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{fileName}";
+                string sourcePath = versionSourcePath;
+                string destPath = Path.Combine(destRoot, versionFileName);
                 EditorFileUtility.CopyFile(sourcePath, destPath, true);
             }
 
             // 加载补丁清单
             byte[] bytesData = FileUtility.ReadAllBytes(manifestFilePath);
-            PackageManifest manifest = PackageManifestHelper.DeserializeManifestFromBinary(bytesData, null); //TODO 自行处理解密
+            PackageManifest manifest = PackageManifestHelper.DeserializeManifestFromBinary(bytesData, null); // TODO: 根据业务需求处理清单解密。
 
             // 拷贝文件列表
             int fileCount = 0;
             foreach (var packageBundle in manifest.BundleList)
             {
                 fileCount++;
-                string sourcePath = $"{outputDirectory}/{packageBundle.GetFileName()}";
-                string destPath = $"{BundleBuilderHelper.GetStreamingAssetsRoot()}/{_packageName}/{packageBundle.GetFileName()}";
+                string fileName = packageBundle.GetFileName();
+                string sourcePath = Path.Combine(sourceRoot, fileName);
+                string destPath = Path.Combine(destRoot, fileName);
                 EditorFileUtility.CopyFile(sourcePath, destPath, true);
             }
 
-            Debug.Log($"补丁包拷贝完成，一共拷贝了{fileCount}个资源文件");
-            AssetDatabase.Refresh();
+            Debug.Log($"Patch package copy completed. Copied {fileCount} bundle files.");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,10 +9,13 @@ using UnityEngine;
 #if YOO_MACRO_SUPPORT
 namespace YooAsset.Editor.Experiment
 {
+    /// <summary>
+    /// 通过 csc.rsp 文件注入 YooAsset 版本宏定义
+    /// </summary>
     [InitializeOnLoad]
     public class RspGenerator
     {
-        // csc.rsp文件路径
+        // Unity 编译器响应文件路径
         private static string RspFilePath => Path.Combine(Application.dataPath, "csc.rsp");
 
         static RspGenerator()
@@ -21,9 +24,9 @@ namespace YooAsset.Editor.Experiment
         }
 
         /// <summary>
-        /// 更新csc.rsp文件
+        /// 更新 csc.rsp 文件
         /// </summary>
-        private static void UpdateRspFile(List<string> addMacros, List<string> removeMacros)
+        private static void UpdateRspFile(IReadOnlyList<string> addMacros, IReadOnlyList<string> removeMacros)
         {
             var existingDefines = new HashSet<string>();
             var otherLines = new List<string>();
@@ -34,24 +37,26 @@ namespace YooAsset.Editor.Experiment
             // 2. 添加新宏
             if (addMacros != null && addMacros.Count > 0)
             {
-                addMacros.ForEach(x =>
+                foreach (var x in addMacros)
                 {
                     if (existingDefines.Contains(x) == false)
                         existingDefines.Add(x);
-                });
+                }
             }
 
             // 3. 移除指定宏
             if (removeMacros != null && removeMacros.Count > 0)
             {
-                removeMacros.ForEach(x =>
+                foreach (var x in removeMacros)
                 {
                     existingDefines.Remove(x);
-                });
+                }
             }
 
             // 4. 重新生成内容
-            WriteRspFile(existingDefines, otherLines);
+            bool changed = WriteRspFile(existingDefines, otherLines);
+            if (changed == false)
+                return;
 
             // 5. 刷新AssetDatabase
             AssetDatabase.Refresh();
@@ -59,7 +64,7 @@ namespace YooAsset.Editor.Experiment
         }
 
         /// <summary>
-        /// 读取csc.rsp文件,返回宏定义和其他行
+        /// 读取 csc.rsp 文件中的宏定义和其他行
         /// </summary>
         private static void ReadRspFile(HashSet<string> defines, List<string> others)
         {
@@ -90,9 +95,10 @@ namespace YooAsset.Editor.Experiment
         }
 
         /// <summary>
-        /// 重新写入csc.rsp文件
+        /// 重新写入 csc.rsp 文件
         /// </summary>
-        private static void WriteRspFile(HashSet<string> defines, List<string> others)
+        /// <returns>文件内容发生变化时返回 true</returns>
+        private static bool WriteRspFile(HashSet<string> defines, List<string> others)
         {
             StringBuilder sb = new StringBuilder();
             if (others != null && others.Count > 0)
@@ -108,7 +114,16 @@ namespace YooAsset.Editor.Experiment
                 }
             }
 
-            File.WriteAllText(RspFilePath, sb.ToString());
+            string newContent = sb.ToString();
+            if (File.Exists(RspFilePath))
+            {
+                string oldContent = File.ReadAllText(RspFilePath);
+                if (oldContent == newContent)
+                    return false;
+            }
+
+            File.WriteAllText(RspFilePath, newContent);
+            return true;
         }
     }
 }

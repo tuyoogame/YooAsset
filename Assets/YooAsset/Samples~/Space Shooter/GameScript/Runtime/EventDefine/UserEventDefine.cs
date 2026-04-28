@@ -1,64 +1,56 @@
-﻿using UniFramework.Event;
+using UniFramework.Event;
 
-public class UserEventDefine
+/// <summary>
+/// User retry package initialization event.
+/// </summary>
+public sealed class UserTryInitializePackageEvent : IEventMessage
 {
-    /// <summary>
-    /// 用户尝试再次初始化资源包
-    /// </summary>
-    public class UserTryInitialize : IEventMessage
+    public static void SendEventMessage()
     {
-        public static void SendEventMessage()
-        {
-            var msg = new UserTryInitialize();
-            UniEvent.SendMessage(msg);
-        }
+        UniEvent.SendMessage(new UserTryInitializePackageEvent());
     }
+}
 
-    /// <summary>
-    /// 用户开始下载网络文件
-    /// </summary>
-    public class UserBeginDownloadWebFiles : IEventMessage
+/// <summary>
+/// User begin downloading web files event.
+/// </summary>
+public sealed class UserBeginDownloadWebFilesEvent : IEventMessage
+{
+    public static void SendEventMessage()
     {
-        public static void SendEventMessage()
-        {
-            var msg = new UserBeginDownloadWebFiles();
-            UniEvent.SendMessage(msg);
-        }
+        UniEvent.SendMessage(new UserBeginDownloadWebFilesEvent());
     }
+}
 
-    /// <summary>
-    /// 用户尝试再次请求资源版本
-    /// </summary>
-    public class UserTryRequestPackageVersion : IEventMessage
+/// <summary>
+/// User retry package version request event.
+/// </summary>
+public sealed class UserTryRequestPackageVersionEvent : IEventMessage
+{
+    public static void SendEventMessage()
     {
-        public static void SendEventMessage()
-        {
-            var msg = new UserTryRequestPackageVersion();
-            UniEvent.SendMessage(msg);
-        }
+        UniEvent.SendMessage(new UserTryRequestPackageVersionEvent());
     }
+}
 
-    /// <summary>
-    /// 用户尝试再次更新补丁清单
-    /// </summary>
-    public class UserTryUpdatePackageManifest : IEventMessage
+/// <summary>
+/// User retry package manifest update event.
+/// </summary>
+public sealed class UserTryUpdatePackageManifestEvent : IEventMessage
+{
+    public static void SendEventMessage()
     {
-        public static void SendEventMessage()
-        {
-            var msg = new UserTryUpdatePackageManifest();
-            UniEvent.SendMessage(msg);
-        }
+        UniEvent.SendMessage(new UserTryUpdatePackageManifestEvent());
     }
+}
 
-    /// <summary>
-    /// 用户尝试再次下载网络文件
-    /// </summary>
-    public class UserTryDownloadWebFiles : IEventMessage
+/// <summary>
+/// User retry web file download event.
+/// </summary>
+public sealed class UserTryDownloadWebFilesEvent : IEventMessage
+{
+    public static void SendEventMessage()
     {
-        public static void SendEventMessage()
-        {
-            var msg = new UserTryDownloadWebFiles();
-            UniEvent.SendMessage(msg);
-        }
+        UniEvent.SendMessage(new UserTryDownloadWebFilesEvent());
     }
 }

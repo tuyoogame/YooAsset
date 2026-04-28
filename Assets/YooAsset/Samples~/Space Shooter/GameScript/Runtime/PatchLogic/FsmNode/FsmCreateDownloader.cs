@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UniFramework.Machine;
 using YooAsset;
 
-public class FsmCreateDownloader : IStateNode
+internal class FsmCreateDownloader : IStateNode
 {
     private StateMachine _machine;
 
@@ -14,7 +12,7 @@ public class FsmCreateDownloader : IStateNode
     }
     void IStateNode.OnEnter()
     {
-        PatchEventDefine.PatchStepsChange.SendEventMessage("创建资源下载器！");
+        PatchStepChangedEvent.SendEventMessage("Creating resource downloader.");
         CreateDownloader();
     }
     void IStateNode.OnUpdate()
@@ -30,21 +28,22 @@ public class FsmCreateDownloader : IStateNode
         var package = YooAssets.GetPackage(packageName);
         int downloadingMaxNum = 10;
         int failedTryAgain = 3;
-        var downloader = package.CreateResourceDownloader(downloadingMaxNum, failedTryAgain);
+        var options = new ResourceDownloaderOptions(downloadingMaxNum, failedTryAgain);
+        var downloader = package.CreateResourceDownloader(options);
         _machine.SetBlackboardValue("Downloader", downloader);
 
         if (downloader.TotalDownloadCount == 0)
         {
-            Debug.Log("Not found any download files !");
+            Debug.Log("No download files were found.");
             _machine.ChangeState<FsmStartGame>();
         }
         else
         {
-            // 发现新更新文件后，挂起流程系统
-            // 注意：开发者需要在下载前检测磁盘空间不足
+            // Suspend the patch workflow after update files are found.
+            // Developers should check available disk space before downloading.
             int totalDownloadCount = downloader.TotalDownloadCount;
             long totalDownloadBytes = downloader.TotalDownloadBytes;
-            PatchEventDefine.FoundUpdateFiles.SendEventMessage(totalDownloadCount, totalDownloadBytes);
+            PatchFoundUpdateFilesEvent.SendEventMessage(totalDownloadCount, totalDownloadBytes);
         }
     }
 }

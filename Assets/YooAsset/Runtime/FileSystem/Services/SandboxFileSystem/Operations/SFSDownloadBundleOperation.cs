@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace YooAsset
@@ -20,6 +21,7 @@ namespace YooAsset
         private readonly SandboxFileSystem _fileSystem;
         private readonly FSDownloadBundleOptions _options;
         private readonly DownloadRetryController _downloadRetryController;
+        private IReadOnlyList<string> _candidateUrls;
         private DownloadFileBaseOperation _downloadFileOp;
         private ESteps _steps = ESteps.None;
 
@@ -172,8 +174,10 @@ namespace YooAsset
         /// </summary>
         private string GetRequestUrl(string fileName)
         {
-            var urls = _fileSystem.RemoteService.GetRemoteUrls(fileName);
-            return _fileSystem.DownloadUrlPolicy.SelectUrl(urls);
+            if (_candidateUrls == null)
+                _candidateUrls = _fileSystem.RemoteService.GetRemoteUrls(fileName);
+            
+            return _fileSystem.DownloadUrlPolicy.SelectUrl(_candidateUrls);
         }
     }
 }

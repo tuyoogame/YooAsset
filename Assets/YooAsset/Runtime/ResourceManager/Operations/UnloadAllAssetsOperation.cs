@@ -13,7 +13,7 @@ namespace YooAsset
             None,
             CheckOptions,
             ReleaseAll,
-            TryAbortLoader,
+            RequestForceDestroy,
             CheckLoading,
             DestroyAll,
             Done,
@@ -28,10 +28,12 @@ namespace YooAsset
             _resourceManager = resourceManager;
             _options = options;
         }
+        /// <inheritdoc />
         protected override void InternalStart()
         {
             _steps = ESteps.CheckOptions;
         }
+        /// <inheritdoc />
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
@@ -55,14 +57,15 @@ namespace YooAsset
                 if (_options.ShouldReleaseHandles)
                     _resourceManager.ReleaseAllHandles();
 
-                _steps = ESteps.TryAbortLoader;
+                _steps = ESteps.RequestForceDestroy;
             }
 
-            if (_steps == ESteps.TryAbortLoader)
+            if (_steps == ESteps.RequestForceDestroy)
             {
-                // 尝试终止所有加载任务
-                // 注意：正在加载AssetBundle的任务无法终止
-                _resourceManager.TryAbortAllBundleLoaders();
+                // 向所有 Provider 和 BundleLoader 下发强制销毁请求
+                _resourceManager.RequestForceDestroyAllProviders();
+                _resourceManager.RequestForceDestroyAllBundleLoaders();
+
                 _steps = ESteps.CheckLoading;
             }
 

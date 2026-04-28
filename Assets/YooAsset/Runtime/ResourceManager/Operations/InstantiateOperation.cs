@@ -35,10 +35,12 @@ namespace YooAsset
             _handle = handle;
             _options = options;
         }
+        /// <inheritdoc />
         protected override void InternalStart()
         {
             _steps = ESteps.LoadObject;
         }
+        /// <inheritdoc />
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
@@ -140,10 +142,12 @@ namespace YooAsset
             }
 #endif
         }
+        /// <inheritdoc />
         protected override void InternalWaitForCompletion()
         {
             ExecuteBatch();
         }
+        /// <inheritdoc />
         protected override string InternalGetDescription()
         {
             var assetInfo = _handle.GetAssetInfo();

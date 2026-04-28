@@ -1,18 +1,21 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 #if YOO_MACRO_SUPPORT
 namespace YooAsset.Editor
 {
-    public class MacroDefine
+    /// <summary>
+    /// 提供 YooAsset 版本相关的脚本宏定义
+    /// </summary>
+    public static class MacroDefine
     {
         /// <summary>
-        /// YooAsset版本宏定义
+        /// YooAsset 版本宏定义集合
         /// </summary>
-        public static readonly List<string> Macros = new List<string>()
+        public static IReadOnlyList<string> Macros { get; } = new List<string>()
         {
-            "YOO_ASSET_2",
-            "YOO_ASSET_2_3",
-            "YOO_ASSET_2_3_OR_NEWER",
+            "YOO_ASSET_3",
+            "YOO_ASSET_3_0",
+            "YOO_ASSET_3_0_OR_NEWER",
         };
     }
 }

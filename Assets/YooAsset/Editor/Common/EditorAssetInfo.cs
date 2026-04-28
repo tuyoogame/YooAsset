@@ -7,6 +7,7 @@ namespace YooAsset.Editor
     [Serializable]
     public class EditorAssetInfo : IComparable<EditorAssetInfo>
     {
+        [NonSerialized]
         private string _fileExtension = null;
 
         /// <summary>

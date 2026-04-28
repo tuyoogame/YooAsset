@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UniFramework.Machine;
+﻿using UniFramework.Machine;
 
 internal class FsmDownloadPackageOver : IStateNode
 {
@@ -13,7 +10,7 @@ internal class FsmDownloadPackageOver : IStateNode
     }
     void IStateNode.OnEnter()
     {
-        PatchEventDefine.PatchStepsChange.SendEventMessage("资源文件下载完毕！");
+        PatchStepChangedEvent.SendEventMessage("Resource files download completed.");
         _machine.ChangeState<FsmClearCacheBundle>();
     }
     void IStateNode.OnUpdate()

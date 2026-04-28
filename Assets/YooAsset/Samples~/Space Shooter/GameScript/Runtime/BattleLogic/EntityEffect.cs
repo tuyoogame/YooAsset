@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
 public class EntityEffect : MonoBehaviour
 {
     public float DelayDestroyTime = 1f;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,6 +8,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using YooAsset.Editor;
 
+/// <summary>
+/// 收集资源包裹中材质产生的着色器变种
+/// </summary>
 public static class ShaderVariantCollector
 {
     private enum ESteps
@@ -34,21 +37,33 @@ public static class ShaderVariantCollector
 
 
     /// <summary>
-    /// 开始收集
+    /// 启动着色器变种收集流程
     /// </summary>
+    /// <param name="savePath">收集结果保存路径，扩展名必须为 .shadervariants。</param>
+    /// <param name="packageName">参与收集的资源包裹名称</param>
+    /// <param name="processMaxNum">每批处理的材质数量</param>
+    /// <param name="completedCallback">收集完成后的回调</param>
     public static void Run(string savePath, string packageName, int processMaxNum, Action completedCallback)
     {
         if (_steps != ESteps.None)
             return;
 
+        if (EditorSceneUtility.HasDirtyScenes())
+        {
+            UnityEngine.Debug.LogError("Unsaved scenes detected. Save all scenes before collecting shader variants.");
+            return;
+        }
+
         if (Path.HasExtension(savePath) == false)
             savePath = $"{savePath}.shadervariants";
         if (Path.GetExtension(savePath) != ".shadervariants")
-            throw new System.Exception("Shader variant file extension is invalid.");
+            throw new System.ArgumentException("Shader variant file extension is invalid.", nameof(savePath));
         if (string.IsNullOrEmpty(packageName))
-            throw new System.Exception("Package name is null or empty !");
+            throw new System.ArgumentNullException(nameof(packageName));
+        if (processMaxNum <= 0)
+            throw new System.ArgumentOutOfRangeException(nameof(processMaxNum), "Process capacity must be greater than zero.");
 
-        // 注意：先删除再保存，否则ShaderVariantCollection内容将无法及时刷新
+        // Unity 对同名 ShaderVariantCollection 的刷新存在延迟，先删除旧资源再写入新结果。
         AssetDatabase.DeleteAsset(savePath);
         EditorFileUtility.CreateFileDirectory(savePath);
         _savePath = savePath;
@@ -68,6 +83,17 @@ public static class ShaderVariantCollector
 
     private static void EditorUpdate()
     {
+        try
+        {
+            InternalUpdate();
+        }
+        catch (Exception ex)
+        {
+            Finish(false, ex);
+        }
+    }
+    private static void InternalUpdate()
+    {
         if (_steps == ESteps.None)
             return;
 
@@ -75,14 +101,14 @@ public static class ShaderVariantCollector
         {
             ShaderVariantCollectionHelper.ClearCurrentShaderVariantCollection();
             _steps = ESteps.CollectAllMaterial;
-            return; //等待一帧
+            return; // 等待一帧，让编辑器完成清理。
         }
 
         if (_steps == ESteps.CollectAllMaterial)
         {
             _allMaterials = GetAllMaterials();
             _steps = ESteps.CollectVariants;
-            return; //等待一帧
+            return; // 等待一帧，让材质列表收集结果稳定。
         }
 
         if (_steps == ESteps.CollectVariants)
@@ -119,7 +145,7 @@ public static class ShaderVariantCollector
 
         if (_steps == ESteps.WaitingDone)
         {
-            // 注意：一定要延迟保存才会起效
+            // Unity 需要等待若干帧后才能把当前变种集合写入资源文件。
             if (_elapsedTime.ElapsedMilliseconds > WaitMilliseconds)
             {
                 _elapsedTime.Stop();
@@ -129,9 +155,7 @@ public static class ShaderVariantCollector
                 ShaderVariantCollectionHelper.SaveCurrentShaderVariantCollection(_savePath);
                 CreateManifest();
 
-                UnityEngine.Debug.Log($"搜集SVC完毕！");
-                EditorApplication.update -= EditorUpdate;
-                _completedCallback?.Invoke();
+                Finish(true);
             }
         }
     }
@@ -164,7 +188,7 @@ public static class ShaderVariantCollector
                         result.Add(assetPath);
                 }
             }
-            EditorDialogUtility.DisplayProgressBar("搜集所有材质球", ++progressValue, collectResult.CollectAssets.Count);
+            EditorDialogUtility.DisplayProgressBar("Collect All Materials", ++progressValue, collectResult.CollectAssets.Count);
         }
         EditorDialogUtility.ClearProgressBar();
 
@@ -175,7 +199,7 @@ public static class ShaderVariantCollector
     {
         Camera camera = Camera.main;
         if (camera == null)
-            throw new System.Exception("Not found main camera.");
+            throw new System.InvalidOperationException("Main camera is missing.");
 
         // 设置主相机
         float aspect = camera.aspect;
@@ -208,13 +232,19 @@ public static class ShaderVariantCollector
             {
                 x++;
             }
-            EditorDialogUtility.DisplayProgressBar("照射所有材质球", ++progressValue, materials.Count);
+            EditorDialogUtility.DisplayProgressBar("Render All Materials", ++progressValue, materials.Count);
         }
         EditorDialogUtility.ClearProgressBar();
     }
     private static GameObject CreateSphere(string assetPath, Vector3 position, int index)
     {
         var material = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
+        if (material == null)
+        {
+            UnityEngine.Debug.LogWarning($"Material not found: '{assetPath}'.");
+            return null;
+        }
+
         var shader = material.shader;
         if (shader == null)
             return null;
@@ -229,11 +259,12 @@ public static class ShaderVariantCollector
     {
         foreach (var go in _allSpheres)
         {
-            GameObject.DestroyImmediate(go);
+            if (go != null)
+                GameObject.DestroyImmediate(go);
         }
         _allSpheres.Clear();
 
-        // 尝试释放编辑器加载的资源
+        // 材质扫描会加载编辑器资源，收集结束后主动释放以降低内存占用。
         EditorUtility.UnloadUnusedAssetsImmediate(true);
     }
     private static void CreateManifest()
@@ -250,5 +281,40 @@ public static class ShaderVariantCollector
         }
 
         AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+    }
+    private static void Finish(bool success, Exception exception = null)
+    {
+        try
+        {
+            if (success)
+                UnityEngine.Debug.Log("Shader variant collection completed.");
+            else
+                UnityEngine.Debug.LogError($"Shader variant collection failed: {exception}.");
+
+            _completedCallback?.Invoke();
+        }
+        finally
+        {
+            Cleanup();
+        }
+    }
+    private static void Cleanup()
+    {
+        EditorApplication.update -= EditorUpdate;
+        EditorDialogUtility.ClearProgressBar();
+
+        if (_elapsedTime != null)
+        {
+            _elapsedTime.Stop();
+            _elapsedTime = null;
+        }
+
+        DestroyAllSpheres();
+        _savePath = null;
+        _packageName = null;
+        _processMaxNum = 0;
+        _completedCallback = null;
+        _allMaterials = null;
+        _steps = ESteps.None;
     }
 }

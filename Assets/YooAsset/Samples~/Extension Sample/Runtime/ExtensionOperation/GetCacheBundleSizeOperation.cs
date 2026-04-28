@@ -20,13 +20,20 @@ public class GetCacheBundleSizeOperation : AsyncOperationBase
     private ESteps _steps = ESteps.None;
 
     /// <summary>
-    /// 总大小（单位：字节）
+    /// 缓存文件总大小，单位为字节
     /// </summary>
-    public long TotalSize = 0;
+    public long TotalSize { private set; get; }
 
 
+    /// <summary>
+    /// 创建缓存文件大小统计操作实例
+    /// </summary>
+    /// <param name="packageName">资源包裹名称</param>
     public GetCacheBundleSizeOperation(string packageName)
     {
+        if (string.IsNullOrEmpty(packageName))
+            throw new System.ArgumentNullException(nameof(packageName));
+
         _packageName = packageName;
     }
     protected override void InternalStart()

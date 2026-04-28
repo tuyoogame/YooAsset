@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Machine;
 using YooAsset;
@@ -14,7 +13,7 @@ internal class FsmRequestPackageVersion : IStateNode
     }
     void IStateNode.OnEnter()
     {
-        PatchEventDefine.PatchStepsChange.SendEventMessage("请求资源版本 !");
+        PatchStepChangedEvent.SendEventMessage("Requesting package version.");
         GameManager.Instance.StartCoroutine(UpdatePackageVersion());
     }
     void IStateNode.OnUpdate()
@@ -34,11 +33,11 @@ internal class FsmRequestPackageVersion : IStateNode
         if (operation.Status != EOperationStatus.Succeeded)
         {
             Debug.LogWarning(operation.Error);
-            PatchEventDefine.PackageVersionRequestFailed.SendEventMessage();
+            PatchPackageVersionRequestFailedEvent.SendEventMessage();
         }
         else
         {
-            Debug.Log($"Request package version : {operation.PackageVersion}");
+            Debug.Log($"Package version requested: '{operation.PackageVersion}'.");
             _machine.SetBlackboardValue("PackageVersion", operation.PackageVersion);
             _machine.ChangeState<FsmUpdatePackageManifest>();
         }

@@ -7,8 +7,6 @@ namespace YooAsset
     /// </summary>
     public abstract class InitializePackageOptions
     {
-        protected InitializePackageOptions() { }
-
         /// <summary>
         /// 同时加载Bundle文件的最大并发数
         /// </summary>

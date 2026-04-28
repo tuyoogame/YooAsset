@@ -22,11 +22,13 @@ namespace YooAsset
             _resourceManager = resourceManager;
             _options = options;
         }
+        /// <inheritdoc />
         protected override void InternalStart()
         {
             _steps = ESteps.UnloadUnused;
             _loopCounter = _options.MaxLoopCount;
         }
+        /// <inheritdoc />
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
@@ -51,10 +53,12 @@ namespace YooAsset
                 }
             }
         }
+        /// <inheritdoc />
         protected override void InternalWaitForCompletion()
         {
             ExecuteBatch();
         }
+        /// <inheritdoc />
         protected override string InternalGetDescription()
         {
             return $"MaxLoopCount: {_options.MaxLoopCount}";

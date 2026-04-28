@@ -1,5 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UniFramework.Event;
@@ -14,7 +12,7 @@ public class UIBattleWindow : MonoBehaviour
     {
         _overView = this.transform.Find("OverView").gameObject;
         _scoreLabel = this.transform.Find("ScoreView/Score").GetComponent<Text>();
-        _scoreLabel.text = "Score : 0";
+        _scoreLabel.text = "Score: 0";
 
         var restartBtn = this.transform.Find("OverView/ReplayButton").GetComponent<Button>();
         restartBtn.onClick.AddListener(OnClickReplayBtn);
@@ -22,8 +20,8 @@ public class UIBattleWindow : MonoBehaviour
         var homeBtn = this.transform.Find("OverView/HomeButton").GetComponent<Button>();
         homeBtn.onClick.AddListener(OnClickHomeBtn);
 
-        _eventGroup.AddListener<BattleEventDefine.ScoreChange>(OnHandleEventMessage);
-        _eventGroup.AddListener<BattleEventDefine.GameOver>(OnHandleEventMessage);
+        _eventGroup.AddListener<BattleScoreChangedEvent>(OnHandleEventMessage);
+        _eventGroup.AddListener<BattleGameOverEvent>(OnHandleEventMessage);
     }
     private void OnDestroy()
     {
@@ -32,20 +30,20 @@ public class UIBattleWindow : MonoBehaviour
 
     private void OnClickReplayBtn()
     {
-        SceneEventDefine.ChangeToBattleScene.SendEventMessage();
+        SceneChangeToBattleEvent.SendEventMessage();
     }
     private void OnClickHomeBtn()
     {
-        SceneEventDefine.ChangeToHomeScene.SendEventMessage();
+        SceneChangeToHomeEvent.SendEventMessage();
     }
     private void OnHandleEventMessage(IEventMessage message)
     {
-        if(message is BattleEventDefine.ScoreChange)
+        if(message is BattleScoreChangedEvent)
         {
-            var msg = message as BattleEventDefine.ScoreChange;
-            _scoreLabel.text = $"Score : {msg.CurrentScores}";
+            var msg = message as BattleScoreChangedEvent;
+            _scoreLabel.text = $"Score: {msg.CurrentScores}";
         }
-        else if(message is BattleEventDefine.GameOver)
+        else if(message is BattleGameOverEvent)
         {
             _overView.SetActive(true);
         }

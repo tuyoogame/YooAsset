@@ -8,6 +8,9 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using YooAsset.Editor;
 
+/// <summary>
+/// 提供自定义构建管线的编辑器视图
+/// </summary>
 [BuildPipelineAttribute("CustomBuildPipeline")]
 internal class CustomBuildPipelineViewer : LegacyBuildPipelineViewer
 {

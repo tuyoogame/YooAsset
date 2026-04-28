@@ -16,21 +16,25 @@ namespace YooAsset
         }
 
         private readonly ResourcePackage _resourcePackage;
+        private readonly ResourceManager _resourceManager;
         private readonly UnloadAllAssetsOptions _options;
         private UnloadAllAssetsOperation _unloadAllAssetsOp;
+        private string _packageVersion = string.Empty;
         private ESteps _steps = ESteps.None;
 
 
-        internal DestroyPackageOperation(ResourcePackage resourcePackage, UnloadAllAssetsOptions options)
+        internal DestroyPackageOperation(ResourcePackage resourcePackage, ResourceManager resourceManager, UnloadAllAssetsOptions options)
         {
             _resourcePackage = resourcePackage;
+            _resourceManager = resourceManager;
             _options = options;
         }
-
+        /// <inheritdoc />
         protected override void InternalStart()
         {
             _steps = ESteps.CheckInitStatus;
         }
+        /// <inheritdoc />
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
@@ -52,9 +56,14 @@ namespace YooAsset
 
                     case EOperationStatus.Succeeded:
                         if (_resourcePackage.PackageValid)
+                        {
+                            _packageVersion = _resourcePackage.GetPackageVersion();
                             _steps = ESteps.UnloadAllAssets;
+                        }
                         else
+                        {
                             _steps = ESteps.DestroyPackage;
+                        }
                         break;
 
                     default:
@@ -66,7 +75,7 @@ namespace YooAsset
             {
                 if (_unloadAllAssetsOp == null)
                 {
-                    _unloadAllAssetsOp = _resourcePackage.UnloadAllAssetsAsync(_options);
+                    _unloadAllAssetsOp = new UnloadAllAssetsOperation(_resourceManager, _options);
                     _unloadAllAssetsOp.StartOperation();
                     AddChildOperation(_unloadAllAssetsOp);
                 }
@@ -88,7 +97,6 @@ namespace YooAsset
 
             if (_steps == ESteps.DestroyPackage)
             {
-                // 销毁包裹
                 _resourcePackage.InternalDestroy();
 
                 // 最后清理该包裹的异步任务
@@ -99,9 +107,10 @@ namespace YooAsset
                 SetResult();
             }
         }
+        /// <inheritdoc />
         protected override string InternalGetDescription()
         {
-            return $"PackageVersion: {_resourcePackage.GetPackageVersion()}";
+            return $"PackageVersion: {_packageVersion}";
         }
     }
 }

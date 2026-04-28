@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using System;
 using UniFramework.Machine;
 using UniFramework.Event;
 using YooAsset;
@@ -10,14 +10,19 @@ public static class PatchManager
 
     public static void Create(string packageName, EPlayMode playMode)
     {
-        // 注册监听事件
-        _eventGroup.AddListener<UserEventDefine.UserTryInitialize>(OnHandleEventMessage);
-        _eventGroup.AddListener<UserEventDefine.UserBeginDownloadWebFiles>(OnHandleEventMessage);
-        _eventGroup.AddListener<UserEventDefine.UserTryRequestPackageVersion>(OnHandleEventMessage);
-        _eventGroup.AddListener<UserEventDefine.UserTryUpdatePackageManifest>(OnHandleEventMessage);
-        _eventGroup.AddListener<UserEventDefine.UserTryDownloadWebFiles>(OnHandleEventMessage);
+        if (string.IsNullOrWhiteSpace(packageName))
+            throw new ArgumentException("Package name cannot be null or empty.", nameof(packageName));
+        if (!IsValidPlayMode(playMode))
+            throw new ArgumentException($"Invalid play mode: {playMode}.", nameof(playMode));
 
-        // 创建状态机
+        // Register event listeners.
+        _eventGroup.AddListener<UserTryInitializePackageEvent>(OnHandleEventMessage);
+        _eventGroup.AddListener<UserBeginDownloadWebFilesEvent>(OnHandleEventMessage);
+        _eventGroup.AddListener<UserTryRequestPackageVersionEvent>(OnHandleEventMessage);
+        _eventGroup.AddListener<UserTryUpdatePackageManifestEvent>(OnHandleEventMessage);
+        _eventGroup.AddListener<UserTryDownloadWebFilesEvent>(OnHandleEventMessage);
+
+        // Create state machine.
         _machine = new StateMachine(null);
         _machine.AddNode<FsmInitializePackage>();
         _machine.AddNode<FsmRequestPackageVersion>();
@@ -33,41 +38,61 @@ public static class PatchManager
     }
     public static void Start()
     {
+        if (_machine == null)
+            throw new InvalidOperationException("Patch manager has not been created. Call Create before Start.");
+
         _machine.Run<FsmInitializePackage>();
     }
     public static void Update()
     {
+        if (_machine == null)
+            throw new InvalidOperationException("Patch manager has not been created. Call Create before Update.");
+
         _machine.Update();
     }
 
     /// <summary>
-    /// 接收事件
+    /// Handles event messages.
     /// </summary>
     private static void OnHandleEventMessage(IEventMessage message)
     {
-        if (message is UserEventDefine.UserTryInitialize)
+        if (message is UserTryInitializePackageEvent)
         {
             _machine.ChangeState<FsmInitializePackage>();
         }
-        else if (message is UserEventDefine.UserBeginDownloadWebFiles)
+        else if (message is UserBeginDownloadWebFilesEvent)
         {
             _machine.ChangeState<FsmDownloadPackageFiles>();
         }
-        else if (message is UserEventDefine.UserTryRequestPackageVersion)
+        else if (message is UserTryRequestPackageVersionEvent)
         {
             _machine.ChangeState<FsmRequestPackageVersion>();
         }
-        else if (message is UserEventDefine.UserTryUpdatePackageManifest)
+        else if (message is UserTryUpdatePackageManifestEvent)
         {
             _machine.ChangeState<FsmUpdatePackageManifest>();
         }
-        else if (message is UserEventDefine.UserTryDownloadWebFiles)
+        else if (message is UserTryDownloadWebFilesEvent)
         {
             _machine.ChangeState<FsmCreateDownloader>();
         }
         else
         {
-            throw new System.NotImplementedException($"{message.GetType()}");
+            throw new InvalidOperationException($"Unsupported patch event message type: {message.GetType().FullName}.");
+        }
+    }
+
+    private static bool IsValidPlayMode(EPlayMode playMode)
+    {
+        switch (playMode)
+        {
+            case EPlayMode.EditorSimulateMode:
+            case EPlayMode.OfflinePlayMode:
+            case EPlayMode.HostPlayMode:
+            case EPlayMode.WebPlayMode:
+                return true;
+            default:
+                return false;
         }
     }
 }

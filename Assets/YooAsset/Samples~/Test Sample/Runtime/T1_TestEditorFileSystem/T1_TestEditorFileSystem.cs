@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Collections;
@@ -27,7 +27,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
             var simulateParams = new PackageBuildParameters(TestConsts.AssetBundlePackageName);
             simulateParams.BuildPipelineName = "EditorSimulateBuildPipeline";
             simulateParams.BuildBundleType = (int)EBundleType.VirtualBundle;
-            simulateParams.AssemblyName = "YooAsset.Test.Editor";
+            simulateParams.AssemblyName = "YooAsset.Tests.Editor";
             simulateParams.TypeFullName = "TestPackageBuilder";
             simulateParams.MethodName = "BuildPackage";
             var simulateResult = PackageBuildInvoker.InvokeBuild(simulateParams);
@@ -39,7 +39,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
             var simulateParams = new PackageBuildParameters(TestConsts.RawBundlePackageName);
             simulateParams.BuildPipelineName = "EditorSimulateBuildPipeline";
             simulateParams.BuildBundleType = (int)EBundleType.RawBundle;
-            simulateParams.AssemblyName = "YooAsset.Test.Editor";
+            simulateParams.AssemblyName = "YooAsset.Tests.Editor";
             simulateParams.TypeFullName = "TestPackageBuilder";
             simulateParams.MethodName = "BuildPackage";
             var simulateResult = PackageBuildInvoker.InvokeBuild(simulateParams);
@@ -199,9 +199,9 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator B11_TestLoadRawVideo()
+    public IEnumerator B11_TestUniTask()
     {
-        var tester = new TestLoadRawVideo();
+        var tester = new TestUniTask();
         yield return tester.RuntimeTester();
     }
 

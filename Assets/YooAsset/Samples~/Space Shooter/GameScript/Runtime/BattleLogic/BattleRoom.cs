@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniFramework.Event;
@@ -14,7 +13,7 @@ public class RoomBoundary
 }
 
 /// <summary>
-/// 战斗房间
+/// Battle room.
 /// </summary>
 public class BattleRoom
 {
@@ -31,7 +30,7 @@ public class BattleRoom
     private readonly EventGroup _eventGroup = new EventGroup();
     private GameObject _roomRoot;
 
-    // 关卡参数
+    // Level parameters.
     private const int EnemyCount = 10;
     private const int EnemyScore = 10;
     private const int AsteroidScore = 1;
@@ -52,25 +51,25 @@ public class BattleRoom
 
 
     /// <summary>
-    /// 初始化房间
+    /// Initializes the room.
     /// </summary>
-    public void IntRoom()
+    public void InitRoom()
     {
-        // 创建房间根对象
+        // Create room root object.
         _roomRoot = new GameObject("BattleRoom");
 
-        // 监听游戏事件
-        _eventGroup.AddListener<BattleEventDefine.PlayerDead>(OnHandleEventMessage);
-        _eventGroup.AddListener<BattleEventDefine.EnemyDead>(OnHandleEventMessage);
-        _eventGroup.AddListener<BattleEventDefine.AsteroidExplosion>(OnHandleEventMessage);
-        _eventGroup.AddListener<BattleEventDefine.PlayerFireBullet>(OnHandleEventMessage);
-        _eventGroup.AddListener<BattleEventDefine.EnemyFireBullet>(OnHandleEventMessage);
+        // Listen for game events.
+        _eventGroup.AddListener<BattlePlayerDeadEvent>(OnHandleEventMessage);
+        _eventGroup.AddListener<BattleEnemyDeadEvent>(OnHandleEventMessage);
+        _eventGroup.AddListener<BattleAsteroidExplosionEvent>(OnHandleEventMessage);
+        _eventGroup.AddListener<BattlePlayerFireBulletEvent>(OnHandleEventMessage);
+        _eventGroup.AddListener<BattleEnemyFireBulletEvent>(OnHandleEventMessage);
 
         _steps = ESteps.Ready;
     }
 
     /// <summary>
-    /// 销毁房间
+    /// Destroys the room.
     /// </summary>
     public void DestroyRoom()
     {
@@ -88,7 +87,7 @@ public class BattleRoom
     }
 
     /// <summary>
-    /// 更新房间
+    /// Updates the room.
     /// </summary>
     public void UpdateRoom()
     {
@@ -99,11 +98,11 @@ public class BattleRoom
         {
             if (_startWaitTimer.Update(Time.deltaTime))
             {
-                // 生成实体
-                var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("player_ship");
+                // Spawn entity.
+                var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("player_ship");
                 assetHandle.Completed += (AssetHandle handle) =>
                 {
-                    handle.InstantiateSync(_roomRoot.transform);
+                    handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, false));
                 };
                 _handles.Add(assetHandle);
                 _steps = ESteps.SpawnEnemy;
@@ -116,11 +115,11 @@ public class BattleRoom
             Vector3 spawnPosition = new Vector3(Random.Range(-_spawnValues.x, _spawnValues.x), _spawnValues.y, _spawnValues.z);
             Quaternion spawnRotation = Quaternion.identity;
 
-            // 生成实体
-            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>(enemyLocation);
+            // Spawn entity.
+            var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>(enemyLocation);
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(spawnPosition, spawnRotation, _roomRoot.transform);
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, spawnPosition, spawnRotation));
             };
             _handles.Add(assetHandle);
 
@@ -156,77 +155,77 @@ public class BattleRoom
     }
 
     /// <summary>
-    /// 接收事件
+    /// Handles event messages.
     /// </summary>
     /// <param name="message"></param>
     private void OnHandleEventMessage(IEventMessage message)
     {
-        if (message is BattleEventDefine.PlayerDead)
+        if (message is BattlePlayerDeadEvent)
         {
-            var msg = message as BattleEventDefine.PlayerDead;
+            var msg = message as BattlePlayerDeadEvent;
 
-            // 创建爆炸效果
-            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("explosion_player");
+            // Create explosion effect.
+            var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("explosion_player");
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, msg.Position, msg.Rotation));
             };
             _handles.Add(assetHandle);
 
             _steps = ESteps.GameOver;
-            BattleEventDefine.GameOver.SendEventMessage();
+            BattleGameOverEvent.SendEventMessage();
         }
-        else if (message is BattleEventDefine.EnemyDead)
+        else if (message is BattleEnemyDeadEvent)
         {
-            var msg = message as BattleEventDefine.EnemyDead;
+            var msg = message as BattleEnemyDeadEvent;
 
-            // 创建爆炸效果
-            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("explosion_enemy");
+            // Create explosion effect.
+            var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("explosion_enemy");
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, msg.Position, msg.Rotation));
             };
             _handles.Add(assetHandle);
 
             _totalScore += EnemyScore;
-            BattleEventDefine.ScoreChange.SendEventMessage(_totalScore);
+            BattleScoreChangedEvent.SendEventMessage(_totalScore);
         }
-        else if (message is BattleEventDefine.AsteroidExplosion)
+        else if (message is BattleAsteroidExplosionEvent)
         {
-            var msg = message as BattleEventDefine.AsteroidExplosion;
+            var msg = message as BattleAsteroidExplosionEvent;
 
-            // 创建爆炸效果
-            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("explosion_asteroid");
+            // Create explosion effect.
+            var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("explosion_asteroid");
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, msg.Position, msg.Rotation));
             };
             _handles.Add(assetHandle);
 
             _totalScore += AsteroidScore;
-            BattleEventDefine.ScoreChange.SendEventMessage(_totalScore);
+            BattleScoreChangedEvent.SendEventMessage(_totalScore);
         }
-        else if (message is BattleEventDefine.PlayerFireBullet)
+        else if (message is BattlePlayerFireBulletEvent)
         {
-            var msg = message as BattleEventDefine.PlayerFireBullet;
+            var msg = message as BattlePlayerFireBulletEvent;
 
-            // 创建子弹实体
-            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("player_bullet");
+            // Create bullet entity.
+            var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("player_bullet");
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, msg.Position, msg.Rotation));
             };
             _handles.Add(assetHandle);
         }
-        else if (message is BattleEventDefine.EnemyFireBullet)
+        else if (message is BattleEnemyFireBulletEvent)
         {
-            var msg = message as BattleEventDefine.EnemyFireBullet;
+            var msg = message as BattleEnemyFireBulletEvent;
 
-            // 创建子弹实体
-            var assetHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("enemy_bullet");
+            // Create bullet entity.
+            var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("enemy_bullet");
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(msg.Position, msg.Rotation, _roomRoot.transform);
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, msg.Position, msg.Rotation));
             };
             _handles.Add(assetHandle);
         }

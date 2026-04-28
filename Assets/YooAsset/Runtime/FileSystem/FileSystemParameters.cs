@@ -6,7 +6,7 @@ namespace YooAsset
     /// <summary>
     /// 提供文件系统的创建参数与工厂方法
     /// </summary>
-    public class FileSystemParameters
+    public partial class FileSystemParameters
     {
         internal readonly Dictionary<string, object> _createParameters = new Dictionary<string, object>(100);
 

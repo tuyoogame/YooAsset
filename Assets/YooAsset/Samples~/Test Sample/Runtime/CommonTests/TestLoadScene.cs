@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Collections;
 using UnityEngine;
@@ -47,7 +47,7 @@ public class TestLoadScene
 
         // 同步加载附加场景并等待
         yield return new WaitForSeconds(0.2f);
-        SceneHandle cachedHandle;
+        YooAsset.SceneHandle cachedHandle;
         {
             cachedHandle = package.LoadSceneSync("scene_c", LoadSceneMode.Additive);
             yield return cachedHandle;

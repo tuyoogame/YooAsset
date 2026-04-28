@@ -449,13 +449,24 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 尝试终止所有 BundleLoader
+        /// 向所有 Provider 下发强制销毁请求
         /// </summary>
-        internal void TryAbortAllBundleLoaders()
+        internal void RequestForceDestroyAllProviders()
+        {
+            foreach (var provider in _providerDict.Values)
+            {
+                provider.RequestForceDestroy();
+            }
+        }
+
+        /// <summary>
+        /// 向所有 BundleLoader 下发强制销毁请求
+        /// </summary>
+        internal void RequestForceDestroyAllBundleLoaders()
         {
             foreach (var loader in _bundleLoaderDict.Values)
             {
-                loader.TryAbortLoader();
+                loader.RequestForceDestroy();
             }
         }
 

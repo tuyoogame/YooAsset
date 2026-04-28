@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -43,7 +42,7 @@ public class EntityEnemy : MonoBehaviour
         {
             _lastFireTime = Time.time;
             _audioSource.Play();
-            BattleEventDefine.EnemyFireBullet.SendEventMessage(_shotSpawn.position, _shotSpawn.rotation);
+            BattleEnemyFireBulletEvent.SendEventMessage(_shotSpawn.position, _shotSpawn.rotation);
         }
     }
     void FixedUpdate()
@@ -65,7 +64,7 @@ public class EntityEnemy : MonoBehaviour
         var name = other.gameObject.name;
         if (name.StartsWith("player"))
         {
-            BattleEventDefine.EnemyDead.SendEventMessage(this.transform.position, this.transform.rotation);
+            BattleEnemyDeadEvent.SendEventMessage(this.transform.position, this.transform.rotation);
             GameObject.Destroy(this.gameObject);
         }
     }

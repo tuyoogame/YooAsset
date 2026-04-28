@@ -1,140 +1,115 @@
-﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEditor.UIElements;
-using UnityEngine.UIElements;
 using YooAsset.Editor;
 
+/// <summary>
+/// 提供着色器变种收集工具窗口
+/// </summary>
 public class ShaderVariantCollectorWindow : EditorWindow
 {
-    [MenuItem("Tools/着色器变种收集器", false, 100)]
+    [MenuItem("Tools/Shader Variant Collector", false, 100)]
     public static void OpenWindow()
     {
-        ShaderVariantCollectorWindow window = GetWindow<ShaderVariantCollectorWindow>("着色器变种收集工具", true);
+        ShaderVariantCollectorWindow window = GetWindow<ShaderVariantCollectorWindow>("Shader Variant Collector", true);
         window.minSize = new Vector2(800, 600);
     }
 
-    private Button _collectButton;
-    private TextField _collectOutputField;
-    private Label _currentShaderCountField;
-    private Label _currentVariantCountField;
-    private SliderInt _processCapacitySlider;
-    private PopupField<string> _packageField;
-
     private List<string> _packageNames;
+    private int _packageIndex;
     private string _currentPackageName;
+    private string _collectOutputPath;
+    private int _processCapacity;
 
-    public void CreateGUI()
+    private void OnEnable()
     {
-        try
+        _packageNames = GetBuildPackageNames();
+        if (_packageNames.Count > 0)
         {
-            VisualElement root = this.rootVisualElement;
-
-            // 加载布局文件
-            var visualAsset = UxmlLoader.LoadWindowUxml<ShaderVariantCollectorWindow>();
-            if (visualAsset == null)
-                return;
-
-            visualAsset.CloneTree(root);
-
-            // 包裹名称列表
-            _packageNames = GetBuildPackageNames();
-            _currentPackageName = _packageNames[0];
-
-            // 文件输出目录
-            _collectOutputField = root.Q<TextField>("CollectOutput");
-            _collectOutputField.SetValueWithoutNotify(ShaderVariantCollectorSetting.GeFileSavePath(_currentPackageName));
-            _collectOutputField.RegisterValueChangedCallback(evt =>
-            {
-                ShaderVariantCollectorSetting.SetFileSavePath(_currentPackageName, _collectOutputField.value);
-            });
-
-            // 收集的包裹
-            var packageContainer = root.Q("PackageContainer");
-            if (_packageNames.Count > 0)
-            {
-                int defaultIndex = GetDefaultPackageIndex(_currentPackageName);
-                _packageField = new PopupField<string>(_packageNames, defaultIndex);
-                _packageField.label = "Package";
-                _packageField.style.width = 350;
-                _packageField.RegisterValueChangedCallback(evt =>
-                {
-                    _currentPackageName = _packageField.value;
-                });
-                packageContainer.Add(_packageField);
-            }
-            else
-            {
-                _packageField = new PopupField<string>();
-                _packageField.label = "Package";
-                _packageField.style.width = 350;
-                packageContainer.Add(_packageField);
-            }
-
-            // 容器值
-            _processCapacitySlider = root.Q<SliderInt>("ProcessCapacity");
-            _processCapacitySlider.SetValueWithoutNotify(ShaderVariantCollectorSetting.GeProcessCapacity(_currentPackageName));
-#if !UNITY_2020_3_OR_NEWER
-            _processCapacitySlider.label = $"Capacity ({_processCapacitySlider.value})";
-            _processCapacitySlider.RegisterValueChangedCallback(evt =>
-            {
-                ShaderVariantCollectorSetting.SetProcessCapacity(_currentPackageName, _processCapacitySlider.value);
-                _processCapacitySlider.label = $"Capacity ({_processCapacitySlider.value})";
-            });
-#else
-            _processCapacitySlider.RegisterValueChangedCallback(evt =>
-            {
-                ShaderVariantCollectorSetting.SetProcessCapacity(_currentPackageName, _processCapacitySlider.value);
-            });
-#endif
-
-            _currentShaderCountField = root.Q<Label>("CurrentShaderCount");
-            _currentVariantCountField = root.Q<Label>("CurrentVariantCount");
-
-            // 变种收集按钮
-            _collectButton = root.Q<Button>("CollectButton");
-            _collectButton.clicked += CollectButton_clicked;
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e.ToString());
+            _packageIndex = 0;
+            _currentPackageName = _packageNames[_packageIndex];
+            RefreshPackageSettings();
         }
     }
-    private void Update()
+    private void OnGUI()
     {
-        if (_currentShaderCountField != null)
-        {
-            int currentShaderCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionShaderCount();
-            _currentShaderCountField.text = $"Current Shader Count : {currentShaderCount}";
-        }
+        EditorGUILayout.Space(4);
 
-        if (_currentVariantCountField != null)
-        {
-            int currentVariantCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionVariantCount();
-            _currentVariantCountField.text = $"Current Variant Count : {currentVariantCount}";
-        }
-    }
+        bool hasPackages = _packageNames.Count > 0;
 
-    private void CollectButton_clicked()
-    {
-        string savePath = ShaderVariantCollectorSetting.GeFileSavePath(_currentPackageName);
-        int processCapacity = _processCapacitySlider.value;
-        ShaderVariantCollector.Run(savePath, _currentPackageName, processCapacity, null);
-    }
-
-    // 构建包裹相关
-    private int GetDefaultPackageIndex(string packageName)
-    {
-        for (int index = 0; index < _packageNames.Count; index++)
+        // Package
+        EditorGUI.BeginDisabledGroup(!hasPackages);
         {
-            if (_packageNames[index] == packageName)
+            int newIndex = EditorGUILayout.Popup("Package", _packageIndex, _packageNames.ToArray());
+            if (newIndex != _packageIndex && hasPackages)
             {
-                return index;
+                _packageIndex = newIndex;
+                _currentPackageName = _packageNames[_packageIndex];
+                RefreshPackageSettings();
             }
         }
-        return 0;
+        EditorGUI.EndDisabledGroup();
+
+        // Save path
+        string newPath = EditorGUILayout.TextField("Save Path", _collectOutputPath);
+        if (newPath != _collectOutputPath)
+        {
+            _collectOutputPath = newPath;
+            if (!string.IsNullOrEmpty(_currentPackageName))
+                ShaderVariantCollectorSetting.SetFileSavePath(_currentPackageName, _collectOutputPath);
+        }
+
+        // Shader / variant counts
+        int shaderCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionShaderCount();
+        int variantCount = ShaderVariantCollectionHelper.GetCurrentShaderVariantCollectionVariantCount();
+        EditorGUILayout.LabelField("Current Shader Count", shaderCount.ToString());
+        EditorGUILayout.LabelField("Current Variant Count", variantCount.ToString());
+
+        // Process capacity slider
+        int newCapacity = EditorGUILayout.IntSlider("Capacity", _processCapacity, 10, 1000);
+        if (newCapacity != _processCapacity)
+        {
+            _processCapacity = newCapacity;
+            if (!string.IsNullOrEmpty(_currentPackageName))
+                ShaderVariantCollectorSetting.SetProcessCapacity(_currentPackageName, _processCapacity);
+        }
+
+        GUILayout.FlexibleSpace();
+
+        // Collect button
+        EditorGUI.BeginDisabledGroup(!hasPackages);
+        {
+            Color defaultColor = GUI.backgroundColor;
+            GUI.backgroundColor = new Color(0.16f, 0.42f, 0.16f, 1f);
+            if (GUILayout.Button("Collect", GUILayout.Height(50)))
+            {
+                CollectButtonClicked();
+            }
+            GUI.backgroundColor = defaultColor;
+        }
+        EditorGUI.EndDisabledGroup();
+
+        EditorGUILayout.Space(4);
+    }
+
+    private void CollectButtonClicked()
+    {
+        if (string.IsNullOrEmpty(_currentPackageName))
+        {
+            Debug.LogError("Package name is empty.");
+            return;
+        }
+
+        string savePath = ShaderVariantCollectorSetting.GetFileSavePath(_currentPackageName);
+        ShaderVariantCollector.Run(savePath, _currentPackageName, _processCapacity, null);
+    }
+    private void RefreshPackageSettings()
+    {
+        if (string.IsNullOrEmpty(_currentPackageName))
+            return;
+
+        _collectOutputPath = ShaderVariantCollectorSetting.GetFileSavePath(_currentPackageName);
+        _processCapacity = ShaderVariantCollectorSetting.GetProcessCapacity(_currentPackageName);
     }
     private List<string> GetBuildPackageNames()
     {

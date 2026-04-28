@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EntityPlayer : MonoBehaviour
-{	
+{
     public RoomBoundary Boundary;
     public float MoveSpeed = 10f;
     public float FireRate = 0.25f;
@@ -25,7 +23,7 @@ public class EntityPlayer : MonoBehaviour
         {
             _nextFireTime = Time.time + FireRate;
             _audioSource.Play();
-            BattleEventDefine.PlayerFireBullet.SendEventMessage(_shotSpawn.position, _shotSpawn.rotation);
+            BattlePlayerFireBulletEvent.SendEventMessage(_shotSpawn.position, _shotSpawn.rotation);
         }
     }
     void FixedUpdate()
@@ -50,7 +48,7 @@ public class EntityPlayer : MonoBehaviour
         var name = other.gameObject.name;
         if (name.StartsWith("enemy") || name.StartsWith("asteroid"))
         {
-            BattleEventDefine.PlayerDead.SendEventMessage(this.transform.position, this.transform.rotation);
+            BattlePlayerDeadEvent.SendEventMessage(this.transform.position, this.transform.rotation);
             GameObject.Destroy(this.gameObject);
         }
     }

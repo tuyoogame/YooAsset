@@ -36,7 +36,8 @@ namespace YooAsset.Editor
             // 清空首包资源目录
             if (copyOption == EBundledCopyOption.ClearAndCopyAll || copyOption == EBundledCopyOption.ClearAndCopyByTags)
             {
-                EditorFileUtility.ClearFolder(bundledRootDirectory);
+                EditorFileUtility.DeleteDirectory(bundledRootDirectory);
+                EditorFileUtility.CreateDirectory(bundledRootDirectory);
             }
 
             // 拷贝补丁清单文件

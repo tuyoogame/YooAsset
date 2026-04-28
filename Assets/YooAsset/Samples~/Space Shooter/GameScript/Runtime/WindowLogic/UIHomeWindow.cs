@@ -1,5 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +15,7 @@ public class UIHomeWindow : MonoBehaviour
         loginBtn.onClick.AddListener(OnClickPlayGameBtn);
 
         var aboutBtn = this.transform.Find("AboutButton").GetComponent<Button>();
-        aboutBtn.onClick.AddListener(OnClicAboutBtn);
+        aboutBtn.onClick.AddListener(OnClickAboutBtn);
 
         var maskBtn = this.transform.Find("AboutView/mask").GetComponent<Button>();
         maskBtn.onClick.AddListener(OnClickMaskBtn);
@@ -25,14 +23,14 @@ public class UIHomeWindow : MonoBehaviour
     private void Start()
     {
         var package = YooAsset.YooAssets.GetPackage("DefaultPackage");
-        _version.text = "Version : " + package.GetPackageVersion();
+        _version.text = "Version: " + package.GetPackageVersion();
     }
 
     private void OnClickPlayGameBtn()
     {
-        SceneEventDefine.ChangeToBattleScene.SendEventMessage();
+        SceneChangeToBattleEvent.SendEventMessage();
     }
-    private void OnClicAboutBtn()
+    private void OnClickAboutBtn()
     {
         _aboutView.SetActive(true);
     }

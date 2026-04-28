@@ -29,10 +29,12 @@ namespace YooAsset
             _package = package;
             _options = options;
         }
+        /// <inheritdoc />
         protected override void InternalStart()
         {
             _steps = ESteps.SetPlayMode;
         }
+        /// <inheritdoc />
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
@@ -137,6 +139,7 @@ namespace YooAsset
                 }
             }
         }
+        /// <inheritdoc />
         protected override string InternalGetDescription()
         {
             return $"PlayMode: {_playMode}";

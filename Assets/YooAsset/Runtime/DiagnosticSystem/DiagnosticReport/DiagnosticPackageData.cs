@@ -9,7 +9,9 @@ namespace YooAsset
     [Serializable]
     internal class DiagnosticPackageData
     {
+        [NonSerialized]
         private readonly Dictionary<string, DiagnosticBundleInfo> _bundleInfoDict = new Dictionary<string, DiagnosticBundleInfo>();
+        [NonSerialized]
         private bool _isParsed = false;
 
         /// <summary>

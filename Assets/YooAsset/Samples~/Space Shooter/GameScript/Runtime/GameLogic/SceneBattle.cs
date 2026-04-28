@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
 
@@ -13,53 +12,53 @@ internal class SceneBattle : MonoBehaviour
 
     private IEnumerator Start()
     {
-        // 加载战斗页面
-        _windowHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<GameObject>("UIBattle");
+        // Load battle window.
+        _windowHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("UIBattle");
         yield return _windowHandle;
-        _windowHandle.InstantiateSync(CanvasDesktop.transform);
+        _windowHandle.InstantiateSync(new InstantiateOptions(true, CanvasDesktop.transform, false));
 
-        // 加载背景音乐
-        _musicHandle = GameManager.Instance.GamePakcage.LoadAssetAsync<AudioClip>("music_background");
+        // Load background music.
+        _musicHandle = GameManager.Instance.GamePackage.LoadAssetAsync<AudioClip>("music_background");
         yield return _musicHandle;
 
-        // 播放背景音乐
+        // Play background music.
         var audioSource = this.gameObject.AddComponent<AudioSource>();
         audioSource.loop = true;
         audioSource.clip = _musicHandle.AssetObject as AudioClip;
         audioSource.Play();
 
-        // 切换场景的时候释放资源
+        // Release unused assets after changing scenes.
         var package = YooAssets.GetPackage("DefaultPackage");
         var operation = package.UnloadUnusedAssetsAsync();
         yield return operation;
 
         _battleRoom = new BattleRoom();
-        _battleRoom.IntRoom();
+        _battleRoom.InitRoom();
     }
     private void OnDestroy()
     {
-        // 释放资源句柄
+        // Release asset handle.
         if (_windowHandle != null)
         {
             _windowHandle.Release();
             _windowHandle = null;
         }
 
-        // 释放资源句柄
+        // Release asset handle.
         if (_musicHandle != null)
         {
             _musicHandle.Release();
             _musicHandle = null;
         }
 
-        // 释放资源句柄
+        // Release battle room.
         if (_battleRoom != null)
         {
             _battleRoom.DestroyRoom();
             _battleRoom = null;
         }
 
-        // 切换场景的时候释放资源
+        // Release unused assets after changing scenes.
         if (YooAssets.IsInitialized)
         {
             var package = YooAssets.GetPackage("DefaultPackage");

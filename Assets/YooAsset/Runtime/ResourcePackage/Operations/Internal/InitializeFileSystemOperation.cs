@@ -28,10 +28,12 @@ namespace YooAsset
             _host = host;
             _parametersList = parametersList;
         }
+        /// <inheritdoc />
         protected override void InternalStart()
         {
             _steps = ESteps.Prepare;
         }
+        /// <inheritdoc />
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)

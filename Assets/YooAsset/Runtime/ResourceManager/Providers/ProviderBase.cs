@@ -71,6 +71,11 @@ namespace YooAsset
         public bool IsDestroyed { private set; get; } = false;
 
         /// <summary>
+        /// 是否已收到强制销毁请求
+        /// </summary>
+        public bool ForceDestroyRequested { private set; get; } = false;
+
+        /// <summary>
         /// 加载任务是否进行中
         /// </summary>
         private bool IsLoading
@@ -127,7 +132,18 @@ namespace YooAsset
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            // 注意：未在加载中的任务可以挂起！
+            if (ForceDestroyRequested)
+            {
+                if (IsLoading == false)
+                {
+                    SetFail("Provider force destroyed during package destruction.");
+                    return;
+                }
+
+                // 注意：已进入加载阶段则继续等待自然完成
+            }
+
+            // 注意：未在加载中的任务可以挂起
             if (IsLoading == false)
             {
                 if (RefCount <= 0)
@@ -206,8 +222,14 @@ namespace YooAsset
         /// <summary>
         /// 销毁资源提供者
         /// </summary>
+        /// <remarks>
+        /// 该方法是幂等的，重复调用不会重复释放资源。
+        /// </remarks>
         public void DestroyProvider()
         {
+            if (IsDestroyed)
+                return;
+
             IsDestroyed = true;
 
             // 检测是否为正常销毁
@@ -222,6 +244,14 @@ namespace YooAsset
             {
                 bundleLoader.Release();
             }
+        }
+
+        /// <summary>
+        /// 请求强制销毁
+        /// </summary>
+        public void RequestForceDestroy()
+        {
+            ForceDestroyRequested = true;
         }
 
         /// <summary>

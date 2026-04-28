@@ -13,17 +13,17 @@
         {
             "name": "com.tuyoogame.yooasset",
             "expression": "",
-            "define": "YOO_ASSET_2"
+            "define": "YOO_ASSET_3"
         },
         {
             "name": "com.tuyoogame.yooasset",
-            "expression": "2.3",
-            "define": "YOO_ASSET_2_3"
+            "expression": "3.0.0-beta",
+            "define": "YOO_ASSET_3_0"
         },
         {
             "name": "com.tuyoogame.yooasset",
-            "expression": "2.3",
-            "define": "YOO_ASSET_2_3_OR_NEWER"
+            "expression": "3.0.0-beta",
+            "define": "YOO_ASSET_3_0_OR_NEWER"
         }
     ],
     "noEngineReferences": false

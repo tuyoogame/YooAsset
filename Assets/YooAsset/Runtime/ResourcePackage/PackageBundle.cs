@@ -72,11 +72,16 @@ namespace YooAsset
         /// </summary>
         [NonSerialized]
         public readonly List<int> ReferrerBundleIDs = new List<int>(10);
+        [NonSerialized]
         private readonly HashSet<int> _referrerBundleIDs = new HashSet<int>();
 
+        [NonSerialized]
         private PackageManifest _manifest;
+        [NonSerialized]
         private bool _isInitialized;
+        [NonSerialized]
         private int _bundleType;
+        [NonSerialized]
         private string _fileName;
 
 
@@ -166,6 +171,7 @@ namespace YooAsset
         }
 
         #region 调试信息
+        [NonSerialized]
         private List<string> _debugReferrerBundleNames;
 
         /// <summary>

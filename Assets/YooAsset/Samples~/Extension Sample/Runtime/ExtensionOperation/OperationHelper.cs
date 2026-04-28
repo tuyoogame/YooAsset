@@ -1,16 +1,21 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using YooAsset;
 
-public class OperationHelper
+/// <summary>
+/// 提供业务自定义操作的启动入口
+/// </summary>
+public static class OperationHelper
 {
     /// <summary>
-    /// 开始一个业务实现的自定义异步任务
+    /// 启动业务自定义操作
     /// </summary>
-    public static void StartOperation(AsyncOperationBase operation)
+    /// <param name="packageName">调度器或资源包裹名称</param>
+    /// <param name="operation">待启动的操作实例</param>
+    public static void StartOperation(string packageName, AsyncOperationBase operation)
     {
-        AsyncOperationSystem.StartOperation(AsyncOperationSystem.GlobalSchedulerName, operation);
+        AsyncOperationSystem.StartOperation(packageName, operation);
     }
 }
