@@ -15,7 +15,9 @@
 /Bundles/
 /ProjectSettings/
 /App/
-/yoo/ 
+/yoo/
+/Assets/Docs
+/Assets/Docs.meta
 /Assets/StreamingAssets
 /Assets/StreamingAssets.meta
 /Assets/Samples
@@ -70,6 +72,7 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+*.zip
 
 # Crashlytics generated file
 crashlytics-build.properties
