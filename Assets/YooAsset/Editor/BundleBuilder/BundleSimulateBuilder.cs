@@ -16,9 +16,7 @@ namespace YooAsset.Editor
         /// <returns>包裹构建结果</returns>
         public static PackageBuildResult SimulateBuild(PackageBuildParameters buildParam)
         {
-            string packageName = buildParam.PackageName;
             string buildPipelineName = buildParam.BuildPipelineName;
-
             if (buildPipelineName == EBuildPipeline.EditorSimulateBuildPipeline.ToString())
             {
                 var buildParameters = new EditorSimulateBuildParameters();
@@ -27,7 +25,7 @@ namespace YooAsset.Editor
                 buildParameters.BuildPipeline = EBuildPipeline.EditorSimulateBuildPipeline.ToString();
                 buildParameters.BuildBundleType = buildParam.BuildBundleType;
                 buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
-                buildParameters.PackageName = packageName;
+                buildParameters.PackageName = buildParam.PackageName;
                 buildParameters.PackageVersion = "Simulate";
                 buildParameters.FileNameStyle = EFileNameStyle.HashName;
                 buildParameters.BundledCopyOption = EBundledCopyOption.None;

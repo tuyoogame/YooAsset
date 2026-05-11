@@ -38,7 +38,7 @@ internal class FsmInitializePackage : IStateNode
         InitializePackageOperation initializationOperation = null;
         if (playMode == EPlayMode.EditorSimulateMode)
         {
-            var buildResult = EditorSimulateBuildInvoker.Build(packageName, (int)EBundleType.VirtualBundle);
+            var buildResult = EditorSimulateBuildInvoker.Build(packageName, (int)EBundleType.VirtualAssetBundle);
             var packageRoot = buildResult.PackageRootDirectory;
             var createParameters = new EditorSimulateModeOptions();
             createParameters.EditorFileSystemParameters = FileSystemParameters.CreateDefaultEditorFileSystemParameters(packageRoot);

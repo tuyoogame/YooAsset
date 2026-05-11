@@ -36,7 +36,6 @@ namespace YooAsset.Editor
         /// <remarks>开启此项可以节省运行时清单占用的内存</remarks>
         public bool ReplaceAssetPathWithAddress = false;
 
-
         /// <summary>
         /// 获取旧版构建管线的构建选项
         /// </summary>

@@ -1,4 +1,3 @@
-using System;
 
 namespace YooAsset.Editor
 {
@@ -15,6 +14,9 @@ namespace YooAsset.Editor
 
             // 检测构建参数
             buildParametersContext.CheckBuildParameters();
+
+            // 检测未保存场景
+            CheckDirtyScenes();
 
             // 删除历史缓存
             if (buildParameters.ClearBuildCacheFiles)

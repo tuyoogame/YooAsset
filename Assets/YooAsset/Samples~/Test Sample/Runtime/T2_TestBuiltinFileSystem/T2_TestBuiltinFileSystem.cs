@@ -18,6 +18,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
 {
     public const string ASSET_BUNDLE_PACKAGE_ROOT_KEY = "T2_ASSET_BUNDLE_PACKAGE_ROOT_KEY";
     public const string RAW_BUNDLE_PACKAGE_ROOT_KEY = "T2_RAW_BUNDLE_PACKAGE_ROOT_KEY";
+    public const string ARCHIVE_BUNDLE_PACKAGE_ROOT_KEY = "T2_ARCHIVE_BUNDLE_PACKAGE_ROOT_KEY";
 
     void IPrebuildSetup.Setup()
     {
@@ -42,6 +43,17 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
             buildParams.MethodName = "BuildPackage";
             var simulateResult = PackageBuildInvoker.InvokeBuild(buildParams);
             UnityEditor.EditorPrefs.SetString(RAW_BUNDLE_PACKAGE_ROOT_KEY, simulateResult.PackageRootDirectory);
+        }
+
+        // 构建ArchiveBundlePackage
+        {
+            var buildParams = new PackageBuildParameters(TestConsts.ArchiveBundlePackageName);
+            buildParams.BuildPipelineName = "ArchiveFileBuildPipeline";
+            buildParams.AssemblyName = "YooAsset.Tests.Editor";
+            buildParams.TypeFullName = "TestPackageBuilder";
+            buildParams.MethodName = "BuildPackage";
+            var simulateResult = PackageBuildInvoker.InvokeBuild(buildParams);
+            UnityEditor.EditorPrefs.SetString(ARCHIVE_BUNDLE_PACKAGE_ROOT_KEY, simulateResult.PackageRootDirectory);
         }
 #endif
     }
@@ -127,6 +139,42 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
                 Debug.LogError(loadPackageManifestOp.Error);
             Assert.AreEqual(EOperationStatus.Succeeded, loadPackageManifestOp.Status);
         }
+
+        // 初始化资源包 ARCHIVE_BUNDLE
+        {
+            string packageRoot = string.Empty;
+#if UNITY_EDITOR
+            packageRoot = UnityEditor.EditorPrefs.GetString(ARCHIVE_BUNDLE_PACKAGE_ROOT_KEY);
+#endif
+            if (Directory.Exists(packageRoot) == false)
+                throw new Exception($"Not found package root : {packageRoot}");
+
+            var package = YooAssets.CreatePackage(TestConsts.ArchiveBundlePackageName);
+
+            // 初始化资源包
+            var initParams = new OfflinePlayModeOptions();
+            initParams.BuiltinFileSystemParameters = FileSystemParameters.CreateDefaultBuiltinFileSystemParameters(packageRoot);
+            var initializeOp = package.InitializePackageAsync(initParams);
+            yield return initializeOp;
+            if (initializeOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(initializeOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, initializeOp.Status);
+
+            // 请求资源版本
+            var requestVersionOp = package.RequestPackageVersionAsync();
+            yield return requestVersionOp;
+            if (requestVersionOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(requestVersionOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, requestVersionOp.Status);
+
+            // 更新资源清单
+            var loadPackageManifestOptions = new LoadPackageManifestOptions(requestVersionOp.PackageVersion, 60);
+            var loadPackageManifestOp = package.LoadPackageManifestAsync(loadPackageManifestOptions);
+            yield return loadPackageManifestOp;
+            if (loadPackageManifestOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(loadPackageManifestOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, loadPackageManifestOp.Status);
+        }
     }
 
     [UnityTest]
@@ -163,7 +211,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
         var tester = new TestLoadAllAssets();
         yield return tester.RuntimeTester();
     }
-    
+
     [UnityTest]
     public IEnumerator B06_TestLoadGameObject()
     {
@@ -200,7 +248,14 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator B11_TestUniTask()
+    public IEnumerator B11_TestLoadArchiveBundle()
+    {
+        var tester = new TestLoadArchiveBundle();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator B12_TestUniTask()
     {
         var tester = new TestUniTask();
         yield return tester.RuntimeTester();
@@ -212,7 +267,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
         var tester = new TestBundleEncryption();
         yield return tester.RuntimeTester();
     }
-    
+
     [UnityTest]
     public IEnumerator C02_TestResourceUnpacker()
     {
@@ -295,6 +350,6 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
     public IEnumerator Z_DestroyPackage()
     {
         var tester = new TestDestroyPackage();
-        yield return tester.RuntimeTester(true);
+        yield return tester.RuntimeTester(true, true);
     }
 }

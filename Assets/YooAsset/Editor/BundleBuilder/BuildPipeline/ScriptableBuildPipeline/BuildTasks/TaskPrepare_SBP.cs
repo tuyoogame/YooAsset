@@ -1,4 +1,3 @@
-using System;
 
 namespace YooAsset.Editor
 {
@@ -11,7 +10,7 @@ namespace YooAsset.Editor
         void IBuildTask.Run(BuildContext context)
         {
             var buildParametersContext = context.GetContextObject<BuildParametersContext>();
-            var buildParameters = buildParametersContext.Parameters as ScriptableBuildParameters;
+            var buildParameters = buildParametersContext.Parameters;
 
             // 检测构建参数
             buildParametersContext.CheckBuildParameters();
@@ -29,13 +28,6 @@ namespace YooAsset.Editor
 
             // 准备输出目录
             PrepareOutputDirectory(buildParameters);
-
-            // 检测内置着色器资源包名称
-            if (string.IsNullOrEmpty(buildParameters.BuiltinShadersBundleName))
-            {
-                string warning = BuildLogger.GetErrorMessage(ErrorCode.BuiltinShadersBundleNameIsNull, "Builtin shaders bundle name is null. It will cause resource redundancy.");
-                BuildLogger.Warning(warning);
-            }
         }
     }
 }

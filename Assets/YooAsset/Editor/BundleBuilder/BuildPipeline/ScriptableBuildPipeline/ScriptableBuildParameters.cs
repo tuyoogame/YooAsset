@@ -72,6 +72,17 @@ namespace YooAsset.Editor
         public string MonoScriptsBundleName;
 
 
+        /// <inheritdoc />
+        protected override void CheckBuildParametersCore() 
+        {
+            // 检测内置着色器资源包名称
+            if (string.IsNullOrEmpty(BuiltinShadersBundleName))
+            {
+                string warning = BuildLogger.GetErrorMessage(ErrorCode.BuiltinShadersBundleNameIsNull, "Builtin shaders bundle name is null. It will cause resource redundancy.");
+                BuildLogger.Warning(warning);
+            }
+        }
+
         /// <summary>
         /// 获取可编程构建管线的构建参数
         /// </summary>

@@ -137,6 +137,11 @@ namespace YooAsset
                 var operation = new SBCLoadRawBundleOperation(this, options.Bundle);
                 return operation;
             }
+            else if (options.Bundle.GetBundleType() == (int)EBundleType.ArchiveBundle)
+            {
+                var operation = new SBCLoadArchiveBundleOperation(this, options.Bundle);
+                return operation;
+            }
             else
             {
                 string error = $"{nameof(SandboxBundleCache)} does not support bundle type: {options.Bundle.GetBundleType()}.";

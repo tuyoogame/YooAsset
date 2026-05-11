@@ -18,6 +18,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
 {
     private const string ASSET_BUNDLE_PACKAGE_ROOT_KEY = "T1_ASSET_BUNDLE_PACKAGE_ROOT_KEY";
     private const string RAW_BUNDLE_PACKAGE_ROOT_KEY = "T1_RAW_BUNDLE_PACKAGE_ROOT_KEY";
+    private const string ARCHIVE_BUNDLE_PACKAGE_ROOT_KEY = "T1_ARCHIVE_BUNDLE_PACKAGE_ROOT_KEY";
 
     void IPrebuildSetup.Setup()
     {
@@ -26,7 +27,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
         {
             var simulateParams = new PackageBuildParameters(TestConsts.AssetBundlePackageName);
             simulateParams.BuildPipelineName = "EditorSimulateBuildPipeline";
-            simulateParams.BuildBundleType = (int)EBundleType.VirtualBundle;
+            simulateParams.BuildBundleType = (int)EBundleType.VirtualAssetBundle;
             simulateParams.AssemblyName = "YooAsset.Tests.Editor";
             simulateParams.TypeFullName = "TestPackageBuilder";
             simulateParams.MethodName = "BuildPackage";
@@ -34,16 +35,28 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
             UnityEditor.EditorPrefs.SetString(ASSET_BUNDLE_PACKAGE_ROOT_KEY, simulateResult.PackageRootDirectory);
         }
 
-        // 构建资源包
+        // 构建原生资源包
         {
             var simulateParams = new PackageBuildParameters(TestConsts.RawBundlePackageName);
             simulateParams.BuildPipelineName = "EditorSimulateBuildPipeline";
-            simulateParams.BuildBundleType = (int)EBundleType.RawBundle;
+            simulateParams.BuildBundleType = (int)EBundleType.VirtualRawBundle;
             simulateParams.AssemblyName = "YooAsset.Tests.Editor";
             simulateParams.TypeFullName = "TestPackageBuilder";
             simulateParams.MethodName = "BuildPackage";
             var simulateResult = PackageBuildInvoker.InvokeBuild(simulateParams);
             UnityEditor.EditorPrefs.SetString(RAW_BUNDLE_PACKAGE_ROOT_KEY, simulateResult.PackageRootDirectory);
+        }
+
+        // 构建归档资源包
+        {
+            var simulateParams = new PackageBuildParameters(TestConsts.ArchiveBundlePackageName);
+            simulateParams.BuildPipelineName = "EditorSimulateBuildPipeline";
+            simulateParams.BuildBundleType = (int)EBundleType.VirtualArchiveBundle;
+            simulateParams.AssemblyName = "YooAsset.Tests.Editor";
+            simulateParams.TypeFullName = "TestPackageBuilder";
+            simulateParams.MethodName = "BuildPackage";
+            var simulateResult = PackageBuildInvoker.InvokeBuild(simulateParams);
+            UnityEditor.EditorPrefs.SetString(ARCHIVE_BUNDLE_PACKAGE_ROOT_KEY, simulateResult.PackageRootDirectory);
         }
 #endif
     }
@@ -101,6 +114,42 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
                 throw new Exception($"Not found package root : {packageRoot}");
 
             var package = YooAssets.CreatePackage(TestConsts.RawBundlePackageName);
+
+            // 初始化资源包
+            var initParams = new EditorSimulateModeOptions();
+            initParams.EditorFileSystemParameters = FileSystemParameters.CreateDefaultEditorFileSystemParameters(packageRoot);
+            var initializeOp = package.InitializePackageAsync(initParams);
+            yield return initializeOp;
+            if (initializeOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(initializeOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, initializeOp.Status);
+
+            // 请求资源版本
+            var requestVersionOp = package.RequestPackageVersionAsync();
+            yield return requestVersionOp;
+            if (requestVersionOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(requestVersionOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, requestVersionOp.Status);
+
+            // 更新资源清单
+            var loadPackageManifestOptions = new LoadPackageManifestOptions(requestVersionOp.PackageVersion, 60);
+            var loadPackageManifestOp = package.LoadPackageManifestAsync(loadPackageManifestOptions);
+            yield return loadPackageManifestOp;
+            if (loadPackageManifestOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(loadPackageManifestOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, loadPackageManifestOp.Status);
+        }
+
+        // 初始化资源包 ARCHIVE_BUNDLE
+        {
+            string packageRoot = string.Empty;
+#if UNITY_EDITOR
+            packageRoot = UnityEditor.EditorPrefs.GetString(ARCHIVE_BUNDLE_PACKAGE_ROOT_KEY);
+#endif
+            if (Directory.Exists(packageRoot) == false)
+                throw new Exception($"Not found package root : {packageRoot}");
+
+            var package = YooAssets.CreatePackage(TestConsts.ArchiveBundlePackageName);
 
             // 初始化资源包
             var initParams = new EditorSimulateModeOptions();
@@ -199,7 +248,14 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator B11_TestUniTask()
+    public IEnumerator B11_TestLoadArchiveBundle()
+    {
+        var tester = new TestLoadArchiveBundle();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator B12_TestUniTask()
     {
         var tester = new TestUniTask();
         yield return tester.RuntimeTester();
@@ -265,6 +321,6 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     public IEnumerator Z_DestroyPackage()
     {
         var tester = new TestDestroyPackage();
-        yield return tester.RuntimeTester(true);
+        yield return tester.RuntimeTester(true, true);
     }
 }

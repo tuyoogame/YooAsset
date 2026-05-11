@@ -9,6 +9,7 @@ namespace YooAsset
     {
         private byte[] _bytes;
         private RawFileObject _cachedObject;
+        private bool _isUnloaded;
 
         /// <summary>
         /// 创建实例
@@ -18,7 +19,9 @@ namespace YooAsset
         {
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
+
             _bytes = bytes;
+            _isUnloaded = false;
         }
 
         /// <summary>
@@ -27,18 +30,20 @@ namespace YooAsset
         /// <returns>创建得到的原生文件对象</returns>
         public RawFileObject CreateRawFileObject()
         {
-            if (_bytes == null)
+            if (_isUnloaded)
                 throw new InvalidOperationException($"{nameof(RawBundle)} has been unloaded.");
+
             if (_cachedObject == null)
                 _cachedObject = RawFileObject.CreateFromBytes(_bytes);
             return _cachedObject;
         }
 
         /// <summary>
-        /// 卸载原生资源包并释放字节数据
+        /// 卸载原生资源包
         /// </summary>
         public void Unload()
         {
+            _isUnloaded = true;
             if (_cachedObject != null)
             {
                 _cachedObject.Release();

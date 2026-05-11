@@ -400,6 +400,9 @@ namespace YooAsset
             if (bundle.GetBundleType() == (int)EBundleType.RawBundle)
                 return true;
 
+            if (bundle.GetBundleType() == (int)EBundleType.ArchiveBundle)
+                return true;
+
             return false;
 #else
             return false;

@@ -20,8 +20,6 @@ namespace YooAsset.Editor
         {
             string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
             BuildLogger.Log($"Start making patch package: '{packageOutputDirectory}'.");
-
-            // 拷贝所有补丁文件
             CopyPackageBundles(buildMapContext);
         }
     }

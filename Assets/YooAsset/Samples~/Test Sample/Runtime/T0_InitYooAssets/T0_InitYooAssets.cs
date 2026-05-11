@@ -23,6 +23,7 @@ public class T0_InitYooAssets : IPrebuildSetup, IPostBuildCleanup
         // 创建包裹配置
         CreateAssetBundlePackageCollector();
         CreateRawBundlePackageCollector();
+        CreateArchiveBundlePackageCollector();
 
         // 修正配置路径为空导致的错误
         YooAsset.Editor.BundleCollectorSettingData.FixFile();
@@ -233,6 +234,23 @@ public class T0_InitYooAssets : IPrebuildSetup, IPostBuildCleanup
             collector1.CollectorType = YooAsset.Editor.ECollectorType.MainAssetCollector;
             collector1.PackRuleName = nameof(YooAsset.Editor.PackRawFile);
             YooAsset.Editor.BundleCollectorSettingData.CreateCollector(rawFileGroup, collector1);
+        }
+    }
+    private static void CreateArchiveBundlePackageCollector()
+    {
+        var archivePackage = YooAsset.Editor.BundleCollectorSettingData.CreatePackage(TestConsts.ArchiveBundlePackageName);
+        archivePackage.EnableAddressable = true;
+        archivePackage.AutoCollectShaders = false;
+        archivePackage.IgnoreRuleName = "RawFileIgnoreRule";
+
+        var archiveFileGroup = YooAsset.Editor.BundleCollectorSettingData.CreateGroup(archivePackage, "ArchiveFileGroup");
+        {
+            var collector1 = new YooAsset.Editor.BundleCollector();
+            collector1.CollectPath = "";
+            collector1.CollectorGUID = "fddaaf9430e24344196cc82ac3d006b4"; //TestRes/RawFiles目录
+            collector1.CollectorType = YooAsset.Editor.ECollectorType.MainAssetCollector;
+            collector1.PackRuleName = nameof(YooAsset.Editor.PackCollector);
+            YooAsset.Editor.BundleCollectorSettingData.CreateCollector(archiveFileGroup, collector1);
         }
     }
 #endif

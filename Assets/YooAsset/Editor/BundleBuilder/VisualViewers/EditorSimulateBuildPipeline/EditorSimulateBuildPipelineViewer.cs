@@ -80,7 +80,7 @@ namespace YooAsset.Editor
             buildParameters.BuildOutputRoot = BundleBuilderHelper.GetDefaultBuildOutputRoot();
             buildParameters.BundledFileRoot = BundleBuilderHelper.GetStreamingAssetsRoot();
             buildParameters.BuildPipeline = PipelineName.ToString();
-            buildParameters.BuildBundleType = (int)EBundleType.VirtualBundle;
+            buildParameters.BuildBundleType =  (int)EBundleType.VirtualAssetBundle;
             buildParameters.BuildTarget = BuildTarget;
             buildParameters.PackageName = PackageName;
             buildParameters.PackageVersion = _buildVersionField.value;

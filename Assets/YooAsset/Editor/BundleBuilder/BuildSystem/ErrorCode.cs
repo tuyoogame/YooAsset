@@ -59,6 +59,16 @@ namespace YooAsset.Editor
         BuildBundleTypeIsUnknown = 117,
 
         /// <summary>
+        /// 构建管线不支持指定的资源包类型
+        /// </summary>
+        BuildBundleTypeNotSupported = 118,
+
+        /// <summary>
+        /// 构建管线不支持资源包加密
+        /// </summary>
+        BundleEncryptionNotSupported = 119,
+
+        /// <summary>
         /// 建议使用 SBP 构建管线
         /// </summary>
         RecommendScriptBuildPipeline = 130,

@@ -117,14 +117,19 @@ namespace YooAsset
         /// <inheritdoc />
         public BCLoadBundleOperation LoadBundleAsync(BCLoadBundleOptions options)
         {
-            if (options.Bundle.GetBundleType() == (int)EBundleType.VirtualBundle)
+            if (options.Bundle.GetBundleType() == (int)EBundleType.VirtualAssetBundle)
             {
-                var operation = new EBCLoadVirtualBundleOperation(this, options.Bundle);
+                var operation = new EBCLoadVirtualAssetBundleOperation(this, options.Bundle);
                 return operation;
             }
-            else if (options.Bundle.GetBundleType() == (int)EBundleType.RawBundle)
+            else if (options.Bundle.GetBundleType() == (int)EBundleType.VirtualRawBundle)
             {
-                var operation = new EBCLoadRawBundleOperation(this, options.Bundle);
+                var operation = new EBCLoadVirtualRawBundleOperation(this, options.Bundle);
+                return operation;
+            }
+            else if (options.Bundle.GetBundleType() == (int)EBundleType.VirtualArchiveBundle)
+            {
+                var operation = new EBCLoadVirtualArchiveBundleOperation(this, options.Bundle);
                 return operation;
             }
             else

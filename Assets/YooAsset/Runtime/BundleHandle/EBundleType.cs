@@ -12,11 +12,6 @@ namespace YooAsset
         None = 0,
 
         /// <summary>
-        /// 虚拟资源包（模拟AssetBundle）
-        /// </summary>
-        VirtualBundle = 1,
-
-        /// <summary>
         /// Unity引擎资源包
         /// </summary>
         AssetBundle = 2,
@@ -25,10 +20,31 @@ namespace YooAsset
         /// 原生文件资源包
         /// </summary>
         RawBundle = 3,
-        
+
+        /// <summary>
+        /// 归档文件资源包
+        /// </summary>
+        ArchiveBundle = 4,
+
         /// <summary>
         /// 团结引擎资源包
         /// </summary>
-        InstantBundle = 4,
+        InstantBundle = 5,
+
+
+        /// <summary>
+        /// 虚拟 Unity 引擎资源包（编辑器模拟 AssetBundle）
+        /// </summary>
+        VirtualAssetBundle = 12,
+
+        /// <summary>
+        /// 虚拟原生文件资源包（编辑器模拟 RawBundle）
+        /// </summary>
+        VirtualRawBundle = 13,
+
+        /// <summary>
+        /// 虚拟归档文件资源包（编辑器模拟 ArchiveBundle）
+        /// </summary>
+        VirtualArchiveBundle = 14,
     }
 }

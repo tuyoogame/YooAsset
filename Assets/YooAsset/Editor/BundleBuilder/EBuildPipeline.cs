@@ -30,5 +30,10 @@ namespace YooAsset.Editor
         /// 团结引擎 InstantAsset 构建管线 (IABP)
         /// </summary>
         InstantAssetBuildPipeline,
+
+        /// <summary>
+        /// 归档文件构建管线 (AFBP)
+        /// </summary>
+        ArchiveFileBuildPipeline,
     }
 }

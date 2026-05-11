@@ -118,6 +118,11 @@ namespace YooAsset
                 var operation = new BBCLoadRawBundleOperation(this, options.Bundle);
                 return operation;
             }
+            else if (options.Bundle.GetBundleType() == (int)EBundleType.ArchiveBundle)
+            {
+                var operation = new BBCLoadArchiveBundleOperation(this, options.Bundle);
+                return operation;
+            }
             else
             {
                 string error = $"{nameof(BuiltinBundleCache)} does not support bundle type: {options.Bundle.GetBundleType()}.";

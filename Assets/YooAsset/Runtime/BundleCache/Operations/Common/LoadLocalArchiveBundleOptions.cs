@@ -1,0 +1,31 @@
+
+namespace YooAsset
+{
+    /// <summary>
+    /// 加载 ArchiveBundle 的上下文信息
+    /// </summary>
+    internal readonly struct LoadLocalArchiveBundleOptions
+    {
+        /// <summary>
+        /// 文件缓存名称
+        /// </summary>
+        public string CacheName { get; }
+
+        /// <summary>
+        /// 资源包描述
+        /// </summary>
+        public PackageBundle Bundle { get; }
+
+        /// <summary>
+        /// 文件加载路径
+        /// </summary>
+        public string FilePath { get; }
+
+        public LoadLocalArchiveBundleOptions(string cacheName, PackageBundle bundle, string filePath)
+        {
+            CacheName = cacheName;
+            Bundle = bundle;
+            FilePath = filePath;
+        }
+    }
+}

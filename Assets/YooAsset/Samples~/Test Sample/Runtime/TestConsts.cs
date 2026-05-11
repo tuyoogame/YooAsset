@@ -15,6 +15,11 @@ public class TestConsts
     public const string RawBundlePackageName = "RawBundleTestPackage";
 
     /// <summary>
+    /// ArchiveBundle 测试包裹名称
+    /// </summary>
+    public const string ArchiveBundlePackageName = "ArchiveBundleTestPackage";
+
+    /// <summary>
     /// sound.wav 资源的 GUID (TestRes/Audio/sound.wav)
     /// </summary>
     public const string SoundAssetGuid = "676dc35635dfd0f48926bcb790a2fd18";

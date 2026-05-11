@@ -1,8 +1,5 @@
 using System;
 using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 
 namespace YooAsset.Editor
 {
@@ -19,18 +16,7 @@ namespace YooAsset.Editor
 
         protected override string GetUnityHash(BuildBundleInfo bundleInfo, BuildContext context)
         {
-            var buildParametersContext = context.GetContextObject<BuildParametersContext>();
-            var rawFileBuildParameters = buildParametersContext.Parameters as RawFileBuildParameters;
-            if (rawFileBuildParameters.IncludePathInHash)
-            {
-                string filePath = bundleInfo.PackageSourceFilePath;
-                return GetFileMD5IncludePath(filePath);
-            }
-            else
-            {
-                string filePath = bundleInfo.PackageSourceFilePath;
-                return HashUtility.ComputeFileMD5(filePath);
-            }
+            return ComputeFileHash(bundleInfo, context);
         }
         protected override uint GetUnityCRC(BuildBundleInfo bundleInfo, BuildContext context)
         {
@@ -38,18 +24,7 @@ namespace YooAsset.Editor
         }
         protected override string GetBundleFileHash(BuildBundleInfo bundleInfo, BuildContext context)
         {
-            var buildParametersContext = context.GetContextObject<BuildParametersContext>();
-            var rawFileBuildParameters = buildParametersContext.Parameters as RawFileBuildParameters;
-            if (rawFileBuildParameters.IncludePathInHash)
-            {
-                string filePath = bundleInfo.PackageSourceFilePath;
-                return GetFileMD5IncludePath(filePath);
-            }
-            else
-            {
-                string filePath = bundleInfo.PackageSourceFilePath;
-                return HashUtility.ComputeFileMD5(filePath);
-            }
+            return ComputeFileHash(bundleInfo, context);
         }
         protected override uint GetBundleFileCRC(BuildBundleInfo bundleInfo, BuildContext context)
         {
@@ -62,12 +37,15 @@ namespace YooAsset.Editor
             return FileUtility.GetFileSize(filePath);
         }
 
-        private string GetFileMD5IncludePath(string filePath)
+        private string ComputeFileHash(BuildBundleInfo bundleInfo, BuildContext context)
         {
-            string pathHash = HashUtility.ComputeMD5(filePath.ToLowerInvariant());
-            string contentHash = HashUtility.ComputeFileMD5(filePath);
-            string combined = pathHash + contentHash;
-            return HashUtility.ComputeMD5(combined);
+            var buildParametersContext = context.GetContextObject<BuildParametersContext>();
+            var parameters = buildParametersContext.Parameters as RawFileBuildParameters;
+            string filePath = bundleInfo.PackageSourceFilePath;
+            if (parameters.IncludePathInHash)
+                return GetFileMD5IncludePath(filePath);
+            else
+                return HashUtility.ComputeFileMD5(filePath);
         }
     }
 }

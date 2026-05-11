@@ -1,5 +1,4 @@
-﻿
-namespace YooAsset.Editor
+﻿namespace YooAsset.Editor
 {
     /// <summary>
     /// 编辑器模拟构建管线的构建映射生成任务
@@ -13,9 +12,16 @@ namespace YooAsset.Editor
             var buildMapContext = CreateBuildMap(true, buildParametersContext.Parameters);
             context.SetContextObject(buildMapContext);
 
-            if (buildParametersContext.Parameters.BuildBundleType == (int)EBundleType.RawBundle)
+            // 注意：检查每个原生文件资源包只能包含一个原生文件
+            if (buildParametersContext.Parameters.BuildBundleType == (int)EBundleType.VirtualRawBundle)
             {
                 CheckRawBundleMapContent(buildMapContext);
+            }
+
+            // 检查归档资源包内每个子文件大小不超过上限
+            if (buildParametersContext.Parameters.BuildBundleType == (int)EBundleType.VirtualArchiveBundle)
+            {
+                CheckArchiveBundleMapContent(buildMapContext);
             }
         }
     }
