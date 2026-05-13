@@ -32,9 +32,9 @@ namespace YooAsset
         LoadScene,
 
         /// <summary>
-        /// 加载原生文件
+        /// 加载资源包文件
         /// </summary>
-        LoadRawFile,
+        LoadBundleFile,
     }
 
     /// <summary>

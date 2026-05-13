@@ -101,8 +101,8 @@ namespace Cysharp.Threading.Tasks
                     case SubAssetsHandle sub_asset_handle:
                         sub_asset_handle.Completed += result.SubContinuation;
                         break;
-                    case RawFileHandle raw_file_handle:
-                        raw_file_handle.Completed += result.RawFileContinuation;
+                    case BundleFileHandle bundle_file_handle:
+                        bundle_file_handle.Completed += result.BundleFileContinuation;
                         break;
                     case AllAssetsHandle all_assets_handle:
                         all_assets_handle.Completed += result.AllAssetsContinuation;
@@ -120,8 +120,8 @@ namespace Cysharp.Threading.Tasks
                     case SubAssetsHandle sub_asset_handle:
                         sub_asset_handle.Completed += result.completedCallback;
                         break;
-                    case RawFileHandle raw_file_handle:
-                        raw_file_handle.Completed += result.completedCallback;
+                    case BundleFileHandle bundle_file_handle:
+                        bundle_file_handle.Completed += result.completedCallback;
                         break;
                     case AllAssetsHandle all_assets_handle:
                         all_assets_handle.Completed += result.completedCallback;
@@ -137,7 +137,7 @@ namespace Cysharp.Threading.Tasks
             void AssetContinuation(AssetHandle _) => HandleCompleted(null);
             void SceneContinuation(SceneHandle _) => HandleCompleted(null);
             void SubContinuation(SubAssetsHandle _) => HandleCompleted(null);
-            void RawFileContinuation(RawFileHandle _) => HandleCompleted(null);
+            void BundleFileContinuation(BundleFileHandle _) => HandleCompleted(null);
             void AllAssetsContinuation(AllAssetsHandle _) => HandleCompleted(null);
 #endif
 
@@ -174,8 +174,8 @@ namespace Cysharp.Threading.Tasks
                     case SubAssetsHandle sub_asset_handle:
                         sub_asset_handle.Completed -= SubContinuation;
                         break;
-                    case RawFileHandle raw_file_handle:
-                        raw_file_handle.Completed -= RawFileContinuation;
+                    case BundleFileHandle bundle_file_handle:
+                        bundle_file_handle.Completed -= BundleFileContinuation;
                         break;
                     case AllAssetsHandle all_assets_handle:
                         all_assets_handle.Completed -= AllAssetsContinuation;
@@ -193,8 +193,8 @@ namespace Cysharp.Threading.Tasks
                     case SubAssetsHandle sub_asset_handle:
                         sub_asset_handle.Completed -= completedCallback;
                         break;
-                    case RawFileHandle raw_file_handle:
-                        raw_file_handle.Completed -= completedCallback;
+                    case BundleFileHandle bundle_file_handle:
+                        bundle_file_handle.Completed -= completedCallback;
                         break;
                     case AllAssetsHandle all_assets_handle:
                         all_assets_handle.Completed -= completedCallback;

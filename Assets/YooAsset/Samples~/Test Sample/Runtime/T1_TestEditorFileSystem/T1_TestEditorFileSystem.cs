@@ -239,11 +239,11 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
         var tester = new TestLoadScene();
         yield return tester.RuntimeTester();
     }
-
+    
     [UnityTest]
-    public IEnumerator B10_TestLoadRawFile()
+    public IEnumerator B10_TestLoadBundleFile()
     {
-        var tester = new TestLoadRawFile();
+        var tester = new TestLoadBundleFile();
         yield return tester.RuntimeTester();
     }
 
@@ -304,9 +304,9 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator C07_TestRawFileRelease()
+    public IEnumerator C07_TestBundleFileRelease()
     {
-        var tester = new TestRawFileRelease();
+        var tester = new TestBundleFileRelease();
         yield return tester.RuntimeTester();
     }
 

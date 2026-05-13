@@ -2,13 +2,13 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 原生文件句柄，用于访问未经 Unity 处理的原始文件。
+    /// 资源包文件句柄，用于持有已加载的资源包引用。
     /// </summary>
-    public sealed partial class RawFileHandle : HandleBase
+    public sealed partial class BundleFileHandle : HandleBase
     {
-        private System.Action<RawFileHandle> _callback;
+        private System.Action<BundleFileHandle> _callback;
 
-        internal RawFileHandle(ProviderBase provider) : base(provider)
+        internal BundleFileHandle(ProviderBase provider) : base(provider)
         {
         }
         internal override void InvokeCallback()
@@ -19,12 +19,12 @@ namespace YooAsset
         /// <summary>
         /// 当加载完成时触发
         /// </summary>
-        public event System.Action<RawFileHandle> Completed
+        public event System.Action<BundleFileHandle> Completed
         {
             add
             {
                 if (CheckValidWithWarning() == false)
-                    throw new YooHandleInvalidException($"{nameof(RawFileHandle)} is invalid. It may have been released or the provider was destroyed.");
+                    throw new YooHandleInvalidException($"{nameof(BundleFileHandle)} is invalid. It may have been released or the provider was destroyed.");
                 if (Provider.IsDone)
                     value.Invoke(this);
                 else
@@ -33,7 +33,7 @@ namespace YooAsset
             remove
             {
                 if (CheckValidWithWarning() == false)
-                    throw new YooHandleInvalidException($"{nameof(RawFileHandle)} is invalid. It may have been released or the provider was destroyed.");
+                    throw new YooHandleInvalidException($"{nameof(BundleFileHandle)} is invalid. It may have been released or the provider was destroyed.");
                 _callback -= value;
             }
         }
@@ -49,10 +49,10 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 获取原生文件的路径
+        /// 获取资源包文件的路径
         /// </summary>
-        /// <returns>原生文件的磁盘路径</returns>
-        public string GetRawFilePath()
+        /// <returns>资源包文件的磁盘路径</returns>
+        public string GetBundleFilePath()
         {
             if (CheckValidWithWarning() == false)
                 return string.Empty;

@@ -7,17 +7,17 @@ using NUnit.Framework;
 using YooAsset;
 
 /// <summary>
-/// 测试原生文件加载
+/// 测试 Bundle 文件加载
 /// </summary>
 /// <remarks>
-/// 覆盖 API: LoadRawFileAsync / LoadRawFileSync / LoadAssetAsync(RawFileObject) / LoadAssetSync(RawFileObject)
+/// 覆盖 API: LoadBundleFileAsync / LoadBundleFileSync / LoadAssetAsync(RawFileObject) / LoadAssetSync(RawFileObject)
 /// 测试内容:
-/// 1. 异步加载原生文件，获取文件路径，验证文件存在且二进制数据非空（raw_file_a）
-/// 2. 同步加载原生文件，获取文件路径，验证文件存在且二进制数据非空（raw_file_b）
+/// 1. 异步加载 Bundle 文件，获取文件路径，验证文件存在且二进制数据非空（raw_file_a）
+/// 2. 同步加载 Bundle 文件，获取文件路径，验证文件存在且二进制数据非空（raw_file_b）
 /// 3. 异步通过 RawFileObject 加载，验证 GetBytes() 和 GetText() 均返回有效数据（raw_file_c）
 /// 4. 同步通过 RawFileObject 加载，验证 GetBytes() 和 GetText() 均返回有效数据（raw_file_d）
 /// </remarks>
-public class TestLoadRawFile
+public class TestLoadBundleFile
 {
     public IEnumerator RuntimeTester()
     {
@@ -26,33 +26,33 @@ public class TestLoadRawFile
 
         // 测试异步加载
         {
-            var rawFileHandle = package.LoadRawFileAsync("raw_file_a");
-            yield return rawFileHandle;
-            Assert.AreEqual(EOperationStatus.Succeeded, rawFileHandle.Status);
+            var bundleFileHandle = package.LoadBundleFileAsync("raw_file_a");
+            yield return bundleFileHandle;
+            Assert.AreEqual(EOperationStatus.Succeeded, bundleFileHandle.Status);
 
-            var filePath = rawFileHandle.GetRawFilePath();
+            var filePath = bundleFileHandle.GetBundleFilePath();
             Assert.IsNotNull(filePath);
             Assert.IsTrue(File.Exists(filePath));
 
             byte[] fileBytes = File.ReadAllBytes(filePath);
             Assert.IsNotNull(fileBytes);
             Assert.Greater(fileBytes.Length, 0);
-            rawFileHandle.Release();
+            bundleFileHandle.Release();
         }
 
         // 测试同步加载
         {
-            var rawFileHandle = package.LoadRawFileSync("raw_file_b");
-            Assert.AreEqual(EOperationStatus.Succeeded, rawFileHandle.Status);
+            var bundleFileHandle = package.LoadBundleFileSync("raw_file_b");
+            Assert.AreEqual(EOperationStatus.Succeeded, bundleFileHandle.Status);
 
-            var filePath = rawFileHandle.GetRawFilePath();
+            var filePath = bundleFileHandle.GetBundleFilePath();
             Assert.IsNotNull(filePath);
             Assert.IsTrue(File.Exists(filePath));
 
             byte[] fileBytes = File.ReadAllBytes(filePath);
             Assert.IsNotNull(fileBytes);
             Assert.Greater(fileBytes.Length, 0);
-            rawFileHandle.Release();
+            bundleFileHandle.Release();
         }
 
         // 测试异步加载：通过 RawFileObject 获取二进制数据和文本数据

@@ -419,60 +419,60 @@ namespace YooAsset
         }
         #endregion
 
-        #region 原生文件
+        #region 资源包文件
         /// <summary>
-        /// 同步加载原生文件
+        /// 同步加载资源包文件
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
-        /// <returns>返回原生文件操作句柄</returns>
-        public RawFileHandle LoadRawFileSync(AssetInfo assetInfo)
+        /// <returns>返回资源包文件操作句柄</returns>
+        public BundleFileHandle LoadBundleFileSync(AssetInfo assetInfo)
         {
             CheckInitialized();
-            return LoadRawFileInternal(assetInfo, true, 0);
+            return LoadBundleFileInternal(assetInfo, true, 0);
         }
 
         /// <summary>
-        /// 同步加载原生文件
+        /// 同步加载资源包文件
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <returns>返回原生文件操作句柄</returns>
-        public RawFileHandle LoadRawFileSync(string location)
+        /// <returns>返回资源包文件操作句柄</returns>
+        public BundleFileHandle LoadBundleFileSync(string location)
         {
             CheckInitialized();
             AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-            return LoadRawFileInternal(assetInfo, true, 0);
+            return LoadBundleFileInternal(assetInfo, true, 0);
         }
 
         /// <summary>
-        /// 加载原生文件
+        /// 异步加载资源包文件
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
         /// <param name="priority">加载的优先级</param>
-        /// <returns>返回原生文件操作句柄</returns>
-        public RawFileHandle LoadRawFileAsync(AssetInfo assetInfo, uint priority = 0)
+        /// <returns>返回资源包文件操作句柄</returns>
+        public BundleFileHandle LoadBundleFileAsync(AssetInfo assetInfo, uint priority = 0)
         {
             CheckInitialized();
-            return LoadRawFileInternal(assetInfo, false, priority);
+            return LoadBundleFileInternal(assetInfo, false, priority);
         }
 
         /// <summary>
-        /// 加载原生文件
+        /// 异步加载资源包文件
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="priority">加载的优先级</param>
-        /// <returns>返回原生文件操作句柄</returns>
-        public RawFileHandle LoadRawFileAsync(string location, uint priority = 0)
+        /// <returns>返回资源包文件操作句柄</returns>
+        public BundleFileHandle LoadBundleFileAsync(string location, uint priority = 0)
         {
             CheckInitialized();
             AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-            return LoadRawFileInternal(assetInfo, false, priority);
+            return LoadBundleFileInternal(assetInfo, false, priority);
         }
 
 
-        private RawFileHandle LoadRawFileInternal(AssetInfo assetInfo, bool waitForAsyncComplete, uint priority)
+        private BundleFileHandle LoadBundleFileInternal(AssetInfo assetInfo, bool waitForAsyncComplete, uint priority)
         {
-            assetInfo.LoadMethod = ELoadMethod.LoadRawFile;
-            var handle = _resourceManager.LoadRawFileAsync(assetInfo, priority);
+            assetInfo.LoadMethod = ELoadMethod.LoadBundleFile;
+            var handle = _resourceManager.LoadBundleFileAsync(assetInfo, priority);
             if (waitForAsyncComplete)
                 handle.WaitForAsyncComplete();
             return handle;

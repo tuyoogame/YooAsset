@@ -305,12 +305,12 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 加载原生文件
+        /// 加载资源包文件
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
         /// <param name="priority">加载优先级</param>
-        /// <returns>原生文件句柄</returns>
-        public RawFileHandle LoadRawFileAsync(AssetInfo assetInfo, uint priority)
+        /// <returns>资源包文件句柄</returns>
+        public BundleFileHandle LoadBundleFileAsync(AssetInfo assetInfo, uint priority)
         {
             if (IsLoadingLocked)
             {
@@ -318,29 +318,29 @@ namespace YooAsset
                 YooLogger.LogError(error);
                 ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
                 errorProvider.SetCompletedWithError(error);
-                return errorProvider.CreateHandle<RawFileHandle>();
+                return errorProvider.CreateHandle<BundleFileHandle>();
             }
 
             if (assetInfo.IsValid == false)
             {
-                YooLogger.LogError($"Failed to load raw file. Error: {assetInfo.Error}");
+                YooLogger.LogError($"Failed to load bundle file. Error: {assetInfo.Error}");
                 ErrorProvider errorProvider = new ErrorProvider(this, assetInfo);
                 errorProvider.SetCompletedWithError(assetInfo.Error);
-                return errorProvider.CreateHandle<RawFileHandle>();
+                return errorProvider.CreateHandle<BundleFileHandle>();
             }
 
-            string providerKey = nameof(LoadRawFileAsync) + assetInfo.AssetKey;
+            string providerKey = nameof(LoadBundleFileAsync) + assetInfo.AssetKey;
             ProviderBase provider = GetAssetProvider(providerKey);
             if (provider == null)
             {
-                provider = new RawFileProvider(this, providerKey, assetInfo);
+                provider = new BundleFileProvider(this, providerKey, assetInfo);
                 provider.InitProviderDebugInfo();
                 _providerDict.Add(providerKey, provider);
                 AsyncOperationSystem.StartOperation(PackageName, provider);
             }
 
             provider.Priority = priority;
-            return provider.CreateHandle<RawFileHandle>();
+            return provider.CreateHandle<BundleFileHandle>();
         }
 
         /// <summary>

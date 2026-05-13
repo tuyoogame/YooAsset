@@ -94,27 +94,27 @@ namespace YooAsset
     }
     #endregion
 
-    #region RawFileHandle -- GetRawFileData / GetRawFileText
-    public sealed partial class RawFileHandle
+    #region BundleFileHandle -- GetRawFileData / GetRawFileText
+    public sealed partial class BundleFileHandle
     {
         /// <summary>
         /// v2.3: rawFileHandle.GetRawFileData()
         /// </summary>
-        [Obsolete("Read file manually via GetRawFilePath().")]
+        [Obsolete("Read file manually via GetBundleFilePath().")]
         public byte[] GetRawFileData()
         {
             if (CheckValidWithWarning() == false) return null;
-            return System.IO.File.ReadAllBytes(GetRawFilePath());
+            return System.IO.File.ReadAllBytes(GetBundleFilePath());
         }
 
         /// <summary>
         /// v2.3: rawFileHandle.GetRawFileText()
         /// </summary>
-        [Obsolete("Read file manually via GetRawFilePath().")]
+        [Obsolete("Read file manually via GetBundleFilePath().")]
         public string GetRawFileText()
         {
             if (CheckValidWithWarning() == false) return null;
-            return System.IO.File.ReadAllText(GetRawFilePath());
+            return System.IO.File.ReadAllText(GetBundleFilePath());
         }
     }
     #endregion

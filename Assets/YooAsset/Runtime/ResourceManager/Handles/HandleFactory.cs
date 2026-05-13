@@ -14,7 +14,7 @@ namespace YooAsset
             { typeof(SceneHandle), op => new SceneHandle(op) },
             { typeof(SubAssetsHandle), op => new SubAssetsHandle(op) },
             { typeof(AllAssetsHandle), op => new AllAssetsHandle(op) },
-            { typeof(RawFileHandle), op => new RawFileHandle(op) }
+            { typeof(BundleFileHandle), op => new BundleFileHandle(op) }
         };
 
         /// <summary>
