@@ -30,6 +30,11 @@ namespace YooAsset.Editor
         /// </summary>
         protected TextField _buildVersionField;
 
+        /// <summary>
+        /// 构建资源包类型下拉框
+        /// </summary>
+        protected DropdownField _buildBundleTypeField;
+
 
         public override void CreateView(VisualElement parent)
         {
@@ -49,6 +54,10 @@ namespace YooAsset.Editor
             // 构建版本
             _buildVersionField = Root.Q<TextField>("BuildVersion");
             SetBuildVersionField(_buildVersionField);
+
+            // 构建资源包类型
+            _buildBundleTypeField = Root.Q<DropdownField>("BuildBundleType");
+            SetBuildBundleTypeField(_buildBundleTypeField);
 
             // 构建按钮
             var buildButton = Root.Q<Button>("Build");
@@ -80,7 +89,7 @@ namespace YooAsset.Editor
             buildParameters.BuildOutputRoot = BundleBuilderHelper.GetDefaultBuildOutputRoot();
             buildParameters.BundledFileRoot = BundleBuilderHelper.GetStreamingAssetsRoot();
             buildParameters.BuildPipeline = PipelineName.ToString();
-            buildParameters.BuildBundleType =  (int)EBundleType.VirtualAssetBundle;
+            buildParameters.BuildBundleType = (int)Enum.Parse(typeof(EBundleType), _buildBundleTypeField.value);
             buildParameters.BuildTarget = BuildTarget;
             buildParameters.PackageName = PackageName;
             buildParameters.PackageVersion = _buildVersionField.value;
@@ -93,6 +102,20 @@ namespace YooAsset.Editor
             var buildResult = pipeline.Run(buildParameters, true);
             if (buildResult.Success)
                 EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
+        }
+
+        private void SetBuildBundleTypeField(DropdownField dropdownField)
+        {
+            var bundleTypes = Enum.GetValues(typeof(EBundleType))
+                .Cast<EBundleType>()
+                .Where(type => type.ToString().StartsWith("Virtual"))
+                .Select(type => type.ToString())
+                .ToList();
+
+            dropdownField.choices = bundleTypes;
+            dropdownField.SetValueWithoutNotify(EBundleType.VirtualAssetBundle.ToString());
+            dropdownField.style.width = StyleWidth;
+            UIElementsTools.SetElementLabelMinWidth(dropdownField, LabelMinWidth);
         }
     }
 }
