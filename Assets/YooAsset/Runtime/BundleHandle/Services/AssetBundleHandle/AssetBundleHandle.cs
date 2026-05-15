@@ -9,27 +9,18 @@ namespace YooAsset
     /// </summary>
     internal sealed class AssetBundleHandle : IBundleHandle
     {
-        private readonly string _bundleFilePath;
         private readonly PackageBundle _packageBundle;
         private readonly AssetBundle _assetBundle;
         private readonly Stream _bundleStream;
 
-        /// <inheritdoc/>
-        public string BundleFilePath
-        {
-            get { return _bundleFilePath; }
-        }
-
         /// <summary>
         /// 创建 AssetBundleHandle 实例
         /// </summary>
-        /// <param name="bundleFilePath">资源包文件的本地路径</param>
         /// <param name="packageBundle">资源包描述</param>
         /// <param name="assetBundle">已加载的 AssetBundle 对象</param>
         /// <param name="bundleStream">加载 AssetBundle 时使用的文件流</param>
-        public AssetBundleHandle(string bundleFilePath, PackageBundle packageBundle, AssetBundle assetBundle, Stream bundleStream)
+        public AssetBundleHandle(PackageBundle packageBundle, AssetBundle assetBundle, Stream bundleStream)
         {
-            _bundleFilePath = bundleFilePath;
             _packageBundle = packageBundle;
             _assetBundle = assetBundle;
             _bundleStream = bundleStream;

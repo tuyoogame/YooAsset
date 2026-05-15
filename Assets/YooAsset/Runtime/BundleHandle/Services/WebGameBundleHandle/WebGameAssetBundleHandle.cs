@@ -8,27 +8,18 @@ namespace YooAsset
     /// </summary>
     internal sealed class WebGameAssetBundleHandle : IBundleHandle
     {
-        private readonly string _bundleFilePath;
         private readonly PackageBundle _packageBundle;
         private readonly AssetBundle _assetBundle;
         private readonly IWebGamePlatform _platform;
 
-        /// <inheritdoc/>
-        public string BundleFilePath
-        {
-            get { return _bundleFilePath; }
-        }
-
         /// <summary>
         /// 创建 WebGameAssetBundleHandle 实例
         /// </summary>
-        /// <param name="bundleFilePath">资源包文件的本地路径</param>
         /// <param name="packageBundle">资源包描述</param>
         /// <param name="assetBundle">已加载的 AssetBundle 对象</param>
         /// <param name="platform">平台实现</param>
-        public WebGameAssetBundleHandle(string bundleFilePath, PackageBundle packageBundle, AssetBundle assetBundle, IWebGamePlatform platform)
+        public WebGameAssetBundleHandle(PackageBundle packageBundle, AssetBundle assetBundle, IWebGamePlatform platform)
         {
-            _bundleFilePath = bundleFilePath;
             _packageBundle = packageBundle;
             _assetBundle = assetBundle;
             _platform = platform;

@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 
 namespace YooAsset
 {
@@ -13,15 +11,8 @@ namespace YooAsset
 
         protected override void CreateBundleHandle()
         {
-            string editorFilePath = EditorFileSystemHelper.GetEditorFilePath(_bundle);
-            if (string.IsNullOrEmpty(editorFilePath))
-            {
-                SetError($"Editor file path is null. Bundle: '{_bundle.BundleName}'.");
-                return;
-            }
-
             SetResult();
-            BundleHandle = new VirtualAssetBundleHandle(editorFilePath, _bundle);
+            BundleHandle = new VirtualAssetBundleHandle(_bundle);
         }
     }
 }

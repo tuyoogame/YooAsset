@@ -9,7 +9,6 @@ namespace YooAsset
         private enum ESteps
         {
             None,
-            GetEntry,
             LoadBundle,
             Done,
         }
@@ -17,7 +16,6 @@ namespace YooAsset
         private readonly WebRemoteBundleCache _fileCache;
         private readonly BCLoadBundleOptions _options;
         private BCLoadBundleOperation _loadBundleOp;
-        private WebRemoteBundleCacheEntry _cacheEntry;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
@@ -32,35 +30,22 @@ namespace YooAsset
         }
         protected override void InternalStart()
         {
-            _steps = ESteps.GetEntry;
+            _steps = ESteps.LoadBundle;
         }
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.GetEntry)
-            {
-                _cacheEntry = _fileCache.GetEntry(_options.Bundle);
-                if (_cacheEntry == null)
-                {
-                    _steps = ESteps.Done;
-                    SetError($"File cache entry not found: '{_options.Bundle.BundleGuid}'.");
-                }
-                else
-                {
-                    _steps = ESteps.LoadBundle;
-                }
-            }
-
             if (_steps == ESteps.LoadBundle)
             {
                 if (_loadBundleOp == null)
                 {
+                    var urls = _fileCache.Config.RemoteService.GetRemoteUrls(_options.Bundle.GetFileName());
                     var options = new LoadWebAssetBundleOptions(
                         cacheName: _fileCache.GetType().Name,
                         bundle: _options.Bundle,
-                        candidateUrls: _cacheEntry.Urls,
+                        candidateUrls: urls,
                         assetBundleDecryptor: _fileCache.Config.AssetBundleDecryptor,
                         downloadBackend: _fileCache.Config.DownloadBackend,
                         downloadVerifyLevel: _fileCache.Config.DownloadVerifyLevel,

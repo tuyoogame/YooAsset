@@ -86,7 +86,7 @@ namespace YooAsset
         }
 
         /// <inheritdoc/>
-        public long SpaceOccupied { get; private set; }
+        public long SpaceOccupied { get; }
         #endregion
 
         /// <summary>
@@ -150,6 +150,12 @@ namespace YooAsset
         public bool IsCached(string bundleGuid)
         {
             return _cacheEntries.ContainsKey(bundleGuid);
+        }
+        /// <inheritdoc />
+        public string GetCacheFilePath(string bundleGuid)
+        {
+            YooLogger.LogWarning($"{nameof(WebServerBundleCache)} does not support local cache file path.");
+            return null;
         }
 
         #region 内部方法

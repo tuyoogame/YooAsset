@@ -39,6 +39,13 @@ namespace YooAsset
         FSLoadPackageBundleOperation LoadPackageBundleAsync(FSLoadPackageBundleOptions options);
 
         /// <summary>
+        /// 确保资源包文件已就绪
+        /// </summary>
+        /// <param name="options">确保资源包已就绪的选项参数</param>
+        /// <returns>确保资源包已就绪的操作句柄</returns>
+        FSEnsurePackageBundleOperation EnsurePackageBundleAsync(FSEnsurePackageBundleOptions options);
+
+        /// <summary>
         /// 下载资源包
         /// </summary>
         /// <param name="options">下载资源包的选项参数</param>

@@ -52,7 +52,7 @@ namespace YooAsset
 
             if (_steps == ESteps.CacheFile)
             {
-                var cacheEntry = new EditorBundleCacheEntry(_options.Bundle.BundleGuid, _options.FilePath);
+                var cacheEntry = new EditorBundleCacheEntry(_options.Bundle.BundleGuid);
                 _fileCache.AddEntry(_options.Bundle.BundleGuid, cacheEntry);
                 _steps = ESteps.Done;
                 SetResult();

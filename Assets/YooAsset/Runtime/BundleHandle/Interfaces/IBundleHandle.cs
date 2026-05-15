@@ -8,11 +8,6 @@ namespace YooAsset
     internal interface IBundleHandle
     {
         /// <summary>
-        /// 资源包文件的本地路径
-        /// </summary>
-        string BundleFilePath { get; }
-
-        /// <summary>
         /// 卸载资源包
         /// </summary>
         void UnloadBundle();

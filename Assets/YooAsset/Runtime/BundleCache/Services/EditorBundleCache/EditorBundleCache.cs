@@ -142,10 +142,16 @@ namespace YooAsset
         /// <inheritdoc />
         public bool IsCached(string bundleGuid)
         {
-            if (Config.VirtualDownloadMode)
-                return _cacheEntries.ContainsKey(bundleGuid);
-            else
+            if (Config.VirtualDownloadMode == false)
                 return true;
+
+            return _cacheEntries.ContainsKey(bundleGuid);
+        }
+        /// <inheritdoc />
+        public string GetCacheFilePath(string bundleGuid)
+        {
+            YooLogger.LogWarning($"{nameof(EditorBundleCache)} does not support local cache file path.");
+            return null;
         }
 
         /// <summary>

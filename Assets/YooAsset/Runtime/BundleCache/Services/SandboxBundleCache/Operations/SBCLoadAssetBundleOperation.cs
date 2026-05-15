@@ -170,7 +170,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     SetResult();
-                    BundleHandle = new AssetBundleHandle(_cacheEntry.DataFilePath, _bundle, assetBundle, null);
+                    BundleHandle = new AssetBundleHandle(_bundle, assetBundle, null);
                 }
             }
         }

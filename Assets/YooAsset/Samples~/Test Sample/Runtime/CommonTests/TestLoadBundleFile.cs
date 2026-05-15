@@ -12,8 +12,8 @@ using YooAsset;
 /// <remarks>
 /// 覆盖 API: LoadBundleFileAsync / LoadBundleFileSync / LoadAssetAsync(RawFileObject) / LoadAssetSync(RawFileObject)
 /// 测试内容:
-/// 1. 异步加载 Bundle 文件，获取文件路径，验证文件存在且二进制数据非空（raw_file_a）
-/// 2. 同步加载 Bundle 文件，获取文件路径，验证文件存在且二进制数据非空（raw_file_b）
+/// 1. 异步加载 Bundle 文件（raw_file_a）
+/// 2. 同步加载 Bundle 文件（raw_file_b）
 /// 3. 异步通过 RawFileObject 加载，验证 GetBytes() 和 GetText() 均返回有效数据（raw_file_c）
 /// 4. 同步通过 RawFileObject 加载，验证 GetBytes() 和 GetText() 均返回有效数据（raw_file_d）
 /// </remarks>
@@ -29,14 +29,6 @@ public class TestLoadBundleFile
             var bundleFileHandle = package.LoadBundleFileAsync("raw_file_a");
             yield return bundleFileHandle;
             Assert.AreEqual(EOperationStatus.Succeeded, bundleFileHandle.Status);
-
-            var filePath = bundleFileHandle.GetBundleFilePath();
-            Assert.IsNotNull(filePath);
-            Assert.IsTrue(File.Exists(filePath));
-
-            byte[] fileBytes = File.ReadAllBytes(filePath);
-            Assert.IsNotNull(fileBytes);
-            Assert.Greater(fileBytes.Length, 0);
             bundleFileHandle.Release();
         }
 
@@ -44,14 +36,6 @@ public class TestLoadBundleFile
         {
             var bundleFileHandle = package.LoadBundleFileSync("raw_file_b");
             Assert.AreEqual(EOperationStatus.Succeeded, bundleFileHandle.Status);
-
-            var filePath = bundleFileHandle.GetBundleFilePath();
-            Assert.IsNotNull(filePath);
-            Assert.IsTrue(File.Exists(filePath));
-
-            byte[] fileBytes = File.ReadAllBytes(filePath);
-            Assert.IsNotNull(fileBytes);
-            Assert.Greater(fileBytes.Length, 0);
             bundleFileHandle.Release();
         }
 

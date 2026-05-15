@@ -73,5 +73,12 @@ namespace YooAsset
         /// <param name="bundleGuid">资源包的唯一标识符</param>
         /// <returns>如果缓存中存在该资源包则返回 true，否则返回 false。</returns>
         bool IsCached(string bundleGuid);
+
+        /// <summary>
+        /// 获取已缓存的资源包文件路径
+        /// </summary>
+        /// <param name="bundleGuid">资源包的唯一标识符</param>
+        /// <returns>返回已缓存的资源包文件路径，如果不存在则返回 null。</returns>
+        string GetCacheFilePath(string bundleGuid);
     }
 }

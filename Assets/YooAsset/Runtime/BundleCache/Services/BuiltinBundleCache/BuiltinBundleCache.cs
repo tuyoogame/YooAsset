@@ -135,6 +135,17 @@ namespace YooAsset
         {
             return _cacheEntries.ContainsKey(bundleGuid);
         }
+        /// <inheritdoc />
+        public string GetCacheFilePath(string bundleGuid)
+        {
+            if (_cacheEntries.TryGetValue(bundleGuid, out BuiltinBundleCacheEntry entry))
+            {
+                return entry.FilePath;
+            }
+
+            YooLogger.LogWarning($"Cache file path not found. Bundle GUID: '{bundleGuid}'.");
+            return null;
+        }
 
         #region 内部方法
         /// <summary>

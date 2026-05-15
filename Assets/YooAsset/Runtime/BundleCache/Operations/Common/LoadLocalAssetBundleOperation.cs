@@ -121,7 +121,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     SetResult();
-                    BundleHandle = new AssetBundleHandle(_options.FilePath, _options.Bundle, _assetBundle, _loadStream);
+                    BundleHandle = new AssetBundleHandle(_options.Bundle, _assetBundle, _loadStream);
                 }
             }
         }

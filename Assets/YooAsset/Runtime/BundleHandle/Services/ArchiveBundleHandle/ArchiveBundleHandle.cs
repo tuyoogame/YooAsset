@@ -7,25 +7,16 @@ namespace YooAsset
     /// </summary>
     internal sealed class ArchiveBundleHandle : IBundleHandle
     {
-        private readonly string _bundleFilePath;
         private readonly PackageBundle _packageBundle;
         private readonly ArchiveBundle _archiveBundle;
-
-        /// <inheritdoc/>
-        public string BundleFilePath
-        {
-            get { return _bundleFilePath; }
-        }
 
         /// <summary>
         /// 创建 ArchiveBundleHandle 实例
         /// </summary>
-        /// <param name="bundleFilePath">资源包文件的本地路径</param>
         /// <param name="packageBundle">资源包描述</param>
         /// <param name="archiveBundle">已解析的归档资源包数据对象</param>
-        public ArchiveBundleHandle(string bundleFilePath, PackageBundle packageBundle, ArchiveBundle archiveBundle)
+        public ArchiveBundleHandle(PackageBundle packageBundle, ArchiveBundle archiveBundle)
         {
-            _bundleFilePath = bundleFilePath;
             _packageBundle = packageBundle;
             _archiveBundle = archiveBundle;
         }

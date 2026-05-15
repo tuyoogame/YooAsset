@@ -51,6 +51,16 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 创建资源包文件确保器
+        /// </summary>
+        /// <returns>返回确保资源包文件就绪的操作对象</returns>
+        public FSEnsurePackageBundleOperation CreateBundleEnsurer()
+        {
+            var options = new FSEnsurePackageBundleOptions(Bundle);
+            return _fileSystem.EnsurePackageBundleAsync(options);
+        }
+
+        /// <summary>
         /// 创建资源包下载器
         /// </summary>
         /// <param name="retryCount">下载失败后的重试次数</param>

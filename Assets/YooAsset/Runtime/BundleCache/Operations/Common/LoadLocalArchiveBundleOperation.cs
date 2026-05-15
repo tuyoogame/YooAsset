@@ -74,7 +74,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     SetResult();
-                    BundleHandle = new ArchiveBundleHandle(_options.FilePath, _options.Bundle, _archiveBundle);
+                    BundleHandle = new ArchiveBundleHandle(_options.Bundle, _archiveBundle);
                 }
             }
         }

@@ -75,7 +75,7 @@ namespace YooAsset
                     {
                         _steps = ESteps.Done;
                         SetResult();
-                        BundleHandle = new AssetBundleHandle(_downloadAssetBundleRequest.Url, _options.Bundle, assetBundle, null);
+                        BundleHandle = new AssetBundleHandle(_options.Bundle, assetBundle, null);
                     }
                 }
                 else
@@ -290,7 +290,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     SetResult();
-                    BundleHandle = new AssetBundleHandle(_downloadBytesRequest.Url, _options.Bundle, assetBundle, null);
+                    BundleHandle = new AssetBundleHandle(_options.Bundle, assetBundle, null);
                 }
             }
 

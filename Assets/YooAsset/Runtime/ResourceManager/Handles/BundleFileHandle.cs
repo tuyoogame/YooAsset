@@ -47,16 +47,5 @@ namespace YooAsset
                 return;
             Provider.WaitForCompletion();
         }
-
-        /// <summary>
-        /// 获取资源包文件的路径
-        /// </summary>
-        /// <returns>资源包文件的磁盘路径</returns>
-        public string GetBundleFilePath()
-        {
-            if (CheckValidWithWarning() == false)
-                return string.Empty;
-            return Provider.LoadedBundleHandle.BundleFilePath;
-        }
     }
 }

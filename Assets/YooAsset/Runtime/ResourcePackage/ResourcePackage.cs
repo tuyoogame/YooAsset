@@ -419,66 +419,6 @@ namespace YooAsset
         }
         #endregion
 
-        #region 资源包文件
-        /// <summary>
-        /// 同步加载资源包文件
-        /// </summary>
-        /// <param name="assetInfo">资源信息</param>
-        /// <returns>返回资源包文件操作句柄</returns>
-        public BundleFileHandle LoadBundleFileSync(AssetInfo assetInfo)
-        {
-            CheckInitialized();
-            return LoadBundleFileInternal(assetInfo, true, 0);
-        }
-
-        /// <summary>
-        /// 同步加载资源包文件
-        /// </summary>
-        /// <param name="location">资源的定位地址</param>
-        /// <returns>返回资源包文件操作句柄</returns>
-        public BundleFileHandle LoadBundleFileSync(string location)
-        {
-            CheckInitialized();
-            AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-            return LoadBundleFileInternal(assetInfo, true, 0);
-        }
-
-        /// <summary>
-        /// 异步加载资源包文件
-        /// </summary>
-        /// <param name="assetInfo">资源信息</param>
-        /// <param name="priority">加载的优先级</param>
-        /// <returns>返回资源包文件操作句柄</returns>
-        public BundleFileHandle LoadBundleFileAsync(AssetInfo assetInfo, uint priority = 0)
-        {
-            CheckInitialized();
-            return LoadBundleFileInternal(assetInfo, false, priority);
-        }
-
-        /// <summary>
-        /// 异步加载资源包文件
-        /// </summary>
-        /// <param name="location">资源的定位地址</param>
-        /// <param name="priority">加载的优先级</param>
-        /// <returns>返回资源包文件操作句柄</returns>
-        public BundleFileHandle LoadBundleFileAsync(string location, uint priority = 0)
-        {
-            CheckInitialized();
-            AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
-            return LoadBundleFileInternal(assetInfo, false, priority);
-        }
-
-
-        private BundleFileHandle LoadBundleFileInternal(AssetInfo assetInfo, bool waitForAsyncComplete, uint priority)
-        {
-            assetInfo.LoadMethod = ELoadMethod.LoadBundleFile;
-            var handle = _resourceManager.LoadBundleFileAsync(assetInfo, priority);
-            if (waitForAsyncComplete)
-                handle.WaitForAsyncComplete();
-            return handle;
-        }
-        #endregion
-
         #region 场景加载
         /// <summary>
         /// 同步加载场景
@@ -892,6 +832,84 @@ namespace YooAsset
             DebugValidateAssetType(assetInfo.AssetType);
             assetInfo.LoadMethod = ELoadMethod.LoadAllAssets;
             var handle = _resourceManager.LoadAllAssetsAsync(assetInfo, priority);
+            if (waitForAsyncComplete)
+                handle.WaitForAsyncComplete();
+            return handle;
+        }
+        #endregion
+
+        #region 资源包文件
+        /// <summary>
+        /// 确保资源包文件已就绪
+        /// </summary>
+        /// <param name="options">确保资源包文件已就绪的选项</param>
+        /// <returns>返回确保资源包文件就绪的操作对象</returns>
+        public EnsureBundleFileOperation EnsureBundleFileAsync(EnsureBundleFileOptions options)
+        {
+            CheckInitialized();
+            if (options.AssetInfo == null)
+            {
+                AssetInfo assetInfo = ConvertLocationToAssetInfo(options.Location, null);
+                options = new EnsureBundleFileOptions(assetInfo);
+            }
+
+            var operation = new EnsureBundleFileOperation(_fileSystemHost, options);
+            AsyncOperationSystem.StartOperation(PackageName, operation);
+            return operation;
+        }
+
+        /// <summary>
+        /// 同步加载资源包文件
+        /// </summary>
+        /// <param name="assetInfo">资源信息</param>
+        /// <returns>返回资源包文件操作句柄</returns>
+        public BundleFileHandle LoadBundleFileSync(AssetInfo assetInfo)
+        {
+            CheckInitialized();
+            return LoadBundleFileInternal(assetInfo, true, 0);
+        }
+
+        /// <summary>
+        /// 同步加载资源包文件
+        /// </summary>
+        /// <param name="location">资源的定位地址</param>
+        /// <returns>返回资源包文件操作句柄</returns>
+        public BundleFileHandle LoadBundleFileSync(string location)
+        {
+            CheckInitialized();
+            AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+            return LoadBundleFileInternal(assetInfo, true, 0);
+        }
+
+        /// <summary>
+        /// 异步加载资源包文件
+        /// </summary>
+        /// <param name="assetInfo">资源信息</param>
+        /// <param name="priority">加载的优先级</param>
+        /// <returns>返回资源包文件操作句柄</returns>
+        public BundleFileHandle LoadBundleFileAsync(AssetInfo assetInfo, uint priority = 0)
+        {
+            CheckInitialized();
+            return LoadBundleFileInternal(assetInfo, false, priority);
+        }
+
+        /// <summary>
+        /// 异步加载资源包文件
+        /// </summary>
+        /// <param name="location">资源的定位地址</param>
+        /// <param name="priority">加载的优先级</param>
+        /// <returns>返回资源包文件操作句柄</returns>
+        public BundleFileHandle LoadBundleFileAsync(string location, uint priority = 0)
+        {
+            CheckInitialized();
+            AssetInfo assetInfo = ConvertLocationToAssetInfo(location, null);
+            return LoadBundleFileInternal(assetInfo, false, priority);
+        }
+
+        private BundleFileHandle LoadBundleFileInternal(AssetInfo assetInfo, bool waitForAsyncComplete, uint priority)
+        {
+            assetInfo.LoadMethod = ELoadMethod.LoadBundleFile;
+            var handle = _resourceManager.LoadBundleFileAsync(assetInfo, priority);
             if (waitForAsyncComplete)
                 handle.WaitForAsyncComplete();
             return handle;

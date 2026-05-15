@@ -100,7 +100,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     SetResult();
-                    BundleHandle = new RawBundleHandle(_options.FilePath, _options.Bundle, _rawBundle);
+                    BundleHandle = new RawBundleHandle(_options.Bundle, _rawBundle);
                 }
             }
         }

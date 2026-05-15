@@ -247,7 +247,7 @@ public class T0_InitYooAssets : IPrebuildSetup, IPostBuildCleanup
         {
             var collector1 = new YooAsset.Editor.BundleCollector();
             collector1.CollectPath = "";
-            collector1.CollectorGUID = "fddaaf9430e24344196cc82ac3d006b4"; //TestRes/RawFiles目录
+            collector1.CollectorGUID = "c0444018376a7cd4ead6a671035617d6"; //TestRes/ArchiveFiles目录
             collector1.CollectorType = YooAsset.Editor.ECollectorType.MainAssetCollector;
             collector1.PackRuleName = nameof(YooAsset.Editor.PackCollector);
             YooAsset.Editor.BundleCollectorSettingData.CreateCollector(archiveFileGroup, collector1);

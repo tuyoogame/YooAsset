@@ -121,6 +121,12 @@ namespace YooAsset
             return operation;
         }
         /// <inheritdoc />
+        public FSEnsurePackageBundleOperation EnsurePackageBundleAsync(FSEnsurePackageBundleOptions options)
+        {
+            var operation = new EFSEnsurePackageBundleOperation(this, options);
+            return operation;
+        }
+        /// <inheritdoc />
         public FSDownloadBundleOperation DownloadBundleAsync(FSDownloadBundleOptions options)
         {
             var downloader = new EFSDownloadBundleOperation(this, options);

@@ -65,8 +65,6 @@ namespace YooAsset
             }
         }
 
-        private readonly Dictionary<string, WebRemoteBundleCacheEntry> _cacheEntries = new Dictionary<string, WebRemoteBundleCacheEntry>(10000);
-
         /// <summary>
         /// 缓存配置
         /// </summary>
@@ -83,16 +81,10 @@ namespace YooAsset
         public bool IsReadOnly { get; }
 
         /// <inheritdoc/>
-        public int FileCount
-        {
-            get
-            {
-                return _cacheEntries.Count;
-            }
-        }
+        public int FileCount { get; }
 
         /// <inheritdoc/>
-        public long SpaceOccupied { get; private set; }
+        public long SpaceOccupied { get; }
         #endregion
 
         /// <summary>
@@ -157,23 +149,11 @@ namespace YooAsset
         {
             return true;
         }
-
-        #region 内部方法
-        /// <summary>
-        /// 获取或创建指定资源包的缓存条目
-        /// </summary>
-        /// <param name="bundle">资源包描述</param>
-        /// <returns>已存在则返回对应条目；否则创建并登记后返回新条目。</returns>
-        internal WebRemoteBundleCacheEntry GetEntry(PackageBundle bundle)
+        /// <inheritdoc />
+        public string GetCacheFilePath(string bundleGuid)
         {
-            if (_cacheEntries.TryGetValue(bundle.BundleGuid, out WebRemoteBundleCacheEntry entry))
-                return entry;
-
-            var urls = Config.RemoteService.GetRemoteUrls(bundle.GetFileName());
-            var newEntry = new WebRemoteBundleCacheEntry(bundle.BundleGuid, urls);
-            _cacheEntries.Add(bundle.BundleGuid, newEntry);
-            return newEntry;
+            YooLogger.LogWarning($"{nameof(WebRemoteBundleCache)} does not support local cache file path.");
+            return null;
         }
-        #endregion
     }
 }

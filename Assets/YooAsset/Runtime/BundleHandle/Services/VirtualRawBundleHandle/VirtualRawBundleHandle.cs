@@ -4,25 +4,16 @@ namespace YooAsset
 {
     internal sealed class VirtualRawBundleHandle : IBundleHandle
     {
-        private readonly string _bundleFilePath;
         private readonly PackageBundle _packageBundle;
         private readonly RawBundle _rawBundle;
-
-        /// <inheritdoc/>
-        public string BundleFilePath
-        {
-            get { return _bundleFilePath; }
-        }
 
         /// <summary>
         /// 创建 VirtualRawBundleHandle 实例
         /// </summary>
-        /// <param name="bundleFilePath">资源包文件的本地路径</param>
         /// <param name="packageBundle">资源包描述</param>
         /// <param name="rawBundle">已加载的原生资源包数据对象</param>
-        public VirtualRawBundleHandle(string bundleFilePath, PackageBundle packageBundle, RawBundle rawBundle)
+        public VirtualRawBundleHandle(PackageBundle packageBundle, RawBundle rawBundle)
         {
-            _bundleFilePath = bundleFilePath;
             _packageBundle = packageBundle;
             _rawBundle = rawBundle;
         }

@@ -94,27 +94,34 @@ namespace YooAsset
     }
     #endregion
 
-    #region BundleFileHandle -- GetRawFileData / GetRawFileText
+    #region BundleFileHandle -- GetBundleFilePath / GetRawFileData / GetRawFileText
     public sealed partial class BundleFileHandle
     {
         /// <summary>
+        /// v2.3: rawFileHandle.GetRawFilePath()
+        /// </summary>
+        [Obsolete("Use EnsureBundleFileAsync() to get bundle file path via EnsureBundleFileOperation.Detail.BundleFilePath.")]
+        public string GetBundleFilePath()
+        {
+            throw new NotSupportedException("GetBundleFilePath() is no longer available. Use EnsureBundleFileAsync() to get bundle file path via EnsureBundleFileOperation.Detail.BundleFilePath.");
+        }
+
+        /// <summary>
         /// v2.3: rawFileHandle.GetRawFileData()
         /// </summary>
-        [Obsolete("Read file manually via GetBundleFilePath().")]
+        [Obsolete("Use LoadAssetAsync<RawFileObject>() to read binary data via RawFileObject.GetBytes().")]
         public byte[] GetRawFileData()
         {
-            if (CheckValidWithWarning() == false) return null;
-            return System.IO.File.ReadAllBytes(GetBundleFilePath());
+            throw new NotSupportedException("GetRawFileData() is no longer available. Use LoadAssetAsync<RawFileObject>() to read binary data via RawFileObject.GetBytes().");
         }
 
         /// <summary>
         /// v2.3: rawFileHandle.GetRawFileText()
         /// </summary>
-        [Obsolete("Read file manually via GetBundleFilePath().")]
+        [Obsolete("Use LoadAssetAsync<RawFileObject>() to read text data via RawFileObject.GetText().")]
         public string GetRawFileText()
         {
-            if (CheckValidWithWarning() == false) return null;
-            return System.IO.File.ReadAllText(GetBundleFilePath());
+            throw new NotSupportedException("GetRawFileText() is no longer available. Use LoadAssetAsync<RawFileObject>() to read text data via RawFileObject.GetText().");
         }
     }
     #endregion

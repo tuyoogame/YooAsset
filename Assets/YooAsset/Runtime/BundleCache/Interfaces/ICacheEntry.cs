@@ -7,7 +7,7 @@ namespace YooAsset
     internal interface ICacheEntry
     {
         /// <summary>
-        /// Bundle 唯一标识
+        /// 资源包唯一标识
         /// </summary>
         string BundleGuid { get; }
     }

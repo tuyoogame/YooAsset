@@ -26,7 +26,7 @@ namespace YooAsset
                 var rawBundle = new RawBundle(data);
 
                 SetResult();
-                BundleHandle = new VirtualRawBundleHandle(editorFilePath, _bundle, rawBundle);
+                BundleHandle = new VirtualRawBundleHandle(_bundle, rawBundle);
             }
             catch (Exception ex)
             {

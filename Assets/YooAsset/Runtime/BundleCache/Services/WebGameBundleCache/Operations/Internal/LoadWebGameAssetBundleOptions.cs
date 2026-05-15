@@ -23,11 +23,6 @@ namespace YooAsset
         public IWebGamePlatform GamePlatform { get; }
 
         /// <summary>
-        /// 平台侧缓存文件路径
-        /// </summary>
-        public string CacheFilePath { get; }
-
-        /// <summary>
         /// 看门狗超时时间
         /// </summary>
         public int WatchdogTimeout { get; }
@@ -43,13 +38,12 @@ namespace YooAsset
         public IDownloadUrlPolicy DownloadUrlPolicy { get; }
 
         public LoadWebGameAssetBundleOptions(PackageBundle bundle, IReadOnlyList<string> candidateUrls,
-           IWebGamePlatform gamePlatform, string cacheFilePath, int watchdogTimeout,
+           IWebGamePlatform gamePlatform, int watchdogTimeout,
             IDownloadRetryPolicy downloadRetryPolicy, IDownloadUrlPolicy downloadUrlPolicy)
         {
             Bundle = bundle;
             CandidateUrls = candidateUrls;
             GamePlatform = gamePlatform;
-            CacheFilePath = cacheFilePath;
             WatchdogTimeout = watchdogTimeout;
             DownloadRetryPolicy = downloadRetryPolicy;
             DownloadUrlPolicy = downloadUrlPolicy;

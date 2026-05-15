@@ -10,10 +10,10 @@ using YooAsset;
 /// <remarks>
 /// 覆盖 API: LoadAssetAsync(RawFileObject) / LoadAssetSync(RawFileObject) / UnloadUnusedAssetsAsync
 /// 测试内容:
-/// 1. 异步加载归档子文件，验证 GetBytes() 和 GetText() 均返回有效数据（raw_file_a）
-/// 2. 同步加载归档子文件，验证 GetBytes() 和 GetText() 均返回有效数据（raw_file_b）
-/// 3. 重复加载同一归档子文件，验证缓存命中不会失败（raw_file_c）
-/// 4. 释放句柄并卸载后重新加载，验证卸载保护和重载链路正常（raw_file_e）
+/// 1. 异步加载归档子文件，验证 GetBytes() 和 GetText() 均返回有效数据（archive_file_a）
+/// 2. 同步加载归档子文件，验证 GetBytes() 和 GetText() 均返回有效数据（archive_file_b）
+/// 3. 重复加载同一归档子文件，验证缓存命中不会失败（archive_file_c）
+/// 4. 释放句柄并卸载后重新加载，验证卸载保护和重载链路正常（archive_file_e）
 /// </remarks>
 public class TestLoadArchiveBundle
 {
@@ -24,7 +24,7 @@ public class TestLoadArchiveBundle
 
         // 异步加载归档子文件
         {
-            var assetHandle = package.LoadAssetAsync<RawFileObject>("raw_file_a");
+            var assetHandle = package.LoadAssetAsync<RawFileObject>("archive_file_a");
             yield return assetHandle;
             Assert.AreEqual(EOperationStatus.Succeeded, assetHandle.Status);
 
@@ -43,7 +43,7 @@ public class TestLoadArchiveBundle
 
         // 同步加载归档子文件
         {
-            var assetHandle = package.LoadAssetSync<RawFileObject>("raw_file_b");
+            var assetHandle = package.LoadAssetSync<RawFileObject>("archive_file_b");
             Assert.AreEqual(EOperationStatus.Succeeded, assetHandle.Status);
 
             var rawFileObject = assetHandle.GetAssetObject<RawFileObject>();
@@ -61,11 +61,11 @@ public class TestLoadArchiveBundle
 
         // 重复加载同一归档子文件，验证缓存命中
         {
-            var handle1 = package.LoadAssetAsync<RawFileObject>("raw_file_c");
+            var handle1 = package.LoadAssetAsync<RawFileObject>("archive_file_c");
             yield return handle1;
             Assert.AreEqual(EOperationStatus.Succeeded, handle1.Status);
 
-            var handle2 = package.LoadAssetAsync<RawFileObject>("raw_file_c");
+            var handle2 = package.LoadAssetAsync<RawFileObject>("archive_file_c");
             yield return handle2;
             Assert.AreEqual(EOperationStatus.Succeeded, handle2.Status);
 
@@ -80,7 +80,7 @@ public class TestLoadArchiveBundle
 
         // 释放后卸载再重新加载，验证新旧对象不是同一实例
         {
-            var assetHandle = package.LoadAssetAsync<RawFileObject>("raw_file_e");
+            var assetHandle = package.LoadAssetAsync<RawFileObject>("archive_file_e");
             yield return assetHandle;
             Assert.AreEqual(EOperationStatus.Succeeded, assetHandle.Status);
 
@@ -93,7 +93,7 @@ public class TestLoadArchiveBundle
             yield return unloadOp;
             Assert.AreEqual(EOperationStatus.Succeeded, unloadOp.Status);
 
-            var reloadHandle = package.LoadAssetAsync<RawFileObject>("raw_file_e");
+            var reloadHandle = package.LoadAssetAsync<RawFileObject>("archive_file_e");
             yield return reloadHandle;
             Assert.AreEqual(EOperationStatus.Succeeded, reloadHandle.Status);
 

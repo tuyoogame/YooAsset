@@ -69,7 +69,7 @@ namespace YooAsset
                     {
                         _steps = ESteps.Done;
                         SetResult();
-                        BundleHandle = new WebGameAssetBundleHandle(_options.CacheFilePath, _options.Bundle, assetBundle, _options.GamePlatform);
+                        BundleHandle = new WebGameAssetBundleHandle(_options.Bundle, assetBundle, _options.GamePlatform);
                     }
                 }
                 else

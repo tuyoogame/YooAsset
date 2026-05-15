@@ -154,6 +154,17 @@ namespace YooAsset
         {
             return _cacheEntries.ContainsKey(bundleGuid);
         }
+        /// <inheritdoc />
+        public string GetCacheFilePath(string bundleGuid)
+        {
+            if (_cacheEntries.TryGetValue(bundleGuid, out SandboxBundleCacheEntry entry))
+            {
+                return entry.DataFilePath;
+            }
+
+            YooLogger.LogWarning($"Cache file path not found. Bundle GUID: '{bundleGuid}'.");
+            return null;
+        }
 
         /// <summary>
         /// 根据 ClearMethod 创建对应的淘汰策略实例

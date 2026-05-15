@@ -108,6 +108,12 @@ namespace YooAsset
             return operation;
         }
         /// <inheritdoc />
+        public FSEnsurePackageBundleOperation EnsurePackageBundleAsync(FSEnsurePackageBundleOptions options)
+        {
+            var operation = new FSEnsurePackageBundleFailureOperation($"{nameof(WebServerFileSystem)} does not support ensure bundle file operation.");
+            return operation;
+        }
+        /// <inheritdoc />
         public FSDownloadBundleOperation DownloadBundleAsync(FSDownloadBundleOptions options)
         {
             var operation = new FSDownloadBundleCompleteOperation($"{nameof(WebServerFileSystem)} does not support download operation.");
