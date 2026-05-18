@@ -46,7 +46,6 @@ namespace YooAsset
             }
         }
 
-        private const int HashFolderNameLength = 2;
         private readonly Dictionary<string, SandboxBundleCacheEntry> _cacheEntries = new Dictionary<string, SandboxBundleCacheEntry>(10000);
         private readonly Dictionary<string, string> _dataFilePathMapping = new Dictionary<string, string>(10000);
         private readonly Dictionary<string, string> _infoFilePathMapping = new Dictionary<string, string>(10000);
@@ -196,11 +195,12 @@ namespace YooAsset
         /// <returns>数据文件的完整路径</returns>
         internal string GetDataFilePath(PackageBundle bundle)
         {
-            if (_dataFilePathMapping.TryGetValue(bundle.BundleGuid, out string filePath) == false)
+            string bundleGuid = bundle.BundleGuid;
+            if (_dataFilePathMapping.TryGetValue(bundleGuid, out string filePath) == false)
             {
-                string folderName = GetHashFolderName(bundle.FileHash);
-                filePath = PathUtility.Combine(RootPath, folderName, bundle.BundleGuid, SandboxBundleCacheConsts.BundleDataFileName);
-                _dataFilePathMapping.Add(bundle.BundleGuid, filePath);
+                string folderName = GetHashFolderName(bundleGuid);
+                filePath = PathUtility.Combine(RootPath, folderName, bundleGuid, SandboxBundleCacheConsts.BundleDataFileName);
+                _dataFilePathMapping.Add(bundleGuid, filePath);
             }
             return filePath;
         }
@@ -212,11 +212,12 @@ namespace YooAsset
         /// <returns>信息文件的完整路径</returns>
         internal string GetInfoFilePath(PackageBundle bundle)
         {
-            if (_infoFilePathMapping.TryGetValue(bundle.BundleGuid, out string filePath) == false)
+            string bundleGuid = bundle.BundleGuid;
+            if (_infoFilePathMapping.TryGetValue(bundleGuid, out string filePath) == false)
             {
-                string folderName = GetHashFolderName(bundle.FileHash);
-                filePath = PathUtility.Combine(RootPath, folderName, bundle.BundleGuid, SandboxBundleCacheConsts.BundleInfoFileName);
-                _infoFilePathMapping.Add(bundle.BundleGuid, filePath);
+                string folderName = GetHashFolderName(bundleGuid);
+                filePath = PathUtility.Combine(RootPath, folderName, bundleGuid, SandboxBundleCacheConsts.BundleInfoFileName);
+                _infoFilePathMapping.Add(bundleGuid, filePath);
             }
             return filePath;
         }
@@ -228,8 +229,9 @@ namespace YooAsset
         /// <returns>数据临时文件的完整路径</returns>
         internal string GetDataTempFilePath(PackageBundle bundle)
         {
-            string folderName = GetHashFolderName(bundle.FileHash);
-            return PathUtility.Combine(RootPath, folderName, bundle.BundleGuid, SandboxBundleCacheConsts.BundleDataTempFileName);
+            string bundleGuid = bundle.BundleGuid;
+            string folderName = GetHashFolderName(bundleGuid);
+            return PathUtility.Combine(RootPath, folderName, bundleGuid, SandboxBundleCacheConsts.BundleDataTempFileName);
         }
 
         /// <summary>
@@ -239,8 +241,9 @@ namespace YooAsset
         /// <returns>信息临时文件的完整路径</returns>
         internal string GetInfoTempFilePath(PackageBundle bundle)
         {
-            string folderName = GetHashFolderName(bundle.FileHash);
-            return PathUtility.Combine(RootPath, folderName, bundle.BundleGuid, SandboxBundleCacheConsts.BundleInfoTempFileName);
+            string bundleGuid = bundle.BundleGuid;
+            string folderName = GetHashFolderName(bundleGuid);
+            return PathUtility.Combine(RootPath, folderName, bundleGuid, SandboxBundleCacheConsts.BundleInfoTempFileName);
         }
 
         /// <summary>
@@ -297,14 +300,14 @@ namespace YooAsset
             }
         }
 
-        private string GetHashFolderName(string fileHash)
+        private string GetHashFolderName(string bundleGuid)
         {
-            if (string.IsNullOrEmpty(fileHash))
-                throw new YooInternalException("File hash is null or empty.");
+            if (string.IsNullOrEmpty(bundleGuid))
+                throw new YooInternalException("Bundle GUID is null or empty.");
 
-            if (fileHash.Length <= HashFolderNameLength)
-                return fileHash;
-            return fileHash.Substring(0, HashFolderNameLength);
+            if (bundleGuid.Length <= SandboxBundleCacheConsts.HashFolderNameLength)
+                return bundleGuid;
+            return bundleGuid.Substring(0, SandboxBundleCacheConsts.HashFolderNameLength);
         }
         #endregion
     }

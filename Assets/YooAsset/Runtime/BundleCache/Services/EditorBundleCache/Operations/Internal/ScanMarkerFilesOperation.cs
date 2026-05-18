@@ -1,38 +1,36 @@
-using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace YooAsset
 {
     /// <summary>
-    /// 搜索缓存文件操作，扫描缓存目录中的文件。
+    /// 扫描标记文件操作
     /// </summary>
-    internal sealed class SearchCacheFilesOperation : AsyncOperationBase
+    internal sealed class ScanMarkerFilesOperation : AsyncOperationBase
     {
         private enum ESteps
         {
             None,
             Prepare,
-            SearchFiles,
+            ScanFiles,
             Done,
         }
 
-        private readonly SandboxBundleCache _fileCache;
+        private readonly EditorBundleCache _fileCache;
         private IEnumerator<string> _shardEnumerator = null;
-        private double _verifyStartTime;
+        private double _scanStartTime;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
-        /// 需要验证的元素
+        /// 扫描到的标记件信息
         /// </summary>
-        public readonly List<SearchFileInfo> Result = new List<SearchFileInfo>(5000);
+        public readonly List<ScanFileInfo> Result = new List<ScanFileInfo>(5000);
 
         /// <summary>
-        /// 创建搜索缓存文件操作实例
+        /// 创建操作实例
         /// </summary>
-        /// <param name="fileCache">沙盒文件缓存系统</param>
-        internal SearchCacheFilesOperation(SandboxBundleCache fileCache)
+        /// <param name="fileCache">编辑器文件缓存系统</param>
+        internal ScanMarkerFilesOperation(EditorBundleCache fileCache)
         {
             _fileCache = fileCache;
         }
@@ -51,8 +49,8 @@ namespace YooAsset
                 {
                     var directories = Directory.EnumerateDirectories(_fileCache.RootPath);
                     _shardEnumerator = directories.GetEnumerator();
-                    _verifyStartTime = TimeUtility.RealtimeSinceStartup;
-                    _steps = ESteps.SearchFiles;
+                    _scanStartTime = TimeUtility.RealtimeSinceStartup;
+                    _steps = ESteps.ScanFiles;
                 }
                 else
                 {
@@ -61,9 +59,9 @@ namespace YooAsset
                 }
             }
 
-            if (_steps == ESteps.SearchFiles)
+            if (_steps == ESteps.ScanFiles)
             {
-                if (SearchFiles())
+                if (ScanFiles())
                     return;
 
                 _shardEnumerator.Dispose();
@@ -71,8 +69,8 @@ namespace YooAsset
 
                 _steps = ESteps.Done;
                 SetResult();
-                double costTime = TimeUtility.RealtimeSinceStartup - _verifyStartTime;
-                YooLogger.Log($"Cache file search completed in {costTime:f1} seconds. Found {Result.Count} cache files.");
+                double costTime = TimeUtility.RealtimeSinceStartup - _scanStartTime;
+                YooLogger.Log($"Marker file scan completed in {costTime:f1} seconds. Found {Result.Count} marker files.");
             }
         }
         protected override void InternalDispose()
@@ -84,7 +82,7 @@ namespace YooAsset
             }
         }
 
-        private bool SearchFiles()
+        private bool ScanFiles()
         {
             bool hasMore;
             while (true)
@@ -93,20 +91,17 @@ namespace YooAsset
                 if (hasMore == false)
                     break;
 
-                var shardFolder = _shardEnumerator.Current;
+                string shardFolder = _shardEnumerator.Current;
                 var childDirectories = Directory.EnumerateDirectories(shardFolder);
-                foreach (var childDirectory in childDirectories)
+                foreach (string childDirectory in childDirectories)
                 {
                     string bundleGuid = Path.GetFileName(childDirectory);
-                    if (_fileCache.IsCached(bundleGuid))
-                        continue;
-
-                    // 创建验证元素类
-                    string fileRootPath = childDirectory;
-                    string dataFilePath = PathUtility.Combine(fileRootPath, SandboxBundleCacheConsts.BundleDataFileName);
-                    string infoFilePath = PathUtility.Combine(fileRootPath, SandboxBundleCacheConsts.BundleInfoFileName);
-                    var element = new SearchFileInfo(bundleGuid, fileRootPath, dataFilePath, infoFilePath);
-                    Result.Add(element);
+                    string markerFilePath = PathUtility.Combine(childDirectory, EditorBundleCacheConsts.MarkerFileName);
+                    if (File.Exists(markerFilePath))
+                    {
+                        var fileInfo = new ScanFileInfo(bundleGuid, markerFilePath);
+                        Result.Add(fileInfo);
+                    }
                 }
 
                 if (IsBusy)

@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 
 namespace YooAsset
 {
@@ -52,7 +54,38 @@ namespace YooAsset
 
             if (_steps == ESteps.CacheFile)
             {
-                var cacheEntry = new EditorBundleCacheEntry(_options.Bundle.BundleGuid);
+                string markerFilePath = _fileCache.GetMarkerFilePath(_options.Bundle);
+                string markerTempPath = _fileCache.GetMarkerTempFilePath(_options.Bundle);
+
+                try
+                {
+                    // 阶段A：准备目标目录，清理可能存在的残留临时文件
+                    FileUtility.EnsureParentDirectoryExists(markerFilePath);
+                    DeleteFileSafely(markerTempPath);
+
+                    // 阶段B：写入临时文件，内容仅用于人工调试
+                    string debugContent = $"BundleName={_options.Bundle.BundleName}\n"
+                        + $"BundleGuid={_options.Bundle.BundleGuid}\n";
+                    File.WriteAllText(markerTempPath, debugContent);
+
+                    // 阶段C：原子提交
+                    if (File.Exists(markerFilePath))
+                        File.Delete(markerFilePath);
+                    File.Move(markerTempPath, markerFilePath);
+                }
+                catch (Exception ex)
+                {
+                    _steps = ESteps.Done;
+                    SetError($"Failed to write marker file: {ex.Message}.");
+                    YooLogger.LogError(Error);
+
+                    // 回滚：清理临时文件，正式文件不受影响
+                    DeleteFileSafely(markerTempPath);
+                    return;
+                }
+
+                // 阶段D：注册内存缓存条目
+                var cacheEntry = new EditorBundleCacheEntry(_options.Bundle.BundleGuid, markerFilePath);
                 _fileCache.AddEntry(_options.Bundle.BundleGuid, cacheEntry);
                 _steps = ESteps.Done;
                 SetResult();
@@ -61,6 +94,19 @@ namespace YooAsset
         protected override void InternalWaitForCompletion()
         {
             ExecuteBatch();
+        }
+
+        private static void DeleteFileSafely(string filePath)
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+            }
+            catch (Exception ex)
+            {
+                YooLogger.LogWarning($"Failed to delete file '{filePath}': {ex.Message}.");
+            }
         }
     }
 }

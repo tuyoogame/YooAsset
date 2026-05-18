@@ -40,5 +40,10 @@ namespace YooAsset
         /// 信息文件预期大小（字节）
         /// </summary>
         public const int InfoFileExpectedSize = 36;
+
+        /// <summary>
+        /// 哈希分片目录前缀长度
+        /// </summary>
+        public const int HashFolderNameLength = 2;
     }
 }

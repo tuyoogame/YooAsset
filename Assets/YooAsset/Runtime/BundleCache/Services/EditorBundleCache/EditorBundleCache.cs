@@ -80,7 +80,7 @@ namespace YooAsset
             PackageName = packageName;
             RootPath = rootPath;
             Config = config;
-            IsReadOnly = true;
+            IsReadOnly = config.VirtualDownloadMode == false;
         }
 
         /// <inheritdoc />
@@ -208,7 +208,42 @@ namespace YooAsset
             if (_cacheEntries.TryGetValue(bundleGuid, out EditorBundleCacheEntry entry))
             {
                 _cacheEntries.Remove(bundleGuid);
+                entry.Delete();
             }
+        }
+
+        /// <summary>
+        /// 获取 marker 文件路径
+        /// </summary>
+        /// <param name="bundle">资源包描述</param>
+        /// <returns>marker 文件的完整路径</returns>
+        internal string GetMarkerFilePath(PackageBundle bundle)
+        {
+            string bundleGuid = bundle.BundleGuid;
+            string hashFolder = GetHashFolderName(bundleGuid);
+            return PathUtility.Combine(RootPath, hashFolder, bundleGuid, EditorBundleCacheConsts.MarkerFileName);
+        }
+
+        /// <summary>
+        /// 获取 marker 临时文件路径
+        /// </summary>
+        /// <param name="bundle">资源包描述</param>
+        /// <returns>marker 临时文件的完整路径</returns>
+        internal string GetMarkerTempFilePath(PackageBundle bundle)
+        {
+            string bundleGuid = bundle.BundleGuid;
+            string hashFolder = GetHashFolderName(bundleGuid);
+            return PathUtility.Combine(RootPath, hashFolder, bundleGuid, EditorBundleCacheConsts.MarkerTempFileName);
+        }
+
+        private string GetHashFolderName(string bundleGuid)
+        {
+            if (string.IsNullOrEmpty(bundleGuid))
+                throw new YooInternalException("Bundle GUID is null or empty.");
+
+            if (bundleGuid.Length <= EditorBundleCacheConsts.HashFolderNameLength)
+                return bundleGuid;
+            return bundleGuid.Substring(0, EditorBundleCacheConsts.HashFolderNameLength);
         }
         #endregion
     }
