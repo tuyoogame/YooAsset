@@ -248,35 +248,42 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator B11_TestLoadArchiveBundle()
+    public IEnumerator B11_TestLoadRawFileObject()
+    {
+        var tester = new TestLoadRawFileObject();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator B12_TestLoadArchiveBundle()
     {
         var tester = new TestLoadArchiveBundle();
         yield return tester.RuntimeTester();
     }
 
     [UnityTest]
-    public IEnumerator B12_TestEnsureBundleFile_RawBundle()
+    public IEnumerator B13_TestEnsureBundleFile_RawBundle()
     {
         var tester = new TestEnsureBundleFile();
         yield return tester.RuntimeTester_RawBundle();
     }
 
     [UnityTest]
-    public IEnumerator B13_TestEnsureBundleFile_AssetBundle()
+    public IEnumerator B14_TestEnsureBundleFile_AssetBundle()
     {
         var tester = new TestEnsureBundleFile();
         yield return tester.RuntimeTester_AssetBundle();
     }
 
     [UnityTest]
-    public IEnumerator B14_TestEnsureBundleFile_ArchiveBundle()
+    public IEnumerator B15_TestEnsureBundleFile_ArchiveBundle()
     {
         var tester = new TestEnsureBundleFile();
         yield return tester.RuntimeTester_ArchiveBundle();
     }
 
     [UnityTest]
-    public IEnumerator B15_TestUniTask()
+    public IEnumerator B16_TestUniTask()
     {
         var tester = new TestUniTask();
         yield return tester.RuntimeTester();
