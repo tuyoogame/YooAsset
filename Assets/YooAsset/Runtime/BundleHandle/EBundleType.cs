@@ -1,3 +1,4 @@
+using System;
 
 namespace YooAsset
 {
@@ -46,5 +47,10 @@ namespace YooAsset
         /// 虚拟归档文件资源包（编辑器模拟 ArchiveBundle）
         /// </summary>
         VirtualArchiveBundle = 14,
+
+#if YOOASSET_LEGACY_API
+        [Obsolete("Use VirtualAssetBundle instead.")]
+        VirtualBundle = VirtualAssetBundle,
+#endif
     }
 }
