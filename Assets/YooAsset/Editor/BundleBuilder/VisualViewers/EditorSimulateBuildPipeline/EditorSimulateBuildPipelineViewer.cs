@@ -33,7 +33,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 构建资源包类型下拉框
         /// </summary>
-        protected DropdownField _buildBundleTypeField;
+        protected PopupField<string> _buildBundleTypeField;
 
 
         public override void CreateView(VisualElement parent)
@@ -56,8 +56,8 @@ namespace YooAsset.Editor
             SetBuildVersionField(_buildVersionField);
 
             // 构建资源包类型
-            _buildBundleTypeField = Root.Q<DropdownField>("BuildBundleType");
-            SetBuildBundleTypeField(_buildBundleTypeField);
+            var buildBundleTypeContainer = Root.Q<VisualElement>("BuildBundleType");
+            _buildBundleTypeField = CreateBuildBundleTypeField(buildBundleTypeContainer);
 
             // 构建按钮
             var buildButton = Root.Q<Button>("Build");
@@ -104,7 +104,7 @@ namespace YooAsset.Editor
                 EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
         }
 
-        private void SetBuildBundleTypeField(DropdownField dropdownField)
+        private PopupField<string> CreateBuildBundleTypeField(VisualElement container)
         {
             var bundleTypes = Enum.GetValues(typeof(EBundleType))
                 .Cast<EBundleType>()
@@ -112,10 +112,17 @@ namespace YooAsset.Editor
                 .Select(type => type.ToString())
                 .ToList();
 
-            dropdownField.choices = bundleTypes;
-            dropdownField.SetValueWithoutNotify(EBundleType.VirtualAssetBundle.ToString());
-            dropdownField.style.width = StyleWidth;
-            UIElementsTools.SetElementLabelMinWidth(dropdownField, LabelMinWidth);
+            int defaultIndex = bundleTypes.IndexOf(EBundleType.VirtualAssetBundle.ToString());
+            if (defaultIndex < 0)
+                defaultIndex = 0;
+
+            var popupField = new PopupField<string>(bundleTypes, defaultIndex);
+            popupField.label = "Build Bundle Type";
+            popupField.style.width = StyleWidth;
+
+            container.Add(popupField);
+            UIElementsTools.SetElementLabelMinWidth(popupField, LabelMinWidth);
+            return popupField;
         }
     }
 }
