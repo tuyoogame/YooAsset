@@ -35,5 +35,10 @@ namespace YooAsset
         /// 自定义运行模式
         /// </summary>
         CustomPlayMode,
+
+        /// <summary>
+        /// 免构建运行模式
+        /// </summary>
+        DatalessPlayMode,
     }
 }
