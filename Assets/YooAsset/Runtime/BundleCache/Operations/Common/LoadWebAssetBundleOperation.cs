@@ -22,9 +22,9 @@ namespace YooAsset
         private ESteps _steps = ESteps.None;
 
         /// <summary>
-        /// 创建 LoadWebNormalAssetBundleOperation 实例
+        /// 创建 AssetBundle 加载操作实例
         /// </summary>
-        /// <param name="options">从网络加载 AssetBundle 的配置选项</param>
+        /// <param name="options">从网络加载 AssetBundle 的操作选项</param>
         public LoadWebNormalAssetBundleOperation(LoadWebAssetBundleOptions options)
         {
             _options = options;
@@ -133,6 +133,7 @@ namespace YooAsset
         private enum ESteps
         {
             None,
+            Prepare,
             DataRequest,
             CheckRequest,
             VerifyData,
@@ -150,9 +151,9 @@ namespace YooAsset
         private ESteps _steps = ESteps.None;
 
         /// <summary>
-        /// 创建 LoadWebEncryptedAssetBundleOperation 实例
+        /// 创建网络 AssetBundle  加载操作实例
         /// </summary>
-        /// <param name="options">从网络加载 AssetBundle 的配置选项</param>
+        /// <param name="options">从网络加载 AssetBundle 的操作选项</param>
         public LoadWebEncryptedAssetBundleOperation(LoadWebAssetBundleOptions options)
         {
             _options = options;
@@ -162,34 +163,27 @@ namespace YooAsset
         }
         protected override void InternalStart()
         {
-            _steps = ESteps.DataRequest;
+            _steps = ESteps.Prepare;
         }
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.DataRequest)
+            if (_steps == ESteps.Prepare)
             {
                 var decryptor = _options.AssetBundleDecryptor;
                 if (decryptor == null)
                 {
                     _steps = ESteps.Done;
-                    SetError($"{_options.CacheName} decryptor is null.");
+                    SetError($"{_options.CacheName} asset bundle decryptor is null.");
                     return;
                 }
 
                 if (decryptor is IBundleMemoryDecryptor)
                 {
                     _decryptor = decryptor as IBundleMemoryDecryptor;
-                    string url = _options.DownloadUrlPolicy.SelectUrl(_options.CandidateUrls);
-                    var args = new DownloadDataRequestArgs(
-                        url: url,
-                        timeout: 0,
-                        watchdogTimeout: _options.WatchdogTimeout);
-                    _downloadBytesRequest = _options.DownloadBackend.CreateBytesRequest(args);
-                    _downloadBytesRequest.SendRequest();
-                    _steps = ESteps.CheckRequest;
+                    _steps = ESteps.DataRequest;
                 }
                 else
                 {
@@ -197,6 +191,18 @@ namespace YooAsset
                     SetError($"{_options.CacheName} does not support '{decryptor.GetType().Name}'.");
                     return;
                 }
+            }
+
+            if (_steps == ESteps.DataRequest)
+            {
+                string url = _options.DownloadUrlPolicy.SelectUrl(_options.CandidateUrls);
+                var args = new DownloadDataRequestArgs(
+                    url: url,
+                    timeout: 0,
+                    watchdogTimeout: _options.WatchdogTimeout);
+                _downloadBytesRequest = _options.DownloadBackend.CreateBytesRequest(args);
+                _downloadBytesRequest.SendRequest();
+                _steps = ESteps.CheckRequest;
             }
 
             if (_steps == ESteps.CheckRequest)
@@ -225,6 +231,7 @@ namespace YooAsset
                     {
                         _steps = ESteps.Done;
                         SetError(_downloadBytesRequest.Error);
+                        YooLogger.LogError(Error);
                     }
                 }
             }
@@ -246,7 +253,7 @@ namespace YooAsset
                 }
                 else
                 {
-                    string error = $"[WebBundleVerify] Verify failed. Url: '{_downloadBytesRequest.Url}' Level: {_options.DownloadVerifyLevel} Result: {verifyResult}.";
+                    string error = $"Verify failed. Url: '{_downloadBytesRequest.Url}' Level: {_options.DownloadVerifyLevel} Result: {verifyResult}.";
                     YooLogger.LogWarning(error);
 
                     if (IsWaitForCompletion == false && _downloadRetryController.HasRetriesRemaining())

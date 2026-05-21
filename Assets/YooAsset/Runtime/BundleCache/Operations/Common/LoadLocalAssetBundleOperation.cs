@@ -30,7 +30,7 @@ namespace YooAsset
         /// <summary>
         /// 创建本地 AssetBundle 加载操作实例
         /// </summary>
-        /// <param name="options">从本地加载 AssetBundle 的配置选项</param>
+        /// <param name="options">从本地加载 AssetBundle 的操作选项</param>
         public LoadLocalAssetBundleOperation(LoadLocalAssetBundleOptions options)
         {
             _options = options;

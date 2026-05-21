@@ -1,9 +1,9 @@
 namespace YooAsset
 {
     /// <summary>
-    ///  小游戏平台加载 AssetBundle 操作
+    /// 小游戏平台加载 RawBundle 操作
     /// </summary>
-    internal sealed class WGBCLoadAssetBundleOperation : BCLoadBundleOperation
+    internal sealed class WGBCLoadRawBundleOperation : BCLoadBundleOperation
     {
         private enum ESteps
         {
@@ -17,7 +17,7 @@ namespace YooAsset
         private BCLoadBundleOperation _loadBundleOp;
         private ESteps _steps = ESteps.None;
 
-        internal WGBCLoadAssetBundleOperation(WebGameBundleCache fileCache, BCLoadBundleOptions options)
+        internal WGBCLoadRawBundleOperation(WebGameBundleCache fileCache, BCLoadBundleOptions options)
         {
             _fileCache = fileCache;
             _options = options;
@@ -36,33 +36,17 @@ namespace YooAsset
                 if (_loadBundleOp == null)
                 {
                     var urls = _fileCache.Config.RemoteService.GetRemoteUrls(_options.Bundle.GetFileName());
-                    if (_options.Bundle.IsEncrypted)
-                    {
-                        var options = new LoadWebAssetBundleOptions(
-                            cacheName: _fileCache.GetType().Name,
-                            bundle: _options.Bundle,
-                            candidateUrls: urls,
-                            assetBundleDecryptor: _fileCache.Config.AssetBundleDecryptor,
-                            downloadBackend: _fileCache.Config.DownloadBackend,
-                            downloadVerifyLevel: _fileCache.Config.DownloadVerifyLevel,
-                            watchdogTimeout: _fileCache.Config.WatchdogTimeout,
-                            disableUnityWebCache: _fileCache.Config.DisableUnityWebCache,
-                            downloadRetryPolicy: _fileCache.Config.DownloadRetryPolicy,
-                            downloadUrlPolicy: _fileCache.Config.DownloadUrlPolicy);
-                        _loadBundleOp = new LoadWebEncryptedAssetBundleOperation(options);
-                    }
-                    else
-                    {
-                        var webGameOptions = new LoadWebGameAssetBundleOptions(
-                            bundle: _options.Bundle,
-                            candidateUrls: urls,
-                            gamePlatform: _fileCache.Config.GamePlatform,
-                            watchdogTimeout: _fileCache.Config.WatchdogTimeout,
-                            downloadRetryPolicy: _fileCache.Config.DownloadRetryPolicy,
-                            downloadUrlPolicy: _fileCache.Config.DownloadUrlPolicy);
-                        _loadBundleOp = new LoadWebGameAssetBundleOperation(webGameOptions);
-                    }
-
+                    var options = new LoadWebRawBundleOptions(
+                        cacheName: _fileCache.GetType().Name,
+                        bundle: _options.Bundle,
+                        candidateUrls: urls,
+                        rawBundleDecryptor: _fileCache.Config.RawBundleDecryptor,
+                        downloadBackend: _fileCache.Config.DownloadBackend,
+                        downloadVerifyLevel: _fileCache.Config.DownloadVerifyLevel,
+                        watchdogTimeout: _fileCache.Config.WatchdogTimeout,
+                        downloadRetryPolicy: _fileCache.Config.DownloadRetryPolicy,
+                        downloadUrlPolicy: _fileCache.Config.DownloadUrlPolicy);
+                    _loadBundleOp = new LoadWebRawBundleOperation(options);
                     _loadBundleOp.StartOperation();
                     AddChildOperation(_loadBundleOp);
                 }

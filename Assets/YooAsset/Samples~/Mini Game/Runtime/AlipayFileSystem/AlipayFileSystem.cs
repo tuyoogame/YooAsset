@@ -11,12 +11,21 @@ public static class AlipayFileSystemCreater
         fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
         return fileSystemParams;
     }
-    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor decryptor)
+    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor)
     {
         string fileSystemClass = $"{nameof(AlipayFileSystem)},YooAsset.MiniGame";
         var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
         fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
-        fileSystemParams.AddParameter(EFileSystemParameter.AssetbundleDecryptor, decryptor);
+        fileSystemParams.AddParameter(EFileSystemParameter.AssetbundleDecryptor, assetBundleDecryptor);
+        return fileSystemParams;
+    }
+    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor)
+    {
+        string fileSystemClass = $"{nameof(AlipayFileSystem)},YooAsset.MiniGame";
+        var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
+        fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
+        fileSystemParams.AddParameter(EFileSystemParameter.AssetbundleDecryptor, assetBundleDecryptor);
+        fileSystemParams.AddParameter(EFileSystemParameter.RawbundleDecryptor, rawBundleDecryptor);
         return fileSystemParams;
     }
 }

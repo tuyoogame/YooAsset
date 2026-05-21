@@ -22,7 +22,7 @@ namespace YooAsset
         /// <summary>
         /// 创建本地 ArchiveBundle 加载操作实例
         /// </summary>
-        /// <param name="options">从本地加载 ArchiveBundle 的配置选项</param>
+        /// <param name="options">从本地加载 ArchiveBundle 的操作选项</param>
         public LoadLocalArchiveBundleOperation(LoadLocalArchiveBundleOptions options)
         {
             _options = options;

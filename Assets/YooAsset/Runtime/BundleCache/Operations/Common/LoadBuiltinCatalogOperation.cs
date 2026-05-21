@@ -31,7 +31,7 @@ namespace YooAsset
         /// <summary>
         /// 创建加载内置资源目录操作实例
         /// </summary>
-        /// <param name="options">加载内置资源目录的配置选项</param>
+        /// <param name="options">加载内置资源目录的操作选项</param>
         internal LoadBuiltinCatalogOperation(LoadBuiltinCatalogOptions options)
         {
             _options = options;

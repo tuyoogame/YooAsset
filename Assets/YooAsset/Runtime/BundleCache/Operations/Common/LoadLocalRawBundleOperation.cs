@@ -23,7 +23,7 @@ namespace YooAsset
         /// <summary>
         /// 创建本地 RawBundle 加载操作实例
         /// </summary>
-        /// <param name="options">从本地加载 RawBundle 的配置选项</param>
+        /// <param name="options">从本地加载 RawBundle 的操作选项</param>
         public LoadLocalRawBundleOperation(LoadLocalRawBundleOptions options)
         {
             _options = options;

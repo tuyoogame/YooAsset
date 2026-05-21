@@ -58,7 +58,7 @@ namespace YooAsset
         /// <summary>
         /// 初始化
         /// </summary>
-        /// <param name="options">初始化配置选项</param>
+        /// <param name="options">初始化操作选项</param>
         /// <param name="host">文件系统宿主</param>
         public void Initialize(InitializePackageOptions options, FileSystemHost host)
         {

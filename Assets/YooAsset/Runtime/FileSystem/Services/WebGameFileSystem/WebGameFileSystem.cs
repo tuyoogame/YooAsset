@@ -56,6 +56,11 @@ namespace YooAsset
         public IBundleDecryptor AssetBundleDecryptor { get; private set; }
 
         /// <summary>
+        /// 自定义参数：RawBundle 解密器
+        /// </summary>
+        public IBundleDecryptor RawBundleDecryptor { get; private set; }
+
+        /// <summary>
         /// 自定义参数：资源清单解密器
         /// </summary>
         public IManifestDecryptor ManifestDecryptor { get; private set; }
@@ -142,6 +147,10 @@ namespace YooAsset
             {
                 AssetBundleDecryptor = FileSystemHelper.CastParameter<IBundleDecryptor>(paramName, value);
             }
+            else if (paramName == nameof(EFileSystemParameter.RawbundleDecryptor))
+            {
+                RawBundleDecryptor = FileSystemHelper.CastParameter<IBundleDecryptor>(paramName, value);
+            }
             else if (paramName == nameof(EFileSystemParameter.ManifestDecryptor))
             {
                 ManifestDecryptor = FileSystemHelper.CastParameter<IManifestDecryptor>(paramName, value);
@@ -189,6 +198,7 @@ namespace YooAsset
                 disableUnityWebCache: DisableUnityWebCache,
                 downloadVerifyLevel: DownloadVerifyLevel,
                 assetBundleDecryptor: AssetBundleDecryptor,
+                rawBundleDecryptor: RawBundleDecryptor,
                 remoteService: RemoteService,
                 downloadBackend: DownloadBackend,
                 downloadRetryPolicy: DownloadRetryPolicy,

@@ -10,12 +10,21 @@ public static class OppoFileSystemCreater
         fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
         return fileSystemParams;
     }
-    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor decryptor)
+    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor)
     {
         string fileSystemClass = $"{nameof(OppoFileSystem)},YooAsset.MiniGame";
         var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
         fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
-        fileSystemParams.AddParameter(EFileSystemParameter.AssetbundleDecryptor, decryptor);
+        fileSystemParams.AddParameter(EFileSystemParameter.AssetbundleDecryptor, assetBundleDecryptor);
+        return fileSystemParams;
+    }
+    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor)
+    {
+        string fileSystemClass = $"{nameof(OppoFileSystem)},YooAsset.MiniGame";
+        var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
+        fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
+        fileSystemParams.AddParameter(EFileSystemParameter.AssetbundleDecryptor, assetBundleDecryptor);
+        fileSystemParams.AddParameter(EFileSystemParameter.RawbundleDecryptor, rawBundleDecryptor);
         return fileSystemParams;
     }
 }
