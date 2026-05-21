@@ -27,21 +27,5 @@ internal class WechatPlatform : IWebGamePlatform
     {
         assetBundle.WXUnload(unloadAll);
     }
-
-    /// <inheritdoc/>
-    public bool IsCached(string cacheFilePath)
-    {
-        if (string.IsNullOrEmpty(cacheFilePath))
-            return false;
-
-        string result = WX.GetCachePath(cacheFilePath);
-        return string.IsNullOrEmpty(result) == false;
-    }
-
-    /// <inheritdoc/>
-    public string GetCacheFilePath(string rootPath, PackageBundle bundle)
-    {
-        return PathUtility.Combine(rootPath, bundle.GetFileName());
-    }
 }
 #endif

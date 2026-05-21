@@ -28,17 +28,5 @@ internal class TaptapPlatform : IWebGamePlatform
     {
         assetBundle.TapUnload(unloadAll);
     }
-
-    /// <inheritdoc/>
-    public bool IsCached(string cacheFilePath)
-    {
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public string GetCacheFilePath(string rootPath, PackageBundle bundle)
-    {
-        return PathUtility.Combine(rootPath, bundle.GetFileName());
-    }
 }
 #endif

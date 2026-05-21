@@ -1,6 +1,5 @@
 #if UNITY_WEBGL && DOUYINMINIGAME
 using YooAsset;
-using TTSDK;
 
 public static class TiktokFileSystemCreater
 {
@@ -29,7 +28,7 @@ internal class TiktokFileSystem : WebGameFileSystem
     /// <inheritdoc/>
     protected override IWebGamePlatform CreatePlatform(string packageRoot)
     {
-        return new TiktokPlatform(TT.GetFileSystemManager());
+        return new TiktokPlatform();
     }
 }
 #endif

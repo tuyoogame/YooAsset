@@ -28,20 +28,5 @@ namespace YooAsset
         /// <param name="assetBundle">待卸载的 AssetBundle 实例</param>
         /// <param name="unloadAll">是否同时卸载所有已加载的资源对象</param>
         void UnloadAssetBundle(AssetBundle assetBundle, bool unloadAll);
-
-        /// <summary>
-        /// 检查指定资源包是否已在平台缓存中
-        /// </summary>
-        /// <param name="cacheFilePath">资源包在本地缓存中的文件路径</param>
-        /// <returns>如果已缓存则返回 true，否则返回 false。</returns>
-        bool IsCached(string cacheFilePath);
-
-        /// <summary>
-        /// 获取资源包在平台缓存中的文件路径
-        /// </summary>
-        /// <param name="rootPath">缓存根目录</param>
-        /// <param name="bundle">资源包描述</param>
-        /// <returns>缓存文件的完整路径</returns>
-        string GetCacheFilePath(string rootPath, PackageBundle bundle);
     }
 }

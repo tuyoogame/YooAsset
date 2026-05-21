@@ -9,17 +9,6 @@ using TTSDK;
 /// </summary>
 internal class TiktokPlatform : IWebGamePlatform
 {
-    private readonly TTFileSystemManager _fileSystemMgr;
-
-    /// <summary>
-    /// 创建 TiktokPlatform 实例
-    /// </summary>
-    /// <param name="fileSystemMgr">抖音文件系统管理器</param>
-    internal TiktokPlatform(TTFileSystemManager fileSystemMgr)
-    {
-        _fileSystemMgr = fileSystemMgr;
-    }
-
     /// <inheritdoc/>
     public UnityWebRequest CreateAssetBundleRequest(string url)
     {
@@ -37,18 +26,6 @@ internal class TiktokPlatform : IWebGamePlatform
     public void UnloadAssetBundle(AssetBundle assetBundle, bool unloadAll)
     {
         assetBundle.TTUnload(unloadAll);
-    }
-
-    /// <inheritdoc/>
-    public bool IsCached(string cacheFilePath)
-    {
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public string GetCacheFilePath(string rootPath, PackageBundle bundle)
-    {
-        return _fileSystemMgr.GetLocalCachedPathForUrl(bundle.GetFileName());
     }
 }
 #endif
