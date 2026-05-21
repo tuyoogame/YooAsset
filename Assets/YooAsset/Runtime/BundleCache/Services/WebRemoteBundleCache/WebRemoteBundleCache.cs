@@ -31,6 +31,11 @@ namespace YooAsset
             public IBundleDecryptor AssetBundleDecryptor { get; }
 
             /// <summary>
+            /// RawBundle 解密器
+            /// </summary>
+            public IBundleDecryptor RawBundleDecryptor { get; }
+
+            /// <summary>
             /// 远程服务接口
             /// </summary>
             public IRemoteService RemoteService { get; }
@@ -51,13 +56,14 @@ namespace YooAsset
             public IDownloadUrlPolicy DownloadUrlPolicy { get; }
 
             public Configuration(int watchdogTimeout, bool disableUnityWebCache,
-                EFileVerifyLevel downloadVerifyLevel, IBundleDecryptor assetBundleDecryptor, IRemoteService remoteService,
+                EFileVerifyLevel downloadVerifyLevel, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor, IRemoteService remoteService,
                 IDownloadBackend downloadBackend, IDownloadRetryPolicy downloadRetryPolicy, IDownloadUrlPolicy downloadUrlPolicy)
             {
                 WatchdogTimeout = watchdogTimeout;
                 DisableUnityWebCache = disableUnityWebCache;
                 DownloadVerifyLevel = downloadVerifyLevel;
                 AssetBundleDecryptor = assetBundleDecryptor;
+                RawBundleDecryptor = rawBundleDecryptor;
                 RemoteService = remoteService;
                 DownloadBackend = downloadBackend;
                 DownloadRetryPolicy = downloadRetryPolicy;
@@ -135,6 +141,11 @@ namespace YooAsset
             if (options.Bundle.GetBundleType() == (int)EBundleType.AssetBundle)
             {
                 var operation = new WRBCLoadAssetBundleOperation(this, options);
+                return operation;
+            }
+            else if (options.Bundle.GetBundleType() == (int)EBundleType.RawBundle)
+            {
+                var operation = new WRBCLoadRawBundleOperation(this, options);
                 return operation;
             }
             else
