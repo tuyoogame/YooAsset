@@ -3,7 +3,7 @@ using UnityEngine;
 namespace YooAsset
 {
     /// <summary>
-    /// 游戏对象实例化选项
+    /// 游戏对象实例化的操作选项
     /// </summary>
     public readonly struct InstantiateOptions
     {

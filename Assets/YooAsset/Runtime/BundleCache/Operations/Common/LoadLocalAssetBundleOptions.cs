@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 加载 AssetBundle 的上下文信息
+    /// 加载 AssetBundle 的操作选项
     /// </summary>
     internal readonly struct LoadLocalAssetBundleOptions
     {

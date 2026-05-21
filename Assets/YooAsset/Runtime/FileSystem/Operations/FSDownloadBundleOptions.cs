@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 下载资源包操作选项
+    /// 下载资源包的操作选项
     /// </summary>
     internal readonly struct FSDownloadBundleOptions
     {

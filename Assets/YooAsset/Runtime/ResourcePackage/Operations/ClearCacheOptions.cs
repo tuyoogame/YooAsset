@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 清理缓存选项
+    /// 清理缓存的操作选项
     /// </summary>
     public readonly struct ClearCacheOptions
     {

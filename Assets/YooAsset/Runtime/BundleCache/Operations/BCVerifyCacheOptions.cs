@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 验证缓存操作选项
+    /// 验证缓存的操作选项
     /// </summary>
     internal readonly struct BCVerifyCacheOptions
     {

@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 加载资源包操作选项
+    /// 加载资源包的操作选项
     /// </summary>
     internal readonly struct BCLoadBundleOptions
     {

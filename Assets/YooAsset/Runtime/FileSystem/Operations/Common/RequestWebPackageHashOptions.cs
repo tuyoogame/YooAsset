@@ -1,7 +1,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 请求Web远端包裹哈希操作选项
+    /// 请求Web远端包裹哈希的操作选项
     /// </summary>
     internal readonly struct RequestWebPackageHashOptions
     {

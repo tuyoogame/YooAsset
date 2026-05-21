@@ -1,7 +1,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 请求Web远端包裹版本操作选项
+    /// 请求Web远端包裹版本的操作选项
     /// </summary>
     internal readonly struct RequestWebPackageVersionOptions
     {

@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 加载清单选项
+    /// 加载清单的操作选项
     /// </summary>
     public readonly struct LoadPackageManifestOptions
     {

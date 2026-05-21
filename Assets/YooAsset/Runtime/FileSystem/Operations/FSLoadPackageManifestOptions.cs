@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 加载包裹清单操作选项
+    /// 加载包裹清单的操作选项
     /// </summary>
     internal readonly struct FSLoadPackageManifestOptions
     {

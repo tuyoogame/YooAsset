@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 清理缓存操作选项
+    /// 清理缓存的操作选项
     /// </summary>
     internal readonly struct BCClearCacheOptions
     {

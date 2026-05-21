@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 按资源信息创建下载器的选项
+    /// 按资源信息创建下载器的操作选项
     /// </summary>
     public readonly struct BundleDownloaderOptions
     {
@@ -59,7 +59,7 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// 按资源标签创建下载器的选项
+    /// 按资源标签创建下载器的操作选项
     /// </summary>
     public readonly struct ResourceDownloaderOptions
     {
@@ -119,7 +119,7 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// 资源解压选项
+    /// 资源解压的操作选项
     /// </summary>
     public readonly struct ResourceUnpackerOptions
     {
@@ -179,7 +179,7 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// 资源导入选项
+    /// 资源导入的操作选项
     /// </summary>
     public readonly struct BundleImporterOptions
     {

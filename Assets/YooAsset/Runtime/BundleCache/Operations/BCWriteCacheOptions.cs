@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 写入缓存操作选项
+    /// 写入缓存的操作选项
     /// </summary>
     internal readonly struct BCWriteCacheOptions
     {

@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 确保资源包文件已就绪的选项
+    /// 确保资源包文件已就绪的操作选项
     /// </summary>
     public readonly struct EnsureBundleFileOptions
     {

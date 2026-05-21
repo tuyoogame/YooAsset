@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 请求版本选项
+    /// 请求版本的操作选项
     /// </summary>
     public readonly struct RequestPackageVersionOptions
     {

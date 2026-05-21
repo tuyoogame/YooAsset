@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 加载内置资源目录操作选项
+    /// 加载内置资源目录的操作选项
     /// </summary>
     internal readonly struct LoadBuiltinCatalogOptions
     {

@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 卸载所有资源的选项配置
+    /// 卸载所有资源的操作选项
     /// </summary>
     public readonly struct UnloadAllAssetsOptions
     {

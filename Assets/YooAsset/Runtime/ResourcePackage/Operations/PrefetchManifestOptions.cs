@@ -2,7 +2,7 @@
 namespace YooAsset
 {
     /// <summary>
-    /// 预取清单选项
+    /// 预取清单的操作选项
     /// </summary>
     public readonly struct PrefetchManifestOptions
     {

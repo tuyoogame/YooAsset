@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace YooAsset
 {
     /// <summary>
-    /// WebGL 游戏平台加载 AssetBundle 的配置选项
+    /// WebGL 游戏平台加载 AssetBundle 的操作选项
     /// </summary>
     internal readonly struct LoadWebGameAssetBundleOptions
     {
