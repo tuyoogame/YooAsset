@@ -31,6 +31,11 @@ namespace YooAsset
             public IBundleDecryptor AssetBundleDecryptor { get; }
 
             /// <summary>
+            /// RawBundle 解密器
+            /// </summary>
+            public IBundleDecryptor RawBundleDecryptor { get; }
+
+            /// <summary>
             /// 下载后台
             /// </summary>
             public IDownloadBackend DownloadBackend { get; }
@@ -45,14 +50,15 @@ namespace YooAsset
             /// </summary>
             public IDownloadUrlPolicy DownloadUrlPolicy { get; }
 
-            public Configuration(int watchdogTimeout, bool disableUnityWebCache, 
-                EFileVerifyLevel downloadVerifyLevel, IBundleDecryptor assetBundleDecryptor, 
+            public Configuration(int watchdogTimeout, bool disableUnityWebCache,
+                EFileVerifyLevel downloadVerifyLevel, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor,
                 IDownloadBackend downloadBackend, IDownloadRetryPolicy downloadRetryPolicy, IDownloadUrlPolicy downloadUrlPolicy)
             {
                 WatchdogTimeout = watchdogTimeout;
                 DisableUnityWebCache = disableUnityWebCache;
                 DownloadVerifyLevel = downloadVerifyLevel;
                 AssetBundleDecryptor = assetBundleDecryptor;
+                RawBundleDecryptor = rawBundleDecryptor;
                 DownloadBackend = downloadBackend;
                 DownloadRetryPolicy = downloadRetryPolicy;
                 DownloadUrlPolicy = downloadUrlPolicy;
@@ -137,6 +143,11 @@ namespace YooAsset
             if (options.Bundle.GetBundleType() == (int)EBundleType.AssetBundle)
             {
                 var operation = new WSBCLoadAssetBundleOperation(this, options);
+                return operation;
+            }
+            else if (options.Bundle.GetBundleType() == (int)EBundleType.RawBundle)
+            {
+                var operation = new WSBCLoadRawBundleOperation(this, options);
                 return operation;
             }
             else
