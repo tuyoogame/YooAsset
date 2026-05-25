@@ -5,6 +5,11 @@
         <ui:Button text="Import" display-tooltip-when-elided="true" name="ImportButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
         <ui:Button text="Fix" display-tooltip-when-elided="true" name="FixButton" style="width: 50px; background-color: rgb(56, 147, 58);" />
     </uie:Toolbar>
+    <uie:Toolbar name="SearchToolbar" style="display: flex; flex-direction: row;">
+        <uie:ToolbarSearchField focusable="true" name="SearchField" style="flex-grow: 1;" />
+        <ui:Button text="Search" display-tooltip-when-elided="true" name="SearchButton" style="width: 60px; background-color: rgb(56, 147, 58);" />
+    </uie:Toolbar>
+    <ui:Label name="SearchResultLabel" style="display: none; height: 24px; -unity-text-align: middle-center; padding-left: 5px; padding-right: 5px;" />
     <ui:VisualElement name="PublicContainer" style="background-color: rgb(79, 79, 79); border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;">
         <ui:VisualElement name="HelpBoxContainer" style="flex-grow: 1;" />
         <ui:VisualElement name="GlobalSettingsContainer">

@@ -60,19 +60,20 @@ namespace YooAsset.Editor
         /// <returns>如果收集器配置有效返回 true</returns>
         public bool IsValid()
         {
-            if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(CollectPath) == null)
+            string assetGUID = AssetDatabase.AssetPathToGUID(CollectPath);
+            if (string.IsNullOrEmpty(assetGUID))
                 return false;
 
             if (CollectorType == ECollectorType.None)
-                return false;
-
-            if (BundleCollectorSettingData.HasAddressRuleName(AddressRuleName) == false)
                 return false;
 
             if (BundleCollectorSettingData.HasBundlePackRuleName(PackRuleName) == false)
                 return false;
 
             if (BundleCollectorSettingData.HasAssetFilterRuleName(FilterRuleName) == false)
+                return false;
+
+            if (BundleCollectorSettingData.HasAddressRuleName(AddressRuleName) == false)
                 return false;
 
             return true;
