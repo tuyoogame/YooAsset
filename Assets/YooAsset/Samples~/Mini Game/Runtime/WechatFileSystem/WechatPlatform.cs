@@ -1,4 +1,4 @@
-#if UNITY_WEBGL && WEIXINMINIGAME
+#if UNITY_WEBGL && (WEIXINMINIGAME || UNITY_WECHATMINIGAME)
 using UnityEngine;
 using UnityEngine.Networking;
 using YooAsset;
