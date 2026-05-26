@@ -135,5 +135,10 @@ namespace YooAsset
         /// URL 选择策略 <see cref="IDownloadUrlPolicy"/>
         /// </summary>
         DownloadUrlPolicy,
+
+        /// <summary>
+        /// WebGL 平台策略 <see cref="IWebPlatformStrategy"/>
+        /// </summary>
+        WebPlatformStrategy,
     }
 }

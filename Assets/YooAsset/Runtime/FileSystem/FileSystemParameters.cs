@@ -102,10 +102,21 @@ namespace YooAsset
         /// </summary>
         /// <param name="packageRoot">文件系统的根目录</param>
         /// <returns>配置好的文件系统参数实例</returns>
-        public static FileSystemParameters CreateDefaultBuiltinFileSystemParameters(string packageRoot = null)
+        public static FileSystemParameters CreateDefaultBuiltinFileSystemParameters(string packageRoot)
         {
             string fileSystemClass = typeof(BuiltinFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
+            return fileSystemParams;
+        }
+
+        /// <summary>
+        /// 创建默认的内置文件系统参数
+        /// </summary>
+        /// <returns>配置好的文件系统参数实例</returns>
+        public static FileSystemParameters CreateDefaultBuiltinFileSystemParameters()
+        {
+            string fileSystemClass = typeof(BuiltinFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
             return fileSystemParams;
         }
 
@@ -115,7 +126,7 @@ namespace YooAsset
         /// <param name="remoteService">远端资源地址查询服务类</param>
         /// <param name="packageRoot">文件系统的根目录</param>
         /// <returns>配置好的文件系统参数实例</returns>
-        public static FileSystemParameters CreateDefaultSandboxFileSystemParameters(IRemoteService remoteService, string packageRoot = null)
+        public static FileSystemParameters CreateDefaultSandboxFileSystemParameters(IRemoteService remoteService, string packageRoot)
         {
             string fileSystemClass = typeof(SandboxFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
@@ -124,11 +135,24 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 创建默认的WebServer文件系统参数
+        /// 创建默认的沙盒文件系统参数
+        /// </summary>
+        /// <param name="remoteService">远端资源地址查询服务类</param>
+        /// <returns>配置好的文件系统参数实例</returns>
+        public static FileSystemParameters CreateDefaultSandboxFileSystemParameters(IRemoteService remoteService)
+        {
+            string fileSystemClass = typeof(SandboxFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
+            fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
+            return fileSystemParams;
+        }
+
+        /// <summary>
+        /// 创建默认的WebGL 服务器文件系统参数
         /// </summary>
         /// <param name="disableUnityWebCache">禁用Unity的网络缓存</param>
         /// <returns>配置好的文件系统参数实例</returns>
-        public static FileSystemParameters CreateDefaultWebServerFileSystemParameters(bool disableUnityWebCache = false)
+        public static FileSystemParameters CreateDefaultWebServerFileSystemParameters(bool disableUnityWebCache)
         {
             string fileSystemClass = typeof(WebServerFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
@@ -137,17 +161,43 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 创建默认的WebRemote文件系统参数
+        /// 创建默认的WebGL 服务器文件系统参数
+        /// </summary>
+        /// <returns>配置好的文件系统参数实例</returns>
+        public static FileSystemParameters CreateDefaultWebServerFileSystemParameters()
+        {
+            string fileSystemClass = typeof(WebServerFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
+            fileSystemParams.AddParameter(EFileSystemParameter.DisableUnityWebCache, false);
+            return fileSystemParams;
+        }
+
+        /// <summary>
+        /// 创建默认的 WebGL 网络文件系统参数
         /// </summary>
         /// <param name="remoteService">远端资源地址查询服务类</param>
         /// <param name="disableUnityWebCache">禁用Unity的网络缓存</param>
         /// <returns>配置好的文件系统参数实例</returns>
-        public static FileSystemParameters CreateDefaultWebRemoteFileSystemParameters(IRemoteService remoteService, bool disableUnityWebCache = false)
+        public static FileSystemParameters CreateDefaultWebNetworkFileSystemParameters(IRemoteService remoteService, bool disableUnityWebCache)
         {
-            string fileSystemClass = typeof(WebRemoteFileSystem).FullName;
+            string fileSystemClass = typeof(WebNetworkFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
             fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
             fileSystemParams.AddParameter(EFileSystemParameter.DisableUnityWebCache, disableUnityWebCache);
+            return fileSystemParams;
+        }
+
+        /// <summary>
+        /// 创建默认的 WebGL 网络文件系统参数
+        /// </summary>
+        /// <param name="remoteService">远端资源地址查询服务类</param>
+        /// <returns>配置好的文件系统参数实例</returns>
+        public static FileSystemParameters CreateDefaultWebNetworkFileSystemParameters(IRemoteService remoteService)
+        {
+            string fileSystemClass = typeof(WebNetworkFileSystem).FullName;
+            var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
+            fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
+            fileSystemParams.AddParameter(EFileSystemParameter.DisableUnityWebCache, false);
             return fileSystemParams;
         }
         #endregion

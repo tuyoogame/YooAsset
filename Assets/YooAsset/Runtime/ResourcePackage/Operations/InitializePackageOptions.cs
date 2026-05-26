@@ -67,14 +67,14 @@ namespace YooAsset
     public class WebPlayModeOptions : InitializePackageOptions
     {
         /// <summary>
-        /// Web服务器文件系统初始化参数
+        /// Web 服务器文件系统初始化参数
         /// </summary>
         public FileSystemParameters WebServerFileSystemParameters { get; set; }
 
         /// <summary>
-        /// Web远程文件系统初始化参数
+        /// Web 网络文件系统初始化参数
         /// </summary>
-        public FileSystemParameters WebRemoteFileSystemParameters { get; set; }
+        public FileSystemParameters WebNetworkFileSystemParameters { get; set; }
     }
 
     /// <summary>

@@ -106,7 +106,7 @@ namespace YooAsset
                     else if (_playMode == EPlayMode.WebPlayMode)
                     {
                         var initializeParameters = _options as WebPlayModeOptions;
-                        _initializeFileSystemOp = _fileSystemHost.InitializeAsync(initializeParameters.WebServerFileSystemParameters, initializeParameters.WebRemoteFileSystemParameters);
+                        _initializeFileSystemOp = _fileSystemHost.InitializeAsync(initializeParameters.WebServerFileSystemParameters, initializeParameters.WebNetworkFileSystemParameters);
                     }
                     else if (_playMode == EPlayMode.CustomPlayMode)
                     {

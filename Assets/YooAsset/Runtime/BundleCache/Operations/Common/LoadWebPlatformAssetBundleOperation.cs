@@ -1,11 +1,9 @@
-using UnityEngine;
-
 namespace YooAsset
 {
     /// <summary>
-    /// 从网络加载未加密 AssetBundle 操作
+    /// WebGL 平台加载非加密 AssetBundle 操作
     /// </summary>
-    internal sealed class LoadWebNormalAssetBundleOperation : BCLoadBundleOperation
+    internal sealed class LoadWebPlatformAssetBundleOperation : BCLoadBundleOperation
     {
         private enum ESteps
         {
@@ -16,16 +14,12 @@ namespace YooAsset
             Done,
         }
 
-        private readonly LoadWebAssetBundleOptions _options;
+        private readonly LoadWebPlatformAssetBundleOptions _options;
         private readonly DownloadRetryController _downloadRetryController;
         private IDownloadAssetBundleRequest _downloadAssetBundleRequest;
         private ESteps _steps = ESteps.None;
 
-        /// <summary>
-        /// 创建 AssetBundle 加载操作实例
-        /// </summary>
-        /// <param name="options">从网络加载 AssetBundle 的操作选项</param>
-        public LoadWebNormalAssetBundleOperation(LoadWebAssetBundleOptions options)
+        internal LoadWebPlatformAssetBundleOperation(LoadWebPlatformAssetBundleOptions options)
         {
             _options = options;
 
@@ -51,7 +45,7 @@ namespace YooAsset
                     disableUnityWebCache: _options.DisableUnityWebCache,
                     fileHash: _options.Bundle.FileHash,
                     unityCrc: _options.Bundle.UnityCrc,
-                    platformStrategy : null);
+                    platformStrategy: _options.PlatformStrategy);
                 _downloadAssetBundleRequest = _options.DownloadBackend.CreateAssetBundleRequest(args);
                 _downloadAssetBundleRequest.SendRequest();
                 _steps = ESteps.CheckRequest;
@@ -59,6 +53,7 @@ namespace YooAsset
 
             if (_steps == ESteps.CheckRequest)
             {
+                //TODO 部分小游戏平台的 downloadProgress 始终返回 0，导致进度条无法正确显示。
                 Progress = _downloadAssetBundleRequest.DownloadProgress;
                 if (_downloadAssetBundleRequest.IsDone == false)
                     return;
@@ -76,7 +71,7 @@ namespace YooAsset
                     {
                         _steps = ESteps.Done;
                         SetResult();
-                        BundleHandle = new AssetBundleHandle(_options.Bundle, assetBundle, null);
+                        BundleHandle = new WebAssetBundleHandle(_options.Bundle, assetBundle, _options.PlatformStrategy);
                     }
                 }
                 else
@@ -125,5 +120,4 @@ namespace YooAsset
             }
         }
     }
-
 }

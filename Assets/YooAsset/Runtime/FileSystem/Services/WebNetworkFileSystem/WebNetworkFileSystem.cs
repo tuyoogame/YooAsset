@@ -1,27 +1,21 @@
 using System;
-using System.IO;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace YooAsset
 {
     /// <summary>
-    /// Web服务端文件系统，管理 WebServer 平台的文件系统访问。
+    /// Web 网络文件系统，统一管理普通 Web 和 Mini Game 平台的远程资源加载。
+    /// 通过 IWebPlatformStrategy 隔离不同平台的 AssetBundle 请求、提取和卸载行为。
     /// </summary>
-    internal class WebServerFileSystem : IFileSystem
+    internal class WebNetworkFileSystem : IFileSystem
     {
         /// <summary>
-        /// Web 文件路径映射表
+        /// 包裹名称
         /// </summary>
-        protected readonly Dictionary<string, string> _webFilePathMapping = new Dictionary<string, string>(10000);
+        public string PackageName { get; private set; }
 
         /// <summary>
-        /// 包裹根目录路径
-        /// </summary>
-        protected string _packageRoot = string.Empty;
-
-        /// <summary>
-        /// Web Bundle 缓存系统
+        /// Web 文件缓存系统
         /// </summary>
         public IBundleCache BundleCache { get; private set; }
 
@@ -34,11 +28,6 @@ namespace YooAsset
         /// 平台策略
         /// </summary>
         public IWebPlatformStrategy PlatformStrategy { get; private set; }
-
-        /// <summary>
-        /// 包裹名称
-        /// </summary>
-        public string PackageName { get; private set; }
 
         #region 自定义参数
         /// <summary>
@@ -60,6 +49,11 @@ namespace YooAsset
         /// 自定义参数：下载的资源包数据的校验级别
         /// </summary>
         public EFileVerifyLevel DownloadVerifyLevel { get; private set; } = EFileVerifyLevel.Middle;
+
+        /// <summary>
+        /// 远程服务接口
+        /// </summary>
+        public IRemoteService RemoteService { get; private set; }
 
         /// <summary>
         /// 自定义参数：AssetBundle 解密器
@@ -87,57 +81,55 @@ namespace YooAsset
         public IDownloadUrlPolicy DownloadUrlPolicy { get; private set; }
         #endregion
 
-        /// <summary>
-        /// 创建实例
-        /// </summary>
-        public WebServerFileSystem()
+        public WebNetworkFileSystem()
         {
         }
+
         /// <inheritdoc />
-        public FSInitializeOperation InitializeAsync()
+        public virtual FSInitializeOperation InitializeAsync()
         {
-            var operation = new WSFSInitializeOperation(this);
+            var operation = new WNFSInitializeOperation(this);
             return operation;
         }
         /// <inheritdoc />
-        public FSRequestPackageVersionOperation RequestPackageVersionAsync(FSRequestPackageVersionOptions options)
+        public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(FSRequestPackageVersionOptions options)
         {
-            var operation = new WSFSRequestPackageVersionOperation(this, options.Timeout);
+            var operation = new WNFSRequestPackageVersionOperation(this, options.AppendTimeTicks, options.Timeout);
             return operation;
         }
         /// <inheritdoc />
-        public FSLoadPackageManifestOperation LoadPackageManifestAsync(FSLoadPackageManifestOptions options)
+        public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(FSLoadPackageManifestOptions options)
         {
-            var operation = new WSFSLoadPackageManifestOperation(this, options.PackageVersion, options.Timeout);
+            var operation = new WNFSLoadPackageManifestOperation(this, options.PackageVersion, options.Timeout);
             return operation;
         }
         /// <inheritdoc />
-        public FSLoadPackageBundleOperation LoadPackageBundleAsync(FSLoadPackageBundleOptions options)
+        public virtual FSLoadPackageBundleOperation LoadPackageBundleAsync(FSLoadPackageBundleOptions options)
         {
-            var operation = new WSFSLoadPackageBundleOperation(this, options);
+            var operation = new WNFSLoadPackageBundleOperation(this, options);
             return operation;
         }
         /// <inheritdoc />
-        public FSEnsurePackageBundleOperation EnsurePackageBundleAsync(FSEnsurePackageBundleOptions options)
+        public virtual FSEnsurePackageBundleOperation EnsurePackageBundleAsync(FSEnsurePackageBundleOptions options)
         {
-            var operation = new FSEnsurePackageBundleFailureOperation($"{nameof(WebServerFileSystem)} does not support ensure bundle file operation.");
+            var operation = new FSEnsurePackageBundleFailureOperation($"{nameof(WebNetworkFileSystem)} does not support ensure bundle file operation.");
             return operation;
         }
         /// <inheritdoc />
-        public FSDownloadBundleOperation DownloadBundleAsync(FSDownloadBundleOptions options)
+        public virtual FSDownloadBundleOperation DownloadBundleAsync(FSDownloadBundleOptions options)
         {
-            var operation = new FSDownloadBundleCompleteOperation($"{nameof(WebServerFileSystem)} does not support download operation.");
+            var operation = new FSDownloadBundleCompleteOperation($"{nameof(WebNetworkFileSystem)} does not support download operation.");
             return operation;
         }
         /// <inheritdoc />
-        public FSClearCacheOperation ClearCacheAsync(FSClearCacheOptions options)
+        public virtual FSClearCacheOperation ClearCacheAsync(FSClearCacheOptions options)
         {
             var operation = new FSClearCacheCompleteOperation();
             return operation;
         }
 
         /// <inheritdoc />
-        public void SetParameter(string paramName, object value)
+        public virtual void SetParameter(string paramName, object value)
         {
             if (paramName == nameof(EFileSystemParameter.DownloadBackend))
             {
@@ -159,6 +151,10 @@ namespace YooAsset
             else if (paramName == nameof(EFileSystemParameter.FileVerifyLevel))
             {
                 DownloadVerifyLevel = FileSystemHelper.CastParameter<EFileVerifyLevel>(paramName, value);
+            }
+            else if (paramName == nameof(EFileSystemParameter.RemoteService))
+            {
+                RemoteService = FileSystemHelper.CastParameter<IRemoteService>(paramName, value);
             }
             else if (paramName == nameof(EFileSystemParameter.AssetbundleDecryptor))
             {
@@ -190,14 +186,9 @@ namespace YooAsset
             }
         }
         /// <inheritdoc />
-        public void OnCreate(string packageName, string packageRoot)
+        public virtual void OnCreate(string packageName, string packageRoot)
         {
             PackageName = packageName;
-
-            if (string.IsNullOrEmpty(packageRoot))
-                _packageRoot = GetDefaultWebPackageRoot(packageName);
-            else
-                _packageRoot = packageRoot;
 
             // 创建默认的下载后台接口
             if (DownloadBackend == null)
@@ -215,21 +206,22 @@ namespace YooAsset
             if (PlatformStrategy == null)
                 PlatformStrategy = new DefaultWebPlatformStrategy(WebRequestCreator);
 
-            // 创建Web文件缓存系统
-            var cacheConfig = new WebServerBundleCache.Configuration(
+            // 创建文件缓存系统
+            var cacheConfig = new WebNetworkBundleCache.Configuration(
                 watchdogTimeout: DownloadWatchdogTimeout,
                 disableUnityWebCache: DisableUnityWebCache,
                 downloadVerifyLevel: DownloadVerifyLevel,
                 assetBundleDecryptor: AssetBundleDecryptor,
                 rawBundleDecryptor: RawBundleDecryptor,
                 platformStrategy: PlatformStrategy,
+                remoteService: RemoteService,
                 downloadBackend: DownloadBackend,
                 downloadRetryPolicy: DownloadRetryPolicy,
                 downloadUrlPolicy: DownloadUrlPolicy);
-            BundleCache = new WebServerBundleCache(packageName, _packageRoot, cacheConfig);
+            BundleCache = new WebNetworkBundleCache(packageName, cacheConfig);
         }
         /// <inheritdoc />
-        public void OnDestroy()
+        public virtual void OnDestroy()
         {
             if (BundleCache != null)
             {
@@ -245,58 +237,25 @@ namespace YooAsset
         }
 
         /// <inheritdoc />
-        public bool CanAcceptBundle(PackageBundle bundle)
+        public virtual bool CanAcceptBundle(PackageBundle bundle)
         {
-            return BundleCache.IsCached(bundle.BundleGuid);
+            // 注意：保底加载！
+            return true;
         }
         /// <inheritdoc />
-        public bool IsDownloadRequired(PackageBundle bundle)
+        public virtual bool IsDownloadRequired(PackageBundle bundle)
         {
             return false;
         }
         /// <inheritdoc />
-        public bool IsUnpackRequired(PackageBundle bundle)
+        public virtual bool IsUnpackRequired(PackageBundle bundle)
         {
             return false;
         }
         /// <inheritdoc />
-        public bool IsImportRequired(PackageBundle bundle)
+        public virtual bool IsImportRequired(PackageBundle bundle)
         {
             return false;
         }
-
-        #region 内部方法
-        protected string GetDefaultWebPackageRoot(string packageName)
-        {
-            string rootDirectory = YooAssetConfiguration.GetDefaultBuiltinRoot();
-            return PathUtility.Combine(rootDirectory, packageName);
-        }
-        /// <summary>
-        /// 获取Web包裹版本文件路径
-        /// </summary>
-        public string GetWebPackageVersionFilePath()
-        {
-            string fileName = YooAssetConfiguration.GetPackageVersionFileName(PackageName);
-            return PathUtility.Combine(_packageRoot, fileName);
-        }
-
-        /// <summary>
-        /// 获取Web包裹哈希文件路径
-        /// </summary>
-        public string GetWebPackageHashFilePath(string packageVersion)
-        {
-            string fileName = YooAssetConfiguration.GetPackageHashFileName(PackageName, packageVersion);
-            return PathUtility.Combine(_packageRoot, fileName);
-        }
-
-        /// <summary>
-        /// 获取Web包裹清单文件路径
-        /// </summary>
-        public string GetWebPackageManifestFilePath(string packageVersion)
-        {
-            string fileName = YooAssetConfiguration.GetManifestBinaryFileName(PackageName, packageVersion);
-            return PathUtility.Combine(_packageRoot, fileName);
-        }
-        #endregion
     }
 }

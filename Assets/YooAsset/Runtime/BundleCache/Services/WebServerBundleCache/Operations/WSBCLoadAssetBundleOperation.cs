@@ -58,22 +58,33 @@ namespace YooAsset
                 if (_loadBundleOp == null)
                 {
                     string url = DownloadUrlHelper.ToLocalFileUrl(_cacheEntry.FilePath);
-                    var options = new LoadWebAssetBundleOptions(
-                        cacheName: _fileCache.GetType().Name,
-                        bundle: _options.Bundle,
-                        candidateUrls: new[] { url },
-                        assetBundleDecryptor: _fileCache.Config.AssetBundleDecryptor,
-                        downloadBackend: _fileCache.Config.DownloadBackend,
-                        downloadVerifyLevel: _fileCache.Config.DownloadVerifyLevel,
-                        watchdogTimeout: _fileCache.Config.WatchdogTimeout,
-                        disableUnityWebCache: _fileCache.Config.DisableUnityWebCache,
-                        downloadRetryPolicy: _fileCache.Config.DownloadRetryPolicy,
-                        downloadUrlPolicy: _fileCache.Config.DownloadUrlPolicy);
-
                     if (_options.Bundle.IsEncrypted)
-                        _loadBundleOp = new LoadWebEncryptedAssetBundleOperation(options);
+                    {
+                        var encryptedOptions = new LoadWebEncryptedAssetBundleOptions(
+                            cacheName: _fileCache.GetType().Name,
+                            bundle: _options.Bundle,
+                            candidateUrls: new[] { url },
+                            assetBundleDecryptor: _fileCache.Config.AssetBundleDecryptor,
+                            downloadBackend: _fileCache.Config.DownloadBackend,
+                            downloadVerifyLevel: _fileCache.Config.DownloadVerifyLevel,
+                            watchdogTimeout: _fileCache.Config.WatchdogTimeout,
+                            downloadRetryPolicy: _fileCache.Config.DownloadRetryPolicy,
+                            downloadUrlPolicy: _fileCache.Config.DownloadUrlPolicy);
+                        _loadBundleOp = new LoadWebEncryptedAssetBundleOperation(encryptedOptions);
+                    }
                     else
-                        _loadBundleOp = new LoadWebNormalAssetBundleOperation(options);
+                    {
+                        var platformOptions = new LoadWebPlatformAssetBundleOptions(
+                            bundle: _options.Bundle,
+                            candidateUrls: new[] { url },
+                            platformStrategy: _fileCache.Config.PlatformStrategy,
+                            downloadBackend: _fileCache.Config.DownloadBackend,
+                            watchdogTimeout: _fileCache.Config.WatchdogTimeout,
+                            disableUnityWebCache: _fileCache.Config.DisableUnityWebCache,
+                            downloadRetryPolicy: _fileCache.Config.DownloadRetryPolicy,
+                            downloadUrlPolicy: _fileCache.Config.DownloadUrlPolicy);
+                        _loadBundleOp = new LoadWebPlatformAssetBundleOperation(platformOptions);
+                    }
 
                     _loadBundleOp.StartOperation();
                     AddChildOperation(_loadBundleOp);

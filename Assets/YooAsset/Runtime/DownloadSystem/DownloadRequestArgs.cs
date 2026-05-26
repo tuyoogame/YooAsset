@@ -107,9 +107,9 @@ namespace YooAsset
             int timeout,
             int watchdogTimeout,
             string savePath,
-            bool appendToFile = false,
-            bool removeFileOnAbort = true,
-            long resumeOffset = 0,
+            bool appendToFile,
+            bool removeFileOnAbort,
+            long resumeOffset,
             IReadOnlyDictionary<string, string> headers = null)
         {
             RequestArgs = new DownloadRequestArgs(
@@ -121,6 +121,32 @@ namespace YooAsset
             AppendToFile = appendToFile;
             RemoveFileOnAbort = removeFileOnAbort;
             ResumeOffset = resumeOffset;
+        }
+
+        /// <summary>
+        /// 构造文件下载请求参数
+        /// </summary>
+        /// <param name="url">请求地址</param>
+        /// <param name="timeout">响应超时时间（秒），0 表示不应用超时。</param>
+        /// <param name="watchdogTimeout">看门狗超时时间（秒），0 表示禁用。</param>
+        /// <param name="savePath">文件保存路径</param>
+        /// <param name="headers">自定义请求头（可选）</param>
+        public DownloadFileRequestArgs(
+            string url,
+            int timeout,
+            int watchdogTimeout,
+            string savePath,
+            IReadOnlyDictionary<string, string> headers = null)
+        {
+            RequestArgs = new DownloadRequestArgs(
+                url: url,
+                timeout: timeout,
+                watchdogTimeout: watchdogTimeout,
+                headers: headers);
+            SavePath = savePath;
+            AppendToFile = false;
+            RemoveFileOnAbort = true;
+            ResumeOffset = 0;
         }
     }
 
@@ -186,6 +212,11 @@ namespace YooAsset
         public uint UnityCrc { get; }
 
         /// <summary>
+        /// Web 平台策略
+        /// </summary>
+        public IWebPlatformStrategy PlatformStrategy { get; }
+
+        /// <summary>
         /// 构造 AssetBundle 下载请求参数
         /// </summary>
         /// <param name="url">请求地址</param>
@@ -194,14 +225,16 @@ namespace YooAsset
         /// <param name="disableUnityWebCache">是否禁用 Unity 内置缓存</param>
         /// <param name="fileHash">文件哈希（启用缓存时必须提供）</param>
         /// <param name="unityCrc">Unity CRC 校验值</param>
+        /// <param name="platformStrategy">WebGL 平台策略</param>
         /// <param name="headers">自定义请求头（可选）</param>
         public DownloadAssetBundleRequestArgs(
             string url,
             int timeout,
             int watchdogTimeout,
-            bool disableUnityWebCache = true,
-            string fileHash = null,
-            uint unityCrc = 0,
+            bool disableUnityWebCache,
+            string fileHash,
+            uint unityCrc,
+            IWebPlatformStrategy platformStrategy,
             IReadOnlyDictionary<string, string> headers = null)
         {
             RequestArgs = new DownloadRequestArgs(
@@ -212,6 +245,7 @@ namespace YooAsset
             DisableUnityWebCache = disableUnityWebCache;
             FileHash = fileHash;
             UnityCrc = unityCrc;
+            PlatformStrategy = platformStrategy;
         }
     }
 
@@ -243,12 +277,12 @@ namespace YooAsset
         /// </summary>
         /// <param name="url">请求地址（仅用于标识）</param>
         /// <param name="fileSize">模拟的文件大小（字节）</param>
-        /// <param name="downloadSpeed">模拟的下载速度（字节/秒），默认 1MB/s</param>
-        public SimulatedDownloadRequestArgs(string url, long fileSize, long downloadSpeed = 1024 * 1024)
+        /// <param name="downloadSpeed">模拟的下载速度（字节/秒）</param>
+        public SimulatedDownloadRequestArgs(string url, long fileSize, long downloadSpeed)
         {
             Url = url;
             FileSize = Math.Max(fileSize, 0);
-            DownloadSpeed = downloadSpeed > 0 ? downloadSpeed : 1024 * 1024;
+            DownloadSpeed = downloadSpeed;
         }
     }
 }

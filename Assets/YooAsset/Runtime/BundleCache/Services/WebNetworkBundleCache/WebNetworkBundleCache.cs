@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-
 namespace YooAsset
 {
     /// <summary>
-    /// Web服务器文件缓存系统，用于WebGL平台从服务器加载资源。
+    /// WebGL 平台网络缓存系统
     /// </summary>
-    internal class WebServerBundleCache : IBundleCache
+    internal class WebNetworkBundleCache : IBundleCache
     {
         internal readonly struct Configuration
         {
@@ -36,12 +33,17 @@ namespace YooAsset
             public IBundleDecryptor RawBundleDecryptor { get; }
 
             /// <summary>
-            /// Web 平台策略
+            /// 平台策略接口
             /// </summary>
             public IWebPlatformStrategy PlatformStrategy { get; }
 
             /// <summary>
-            /// 下载后台
+            /// 远程服务接口
+            /// </summary>
+            public IRemoteService RemoteService { get; }
+
+            /// <summary>
+            /// 下载后台接口
             /// </summary>
             public IDownloadBackend DownloadBackend { get; }
 
@@ -56,9 +58,9 @@ namespace YooAsset
             public IDownloadUrlPolicy DownloadUrlPolicy { get; }
 
             public Configuration(int watchdogTimeout, bool disableUnityWebCache,
-                EFileVerifyLevel downloadVerifyLevel, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor,
-                IWebPlatformStrategy platformStrategy, IDownloadBackend downloadBackend,
-                IDownloadRetryPolicy downloadRetryPolicy, IDownloadUrlPolicy downloadUrlPolicy)
+               EFileVerifyLevel downloadVerifyLevel, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor,
+               IWebPlatformStrategy platformStrategy, IRemoteService remoteService, IDownloadBackend downloadBackend,
+               IDownloadRetryPolicy downloadRetryPolicy, IDownloadUrlPolicy downloadUrlPolicy)
             {
                 WatchdogTimeout = watchdogTimeout;
                 DisableUnityWebCache = disableUnityWebCache;
@@ -66,13 +68,12 @@ namespace YooAsset
                 AssetBundleDecryptor = assetBundleDecryptor;
                 RawBundleDecryptor = rawBundleDecryptor;
                 PlatformStrategy = platformStrategy;
+                RemoteService = remoteService;
                 DownloadBackend = downloadBackend;
                 DownloadRetryPolicy = downloadRetryPolicy;
                 DownloadUrlPolicy = downloadUrlPolicy;
             }
         }
-
-        private readonly Dictionary<string, WebServerBundleCacheEntry> _cacheEntries = new Dictionary<string, WebServerBundleCacheEntry>(10000);
 
         /// <summary>
         /// 缓存配置
@@ -90,28 +91,15 @@ namespace YooAsset
         public bool IsReadOnly { get; }
 
         /// <inheritdoc/>
-        public int FileCount
-        {
-            get
-            {
-                return _cacheEntries.Count;
-            }
-        }
+        public int FileCount { get; }
 
         /// <inheritdoc/>
         public long SpaceOccupied { get; }
         #endregion
 
-        /// <summary>
-        /// 创建 WebServerBundleCache 实例
-        /// </summary>
-        /// <param name="packageName">包裹名称</param>
-        /// <param name="rootPath">缓存根目录</param>
-        /// <param name="config">缓存配置</param>
-        public WebServerBundleCache(string packageName, string rootPath, Configuration config)
+        public WebNetworkBundleCache(string packageName, Configuration config)
         {
             PackageName = packageName;
-            RootPath = rootPath;
             Config = config;
             IsReadOnly = true;
         }
@@ -123,13 +111,13 @@ namespace YooAsset
         /// <inheritdoc />
         public BCInitializeOperation InitializeAsync()
         {
-            var operation = new WSBCInitializeOperation(this);
+            var operation = new WNBCInitializeOperation();
             return operation;
         }
         /// <inheritdoc />
         public BCWriteCacheOperation WriteCacheAsync(BCWriteCacheOptions options)
         {
-            var operation = new BCWriteCacheCompleteOperation($"{nameof(WebServerBundleCache)} is readonly.");
+            var operation = new BCWriteCacheCompleteOperation($"{nameof(WebNetworkBundleCache)} is readonly.");
             return operation;
         }
         /// <inheritdoc />
@@ -149,17 +137,17 @@ namespace YooAsset
         {
             if (options.Bundle.GetBundleType() == (int)EBundleType.AssetBundle)
             {
-                var operation = new WSBCLoadAssetBundleOperation(this, options);
+                var operation = new WNBCLoadAssetBundleOperation(this, options);
                 return operation;
             }
             else if (options.Bundle.GetBundleType() == (int)EBundleType.RawBundle)
             {
-                var operation = new WSBCLoadRawBundleOperation(this, options);
+                var operation = new WNBCLoadRawBundleOperation(this, options);
                 return operation;
             }
             else
             {
-                string error = $"{nameof(WebServerBundleCache)} does not support bundle type: {options.Bundle.GetBundleType()}.";
+                string error = $"{nameof(WebNetworkBundleCache)} does not support bundle type: {options.Bundle.GetBundleType()}.";
                 var operation = new BCLoadBundleErrorOperation(error);
                 return operation;
             }
@@ -167,50 +155,13 @@ namespace YooAsset
         /// <inheritdoc />
         public bool IsCached(string bundleGuid)
         {
-            return _cacheEntries.ContainsKey(bundleGuid);
+            return true;
         }
         /// <inheritdoc />
         public string GetCacheFilePath(string bundleGuid)
         {
-            YooLogger.LogWarning($"{nameof(WebServerBundleCache)} does not support local cache file path.");
+            YooLogger.LogWarning($"{nameof(WebNetworkBundleCache)} does not support local cache file path.");
             return null;
         }
-
-        #region 内部方法
-        /// <summary>
-        /// 获取指定缓存条目
-        /// </summary>
-        /// <param name="bundleGuid">资源包 GUID</param>
-        /// <returns>对应的 Web 服务器缓存条目</returns>
-        internal WebServerBundleCacheEntry GetEntry(string bundleGuid)
-        {
-            if (_cacheEntries.TryGetValue(bundleGuid, out WebServerBundleCacheEntry entry))
-                return entry;
-            else
-                return null;
-        }
-
-        /// <summary>
-        /// 添加指定缓存条目
-        /// </summary>
-        /// <param name="bundleGuid">资源包 GUID</param>
-        /// <param name="cacheEntry">Web 服务器缓存条目</param>
-        internal void AddEntry(string bundleGuid, WebServerBundleCacheEntry cacheEntry)
-        {
-            if (_cacheEntries.ContainsKey(bundleGuid))
-                throw new YooInternalException($"Cache entry already exists: '{bundleGuid}'.");
-
-            _cacheEntries.Add(bundleGuid, cacheEntry);
-        }
-
-        /// <summary>
-        /// 获取Catalog文件加载路径
-        /// </summary>
-        /// <returns>文件的完整加载路径</returns>
-        internal string GetCatalogBinaryFileLoadPath()
-        {
-            return PathUtility.Combine(RootPath, BuiltinCatalogConsts.BinaryFileName);
-        }
-        #endregion
     }
 }
