@@ -26,17 +26,16 @@ var createParameters = new WebPlayModeOptions();
 
 string defaultHostServer = GetHostServerURL();
 string fallbackHostServer = GetHostServerURL();
-string packageRoot = "/__GAME_FILE_CACHE";
 IRemoteService remoteService = new RemoteService(defaultHostServer, fallbackHostServer);
 
 createParameters.WebServerFileSystemParameters =
-    KuaiShouFileSystemCreater.CreateFileSystemParameters(packageRoot, remoteService);
+    KuaiShouFileSystemCreater.CreateFileSystemParameters(remoteService);
 
 var initializationOperation = package.InitializePackageAsync(createParameters);
 #endif
 ```
 
-对当前文件系统来说，`packageRoot` 只需要是一个非空值。快手小游戏底层会对远程 AssetBundle 请求做平台适配，业务侧仍然按照远程异步加载流程使用 YooAsset。
+快手小游戏底层会对远程 AssetBundle 请求做平台适配，业务侧仍然按照远程异步加载流程使用 YooAsset。
 
 ## 资源包命名
 

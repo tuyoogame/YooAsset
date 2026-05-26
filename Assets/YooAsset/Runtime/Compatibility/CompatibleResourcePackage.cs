@@ -71,7 +71,7 @@ namespace YooAsset
                 options.AutoUnloadBundleWhenUnused = wpp.AutoUnloadBundleWhenUnused;
                 options.WebGLForceSyncLoadAsset = wpp.WebGLForceSyncLoadAsset;
                 options.WebServerFileSystemParameters = wpp.WebServerFileSystemParameters;
-                options.WebRemoteFileSystemParameters = wpp.WebRemoteFileSystemParameters;
+                options.WebNetworkFileSystemParameters = wpp.WebRemoteFileSystemParameters;
                 var operation = InitializePackageAsync(options);
                 var wrapper = new InitializationOperation(operation);
                 AsyncOperationSystem.StartOperation(PackageName, wrapper);

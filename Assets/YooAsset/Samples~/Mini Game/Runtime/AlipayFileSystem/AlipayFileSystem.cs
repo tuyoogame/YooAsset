@@ -1,43 +1,32 @@
 #if UNITY_WEBGL && UNITY_ALIMINIGAME
 using YooAsset;
-using AlipaySdk;
 
 public static class AlipayFileSystemCreater
 {
-    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService)
+    public static FileSystemParameters CreateFileSystemParameters(IRemoteService remoteService)
     {
-        string fileSystemClass = $"{nameof(AlipayFileSystem)},YooAsset.MiniGame";
-        var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
-        fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
+        var fileSystemParams = CreateBaseFileSystemParameters(remoteService);
         return fileSystemParams;
     }
-    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor)
+    public static FileSystemParameters CreateFileSystemParameters(IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor)
     {
-        string fileSystemClass = $"{nameof(AlipayFileSystem)},YooAsset.MiniGame";
-        var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
-        fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
+        var fileSystemParams = CreateBaseFileSystemParameters(remoteService);
         fileSystemParams.AddParameter(EFileSystemParameter.AssetbundleDecryptor, assetBundleDecryptor);
         return fileSystemParams;
     }
-    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor)
+    public static FileSystemParameters CreateFileSystemParameters(IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor)
     {
-        string fileSystemClass = $"{nameof(AlipayFileSystem)},YooAsset.MiniGame";
-        var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
-        fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
+        var fileSystemParams = CreateBaseFileSystemParameters(remoteService);
         fileSystemParams.AddParameter(EFileSystemParameter.AssetbundleDecryptor, assetBundleDecryptor);
         fileSystemParams.AddParameter(EFileSystemParameter.RawbundleDecryptor, rawBundleDecryptor);
         return fileSystemParams;
     }
-}
 
-/// <summary>
-/// 支付宝小游戏文件系统
-/// </summary>
-internal class AlipayFileSystem : WebGameFileSystem
-{
-    protected override IWebGamePlatform CreatePlatform(string packageRoot)
+    private static FileSystemParameters CreateBaseFileSystemParameters(IRemoteService remoteService)
     {
-        return new AlipayPlatform();
+        var fileSystemParams = FileSystemParameters.CreateDefaultWebNetworkFileSystemParameters(remoteService, true);
+        fileSystemParams.AddParameter(EFileSystemParameter.WebPlatformStrategy, new AlipayPlatform());
+        return fileSystemParams;
     }
 }
 #endif

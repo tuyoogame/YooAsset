@@ -24,17 +24,16 @@ var createParameters = new WebPlayModeOptions();
 
 string defaultHostServer = GetHostServerURL();
 string fallbackHostServer = GetHostServerURL();
-string packageRoot = "/__GAME_FILE_CACHE";
 IRemoteService remoteService = new RemoteService(defaultHostServer, fallbackHostServer);
 
 createParameters.WebServerFileSystemParameters =
-    OppoFileSystemCreater.CreateFileSystemParameters(packageRoot, remoteService);
+    OppoFileSystemCreater.CreateFileSystemParameters(remoteService);
 
 var initializationOperation = package.InitializePackageAsync(createParameters);
 #endif
 ```
 
-对当前文件系统来说，`packageRoot` 只需要是一个非空值。OPPO 真正的 AssetBundle 缓存行为由生成后小游戏工程里的 `manifest.json` 控制。
+OPPO 真正的 AssetBundle 缓存行为由生成后小游戏工程里的 `manifest.json` 控制。
 
 ## OPPO 缓存配置
 

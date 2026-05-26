@@ -7,12 +7,14 @@ using KSWASM;
 /// <summary>
 /// 快手小游戏平台实现
 /// </summary>
-internal class KuaiShouPlatform : IWebGamePlatform
+internal class KuaiShouPlatform : IWebPlatformStrategy
 {
     /// <inheritdoc/>
-    public UnityWebRequest CreateAssetBundleRequest(string url)
+    public UnityWebRequest CreateAssetBundleRequest(WebAssetBundleRequestArgs args)
     {
-        return KSAssetBundle.GetAssetBundle(url);
+        UnityWebRequest request = KSAssetBundle.GetAssetBundle(args.Url);
+        request.disposeDownloadHandlerOnDispose = true;
+        return request;
     }
 
     /// <inheritdoc/>

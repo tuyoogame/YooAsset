@@ -24,17 +24,16 @@ var createParameters = new WebPlayModeOptions();
 
 string defaultHostServer = GetHostServerURL();
 string fallbackHostServer = GetHostServerURL();
-string packageRoot = "/__GAME_FILE_CACHE";
 IRemoteService remoteService = new RemoteService(defaultHostServer, fallbackHostServer);
 
 createParameters.WebServerFileSystemParameters =
-    VivoFileSystemCreater.CreateFileSystemParameters(packageRoot, remoteService);
+    VivoFileSystemCreater.CreateFileSystemParameters(remoteService);
 
 var initializationOperation = package.InitializePackageAsync(createParameters);
 #endif
 ```
 
-对当前文件系统来说，`packageRoot` 只需要是一个非空值。vivo 小游戏底层会对远程 AssetBundle 请求做缓存，业务侧仍然按照远程异步加载流程使用 YooAsset。
+vivo 小游戏底层会对远程 AssetBundle 请求做缓存，业务侧仍然按照远程异步加载流程使用 YooAsset。
 
 ## 资源包命名
 

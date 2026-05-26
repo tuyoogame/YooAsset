@@ -88,13 +88,31 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// v2.3 WebRemote 文件系统入口
+        /// WebRemote 文件系统入口，转发到 WebNetwork 文件系统
         /// </summary>
-        [Obsolete("Use CreateDefaultWebRemoteFileSystemParameters(IRemoteService, bool) instead. IWebDecryptionServices is no longer supported.")]
+        [Obsolete("Use CreateDefaultWebNetworkFileSystemParameters instead.")]
+        public static FileSystemParameters CreateDefaultWebRemoteFileSystemParameters(IRemoteService remoteService, bool disableUnityWebCache)
+        {
+            return CreateDefaultWebNetworkFileSystemParameters(remoteService, disableUnityWebCache);
+        }
+
+        /// <summary>
+        /// WebRemote 文件系统入口，转发到 WebNetwork 文件系统
+        /// </summary>
+        [Obsolete("Use CreateDefaultWebNetworkFileSystemParameters instead.")]
+        public static FileSystemParameters CreateDefaultWebRemoteFileSystemParameters(IRemoteService remoteService)
+        {
+            return CreateDefaultWebNetworkFileSystemParameters(remoteService);
+        }
+
+        /// <summary>
+        /// v2.3 WebRemote 文件系统入口，转发到 WebNetwork 文件系统
+        /// </summary>
+        [Obsolete("Use CreateDefaultWebNetworkFileSystemParameters(IRemoteService, bool) instead. IWebDecryptionServices is no longer supported.")]
         public static FileSystemParameters CreateDefaultWebRemoteFileSystemParameters(IRemoteServices remoteServices, IWebDecryptionServices decryptionServices = null, bool disableUnityWebCache = false)
         {
             var adapter = remoteServices != null ? new RemoteServicesAdapter(remoteServices) : null;
-            return CreateDefaultWebRemoteFileSystemParameters(adapter, disableUnityWebCache);
+            return CreateDefaultWebNetworkFileSystemParameters(adapter, disableUnityWebCache);
         }
     }
 
