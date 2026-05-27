@@ -8,11 +8,6 @@ namespace YooAsset
         internal readonly struct Configuration
         {
             /// <summary>
-            /// 看门狗超时时间
-            /// </summary>
-            public int WatchdogTimeout { get; }
-
-            /// <summary>
             /// 禁用 Unity 内置网络缓存
             /// </summary>
             public bool DisableUnityWebCache { get; }
@@ -57,12 +52,11 @@ namespace YooAsset
             /// </summary>
             public IDownloadUrlPolicy DownloadUrlPolicy { get; }
 
-            public Configuration(int watchdogTimeout, bool disableUnityWebCache,
+            public Configuration(bool disableUnityWebCache,
                EFileVerifyLevel downloadVerifyLevel, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor,
                IWebPlatformStrategy platformStrategy, IRemoteService remoteService, IDownloadBackend downloadBackend,
                IDownloadRetryPolicy downloadRetryPolicy, IDownloadUrlPolicy downloadUrlPolicy)
             {
-                WatchdogTimeout = watchdogTimeout;
                 DisableUnityWebCache = disableUnityWebCache;
                 DownloadVerifyLevel = downloadVerifyLevel;
                 AssetBundleDecryptor = assetBundleDecryptor;

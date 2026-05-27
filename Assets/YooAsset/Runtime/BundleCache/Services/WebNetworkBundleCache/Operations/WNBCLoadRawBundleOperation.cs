@@ -44,7 +44,7 @@ namespace YooAsset
                         rawBundleDecryptor: _fileCache.Config.RawBundleDecryptor,
                         downloadBackend: _fileCache.Config.DownloadBackend,
                         downloadVerifyLevel: _fileCache.Config.DownloadVerifyLevel,
-                        watchdogTimeout: _fileCache.Config.WatchdogTimeout,
+                        watchdogTimeout: 0,
                         downloadRetryPolicy: _fileCache.Config.DownloadRetryPolicy,
                         downloadUrlPolicy: _fileCache.Config.DownloadUrlPolicy);
                     _loadBundleOp = new LoadWebRawBundleOperation(options);

@@ -46,7 +46,7 @@ namespace YooAsset
                             assetBundleDecryptor: _fileCache.Config.AssetBundleDecryptor,
                             downloadBackend: _fileCache.Config.DownloadBackend,
                             downloadVerifyLevel: _fileCache.Config.DownloadVerifyLevel,
-                            watchdogTimeout: _fileCache.Config.WatchdogTimeout,
+                            watchdogTimeout: 0,
                             downloadRetryPolicy: _fileCache.Config.DownloadRetryPolicy,
                             downloadUrlPolicy: _fileCache.Config.DownloadUrlPolicy);
                         _loadBundleOp = new LoadWebEncryptedAssetBundleOperation(encryptedOptions);
@@ -58,7 +58,7 @@ namespace YooAsset
                             candidateUrls: urls,
                             platformStrategy: _fileCache.Config.PlatformStrategy,
                             downloadBackend: _fileCache.Config.DownloadBackend,
-                            watchdogTimeout: _fileCache.Config.WatchdogTimeout,
+                            watchdogTimeout: 0,
                             disableUnityWebCache: _fileCache.Config.DisableUnityWebCache,
                             downloadRetryPolicy: _fileCache.Config.DownloadRetryPolicy,
                             downloadUrlPolicy: _fileCache.Config.DownloadUrlPolicy);

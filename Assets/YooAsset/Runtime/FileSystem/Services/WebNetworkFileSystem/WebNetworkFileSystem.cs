@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 namespace YooAsset
 {
@@ -39,11 +38,6 @@ namespace YooAsset
         /// 自定义参数：禁用 Unity 内置网络缓存
         /// </summary>
         public bool DisableUnityWebCache { get; private set; } = false;
-
-        /// <summary>
-        /// 自定义参数：下载任务的看门狗机制超时时间
-        /// </summary>
-        public int DownloadWatchdogTimeout { get; private set; } = 0;
 
         /// <summary>
         /// 自定义参数：下载的资源包数据的校验级别
@@ -145,8 +139,8 @@ namespace YooAsset
             }
             else if (paramName == nameof(EFileSystemParameter.DownloadWatchdogTimeout))
             {
-                int convertValue = FileSystemHelper.CastParameter<int>(paramName, value);
-                DownloadWatchdogTimeout = Mathf.Max(convertValue, 0);
+                // 小游戏平台的 UnityWebRequest 可能无法返回可靠的下载字节数，因此不支持看门狗机制。
+                YooLogger.LogError($"{nameof(EFileSystemParameter.DownloadWatchdogTimeout)} is not supported by {nameof(WebNetworkFileSystem)}.");
             }
             else if (paramName == nameof(EFileSystemParameter.FileVerifyLevel))
             {
@@ -208,7 +202,6 @@ namespace YooAsset
 
             // 创建文件缓存系统
             var cacheConfig = new WebNetworkBundleCache.Configuration(
-                watchdogTimeout: DownloadWatchdogTimeout,
                 disableUnityWebCache: DisableUnityWebCache,
                 downloadVerifyLevel: DownloadVerifyLevel,
                 assetBundleDecryptor: AssetBundleDecryptor,
