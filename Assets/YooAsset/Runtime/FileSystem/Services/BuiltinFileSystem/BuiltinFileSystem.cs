@@ -60,9 +60,7 @@ namespace YooAsset
         /// </summary>
         public IDownloadBackend DownloadBackend { get; private set; }
 
-        /// <summary>
-        /// 包裹名称
-        /// </summary>
+        /// <inheritdoc />
         public string PackageName { get; private set; }
 
         #region 自定义参数
@@ -142,6 +140,11 @@ namespace YooAsset
         /// 自定义参数：资源清单解密器
         /// </summary>
         public IManifestDecryptor ManifestDecryptor { get; private set; }
+
+        /// <summary>
+        /// 自定义参数：内置资源包解包策略
+        /// </summary>
+        internal IBundleUnpackPolicy BundleUnpackPolicy { get; private set; }
         #endregion
 
         /// <summary>
@@ -286,6 +289,10 @@ namespace YooAsset
             {
                 ManifestDecryptor = FileSystemHelper.CastParameter<IManifestDecryptor>(paramName, value);
             }
+            else if (paramName == nameof(EFileSystemParameter.BundleUnpackPolicy))
+            {
+                BundleUnpackPolicy = FileSystemHelper.CastParameter<IBundleUnpackPolicy>(paramName, value);
+            }
             else
             {
                 throw new ArgumentException($"Unrecognized parameter name: '{paramName}'.", nameof(paramName));
@@ -310,6 +317,10 @@ namespace YooAsset
             _unpackManifestFilesRoot = PathUtility.Combine(unpackRoot, BuiltinFileSystemConsts.UnpackManifestFilesFolderName);
             _unpackBundleFilesRoot = PathUtility.Combine(unpackRoot, BuiltinFileSystemConsts.UnpackBundleFilesFolderName);
             _tempFilesRoot = PathUtility.Combine(unpackRoot, BuiltinFileSystemConsts.UnpackTempFilesFolderName);
+
+            // 创建默认的解包策略
+            if (BundleUnpackPolicy == null)
+                BundleUnpackPolicy = new DefaultBundleUnpackPolicy();
 
             // 创建默认的下载后台接口
             if (DownloadBackend == null)
@@ -376,14 +387,13 @@ namespace YooAsset
         /// <inheritdoc />
         public bool IsUnpackRequired(PackageBundle bundle)
         {
-            if (IsUnpackBundleFile(bundle))
-            {
-                return UnpackBundleCache.IsCached(bundle.BundleGuid) == false;
-            }
-            else
-            {
+            if (CanAcceptBundle(bundle) == false)
                 return false;
-            }
+
+            if (IsUnpackBundle(bundle) == false)
+                return false;
+
+            return UnpackBundleCache.IsCached(bundle.BundleGuid) == false;
         }
         /// <inheritdoc />
         public bool IsImportRequired(PackageBundle bundle)
@@ -391,31 +401,16 @@ namespace YooAsset
             return false;
         }
 
+        #region 内部方法
         /// <summary>
-        /// 是否属于解压资源包文件
+        /// 通过策略判定指定资源包是否为需要解包的类型
         /// </summary>
-        public bool IsUnpackBundleFile(PackageBundle bundle)
+        internal bool IsUnpackBundle(PackageBundle bundle)
         {
-            if (CanAcceptBundle(bundle) == false)
-                return false;
-
-#if UNITY_ANDROID || UNITY_OPENHARMONY
-            if (bundle.IsEncrypted)
-                return true;
-
-            if (bundle.GetBundleType() == (int)EBundleType.RawBundle)
-                return true;
-
-            if (bundle.GetBundleType() == (int)EBundleType.ArchiveBundle)
-                return true;
-
-            return false;
-#else
-            return false;
-#endif
+            var unpackInfo = new BundleUnpackInfo(bundle);
+            return BundleUnpackPolicy.IsUnpackBundle(unpackInfo);
         }
 
-        #region 内部方法
         /// <summary>
         /// 获取默认的内置包裹根目录
         /// </summary>

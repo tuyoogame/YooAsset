@@ -28,9 +28,7 @@ namespace YooAsset
         /// </summary>
         public IDownloadBackend DownloadBackend { get; private set; }
 
-        /// <summary>
-        /// 包裹名称
-        /// </summary>
+        /// <inheritdoc />
         public string PackageName { get; private set; }
 
         #region 自定义参数

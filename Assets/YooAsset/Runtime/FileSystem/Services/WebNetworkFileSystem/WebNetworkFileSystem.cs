@@ -9,11 +9,6 @@ namespace YooAsset
     internal class WebNetworkFileSystem : IFileSystem
     {
         /// <summary>
-        /// 包裹名称
-        /// </summary>
-        public string PackageName { get; private set; }
-
-        /// <summary>
         /// Web 文件缓存系统
         /// </summary>
         public IBundleCache BundleCache { get; private set; }
@@ -27,6 +22,9 @@ namespace YooAsset
         /// 平台策略
         /// </summary>
         public IWebPlatformStrategy PlatformStrategy { get; private set; }
+
+        /// <inheritdoc />
+        public string PackageName { get; private set; }
 
         #region 自定义参数
         /// <summary>

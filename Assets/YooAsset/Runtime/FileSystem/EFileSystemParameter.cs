@@ -140,5 +140,10 @@ namespace YooAsset
         /// WebGL 平台策略 <see cref="IWebPlatformStrategy"/>
         /// </summary>
         WebPlatformStrategy,
+
+        /// <summary>
+        /// 内置资源包解包策略 <see cref="IBundleUnpackPolicy"/>
+        /// </summary>
+        BundleUnpackPolicy,
     }
 }

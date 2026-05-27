@@ -33,7 +33,7 @@ namespace YooAsset
 
             if (_steps == ESteps.CheckUnpack)
             {
-                if (_fileSystem.IsUnpackBundleFile(_options.Bundle))
+                if (_fileSystem.IsUnpackBundle(_options.Bundle))
                 {
                     if (_fileSystem.UnpackBundleCache.IsCached(_options.Bundle.BundleGuid))
                     {

@@ -40,7 +40,7 @@ namespace YooAsset
 
             if (_steps == ESteps.Prepare)
             {
-                if (_fileSystem.IsUnpackBundleFile(_options.Bundle))
+                if (_fileSystem.IsUnpackBundle(_options.Bundle))
                 {
                     if (_fileSystem.UnpackBundleCache.IsCached(_options.Bundle.BundleGuid))
                         _steps = ESteps.LoadUnpackBundle;

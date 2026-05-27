@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace YooAsset
@@ -142,10 +141,24 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 是否包含指定的标签
+        /// 是否包含指定的单个标签
         /// </summary>
-        /// <param name="tags">要检查的标签数组</param>
-        /// <returns>如果包含任意一个标签返回true，否则返回false。</returns>
+        public bool HasTag(string tag)
+        {
+            if (Tags == null || Tags.Length == 0)
+                return false;
+
+            for (int i = 0; i < Tags.Length; i++)
+            {
+                if (Tags[i] == tag)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 是否包含指定标签数组中的任意一个
+        /// </summary>
         public bool HasAnyTag(string[] tags)
         {
             if (tags == null || tags.Length == 0)
@@ -153,9 +166,9 @@ namespace YooAsset
             if (Tags == null || Tags.Length == 0)
                 return false;
 
-            foreach (var tag in tags)
+            for (int i = 0; i < tags.Length; i++)
             {
-                if (Tags.Contains(tag))
+                if (HasTag(tags[i]))
                     return true;
             }
             return false;

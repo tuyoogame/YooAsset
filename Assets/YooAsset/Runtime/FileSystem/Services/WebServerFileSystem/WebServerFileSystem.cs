@@ -35,9 +35,7 @@ namespace YooAsset
         /// </summary>
         public IWebPlatformStrategy PlatformStrategy { get; private set; }
 
-        /// <summary>
-        /// 包裹名称
-        /// </summary>
+        /// <inheritdoc />
         public string PackageName { get; private set; }
 
         #region 自定义参数
