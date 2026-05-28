@@ -145,6 +145,11 @@ namespace YooAsset
         /// 自定义参数：内置资源包解包策略
         /// </summary>
         internal IBundleUnpackPolicy BundleUnpackPolicy { get; private set; }
+
+        /// <summary>
+        /// 自定义参数：内置文件访问器
+        /// </summary>
+        internal IBuiltinFileAccessor BuiltinFileAccessor { get; private set; }
         #endregion
 
         /// <summary>
@@ -292,6 +297,10 @@ namespace YooAsset
             else if (paramName == nameof(EFileSystemParameter.BundleUnpackPolicy))
             {
                 BundleUnpackPolicy = FileSystemHelper.CastParameter<IBundleUnpackPolicy>(paramName, value);
+            }
+            else if (paramName == nameof(EFileSystemParameter.BuiltinFileAccessor))
+            {
+                BuiltinFileAccessor = FileSystemHelper.CastParameter<IBuiltinFileAccessor>(paramName, value);
             }
             else
             {

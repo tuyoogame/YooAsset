@@ -145,5 +145,10 @@ namespace YooAsset
         /// 内置资源包解包策略 <see cref="IBundleUnpackPolicy"/>
         /// </summary>
         BundleUnpackPolicy,
+
+        /// <summary>
+        /// 内置文件访问器 <see cref="IBuiltinFileAccessor"/>
+        /// </summary>
+        BuiltinFileAccessor,
     }
 }

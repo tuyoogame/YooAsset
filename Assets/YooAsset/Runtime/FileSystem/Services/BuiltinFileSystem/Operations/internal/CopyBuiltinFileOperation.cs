@@ -13,7 +13,8 @@ namespace YooAsset
             None,
             CheckFileExist,
             TryCopyFile,
-            UnpackFile,
+            TryCopyByAccessor,
+            TryCopyByRequest,
             Done,
         }
 
@@ -55,6 +56,8 @@ namespace YooAsset
 
             if (_steps == ESteps.TryCopyFile)
             {
+                // 注意：Android/OpenHarmony 平台 File.Exists 无法识别包体内文件。
+                // 该步骤仅对 StreamingAssets 为真实文件系统目录的平台（Windows/iOS/Mac）生效。
                 if (File.Exists(_sourceFilePath))
                 {
                     try
@@ -66,21 +69,43 @@ namespace YooAsset
                     }
                     catch (Exception ex)
                     {
-                        YooLogger.LogWarning($"Failed to copy builtin file: {ex.Message}.");
-                        _steps = ESteps.UnpackFile;
+                        _steps = ESteps.Done;
+                        SetError($"Failed to copy builtin file: {ex.Message}.");
+                        YooLogger.LogError(Error);
                     }
                 }
                 else
                 {
-                    _steps = ESteps.UnpackFile;
+                    if (_fileSystem.BuiltinFileAccessor != null)
+                        _steps = ESteps.TryCopyByAccessor;
+                    else
+                        _steps = ESteps.TryCopyByRequest;
                 }
             }
 
-            if (_steps == ESteps.UnpackFile)
+            if (_steps == ESteps.TryCopyByAccessor)
+            {
+                try
+                {
+                    FileUtility.EnsureParentDirectoryExists(_destFilePath);
+                    byte[] data = _fileSystem.BuiltinFileAccessor.ReadAllBytes(_sourceFilePath);
+                    File.WriteAllBytes(_destFilePath, data);
+                    _steps = ESteps.Done;
+                    SetResult();
+                }
+                catch (Exception ex)
+                {
+                    _steps = ESteps.Done;
+                    SetError($"Failed to copy builtin file by accessor: {ex.Message}.");
+                    YooLogger.LogError(Error);
+                }
+            }
+
+            if (_steps == ESteps.TryCopyByRequest)
             {
                 if (_downloadFileRequest == null)
                 {
-                    // TODO: 团结引擎，在某些安卓机型（红米），通过UnityWebRequest拷贝包内文件会小概率失败！需要借助其它方式来拷贝包内文件。
+                    // TODO: 团结引擎，在某些安卓机型（红米），通过UnityWebRequest拷贝包内文件会小概率失败。
                     string url = DownloadUrlHelper.ToLocalFileUrl(_sourceFilePath);
                     var args = new DownloadFileRequestArgs(
                         url: url,
