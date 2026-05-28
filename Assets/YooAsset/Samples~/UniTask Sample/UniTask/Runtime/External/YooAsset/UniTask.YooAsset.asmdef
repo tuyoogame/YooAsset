@@ -16,7 +16,7 @@
         {
             "name": "com.cysharp.unitask",
             "expression": "",
-            "define": "UNITASK_YOOASSET_SUPPORT"
+            "define": "YOOASSET_UNITASK_SUPPORT"
         }
     ],
     "noEngineReferences": false

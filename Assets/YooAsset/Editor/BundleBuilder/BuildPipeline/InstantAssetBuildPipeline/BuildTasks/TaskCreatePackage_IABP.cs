@@ -1,4 +1,4 @@
-#if TUANJIE_1_8_OR_NEWER
+#if TUANJIE_1_8_OR_NEWER && YOOASSET_INSTANT_ASSET_SUPPORT
 namespace YooAsset.Editor
 {
     /// <summary>

@@ -1,4 +1,4 @@
-#if UNITASK_YOOASSET_SUPPORT
+#if YOOASSET_UNITASK_SUPPORT
 using System;
 using System.Threading;
 using YooAsset;

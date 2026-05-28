@@ -1,4 +1,4 @@
-#if UNITASK_YOOASSET_SUPPORT
+#if YOOASSET_UNITASK_SUPPORT
 using System;
 using System.Collections;
 using System.Threading;
@@ -208,7 +208,7 @@ public class TestUniTask
 {
     public IEnumerator RuntimeTester()
     {
-        Debug.LogWarning("UniTask tests skipped: UNITASK_YOOASSET_SUPPORT is not defined.");
+        Debug.LogWarning("UniTask tests skipped: YOOASSET_UNITASK_SUPPORT is not defined.");
         yield break;
     }
 }

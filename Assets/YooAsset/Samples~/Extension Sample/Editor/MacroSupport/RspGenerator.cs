@@ -6,7 +6,7 @@ using System.Xml;
 using UnityEditor;
 using UnityEngine;
 
-#if YOO_MACRO_SUPPORT
+#if YOOASSET_MACRO_SUPPORT
 namespace YooAsset.Editor.Experiment
 {
     /// <summary>

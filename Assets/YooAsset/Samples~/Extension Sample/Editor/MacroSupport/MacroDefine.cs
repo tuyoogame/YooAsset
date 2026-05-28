@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-#if YOO_MACRO_SUPPORT
+#if YOOASSET_MACRO_SUPPORT
 namespace YooAsset.Editor
 {
     /// <summary>
@@ -13,9 +13,9 @@ namespace YooAsset.Editor
         /// </summary>
         public static IReadOnlyList<string> Macros { get; } = new List<string>()
         {
-            "YOO_ASSET_3",
-            "YOO_ASSET_3_0",
-            "YOO_ASSET_3_0_OR_NEWER",
+            "YOOASSET_3",
+            "YOOASSET_3_0",
+            "YOOASSET_3_0_OR_NEWER",
         };
     }
 }

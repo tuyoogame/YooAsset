@@ -46,7 +46,7 @@ public class TestTask : MonoBehaviour
    Project Settings --> Player --> Scripting Define Symbols
 
    ```
-   UNITASK_YOOASSET_SUPPORT
+   YOOASSET_UNITASK_SUPPORT
    ```
 
 5. 重启Unity引擎
@@ -68,7 +68,7 @@ public class TestTask : MonoBehaviour
    Project Settings --> Player --> Scripting Define Symbols
 
    ```
-   UNITASK_YOOASSET_SUPPORT
+   YOOASSET_UNITASK_SUPPORT
    ```
 
 4. 重启Unity引擎

@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml;
 using UnityEditor;
 
-#if YOO_MACRO_SUPPORT
+#if YOOASSET_MACRO_SUPPORT
 namespace YooAsset.Editor
 {
     /// <summary>
