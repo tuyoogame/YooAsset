@@ -27,14 +27,6 @@ namespace YooAsset.Editor
         /// <inheritdoc />
         protected override void CheckBuildParametersCore()
         {
-            // ArchiveBundle 不支持资源包加密
-            if (BundleEncryptor != null)
-            {
-                string message = BuildLogger.GetErrorMessage(ErrorCode.BundleEncryptionNotSupported,
-                    $"ArchiveFileBuildPipeline does not support bundle encryption. Please remove the BundleEncryptor configuration.");
-                throw new NotSupportedException(message);
-            }
-
             // 校验文件对齐参数范围
             if (FileAlignment < 0 || FileAlignment > MaxFileAlignment)
             {

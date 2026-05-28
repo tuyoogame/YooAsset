@@ -158,11 +158,11 @@ namespace YooAsset
             {
                 DownloadVerifyLevel = FileSystemHelper.CastParameter<EFileVerifyLevel>(paramName, value);
             }
-            else if (paramName == nameof(EFileSystemParameter.AssetbundleDecryptor))
+            else if (paramName == nameof(EFileSystemParameter.AssetBundleDecryptor))
             {
                 AssetBundleDecryptor = FileSystemHelper.CastParameter<IBundleDecryptor>(paramName, value);
             }
-            else if (paramName == nameof(EFileSystemParameter.RawbundleDecryptor))
+            else if (paramName == nameof(EFileSystemParameter.RawBundleDecryptor))
             {
                 RawBundleDecryptor = FileSystemHelper.CastParameter<IBundleDecryptor>(paramName, value);
             }

@@ -56,15 +56,14 @@ namespace YooAsset
         }
 
         private readonly string _archiveFilePath;
+        private readonly byte[] _memoryData;
         private readonly Dictionary<string, FileEntry> _entries;
         private readonly Dictionary<string, RawFileObject> _cachedObjects = new Dictionary<string, RawFileObject>();
         private bool _isUnloaded;
 
         /// <summary>
-        /// 创建 ArchiveBundle 实例
+        /// 从本地文件创建 ArchiveBundle 实例
         /// </summary>
-        /// <param name="archiveFilePath">归档文件的本地路径</param>
-        /// <param name="entries">子文件索引字典</param>
         public ArchiveBundle(string archiveFilePath, Dictionary<string, FileEntry> entries)
         {
             if (string.IsNullOrEmpty(archiveFilePath))
@@ -73,6 +72,23 @@ namespace YooAsset
                 throw new ArgumentNullException(nameof(entries));
 
             _archiveFilePath = archiveFilePath;
+            _memoryData = null;
+            _entries = entries;
+            _isUnloaded = false;
+        }
+
+        /// <summary>
+        /// 从解密后的内存数据创建 ArchiveBundle 实例
+        /// </summary>
+        public ArchiveBundle(byte[] memoryData, Dictionary<string, FileEntry> entries)
+        {
+            if (memoryData == null)
+                throw new ArgumentNullException(nameof(memoryData));
+            if (entries == null)
+                throw new ArgumentNullException(nameof(entries));
+
+            _archiveFilePath = null;
+            _memoryData = memoryData;
             _entries = entries;
             _isUnloaded = false;
         }
@@ -92,8 +108,8 @@ namespace YooAsset
             if (_cachedObjects.TryGetValue(assetPath, out RawFileObject cached))
                 return cached;
 
-            byte[] fileData = ReadFileData(assetPath);
-            var rawFileObject = RawFileObject.CreateFromBytes(fileData);
+            byte[] assetData = ReadAssetData(assetPath);
+            var rawFileObject = RawFileObject.CreateFromBytes(assetData);
             _cachedObjects[assetPath] = rawFileObject;
             return rawFileObject;
         }
@@ -113,14 +129,24 @@ namespace YooAsset
             _entries.Clear();
         }
 
-        /// <summary>
-        /// 从归档文件中读取子文件的字节数据
-        /// </summary>
-        private byte[] ReadFileData(string assetPath)
+        private byte[] ReadAssetData(string assetPath)
         {
             if (_entries.TryGetValue(assetPath, out FileEntry entry) == false)
                 throw new InvalidOperationException($"Asset not found in archive: '{assetPath}'.");
 
+            if (_memoryData != null)
+                return ReadFromMemory(entry);
+            else
+                return ReadFromFile(entry);
+        }
+        private byte[] ReadFromMemory(FileEntry entry)
+        {
+            byte[] buffer = new byte[entry.DataLength];
+            Buffer.BlockCopy(_memoryData, (int)entry.DataOffset, buffer, 0, (int)entry.DataLength);
+            return buffer;
+        }
+        private byte[] ReadFromFile(FileEntry entry)
+        {
             byte[] buffer = new byte[entry.DataLength];
             using (var fs = new FileStream(_archiveFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
@@ -130,7 +156,7 @@ namespace YooAsset
                 {
                     int read = fs.Read(buffer, bytesRead, buffer.Length - bytesRead);
                     if (read == 0)
-                        throw new EndOfStreamException($"Unexpected end of archive file while reading '{assetPath}'.");
+                        throw new EndOfStreamException($"Unexpected end of archive file while reading '{entry.AssetPath}'.");
                     bytesRead += read;
                 }
             }

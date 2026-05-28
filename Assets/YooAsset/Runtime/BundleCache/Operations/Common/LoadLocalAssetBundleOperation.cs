@@ -56,14 +56,14 @@ namespace YooAsset
                     if (decryptor == null)
                     {
                         _steps = ESteps.Done;
-                        SetError($"{_options.CacheName} decryptor is null.");
+                        SetError($"{_options.CacheName} asset bundle decryptor is null.");
                         return;
                     }
 
                     LoadResult result;
                     if (decryptor is IBundleOffsetDecryptor offsetDecryptor)
                     {
-                        result = LoadFromFileWithOffset(offsetDecryptor);
+                        result = LoadFromFile(offsetDecryptor);
                     }
                     else if (decryptor is IBundleMemoryDecryptor memoryDecryptor)
                     {
@@ -76,7 +76,7 @@ namespace YooAsset
                     else
                     {
                         _steps = ESteps.Done;
-                        SetError($"{_options.CacheName} does not support '{decryptor.GetType().Name}'.");
+                        SetError($"{_options.CacheName} does not support '{decryptor.GetType().Name}' for AssetBundle.");
                         return;
                     }
 
@@ -137,18 +137,17 @@ namespace YooAsset
             else
                 _createRequest = AssetBundle.LoadFromFileAsync(_options.FilePath);
         }
-        private LoadResult LoadFromFileWithOffset(IBundleOffsetDecryptor decryptor)
+        private LoadResult LoadFromFile(IBundleOffsetDecryptor decryptor)
         {
             var args = new BundleDecryptArgs(_options.Bundle, null, _options.FilePath);
-            long rawOffset = decryptor.GetFileOffset(args);
-            if (rawOffset < 0)
-                return LoadResult.Failure($"{_options.CacheName} decryptor returned negative offset: {rawOffset}.");
-            ulong offset = (ulong)rawOffset;
+            long offset = decryptor.GetFileOffset(args);
+            if (offset < 0)
+                return LoadResult.Failure($"{_options.CacheName} decryptor returned negative offset: {offset}.");
 
             if (IsWaitForCompletion)
-                _assetBundle = AssetBundle.LoadFromFile(_options.FilePath, 0, offset);
+                _assetBundle = AssetBundle.LoadFromFile(_options.FilePath, 0, (ulong)offset);
             else
-                _createRequest = AssetBundle.LoadFromFileAsync(_options.FilePath, 0, offset);
+                _createRequest = AssetBundle.LoadFromFileAsync(_options.FilePath, 0, (ulong)offset);
 
             return LoadResult.Default();
         }

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 
 namespace YooAsset
 {
@@ -22,8 +21,7 @@ namespace YooAsset
 
             try
             {
-                byte[] data = File.ReadAllBytes(editorFilePath);
-                var rawBundle = new RawBundle(data);
+                var rawBundle = RawBundleHelper.LoadFromFile(editorFilePath);
 
                 SetResult();
                 BundleHandle = new VirtualRawBundleHandle(_bundle, rawBundle);

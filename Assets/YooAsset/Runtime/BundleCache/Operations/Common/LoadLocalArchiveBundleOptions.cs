@@ -21,11 +21,17 @@ namespace YooAsset
         /// </summary>
         public string FilePath { get; }
 
-        public LoadLocalArchiveBundleOptions(string cacheName, PackageBundle bundle, string filePath)
+        /// <summary>
+        /// ArchiveBundle 解密器
+        /// </summary>
+        public IBundleDecryptor ArchiveBundleDecryptor { get; }
+
+        public LoadLocalArchiveBundleOptions(string cacheName, PackageBundle bundle, string filePath, IBundleDecryptor archiveBundleDecryptor)
         {
             CacheName = cacheName;
             Bundle = bundle;
             FilePath = filePath;
+            ArchiveBundleDecryptor = archiveBundleDecryptor;
         }
     }
 }

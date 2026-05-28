@@ -38,26 +38,51 @@ namespace YooAsset
 
             if (_steps == ESteps.LoadBundle)
             {
-                if (_options.Bundle.IsEncrypted)
+                if (_options.Bundle.IsEncrypted == false)
                 {
-                    _steps = ESteps.Done;
-                    SetError($"ArchiveBundle encrypted loading is not supported: '{_options.FilePath}'.");
-                    return;
-                }
+                    if (FileUtility.IsFileIOSupported(_options.FilePath) == false)
+                    {
+                        _steps = ESteps.Done;
+                        SetError($"FileIO is not supported for builtin path: '{_options.FilePath}'.");
+                        return;
+                    }
 
-                if (FileUtility.IsFileIOSupported(_options.FilePath) == false)
-                {
-                    _steps = ESteps.Done;
-                    SetError($"FileIO is not supported for builtin path: '{_options.FilePath}'.");
-                    return;
+                    LoadResult result = LoadFromFile();
+                    if (result.Succeeded == false)
+                    {
+                        _steps = ESteps.Done;
+                        SetError(result.Error);
+                        return;
+                    }
                 }
-
-                LoadResult result = ParseArchiveFile();
-                if (result.Succeeded == false)
+                else
                 {
-                    _steps = ESteps.Done;
-                    SetError(result.Error);
-                    return;
+                    var decryptor = _options.ArchiveBundleDecryptor;
+                    if (decryptor == null)
+                    {
+                        _steps = ESteps.Done;
+                        SetError($"{_options.CacheName} archive bundle decryptor is null.");
+                        return;
+                    }
+
+                    LoadResult result;
+                    if (decryptor is IBundleMemoryDecryptor memoryDecryptor)
+                    {
+                        result = LoadFromMemory(memoryDecryptor);
+                    }
+                    else
+                    {
+                        _steps = ESteps.Done;
+                        SetError($"{_options.CacheName} does not support '{decryptor.GetType().Name}' for ArchiveBundle.");
+                        return;
+                    }
+
+                    if (result.Succeeded == false)
+                    {
+                        _steps = ESteps.Done;
+                        SetError(result.Error);
+                        return;
+                    }
                 }
 
                 _steps = ESteps.CheckResult;
@@ -83,16 +108,33 @@ namespace YooAsset
             ExecuteBatch();
         }
 
-        private LoadResult ParseArchiveFile()
+        private LoadResult LoadFromFile()
         {
             try
             {
-                _archiveBundle = ArchiveBundleHelper.LoadArchiveBundle(_options.FilePath);
+                _archiveBundle = ArchiveBundleHelper.LoadFromFile(_options.FilePath);
                 return LoadResult.Default();
             }
             catch (Exception ex)
             {
-                return LoadResult.Failure($"Failed to parse archive file: {ex.Message}.");
+                return LoadResult.Failure($"Failed to load archive bundle file: {ex.Message}.");
+            }
+        }
+        private LoadResult LoadFromMemory(IBundleMemoryDecryptor decryptor)
+        {
+            try
+            {
+                var args = new BundleDecryptArgs(_options.Bundle, null, _options.FilePath);
+                byte[] binaryData = decryptor.GetDecryptedData(args);
+                if (binaryData == null)
+                    return LoadResult.Failure($"{_options.CacheName} decryptor returned null data.");
+
+                _archiveBundle = ArchiveBundleHelper.LoadFromMemory(binaryData);
+                return LoadResult.Default();
+            }
+            catch (Exception ex)
+            {
+                return LoadResult.Failure($"Failed to load archive bundle file from memory: {ex.Message}.");
             }
         }
     }

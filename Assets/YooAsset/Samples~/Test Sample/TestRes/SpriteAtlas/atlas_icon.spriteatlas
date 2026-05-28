@@ -46,9 +46,9 @@ SpriteAtlas:
   - {fileID: 21300000, guid: fcab35236e33438448805a9211b0cc19, type: 3}
   - {fileID: 21300000, guid: 3b8db7241fc8ff54e9dea6fc64cfd7e5, type: 3}
   m_PackedSpriteNamesToIndex:
-  - pause
-  - bullet
-  - rocket
+  - sprite_b
+  - sprite_a
+  - sprite_c
   m_RenderDataMap: {}
   m_Tag: atlas_icon
   m_IsVariant: 0

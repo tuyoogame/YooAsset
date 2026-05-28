@@ -1,27 +1,17 @@
 using System;
 using System.Text;
-using System.Collections;
 using YooAsset;
 
 /// <summary>
-/// 测试用清单加密器，使用 XOR 方式加密清单数据
+/// 资源清单加密器
 /// </summary>
 public class TestManifestEncryptor : IManifestEncryptor
 {
+    public const string KEY = "YOO";
+
     byte[] IManifestEncryptor.Encrypt(byte[] fileData)
     {
-        return TestXorCrypto.Crypto(fileData, "YOO");
-    }
-}
-
-/// <summary>
-/// 测试用清单解密器，使用 XOR 方式解密清单数据
-/// </summary>
-public class TestManifestDecryptor : IManifestDecryptor
-{
-    byte[] IManifestDecryptor.Decrypt(byte[] fileData)
-    {
-        return TestXorCrypto.Crypto(fileData, "YOO");
+        return TestXorCrypto.Crypto(fileData, KEY);
     }
 }
 
@@ -62,7 +52,7 @@ public class TestXorCrypto
     /// <returns>处理后的字节数组</returns>
     public static byte[] Crypto(byte[] data, string key)
     {
-        byte[] keyBytes = System.Text.Encoding.UTF8.GetBytes(key);
+        byte[] keyBytes = Encoding.UTF8.GetBytes(key);
         return Crypto(data, keyBytes);
     }
 }

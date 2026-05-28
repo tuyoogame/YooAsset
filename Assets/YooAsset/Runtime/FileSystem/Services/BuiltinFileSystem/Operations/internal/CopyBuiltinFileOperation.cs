@@ -57,7 +57,7 @@ namespace YooAsset
             if (_steps == ESteps.TryCopyFile)
             {
                 // 注意：Android/OpenHarmony 平台 File.Exists 无法识别包体内文件。
-                // 该步骤仅对 StreamingAssets 为真实文件系统目录的平台（Windows/iOS/Mac）生效。
+                // 说明：该步骤仅对 StreamingAssets 为真实文件系统目录的平台（Windows/iOS/Mac）生效。
                 if (File.Exists(_sourceFilePath))
                 {
                     try

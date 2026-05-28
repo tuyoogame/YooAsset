@@ -109,17 +109,22 @@ namespace YooAsset
         /// <summary>
         /// AssetBundle 解密器 <see cref="IBundleDecryptor"/>
         /// </summary>
-        AssetbundleDecryptor,
+        AssetBundleDecryptor,
 
         /// <summary>
         /// RawBundle 解密器 <see cref="IBundleDecryptor"/>
         /// </summary>
-        RawbundleDecryptor,
+        RawBundleDecryptor,
+
+        /// <summary>
+        /// ArchiveBundle 解密器 <see cref="IBundleDecryptor"/>
+        /// </summary>
+        ArchiveBundleDecryptor,
 
         /// <summary>
         /// AssetBundle 备用解密器 <see cref="IBundleMemoryDecryptor"/>
         /// </summary>
-        AssetbundleFallbackDecryptor,
+        AssetBundleFallbackDecryptor,
 
         /// <summary>
         /// 资源清单解密器 <see cref="IManifestDecryptor"/>

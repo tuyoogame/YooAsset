@@ -31,17 +31,24 @@ namespace YooAsset
             public IBundleDecryptor RawBundleDecryptor { get; }
 
             /// <summary>
+            /// ArchiveBundle 解密器
+            /// </summary>
+            public IBundleDecryptor ArchiveBundleDecryptor { get; }
+
+            /// <summary>
             /// AssetBundle 备用解密器
             /// </summary>
             public IBundleMemoryDecryptor AssetBundleFallbackDecryptor { get; }
 
             public Configuration(int fileVerifyMaxConcurrency, EFileVerifyLevel fileVerifyLevel,
-                IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor, IBundleMemoryDecryptor assetBundleFallbackDecryptor)
+                IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor,
+                IBundleDecryptor archiveBundleDecryptor, IBundleMemoryDecryptor assetBundleFallbackDecryptor)
             {
                 FileVerifyMaxConcurrency = fileVerifyMaxConcurrency;
                 FileVerifyLevel = fileVerifyLevel;
                 AssetBundleDecryptor = assetBundleDecryptor;
                 RawBundleDecryptor = rawBundleDecryptor;
+                ArchiveBundleDecryptor = archiveBundleDecryptor;
                 AssetBundleFallbackDecryptor = assetBundleFallbackDecryptor;
             }
         }

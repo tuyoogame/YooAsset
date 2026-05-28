@@ -21,14 +21,21 @@ namespace YooAsset
             public IBundleDecryptor RawBundleDecryptor { get; }
 
             /// <summary>
+            /// ArchiveBundle 解密器
+            /// </summary>
+            public IBundleDecryptor ArchiveBundleDecryptor { get; }
+
+            /// <summary>
             /// 下载后台
             /// </summary>
             public IDownloadBackend DownloadBackend { get; }
 
-            public Configuration(IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor, IDownloadBackend downloadBackend)
+            public Configuration(IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor,
+                IBundleDecryptor archiveBundleDecryptor, IDownloadBackend downloadBackend)
             {
                 AssetBundleDecryptor = assetBundleDecryptor;
                 RawBundleDecryptor = rawBundleDecryptor;
+                ArchiveBundleDecryptor = archiveBundleDecryptor;
                 DownloadBackend = downloadBackend;
             }
         }

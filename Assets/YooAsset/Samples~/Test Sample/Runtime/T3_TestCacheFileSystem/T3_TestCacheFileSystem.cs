@@ -34,7 +34,11 @@ public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
         if (Directory.Exists(cacheRoot))
             Directory.Delete(cacheRoot, true);
 
-        // 拷贝打包资源到本地服务器
+        // 清空旧的本地服务器测试目录
+        if (Directory.Exists(TestConsts.TestServerDirectory))
+            Directory.Delete(TestConsts.TestServerDirectory, true);
+
+        // 拷贝 AssetBundlePackage 到本地服务器
         {
             string packageRoot = string.Empty;
 #if UNITY_EDITOR
@@ -46,7 +50,31 @@ public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
             CopyDirectory(packageRoot, TestConsts.TestServerDirectory);
         }
 
-        // 初始化资源包 ASSET_BUNDLE
+        // 拷贝 RawBundlePackage 到本地服务器
+        {
+            string packageRoot = string.Empty;
+#if UNITY_EDITOR
+            packageRoot = UnityEditor.EditorPrefs.GetString(T2_TestBuiltinFileSystem.RAW_BUNDLE_PACKAGE_ROOT_KEY);
+#endif
+            if (Directory.Exists(packageRoot) == false)
+                throw new Exception($"Not found package root : {packageRoot}");
+
+            CopyDirectory(packageRoot, TestConsts.TestServerDirectory);
+        }
+
+        // 拷贝 ArchiveBundlePackage 到本地服务器
+        {
+            string packageRoot = string.Empty;
+#if UNITY_EDITOR
+            packageRoot = UnityEditor.EditorPrefs.GetString(T2_TestBuiltinFileSystem.ARCHIVE_BUNDLE_PACKAGE_ROOT_KEY);
+#endif
+            if (Directory.Exists(packageRoot) == false)
+                throw new Exception($"Not found package root : {packageRoot}");
+
+            CopyDirectory(packageRoot, TestConsts.TestServerDirectory);
+        }
+
+        // 初始化 AssetBundlePackage
         {
             var package = YooAssets.CreatePackage(TestConsts.AssetBundlePackageName);
 
@@ -58,7 +86,71 @@ public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
             initParams.BuiltinFileSystemParameters = null;
             initParams.CacheFileSystemParameters = FileSystemParameters.CreateDefaultSandboxFileSystemParameters(remoteService);
             initParams.CacheFileSystemParameters.AddParameter(EFileSystemParameter.ManifestDecryptor, manifestServices);
-            initParams.CacheFileSystemParameters.AddParameter(EFileSystemParameter.AssetbundleDecryptor, new TestFileStreamDecryption());
+            initParams.CacheFileSystemParameters.AddParameter(EFileSystemParameter.AssetBundleDecryptor, new TestAssetBundleDecryptor());
+            var initializeOp = package.InitializePackageAsync(initParams);
+            yield return initializeOp;
+            if (initializeOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(initializeOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, initializeOp.Status);
+
+            // 请求资源版本
+            var requestVersionOp = package.RequestPackageVersionAsync();
+            yield return requestVersionOp;
+            if (requestVersionOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(requestVersionOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, requestVersionOp.Status);
+
+            // 更新资源清单
+            var loadPackageManifestOptions = new LoadPackageManifestOptions(requestVersionOp.PackageVersion, 60);
+            var loadPackageManifestOp = package.LoadPackageManifestAsync(loadPackageManifestOptions);
+            yield return loadPackageManifestOp;
+            if (loadPackageManifestOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(loadPackageManifestOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, loadPackageManifestOp.Status);
+        }
+
+        // 初始化 RawBundlePackage
+        {
+            var package = YooAssets.CreatePackage(TestConsts.RawBundlePackageName);
+
+            // 初始化资源包
+            var initParams = new HostPlayModeOptions();
+            var remoteService = new TestRemoteService(TestConsts.TestServerURL);
+            initParams.BuiltinFileSystemParameters = null;
+            initParams.CacheFileSystemParameters = FileSystemParameters.CreateDefaultSandboxFileSystemParameters(remoteService);
+            initParams.CacheFileSystemParameters.AddParameter(EFileSystemParameter.RawBundleDecryptor, new TestRawBundleDecryptor());
+            var initializeOp = package.InitializePackageAsync(initParams);
+            yield return initializeOp;
+            if (initializeOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(initializeOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, initializeOp.Status);
+
+            // 请求资源版本
+            var requestVersionOp = package.RequestPackageVersionAsync();
+            yield return requestVersionOp;
+            if (requestVersionOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(requestVersionOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, requestVersionOp.Status);
+
+            // 更新资源清单
+            var loadPackageManifestOptions = new LoadPackageManifestOptions(requestVersionOp.PackageVersion, 60);
+            var loadPackageManifestOp = package.LoadPackageManifestAsync(loadPackageManifestOptions);
+            yield return loadPackageManifestOp;
+            if (loadPackageManifestOp.Status != EOperationStatus.Succeeded)
+                Debug.LogError(loadPackageManifestOp.Error);
+            Assert.AreEqual(EOperationStatus.Succeeded, loadPackageManifestOp.Status);
+        }
+
+        // 初始化 ArchiveBundlePackage
+        {
+            var package = YooAssets.CreatePackage(TestConsts.ArchiveBundlePackageName);
+
+            // 初始化资源包
+            var initParams = new HostPlayModeOptions();
+            var remoteService = new TestRemoteService(TestConsts.TestServerURL);
+            initParams.BuiltinFileSystemParameters = null;
+            initParams.CacheFileSystemParameters = FileSystemParameters.CreateDefaultSandboxFileSystemParameters(remoteService);
+            initParams.CacheFileSystemParameters.AddParameter(EFileSystemParameter.ArchiveBundleDecryptor, new TestArchiveBundleDecryptor());
             var initializeOp = package.InitializePackageAsync(initParams);
             yield return initializeOp;
             if (initializeOp.Status != EOperationStatus.Succeeded)
@@ -120,14 +212,182 @@ public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator C04_TestClearCache()
+    public IEnumerator D01_TestAsyncTask()
+    {
+        var tester = new TestAsyncTask();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D02_TestAsyncCompleted()
+    {
+        var tester = new TestAsyncCompleted();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D03_TestLoadAsset()
+    {
+        var tester = new TestLoadAsset();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D04_TestLoadSubAssets()
+    {
+        var tester = new TestLoadSubAssets();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D05_TestLoadAllAssets()
+    {
+        var tester = new TestLoadAllAssets();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D06_TestLoadGameObject()
+    {
+        var tester = new TestLoadGameObject();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D07_TestLoadSpriteAtlas()
+    {
+        var tester = new TestLoadSpriteAtlas();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D08_TestLoadScriptableObject()
+    {
+        var tester = new TestLoadScriptableObject();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D09_TestLoadScene()
+    {
+        var tester = new TestLoadScene();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D10_TestLoadBundleFile()
+    {
+        var tester = new TestLoadBundleFile();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D11_TestLoadRawBundle()
+    {
+        var tester = new TestLoadRawBundle();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D12_TestLoadArchiveBundle()
+    {
+        var tester = new TestLoadArchiveBundle();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator D13_TestEnsureBundleFile_RawBundle()
+    {
+        var tester = new TestEnsureBundleFile();
+        yield return tester.RuntimeTester_RawBundle();
+    }
+
+    [UnityTest]
+    public IEnumerator D14_TestEnsureBundleFile_AssetBundle()
+    {
+        var tester = new TestEnsureBundleFile();
+        yield return tester.RuntimeTester_AssetBundle();
+    }
+
+    [UnityTest]
+    public IEnumerator D15_TestEnsureBundleFile_ArchiveBundle()
+    {
+        var tester = new TestEnsureBundleFile();
+        yield return tester.RuntimeTester_ArchiveBundle();
+    }
+
+    [UnityTest]
+    public IEnumerator D16_TestUniTask()
+    {
+        var tester = new TestUniTask();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator E01_TestGetPackageInfo()
+    {
+        var tester = new TestGetPackageInfo();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator E02_TestGetAssetInfo()
+    {
+        var tester = new TestGetAssetInfo();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator E03_TestIsLocationValid()
+    {
+        var tester = new TestIsLocationValid();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator E04_TestLoadInvalidAsset()
+    {
+        var tester = new TestLoadInvalidAsset();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator E05_TestDuplicateLoad()
+    {
+        var tester = new TestDuplicateLoad();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator E06_TestHandleRelease()
+    {
+        var tester = new TestHandleRelease();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator E07_TestBundleFileRelease()
+    {
+        var tester = new TestBundleFileRelease();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator E08_TestUnloadAllAssets()
+    {
+        var tester = new TestUnloadAllAssets();
+        yield return tester.RuntimeTester();
+    }
+
+    [UnityTest]
+    public IEnumerator F01_TestClearCache()
     {
         var tester = new TestClearCache();
         yield return tester.RuntimeTester();
     }
 
     [UnityTest]
-    public IEnumerator C05_TestClearManifest()
+    public IEnumerator F02_TestClearManifest()
     {
         var tester = new TestClearManifest();
         yield return tester.RuntimeTester();
@@ -137,7 +397,7 @@ public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
     public IEnumerator Z_DestroyPackage()
     {
         var tester = new TestDestroyPackage();
-        yield return tester.RuntimeTester(false);
+        yield return tester.RuntimeTester(true, true);
     }
 
     private static void CopyDirectory(string sourceDir, string targetDir)

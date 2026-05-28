@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7029742931587134142}
   m_Layer: 0
-  m_Name: prefab_importA
+  m_Name: prefab_unpack_a
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

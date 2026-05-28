@@ -23,7 +23,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     void IPrebuildSetup.Setup()
     {
 #if UNITY_EDITOR
-        // 构建资源包
+        // 构建 AssetBundlePackage
         {
             var simulateParams = new PackageBuildParameters(TestConsts.AssetBundlePackageName);
             simulateParams.BuildPipelineName = "EditorSimulateBuildPipeline";
@@ -35,7 +35,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
             UnityEditor.EditorPrefs.SetString(ASSET_BUNDLE_PACKAGE_ROOT_KEY, simulateResult.PackageRootDirectory);
         }
 
-        // 构建原生资源包
+        // 构建 RawBundlePackage
         {
             var simulateParams = new PackageBuildParameters(TestConsts.RawBundlePackageName);
             simulateParams.BuildPipelineName = "EditorSimulateBuildPipeline";
@@ -47,7 +47,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
             UnityEditor.EditorPrefs.SetString(RAW_BUNDLE_PACKAGE_ROOT_KEY, simulateResult.PackageRootDirectory);
         }
 
-        // 构建归档资源包
+        // 构建 ArchiveBundlePackage
         {
             var simulateParams = new PackageBuildParameters(TestConsts.ArchiveBundlePackageName);
             simulateParams.BuildPipelineName = "EditorSimulateBuildPipeline";
@@ -68,7 +68,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     [UnityTest]
     public IEnumerator A_InitializePackage()
     {
-        // 初始化资源包 ASSET_BUNDLE
+        // 初始化 AssetBundlePackage
         {
             string packageRoot = string.Empty;
 #if UNITY_EDITOR
@@ -104,7 +104,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
             Assert.AreEqual(EOperationStatus.Succeeded, loadPackageManifestOp.Status);
         }
 
-        // 初始化资源包 RAW_BUNDLE
+        // 初始化 RawBundlePackage
         {
             string packageRoot = string.Empty;
 #if UNITY_EDITOR
@@ -140,7 +140,7 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
             Assert.AreEqual(EOperationStatus.Succeeded, loadPackageManifestOp.Status);
         }
 
-        // 初始化资源包 ARCHIVE_BUNDLE
+        // 初始化 ArchiveBundlePackage
         {
             string packageRoot = string.Empty;
 #if UNITY_EDITOR
@@ -248,9 +248,9 @@ public class T1_TestEditorFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator B11_TestLoadRawFileObject()
+    public IEnumerator B11_TestLoadRawBundle()
     {
-        var tester = new TestLoadRawFileObject();
+        var tester = new TestLoadRawBundle();
         yield return tester.RuntimeTester();
     }
 

@@ -124,6 +124,11 @@ namespace YooAsset
         public IBundleDecryptor RawBundleDecryptor { get; private set; }
 
         /// <summary>
+        /// 自定义参数：ArchiveBundle 解密器
+        /// </summary>
+        public IBundleDecryptor ArchiveBundleDecryptor { get; private set; }
+
+        /// <summary>
         /// 自定义参数：AssetBundle 备用解密器
         /// </summary>
         public IBundleMemoryDecryptor AssetBundleFallbackDecryptor { get; private set; }
@@ -275,15 +280,19 @@ namespace YooAsset
             {
                 RemoteService = FileSystemHelper.CastParameter<IRemoteService>(paramName, value);
             }
-            else if (paramName == nameof(EFileSystemParameter.AssetbundleDecryptor))
+            else if (paramName == nameof(EFileSystemParameter.AssetBundleDecryptor))
             {
                 AssetBundleDecryptor = FileSystemHelper.CastParameter<IBundleDecryptor>(paramName, value);
             }
-            else if (paramName == nameof(EFileSystemParameter.RawbundleDecryptor))
+            else if (paramName == nameof(EFileSystemParameter.RawBundleDecryptor))
             {
                 RawBundleDecryptor = FileSystemHelper.CastParameter<IBundleDecryptor>(paramName, value);
             }
-            else if (paramName == nameof(EFileSystemParameter.AssetbundleFallbackDecryptor))
+            else if (paramName == nameof(EFileSystemParameter.ArchiveBundleDecryptor))
+            {
+                ArchiveBundleDecryptor = FileSystemHelper.CastParameter<IBundleDecryptor>(paramName, value);
+            }
+            else if (paramName == nameof(EFileSystemParameter.AssetBundleFallbackDecryptor))
             {
                 AssetBundleFallbackDecryptor = FileSystemHelper.CastParameter<IBundleMemoryDecryptor>(paramName, value);
             }
@@ -337,6 +346,7 @@ namespace YooAsset
                     fileVerifyLevel: FileVerifyLevel,
                     assetBundleDecryptor: AssetBundleDecryptor,
                     rawBundleDecryptor: RawBundleDecryptor,
+                    archiveBundleDecryptor: ArchiveBundleDecryptor,
                     assetBundleFallbackDecryptor: AssetBundleFallbackDecryptor);
                 BundleCache = new SandboxBundleCache(PackageName, _cacheBundleFilesRoot, cacheConfig);
             }

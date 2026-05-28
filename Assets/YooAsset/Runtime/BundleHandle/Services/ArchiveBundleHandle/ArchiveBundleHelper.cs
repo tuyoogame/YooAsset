@@ -8,14 +8,36 @@ namespace YooAsset
     internal static class ArchiveBundleHelper
     {
         /// <summary>
-        /// 解析 YARK 归档文件
+        /// 从本地文件解析 YARK 归档
         /// </summary>
         /// <param name="filePath">归档文件路径</param>
         /// <returns>解析成功的 ArchiveBundle 实例</returns>
-        public static ArchiveBundle LoadArchiveBundle(string filePath)
+        public static ArchiveBundle LoadFromFile(string filePath)
         {
             using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var reader = new BinaryReader(fs))
+            {
+                var entries = ParseEntries(fs, fs.Length);
+                return new ArchiveBundle(filePath, entries);
+            }
+        }
+
+        /// <summary>
+        /// 从解密后的内存数据解析 YARK 归档
+        /// </summary>
+        /// <param name="fileData">解密后的完整归档字节数据</param>
+        /// <returns>解析成功的 ArchiveBundle 实例</returns>
+        public static ArchiveBundle LoadFromMemory(byte[] fileData)
+        {
+            using (var ms = new MemoryStream(fileData, false))
+            {
+                var entries = ParseEntries(ms, fileData.Length);
+                return new ArchiveBundle(fileData, entries);
+            }
+        }
+
+        private static Dictionary<string, ArchiveBundle.FileEntry> ParseEntries(Stream stream, long dataLength)
+        {
+            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
             {
                 // 校验文件头魔数（YARK）
                 uint magic = reader.ReadUInt32();
@@ -34,7 +56,6 @@ namespace YooAsset
                 if (fileCount > ArchiveBundleConsts.MaxChildFileCount)
                     throw new InvalidOperationException($"Archive child file count {fileCount} exceeds maximum ({ArchiveBundleConsts.MaxChildFileCount}).");
 
-                long fileLength = fs.Length;
                 var entries = new Dictionary<string, ArchiveBundle.FileEntry>(fileCount);
                 for (int i = 0; i < fileCount; i++)
                 {
@@ -44,9 +65,9 @@ namespace YooAsset
                         throw new InvalidOperationException($"Invalid path length {pathLen} at entry index {i}.");
                     if (pathLen > ArchiveBundleConsts.MaxChildFilePathBytes)
                         throw new InvalidOperationException($"Path length {pathLen} exceeds maximum ({ArchiveBundleConsts.MaxChildFilePathBytes}) at entry index {i}.");
-                    long remaining = fileLength - fs.Position;
+                    long remaining = dataLength - stream.Position;
                     if (pathLen > remaining)
-                        throw new InvalidOperationException($"Path length {pathLen} exceeds remaining file size at entry index {i}.");
+                        throw new InvalidOperationException($"Path length {pathLen} exceeds remaining data size at entry index {i}.");
 
                     string assetPath = Encoding.UTF8.GetString(reader.ReadBytes(pathLen));
                     if (string.IsNullOrEmpty(assetPath))
@@ -59,15 +80,15 @@ namespace YooAsset
                     uint crc = reader.ReadUInt32();
 
                     // 校验数据范围是否越过文件边界
-                    if (offset < 0 || offset > fileLength)
+                    if (offset < 0 || offset > dataLength)
                         throw new InvalidOperationException($"Invalid data offset {offset} for '{assetPath}'.");
-                    if (length < 0 || length > fileLength - offset)
-                        throw new InvalidOperationException($"Data range [{offset}, {offset + length}) exceeds file size {fileLength} for '{assetPath}'.");
+                    if (length < 0 || length > dataLength - offset)
+                        throw new InvalidOperationException($"Data range [{offset}, {offset + length}) exceeds data size {dataLength} for '{assetPath}'.");
 
                     entries[assetPath] = new ArchiveBundle.FileEntry(assetPath, offset, length, crc);
                 }
 
-                return new ArchiveBundle(filePath, entries);
+                return entries;
             }
         }
     }

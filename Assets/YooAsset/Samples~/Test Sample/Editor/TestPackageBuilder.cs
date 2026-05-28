@@ -71,7 +71,7 @@ public static class TestPackageBuilder
             buildParameters.ClearBuildCacheFiles = true;
             buildParameters.UseAssetDependencyDB = true;
             buildParameters.BuiltinShadersBundleName = builtinShaderBundleName;
-            buildParameters.BundleEncryptor = new TestFileStreamEncryption();
+            buildParameters.BundleEncryptor = new TestAssetBundleEncryptor();
             buildParameters.ManifestEncryptor = new TestManifestEncryptor();
             buildParameters.ManifestDecryptor = new TestManifestDecryptor();
 
@@ -115,7 +115,7 @@ public static class TestPackageBuilder
             buildParameters.CompressOption = ECompressOption.LZ4;
             buildParameters.ClearBuildCacheFiles = true;
             buildParameters.UseAssetDependencyDB = true;
-            buildParameters.BundleEncryptor = new TestFileStreamEncryption();
+            buildParameters.BundleEncryptor = new TestAssetBundleEncryptor();
             buildParameters.ManifestEncryptor = new TestManifestEncryptor();
             buildParameters.ManifestDecryptor = new TestManifestDecryptor();
 
@@ -157,6 +157,7 @@ public static class TestPackageBuilder
             buildParameters.BundledCopyParams = string.Empty;
             buildParameters.ClearBuildCacheFiles = true;
             buildParameters.UseAssetDependencyDB = true;
+            buildParameters.BundleEncryptor = new TestRawBundleEncryptor();
 
             var pipeline = new RawFileBuildPipeline();
             BuildResult buildResult = pipeline.Run(buildParameters, false);
@@ -197,6 +198,7 @@ public static class TestPackageBuilder
             buildParameters.ClearBuildCacheFiles = true;
             buildParameters.UseAssetDependencyDB = true;
             buildParameters.FileAlignment = 4;
+            buildParameters.BundleEncryptor = new TestArchiveBundleEncryptor();
 
             var pipeline = new ArchiveFileBuildPipeline();
             BuildResult buildResult = pipeline.Run(buildParameters, false);

@@ -60,7 +60,8 @@ namespace YooAsset
                     var options = new LoadLocalArchiveBundleOptions(
                         cacheName: _fileCache.GetType().Name,
                         bundle: _bundle,
-                        filePath: _cacheEntry.FilePath);
+                        filePath: _cacheEntry.FilePath,
+                        archiveBundleDecryptor: _fileCache.Config.ArchiveBundleDecryptor);
                     _loadLocalArchiveBundleOp = new LoadLocalArchiveBundleOperation(options);
                     _loadLocalArchiveBundleOp.StartOperation();
                     AddChildOperation(_loadLocalArchiveBundleOp);

@@ -14,7 +14,7 @@ using YooAsset;
 /// 覆盖 API: LoadAssetAsync (SpriteAtlas)
 /// 测试内容:
 /// 1. 异步加载 SpriteAtlas 资源，验证加载状态和资源对象非空
-/// 2. 从图集中获取三个精灵（bullet、pause、rocket），验证均非空
+/// 2. 从图集中获取三个精灵（sprite_a、sprite_b、sprite_c），验证均非空
 /// </remarks>
 public class TestLoadSpriteAtlas
 {
@@ -30,13 +30,13 @@ public class TestLoadSpriteAtlas
         var spriteAtlas = assetHandle.AssetObject as SpriteAtlas;
         Assert.IsNotNull(spriteAtlas);
 
-        var sprite1 = spriteAtlas.GetSprite("bullet");
+        var sprite1 = spriteAtlas.GetSprite("sprite_a");
         Assert.IsNotNull(sprite1);
 
-        var sprite2 = spriteAtlas.GetSprite("pause");
+        var sprite2 = spriteAtlas.GetSprite("sprite_b");
         Assert.IsNotNull(sprite2);
 
-        var sprite3 = spriteAtlas.GetSprite("rocket");
+        var sprite3 = spriteAtlas.GetSprite("sprite_c");
         Assert.IsNotNull(sprite3);
         assetHandle.Release();
     }

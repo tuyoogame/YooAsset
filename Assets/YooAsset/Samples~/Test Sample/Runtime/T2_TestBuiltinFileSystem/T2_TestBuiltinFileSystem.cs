@@ -23,7 +23,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
     void IPrebuildSetup.Setup()
     {
 #if UNITY_EDITOR
-        // 构建AssetBundlePackage
+        // 构建 AssetBundlePackage
         {
             var buildParams = new PackageBuildParameters(TestConsts.AssetBundlePackageName);
             buildParams.BuildPipelineName = "ScriptableBuildPipeline";
@@ -34,7 +34,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
             UnityEditor.EditorPrefs.SetString(ASSET_BUNDLE_PACKAGE_ROOT_KEY, simulateResult.PackageRootDirectory);
         }
 
-        // 构建RawBundlePackage
+        // 构建 RawBundlePackage
         {
             var buildParams = new PackageBuildParameters(TestConsts.RawBundlePackageName);
             buildParams.BuildPipelineName = "RawFileBuildPipeline";
@@ -45,7 +45,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
             UnityEditor.EditorPrefs.SetString(RAW_BUNDLE_PACKAGE_ROOT_KEY, simulateResult.PackageRootDirectory);
         }
 
-        // 构建ArchiveBundlePackage
+        // 构建 ArchiveBundlePackage
         {
             var buildParams = new PackageBuildParameters(TestConsts.ArchiveBundlePackageName);
             buildParams.BuildPipelineName = "ArchiveFileBuildPipeline";
@@ -65,7 +65,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
     [UnityTest]
     public IEnumerator A_InitializePackage()
     {
-        // 初始化资源包 ASSET_BUNDLE
+        // 初始化 AssetBundlePackage
         {
             string packageRoot = string.Empty;
 #if UNITY_EDITOR
@@ -81,7 +81,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
             var manifestServices = new TestManifestDecryptor();
             initParams.BuiltinFileSystemParameters = FileSystemParameters.CreateDefaultBuiltinFileSystemParameters(packageRoot);
             initParams.BuiltinFileSystemParameters.AddParameter(EFileSystemParameter.ManifestDecryptor, manifestServices);
-            initParams.BuiltinFileSystemParameters.AddParameter(EFileSystemParameter.AssetbundleDecryptor, new TestFileStreamDecryption());
+            initParams.BuiltinFileSystemParameters.AddParameter(EFileSystemParameter.AssetBundleDecryptor, new TestAssetBundleDecryptor());
             var initializeOp = package.InitializePackageAsync(initParams);
             yield return initializeOp;
             if (initializeOp.Status != EOperationStatus.Succeeded)
@@ -104,7 +104,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
             Assert.AreEqual(EOperationStatus.Succeeded, loadPackageManifestOp.Status);
         }
 
-        // 初始化资源包 RAW_BUNDLE
+        // 初始化 RawBundlePackage
         {
             string packageRoot = string.Empty;
 #if UNITY_EDITOR
@@ -118,6 +118,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
             // 初始化资源包
             var initParams = new OfflinePlayModeOptions();
             initParams.BuiltinFileSystemParameters = FileSystemParameters.CreateDefaultBuiltinFileSystemParameters(packageRoot);
+            initParams.BuiltinFileSystemParameters.AddParameter(EFileSystemParameter.RawBundleDecryptor, new TestRawBundleDecryptor());
             var initializeOp = package.InitializePackageAsync(initParams);
             yield return initializeOp;
             if (initializeOp.Status != EOperationStatus.Succeeded)
@@ -140,7 +141,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
             Assert.AreEqual(EOperationStatus.Succeeded, loadPackageManifestOp.Status);
         }
 
-        // 初始化资源包 ARCHIVE_BUNDLE
+        // 初始化 ArchiveBundlePackage
         {
             string packageRoot = string.Empty;
 #if UNITY_EDITOR
@@ -154,6 +155,7 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
             // 初始化资源包
             var initParams = new OfflinePlayModeOptions();
             initParams.BuiltinFileSystemParameters = FileSystemParameters.CreateDefaultBuiltinFileSystemParameters(packageRoot);
+            initParams.BuiltinFileSystemParameters.AddParameter(EFileSystemParameter.ArchiveBundleDecryptor, new TestArchiveBundleDecryptor());
             var initializeOp = package.InitializePackageAsync(initParams);
             yield return initializeOp;
             if (initializeOp.Status != EOperationStatus.Succeeded)
@@ -248,9 +250,9 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator B11_TestLoadRawFileObject()
+    public IEnumerator B11_TestLoadRawBundle()
     {
-        var tester = new TestLoadRawFileObject();
+        var tester = new TestLoadRawBundle();
         yield return tester.RuntimeTester();
     }
 
@@ -290,9 +292,9 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
     }
 
     [UnityTest]
-    public IEnumerator C01_TestBundleEncryption()
+    public IEnumerator C01_TestAssetBundleDecryption()
     {
-        var tester = new TestBundleEncryption();
+        var tester = new TestAssetBundleDecryption();
         yield return tester.RuntimeTester();
     }
 

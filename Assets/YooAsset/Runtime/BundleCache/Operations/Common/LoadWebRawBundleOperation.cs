@@ -199,12 +199,12 @@ namespace YooAsset
                 if (binaryData == null)
                     return LoadResult.Failure($"{_options.CacheName} decryptor returned null data.");
 
-                _rawBundle = new RawBundle(binaryData);
+                _rawBundle = RawBundleHelper.LoadFromMemory(binaryData);
                 return LoadResult.Default();
             }
             else
             {
-                _rawBundle = new RawBundle(fileData);
+                _rawBundle = RawBundleHelper.LoadFromMemory(fileData);
                 return LoadResult.Default();
             }
         }

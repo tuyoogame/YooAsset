@@ -29,13 +29,13 @@ public class TestResourceImporter
         string fileRoot = $"{packageDir.Parent.FullName}/OutputCache";
 
         var fileInfoA = new ImportBundleInfo(
-            filePath: $"{fileRoot}/assets_samples_test_sample_testres3_import_prefab_importa.bundle.encrypt",
-            bundleName: "assets_samples_test_sample_testres3_import_prefab_importa.bundle",
+            filePath: $"{fileRoot}/assets_samples_test_sample_testres3_importfiles_prefab_import_a.bundle.encrypt",
+            bundleName: "assets_samples_test_sample_testres3_importfiles_prefab_import_a.bundle",
             bundleGuid: null);
 
         var fileInfoB = new ImportBundleInfo(
-            filePath: $"{fileRoot}/assets_samples_test_sample_testres3_import_prefab_importb.bundle.encrypt",
-            bundleName: "assets_samples_test_sample_testres3_import_prefab_importb.bundle",
+            filePath: $"{fileRoot}/assets_samples_test_sample_testres3_importfiles_prefab_import_b.bundle.encrypt",
+            bundleName: "assets_samples_test_sample_testres3_importfiles_prefab_import_b.bundle",
             bundleGuid: null);
 
         ImportBundleInfo[] importInfos = { fileInfoA, fileInfoB };

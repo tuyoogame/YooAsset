@@ -14,6 +14,7 @@ using YooAsset;
 /// 2. 同步加载归档子文件，验证 GetBytes() 和 GetText() 均返回有效数据（archive_file_b）
 /// 3. 重复加载同一归档子文件，验证缓存命中不会失败（archive_file_c）
 /// 4. 释放句柄并卸载后重新加载，验证卸载保护和重载链路正常（archive_file_e）
+/// 5. 加载加密归档子文件，验证 Memory 解密路径（archive_file_x / archive_file_y）
 /// </remarks>
 public class TestLoadArchiveBundle
 {
@@ -102,6 +103,45 @@ public class TestLoadArchiveBundle
             Assert.Greater(reloadedObj.GetBytes().Length, 0);
             Assert.AreNotSame(previousObj, reloadedObj);
             reloadHandle.Release();
+        }
+
+        // 异步加载加密归档子文件，验证 Memory 解密路径
+        {
+            var assetHandle = package.LoadAssetAsync<RawFileObject>("archive_file_x");
+            yield return assetHandle;
+            Assert.AreEqual(EOperationStatus.Succeeded, assetHandle.Status);
+
+            var rawFileObject = assetHandle.GetAssetObject<RawFileObject>();
+            Assert.IsNotNull(rawFileObject);
+
+            byte[] fileBytes = rawFileObject.GetBytes();
+            Assert.IsNotNull(fileBytes);
+            Assert.Greater(fileBytes.Length, 0);
+
+            string fileText = rawFileObject.GetText();
+            Assert.IsNotNull(fileText);
+            Assert.IsNotEmpty(fileText);
+            Assert.AreEqual("this is archive file x !", fileText);
+            assetHandle.Release();
+        }
+
+        // 同步加载加密归档子文件，验证 Memory 解密路径
+        {
+            var assetHandle = package.LoadAssetSync<RawFileObject>("archive_file_y");
+            Assert.AreEqual(EOperationStatus.Succeeded, assetHandle.Status);
+
+            var rawFileObject = assetHandle.GetAssetObject<RawFileObject>();
+            Assert.IsNotNull(rawFileObject);
+
+            byte[] fileBytes = rawFileObject.GetBytes();
+            Assert.IsNotNull(fileBytes);
+            Assert.Greater(fileBytes.Length, 0);
+
+            string fileText = rawFileObject.GetText();
+            Assert.IsNotNull(fileText);
+            Assert.IsNotEmpty(fileText);
+            Assert.AreEqual("this is archive file y !", fileText);
+            assetHandle.Release();
         }
     }
 }

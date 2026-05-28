@@ -148,11 +148,11 @@ namespace YooAsset
             {
                 RemoteService = FileSystemHelper.CastParameter<IRemoteService>(paramName, value);
             }
-            else if (paramName == nameof(EFileSystemParameter.AssetbundleDecryptor))
+            else if (paramName == nameof(EFileSystemParameter.AssetBundleDecryptor))
             {
                 AssetBundleDecryptor = FileSystemHelper.CastParameter<IBundleDecryptor>(paramName, value);
             }
-            else if (paramName == nameof(EFileSystemParameter.RawbundleDecryptor))
+            else if (paramName == nameof(EFileSystemParameter.RawBundleDecryptor))
             {
                 RawBundleDecryptor = FileSystemHelper.CastParameter<IBundleDecryptor>(paramName, value);
             }

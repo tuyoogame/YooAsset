@@ -30,12 +30,12 @@ public class TestClearCache
 
         // ---- 1. ClearBundleFilesByLocations ----
         {
-            var options = new ClearCacheOptions(ClearCacheMethods.ClearBundleFilesByLocations, "prefab_encryptA");
+            var options = new ClearCacheOptions(ClearCacheMethods.ClearBundleFilesByLocations, "prefab_encrypt_x");
             var clearOp = package.ClearCacheAsync(options);
             yield return clearOp;
             Assert.AreEqual(EOperationStatus.Succeeded, clearOp.Status);
 
-            Assert.Greater(package.GetDownloadSize("prefab_encryptA"), 0);
+            Assert.Greater(package.GetDownloadSize("prefab_encrypt_x"), 0);
         }
 
         // ---- 2. ClearBundleFilesByTags ----
@@ -53,7 +53,7 @@ public class TestClearCache
             yield return clearOp;
             Assert.AreEqual(EOperationStatus.Succeeded, clearOp.Status);
 
-            Assert.Greater(package.GetDownloadSize("prefab_encryptA"), 0);
+            Assert.Greater(package.GetDownloadSize("prefab_encrypt_x"), 0);
         }
 
         // ---- 4. ClearAllBundleFiles ----
