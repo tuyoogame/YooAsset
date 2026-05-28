@@ -2,6 +2,50 @@
 
 All notable changes to this package will be documented in this file.
 
+## [3.0.2-beta] - 2026-05-28
+
+### Added
+
+- 新增 `WebNetworkFileSystem` 文件系统
+
+  用于统一 WebGL 远程加载和 Mini Game 平台资源加载流程，并通过 `IWebPlatformStrategy` 适配不同平台的 AssetBundle 请求、提取和卸载行为。
+
+- 新增 Web 文件系统对 `RawBundle` 和 `ArchiveBundle` 的加载支持
+
+  `WebServerFileSystem` 和 `WebNetworkFileSystem` 支持在 WebGL 平台加载原始文件包和归档资源包。
+
+- 新增加密 `ArchiveBundle` 构建和加载支持
+
+  `ArchiveFileBuildPipeline` 支持加密归档资源包，运行时可通过 `EFileSystemParameter.ArchiveBundleDecryptor` 配置对应解密器。
+
+- 新增 `IBundleUnpackPolicy` 内置资源包解包策略
+
+  支持根据资源包名称、文件名、类型、加密状态和标签，自定义哪些内置资源包需要解包。
+
+- 新增 `IBuiltinFileAccessor` 内置文件访问器
+
+  支持为 `StreamingAssets` 文件提供自定义存在检测和字节读取能力，方便 Android 等平台接入第三方同步读取方案。
+
+- 新增 Bundle Collector 资源搜索功能
+
+  支持在收集器窗口输入或拖入资源路径，定位资源所在的分组和收集器，并高亮命中的资源配置。
+
+- 新增 Mini Game 平台示例
+
+  补充 OPPO、vivo、快手小游戏文件系统示例。
+
+### Changed
+
+- WebGL 运行模式文件系统结构调整
+
+  移除旧版 `WebGameFileSystem` 和 `WebRemoteFileSystem`，相关能力已合并到新的文件系统 `WebNetworkFileSystem`。
+
+### Fixed
+
+- 修复微信小游戏示例宏兼容问题
+
+  微信小游戏文件系统同时支持 `WEIXINMINIGAME` 和 `UNITY_WECHATMINIGAME` 宏。
+
 ## [3.0.1-beta] - 2026-05-19
 
 ### Added
