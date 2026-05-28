@@ -36,6 +36,11 @@ namespace YooAsset
             public IBundleDecryptor RawBundleDecryptor { get; }
 
             /// <summary>
+            /// ArchiveBundle 解密器
+            /// </summary>
+            public IBundleDecryptor ArchiveBundleDecryptor { get; }
+
+            /// <summary>
             /// Web 平台策略
             /// </summary>
             public IWebPlatformStrategy PlatformStrategy { get; }
@@ -57,7 +62,7 @@ namespace YooAsset
 
             public Configuration(int watchdogTimeout, bool disableUnityWebCache,
                 EFileVerifyLevel downloadVerifyLevel, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor,
-                IWebPlatformStrategy platformStrategy, IDownloadBackend downloadBackend,
+                IBundleDecryptor archiveBundleDecryptor, IWebPlatformStrategy platformStrategy, IDownloadBackend downloadBackend,
                 IDownloadRetryPolicy downloadRetryPolicy, IDownloadUrlPolicy downloadUrlPolicy)
             {
                 WatchdogTimeout = watchdogTimeout;
@@ -65,6 +70,7 @@ namespace YooAsset
                 DownloadVerifyLevel = downloadVerifyLevel;
                 AssetBundleDecryptor = assetBundleDecryptor;
                 RawBundleDecryptor = rawBundleDecryptor;
+                ArchiveBundleDecryptor = archiveBundleDecryptor;
                 PlatformStrategy = platformStrategy;
                 DownloadBackend = downloadBackend;
                 DownloadRetryPolicy = downloadRetryPolicy;
@@ -155,6 +161,11 @@ namespace YooAsset
             else if (options.Bundle.GetBundleType() == (int)EBundleType.RawBundle)
             {
                 var operation = new WSBCLoadRawBundleOperation(this, options);
+                return operation;
+            }
+            else if (options.Bundle.GetBundleType() == (int)EBundleType.ArchiveBundle)
+            {
+                var operation = new WSBCLoadArchiveBundleOperation(this, options);
                 return operation;
             }
             else

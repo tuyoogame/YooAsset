@@ -3,9 +3,9 @@ using System;
 namespace YooAsset
 {
     /// <summary>
-    /// WebGL 平台加载 RawBundle 操作
+    /// WebGL 平台加载 ArchiveBundle 操作
     /// </summary>
-    internal sealed class LoadWebRawBundleOperation : BCLoadBundleOperation
+    internal sealed class LoadWebArchiveBundleOperation : BCLoadBundleOperation
     {
         private enum ESteps
         {
@@ -19,14 +19,14 @@ namespace YooAsset
             Done,
         }
 
-        private readonly LoadWebRawBundleOptions _options;
+        private readonly LoadWebArchiveBundleOptions _options;
         private readonly DownloadRetryController _downloadRetryController;
         private IDownloadBytesRequest _downloadBytesRequest;
         private IBundleMemoryDecryptor _decryptor;
-        private RawBundle _rawBundle;
+        private ArchiveBundle _archiveBundle;
         private ESteps _steps = ESteps.None;
 
-        internal LoadWebRawBundleOperation(LoadWebRawBundleOptions options)
+        internal LoadWebArchiveBundleOperation(LoadWebArchiveBundleOptions options)
         {
             _options = options;
 
@@ -50,11 +50,11 @@ namespace YooAsset
                 }
                 else
                 {
-                    var decryptor = _options.RawBundleDecryptor;
+                    var decryptor = _options.ArchiveBundleDecryptor;
                     if (decryptor == null)
                     {
                         _steps = ESteps.Done;
-                        SetError($"{_options.CacheName} raw bundle decryptor is null.");
+                        SetError($"{_options.CacheName} archive bundle decryptor is null.");
                         return;
                     }
 
@@ -66,7 +66,7 @@ namespace YooAsset
                     else
                     {
                         _steps = ESteps.Done;
-                        SetError($"{_options.CacheName} does not support '{decryptor.GetType().Name}' for RawBundle.");
+                        SetError($"{_options.CacheName} does not support '{decryptor.GetType().Name}' for ArchiveBundle.");
                         return;
                     }
                 }
@@ -160,7 +160,7 @@ namespace YooAsset
 
                 _steps = ESteps.Done;
                 SetResult();
-                BundleHandle = new RawBundleHandle(_options.Bundle, _rawBundle);
+                BundleHandle = new ArchiveBundleHandle(_options.Bundle, _archiveBundle);
             }
 
             if (_steps == ESteps.TryAgain)
@@ -199,11 +199,11 @@ namespace YooAsset
                     if (binaryData == null)
                         return LoadResult.Failure($"{_options.CacheName} decryptor returned null data.");
 
-                    _rawBundle = RawBundleHelper.LoadFromMemory(binaryData);
+                    _archiveBundle = ArchiveBundleHelper.LoadFromMemory(binaryData);
                 }
                 else
                 {
-                    _rawBundle = RawBundleHelper.LoadFromMemory(fileData);
+                    _archiveBundle = ArchiveBundleHelper.LoadFromMemory(fileData);
                 }
                 return LoadResult.Default();
             }

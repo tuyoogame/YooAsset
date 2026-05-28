@@ -3,9 +3,9 @@ using System.Collections.Generic;
 namespace YooAsset
 {
     /// <summary>
-    /// WebGL 平台加载 RawBundle 的操作选项
+    /// WebGL 平台加载 ArchiveBundle 的操作选项
     /// </summary>
-    internal readonly struct LoadWebRawBundleOptions
+    internal readonly struct LoadWebArchiveBundleOptions
     {
         /// <summary>
         /// 文件缓存名称
@@ -23,9 +23,9 @@ namespace YooAsset
         public IReadOnlyList<string> CandidateUrls { get; }
 
         /// <summary>
-        /// RawBundle 解密器
+        /// ArchiveBundle 解密器
         /// </summary>
-        public IBundleDecryptor RawBundleDecryptor { get; }
+        public IBundleDecryptor ArchiveBundleDecryptor { get; }
 
         /// <summary>
         /// 下载后台接口
@@ -52,14 +52,14 @@ namespace YooAsset
         /// </summary>
         public IDownloadUrlPolicy DownloadUrlPolicy { get; }
 
-        public LoadWebRawBundleOptions(string cacheName, PackageBundle bundle, IReadOnlyList<string> candidateUrls,
-            IBundleDecryptor rawBundleDecryptor, IDownloadBackend downloadBackend, EFileVerifyLevel downloadVerifyLevel,
+        public LoadWebArchiveBundleOptions(string cacheName, PackageBundle bundle, IReadOnlyList<string> candidateUrls,
+            IBundleDecryptor archiveBundleDecryptor, IDownloadBackend downloadBackend, EFileVerifyLevel downloadVerifyLevel,
             int watchdogTimeout, IDownloadRetryPolicy downloadRetryPolicy, IDownloadUrlPolicy downloadUrlPolicy)
         {
             CacheName = cacheName;
             Bundle = bundle;
             CandidateUrls = candidateUrls;
-            RawBundleDecryptor = rawBundleDecryptor;
+            ArchiveBundleDecryptor = archiveBundleDecryptor;
             DownloadBackend = downloadBackend;
             DownloadVerifyLevel = downloadVerifyLevel;
             WatchdogTimeout = watchdogTimeout;

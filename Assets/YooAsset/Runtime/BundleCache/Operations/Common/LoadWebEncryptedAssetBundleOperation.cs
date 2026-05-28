@@ -61,7 +61,7 @@ namespace YooAsset
                 else
                 {
                     _steps = ESteps.Done;
-                    SetError($"{_options.CacheName} does not support '{decryptor.GetType().Name}'.");
+                    SetError($"{_options.CacheName} does not support '{decryptor.GetType().Name}' for ArchiveBundle.");
                     return;
                 }
             }

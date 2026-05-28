@@ -28,6 +28,11 @@ namespace YooAsset
             public IBundleDecryptor RawBundleDecryptor { get; }
 
             /// <summary>
+            /// ArchiveBundle 解密器
+            /// </summary>
+            public IBundleDecryptor ArchiveBundleDecryptor { get; }
+
+            /// <summary>
             /// 平台策略接口
             /// </summary>
             public IWebPlatformStrategy PlatformStrategy { get; }
@@ -54,13 +59,14 @@ namespace YooAsset
 
             public Configuration(bool disableUnityWebCache,
                EFileVerifyLevel downloadVerifyLevel, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor,
-               IWebPlatformStrategy platformStrategy, IRemoteService remoteService, IDownloadBackend downloadBackend,
-               IDownloadRetryPolicy downloadRetryPolicy, IDownloadUrlPolicy downloadUrlPolicy)
+               IBundleDecryptor archiveBundleDecryptor, IWebPlatformStrategy platformStrategy, IRemoteService remoteService,
+               IDownloadBackend downloadBackend, IDownloadRetryPolicy downloadRetryPolicy, IDownloadUrlPolicy downloadUrlPolicy)
             {
                 DisableUnityWebCache = disableUnityWebCache;
                 DownloadVerifyLevel = downloadVerifyLevel;
                 AssetBundleDecryptor = assetBundleDecryptor;
                 RawBundleDecryptor = rawBundleDecryptor;
+                ArchiveBundleDecryptor = archiveBundleDecryptor;
                 PlatformStrategy = platformStrategy;
                 RemoteService = remoteService;
                 DownloadBackend = downloadBackend;
@@ -137,6 +143,11 @@ namespace YooAsset
             else if (options.Bundle.GetBundleType() == (int)EBundleType.RawBundle)
             {
                 var operation = new WNBCLoadRawBundleOperation(this, options);
+                return operation;
+            }
+            else if (options.Bundle.GetBundleType() == (int)EBundleType.ArchiveBundle)
+            {
+                var operation = new WNBCLoadArchiveBundleOperation(this, options);
                 return operation;
             }
             else
