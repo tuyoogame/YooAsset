@@ -39,6 +39,6 @@ namespace YooAsset
         /// <summary>
         /// 免构建运行模式
         /// </summary>
-        DatalessPlayMode,
+        //DatalessPlayMode,
     }
 }
