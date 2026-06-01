@@ -20,9 +20,29 @@ namespace YooAsset.Editor
         [MenuItem("YooAsset/Bundle Collector", false, 101)]
         public static void OpenWindow()
         {
+            OpenWindowInternal();
+        }
+
+        /// <summary>
+        /// 打开资源收集器窗口并定位到指定的收集器
+        /// </summary>
+        /// <param name="packageName">包裹名称</param>
+        /// <param name="groupName">分组名称</param>
+        /// <param name="collectPath">收集路径</param>
+        public static void OpenWindow(string packageName, string groupName, string collectPath)
+        {
+            BundleCollectorWindow window = OpenWindowInternal();
+            window.SetFocusCollector(packageName, groupName, collectPath);
+            window.RefreshWindow();
+            window.Focus();
+        }
+
+        private static BundleCollectorWindow OpenWindowInternal()
+        {
             Type[] dockedTypes = EditorWindowDefine.GetDockedWindowTypes();
             BundleCollectorWindow window = GetWindow<BundleCollectorWindow>("Bundle Collector", true, dockedTypes);
             window.minSize = new Vector2(800, 600);
+            return window;
         }
 
         private const string PlaceholderClass = "search-placeholder";
@@ -77,6 +97,7 @@ namespace YooAsset.Editor
         private int _highlightCollectorIndex = -1;
         private int _lastModifyPackageIndex = 0;
         private int _lastModifyGroupIndex = 0;
+        private bool _hasFocusCollector = false;
         private bool _showGlobalSettings = false;
         private bool _showPackageSettings = false;
 
@@ -471,7 +492,8 @@ namespace YooAsset.Editor
         private void RefreshWindow()
         {
             _highlightAssetPath = null;
-            _highlightCollectorIndex = -1;
+            if (_hasFocusCollector == false)
+                _highlightCollectorIndex = -1;
             _groupContainer.visible = false;
             _collectorContainer.visible = false;
 
@@ -508,6 +530,7 @@ namespace YooAsset.Editor
         {
             _highlightAssetPath = null;
             _highlightCollectorIndex = -1;
+            _hasFocusCollector = false;
             FillCollectorViewData();
 
             string searchInput = GetSearchInput();
@@ -575,6 +598,46 @@ namespace YooAsset.Editor
                 return ruleDisplayName.DisplayName;
             else
                 return ruleDisplayName.ClassName;
+        }
+
+        // 焦点相关
+        private void SetFocusCollector(string packageName, string groupName, string collectPath)
+        {
+            var packages = BundleCollectorSettingData.Setting.Packages;
+            int packageIndex = packages.FindIndex(item => item.PackageName == packageName);
+            if (packageIndex < 0)
+            {
+                Debug.LogWarning($"Package not found: '{packageName}'.");
+                _highlightCollectorIndex = -1;
+                _hasFocusCollector = false;
+                return;
+            }
+
+            var package = packages[packageIndex];
+            int groupIndex = package.Groups.FindIndex(item => item.GroupName == groupName);
+            if (groupIndex < 0)
+            {
+                Debug.LogWarning($"Group not found: '{groupName}' in package '{packageName}'.");
+                _highlightCollectorIndex = -1;
+                _hasFocusCollector = false;
+                return;
+            }
+
+            var group = package.Groups[groupIndex];
+            int collectorIndex = group.Collectors.FindIndex(item => string.Equals(item.CollectPath, collectPath, StringComparison.OrdinalIgnoreCase));
+            if (collectorIndex < 0)
+            {
+                Debug.LogWarning($"Collector not found: '{collectPath}'.");
+                _highlightCollectorIndex = -1;
+                _hasFocusCollector = false;
+                return;
+            }
+
+            _highlightAssetPath = null;
+            _highlightCollectorIndex = collectorIndex;
+            _lastModifyPackageIndex = packageIndex;
+            _lastModifyGroupIndex = groupIndex;
+            _hasFocusCollector = true;
         }
 
         // 搜索栏相关
@@ -898,6 +961,7 @@ namespace YooAsset.Editor
                 if (foldout != null)
                     foldout.value = true;
                 _highlightCollectorIndex = -1;
+                _hasFocusCollector = false;
             }
         }
         private VisualElement MakeCollectorListViewItem()

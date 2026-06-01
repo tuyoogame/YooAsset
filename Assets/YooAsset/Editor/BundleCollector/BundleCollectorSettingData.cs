@@ -176,6 +176,17 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
+        /// 工程中是否已存在收集器配置文件
+        /// </summary>
+        /// <returns>存在返回 true</returns>
+        public static bool HasSettingAsset()
+        {
+            string typeName = nameof(BundleCollectorSetting);
+            var guids = AssetDatabase.FindAssets($"t:{typeName}");
+            return guids != null && guids.Length > 0;
+        }
+
+        /// <summary>
         /// 存储配置文件
         /// </summary>
         public static void SaveFile()
