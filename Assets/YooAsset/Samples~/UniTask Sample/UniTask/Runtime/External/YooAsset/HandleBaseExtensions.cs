@@ -1,8 +1,4 @@
 #if YOOASSET_UNITASK_SUPPORT
-#if UNITY_2020_1_OR_NEWER && ! UNITY_2021
-#define UNITY_2020_BUG
-#endif
-
 using System;
 using System.Threading;
 using YooAsset;
@@ -40,7 +36,6 @@ namespace Cysharp.Threading.Tasks
                 TaskPool.RegisterSizeGetter(typeof(HandleBaseConfiguredSource), () => pool.Size);
             }
 
-            readonly Action<HandleBase> completedCallback;
             HandleBase handle;
             CancellationToken cancellationToken;
             CancellationTokenRegistration cancellationTokenRegistration;
@@ -52,7 +47,6 @@ namespace Cysharp.Threading.Tasks
 
             HandleBaseConfiguredSource()
             {
-                completedCallback = HandleCompleted;
             }
 
             public static IUniTaskSource Create(HandleBase handle, PlayerLoopTiming timing, IProgress<float> progress, CancellationToken cancellationToken, bool cancelImmediately, out short token)
@@ -85,11 +79,7 @@ namespace Cysharp.Threading.Tasks
                 TaskTracker.TrackActiveTask(result, 3);
                 PlayerLoopHelper.AddAction(timing, result);
 
-                // BUG 在 Unity 2020.3.36 版本测试中, IL2Cpp 会报 如下错误
-                // BUG ArgumentException: Incompatible Delegate Types. First is System.Action`1[[YooAsset.AssetHandle, YooAsset, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]] second is System.Action`1[[YooAsset.HandleBase, YooAsset, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]
-                // BUG 也可能报的是 Action '1' Action '1' 的 InvalidCastException
-                // BUG 此处不得不这么修改, 如果后续 Unity 修复了这个问题, 可以恢复之前的写法
-#if UNITY_2020_BUG
+                // 注意：统一用强类型回调订阅 Handle.Completed，修复 IL2CPP 逆变委托崩溃
                 switch (handle)
                 {
                     case AssetHandle asset_handle:
@@ -108,38 +98,16 @@ namespace Cysharp.Threading.Tasks
                         all_assets_handle.Completed += result.AllAssetsContinuation;
                         break;
                 }
-#else
-                switch (handle)
-                {
-                    case AssetHandle asset_handle:
-                        asset_handle.Completed += result.completedCallback;
-                        break;
-                    case SceneHandle scene_handle:
-                        scene_handle.Completed += result.completedCallback;
-                        break;
-                    case SubAssetsHandle sub_asset_handle:
-                        sub_asset_handle.Completed += result.completedCallback;
-                        break;
-                    case BundleFileHandle bundle_file_handle:
-                        bundle_file_handle.Completed += result.completedCallback;
-                        break;
-                    case AllAssetsHandle all_assets_handle:
-                        all_assets_handle.Completed += result.completedCallback;
-                        break;
-                }
-#endif
 
                 token = result.core.Version;
                 return result;
             }
 
-#if UNITY_2020_BUG
             void AssetContinuation(AssetHandle _) => HandleCompleted(null);
             void SceneContinuation(SceneHandle _) => HandleCompleted(null);
             void SubContinuation(SubAssetsHandle _) => HandleCompleted(null);
             void BundleFileContinuation(BundleFileHandle _) => HandleCompleted(null);
             void AllAssetsContinuation(AllAssetsHandle _) => HandleCompleted(null);
-#endif
 
             void HandleCompleted(HandleBase _)
             {
@@ -162,7 +130,6 @@ namespace Cysharp.Threading.Tasks
             {
                 if (handle == null || !handle.IsValid) return;
 
-#if UNITY_2020_BUG
                 switch (handle)
                 {
                     case AssetHandle asset_handle:
@@ -181,26 +148,6 @@ namespace Cysharp.Threading.Tasks
                         all_assets_handle.Completed -= AllAssetsContinuation;
                         break;
                 }
-#else
-                switch (handle)
-                {
-                    case AssetHandle asset_handle:
-                        asset_handle.Completed -= completedCallback;
-                        break;
-                    case SceneHandle scene_handle:
-                        scene_handle.Completed -= completedCallback;
-                        break;
-                    case SubAssetsHandle sub_asset_handle:
-                        sub_asset_handle.Completed -= completedCallback;
-                        break;
-                    case BundleFileHandle bundle_file_handle:
-                        bundle_file_handle.Completed -= completedCallback;
-                        break;
-                    case AllAssetsHandle all_assets_handle:
-                        all_assets_handle.Completed -= completedCallback;
-                        break;
-                }
-#endif
             }
 
             public void GetResult(short token)
