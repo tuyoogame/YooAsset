@@ -469,7 +469,9 @@ namespace YooAsset
             if (_records.TryGetValue(bundle.BundleGUID, out RecordFileElement element) == false)
                 return EFileVerifyResult.CacheNotFound;
 
-            EFileVerifyResult result = FileVerifyHelper.FileVerify(element.DataFilePath, element.DataFileSize, element.DataFileCRC, EFileVerifyLevel.High);
+            // 注意：使用清单里的权威校验值（与下载/解压时的校验基准一致），而不是缓存记录里来源于本地 .info 文件的自描述值，
+            // 否则数据文件与 .info 文件被一并篡改时仍会校验通过。
+            EFileVerifyResult result = FileVerifyHelper.FileVerify(element.DataFilePath, bundle.FileSize, bundle.FileCRC, EFileVerifyLevel.High);
             return result;
         }
         public bool WriteCacheBundleFile(PackageBundle bundle, string copyPath)
