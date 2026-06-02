@@ -2,6 +2,20 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.3.19] - 2026-06-02
+
+### Fixed
+
+- (#734) 修复了强制回收所有资源与自动卸载Bundle冲突。
+- (#712) 修复了在禁用边玩边下的时候，加载原生文件流程未处理的问题。
+- (#702) 修复了解压行为在包体内文件被篡改后，会无限尝试的问题。
+- 修复了释放零引用待处理 Provider 时 UnloadAllAssetsOperation 死锁的问题。
+- 修复了缓存文件校验改用清单的 FileCRC/FileSize，而非来自 .info 文件的自记录值。
+
+### Improvements
+
+- 优化了资源清单重名键校验仅在 UNITY_EDITOR || DEBUG 下执行。
+
 ## [2.3.18] - 2025-12-04
 
 ### Fixed
