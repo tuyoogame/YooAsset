@@ -133,6 +133,8 @@ namespace YooAsset
                 }
                 else
                 {
+                    // 注意：本地内置文件被篡改或损坏时校验会失败，重试只会重复读取同一文件，因此标记为不可重试。
+                    VerifyFailed = true;
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
                     Error = _verifyOperation.Error;

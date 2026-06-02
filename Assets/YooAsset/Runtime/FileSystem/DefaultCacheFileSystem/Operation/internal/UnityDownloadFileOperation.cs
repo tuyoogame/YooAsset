@@ -27,6 +27,12 @@ namespace YooAsset
         /// </summary>
         public int RefCount { private set; get; }
 
+        /// <summary>
+        /// 文件校验是否失败
+        /// 注意：本地文件（解压/导入）校验失败属于确定性失败，重试无意义，上层不应重试。
+        /// </summary>
+        public bool VerifyFailed { protected set; get; } = false;
+
         internal UnityDownloadFileOperation(DefaultCacheFileSystem fileSystem, PackageBundle bundle, string url) : base(url)
         {
             _fileSystem = fileSystem;
