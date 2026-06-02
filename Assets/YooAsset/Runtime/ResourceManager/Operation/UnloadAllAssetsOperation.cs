@@ -25,6 +25,7 @@ namespace YooAsset
             CheckOptions,
             ReleaseAll,
             TryAbortLoader,
+            RequestForceDestroy,
             CheckLoading,
             DestroyAll,
             Done,
@@ -92,6 +93,17 @@ namespace YooAsset
                 foreach (var loader in _resManager.LoaderDic.Values)
                 {
                     loader.TryAbortLoader();
+                }
+                _steps = ESteps.RequestForceDestroy;
+            }
+
+            if (_steps == ESteps.RequestForceDestroy)
+            {
+                // 向所有资源提供者下发强制销毁请求
+                // 注意：防止零引用且尚未进入加载阶段的任务被无限挂起，从而导致 CheckLoading 死锁。
+                foreach (var provider in _resManager.ProviderDic.Values)
+                {
+                    provider.RequestForceDestroy();
                 }
                 _steps = ESteps.CheckLoading;
             }
