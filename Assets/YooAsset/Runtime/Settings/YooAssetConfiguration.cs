@@ -161,17 +161,18 @@ namespace YooAsset
         /// <returns>缓存文件根目录的绝对路径</returns>
         internal static string GetEditorCacheRoot()
         {
-            // 注意：为了方便调试查看，编辑器下把存储目录放到项目根目录下。
+            // 注意：为了方便调试查看，编辑器下把存储目录放到项目的 Library 目录下。
             string projectPath = Path.GetDirectoryName(Application.dataPath);
             if (string.IsNullOrEmpty(projectPath))
                 throw new InvalidOperationException("Could not determine project root path from Application.dataPath.");
             projectPath = PathUtility.NormalizePath(projectPath);
 
+            string libraryPath = PathUtility.Combine(projectPath, "Library");
             var settings = GetSettings();
             if (string.IsNullOrEmpty(settings.YooFolderName))
-                return projectPath;
+                return libraryPath;
             else
-                return PathUtility.Combine(projectPath, settings.YooFolderName);
+                return PathUtility.Combine(libraryPath, settings.YooFolderName);
         }
 
         /// <summary>
