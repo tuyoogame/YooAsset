@@ -33,7 +33,7 @@ public static class WechatFileSystemCreater
     }
     public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor)
     {
-        string fileSystemClass = typeof(WechatFileSystem).FullName;
+        string fileSystemClass = $"{nameof(WechatFileSystem)},YooAsset.MiniGame";
         var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
         fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
         fileSystemParams.AddParameter(EFileSystemParameter.DisableUnityWebCache, true);
