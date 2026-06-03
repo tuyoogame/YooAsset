@@ -3,19 +3,19 @@ using UnityEngine;
 using YooAsset;
 
 /// <summary>
-/// 游戏对象弱引用，序列化时只保存资源 GUID
+/// 资源弱引用基类
 /// </summary>
 [Serializable]
-public class GameObjectReference
+public abstract class AssetReference
 {
     [SerializeField]
-    private string _packageName = "DefaultPackage";
+    protected string _packageName = "DefaultPackage";
 
     [SerializeField]
-    private string _assetGUID = "";
+    protected string _assetGUID = "";
 
     [NonSerialized]
-    private AssetHandle _handle;
+    protected AssetHandle _handle;
 
     /// <summary>
     /// 资源所属的包裹名称
@@ -27,6 +27,16 @@ public class GameObjectReference
     /// </summary>
     public string AssetGUID => _assetGUID;
 
+    /// <summary>
+    /// 当前加载句柄（未加载时为 null）
+    /// </summary>
+    public AssetHandle Handle => _handle;
+
+    /// <summary>
+    /// 该引用负责加载的资源类型，由子类指定
+    /// </summary>
+    public abstract Type AssetType { get; }
+
 
     /// <summary>
     /// 检查运行时引用键是否有效
@@ -37,18 +47,18 @@ public class GameObjectReference
             return false;
 
         var package = YooAssets.GetPackage(_packageName);
-        var assetInfo = package.GetAssetInfoByGuid(_assetGUID, typeof(GameObject));
+        var assetInfo = package.GetAssetInfoByGuid(_assetGUID, AssetType);
         return assetInfo.IsValid;
     }
 
     /// <summary>
-    /// 异步加载引用的游戏对象
+    /// 异步加载引用的资源
     /// </summary>
     /// <returns>加载操作句柄</returns>
     public AssetHandle LoadAssetAsync()
     {
         if (_handle != null)
-            throw new InvalidOperationException("GameObject reference has already been loaded. Release it first.");
+            throw new InvalidOperationException($"{GetType().Name} has already been loaded. Release it first.");
 
         if (string.IsNullOrEmpty(_packageName))
             throw new ArgumentException("Package name is not set.", nameof(_packageName));
@@ -56,7 +66,7 @@ public class GameObjectReference
             throw new ArgumentException("Asset GUID is not set.", nameof(_assetGUID));
 
         var package = YooAssets.GetPackage(_packageName);
-        var assetInfo = package.GetAssetInfoByGuid(_assetGUID, typeof(GameObject));
+        var assetInfo = package.GetAssetInfoByGuid(_assetGUID, AssetType);
         _handle = package.LoadAssetAsync(assetInfo);
         return _handle;
     }
