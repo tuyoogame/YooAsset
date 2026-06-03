@@ -1,0 +1,31 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:TwoPaneSplitView name="TwoPaneSplitView1" fixed-pane-index="0" fixed-pane-initial-size="200">
+        <ui:TwoPaneSplitView name="TwoPaneSplitView2" fixed-pane-index="0" fixed-pane-initial-size="200">
+            <ui:VisualElement name="LeftGroup"
+                              style="border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); margin-left: 0; margin-right: 0; margin-top: 1px; margin-bottom: 1px; display: flex;">
+                <uie:Toolbar name="TopBar" style="height: 25px; margin-left: 1px; margin-right: 1px;">
+                    <uie:ToolbarButton text="Project" display-tooltip-when-elided="true" name="TopBar1"
+                                       style="width: 200px; -unity-text-align: middle-left; flex-grow: 1;"/>
+                </uie:Toolbar>
+                <YooAsset.Editor.TreeViewer name="FileExplorer" style="flex-grow: 1;"/>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="RightGroup"
+                              style="flex-grow: 1; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); margin-left: 0; margin-right: 0; margin-top: 2px; margin-bottom: 1px; display: flex;">
+                <YooAsset.Editor.GraphViewer name="GraphView" style="flex-grow: 1;"/>
+            </ui:VisualElement>
+        </ui:TwoPaneSplitView>
+
+        <ui:TwoPaneSplitView name="TwoPaneSplitView3" fixed-pane-index="0" fixed-pane-initial-size="200">
+            <ui:VisualElement name="LeftGroup"
+                              style="border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); margin-left: 0; margin-right: 0; margin-top: 1px; margin-bottom: 1px; display: flex;">
+                <YooAsset.Editor.TableViewer name="LeftTableView" style="flex-grow: 1;"/>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="RightGroup"
+                              style="border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); margin-left: 0; margin-right: 0; margin-top: 1px; margin-bottom: 1px; display: flex;">
+                <YooAsset.Editor.TableViewer name="RightTableView" style="flex-grow: 1;"/>
+            </ui:VisualElement>
+        </ui:TwoPaneSplitView>
+    </ui:TwoPaneSplitView>
+</ui:UXML>
