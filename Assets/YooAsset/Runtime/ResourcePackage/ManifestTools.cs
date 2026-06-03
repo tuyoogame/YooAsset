@@ -8,6 +8,8 @@ namespace YooAsset
 {
     internal static class ManifestTools
     {
+        public const string AssetBundleFileExtension = ".bundle";
+
         /// <summary>
         /// 验证清单文件的二进制数据
         /// </summary>
@@ -150,8 +152,11 @@ namespace YooAsset
         /// </summary>
         public static string GetRemoteBundleFileExtension(string bundleName)
         {
-            string fileExtension = Path.GetExtension(bundleName);
-            return fileExtension;
+#if UNITY_WEBGL
+			return AssetBundleFileExtension;
+#else
+			return Path.GetExtension(bundleName);
+#endif
         }
 
         /// <summary>
