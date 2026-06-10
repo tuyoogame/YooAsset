@@ -13,7 +13,7 @@ namespace YooAsset
         private enum ESteps
         {
             None,
-            RestoreFileData,
+            DecryptManifest,
             DeserializeFileHeader,
             PrepareAssetList,
             DeserializeAssetList,
@@ -26,6 +26,8 @@ namespace YooAsset
         private readonly IManifestDecryptor _decryptor;
         private byte[] _sourceData;
         private BufferReader _buffer;
+        private string[] _tagTable;
+        private string[] _directoryTable;
         private int _packageAssetCount;
         private int _packageBundleCount;
         private int _progressTotalValue;
@@ -48,14 +50,14 @@ namespace YooAsset
         }
         protected override void InternalStart()
         {
-            _steps = ESteps.RestoreFileData;
+            _steps = ESteps.DecryptManifest;
         }
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.RestoreFileData)
+            if (_steps == ESteps.DecryptManifest)
             {
                 if (_decryptor != null)
                 {
@@ -110,6 +112,12 @@ namespace YooAsset
                 Manifest.PackageVersion = _buffer.ReadString();
                 Manifest.PackageNote = _buffer.ReadString();
 
+                // 读取全局标签表
+                _tagTable = _buffer.ReadStringArray();
+
+                // 读取全局目录表
+                _directoryTable = _buffer.ReadStringArray();
+
                 // 检测配置
                 if (Manifest.EnableAddressable && Manifest.LocationToLower)
                     throw new YooManifestInvalidException("Addressable mode does not support converting locations to lowercase.");
@@ -138,18 +146,35 @@ namespace YooAsset
                 while (_packageAssetCount > 0)
                 {
                     var packageAsset = new PackageAsset();
-                    packageAsset.Address = _buffer.ReadString();
+
+                    // Address
+                    if (Manifest.EnableAddressable)
+                        packageAsset.Address = _buffer.ReadString();
+                    else
+                        packageAsset.Address = string.Empty;
+
+                    // AssetPath
+                    ushort dirIndex = _buffer.ReadUInt16();
                     if (replaceAssetPath)
                     {
                         packageAsset.AssetPath = packageAsset.Address;
-                        _buffer.SkipString(); //跳过解析AssetPath
+                        _buffer.SkipString(); //跳过解析文件名
                     }
                     else
                     {
-                        packageAsset.AssetPath = _buffer.ReadString();
+                        packageAsset.AssetPath = ResolvePath(dirIndex);
                     }
-                    packageAsset.AssetGuid = _buffer.ReadString();
-                    packageAsset.AssetTags = _buffer.ReadStringArray();
+
+                    // AssetGuid
+                    if (Manifest.IncludeAssetGuid)
+                        packageAsset.AssetGuid = _buffer.ReadHash16();
+                    else
+                        packageAsset.AssetGuid = string.Empty;
+
+                    // Tags
+                    var tagIndices = _buffer.ReadUInt16Array();
+                    packageAsset.Tags = ResolveTags(tagIndices);
+
                     packageAsset.BundleID = _buffer.ReadInt32();
                     packageAsset.DependentBundleIDs = _buffer.ReadInt32Array();
                     FillAssetCollection(Manifest, packageAsset, replaceAssetPath);
@@ -180,12 +205,13 @@ namespace YooAsset
                     var packageBundle = new PackageBundle();
                     packageBundle.BundleName = _buffer.ReadString();
                     packageBundle.UnityCrc = _buffer.ReadUInt32();
-                    packageBundle.FileHash = _buffer.ReadString();
+                    packageBundle.FileHash = _buffer.ReadHash16();
                     packageBundle.FileCrc = _buffer.ReadUInt32();
                     packageBundle.FileSize = _buffer.ReadInt64();
                     packageBundle.IsEncrypted = _buffer.ReadBoolean();
-                    packageBundle.Tags = _buffer.ReadStringArray();
+                    packageBundle.Tags = ResolveTags(_buffer.ReadUInt16Array());
                     packageBundle.DependentBundleIDs = _buffer.ReadInt32Array();
+                    packageBundle.Initialize(Manifest);
                     FillBundleCollection(Manifest, packageBundle);
 
                     _packageBundleCount--;
@@ -202,7 +228,9 @@ namespace YooAsset
 
             if (_steps == ESteps.InitManifest)
             {
-                Manifest.Initialize();
+                FillBundleMainAssets(Manifest);
+                FillBundleReferrerBundleIDs(Manifest);
+
                 _steps = ESteps.Done;
                 SetResult();
             }
@@ -212,51 +240,77 @@ namespace YooAsset
             ExecuteBatch();
         }
 
+        private PackageTags ResolveTags(ushort[] tagIndices)
+        {
+            if (tagIndices.Length == 0)
+                return new PackageTags(Array.Empty<string>());
+
+            string[] tags = new string[tagIndices.Length];
+            for (int i = 0; i < tagIndices.Length; i++)
+            {
+                ushort tagIndex = tagIndices[i];
+
+#if UNITY_EDITOR || DEBUG
+                if (tagIndex >= _tagTable.Length)
+                    throw new YooManifestInvalidException($"Invalid tag index: {tagIndex}. Valid range is 0 to {_tagTable.Length - 1}.");
+#endif
+
+                tags[i] = _tagTable[tagIndex];
+            }
+
+            return new PackageTags(tags);
+        }
+        private string ResolvePath(ushort dirIndex)
+        {
+#if UNITY_EDITOR || DEBUG
+            if (dirIndex >= _directoryTable.Length)
+                throw new YooManifestInvalidException($"Invalid directory index: {dirIndex}. Valid range is 0 to {_directoryTable.Length - 1}.");
+#endif
+
+            string fileName = _buffer.ReadString();
+            string directory = _directoryTable[dirIndex];
+            if (string.IsNullOrEmpty(directory))
+                return fileName;
+            else
+                return string.Concat(directory, "/", fileName);
+        }
+
         private void CreateAssetCollection(PackageManifest manifest, int assetCount)
         {
             manifest.AssetList = new List<PackageAsset>(assetCount);
-            manifest.AssetDictionary = new Dictionary<string, PackageAsset>(assetCount);
 
             if (manifest.EnableAddressable)
             {
-                manifest.AssetPathsByLocation = new Dictionary<string, string>(assetCount * 3);
+                manifest.AssetsByLocation = new Dictionary<string, PackageAsset>(assetCount * 3);
             }
             else
             {
                 if (manifest.LocationToLower)
-                    manifest.AssetPathsByLocation = new Dictionary<string, string>(assetCount * 2, StringComparer.OrdinalIgnoreCase);
+                    manifest.AssetsByLocation = new Dictionary<string, PackageAsset>(assetCount * 2, StringComparer.OrdinalIgnoreCase);
                 else
-                    manifest.AssetPathsByLocation = new Dictionary<string, string>(assetCount * 2);
+                    manifest.AssetsByLocation = new Dictionary<string, PackageAsset>(assetCount * 2);
             }
 
             if (manifest.IncludeAssetGuid)
-                manifest.AssetPathsByGuid = new Dictionary<string, string>(assetCount);
+                manifest.AssetsByGuid = new Dictionary<string, PackageAsset>(assetCount);
             else
-                manifest.AssetPathsByGuid = new Dictionary<string, string>();
+                manifest.AssetsByGuid = new Dictionary<string, PackageAsset>();
         }
         private void FillAssetCollection(PackageManifest manifest, PackageAsset packageAsset, bool replaceAssetPath)
         {
             // 添加到列表集合
             manifest.AssetList.Add(packageAsset);
 
-            // 注意：我们不允许原始路径存在重名
-            string assetPath = packageAsset.AssetPath;
-#if UNITY_EDITOR || DEBUG
-            if (manifest.AssetDictionary.ContainsKey(assetPath))
-                throw new YooManifestInvalidException($"Asset path already exists: '{assetPath}'.");
-#endif
-            manifest.AssetDictionary.Add(assetPath, packageAsset);
-
-            // 填充AssetPathMapping1
+            // 填充AssetsByLocation
             {
                 string location = packageAsset.AssetPath;
 
-                // 添加原生路径的映射
+                // 添加原生路径的映射（注意：我们不允许原始路径存在重名）
 #if UNITY_EDITOR || DEBUG
-                if (manifest.AssetPathsByLocation.ContainsKey(location))
-                    throw new YooManifestInvalidException($"Location already exists: '{location}'.");
+                if (manifest.AssetsByLocation.ContainsKey(location))
+                    throw new YooManifestInvalidException($"Asset path already exists: '{location}'.");
 #endif
-                manifest.AssetPathsByLocation.Add(location, packageAsset.AssetPath);
+                manifest.AssetsByLocation.Add(location, packageAsset);
 
                 // 添加无后缀名路径的映射
                 if (manifest.SupportExtensionless)
@@ -264,22 +318,22 @@ namespace YooAsset
                     string locationWithoutExtension = Path.ChangeExtension(location, null);
                     if (ReferenceEquals(location, locationWithoutExtension) == false)
                     {
-                        if (manifest.AssetPathsByLocation.ContainsKey(locationWithoutExtension))
+                        if (manifest.AssetsByLocation.ContainsKey(locationWithoutExtension))
                             YooLogger.LogWarning($"Location already exists: '{locationWithoutExtension}'.");
                         else
-                            manifest.AssetPathsByLocation.Add(locationWithoutExtension, packageAsset.AssetPath);
+                            manifest.AssetsByLocation.Add(locationWithoutExtension, packageAsset);
                     }
                 }
             }
 
-            // 填充AssetPathMapping2
+            // 填充AssetsByGuid
             if (manifest.IncludeAssetGuid)
             {
 #if UNITY_EDITOR || DEBUG
-                if (manifest.AssetPathsByGuid.ContainsKey(packageAsset.AssetGuid))
+                if (manifest.AssetsByGuid.ContainsKey(packageAsset.AssetGuid))
                     throw new YooManifestInvalidException($"Asset GUID already exists: '{packageAsset.AssetGuid}'.");
 #endif
-                manifest.AssetPathsByGuid.Add(packageAsset.AssetGuid, packageAsset.AssetPath);
+                manifest.AssetsByGuid.Add(packageAsset.AssetGuid, packageAsset);
             }
 
             // 添加可寻址地址
@@ -289,10 +343,10 @@ namespace YooAsset
                 if (string.IsNullOrEmpty(location) == false)
                 {
 #if UNITY_EDITOR || DEBUG
-                    if (manifest.AssetPathsByLocation.ContainsKey(location))
+                    if (manifest.AssetsByLocation.ContainsKey(location))
                         throw new YooManifestInvalidException($"Location already exists: '{location}'.");
 #endif
-                    manifest.AssetPathsByLocation.Add(location, packageAsset.AssetPath);
+                    manifest.AssetsByLocation.Add(location, packageAsset);
                 }
             }
         }
@@ -306,15 +360,79 @@ namespace YooAsset
         }
         private void FillBundleCollection(PackageManifest manifest, PackageBundle packageBundle)
         {
-            // 初始化资源包
-            packageBundle.Initialize(manifest);
-
             // 添加到列表集合
             manifest.BundleList.Add(packageBundle);
 
             manifest.BundlesByBundleName.Add(packageBundle.BundleName, packageBundle);
             manifest.BundlesByFileName.Add(packageBundle.GetFileName(), packageBundle);
             manifest.BundlesByGuid.Add(packageBundle.BundleGuid, packageBundle);
+        }
+
+        private void FillBundleMainAssets(PackageManifest manifest)
+        {
+            int bundleCount = manifest.BundleList.Count;
+
+            // 1. 统计每个资源包的主资源数量
+            int[] mainAssetCounts = new int[bundleCount];
+            foreach (var packageAsset in manifest.AssetList)
+            {
+                int bundleID = packageAsset.BundleID;
+                if (bundleID < 0 || bundleID >= bundleCount)
+                    throw new ArgumentOutOfRangeException($"Invalid bundle ID: {bundleID}. Valid range is 0 to {bundleCount - 1}.");
+
+                mainAssetCounts[bundleID]++;
+            }
+
+            // 2. 创建列表
+            for (int index = 0; index < bundleCount; index++)
+            {
+                int capacity = mainAssetCounts[index];
+                manifest.BundleList[index].MainAssets = new List<PackageAsset>(capacity);
+            }
+
+            // 3. 填充数据
+            foreach (var packageAsset in manifest.AssetList)
+            {
+                manifest.BundleList[packageAsset.BundleID].MainAssets.Add(packageAsset);
+            }
+        }
+        private void FillBundleReferrerBundleIDs(PackageManifest manifest)
+        {
+            int bundleCount = manifest.BundleList.Count;
+
+            // 1. 统计每个资源包被引用的次数
+            int[] referrerCounts = new int[bundleCount];
+            for (int index = 0; index < bundleCount; index++)
+            {
+                foreach (int dependIndex in manifest.BundleList[index].DependentBundleIDs)
+                {
+                    if (dependIndex < 0 || dependIndex >= bundleCount)
+                        throw new ArgumentOutOfRangeException($"Invalid dependent bundle index: {dependIndex}. Valid range is 0 to {bundleCount - 1}.");
+
+                    referrerCounts[dependIndex]++;
+                }
+            }
+
+            // 2. 创建列表
+            for (int index = 0; index < bundleCount; index++)
+            {
+                int capacity = referrerCounts[index];
+                manifest.BundleList[index].ReferrerBundleIDs = new List<int>(capacity);
+            }
+
+            // 3. 填充数据
+            for (int index = 0; index < bundleCount; index++)
+            {
+                foreach (int dependIndex in manifest.BundleList[index].DependentBundleIDs)
+                {
+                    var dependBundle = manifest.BundleList[dependIndex];
+#if UNITY_EDITOR || DEBUG
+                    if (dependBundle.ReferrerBundleIDs.Contains(index))
+                        throw new YooManifestInvalidException($"Duplicate referrer bundle ID detected: referrer {index} -> bundle {dependIndex}.");
+#endif
+                    dependBundle.ReferrerBundleIDs.Add(index);
+                }
+            }
         }
     }
 }

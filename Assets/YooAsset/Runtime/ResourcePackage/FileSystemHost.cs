@@ -421,14 +421,14 @@ namespace YooAsset
                 if (predicate(fileSystem, packageBundle))
                 {
                     // 注意：未标记的资源包视为公共依赖，始终包含在下载列表中
-                    if (packageBundle.IsTagged() == false)
+                    if (packageBundle.Tags.IsTagged == false)
                     {
                         var bundleInfo = new BundleInfo(fileSystem, packageBundle);
                         result.Add(bundleInfo);
                     }
                     else
                     {
-                        if (packageBundle.HasAnyTag(tags))
+                        if (packageBundle.Tags.HasAnyTag(tags))
                         {
                             var bundleInfo = new BundleInfo(fileSystem, packageBundle);
                             result.Add(bundleInfo);

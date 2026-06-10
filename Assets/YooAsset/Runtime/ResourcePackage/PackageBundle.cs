@@ -40,11 +40,6 @@ namespace YooAsset
         public bool IsEncrypted;
 
         /// <summary>
-        /// 资源包的分类标签
-        /// </summary>
-        public string[] Tags;
-
-        /// <summary>
         /// 依赖的资源包ID集合
         /// 注意：引擎层构建查询结果
         /// </summary>
@@ -60,26 +55,26 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 资源包的分类标签
+        /// </summary>
+        [NonSerialized]
+        public PackageTags Tags;
+
+        /// <summary>
         /// 包含的主资源集合
         /// </summary>
         [NonSerialized]
-        public readonly List<PackageAsset> MainAssets = new List<PackageAsset>(10);
+        public List<PackageAsset> MainAssets;
 
         /// <summary>
-        /// 引用该资源包的资源包列表
+        /// 引用该资源包的资源包ID列表
         /// 说明：谁引用了该资源包
         /// </summary>
         [NonSerialized]
-        public readonly List<int> ReferrerBundleIDs = new List<int>(10);
-        [NonSerialized]
-        private readonly HashSet<int> _referrerBundleIDs = new HashSet<int>();
+        public List<int> ReferrerBundleIDs;
 
         [NonSerialized]
         private PackageManifest _manifest;
-        [NonSerialized]
-        private bool _isInitialized;
-        [NonSerialized]
-        private int _bundleType;
         [NonSerialized]
         private string _fileName;
 
@@ -94,14 +89,10 @@ namespace YooAsset
         /// <summary>
         /// 初始化资源包
         /// </summary>
-        /// <param name="manifest">所属的资源清单</param>
         public void Initialize(PackageManifest manifest)
         {
-            _isInitialized = true;
             _manifest = manifest;
-            _bundleType = manifest.BuildBundleType;
-            string fileExtension = PackageManifestHelper.GetRemoteBundleFileExtension(BundleName);
-            _fileName = PackageManifestHelper.GetRemoteBundleFileName(manifest.OutputNameStyle, BundleName, fileExtension, FileHash);
+            _fileName = BundleFileNaming.GetBundleFileName(manifest.OutputNameStyle, BundleName, FileHash);
         }
 
         /// <summary>
@@ -110,9 +101,9 @@ namespace YooAsset
         /// <returns>返回资源包类型</returns>
         public int GetBundleType()
         {
-            if (_isInitialized == false)
+            if (_manifest == null)
                 throw new YooInternalException("PackageBundle is not initialized.");
-            return _bundleType;
+            return _manifest.BuildBundleType;
         }
 
         /// <summary>
@@ -121,66 +112,9 @@ namespace YooAsset
         /// <returns>返回资源包文件名称</returns>
         public string GetFileName()
         {
-            if (_isInitialized == false)
+            if (_manifest == null)
                 throw new YooInternalException("PackageBundle is not initialized.");
             return _fileName;
-        }
-
-        /// <summary>
-        /// 添加引用该资源包的资源包ID
-        /// </summary>
-        /// <param name="bundleID">引用该资源包的资源包ID</param>
-        /// <remarks>记录谁引用了该资源包</remarks>
-        public void AddReferrerBundleID(int bundleID)
-        {
-            if (_referrerBundleIDs.Contains(bundleID) == false)
-            {
-                _referrerBundleIDs.Add(bundleID);
-                ReferrerBundleIDs.Add(bundleID);
-            }
-        }
-
-        /// <summary>
-        /// 是否包含指定的单个标签
-        /// </summary>
-        public bool HasTag(string tag)
-        {
-            if (Tags == null || Tags.Length == 0)
-                return false;
-
-            for (int i = 0; i < Tags.Length; i++)
-            {
-                if (Tags[i] == tag)
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 是否包含指定标签数组中的任意一个
-        /// </summary>
-        public bool HasAnyTag(string[] tags)
-        {
-            if (tags == null || tags.Length == 0)
-                return false;
-            if (Tags == null || Tags.Length == 0)
-                return false;
-
-            for (int i = 0; i < tags.Length; i++)
-            {
-                if (HasTag(tags[i]))
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 是否包含分类标签
-        /// </summary>
-        /// <returns>如果包含至少一个标签返回true，否则返回false。</returns>
-        public bool IsTagged()
-        {
-            return Tags != null && Tags.Length > 0;
         }
 
         #region 调试信息

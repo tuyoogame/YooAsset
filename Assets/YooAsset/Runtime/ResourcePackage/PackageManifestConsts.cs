@@ -19,11 +19,11 @@ namespace YooAsset
         /// <summary>
         /// 文件版本号
         /// </summary>
-        public const int FileVersion = 1;
+        public const int FileVersion = 2;
 
         /// <summary>
-        /// 文件最小合法大小（37字节）
+        /// 文件最小合法大小（39字节）
         /// </summary>
-        public const int MinFileSize = 37;
+        public const int MinFileSize = 39;
     }
 }

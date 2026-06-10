@@ -216,19 +216,19 @@ namespace YooAsset.Editor
         }
 
         /// <summary>
-        /// 创建PackageBundle类
+        /// 创建BuildBundle类
         /// </summary>
-        internal PackageBundle CreatePackageBundle()
+        internal BuildBundle CreateBuildBundle()
         {
-            PackageBundle packageBundle = new PackageBundle();
-            packageBundle.BundleName = BundleName;
-            packageBundle.UnityCrc = PackageUnityCRC;
-            packageBundle.FileHash = PackageFileHash;
-            packageBundle.FileCrc = PackageFileCRC;
-            packageBundle.FileSize = PackageFileSize;
-            packageBundle.IsEncrypted = Encrypted;
-            packageBundle.DependentBundleIDs = Array.Empty<int>();
-            return packageBundle;
+            BuildBundle buildBundle = new BuildBundle();
+            buildBundle.BundleName = BundleName;
+            buildBundle.UnityCrc = PackageUnityCRC;
+            buildBundle.FileHash = PackageFileHash;
+            buildBundle.FileCrc = PackageFileCRC;
+            buildBundle.FileSize = PackageFileSize;
+            buildBundle.IsEncrypted = Encrypted;
+            buildBundle.DependentBundleIDs = Array.Empty<int>();
+            return buildBundle;
         }
     }
 }

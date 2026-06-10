@@ -82,22 +82,16 @@ namespace YooAsset
         public List<PackageBundle> BundleList = new List<PackageBundle>();
 
         /// <summary>
-        /// 资源映射集合（提供AssetPath获取PackageAsset）
+        /// 资源映射集合（提供Location获取PackageAsset）
         /// </summary>
         [NonSerialized]
-        public Dictionary<string, PackageAsset> AssetDictionary;
+        public Dictionary<string, PackageAsset> AssetsByLocation;
 
         /// <summary>
-        /// 资源路径映射集合（提供Location获取AssetPath）
+        /// 资源映射集合（提供AssetGUID获取PackageAsset）
         /// </summary>
         [NonSerialized]
-        public Dictionary<string, string> AssetPathsByLocation;
-
-        /// <summary>
-        /// 资源路径映射集合（提供AssetGUID获取AssetPath）
-        /// </summary>
-        [NonSerialized]
-        public Dictionary<string, string> AssetPathsByGuid;
+        public Dictionary<string, PackageAsset> AssetsByGuid;
 
         /// <summary>
         /// 资源包集合（提供BundleName获取PackageBundle）
@@ -119,66 +113,12 @@ namespace YooAsset
 
 
         /// <summary>
-        /// 初始化资源清单
-        /// </summary>
-        public void Initialize()
-        {
-            // 填充资源包内包含的主资源列表
-            foreach (var packageAsset in AssetList)
-            {
-                int bundleID = packageAsset.BundleID;
-                if (bundleID >= 0 && bundleID < BundleList.Count)
-                {
-                    var packageBundle = BundleList[bundleID];
-                    packageBundle.MainAssets.Add(packageAsset);
-                }
-                else
-                {
-                    throw new System.ArgumentOutOfRangeException($"Invalid bundle ID: {bundleID}. Valid range is 0 to {BundleList.Count - 1}.");
-                }
-            }
-
-            // 填充资源包引用关系
-            for (int index = 0; index < BundleList.Count; index++)
-            {
-                var sourceBundle = BundleList[index];
-                foreach (int dependIndex in sourceBundle.DependentBundleIDs)
-                {
-                    if (dependIndex >= 0 && dependIndex < BundleList.Count)
-                    {
-                        var dependBundle = BundleList[dependIndex];
-                        dependBundle.AddReferrerBundleID(index);
-                    }
-                    else
-                    {
-                        throw new System.ArgumentOutOfRangeException($"Invalid dependent bundle index: {dependIndex}. Valid range is 0 to {BundleList.Count - 1}.");
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// 获取包裹的详细信息
         /// </summary>
         /// <returns>返回包含包裹配置信息的详细信息对象</returns>
         public PackageDetails GetPackageDetails()
         {
-            PackageDetails details = new PackageDetails();
-            details.FileVersion = FileVersion;
-            details.EnableAddressable = EnableAddressable;
-            details.SupportExtensionless = SupportExtensionless;
-            details.LocationToLower = LocationToLower;
-            details.IncludeAssetGuid = IncludeAssetGuid;
-            details.ReplaceAssetPathWithAddress = ReplaceAssetPathWithAddress;
-            details.OutputNameStyle = OutputNameStyle;
-            details.BuildBundleType = BuildBundleType;
-            details.BuildPipeline = BuildPipeline;
-            details.PackageName = PackageName;
-            details.PackageVersion = PackageVersion;
-            details.PackageNote = PackageNote;
-            details.AssetTotalCount = AssetList.Count;
-            details.BundleTotalCount = BundleList.Count;
-            return details;
+            return new PackageDetails(this);
         }
 
         /// <summary>
@@ -191,8 +131,8 @@ namespace YooAsset
             if (string.IsNullOrEmpty(location))
                 return string.Empty;
 
-            if (AssetPathsByLocation.TryGetValue(location, out string assetPath))
-                return assetPath;
+            if (AssetsByLocation.TryGetValue(location, out PackageAsset packageAsset))
+                return packageAsset.AssetPath;
             else
                 return string.Empty;
         }
@@ -271,7 +211,7 @@ namespace YooAsset
         /// <returns>如果找到返回true，否则返回false。</returns>
         public bool TryGetPackageAsset(string assetPath, out PackageAsset result)
         {
-            return AssetDictionary.TryGetValue(assetPath, out result);
+            return AssetsByLocation.TryGetValue(assetPath, out result);
         }
 
         /// <summary>
@@ -343,7 +283,7 @@ namespace YooAsset
             List<AssetInfo> result = new List<AssetInfo>(AssetList.Count);
             foreach (var packageAsset in AssetList)
             {
-                if (packageAsset.HasAnyTag(tags))
+                if (packageAsset.Tags.HasAnyTag(tags))
                 {
                     AssetInfo assetInfo = new AssetInfo(PackageName, packageAsset, null);
                     result.Add(assetInfo);
@@ -362,39 +302,20 @@ namespace YooAsset
         {
             DebugCheckLocation(location);
 
-            string assetPath = ResolveLocationToAssetPath(location);
-            if (TryGetPackageAsset(assetPath, out PackageAsset packageAsset))
-            {
-                AssetInfo assetInfo = new AssetInfo(PackageName, packageAsset, assetType);
-                return assetInfo;
-            }
-            else
-            {
-                string error;
-                if (string.IsNullOrEmpty(location))
-                    error = "Location is null or empty.";
-                else
-                    error = $"Location is invalid: '{location}'.";
-                AssetInfo assetInfo = new AssetInfo(PackageName, error);
-                return assetInfo;
-            }
-        }
-        private string ResolveLocationToAssetPath(string location)
-        {
             if (string.IsNullOrEmpty(location))
             {
                 YooLogger.LogError("Failed to map location to asset path. Location is null or empty.");
-                return string.Empty;
+                return new AssetInfo(PackageName, "Location is null or empty.");
             }
 
-            if (AssetPathsByLocation.TryGetValue(location, out string assetPath))
+            if (AssetsByLocation.TryGetValue(location, out PackageAsset packageAsset))
             {
-                return assetPath;
+                return new AssetInfo(PackageName, packageAsset, assetType);
             }
             else
             {
                 YooLogger.LogWarning($"Failed to map location to asset path: '{location}'.");
-                return string.Empty;
+                return new AssetInfo(PackageName, $"Location is invalid: '{location}'.");
             }
         }
 
@@ -409,43 +330,23 @@ namespace YooAsset
             if (IncludeAssetGuid == false)
             {
                 YooLogger.LogWarning("Package manifest does not include asset GUID. Please check asset bundle collector settings.");
-                AssetInfo assetInfo = new AssetInfo(PackageName, "AssetGuid data is empty.");
-                return assetInfo;
+                return new AssetInfo(PackageName, "AssetGuid data is empty.");
             }
 
-            string assetPath = ResolveGuidToAssetPath(assetGuid);
-            if (TryGetPackageAsset(assetPath, out PackageAsset packageAsset))
-            {
-                AssetInfo assetInfo = new AssetInfo(PackageName, packageAsset, assetType);
-                return assetInfo;
-            }
-            else
-            {
-                string error;
-                if (string.IsNullOrEmpty(assetGuid))
-                    error = "Asset GUID is null or empty.";
-                else
-                    error = $"Asset GUID is invalid: '{assetGuid}'.";
-                AssetInfo assetInfo = new AssetInfo(PackageName, error);
-                return assetInfo;
-            }
-        }
-        private string ResolveGuidToAssetPath(string assetGuid)
-        {
             if (string.IsNullOrEmpty(assetGuid))
             {
                 YooLogger.LogError("Failed to map asset GUID to asset path. Asset GUID is null or empty.");
-                return string.Empty;
+                return new AssetInfo(PackageName, "Asset GUID is null or empty.");
             }
 
-            if (AssetPathsByGuid.TryGetValue(assetGuid, out string assetPath))
+            if (AssetsByGuid.TryGetValue(assetGuid, out PackageAsset packageAsset))
             {
-                return assetPath;
+                return new AssetInfo(PackageName, packageAsset, assetType);
             }
             else
             {
                 YooLogger.LogWarning($"Failed to map asset GUID to asset path: '{assetGuid}'.");
-                return string.Empty;
+                return new AssetInfo(PackageName, $"Asset GUID is invalid: '{assetGuid}'.");
             }
         }
 

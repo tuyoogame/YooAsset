@@ -11,6 +11,7 @@ namespace YooAsset
     /// </summary>
     internal class BufferReader
     {
+        private readonly char[] _hashChars = new char[32];
         private readonly byte[] _buffer;
         private int _position = 0;
 
@@ -164,6 +165,38 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 读取哈希值（16字节数据转换为32位哈希值）
+        /// </summary>
+        public string ReadHash16()
+        {
+            EnsureCapacity(16);
+            for (int i = 0; i < 16; i++)
+            {
+                byte b = _buffer[_position++];
+                _hashChars[i * 2] = GetHexChar(b >> 4);
+                _hashChars[i * 2 + 1] = GetHexChar(b & 0xF);
+            }
+            return new string(_hashChars);
+        }
+
+        /// <summary>
+        /// 读取16位无符号整数数组
+        /// </summary>
+        public ushort[] ReadUInt16Array()
+        {
+            ushort count = ReadUInt16();
+            if (count == 0)
+                return Array.Empty<ushort>();
+
+            ushort[] values = new ushort[count];
+            for (int i = 0; i < count; i++)
+            {
+                values[i] = ReadUInt16();
+            }
+            return values;
+        }
+
+        /// <summary>
         /// 读取32位有符号整数数组
         /// </summary>
         public int[] ReadInt32Array()
@@ -221,6 +254,12 @@ namespace YooAsset
             {
                 throw new InvalidOperationException("Insufficient buffer capacity.");
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static char GetHexChar(int value)
+        {
+            return (char)(value < 10 ? '0' + value : 'a' + value - 10);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace YooAsset
             {
                 if (options.Manifest.TryGetPackageBundleByBundleGuid(entry.BundleGuid, out PackageBundle bundle))
                 {
-                    if (bundle.HasAnyTag(tags))
+                    if (bundle.Tags.HasAnyTag(tags))
                         bundleGuids.Add(bundle.BundleGuid);
                 }
             }

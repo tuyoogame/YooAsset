@@ -29,43 +29,13 @@ namespace YooAsset
         public bool IsEncrypted => _bundle.IsEncrypted;
 
         /// <summary>
-        /// 分类标签数量
+        /// 分类标签集合
         /// </summary>
-        public int TagCount
-        {
-            get
-            {
-                return _bundle.Tags == null ? 0 : _bundle.Tags.Length;
-            }
-        }
+        public PackageTags Tags => _bundle.Tags;
 
         internal BundleUnpackInfo(PackageBundle bundle)
         {
             _bundle = bundle;
-        }
-
-        /// <summary>
-        /// 获取指定索引的分类标签
-        /// </summary>
-        public string GetTag(int index)
-        {
-            return _bundle.Tags[index];
-        }
-
-        /// <summary>
-        /// 是否包含指定的单个标签
-        /// </summary>
-        public bool HasTag(string tag)
-        {
-            return _bundle.HasTag(tag);
-        }
-
-        /// <summary>
-        /// 是否包含指定标签数组中的任意一个
-        /// </summary>
-        public bool HasAnyTag(string[] tags)
-        {
-            return _bundle.HasAnyTag(tags);
         }
     }
 

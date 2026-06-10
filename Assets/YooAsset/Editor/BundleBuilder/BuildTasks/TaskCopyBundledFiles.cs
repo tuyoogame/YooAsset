@@ -25,7 +25,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 拷贝首包资源文件
         /// </summary>
-        internal void CopyBundledFilesToStreaming(BuildParametersContext buildParametersContext, PackageManifest manifest)
+        internal void CopyBundledFilesToStreaming(BuildParametersContext buildParametersContext, BuildManifest manifest)
         {
             EBundledCopyOption copyOption = buildParametersContext.Parameters.BundledCopyOption;
             string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
@@ -67,10 +67,10 @@ namespace YooAsset.Editor
             // 拷贝文件列表（所有文件）
             if (copyOption == EBundledCopyOption.ClearAndCopyAll || copyOption == EBundledCopyOption.OnlyCopyAll)
             {
-                foreach (var packageBundle in manifest.BundleList)
+                foreach (var buildBundle in manifest.BundleList)
                 {
-                    string sourcePath = $"{packageOutputDirectory}/{packageBundle.GetFileName()}";
-                    string destPath = $"{bundledRootDirectory}/{packageBundle.GetFileName()}";
+                    string sourcePath = $"{packageOutputDirectory}/{buildBundle.GetFileName(manifest.OutputNameStyle)}";
+                    string destPath = $"{bundledRootDirectory}/{buildBundle.GetFileName(manifest.OutputNameStyle)}";
                     EditorFileUtility.CopyFile(sourcePath, destPath, true);
                 }
             }
@@ -85,12 +85,12 @@ namespace YooAsset.Editor
                     throw new InvalidOperationException(message);
                 }
                 string[] tags = copyParams.Split(';');
-                foreach (var packageBundle in manifest.BundleList)
+                foreach (var buildBundle in manifest.BundleList)
                 {
-                    if (packageBundle.HasAnyTag(tags) == false)
+                    if (buildBundle.HasAnyTag(tags) == false)
                         continue;
-                    string sourcePath = $"{packageOutputDirectory}/{packageBundle.GetFileName()}";
-                    string destPath = $"{bundledRootDirectory}/{packageBundle.GetFileName()}";
+                    string sourcePath = $"{packageOutputDirectory}/{buildBundle.GetFileName(manifest.OutputNameStyle)}";
+                    string destPath = $"{bundledRootDirectory}/{buildBundle.GetFileName(manifest.OutputNameStyle)}";
                     EditorFileUtility.CopyFile(sourcePath, destPath, true);
                 }
             }

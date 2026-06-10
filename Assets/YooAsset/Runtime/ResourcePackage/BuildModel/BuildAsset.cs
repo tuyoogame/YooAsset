@@ -1,12 +1,9 @@
-using System;
-
 namespace YooAsset
 {
     /// <summary>
-    /// 清单中的资源描述
+    /// 构建期专用的资源描述
     /// </summary>
-    [Serializable]
-    internal class PackageAsset
+    internal class BuildAsset
     {
         /// <summary>
         /// 可寻址地址
@@ -37,7 +34,11 @@ namespace YooAsset
         /// <summary>
         /// 资源的分类标签
         /// </summary>
-        [NonSerialized]
-        public PackageTags Tags;
+        public string[] Tags;
+
+        /// <summary>
+        /// 临时数据对象
+        /// </summary>
+        public object EditorUserData;
     }
 }

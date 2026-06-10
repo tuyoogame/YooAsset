@@ -22,7 +22,7 @@ namespace YooAsset.Editor
             var buildParameters = buildParametersContext.Parameters;
 
             string packageOutputDirectory = buildParametersContext.GetPackageOutputDirectory();
-            PackageManifest manifest = manifestContext.Manifest;
+            BuildManifest manifest = manifestContext.Manifest;
             BuildReport buildReport = new BuildReport();
 
             // 概述信息
@@ -89,36 +89,36 @@ namespace YooAsset.Editor
 
             // 资源对象列表
             buildReport.AssetInfos = new List<ReportAssetInfo>(manifest.AssetList.Count);
-            foreach (var packageAsset in manifest.AssetList)
+            foreach (var buildAsset in manifest.AssetList)
             {
-                var mainBundle = manifest.BundleList[packageAsset.BundleID];
+                var mainBundle = manifest.BundleList[buildAsset.BundleID];
                 ReportAssetInfo reportAssetInfo = new ReportAssetInfo();
-                reportAssetInfo.Address = packageAsset.Address;
-                reportAssetInfo.AssetPath = packageAsset.AssetPath;
-                reportAssetInfo.AssetTags = packageAsset.AssetTags;
-                reportAssetInfo.AssetGuid = AssetDatabase.AssetPathToGUID(packageAsset.AssetPath);
+                reportAssetInfo.Address = buildAsset.Address;
+                reportAssetInfo.AssetPath = buildAsset.AssetPath;
+                reportAssetInfo.AssetTags = buildAsset.Tags;
+                reportAssetInfo.AssetGuid = AssetDatabase.AssetPathToGUID(buildAsset.AssetPath);
                 reportAssetInfo.MainBundleName = mainBundle.BundleName;
                 reportAssetInfo.MainBundleSize = mainBundle.FileSize;
-                reportAssetInfo.DependAssets = GetAssetDependAssets(buildMapContext, mainBundle.BundleName, packageAsset.AssetPath);
-                reportAssetInfo.DependBundles = GetAssetDependBundles(manifest, packageAsset);
+                reportAssetInfo.DependAssets = GetAssetDependAssets(buildMapContext, mainBundle.BundleName, buildAsset.AssetPath);
+                reportAssetInfo.DependBundles = GetAssetDependBundles(manifest, buildAsset);
                 buildReport.AssetInfos.Add(reportAssetInfo);
             }
 
             // 资源包列表
             buildReport.BundleInfos = new List<ReportBundleInfo>(manifest.BundleList.Count);
-            foreach (var packageBundle in manifest.BundleList)
+            foreach (var buildBundle in manifest.BundleList)
             {
                 ReportBundleInfo reportBundleInfo = new ReportBundleInfo();
-                reportBundleInfo.BundleName = packageBundle.BundleName;
-                reportBundleInfo.FileName = packageBundle.GetFileName();
-                reportBundleInfo.FileHash = packageBundle.FileHash;
-                reportBundleInfo.FileCrc = packageBundle.FileCrc;
-                reportBundleInfo.FileSize = packageBundle.FileSize;
-                reportBundleInfo.Encrypted = packageBundle.IsEncrypted;
-                reportBundleInfo.Tags = packageBundle.Tags;
-                reportBundleInfo.DependBundles = GetBundleDependBundles(manifest, packageBundle);
-                reportBundleInfo.ReferenceBundles = GetBundleReferenceBundles(manifest, packageBundle);
-                reportBundleInfo.BundleContents = GetBundleContents(buildMapContext, packageBundle.BundleName);
+                reportBundleInfo.BundleName = buildBundle.BundleName;
+                reportBundleInfo.FileName = buildBundle.GetFileName(manifest.OutputNameStyle);
+                reportBundleInfo.FileHash = buildBundle.FileHash;
+                reportBundleInfo.FileCrc = buildBundle.FileCrc;
+                reportBundleInfo.FileSize = buildBundle.FileSize;
+                reportBundleInfo.Encrypted = buildBundle.IsEncrypted;
+                reportBundleInfo.Tags = buildBundle.Tags;
+                reportBundleInfo.DependBundles = GetBundleDependBundles(manifest, buildBundle);
+                reportBundleInfo.ReferenceBundles = GetBundleReferenceBundles(manifest, buildBundle);
+                reportBundleInfo.BundleContents = GetBundleContents(buildMapContext, buildBundle.BundleName);
                 buildReport.BundleInfos.Add(reportBundleInfo);
             }
 
@@ -151,10 +151,10 @@ namespace YooAsset.Editor
         /// <summary>
         /// 获取资源对象依赖的资源包集合
         /// </summary>
-        private List<string> GetAssetDependBundles(PackageManifest manifest, PackageAsset packageAsset)
+        private List<string> GetAssetDependBundles(BuildManifest manifest, BuildAsset buildAsset)
         {
-            List<string> dependBundles = new List<string>(packageAsset.DependentBundleIDs.Length);
-            foreach (int index in packageAsset.DependentBundleIDs)
+            List<string> dependBundles = new List<string>(buildAsset.DependentBundleIDs.Length);
+            foreach (int index in buildAsset.DependentBundleIDs)
             {
                 string dependBundleName = manifest.BundleList[index].BundleName;
                 dependBundles.Add(dependBundleName);
@@ -166,10 +166,10 @@ namespace YooAsset.Editor
         /// <summary>
         /// 获取资源包依赖的资源包集合
         /// </summary>
-        private List<string> GetBundleDependBundles(PackageManifest manifest, PackageBundle packageBundle)
+        private List<string> GetBundleDependBundles(BuildManifest manifest, BuildBundle buildBundle)
         {
-            List<string> dependBundles = new List<string>(packageBundle.DependentBundleIDs.Length);
-            foreach (int index in packageBundle.DependentBundleIDs)
+            List<string> dependBundles = new List<string>(buildBundle.DependentBundleIDs.Length);
+            foreach (int index in buildBundle.DependentBundleIDs)
             {
                 string dependBundleName = manifest.BundleList[index].BundleName;
                 dependBundles.Add(dependBundleName);
@@ -181,10 +181,10 @@ namespace YooAsset.Editor
         /// <summary>
         /// 获取引用该资源包的资源包集合
         /// </summary>
-        private List<string> GetBundleReferenceBundles(PackageManifest manifest, PackageBundle packageBundle)
+        private List<string> GetBundleReferenceBundles(BuildManifest manifest, BuildBundle buildBundle)
         {
-            List<string> referenceBundles = new List<string>(packageBundle.ReferrerBundleIDs.Count);
-            foreach (int index in packageBundle.ReferrerBundleIDs)
+            List<string> referenceBundles = new List<string>(buildBundle.ReferrerBundleIDs.Count);
+            foreach (int index in buildBundle.ReferrerBundleIDs)
             {
                 string dependBundleName = manifest.BundleList[index].BundleName;
                 referenceBundles.Add(dependBundleName);
@@ -204,15 +204,15 @@ namespace YooAsset.Editor
             return result;
         }
 
-        private int GetMainAssetCount(PackageManifest manifest)
+        private int GetMainAssetCount(BuildManifest manifest)
         {
             return manifest.AssetList.Count;
         }
-        private int GetAllBundleCount(PackageManifest manifest)
+        private int GetAllBundleCount(BuildManifest manifest)
         {
             return manifest.BundleList.Count;
         }
-        private long GetAllBundleSize(PackageManifest manifest)
+        private long GetAllBundleSize(BuildManifest manifest)
         {
             long fileBytes = 0;
             foreach (var packageBundle in manifest.BundleList)
@@ -221,7 +221,7 @@ namespace YooAsset.Editor
             }
             return fileBytes;
         }
-        private int GetEncryptedBundleCount(PackageManifest manifest)
+        private int GetEncryptedBundleCount(BuildManifest manifest)
         {
             int fileCount = 0;
             foreach (var packageBundle in manifest.BundleList)
@@ -231,7 +231,7 @@ namespace YooAsset.Editor
             }
             return fileCount;
         }
-        private long GetEncryptedBundleSize(PackageManifest manifest)
+        private long GetEncryptedBundleSize(BuildManifest manifest)
         {
             long fileBytes = 0;
             foreach (var packageBundle in manifest.BundleList)

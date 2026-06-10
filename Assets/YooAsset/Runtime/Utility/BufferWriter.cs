@@ -179,6 +179,47 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 写入哈希值（32位哈希值转换为16字节数据）
+        /// </summary>
+        public void WriteHash16(string hashString)
+        {
+            if (hashString == null)
+                throw new ArgumentNullException(nameof(hashString));
+
+#if UNITY_EDITOR || DEBUG
+            if (hashString.Length != 32)
+                throw new InvalidOperationException($"Hash string length must be 32, but got {hashString.Length}: '{hashString}'.");
+#endif
+
+            EnsureCapacity(16);
+            for (int i = 0; i < 16; i++)
+            {
+                int high = GetHexValue(hashString[i * 2]);
+                int low = GetHexValue(hashString[i * 2 + 1]);
+                _buffer[_position++] = (byte)((high << 4) | low);
+            }
+        }
+
+        /// <summary>
+        /// 写入16位无符号整数数组
+        /// </summary>
+        public void WriteUInt16Array(ushort[] values)
+        {
+            if (values == null)
+                throw new ArgumentNullException(nameof(values));
+
+            int count = values.Length;
+            if (count > ushort.MaxValue)
+                throw new OverflowException($"Array length exceeds the maximum value of {ushort.MaxValue}.");
+
+            WriteUInt16(Convert.ToUInt16(count));
+            for (int i = 0; i < count; i++)
+            {
+                WriteUInt16(values[i]);
+            }
+        }
+
+        /// <summary>
         /// 写入32位有符号整数数组
         /// </summary>
         public void WriteInt32Array(int[] values)
@@ -242,6 +283,17 @@ namespace YooAsset
             {
                 throw new InvalidOperationException("Insufficient buffer capacity.");
             }
+        }
+
+        private static int GetHexValue(char c)
+        {
+            if (c >= '0' && c <= '9')
+                return c - '0';
+            if (c >= 'a' && c <= 'f')
+                return c - 'a' + 10;
+            if (c >= 'A' && c <= 'F')
+                return c - 'A' + 10;
+            throw new FormatException($"Invalid hex character: '{c}'.");
         }
     }
 }
