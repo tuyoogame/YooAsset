@@ -7,6 +7,11 @@ namespace YooAsset
     /// </summary>
     public class PackageTags
     {
+        /// <summary>
+        /// 空标签集合
+        /// </summary>
+        public static readonly PackageTags Empty = new PackageTags(Array.Empty<string>());
+
         private readonly string[] _tags;
 
         /// <summary>

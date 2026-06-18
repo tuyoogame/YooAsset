@@ -126,6 +126,19 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 资源标签集合
+        /// </summary>
+        public PackageTags Tags
+        {
+            get
+            {
+                if (_packageAsset == null)
+                    return PackageTags.Empty;
+                return _packageAsset.Tags;
+            }
+        }
+
+        /// <summary>
         /// 创建有效的资源信息实例
         /// </summary>
         /// <param name="packageName">所属包裹名称</param>

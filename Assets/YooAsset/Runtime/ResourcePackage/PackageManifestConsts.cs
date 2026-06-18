@@ -22,8 +22,8 @@ namespace YooAsset
         public const int FileVersion = 2;
 
         /// <summary>
-        /// 文件最小合法大小（39字节）
+        /// 文件最小合法大小（41字节）
         /// </summary>
-        public const int MinFileSize = 39;
+        public const int MinFileSize = 41;
     }
 }
