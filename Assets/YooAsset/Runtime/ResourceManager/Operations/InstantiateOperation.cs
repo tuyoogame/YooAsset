@@ -90,9 +90,6 @@ namespace YooAsset
                     return;
                 }
 
-                if (_options.IsActive == false)
-                    Result.SetActive(false);
-
                 _steps = ESteps.Done;
                 SetResult();
             }
@@ -122,8 +119,7 @@ namespace YooAsset
                     Result = _instantiateAsync.Result[0] as GameObject;
                     if (Result != null)
                     {
-                        if (_options.IsActive == false)
-                            Result.SetActive(false);
+                        Result.SetActive(_options.IsActive);
 
                         _steps = ESteps.Done;
                         SetResult();
@@ -182,20 +178,24 @@ namespace YooAsset
                 return null;
             }
 
+            GameObject result;
             if (options.SetPositionAndRotation)
             {
                 if (options.Parent != null)
-                    return UnityEngine.Object.Instantiate(go, options.Position, options.Rotation, options.Parent);
+                    result = UnityEngine.Object.Instantiate(go, options.Position, options.Rotation, options.Parent);
                 else
-                    return UnityEngine.Object.Instantiate(go, options.Position, options.Rotation);
+                    result = UnityEngine.Object.Instantiate(go, options.Position, options.Rotation);
             }
             else
             {
                 if (options.Parent != null)
-                    return UnityEngine.Object.Instantiate(go, options.Parent, options.InWorldSpace);
+                    result = UnityEngine.Object.Instantiate(go, options.Parent, options.InWorldSpace);
                 else
-                    return UnityEngine.Object.Instantiate(go);
+                    result = UnityEngine.Object.Instantiate(go);
             }
+
+            result.SetActive(options.IsActive);
+            return result;
         }
 
 #if UNITY_2023_3_OR_NEWER
