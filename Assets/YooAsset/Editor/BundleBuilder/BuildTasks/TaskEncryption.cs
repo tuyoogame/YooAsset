@@ -35,10 +35,13 @@ namespace YooAsset.Editor
                 if (encryptResult.IsEncrypted)
                 {
                     string encryptedFilePath = $"{pipelineOutputDirectory}/{bundleInfo.BundleName}.encrypt";
-                    FileUtility.WriteAllBytes(encryptedFilePath, encryptResult.EncryptedFileData);
+                    bool isWritten = WriteEncryptedFile(encryptedFilePath, encryptResult.EncryptedFileData);
                     bundleInfo.EncryptedFilePath = encryptedFilePath;
                     bundleInfo.Encrypted = true;
-                    BuildLogger.Log($"Bundle file encryption complete: '{filePath}'.");
+                    if (isWritten)
+                        BuildLogger.Log($"Bundle file encryption complete: '{filePath}'.");
+                    else
+                        BuildLogger.Log($"Bundle file encryption reused: '{filePath}'.");
                 }
                 else
                 {
@@ -49,6 +52,18 @@ namespace YooAsset.Editor
                 EditorDialogUtility.DisplayProgressBar("Encrypting bundle", ++progressValue, buildMapContext.Collection.Count);
             }
             EditorDialogUtility.ClearProgressBar();
+        }
+
+        /// <summary>
+        /// 写入加密后的资源包文件
+        /// </summary>
+        /// <param name="encryptedFilePath">加密文件路径</param>
+        /// <param name="encryptedFileData">加密文件数据</param>
+        /// <returns>是否实际写入了文件</returns>
+        protected virtual bool WriteEncryptedFile(string encryptedFilePath, byte[] encryptedFileData)
+        {
+            FileUtility.WriteAllBytes(encryptedFilePath, encryptedFileData);
+            return true;
         }
     }
 }
