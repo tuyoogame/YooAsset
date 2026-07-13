@@ -17,7 +17,7 @@ namespace YooAsset
 
         private readonly FileSystemHost _host;
         private readonly LoadPackageManifestOptions _options;
-        private FSLoadPackageManifestOperation _loadManifestOp;
+        private FSLoadPackageManifestOperation _loadPackageManifestOp;
         private ESteps _steps = ESteps.None;
 
         internal LoadPackageManifestOperation(FileSystemHost host, LoadPackageManifestOptions options)
@@ -65,7 +65,7 @@ namespace YooAsset
 
             if (_steps == ESteps.LoadPackageManifest)
             {
-                if (_loadManifestOp == null)
+                if (_loadPackageManifestOp == null)
                 {
                     var mainFileSystem = _host.GetMainFileSystem();
                     if (mainFileSystem == null)
@@ -75,25 +75,26 @@ namespace YooAsset
                         return;
                     }
 
-                    _loadManifestOp = mainFileSystem.LoadPackageManifestAsync(_options.ConvertTo());
-                    _loadManifestOp.StartOperation();
-                    AddChildOperation(_loadManifestOp);
+                    _loadPackageManifestOp = mainFileSystem.LoadPackageManifestAsync(_options.ConvertTo());
+                    _loadPackageManifestOp.StartOperation();
+                    AddChildOperation(_loadPackageManifestOp);
                 }
 
-                _loadManifestOp.UpdateOperation();
-                if (_loadManifestOp.IsDone == false)
+                _loadPackageManifestOp.UpdateOperation();
+                Progress = _loadPackageManifestOp.Progress;
+                if (_loadPackageManifestOp.IsDone == false)
                     return;
 
-                if (_loadManifestOp.Status == EOperationStatus.Succeeded)
+                if (_loadPackageManifestOp.Status == EOperationStatus.Succeeded)
                 {
                     _steps = ESteps.Done;
-                    _host.SetActiveManifest(_loadManifestOp.Manifest);
+                    _host.SetActiveManifest(_loadPackageManifestOp.Manifest);
                     SetResult();
                 }
                 else
                 {
                     _steps = ESteps.Done;
-                    SetError(_loadManifestOp.Error);
+                    SetError(_loadPackageManifestOp.Error);
                 }
             }
         }

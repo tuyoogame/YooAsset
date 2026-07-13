@@ -365,6 +365,22 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 计算多阶段操作的整体进度
+        /// </summary>
+        /// <param name="stageIndex">当前阶段索引（从0开始）</param>
+        /// <param name="stageCount">阶段总数</param>
+        /// <param name="stageProgress">当前阶段进度（0-1）</param>
+        /// <returns>返回归一化的整体进度值（0-1）</returns>
+        protected float CalculateMultiStageProgress(int stageIndex, int stageCount, float stageProgress)
+        {
+            if (stageProgress < 0f)
+                stageProgress = 0f;
+            else if (stageProgress > 1f)
+                stageProgress = 1f;
+            return (stageIndex + stageProgress) / stageCount;
+        }
+
+        /// <summary>
         /// 添加子任务
         /// </summary>
         /// <param name="child">要添加的子任务</param>

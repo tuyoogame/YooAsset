@@ -70,6 +70,7 @@ namespace YooAsset
                 }
 
                 _loadBuiltinPackageManifestOp.UpdateOperation();
+                Progress = _loadBuiltinPackageManifestOp.Progress;
                 if (_loadBuiltinPackageManifestOp.IsDone == false)
                     return;
 

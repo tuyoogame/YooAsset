@@ -76,6 +76,7 @@ namespace YooAsset
                 }
 
                 _downloadPackageManifestOp.UpdateOperation();
+                Progress = CalculateMultiStageProgress(0, 2, _downloadPackageManifestOp.Progress);
                 if (_downloadPackageManifestOp.IsDone == false)
                     return;
 
@@ -126,7 +127,7 @@ namespace YooAsset
                 }
 
                 _loadCachePackageManifestOp.UpdateOperation();
-                Progress = _loadCachePackageManifestOp.Progress;
+                Progress = CalculateMultiStageProgress(1, 2, _loadCachePackageManifestOp.Progress);
                 if (_loadCachePackageManifestOp.IsDone == false)
                     return;
 
