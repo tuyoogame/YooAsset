@@ -51,7 +51,7 @@ namespace YooAsset
                     if (string.IsNullOrEmpty(instanceId) == false)
                     {
                         _steps = ESteps.Done;
-                        SetError($"CopyBuiltinPackageManifestDestRoot cannot be customized when FileSystemInstanceId is set.");
+                        SetError("CopyBuiltinPackageManifestDestRoot cannot be customized when FileSystemInstanceId is set.");
                         return;
                     }
                 }
