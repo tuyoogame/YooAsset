@@ -9,6 +9,7 @@ namespace YooAsset
         private enum ESteps
         {
             None,
+            GetCopyManifestFileRoot,
             LoadBuiltinPackageVersion,
             CopyBuiltinPackageHash,
             CopyBuiltinPackageManifest,
@@ -19,6 +20,7 @@ namespace YooAsset
         private RequestBuiltinPackageVersionOperation _requestBuiltinPackageVersionOp;
         private CopyBuiltinFileOperation _copyBuiltinHashFileOp;
         private CopyBuiltinFileOperation _copyBuiltinManifestFileOp;
+        private string _manifestFileRoot;
         private ESteps _steps = ESteps.None;
 
         public CopyBuiltinPackageManifestOperation(BuiltinFileSystem fileSystem)
@@ -27,12 +29,35 @@ namespace YooAsset
         }
         protected override void InternalStart()
         {
-            _steps = ESteps.LoadBuiltinPackageVersion;
+            _steps = ESteps.GetCopyManifestFileRoot;
         }
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
+
+            if (_steps == ESteps.GetCopyManifestFileRoot)
+            {
+                string destRoot = _fileSystem.CopyBuiltinPackageManifestDestRoot;
+                if (string.IsNullOrEmpty(destRoot))
+                {
+                    string packageRoot = YooAssetConfiguration.GetDefaultCacheRoot(_fileSystem.PackageName);
+                    _manifestFileRoot = PathUtility.Combine(packageRoot, SandboxFileSystemConsts.ManifestFilesFolderName);
+                }
+                else
+                {
+                    _manifestFileRoot = destRoot;
+                    string instanceId = YooAssetConfiguration.GetFileSystemInstanceId();
+                    if (string.IsNullOrEmpty(instanceId) == false)
+                    {
+                        _steps = ESteps.Done;
+                        SetError($"CopyBuiltinPackageManifestDestRoot cannot be customized when FileSystemInstanceId is set.");
+                        return;
+                    }
+                }
+
+                _steps = ESteps.LoadBuiltinPackageVersion;
+            }
 
             if (_steps == ESteps.LoadBuiltinPackageVersion)
             {
@@ -116,27 +141,15 @@ namespace YooAsset
             }
         }
 
-        private string GetCopyManifestFileRoot()
-        {
-            string destRoot = _fileSystem.CopyBuiltinPackageManifestDestRoot;
-            if (string.IsNullOrEmpty(destRoot))
-            {
-                string defaultCacheRoot = YooAssetConfiguration.GetDefaultCacheRoot();
-                destRoot = PathUtility.Combine(defaultCacheRoot, _fileSystem.PackageName, SandboxFileSystemConsts.ManifestFilesFolderName);
-            }
-            return destRoot;
-        }
         private string GetCopyPackageHashDestPath(string packageVersion)
         {
-            string fileRoot = GetCopyManifestFileRoot();
             string fileName = YooAssetConfiguration.GetPackageHashFileName(_fileSystem.PackageName, packageVersion);
-            return PathUtility.Combine(fileRoot, fileName);
+            return PathUtility.Combine(_manifestFileRoot, fileName);
         }
         private string GetCopyPackageManifestDestPath(string packageVersion)
         {
-            string fileRoot = GetCopyManifestFileRoot();
             string fileName = YooAssetConfiguration.GetManifestBinaryFileName(_fileSystem.PackageName, packageVersion);
-            return PathUtility.Combine(fileRoot, fileName);
+            return PathUtility.Combine(_manifestFileRoot, fileName);
         }
     }
 }

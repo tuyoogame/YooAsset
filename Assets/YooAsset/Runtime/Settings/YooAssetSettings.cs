@@ -19,7 +19,13 @@ namespace YooAsset
         /// </summary>
         /// <remarks>设为空则不添加前缀</remarks>
         public string PackageFilePrefix = string.Empty;
-        
+
+        /// <summary>
+        /// 文件系统实例标识
+        /// </summary>
+        /// <remarks>用于隔离多进程客户端的可写缓存目录</remarks>
+        [System.NonSerialized]
+        public string FileSystemInstanceId = string.Empty;
 
         /// <summary>
         /// 构建输出文件夹名称

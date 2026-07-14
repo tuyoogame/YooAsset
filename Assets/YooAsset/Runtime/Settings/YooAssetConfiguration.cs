@@ -51,10 +51,29 @@ namespace YooAsset
         /// <summary>
         /// 获取资源包裹的根文件夹名称
         /// </summary>
-        /// <returns>文件夹名称。如果未配置则返回默认值 "yoo"。</returns>
+        /// <returns>文件夹名称。如果未配置则返回默认值 "yoo"</returns>
         public static string GetYooFolderName()
         {
             return GetSettings().YooFolderName;
+        }
+
+        /// <summary>
+        /// 设置文件系统实例标识
+        /// </summary>
+        /// <param name="fileSystemInstanceId">文件系统实例标识</param>
+        /// <remarks>必须在任意包裹初始化前调用</remarks>
+        public static void SetFileSystemInstanceId(string fileSystemInstanceId)
+        {
+            GetSettings().FileSystemInstanceId = fileSystemInstanceId;
+        }
+
+        /// <summary>
+        /// 获取文件系统实例标识
+        /// </summary>
+        /// <returns>文件系统实例标识</returns>
+        public static string GetFileSystemInstanceId()
+        {
+            return GetSettings().FileSystemInstanceId;
         }
 
         /// <summary>
@@ -244,6 +263,26 @@ namespace YooAsset
 #else
             return GetMobileCacheRoot();
 #endif
+        }
+
+        /// <summary>
+        /// 获取默认的缓存包裹根目录
+        /// </summary>
+        /// <param name="packageName">包裹名称</param>
+        /// <returns>缓存包裹根目录的绝对路径</returns>
+        internal static string GetDefaultCacheRoot(string packageName)
+        {
+            if (string.IsNullOrEmpty(packageName))
+                throw new ArgumentNullException(nameof(packageName));
+
+            string cacheRoot = GetDefaultCacheRoot();
+            string fileSystemInstanceId = GetFileSystemInstanceId();
+            if (string.IsNullOrEmpty(fileSystemInstanceId))
+                return PathUtility.Combine(cacheRoot, packageName);
+
+            string instanceHash = HashUtility.ComputeMD5(fileSystemInstanceId);
+            string instanceFolder = $"instance-{instanceHash}";
+            return PathUtility.Combine(cacheRoot, instanceFolder, packageName);
         }
 
         /// <summary>
