@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace YooAsset
@@ -64,6 +65,17 @@ namespace YooAsset
         /// <remarks>必须在任意包裹初始化前调用</remarks>
         public static void SetFileSystemInstanceId(string fileSystemInstanceId)
         {
+            if (string.IsNullOrEmpty(fileSystemInstanceId) == false)
+            {
+                if (fileSystemInstanceId.Length > 16)
+                    throw new ArgumentException("File system instance ID cannot exceed 16 characters.", nameof(fileSystemInstanceId));
+
+                // 验证实例标识只能包含小写字母、数字、连字符和下划线
+                fileSystemInstanceId = fileSystemInstanceId.ToLowerInvariant();
+                if (Regex.IsMatch(fileSystemInstanceId, @"^[a-z0-9_-]+$") == false)
+                    throw new ArgumentException("File system instance ID contains invalid characters.", nameof(fileSystemInstanceId));
+            }
+
             GetSettings().FileSystemInstanceId = fileSystemInstanceId;
         }
 
@@ -280,8 +292,7 @@ namespace YooAsset
             if (string.IsNullOrEmpty(fileSystemInstanceId))
                 return PathUtility.Combine(cacheRoot, packageName);
 
-            string instanceHash = HashUtility.ComputeMD5(fileSystemInstanceId);
-            string instanceFolder = $"instance-{instanceHash}";
+            string instanceFolder = $"instance-{fileSystemInstanceId}";
             return PathUtility.Combine(cacheRoot, instanceFolder, packageName);
         }
 
