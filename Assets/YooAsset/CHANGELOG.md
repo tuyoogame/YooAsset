@@ -2,6 +2,30 @@
 
 All notable changes to this package will be documented in this file.
 
+## [3.0.4] - 2026-07-14
+
+本版本新增多开客户端缓存目录隔离和稳定加密构建任务，并修复资源清单加载进度及实例化激活状态问题。
+
+### Added
+
+- 新增多开客户端缓存目录隔离机制
+
+  支持通过 `YooAssetConfiguration.SetFileSystemInstanceId()` 设置全局实例标识，使 `SandboxFileSystem` 和 `BuiltinFileSystem` 的默认可写缓存目录按客户端实例隔离。
+
+- 新增稳定加密构建任务 `TaskStableEncryption`
+
+  构建时生成的密文与已有文件一致时复用原文件，避免更新文件修改时间，减少增量构建中的无效文件变更。
+
+### Fixed
+
+- 修复同步和异步实例化的激活状态不一致
+
+  `InstantiateOperation` 现在会统一应用实例化选项中的 `IsActive` 状态。
+
+- 修复资源清单加载进度不准确
+
+  完善资源清单下载、加载和预取操作之间的进度传递，避免进度缺失或回退。
+
 ## [3.0.3-beta] - 2026-06-18
 
 本版本重点优化资源清单二进制结构，显著减小清单体积、同时降低运行时内存占用并提升资源定位查询效率。。
