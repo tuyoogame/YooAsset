@@ -329,9 +329,17 @@ namespace YooAsset
             // 设置根目录
             string unpackRoot;
             if (string.IsNullOrEmpty(UnpackFileSystemRoot))
-                unpackRoot = GetDefaultUnpackPackageRoot(packageName);
+            {
+                unpackRoot = YooAssetConfiguration.GetDefaultCacheRoot(packageName);
+            }
             else
+            {
                 unpackRoot = UnpackFileSystemRoot;
+                string instanceId = YooAssetConfiguration.GetFileSystemInstanceId();
+                if (string.IsNullOrEmpty(instanceId) == false)
+                    YooLogger.LogWarning($"{nameof(YooAssetSettings.FileSystemInstanceId)} is ignored because a custom unpack root was provided.");
+            }
+
             _unpackManifestFilesRoot = PathUtility.Combine(unpackRoot, BuiltinFileSystemConsts.UnpackManifestFilesFolderName);
             _unpackBundleFilesRoot = PathUtility.Combine(unpackRoot, BuiltinFileSystemConsts.UnpackBundleFilesFolderName);
             _tempFilesRoot = PathUtility.Combine(unpackRoot, BuiltinFileSystemConsts.UnpackTempFilesFolderName);
@@ -519,15 +527,6 @@ namespace YooAsset
             {
                 Directory.Delete(_tempFilesRoot, true);
             }
-        }
-
-        /// <summary>
-        /// 获取默认的解压根目录
-        /// </summary>
-        public string GetDefaultUnpackPackageRoot(string packageName)
-        {
-            string rootDirectory = YooAssetConfiguration.GetDefaultCacheRoot();
-            return PathUtility.Combine(rootDirectory, packageName);
         }
 
         /// <summary>
