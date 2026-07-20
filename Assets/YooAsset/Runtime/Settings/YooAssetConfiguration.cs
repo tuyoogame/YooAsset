@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace YooAsset
@@ -59,36 +58,6 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 设置文件系统实例标识
-        /// </summary>
-        /// <param name="fileSystemInstanceId">文件系统实例标识</param>
-        /// <remarks>必须在任意包裹初始化前调用</remarks>
-        public static void SetFileSystemInstanceId(string fileSystemInstanceId)
-        {
-            if (string.IsNullOrEmpty(fileSystemInstanceId) == false)
-            {
-                if (fileSystemInstanceId.Length > 16)
-                    throw new ArgumentException("File system instance ID cannot exceed 16 characters.", nameof(fileSystemInstanceId));
-
-                // 验证实例标识只能包含小写字母、数字、连字符和下划线
-                fileSystemInstanceId = fileSystemInstanceId.ToLowerInvariant();
-                if (Regex.IsMatch(fileSystemInstanceId, @"^[a-z0-9_-]+$") == false)
-                    throw new ArgumentException("File system instance ID contains invalid characters.", nameof(fileSystemInstanceId));
-            }
-
-            GetSettings().FileSystemInstanceId = fileSystemInstanceId;
-        }
-
-        /// <summary>
-        /// 获取文件系统实例标识
-        /// </summary>
-        /// <returns>文件系统实例标识</returns>
-        public static string GetFileSystemInstanceId()
-        {
-            return GetSettings().FileSystemInstanceId;
-        }
-
-        /// <summary>
         /// 获取构建报告的文件名
         /// </summary>
         /// <param name="packageName">包裹名称</param>
@@ -126,26 +95,6 @@ namespace YooAsset
                 return $"{packageName}_{packageVersion}.bytes";
             else
                 return $"{settings.PackageFilePrefix}_{packageName}_{packageVersion}.bytes";
-        }
-
-        /// <summary>
-        /// 获取清单 JSON 文件的文件名
-        /// </summary>
-        /// <param name="packageName">包裹名称</param>
-        /// <param name="packageVersion">包裹版本号</param>
-        /// <returns>包含 .json 扩展名的文件名</returns>
-        public static string GetManifestJsonFileName(string packageName, string packageVersion)
-        {
-            if (string.IsNullOrEmpty(packageName))
-                throw new ArgumentNullException(nameof(packageName));
-            if (string.IsNullOrEmpty(packageVersion))
-                throw new ArgumentNullException(nameof(packageVersion));
-
-            var settings = GetSettings();
-            if (string.IsNullOrEmpty(settings.PackageFilePrefix))
-                return $"{packageName}_{packageVersion}.json";
-            else
-                return $"{settings.PackageFilePrefix}_{packageName}_{packageVersion}.json";
         }
 
         /// <summary>
@@ -288,12 +237,7 @@ namespace YooAsset
                 throw new ArgumentNullException(nameof(packageName));
 
             string cacheRoot = GetDefaultCacheRoot();
-            string fileSystemInstanceId = GetFileSystemInstanceId();
-            if (string.IsNullOrEmpty(fileSystemInstanceId))
-                return PathUtility.Combine(cacheRoot, packageName);
-
-            string instanceFolder = $"instance-{fileSystemInstanceId}";
-            return PathUtility.Combine(cacheRoot, instanceFolder, packageName);
+            return PathUtility.Combine(cacheRoot, packageName);
         }
 
         /// <summary>

@@ -329,16 +329,9 @@ namespace YooAsset
             // 设置根目录
             string unpackRoot;
             if (string.IsNullOrEmpty(UnpackFileSystemRoot))
-            {
                 unpackRoot = YooAssetConfiguration.GetDefaultCacheRoot(packageName);
-            }
             else
-            {
                 unpackRoot = UnpackFileSystemRoot;
-                string instanceId = YooAssetConfiguration.GetFileSystemInstanceId();
-                if (string.IsNullOrEmpty(instanceId) == false)
-                    YooLogger.LogWarning($"{nameof(YooAssetSettings.FileSystemInstanceId)} is ignored because a custom unpack root was provided.");
-            }
 
             _unpackManifestFilesRoot = PathUtility.Combine(unpackRoot, BuiltinFileSystemConsts.UnpackManifestFilesFolderName);
             _unpackBundleFilesRoot = PathUtility.Combine(unpackRoot, BuiltinFileSystemConsts.UnpackBundleFilesFolderName);

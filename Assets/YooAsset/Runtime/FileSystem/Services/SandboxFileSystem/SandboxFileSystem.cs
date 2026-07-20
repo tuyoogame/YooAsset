@@ -319,16 +319,9 @@ namespace YooAsset
             PackageName = packageName;
 
             if (string.IsNullOrEmpty(packageRoot))
-            {
                 _packageRoot = YooAssetConfiguration.GetDefaultCacheRoot(packageName);
-            }
             else
-            {
                 _packageRoot = packageRoot;
-                string instanceId = YooAssetConfiguration.GetFileSystemInstanceId();
-                if (string.IsNullOrEmpty(instanceId) == false)
-                    YooLogger.LogWarning($"{nameof(YooAssetSettings.FileSystemInstanceId)} is ignored because a custom package root was provided.");
-            }
 
             _cacheBundleFilesRoot = PathUtility.Combine(_packageRoot, SandboxFileSystemConsts.BundleFilesFolderName);
             _cacheManifestFilesRoot = PathUtility.Combine(_packageRoot, SandboxFileSystemConsts.ManifestFilesFolderName);

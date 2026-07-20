@@ -76,12 +76,10 @@ namespace YooAsset
             string packageVersionFileName = YooAssetConfiguration.GetPackageVersionFileName(packageName);
             string packageHashFileName = YooAssetConfiguration.GetPackageHashFileName(packageName, packageVersion);
             string manifestBinaryFileName = YooAssetConfiguration.GetManifestBinaryFileName(packageName, packageVersion);
-            string manifestJsonFileName = YooAssetConfiguration.GetManifestJsonFileName(packageName, packageVersion);
             string reportFileName = YooAssetConfiguration.GetBuildReportFileName(packageName, packageVersion);
             whiteFileNameList.Add(packageVersionFileName);
             whiteFileNameList.Add(packageHashFileName);
             whiteFileNameList.Add(manifestBinaryFileName);
-            whiteFileNameList.Add(manifestJsonFileName);
             whiteFileNameList.Add(reportFileName);
 
             // 记录所有内置资源文件

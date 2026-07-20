@@ -21,13 +21,6 @@ namespace YooAsset
         public string PackageFilePrefix = string.Empty;
 
         /// <summary>
-        /// 文件系统实例标识
-        /// </summary>
-        /// <remarks>用于隔离多进程客户端的可写缓存目录</remarks>
-        [System.NonSerialized]
-        public string FileSystemInstanceId = string.Empty;
-
-        /// <summary>
         /// 构建输出文件夹名称
         /// </summary>
         public const string OutputFolderName = "OutputCache";

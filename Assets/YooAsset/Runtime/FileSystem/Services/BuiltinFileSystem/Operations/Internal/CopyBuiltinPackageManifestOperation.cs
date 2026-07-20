@@ -47,13 +47,6 @@ namespace YooAsset
                 else
                 {
                     _manifestFileRoot = destRoot;
-                    string instanceId = YooAssetConfiguration.GetFileSystemInstanceId();
-                    if (string.IsNullOrEmpty(instanceId) == false)
-                    {
-                        _steps = ESteps.Done;
-                        SetError("CopyBuiltinPackageManifestDestRoot cannot be customized when FileSystemInstanceId is set.");
-                        return;
-                    }
                 }
 
                 _steps = ESteps.LoadBuiltinPackageVersion;
