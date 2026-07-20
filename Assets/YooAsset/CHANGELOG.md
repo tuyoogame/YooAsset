@@ -2,6 +2,18 @@
 
 All notable changes to this package will be documented in this file.
 
+## [3.0.5] - 2026-07-20
+
+本版本将多开客户端的缓存目录隔离方案由全局实例标识改为显式传入独立的 `packageRoot`。
+
+### Removed
+
+- 移除全局文件系统实例标识
+
+  多开客户端的缓存目录隔离不再依赖全局实例标识，改为在创建文件系统时为各文件系统显式传入独立的 `packageRoot`。
+
+  移除 `YooAssetConfiguration.SetFileSystemInstanceId()` / `GetFileSystemInstanceId()` 。
+
 ## [3.0.4] - 2026-07-14
 
 本版本新增多开客户端缓存目录隔离和稳定加密构建任务，并修复资源清单加载进度及实例化激活状态问题。
