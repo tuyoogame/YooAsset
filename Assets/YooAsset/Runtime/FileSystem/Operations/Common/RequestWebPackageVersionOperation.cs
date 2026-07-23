@@ -9,6 +9,7 @@ namespace YooAsset
         {
             None,
             RequestPackageVersion,
+            VerifyPackageVersion,
             Done,
         }
 
@@ -56,22 +57,28 @@ namespace YooAsset
                 if (_downloadTextRequest.Status == EDownloadRequestStatus.Succeeded)
                 {
                     PackageVersion = _downloadTextRequest.Result;
-                    if (TextUtility.ValidateContent(PackageVersion, out string validateError) == false)
-                    {
-                        _steps = ESteps.Done;
-                        SetError($"Web package version file validation failed: {validateError}.");
-                    }
-                    else
-                    {
-                        _steps = ESteps.Done;
-                        SetResult();
-                    }
+                    _steps = ESteps.VerifyPackageVersion;
+                    _options.DownloadUrlPolicy.OnRequestSucceeded(_downloadTextRequest.Url);
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     SetError(_downloadTextRequest.Error);
                     _options.DownloadUrlPolicy.OnRequestFailed(_downloadTextRequest.Url, _downloadTextRequest.HttpCode, _downloadTextRequest.HttpError);
+                }
+            }
+
+            if (_steps == ESteps.VerifyPackageVersion)
+            {
+                if (TextUtility.ValidateContent(PackageVersion, out string validateError) == false)
+                {
+                    _steps = ESteps.Done;
+                    SetError($"Web package version file validation failed: {validateError}.");
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    SetResult();
                 }
             }
         }

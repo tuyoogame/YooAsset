@@ -62,7 +62,11 @@ namespace YooAsset
                 catch (System.Exception ex)
                 {
                     _steps = ESteps.Done;
-                    LatestReport = DownloadReport.CreateFinished(-1, ex.Message, 0, 0f);
+                    LatestReport = DownloadReport.CreateFinished(
+                        httpCode: -1,
+                        httpError: ex.Message,
+                        downloadedBytes: 0,
+                        downloadProgress: 0f);
                     SetError($"Failed to copy local file: {ex.Message}.");
 
                     // 注意：拷贝失败后直接删除临时文件

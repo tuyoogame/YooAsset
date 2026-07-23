@@ -55,8 +55,11 @@ namespace YooAsset
                     return;
 
                 // 更新下载报告
-                LatestReport = DownloadReport.CreateFinished(_downloadRequest.HttpCode, _downloadRequest.HttpError,
-                    _downloadRequest.DownloadedBytes, _downloadRequest.DownloadProgress);
+                LatestReport = DownloadReport.CreateFinished(
+                    httpCode: _downloadRequest.HttpCode,
+                    httpError: _downloadRequest.HttpError,
+                    downloadedBytes: _downloadRequest.DownloadedBytes,
+                    downloadProgress: _downloadRequest.DownloadProgress);
 
                 // 检查网络错误
                 if (_downloadRequest.Status == EDownloadRequestStatus.Succeeded)
@@ -107,7 +110,9 @@ namespace YooAsset
         }
         protected override void InternalWaitForCompletion()
         {
-            throw new YooInternalException($"{nameof(SimulateAndCacheFileOperation)} does not support synchronous waiting. Bundle: '{Bundle.BundleName}', Url: '{Url}'.");
+            string error = $"{GetType().Name} does not support synchronous waiting. Bundle: '{Bundle.BundleName}', Url: '{Url}'.";
+            SetError(error);
+            YooLogger.LogError(error);
         }
     }
 }

@@ -9,6 +9,7 @@ namespace YooAsset
         {
             None,
             RequestPackageHash,
+            VerifyPackageHash,
             Done,
         }
 
@@ -56,22 +57,28 @@ namespace YooAsset
                 if (_downloadTextRequest.Status == EDownloadRequestStatus.Succeeded)
                 {
                     PackageHash = _downloadTextRequest.Result;
-                    if (TextUtility.ValidateContent(PackageHash, out string validateError) == false)
-                    {
-                        _steps = ESteps.Done;
-                        SetError($"Web package hash file validation failed: {validateError}.");
-                    }
-                    else
-                    {
-                        _steps = ESteps.Done;
-                        SetResult();
-                    }
+                    _steps = ESteps.VerifyPackageHash;
+                    _options.DownloadUrlPolicy.OnRequestSucceeded(_downloadTextRequest.Url);
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     SetError(_downloadTextRequest.Error);
                     _options.DownloadUrlPolicy.OnRequestFailed(_downloadTextRequest.Url, _downloadTextRequest.HttpCode, _downloadTextRequest.HttpError);
+                }
+            }
+
+            if (_steps == ESteps.VerifyPackageHash)
+            {
+                if (TextUtility.ValidateContent(PackageHash, out string validateError) == false)
+                {
+                    _steps = ESteps.Done;
+                    SetError($"Web package hash file validation failed: {validateError}.");
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    SetResult();
                 }
             }
         }

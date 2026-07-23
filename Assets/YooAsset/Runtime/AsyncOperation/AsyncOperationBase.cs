@@ -171,18 +171,29 @@ namespace YooAsset
             {
                 IsWaitForCompletion = true;
 
-                if (IsDone == false)
-                    InternalWaitForCompletion();
-
-                if (IsDone == false)
+                try
                 {
-                    _error = $"Operation '{GetType().Name}' did not complete during synchronous wait.";
-                    _status = EOperationStatus.Failed;
-                    YooLogger.LogError(_error);
-                }
+                    if (IsDone == false)
+                        InternalWaitForCompletion();
 
-                // 注意：强制收尾，确保Task能完成
-                CompleteOperation();
+                    if (IsDone == false)
+                    {
+                        _error = $"Operation '{GetType().Name}' did not complete during synchronous wait.";
+                        _status = EOperationStatus.Failed;
+                        YooLogger.LogError(_error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _error = ex.ToString();
+                    _status = EOperationStatus.Failed;
+                    YooLogger.LogError($"Exception in {GetType().Name}.InternalWaitForCompletion: {ex}.");
+                }
+                finally
+                {
+                    // 注意：强制收尾，确保Task能完成
+                    CompleteOperation();
+                }
             }
         }
 
@@ -258,17 +269,10 @@ namespace YooAsset
         /// </summary>
         internal void AbortOperation()
         {
-            if (_children != null)
-            {
-                for (int i = _children.Count - 1; i >= 0; i--)
-                {
-                    _children[i].AbortOperation();
-                }
-            }
+            AbortChildren();
 
             if (IsDone == false)
             {
-                InternalAbort();
                 _error = "Operation was aborted.";
                 _status = EOperationStatus.Failed;
                 YooLogger.LogWarning($"Async operation '{GetType().Name}' has been aborted.");
@@ -288,13 +292,6 @@ namespace YooAsset
         /// 内部更新方法（子类必须实现）
         /// </summary>
         protected abstract void InternalUpdate();
-
-        /// <summary>
-        /// 内部中止方法（子类可选实现）
-        /// </summary>
-        protected virtual void InternalAbort()
-        {
-        }
 
         /// <summary>
         /// 内部释放方法（子类可选实现）
@@ -499,6 +496,12 @@ namespace YooAsset
                 // 结束记录
                 DebugEndRecording();
 
+                // 注意：失败的父任务不应遗留仍在运行的子任务
+                if (_status == EOperationStatus.Failed)
+                {
+                    AbortChildren();
+                }
+
                 try
                 {
                     InternalDispose();
@@ -509,6 +512,31 @@ namespace YooAsset
                 }
 
                 InvokeCompletedCallbacks();
+            }
+        }
+
+        /// <summary>
+        /// 终止所有子任务
+        /// </summary>
+        private void AbortChildren()
+        {
+            if (_children == null)
+                return;
+
+            for (int i = _children.Count - 1; i >= 0; i--)
+            {
+                var child = _children[i];
+                if (child.IsCompleted)
+                    continue;
+
+                try
+                {
+                    child.AbortOperation();
+                }
+                catch (Exception ex)
+                {
+                    YooLogger.LogError($"Exception while aborting child operation '{child.GetType().Name}' from '{GetType().Name}': {ex}.");
+                }
             }
         }
 

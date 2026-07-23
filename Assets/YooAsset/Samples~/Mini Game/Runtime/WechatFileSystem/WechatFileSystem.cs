@@ -31,13 +31,17 @@ public static class WechatFileSystemCreater
         var fileSystemParams = CreateFileSystemParameters(packageRoot, remoteService, assetBundleDecryptor, null);
         return fileSystemParams;
     }
-    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor)
+    public static FileSystemParameters CreateFileSystemParameters(string packageRoot, IRemoteService remoteService, IBundleDecryptor assetBundleDecryptor, IBundleDecryptor rawBundleDecryptor, UnityWebRequestCreator webRequestCreator = null)
     {
         string fileSystemClass = $"{nameof(WechatFileSystem)},YooAsset.MiniGame";
         var fileSystemParams = new FileSystemParameters(fileSystemClass, packageRoot);
         fileSystemParams.AddParameter(EFileSystemParameter.RemoteService, remoteService);
         fileSystemParams.AddParameter(EFileSystemParameter.DisableUnityWebCache, true);
-        fileSystemParams.AddParameter(EFileSystemParameter.WebPlatformStrategy, new WechatPlatform());
+        fileSystemParams.AddParameter(EFileSystemParameter.WebPlatformStrategy, new WechatPlatformStrategy());
+        fileSystemParams.AddParameter(EFileSystemParameter.WebPreloadStrategy, new WechatPreloadStrategy(webRequestCreator));
+
+        if (webRequestCreator != null)
+            fileSystemParams.AddParameter(EFileSystemParameter.UnityWebRequestCreator, webRequestCreator);
 
         if (assetBundleDecryptor != null)
             fileSystemParams.AddParameter(EFileSystemParameter.AssetBundleDecryptor, assetBundleDecryptor);

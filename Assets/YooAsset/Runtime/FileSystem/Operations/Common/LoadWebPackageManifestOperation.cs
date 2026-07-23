@@ -59,6 +59,7 @@ namespace YooAsset
                 if (_downloadBytesRequest.Status == EDownloadRequestStatus.Succeeded)
                 {
                     _steps = ESteps.VerifyFileData;
+                    _options.DownloadUrlPolicy.OnRequestSucceeded(_downloadBytesRequest.Url);
                 }
                 else
                 {

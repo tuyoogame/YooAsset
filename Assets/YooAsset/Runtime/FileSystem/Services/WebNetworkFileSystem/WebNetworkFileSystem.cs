@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace YooAsset
 {
@@ -14,6 +15,11 @@ namespace YooAsset
         public IBundleCache BundleCache { get; private set; }
 
         /// <summary>
+        /// 下载调度器
+        /// </summary>
+        public DownloadSchedulerOperation DownloadScheduler { get; internal set; }
+
+        /// <summary>
         /// 下载后台接口
         /// </summary>
         public IDownloadBackend DownloadBackend { get; private set; }
@@ -22,6 +28,16 @@ namespace YooAsset
         /// 平台策略
         /// </summary>
         public IWebPlatformStrategy PlatformStrategy { get; private set; }
+
+        /// <summary>
+        /// 预下载策略
+        /// </summary>
+        public IWebPreloadStrategy PreloadStrategy { get; private set; }
+
+        /// <summary>
+        /// 预下载冲突协调器
+        /// </summary>
+        internal PreloadConflictController PreloadConflict { get; private set; }
 
         /// <inheritdoc />
         public string PackageName { get; private set; }
@@ -36,6 +52,16 @@ namespace YooAsset
         /// 自定义参数：禁用 Unity 内置网络缓存
         /// </summary>
         public bool DisableUnityWebCache { get; private set; } = false;
+
+        /// <summary>
+        /// 自定义参数：最大并发连接数
+        /// </summary>
+        public int DownloadMaxConcurrency { get; private set; } = 8;
+
+        /// <summary>
+        /// 自定义参数：每帧发起的最大请求数
+        /// </summary>
+        public int DownloadMaxRequestsPerFrame { get; private set; } = 8;
 
         /// <summary>
         /// 自定义参数：下载的资源包数据的校验级别
@@ -115,8 +141,13 @@ namespace YooAsset
         /// <inheritdoc />
         public virtual FSDownloadBundleOperation DownloadBundleAsync(FSDownloadBundleOptions options)
         {
-            var operation = new FSDownloadBundleCompleteOperation($"{nameof(WebNetworkFileSystem)} does not support download operation.");
-            return operation;
+            if (PreloadStrategy == null)
+            {
+                var operation = new FSDownloadBundleCompleteOperation($"{nameof(WebNetworkFileSystem)} does not support download operation.");
+                return operation;
+            }
+
+            return new WNFSDownloadBundleOperation(this, options);
         }
         /// <inheritdoc />
         public virtual FSClearCacheOperation ClearCacheAsync(FSClearCacheOptions options)
@@ -139,6 +170,28 @@ namespace YooAsset
             else if (paramName == nameof(EFileSystemParameter.DisableUnityWebCache))
             {
                 DisableUnityWebCache = FileSystemHelper.CastParameter<bool>(paramName, value);
+            }
+            else if (paramName == nameof(EFileSystemParameter.DownloadMaxConcurrency))
+            {
+                int convertValue = FileSystemHelper.CastParameter<int>(paramName, value);
+                if (convertValue > 32)
+                {
+                    YooLogger.LogWarning($"DOWNLOAD_MAX_CONCURRENCY value {convertValue} is too large, clamped to 32. Recommended range: 1 - 32.");
+                }
+
+                // 限制在合理范围内：1-32
+                DownloadMaxConcurrency = Mathf.Clamp(convertValue, 1, 32);
+            }
+            else if (paramName == nameof(EFileSystemParameter.DownloadMaxRequestPerFrame))
+            {
+                int convertValue = FileSystemHelper.CastParameter<int>(paramName, value);
+                if (convertValue > 32)
+                {
+                    YooLogger.LogWarning($"DOWNLOAD_MAX_REQUEST_PER_FRAME value {convertValue} is too large, clamped to 32. Recommended range: 1 - 32.");
+                }
+
+                // 限制在合理范围内：1-32
+                DownloadMaxRequestsPerFrame = Mathf.Clamp(convertValue, 1, 32);
             }
             else if (paramName == nameof(EFileSystemParameter.DownloadWatchdogTimeout))
             {
@@ -181,6 +234,10 @@ namespace YooAsset
             {
                 PlatformStrategy = FileSystemHelper.CastParameter<IWebPlatformStrategy>(paramName, value);
             }
+            else if (paramName == nameof(EFileSystemParameter.WebPreloadStrategy))
+            {
+                PreloadStrategy = FileSystemHelper.CastParameter<IWebPreloadStrategy>(paramName, value);
+            }
             else
             {
                 throw new ArgumentException($"Unrecognized parameter name: '{paramName}'.", nameof(paramName));
@@ -207,6 +264,10 @@ namespace YooAsset
             if (PlatformStrategy == null)
                 PlatformStrategy = new DefaultWebPlatformStrategy(WebRequestCreator);
 
+            // 创建预下载冲突协调器
+            // 注意：配置了预下载策略即启用加载/预下载冲突协调，未配置时门禁空转。
+            PreloadConflict = new PreloadConflictController(PreloadStrategy != null);
+
             // 创建文件缓存系统
             var cacheConfig = new WebNetworkBundleCache.Configuration(
                 disableUnityWebCache: DisableUnityWebCache,
@@ -230,11 +291,19 @@ namespace YooAsset
                 BundleCache = null;
             }
 
+            if (DownloadScheduler != null)
+            {
+                DownloadScheduler.AbortOperation();
+                DownloadScheduler = null;
+            }
+
             if (DownloadBackend != null)
             {
                 DownloadBackend.Dispose();
                 DownloadBackend = null;
             }
+
+            PreloadConflict = null;
         }
 
         /// <inheritdoc />
@@ -246,7 +315,11 @@ namespace YooAsset
         /// <inheritdoc />
         public virtual bool IsDownloadRequired(PackageBundle bundle)
         {
-            return false;
+            // 注意：未配置预下载策略时，文件系统不支持主动下载。
+            if (PreloadStrategy == null)
+                return false;
+
+            return IsBundleCached(bundle) == false;
         }
         /// <inheritdoc />
         public virtual bool IsUnpackRequired(PackageBundle bundle)
@@ -258,5 +331,15 @@ namespace YooAsset
         {
             return false;
         }
+
+        #region 内部方法
+        internal bool IsBundleCached(PackageBundle bundle)
+        {
+            // 注意：调用方必须保证已配置预下载策略。
+            var candidateUrls = RemoteService.GetRemoteUrls(bundle.GetFileName());
+            var args = new WebPreloadQueryArgs(bundle, candidateUrls);
+            return PreloadStrategy.IsBundleCached(args);
+        }
+        #endregion
     }
 }

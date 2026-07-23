@@ -12,6 +12,7 @@ namespace YooAsset
             CheckPlatform,
             CheckParameter,
             InitializeBundleCache,
+            CreateScheduler,
             Done,
         }
 
@@ -83,14 +84,32 @@ namespace YooAsset
 
                 if (_initializeBundleCacheOp.Status == EOperationStatus.Succeeded)
                 {
-                    _steps = ESteps.Done;
-                    SetResult();
+                    _steps = ESteps.CreateScheduler;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     SetError(_initializeBundleCacheOp.Error);
                 }
+            }
+
+            if (_steps == ESteps.CreateScheduler)
+            {
+                // 注意：下载调度中心在最后一步创建，防止初始化失败后残留任务。
+                // 注意：下载调度中心作为独立任务运行！
+                if (_fileSystem.DownloadScheduler == null)
+                {
+                    var schedulerConfig = new DownloadSchedulerOperation.Configuration(
+                        schedulerName: _fileSystem.GetType().Name,
+                        downloadBackend: _fileSystem.DownloadBackend,
+                        maxConcurrency: _fileSystem.DownloadMaxConcurrency,
+                        maxRequestsPerFrame: _fileSystem.DownloadMaxRequestsPerFrame);
+                    _fileSystem.DownloadScheduler = new DownloadSchedulerOperation(schedulerConfig);
+                    AsyncOperationSystem.StartOperation(_fileSystem.PackageName, _fileSystem.DownloadScheduler);
+                }
+
+                _steps = ESteps.Done;
+                SetResult();
             }
         }
     }

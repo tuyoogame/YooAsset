@@ -142,9 +142,14 @@ namespace YooAsset
         DownloadUrlPolicy,
 
         /// <summary>
-        /// WebGL 平台策略 <see cref="IWebPlatformStrategy"/>
+        /// Web 平台通用策略 <see cref="IWebPlatformStrategy"/>
         /// </summary>
         WebPlatformStrategy,
+
+        /// <summary>
+        /// Web 平台预下载策略 <see cref="IWebPreloadStrategy"/>
+        /// </summary>
+        WebPreloadStrategy,
 
         /// <summary>
         /// 内置资源包解包策略 <see cref="IBundleUnpackPolicy"/>

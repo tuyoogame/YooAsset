@@ -190,10 +190,6 @@ namespace YooAsset
         {
             OnUpdate();
         }
-        protected override void InternalAbort()
-        {
-            OnAbort();
-        }
         protected override void InternalWaitForCompletion()
         {
             OnWaitForAsyncComplete();
@@ -201,7 +197,6 @@ namespace YooAsset
 
         protected abstract void OnStart();
         protected abstract void OnUpdate();
-        protected abstract void OnAbort();
         protected virtual void OnWaitForAsyncComplete() { }
 
         protected new bool IsBusy

@@ -53,7 +53,7 @@ namespace YooAsset
                     if (_fileCache.Config.VirtualWebGLMode)
                     {
                         _steps = ESteps.Done;
-                        SetError("WebGL mode only supports async load method.");
+                        SetError("Virtual webgl mode only supports async load method.");
                     }
                     else
                     {

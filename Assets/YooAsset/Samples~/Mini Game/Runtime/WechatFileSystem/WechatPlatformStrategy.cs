@@ -7,7 +7,7 @@ using WeChatWASM;
 /// <summary>
 /// 微信小游戏平台实现
 /// </summary>
-internal class WechatPlatform : IWebPlatformStrategy
+internal class WechatPlatformStrategy : IWebPlatformStrategy
 {
     /// <inheritdoc/>
     public UnityWebRequest CreateAssetBundleRequest(WebAssetBundleRequestArgs args)

@@ -45,7 +45,7 @@ namespace YooAsset
     }
 
     /// <summary>
-    /// Web 平台策略接口
+    /// Web 平台通用策略接口
     /// </summary>
     internal interface IWebPlatformStrategy
     {

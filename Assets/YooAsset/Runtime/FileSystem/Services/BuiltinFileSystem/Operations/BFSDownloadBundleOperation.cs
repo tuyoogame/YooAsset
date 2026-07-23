@@ -93,15 +93,12 @@ namespace YooAsset
         {
             ExecuteBatch();
         }
-        protected override void InternalAbort()
+        protected override void InternalDispose()
         {
-            // 注意：取消下载任务的时候引用计数减一
-            if (_steps != ESteps.Done)
+            if (_downloadFileOp != null)
             {
-                if (_downloadFileOp != null)
-                {
-                    _downloadFileOp.Release();
-                }
+                _downloadFileOp.Release();
+                _downloadFileOp = null;
             }
         }
     }
