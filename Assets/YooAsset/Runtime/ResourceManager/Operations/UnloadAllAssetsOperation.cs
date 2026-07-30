@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace YooAsset
@@ -16,11 +15,14 @@ namespace YooAsset
             RequestForceDestroy,
             CheckLoading,
             DestroyAll,
+            WaitUnloadUnused,
             Done,
         }
 
         private readonly ResourceManager _resourceManager;
         private readonly UnloadAllAssetsOptions _options;
+        private AsyncOperation _unloadUnusedOp = null;
+        private bool _lockAcquired = false;
         private ESteps _steps = ESteps.None;
 
         internal UnloadAllAssetsOperation(ResourceManager resourceManager, UnloadAllAssetsOptions options)
@@ -43,7 +45,10 @@ namespace YooAsset
             {
                 // 设置锁定状态
                 if (_options.ShouldLockLoading)
-                    _resourceManager.IsLoadingLocked = true;
+                {
+                    _resourceManager.AcquireLoadingLock();
+                    _lockAcquired = true;
+                }
 
                 _steps = ESteps.ReleaseAll;
             }
@@ -74,6 +79,7 @@ namespace YooAsset
                 // 注意：等待所有任务完成
                 if (_resourceManager.AreAllProvidersDone() == false)
                     return;
+
                 _steps = ESteps.DestroyAll;
             }
 
@@ -84,13 +90,39 @@ namespace YooAsset
 
                 // 强制销毁文件加载器
                 _resourceManager.DestroyAllBundleLoaders();
-                _resourceManager.IsLoadingLocked = false;
 
                 // 注意：调用底层接口释放所有资源
-                Resources.UnloadUnusedAssets();
+                _unloadUnusedOp = Resources.UnloadUnusedAssets();
+                if (_options.ShouldWaitUnloadUnused == false)
+                {
+                    _steps = ESteps.Done;
+                    SetResult();
+                    return;
+                }
+
+                _steps = ESteps.WaitUnloadUnused;
+            }
+
+            if (_steps == ESteps.WaitUnloadUnused)
+            {
+                // 注意：等待底层资源卸载完毕
+                Progress = _unloadUnusedOp.progress;
+                if (_unloadUnusedOp.isDone == false)
+                    return;
 
                 _steps = ESteps.Done;
                 SetResult();
+            }
+        }
+        /// <inheritdoc />
+        protected override void InternalDispose()
+        {
+            // 注意：无论成功、失败还是被中止，都要解除加载锁定
+            // 说明：仅释放本操作持有的锁定，避免误释放其它操作的锁定
+            if (_lockAcquired)
+            {
+                _lockAcquired = false;
+                _resourceManager.ReleaseLoadingLock();
             }
         }
     }

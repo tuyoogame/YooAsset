@@ -119,7 +119,11 @@ namespace YooAsset
         /// <returns>返回销毁包裹操作对象</returns>
         public DestroyPackageOperation DestroyPackageAsync()
         {
-            var options = new UnloadAllAssetsOptions(true, true);
+            // 注意：销毁包裹前需要等待底层资源卸载完毕
+            var options = new UnloadAllAssetsOptions(
+                shouldReleaseHandles: true,
+                shouldLockLoading: true,
+                shouldWaitUnloadUnused: true);
             var operation = new DestroyPackageOperation(this, _resourceManager, options);
             AsyncOperationSystem.StartOperation(AsyncOperationSystem.GlobalSchedulerName, operation);
             return operation;
@@ -236,7 +240,9 @@ namespace YooAsset
         /// <returns>返回卸载资源操作对象</returns>
         public UnloadAllAssetsOperation UnloadAllAssetsAsync()
         {
-            var options = new UnloadAllAssetsOptions(true, true);
+            var options = new UnloadAllAssetsOptions(
+                shouldReleaseHandles: true,
+                shouldLockLoading: true);
             return UnloadAllAssetsAsync(options);
         }
 

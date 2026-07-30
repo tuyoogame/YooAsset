@@ -23,6 +23,7 @@ namespace YooAsset
         private FileSystemHost _fileSystemHost;
         private int _bundleLoadingMaxConcurrency;
         private int _bundleLoadingCounter;
+        private int _loadingLockCounter;
         private long _sceneInstanceCounter;
 
         /// <summary>
@@ -43,7 +44,10 @@ namespace YooAsset
         /// <summary>
         /// 加载操作是否被锁定
         /// </summary>
-        public bool IsLoadingLocked { get; set; } = false;
+        public bool IsLoadingLocked
+        {
+            get { return _loadingLockCounter > 0; }
+        }
 
 
         /// <summary>
@@ -565,6 +569,27 @@ namespace YooAsset
         internal bool IsBundleLoadingBusy()
         {
             return _bundleLoadingCounter >= _bundleLoadingMaxConcurrency;
+        }
+
+        /// <summary>
+        /// 增加加载锁定计数
+        /// </summary>
+        internal void AcquireLoadingLock()
+        {
+            _loadingLockCounter++;
+        }
+
+        /// <summary>
+        /// 减少加载锁定计数
+        /// </summary>
+        internal void ReleaseLoadingLock()
+        {
+            _loadingLockCounter--;
+            if (_loadingLockCounter < 0)
+            {
+                YooLogger.LogError("Loading lock counter became negative and was reset to zero.");
+                _loadingLockCounter = 0;
+            }
         }
 
         private LoadBundleOperation GetOrCreateBundleLoader(BundleInfo bundleInfo)

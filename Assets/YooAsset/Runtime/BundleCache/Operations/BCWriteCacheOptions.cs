@@ -21,7 +21,12 @@ namespace YooAsset
         /// </summary>
         public byte[] FileData { get; }
 
-        public BCWriteCacheOptions(PackageBundle bundle, string filePath, byte[] fileData = null)
+        public BCWriteCacheOptions(PackageBundle bundle, string filePath)
+            : this(bundle, filePath, null)
+        {
+        }
+
+        public BCWriteCacheOptions(PackageBundle bundle, string filePath, byte[] fileData)
         {
             Bundle = bundle;
             FilePath = filePath;
