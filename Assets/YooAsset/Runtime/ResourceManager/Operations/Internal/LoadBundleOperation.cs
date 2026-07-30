@@ -21,6 +21,7 @@ namespace YooAsset
         private readonly List<ProviderBase> _providers = new List<ProviderBase>(100);
         private readonly List<ProviderBase> _removeList = new List<ProviderBase>(100);
         private FSLoadPackageBundleOperation _loadPackageBundleOp;
+        private bool _loadingCounterIncremented = false;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
@@ -101,6 +102,7 @@ namespace YooAsset
                 {
                     // 统计计数增加
                     _resourceManager.IncrementBundleLoadingCounter();
+                    _loadingCounterIncremented = true;
                     _loadPackageBundleOp = LoadBundleInfo.CreateBundleLoader();
                     _loadPackageBundleOp.StartOperation();
                     AddChildOperation(_loadPackageBundleOp);
@@ -132,8 +134,15 @@ namespace YooAsset
                     _steps = ESteps.Done;
                     SetError(_loadPackageBundleOp.Error);
                 }
-
-                // 统计计数减少
+            }
+        }
+        protected override void InternalDispose()
+        {
+            // 注意：无论成功、失败还是被中止，都要减少统计计数
+            // 说明：仅归还本操作增加的计数，避免中止时计数失衡
+            if (_loadingCounterIncremented)
+            {
+                _loadingCounterIncremented = false;
                 _resourceManager.DecrementBundleLoadingCounter();
             }
         }
@@ -314,6 +323,5 @@ namespace YooAsset
                 _removeList.Clear();
             }
         }
-
     }
 }
