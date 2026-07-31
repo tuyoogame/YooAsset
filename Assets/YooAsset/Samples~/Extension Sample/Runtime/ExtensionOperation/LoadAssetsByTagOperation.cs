@@ -8,7 +8,7 @@ using YooAsset;
 /// 按资源标签加载一组资源对象
 /// </summary>
 /// <typeparam name="TObject">资源对象的 Unity 类型</typeparam>
-public class LoadAssetsByTagOperation<TObject> : AsyncOperationBase where TObject : UnityEngine.Object
+public class LoadAssetsByTagOperation<TObject> : CustomAsyncOperation where TObject : UnityEngine.Object
 {
     private enum ESteps
     {

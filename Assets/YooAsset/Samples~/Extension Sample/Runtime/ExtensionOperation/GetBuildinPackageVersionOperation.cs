@@ -7,7 +7,7 @@ using YooAsset;
 /// <summary>
 /// 获取包体里的内置资源清单版本
 /// </summary>
-public class GetBuildinPackageVersionOperation : AsyncOperationBase
+public class GetBuildinPackageVersionOperation : CustomAsyncOperation
 {
     private enum ESteps
     {

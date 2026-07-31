@@ -208,6 +208,19 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 将自定义异步操作提交到全局调度器
+        /// </summary>
+        /// <param name="operation">自定义异步操作</param>
+        public static void StartOperation(CustomAsyncOperation operation)
+        {
+            CheckInitialized();
+            if (operation == null)
+                throw new System.ArgumentNullException(nameof(operation));
+
+            AsyncOperationSystem.StartOperation(AsyncOperationSystem.GlobalSchedulerName, operation);
+        }
+
+        /// <summary>
         /// 设置异步系统参数，每帧执行消耗的最大时间切片。
         /// </summary>
         /// <param name="milliseconds">最大时间切片（单位：毫秒），不能为负数。</param>

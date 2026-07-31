@@ -22,7 +22,7 @@ public static class YooAssetsExtension
     public static LoadGameObjectOperation LoadGameObjectAsync(this ResourcePackage package, string location, Vector3 position, Quaternion rotation, Transform parent, bool destroyGoOnRelease = false)
     {
         var operation = new LoadGameObjectOperation(package.PackageName, location, position, rotation, parent, destroyGoOnRelease);
-        AsyncOperationSystem.StartOperation(AsyncOperationSystem.GlobalSchedulerName, operation);
+        package.StartOperation(operation);
         return operation;
     }
 }
@@ -30,7 +30,7 @@ public static class YooAssetsExtension
 /// <summary>
 /// 加载并实例化游戏对象的操作
 /// </summary>
-public class LoadGameObjectOperation : AsyncOperationBase
+public class LoadGameObjectOperation : CustomAsyncOperation
 {
     private enum ESteps
     {

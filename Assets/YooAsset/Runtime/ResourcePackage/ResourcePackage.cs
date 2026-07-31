@@ -200,6 +200,21 @@ namespace YooAsset
             return operation;
         }
 
+        /// <summary>
+        /// 将自定义异步操作提交到包裹的调度器
+        /// </summary>
+        /// <param name="operation">自定义异步操作</param>
+        /// <remarks>
+        /// 注意：操作会在包裹被移除的时候中止
+        /// </remarks>
+        public void StartOperation(CustomAsyncOperation operation)
+        {
+            if (operation == null)
+                throw new System.ArgumentNullException(nameof(operation));
+
+            AsyncOperationSystem.StartOperation(PackageName, operation);
+        }
+
 
         #region 包裹信息
         /// <summary>

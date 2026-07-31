@@ -30,7 +30,7 @@ namespace YooAsset
         /// <summary>
         /// 是否正处于同步等待状态
         /// </summary>
-        internal bool IsWaitForCompletion { get; private set; }
+        protected bool IsWaitForCompletion { get; private set; }
 
         /// <summary>
         /// 当前帧时间切片是否已用完

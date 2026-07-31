@@ -7,7 +7,7 @@ using YooAsset;
 /// <summary>
 /// 获取沙盒目录里缓存文件大小
 /// </summary>
-public class GetCacheBundleSizeOperation : AsyncOperationBase
+public class GetCacheBundleSizeOperation : CustomAsyncOperation
 {
     private enum ESteps
     {

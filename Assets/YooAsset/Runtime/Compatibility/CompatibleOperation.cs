@@ -179,7 +179,7 @@ namespace YooAsset
     /// <summary>
     /// v2.3 游戏异步操作基类（v3 已移除）
     /// </summary>
-    [Obsolete("GameAsyncOperation has been removed in v3. Use AsyncOperationBase directly.")]
+    [Obsolete("GameAsyncOperation has been removed in v3. Use CustomAsyncOperation instead.")]
     public abstract class GameAsyncOperation : AsyncOperationBase
     {
         protected override void InternalStart()

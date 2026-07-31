@@ -73,7 +73,7 @@ namespace YooAsset
         /// <summary>
         /// v2.3: YooAssets.StartOperation(GameAsyncOperation)
         /// </summary>
-        [Obsolete("GameAsyncOperation has been removed in v3.")]
+        [Obsolete("GameAsyncOperation has been removed in v3. Use StartOperation(CustomAsyncOperation) instead.")]
         public static void StartOperation(GameAsyncOperation operation)
         {
             AsyncOperationSystem.StartOperation(AsyncOperationSystem.GlobalSchedulerName, operation);
