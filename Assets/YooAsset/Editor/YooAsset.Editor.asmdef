@@ -15,6 +15,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.scriptablebuildpipeline",
+            "expression": "2.0.1",
+            "define": "SBP_2_0_1_OR_NEWER"
+        }
+    ],
     "noEngineReferences": false
 }
