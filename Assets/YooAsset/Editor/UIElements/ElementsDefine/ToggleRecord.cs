@@ -9,11 +9,16 @@ namespace YooAsset.Editor
     /// <summary>
     /// 录制开关
     /// </summary>
-    public class ToggleRecord : Toggle
+#if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+#endif
+    public partial class ToggleRecord : Toggle
     {
+#if !UNITY_6000_0_OR_NEWER
         public new class UxmlFactory : UxmlFactory<ToggleRecord, UxmlTraits>
         {
         }
+#endif
 
         private readonly VisualElement _checkbox;
 

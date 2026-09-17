@@ -9,11 +9,16 @@ namespace YooAsset.Editor
     /// <summary>
     /// 折叠开关
     /// </summary>
-    public class ToggleFoldout : Toggle
+#if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+#endif
+    public partial class ToggleFoldout : Toggle
     {
+#if !UNITY_6000_0_OR_NEWER
         public new class UxmlFactory : UxmlFactory<ToggleFoldout, UxmlTraits>
         {
         }
+#endif
 
         private readonly VisualElement _checkbox;
 

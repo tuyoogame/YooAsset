@@ -15,11 +15,16 @@ namespace YooAsset.Editor
     /// <remarks>
     /// Unity 2022 及以上版本推荐使用官方 MultiColumnListView 组件替代。
     /// </remarks>
-    public class TableViewer : VisualElement
+#if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+#endif
+    public partial class TableViewer : VisualElement
     {
+#if !UNITY_6000_0_OR_NEWER
         public new class UxmlFactory : UxmlFactory<TableViewer, UxmlTraits>
         {
         }
+#endif
 
         private readonly Toolbar _toolbar;
         private readonly ListView _listView;

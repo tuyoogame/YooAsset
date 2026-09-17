@@ -9,11 +9,16 @@ namespace YooAsset.Editor
     /// <summary>
     /// 可拖拽的水平尺寸调节手柄，用于控制目标元素宽度
     /// </summary>
-    public class ResizeHandle : VisualElement
+#if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+#endif
+    public partial class ResizeHandle : VisualElement
     {
+#if !UNITY_6000_0_OR_NEWER
         public new class UxmlFactory : UxmlFactory<ResizeHandle, UxmlTraits>
         {
         }
+#endif
 
         private bool _isResizing = false;
         private float _initialWidth;

@@ -11,11 +11,16 @@ namespace YooAsset.Editor
     /// <summary>
     /// 树形列表视图
     /// </summary>
-    public class TreeViewer : VisualElement
+#if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+#endif
+    public partial class TreeViewer : VisualElement
     {
+#if !UNITY_6000_0_OR_NEWER
         public new class UxmlFactory : UxmlFactory<TreeViewer, UxmlTraits>
         {
         }
+#endif
 
         private readonly ListView _listView;
         private readonly List<TreeNode> _flattenList = new List<TreeNode>(1000);

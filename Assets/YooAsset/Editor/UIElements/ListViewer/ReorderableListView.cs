@@ -13,11 +13,16 @@ namespace YooAsset.Editor
     /// <summary>
     /// 可排序列表视图，支持折叠、增删元素和自定义元素渲染
     /// </summary>
-    public class ReorderableListView : VisualElement
+#if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+#endif
+    public partial class ReorderableListView : VisualElement
     {
+#if !UNITY_6000_0_OR_NEWER
         public new class UxmlFactory : UxmlFactory<ReorderableListView, UxmlTraits>
         {
         }
+#endif
         
         /// <summary>
         /// 制作列表元素的委托
