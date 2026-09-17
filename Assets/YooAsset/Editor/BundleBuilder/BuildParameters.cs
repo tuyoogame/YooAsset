@@ -64,6 +64,11 @@ namespace YooAsset.Editor
         public bool UseAssetDependencyDB { get; set; } = false;
 
         /// <summary>
+        /// 是否检测资源路径中的 Unicode 格式控制字符
+        /// </summary>
+        public bool EnableAssetPathValidation { get; set; } = false;
+
+        /// <summary>
         /// 启用共享资源打包
         /// </summary>
         public bool EnableSharePackRule { get; set; } = false;

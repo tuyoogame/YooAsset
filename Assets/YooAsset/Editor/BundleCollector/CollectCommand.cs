@@ -73,6 +73,11 @@ namespace YooAsset.Editor
         public bool UseAssetDependencyDB { set; get; }
 
         /// <summary>
+        /// 是否检测资源路径中的 Unicode 格式控制字符
+        /// </summary>
+        public bool EnableAssetPathValidation { set; get; } = false;
+
+        /// <summary>
         /// 是否启用可寻址资源定位
         /// </summary>
         public bool EnableAddressable { set; get; }

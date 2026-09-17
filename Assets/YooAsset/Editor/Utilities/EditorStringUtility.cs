@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace YooAsset.Editor
 {
@@ -8,6 +9,32 @@ namespace YooAsset.Editor
     /// </summary>
     public static class EditorStringUtility
     {
+        /// <summary>
+        /// 检测格式控制字符
+        /// </summary>
+        /// <param name="value">待检测的字符串</param>
+        /// <returns>首个命中字符的转义文本</returns>
+        public static string GetFormatCharacterEscape(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return null;
+
+            for (int index = 0; index < value.Length;)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(value, index) == UnicodeCategory.Format)
+                {
+                    int codePoint = char.ConvertToUtf32(value, index);
+                    if (codePoint > 0xFFFF)
+                        return @"\U" + codePoint.ToString("X8", CultureInfo.InvariantCulture);
+                    else
+                        return @"\u" + codePoint.ToString("X4", CultureInfo.InvariantCulture);
+                }
+                index += char.IsSurrogatePair(value, index) ? 2 : 1;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// 移除字符串的第一个字符
         /// </summary>

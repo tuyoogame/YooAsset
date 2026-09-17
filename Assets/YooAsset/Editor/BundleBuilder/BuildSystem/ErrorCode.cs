@@ -96,6 +96,11 @@ namespace YooAsset.Editor
         PackAssetListIsEmpty = 202,
 
         /// <summary>
+        /// 资源路径包含 Unicode 格式控制字符
+        /// </summary>
+        AssetPathContainsFormatCharacter = 203,
+
+        /// <summary>
         /// 不支持多个原生资源打入同一资源包
         /// </summary>
         NotSupportMultipleRawAsset = 210,

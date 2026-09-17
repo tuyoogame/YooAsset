@@ -27,7 +27,8 @@ namespace YooAsset.Editor
 
             // 1. 获取所有收集器收集的资源
             bool useAssetDependencyDB = buildParameters.UseAssetDependencyDB;
-            var collectResult = BundleCollectorSettingData.Setting.BeginCollect(packageName, simulateBuild, useAssetDependencyDB);
+            bool enableAssetPathValidation = buildParameters.EnableAssetPathValidation;
+            var collectResult = BundleCollectorSettingData.Setting.BeginCollect(packageName, simulateBuild, useAssetDependencyDB, enableAssetPathValidation);
             List<CollectAssetInfo> allCollectAssets = collectResult.CollectAssets;
 
             // 2. 剔除未被引用的依赖项资源

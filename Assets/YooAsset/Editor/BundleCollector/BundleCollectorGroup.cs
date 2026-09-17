@@ -104,6 +104,34 @@ namespace YooAsset.Editor
                 }
             }
 
+            // 检测资源路径合法性
+            if (command.EnableAssetPathValidation)
+            {
+                var assetPathLookup = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var collectInfoPair in result)
+                {
+                    CollectAssetInfo collectAssetInfo = collectInfoPair.Value;
+                    assetPathLookup.Add(collectAssetInfo.AssetInfo.AssetPath);
+                    foreach (var dependAssetInfo in collectAssetInfo.DependAssets)
+                    {
+                        assetPathLookup.Add(dependAssetInfo.AssetPath);
+                    }
+                }
+
+                bool hasInvalidAssetPath = false;
+                foreach (string assetPath in assetPathLookup)
+                {
+                    if (CheckAssetPath(assetPath) == false)
+                        hasInvalidAssetPath = true;
+                }
+                if (hasInvalidAssetPath)
+                {
+                    string message = BuildLogger.GetErrorMessage(ErrorCode.AssetPathContainsFormatCharacter,
+                        "Asset paths contain Unicode format characters. Check the error logs in the Unity Console and rename the affected assets or containing folders before building.");
+                    throw new InvalidOperationException(message);
+                }
+            }
+
             // 检测可寻址地址是否重复
             if (command.EnableAddressable)
             {
@@ -130,6 +158,16 @@ namespace YooAsset.Editor
 
             // 返回列表
             return result.Values.ToList();
+        }
+
+        private bool CheckAssetPath(string assetPath)
+        {
+            string characterEscape = EditorStringUtility.GetFormatCharacterEscape(assetPath);
+            if (characterEscape == null)
+                return true;
+
+            BuildLogger.Error($"Asset path contains a Unicode format character ({characterEscape}): '{assetPath}'. Rename the asset or containing folder to remove format characters before building.");
+            return false;
         }
     }
 }

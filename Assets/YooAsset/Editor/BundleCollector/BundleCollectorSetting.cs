@@ -99,8 +99,9 @@ namespace YooAsset.Editor
         /// <param name="packageName">包裹名称</param>
         /// <param name="simulateBuild">是否模拟构建</param>
         /// <param name="useAssetDependencyDB">是否使用资源依赖数据库</param>
+        /// <param name="enableAssetPathValidation">是否检测资源路径中的 Unicode 格式控制字符</param>
         /// <returns>资源收集结果</returns>
-        public CollectResult BeginCollect(string packageName, bool simulateBuild, bool useAssetDependencyDB)
+        public CollectResult BeginCollect(string packageName, bool simulateBuild, bool useAssetDependencyDB, bool enableAssetPathValidation)
         {
             if (string.IsNullOrEmpty(packageName))
                 throw new ArgumentException("Build package name is null or empty.", nameof(packageName));
@@ -115,6 +116,7 @@ namespace YooAsset.Editor
             command.SetSimulateBuild(simulateBuild);
             command.UniqueBundleName = UniqueBundleName;
             command.UseAssetDependencyDB = useAssetDependencyDB;
+            command.EnableAssetPathValidation = enableAssetPathValidation;
             command.EnableAddressable = package.EnableAddressable;
             command.SupportExtensionless = package.SupportExtensionless;
             command.LocationToLower = package.LocationToLower;
