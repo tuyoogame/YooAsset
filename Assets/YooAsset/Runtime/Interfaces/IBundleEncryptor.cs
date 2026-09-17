@@ -9,7 +9,7 @@ namespace YooAsset
         /// <summary>
         /// 资源包名称
         /// </summary>
-        internal string BundleName { get; }
+        public string BundleName { get; }
 
         /// <summary>
         /// 待加密的源文件路径

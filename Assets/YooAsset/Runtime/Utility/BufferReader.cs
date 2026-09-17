@@ -87,6 +87,7 @@ namespace YooAsset
             _position += 2;
             return value;
         }
+
         /// <summary>
         /// 读取16位无符号整数
         /// </summary>
@@ -127,6 +128,7 @@ namespace YooAsset
             _position += 8;
             return (uint)i1 | ((long)i2 << 32);
         }
+
         /// <summary>
         /// 读取64位无符号整数
         /// </summary>
