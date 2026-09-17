@@ -9,4 +9,6 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("YooAsset.MiniGame")]
 [assembly: InternalsVisibleTo("YooAsset.Extension")]
 [assembly: InternalsVisibleTo("YooAsset.Extension.Editor")]
+[assembly: InternalsVisibleTo("YooAsset.Custom")]
+[assembly: InternalsVisibleTo("YooAsset.Custom.Editor")]
 [assembly: InternalsVisibleTo("Assembly-CSharp-Editor")]
