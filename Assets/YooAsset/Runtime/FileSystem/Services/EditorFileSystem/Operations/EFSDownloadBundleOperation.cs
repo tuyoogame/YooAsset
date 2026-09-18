@@ -18,6 +18,7 @@ namespace YooAsset
         private readonly EditorFileSystem _fileSystem;
         private readonly FSDownloadBundleOptions _options;
         private DownloadFileBaseOperation _downloadFileOp;
+        private bool _continueDownloadInBackground = false;
         private ESteps _steps = ESteps.None;
 
         internal EFSDownloadBundleOperation(EditorFileSystem fileSystem, FSDownloadBundleOptions options) : base(options.Bundle)
@@ -76,6 +77,9 @@ namespace YooAsset
                 {
                     if (_downloadFileOp is SimulateAndCacheFileOperation)
                     {
+                        // 注意：同步加载无法等待模拟下载时，允许下载任务在后台继续执行。
+                        _continueDownloadInBackground = true;
+
                         _steps = ESteps.Done;
                         SetError($"Attempting to load bundle '{Bundle.BundleName}' from simulate: '{_downloadFileOp.Url}'.");
                         return;
@@ -110,10 +114,14 @@ namespace YooAsset
         }
         protected override void InternalDispose()
         {
-            if (_downloadFileOp != null)
+            // 注意：同步加载失败后保留下载引用，使后台任务继续执行。
+            if (_continueDownloadInBackground == false)
             {
-                _downloadFileOp.Release();
-                _downloadFileOp = null;
+                if (_downloadFileOp != null)
+                {
+                    _downloadFileOp.Release();
+                    _downloadFileOp = null;
+                }
             }
         }
     }
