@@ -2,6 +2,52 @@
 
 All notable changes to this package will be documented in this file.
 
+## [3.0.6] - 2026-09-18
+
+### Added
+
+- 新增小游戏资源包预下载支持
+
+  `WebNetworkFileSystem` 支持通过 `EFileSystemParameter.WebPreloadStrategy` 配置 `IWebPreloadStrategy`，接入平台预下载和缓存查询能力，并支持下载并发数及每帧请求数限制。
+
+  微信小游戏示例新增 `WechatPreloadStrategy`，支持将资源包预下载到平台缓存；同一资源包的预下载与加载会进行冲突协调，优先处理等待中的加载请求。
+
+- 新增自定义异步操作基类 `CustomAsyncOperation`
+
+  支持通过 `YooAssets.StartOperation()` 或 `ResourcePackage.StartOperation()` 将自定义操作提交到全局或包裹调度器。
+
+- 新增等待引擎底层资源卸载选项
+
+  `UnloadAllAssetsOptions` 新增 `shouldWaitUnloadUnused` 构造参数，开启后等待 `Resources.UnloadUnusedAssets()` 完成并同步卸载进度。该选项默认关闭。
+
+- (#763) 新增自定义扩展友元程序集
+
+  运行时程序集向 `YooAsset.Custom` 和 `YooAsset.Custom.Editor` 开放内部成员访问，编辑器程序集向 `YooAsset.Custom.Editor` 开放内部成员访问，便于项目定制扩展。
+
+- (#762) 新增资源收集路径校验参数
+
+  新增构建参数 `BuildParameters.EnableAssetPathValidation` ，默认关闭。开启后会检查收集资源及其依赖资源的路径，发现格式控制字符时输出问题路径和字符编码并终止构建，便于定位不可见字符导致的路径问题。
+
+### Fixed
+
+- (#759) 修复 Unity 6.7 Alpha 下自定义 UXML 控件编译报错
+
+  针对旧版 `UxmlFactory` / `UxmlTraits` API 移除导致的编译问题，Unity 6 及以上版本改用 `UxmlElement` 注册自定义控件，旧版 Unity 保留原有实现。
+
+- (#767) 修复新版 Scriptable Build Pipeline 内置资源包构建任务兼容问题
+
+  SBP 2.0.1 及以上版本使用 `CreateBuiltInBundle`，旧版保留 `CreateBuiltInShadersBundle`。
+
+- (#766) 修复 Linux 平台文件系统目录大小写兼容问题
+
+  将相关 `internal` 目录及对应 `.meta` 文件统一命名为 `Internal`，保持目录命名一致。
+
+### Removed
+
+- 移除 `AsyncOperationBase.InternalAbort()` 中止回调
+
+  自定义操作的清理逻辑需迁移到 `InternalDispose()`，该方法在操作成功、失败或中止后统一执行。
+
 ## [3.0.5] - 2026-07-20
 
 本版本将多开客户端的缓存目录隔离方案由全局实例标识改为显式传入独立的 `packageRoot`。
