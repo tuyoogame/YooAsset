@@ -185,9 +185,17 @@ namespace YooAsset
                 }
                 catch (Exception ex)
                 {
-                    _error = ex.ToString();
-                    _status = EOperationStatus.Failed;
-                    YooLogger.LogError($"Exception in {GetType().Name}.InternalWaitForCompletion: {ex}.");
+                    // 注意：如果同步等待已经通知到了业务层，那么无需再设置失败状态。
+                    if (IsCompleted)
+                    {
+                        UnityEngine.Debug.LogException(ex);
+                    }
+                    else
+                    {
+                        _error = ex.ToString();
+                        _status = EOperationStatus.Failed;
+                        YooLogger.LogError($"Exception in {GetType().Name}.InternalWaitForCompletion: {ex}.");
+                    }
                 }
                 finally
                 {
