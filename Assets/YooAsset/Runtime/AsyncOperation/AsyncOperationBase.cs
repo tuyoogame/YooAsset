@@ -269,7 +269,16 @@ namespace YooAsset
         /// </summary>
         internal void AbortOperation()
         {
-            AbortChildren();
+            // 终止所有子任务
+            if (_children != null)
+            {
+                for (int i = _children.Count - 1; i >= 0; i--)
+                {
+                    var child = _children[i];
+                    if (child.IsCompleted == false)
+                        child.AbortOperation();
+                }
+            }
 
             if (IsDone == false)
             {
@@ -486,6 +495,9 @@ namespace YooAsset
         /// <summary>
         /// 完成异步任务（触发回调和Task完成）
         /// </summary>
+        /// <remarks>
+        /// TODO : 失败的任务不要终止子任务，避免一些共享任务被意外杀死。
+        /// </remarks>
         private void CompleteOperation()
         {
             if (IsCompleted == false)
@@ -495,12 +507,6 @@ namespace YooAsset
 
                 // 结束记录
                 DebugEndRecording();
-
-                // 注意：失败的父任务不应遗留仍在运行的子任务
-                if (_status == EOperationStatus.Failed)
-                {
-                    AbortChildren();
-                }
 
                 try
                 {
@@ -512,31 +518,6 @@ namespace YooAsset
                 }
 
                 InvokeCompletedCallbacks();
-            }
-        }
-
-        /// <summary>
-        /// 终止所有子任务
-        /// </summary>
-        private void AbortChildren()
-        {
-            if (_children == null)
-                return;
-
-            for (int i = _children.Count - 1; i >= 0; i--)
-            {
-                var child = _children[i];
-                if (child.IsCompleted)
-                    continue;
-
-                try
-                {
-                    child.AbortOperation();
-                }
-                catch (Exception ex)
-                {
-                    YooLogger.LogError($"Exception while aborting child operation '{child.GetType().Name}' from '{GetType().Name}': {ex}.");
-                }
             }
         }
 
