@@ -30,7 +30,7 @@ public class T3_TestCacheFileSystem : IPrebuildSetup, IPostBuildCleanup
     {
         // 清空旧的缓存目录
         string projectPath = Path.GetDirectoryName(Application.dataPath);
-        string cacheRoot = $"{projectPath}/yoo";
+        string cacheRoot = $"{projectPath}/Library/yoo";
         if (Directory.Exists(cacheRoot))
             Directory.Delete(cacheRoot, true);
 

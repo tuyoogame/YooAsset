@@ -65,6 +65,12 @@ public class T2_TestBuiltinFileSystem : IPrebuildSetup, IPostBuildCleanup
     [UnityTest]
     public IEnumerator A_InitializePackage()
     {
+        // 清空旧的缓存目录
+        string projectPath = Path.GetDirectoryName(Application.dataPath);
+        string cacheRoot = $"{projectPath}/Library/yoo";
+        if (Directory.Exists(cacheRoot))
+            Directory.Delete(cacheRoot, true);
+
         // 初始化 AssetBundlePackage
         {
             string packageRoot = string.Empty;
