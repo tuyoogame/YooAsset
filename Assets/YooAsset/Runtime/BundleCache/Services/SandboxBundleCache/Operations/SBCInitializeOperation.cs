@@ -46,7 +46,7 @@ namespace YooAsset
                 }
 
                 _searchCacheFilesOp.UpdateOperation();
-                Progress = _searchCacheFilesOp.Progress;
+                Progress = CalculateMultiStageProgress(0, 2, _searchCacheFilesOp.Progress);
                 if (_searchCacheFilesOp.IsDone == false)
                     return;
 
@@ -71,7 +71,7 @@ namespace YooAsset
                 }
 
                 _verifyCacheFilesOp.UpdateOperation();
-                Progress = _verifyCacheFilesOp.Progress;
+                Progress = CalculateMultiStageProgress(1, 2, _verifyCacheFilesOp.Progress);
                 if (_verifyCacheFilesOp.IsDone == false)
                     return;
 

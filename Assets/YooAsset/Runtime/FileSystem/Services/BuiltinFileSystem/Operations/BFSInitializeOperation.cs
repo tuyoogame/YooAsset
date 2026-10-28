@@ -129,7 +129,7 @@ namespace YooAsset
                 }
 
                 _initializeBuiltinBundleCacheOp.UpdateOperation();
-                Progress = _initializeBuiltinBundleCacheOp.Progress;
+                Progress = CalculateMultiStageProgress(0, 2, _initializeBuiltinBundleCacheOp.Progress);
                 if (_initializeBuiltinBundleCacheOp.IsDone == false)
                     return;
 
@@ -154,7 +154,7 @@ namespace YooAsset
                 }
 
                 _initializeUnpackBundleCacheOp.UpdateOperation();
-                Progress = _initializeUnpackBundleCacheOp.Progress;
+                Progress = CalculateMultiStageProgress(1, 2, _initializeUnpackBundleCacheOp.Progress);
                 if (_initializeUnpackBundleCacheOp.IsDone == false)
                     return;
 

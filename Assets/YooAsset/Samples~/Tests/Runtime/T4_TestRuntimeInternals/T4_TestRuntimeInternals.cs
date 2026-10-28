@@ -16,4 +16,11 @@ public class T4_TestRuntimeInternals
         var tester = new TestProviderFailureIsolation();
         tester.RuntimeTester();
     }
+
+    [Test]
+    public void A02_TestInitializationProgress()
+    {
+        var tester = new TestInitializationProgress();
+        tester.RuntimeTester();
+    }
 }

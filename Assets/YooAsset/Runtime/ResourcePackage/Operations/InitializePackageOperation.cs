@@ -123,6 +123,7 @@ namespace YooAsset
                 }
 
                 _initializeFileSystemOp.UpdateOperation();
+                Progress = _initializeFileSystemOp.Progress;
                 if (_initializeFileSystemOp.IsDone == false)
                     return;
 
