@@ -47,7 +47,6 @@ namespace YooAsset
             {
                 var cacheEntries = _fileCache.GetAllEntries();
                 EvictionResult clearResult = _policy.SelectEvictionTargets(cacheEntries, _options);
-
                 if (clearResult.Succeeded == false)
                 {
                     _steps = ESteps.Done;

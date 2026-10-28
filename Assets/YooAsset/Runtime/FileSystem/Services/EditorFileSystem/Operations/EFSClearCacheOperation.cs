@@ -55,6 +55,7 @@ namespace YooAsset
                 }
 
                 _clearCacheOp.UpdateOperation();
+                Progress = _clearCacheOp.Progress;
                 if (_clearCacheOp.IsDone == false)
                     return;
 

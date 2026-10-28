@@ -21,6 +21,7 @@ namespace YooAsset
         private readonly ClearCacheOptions _options;
         private List<IFileSystem> _cloneList;
         private FSClearCacheOperation _clearCacheFilesOp;
+        private int _fileSystemCount;
         private ESteps _steps = ESteps.None;
 
         internal ClearCacheOperation(FileSystemHost host, ClearCacheOptions options)
@@ -60,6 +61,7 @@ namespace YooAsset
                 }
 
                 _cloneList = fileSystems.ToList();
+                _fileSystemCount = _cloneList.Count;
                 _steps = ESteps.ClearCacheFiles;
             }
 
@@ -85,7 +87,10 @@ namespace YooAsset
             if (_steps == ESteps.CheckClearResult)
             {
                 _clearCacheFilesOp.UpdateOperation();
-                Progress = _clearCacheFilesOp.Progress;
+
+                int stageIndex = _fileSystemCount - _cloneList.Count - 1;
+                float progress = CalculateMultiStageProgress(stageIndex, _fileSystemCount, _clearCacheFilesOp.Progress);
+                Progress = System.Math.Max(Progress, progress);
                 if (_clearCacheFilesOp.IsDone == false)
                     return;
 

@@ -23,4 +23,11 @@ public class T4_TestRuntimeInternals
         var tester = new TestInitializationProgress();
         tester.RuntimeTester();
     }
+
+    [Test]
+    public void A03_TestClearCacheProgress()
+    {
+        var tester = new TestClearCacheProgress();
+        tester.RuntimeTester();
+    }
 }
