@@ -54,9 +54,11 @@ namespace YooAsset
             if (_steps == ESteps.CheckRequest)
             {
                 //TODO 部分小游戏平台的 downloadProgress 始终返回 0，导致进度条无法正确显示。
-                Progress = _downloadAssetBundleRequest.DownloadProgress;
                 if (_downloadAssetBundleRequest.IsDone == false)
+                {
+                    Progress = _downloadAssetBundleRequest.DownloadProgress;
                     return;
+                }
 
                 if (_downloadAssetBundleRequest.Status == EDownloadRequestStatus.Succeeded)
                 {
