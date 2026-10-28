@@ -98,8 +98,7 @@ namespace YooAsset
 
                 // 说明：各文件系统等权折算
                 int stageIndex = _fileSystemCount - _cloneList.Count - 1;
-                float progress = CalculateMultiStageProgress(stageIndex, _fileSystemCount, _initFileSystemOp.Progress);
-                Progress = System.Math.Max(Progress, progress);
+                Progress = CalculateMultiStageProgress(stageIndex, _fileSystemCount, _initFileSystemOp.Progress);
                 if (_initFileSystemOp.IsDone == false)
                     return;
 

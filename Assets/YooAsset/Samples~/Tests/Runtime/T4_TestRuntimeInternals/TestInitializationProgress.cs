@@ -4,7 +4,7 @@ using NUnit.Framework;
 using YooAsset;
 
 /// <summary>
-/// 在内存中驱动初始化操作，验证进度传递、阶段折算和单调性，不依赖资源构建或网络。
+/// 在内存中驱动初始化操作，验证进度传递、阶段折算和衔接，不依赖资源构建或网络。
 /// </summary>
 public class TestInitializationProgress
 {
@@ -67,7 +67,7 @@ public class TestInitializationProgress
                 children[i].Report(0.4f);
                 CheckProgress(operation, (i + 0.4f) / count, ref previous);
                 children[i].Report(0.2f);
-                CheckProgress(operation, (i + 0.4f) / count, ref previous);
+                CheckProgress(operation, (i + 0.2f) / count, ref previous, checkMonotonic: false);
                 children[i].Report(0.8f);
                 CheckProgress(operation, (i + 0.8f) / count, ref previous);
                 children[i].Succeed();
@@ -159,11 +159,12 @@ public class TestInitializationProgress
         }
     }
 
-    private static void CheckProgress(AsyncOperationBase operation, float expected, ref float previous)
+    private static void CheckProgress(AsyncOperationBase operation, float expected, ref float previous, bool checkMonotonic = true)
     {
         operation.UpdateOperation();
         Assert.That(operation.Progress, Is.InRange(0f, 1f));
-        Assert.GreaterOrEqual(operation.Progress, previous, operation.GetType().Name);
+        if (checkMonotonic)
+            Assert.GreaterOrEqual(operation.Progress, previous, operation.GetType().Name);
         Assert.AreEqual(expected, operation.Progress, 0.00001f, operation.Error);
         previous = operation.Progress;
     }

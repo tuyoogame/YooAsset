@@ -45,7 +45,7 @@ public class TestClearCacheProgress
             children[i].Report(0.6f);
             CheckProgress(operation, (i + 0.6f) / count, ref previous);
             children[i].Report(0.2f);
-            CheckProgress(operation, (i + 0.6f) / count, ref previous);
+            CheckProgress(operation, (i + 0.2f) / count, ref previous, checkMonotonic: false);
             children[i].Succeed();
             CheckProgress(operation, (i + 1f) / count, ref previous);
         }
@@ -127,11 +127,12 @@ public class TestClearCacheProgress
         return operation;
     }
 
-    private static void CheckProgress(AsyncOperationBase operation, float expected, ref float previous)
+    private static void CheckProgress(AsyncOperationBase operation, float expected, ref float previous, bool checkMonotonic = true)
     {
         operation.UpdateOperation();
         Assert.That(operation.Progress, Is.InRange(0f, 1f));
-        Assert.GreaterOrEqual(operation.Progress, previous);
+        if (checkMonotonic)
+            Assert.GreaterOrEqual(operation.Progress, previous);
         Assert.AreEqual(expected, operation.Progress, 0.00001f, operation.Error);
         previous = operation.Progress;
     }

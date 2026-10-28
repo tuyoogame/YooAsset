@@ -89,8 +89,7 @@ namespace YooAsset
                 _clearCacheFilesOp.UpdateOperation();
 
                 int stageIndex = _fileSystemCount - _cloneList.Count - 1;
-                float progress = CalculateMultiStageProgress(stageIndex, _fileSystemCount, _clearCacheFilesOp.Progress);
-                Progress = System.Math.Max(Progress, progress);
+                Progress = CalculateMultiStageProgress(stageIndex, _fileSystemCount, _clearCacheFilesOp.Progress);
                 if (_clearCacheFilesOp.IsDone == false)
                     return;
 
