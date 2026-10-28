@@ -24,7 +24,7 @@ public class TestBundleUnload
         ResourcePackage package = YooAssets.GetPackage(TestConsts.AssetBundlePackageName);
         Assert.IsNotNull(package);
 
-        string targetBundleName = "assets_samples_test_sample_testres4_enemy.bundle";
+        string targetBundleName = "assets_samples_tests_testres4_enemy.bundle";
 
         // 加载Enemy
         AssetHandle assetHandle;
