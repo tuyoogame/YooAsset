@@ -150,7 +150,8 @@ namespace YooAsset
                 foreach (var downloader in _downloaders)
                 {
                     downloader.UpdateOperation();
-                    downloadBytes += downloader.Report.DownloadedBytes;
+                    long downloadedBytes = downloader.GetDownloadedBytes();
+                    downloadBytes += downloadedBytes;
                     if (downloader.IsDone == false)
                         continue;
 
@@ -165,7 +166,7 @@ namespace YooAsset
                     // 下载成功
                     _removeList.Add(downloader);
                     _completedDownloadCount++;
-                    _completedDownloadBytes += downloader.Report.DownloadedBytes;
+                    _completedDownloadBytes += downloadedBytes;
                 }
 
                 // 移除已经完成的下载器（无论成功或失败）

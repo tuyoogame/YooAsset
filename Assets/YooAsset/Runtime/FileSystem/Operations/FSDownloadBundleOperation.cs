@@ -20,6 +20,18 @@ namespace YooAsset
         {
             Bundle = bundle;
         }
+
+        /// <summary>
+        /// 获取已下载的字节数
+        /// 注意：成功时按清单中的文件大小结算。
+        /// </summary>
+        public long GetDownloadedBytes()
+        {
+            if (Status == EOperationStatus.Succeeded)
+                return Bundle.FileSize;
+            else
+                return Report.DownloadedBytes;
+        }
     }
 
     /// <summary>
