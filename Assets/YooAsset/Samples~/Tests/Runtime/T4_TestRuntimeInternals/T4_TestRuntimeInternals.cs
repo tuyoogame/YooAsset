@@ -30,4 +30,11 @@ public class T4_TestRuntimeInternals
         var tester = new TestClearCacheProgress();
         tester.RuntimeTester();
     }
+
+    [Test]
+    public void A04_TestDestroyPackageProgress()
+    {
+        var tester = new TestDestroyPackageProgress();
+        tester.RuntimeTester();
+    }
 }

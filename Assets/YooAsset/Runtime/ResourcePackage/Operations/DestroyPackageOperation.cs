@@ -81,6 +81,7 @@ namespace YooAsset
                 }
 
                 _unloadAllAssetsOp.UpdateOperation();
+                Progress = _unloadAllAssetsOp.Progress;
                 if (_unloadAllAssetsOp.IsDone == false)
                     return;
 
