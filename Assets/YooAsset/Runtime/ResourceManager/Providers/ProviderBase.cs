@@ -91,6 +91,7 @@ namespace YooAsset
         private readonly LoadBundleOperation _mainBundleLoader;
         private readonly List<LoadBundleOperation> _bundleLoaders = new List<LoadBundleOperation>(10);
         private readonly HashSet<HandleBase> _handles = new HashSet<HandleBase>();
+        protected virtual int LoadingStageCount => 2;
 
         /// <summary>
         /// 创建资源提供者实例
@@ -171,9 +172,18 @@ namespace YooAsset
                 }
 
                 // 更新资源包加载器
+                float bundleProgress = 0f;
                 foreach (var bundleLoader in _bundleLoaders)
                 {
                     bundleLoader.UpdateOperation();
+                    bundleProgress += bundleLoader.Progress;
+                }
+
+                // 计算资源包加载进度
+                if (_bundleLoaders.Count > 0)
+                {
+                    float progress = CalculateMultiStageProgress(0, LoadingStageCount, bundleProgress / _bundleLoaders.Count);
+                    Progress = System.Math.Max(Progress, progress);
                 }
 
                 // 检测加载是否完成
@@ -328,6 +338,7 @@ namespace YooAsset
         {
             _steps = ESteps.Done;
             SetResult();
+            Progress = 1f;
             InvokeCompletion();
         }
 
@@ -339,6 +350,7 @@ namespace YooAsset
         {
             _steps = ESteps.Done;
             SetError(error);
+            Progress = 1f;
             InvokeCompletion();
         }
 

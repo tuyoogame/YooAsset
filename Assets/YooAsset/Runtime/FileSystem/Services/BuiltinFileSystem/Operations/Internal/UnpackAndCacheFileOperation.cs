@@ -63,6 +63,7 @@ namespace YooAsset
                     _copyBuiltinFileOp.WaitForCompletion();
 
                 _copyBuiltinFileOp.UpdateOperation();
+                Progress = CalculateMultiStageProgress(0, 2, _copyBuiltinFileOp.Progress);
                 if (_copyBuiltinFileOp.IsDone == false)
                     return;
 
@@ -99,6 +100,7 @@ namespace YooAsset
                     _writeCacheOp.WaitForCompletion();
 
                 _writeCacheOp.UpdateOperation();
+                Progress = CalculateMultiStageProgress(1, 2, _writeCacheOp.Progress);
                 if (_writeCacheOp.IsDone == false)
                     return;
 

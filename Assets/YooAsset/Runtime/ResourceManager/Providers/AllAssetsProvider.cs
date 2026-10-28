@@ -29,7 +29,7 @@ namespace YooAsset
                 _loadAllAssetsOp.WaitForCompletion();
 
             _loadAllAssetsOp.UpdateOperation();
-            Progress = _loadAllAssetsOp.Progress;
+            Progress = CalculateMultiStageProgress(1, LoadingStageCount, _loadAllAssetsOp.Progress);
             if (_loadAllAssetsOp.IsDone == false)
                 return;
 

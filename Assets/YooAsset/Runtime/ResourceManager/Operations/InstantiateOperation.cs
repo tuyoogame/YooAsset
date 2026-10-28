@@ -58,6 +58,7 @@ namespace YooAsset
                 if (IsWaitForCompletion)
                     _handle.WaitForAsyncComplete();
 
+                Progress = _handle.Progress;
                 if (_handle.IsDone == false)
                     return;
 

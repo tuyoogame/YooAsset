@@ -37,4 +37,11 @@ public class T4_TestRuntimeInternals
         var tester = new TestDestroyPackageProgress();
         tester.RuntimeTester();
     }
+
+    [Test]
+    public void A05_TestProviderLoadingProgress()
+    {
+        var tester = new TestProviderLoadingProgress();
+        tester.RuntimeTester();
+    }
 }

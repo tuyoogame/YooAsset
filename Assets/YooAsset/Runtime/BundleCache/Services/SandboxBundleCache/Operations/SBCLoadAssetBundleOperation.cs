@@ -77,6 +77,7 @@ namespace YooAsset
                     _loadLocalAssetBundleOp.WaitForCompletion();
 
                 _loadLocalAssetBundleOp.UpdateOperation();
+                Progress = _loadLocalAssetBundleOp.Progress;
                 if (_loadLocalAssetBundleOp.IsDone == false)
                     return;
 

@@ -6,6 +6,8 @@ namespace YooAsset
     /// </summary>
     internal sealed class BundleFileProvider : ProviderBase
     {
+        protected override int LoadingStageCount => 1;
+
         public BundleFileProvider(ResourceManager manager, string providerKey, AssetInfo assetInfo) : base(manager, providerKey, assetInfo)
         {
         }

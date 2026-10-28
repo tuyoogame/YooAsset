@@ -17,6 +17,7 @@ namespace YooAsset
         protected readonly EditorBundleCache _fileCache;
         protected readonly PackageBundle _bundle;
         private int _asyncSimulateFrame;
+        private int _totalSimulateFrame;
         private ESteps _steps = ESteps.None;
 
         protected EBCLoadBundleBaseOperation(EditorBundleCache fileCache, PackageBundle bundle)
@@ -28,6 +29,7 @@ namespace YooAsset
         {
             _steps = ESteps.CheckCache;
             _asyncSimulateFrame = GetAsyncSimulateFrame();
+            _totalSimulateFrame = _asyncSimulateFrame;
         }
         protected override void InternalUpdate()
         {
@@ -68,6 +70,10 @@ namespace YooAsset
                     {
                         _steps = ESteps.Done;
                         CreateBundleHandle();
+                    }
+                    else
+                    {
+                        Progress = 1f - _asyncSimulateFrame / (float)_totalSimulateFrame;
                     }
                 }
             }

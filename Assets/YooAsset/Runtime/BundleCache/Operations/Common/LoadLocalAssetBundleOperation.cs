@@ -104,6 +104,7 @@ namespace YooAsset
                     }
                     else
                     {
+                        Progress = _createRequest.progress;
                         if (_createRequest.isDone == false)
                             return;
                         _assetBundle = _createRequest.assetBundle;

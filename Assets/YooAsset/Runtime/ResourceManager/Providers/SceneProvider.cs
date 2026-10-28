@@ -37,7 +37,8 @@ namespace YooAsset
                 _loadSceneOp.AllowSceneActivation();
 
             _loadSceneOp.UpdateOperation();
-            Progress = _loadSceneOp.Progress;
+            if (_loadSceneOp.Progress > 0.5f)
+                Progress = _loadSceneOp.Progress;
             if (_loadSceneOp.IsDone == false)
                 return;
 

@@ -127,6 +127,7 @@ namespace YooAsset
                     _loadBundleOp.WaitForCompletion();
 
                 _loadBundleOp.UpdateOperation();
+                Progress = _loadBundleOp.Progress;
                 if (_loadBundleOp.IsDone == false)
                     return;
 
