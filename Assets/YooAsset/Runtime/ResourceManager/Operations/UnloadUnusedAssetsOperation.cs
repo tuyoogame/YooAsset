@@ -41,6 +41,7 @@ namespace YooAsset
                 {
                     _loopCounter--;
                     _resourceManager.DestroyUnusedBundle();
+                    Progress = 1f - _loopCounter / (float)_options.MaxLoopCount;
 
                     if (IsBusy)
                         break;
