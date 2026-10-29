@@ -95,7 +95,7 @@ internal sealed class WXFSClearUnusedBundleFilesAsync : FSClearCacheOperation
             if (_unusedFileTotalCount == 0)
                 Progress = 1.0f;
             else
-                Progress = 1.0f - (_unusedCacheFiles.Count / _unusedFileTotalCount);
+                Progress = 1.0f - ((float)_unusedCacheFiles.Count / _unusedFileTotalCount);
 
             if (_unusedCacheFiles.Count == 0)
             {

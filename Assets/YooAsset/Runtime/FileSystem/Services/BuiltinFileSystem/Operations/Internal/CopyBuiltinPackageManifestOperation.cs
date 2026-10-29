@@ -62,6 +62,7 @@ namespace YooAsset
                 }
 
                 _requestBuiltinPackageVersionOp.UpdateOperation();
+                Progress = CalculateMultiStageProgress(0, 3, _requestBuiltinPackageVersionOp.Progress);
                 if (_requestBuiltinPackageVersionOp.IsDone == false)
                     return;
 
@@ -90,6 +91,7 @@ namespace YooAsset
                 }
 
                 _copyBuiltinHashFileOp.UpdateOperation();
+                Progress = CalculateMultiStageProgress(1, 3, _copyBuiltinHashFileOp.Progress);
                 if (_copyBuiltinHashFileOp.IsDone == false)
                     return;
 
@@ -118,6 +120,7 @@ namespace YooAsset
                 }
 
                 _copyBuiltinManifestFileOp.UpdateOperation();
+                Progress = CalculateMultiStageProgress(2, 3, _copyBuiltinManifestFileOp.Progress);
                 if (_copyBuiltinManifestFileOp.IsDone == false)
                     return;
 

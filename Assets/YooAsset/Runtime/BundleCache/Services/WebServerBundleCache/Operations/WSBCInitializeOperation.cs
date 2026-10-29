@@ -49,6 +49,7 @@ namespace YooAsset
                 }
 
                 _loadBuiltinCatalogOp.UpdateOperation();
+                Progress = _loadBuiltinCatalogOp.Progress;
                 if (_loadBuiltinCatalogOp.IsDone == false)
                     return;
 

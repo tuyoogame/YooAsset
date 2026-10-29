@@ -78,6 +78,7 @@ namespace YooAsset
                 }
 
                 _downloadFileRequest.UpdateRequest();
+                Progress = _downloadFileRequest.DownloadProgress;
                 if (_downloadFileRequest.IsDone == false)
                     return;
 

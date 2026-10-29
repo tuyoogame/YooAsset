@@ -58,6 +58,7 @@ namespace YooAsset
                 }
 
                 _requestVersionOp.UpdateOperation();
+                Progress = _requestVersionOp.Progress;
                 if (_requestVersionOp.IsDone == false)
                     return;
 

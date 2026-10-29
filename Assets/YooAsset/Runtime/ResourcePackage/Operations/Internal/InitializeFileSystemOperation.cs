@@ -6,7 +6,7 @@ namespace YooAsset
     /// <summary>
     /// 初始化文件系统操作
     /// </summary>
-    public sealed class InitializeFileSystemOperation : AsyncOperationBase
+    internal sealed class InitializeFileSystemOperation : AsyncOperationBase
     {
         private enum ESteps
         {

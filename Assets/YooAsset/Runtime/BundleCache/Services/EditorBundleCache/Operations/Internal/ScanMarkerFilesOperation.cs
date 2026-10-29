@@ -17,8 +17,10 @@ namespace YooAsset
         }
 
         private readonly EditorBundleCache _fileCache;
-        private IEnumerator<string> _shardEnumerator = null;
-        private double _scanStartTime;
+        private IEnumerator<string> _bundleEnumerator;
+        private string[] _shardFolders;
+        private int _shardIndex;
+        private double _startTime;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
@@ -47,9 +49,9 @@ namespace YooAsset
             {
                 if (Directory.Exists(_fileCache.RootPath))
                 {
-                    var directories = Directory.EnumerateDirectories(_fileCache.RootPath);
-                    _shardEnumerator = directories.GetEnumerator();
-                    _scanStartTime = TimeUtility.RealtimeSinceStartup;
+                    _startTime = TimeUtility.RealtimeSinceStartup;
+                    _shardFolders = Directory.GetDirectories(_fileCache.RootPath);
+                    _shardIndex = 0;
                     _steps = ESteps.ScanFiles;
                 }
                 else
@@ -64,37 +66,34 @@ namespace YooAsset
                 if (ScanFiles())
                     return;
 
-                _shardEnumerator.Dispose();
-                _shardEnumerator = null;
-
                 _steps = ESteps.Done;
                 SetResult();
-                double costTime = TimeUtility.RealtimeSinceStartup - _scanStartTime;
+                double costTime = TimeUtility.RealtimeSinceStartup - _startTime;
                 YooLogger.Log($"Marker file scan completed in {costTime:f1} seconds. Found {Result.Count} marker files.");
             }
         }
         protected override void InternalDispose()
         {
-            if (_shardEnumerator != null)
+            if (_bundleEnumerator != null)
             {
-                _shardEnumerator.Dispose();
-                _shardEnumerator = null;
+                _bundleEnumerator.Dispose();
+                _bundleEnumerator = null;
             }
         }
 
         private bool ScanFiles()
         {
-            bool hasMore;
-            while (true)
+            while (_shardIndex < _shardFolders.Length)
             {
-                hasMore = _shardEnumerator.MoveNext();
-                if (hasMore == false)
-                    break;
-
-                string shardFolder = _shardEnumerator.Current;
-                var childDirectories = Directory.EnumerateDirectories(shardFolder);
-                foreach (string childDirectory in childDirectories)
+                if (_bundleEnumerator == null)
                 {
+                    string shardFolder = _shardFolders[_shardIndex];
+                    _bundleEnumerator = Directory.EnumerateDirectories(shardFolder).GetEnumerator();
+                }
+
+                if (_bundleEnumerator.MoveNext())
+                {
+                    string childDirectory = _bundleEnumerator.Current;
                     string bundleGuid = Path.GetFileName(childDirectory);
                     string markerFilePath = PathUtility.Combine(childDirectory, EditorBundleCacheConsts.MarkerFileName);
                     if (File.Exists(markerFilePath))
@@ -103,12 +102,19 @@ namespace YooAsset
                         Result.Add(fileInfo);
                     }
                 }
+                else
+                {
+                    _bundleEnumerator.Dispose();
+                    _bundleEnumerator = null;
+                    _shardIndex++;
+                    Progress = (float)_shardIndex / _shardFolders.Length;
+                }
 
                 if (IsBusy)
                     break;
             }
 
-            return hasMore;
+            return _shardIndex < _shardFolders.Length;
         }
     }
 }

@@ -41,6 +41,7 @@ namespace YooAsset
                 }
 
                 _loadEditorPackageVersionOp.UpdateOperation();
+                Progress = _loadEditorPackageVersionOp.Progress;
                 if (_loadEditorPackageVersionOp.IsDone == false)
                     return;
 

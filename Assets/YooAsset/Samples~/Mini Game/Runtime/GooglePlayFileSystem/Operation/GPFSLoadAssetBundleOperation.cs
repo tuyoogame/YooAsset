@@ -50,6 +50,7 @@ internal sealed class GPFSLoadPackageBundleOperation : FSLoadPackageBundleOperat
 
         if (_steps == ESteps.CheckResult)
         {
+            Progress = _bundleRequest.DownloadProgress;
             if (_bundleRequest.IsDone == false)
                 return;
 

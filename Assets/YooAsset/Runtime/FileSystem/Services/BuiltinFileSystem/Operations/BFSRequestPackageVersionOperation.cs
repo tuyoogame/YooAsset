@@ -41,6 +41,7 @@ namespace YooAsset
                 }
 
                 _requestBuiltinPackageVersionOp.UpdateOperation();
+                Progress = _requestBuiltinPackageVersionOp.Progress;
                 if (_requestBuiltinPackageVersionOp.IsDone == false)
                     return;
 

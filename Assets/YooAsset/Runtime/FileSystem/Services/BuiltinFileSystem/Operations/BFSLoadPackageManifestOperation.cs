@@ -45,6 +45,7 @@ namespace YooAsset
                 }
 
                 _requestBuiltinPackageHashOp.UpdateOperation();
+                Progress = CalculateMultiStageProgress(0, 2, _requestBuiltinPackageHashOp.Progress);
                 if (_requestBuiltinPackageHashOp.IsDone == false)
                     return;
 
@@ -70,7 +71,7 @@ namespace YooAsset
                 }
 
                 _loadBuiltinPackageManifestOp.UpdateOperation();
-                Progress = _loadBuiltinPackageManifestOp.Progress;
+                Progress = CalculateMultiStageProgress(1, 2, _loadBuiltinPackageManifestOp.Progress);
                 if (_loadBuiltinPackageManifestOp.IsDone == false)
                     return;
 
