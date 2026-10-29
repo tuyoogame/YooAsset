@@ -101,7 +101,6 @@ namespace YooAsset
                 {
                     var schedulerConfig = new DownloadSchedulerOperation.Configuration(
                         schedulerName: _fileSystem.GetType().Name,
-                        downloadBackend: _fileSystem.DownloadBackend,
                         maxConcurrency: _fileSystem.DownloadMaxConcurrency,
                         maxRequestsPerFrame: _fileSystem.DownloadMaxRequestsPerFrame);
                     _fileSystem.DownloadScheduler = new DownloadSchedulerOperation(schedulerConfig);

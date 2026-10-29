@@ -63,7 +63,7 @@ namespace YooAsset
             // 检测下载结果
             if (_steps == ESteps.CheckRequest)
             {
-                bool isDone = _downloadFileRequest.IsDone;
+                _downloadFileRequest.UpdateRequest();
                 if (_enableResume)
                 {
                     long downloadedBytes = _fileOriginLength + _downloadFileRequest.DownloadedBytes;
@@ -76,7 +76,7 @@ namespace YooAsset
                     LatestReport = DownloadReport.CreateProgress(_downloadFileRequest.DownloadedBytes, _downloadFileRequest.DownloadProgress);
                     Progress = _downloadFileRequest.DownloadProgress;
                 }
-                if (isDone == false)
+                if (_downloadFileRequest.IsDone == false)
                     return;
 
                 // 更新下载报告

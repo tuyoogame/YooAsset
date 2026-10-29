@@ -100,11 +100,9 @@ namespace YooAsset
                 // 说明：下载任务由 DownloadSchedulerOperation 统一驱动，此处仅读取状态。
                 // 说明：同步等待由 WaitForCompletion() 内部的 ExecuteBatch() 保证。
                 Report = _downloadFileOp.LatestReport;
+                Progress = _downloadFileOp.Progress;
                 if (_downloadFileOp.IsDone == false)
-                {
-                    Progress = _downloadFileOp.Progress;
                     return;
-                }
 
                 if (_downloadFileOp.Status == EOperationStatus.Succeeded)
                 {

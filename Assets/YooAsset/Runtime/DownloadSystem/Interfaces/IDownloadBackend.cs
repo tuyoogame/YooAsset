@@ -17,14 +17,6 @@ namespace YooAsset
         string Name { get; }
 
         /// <summary>
-        /// 驱动更新
-        /// </summary>
-        /// <remarks>
-        /// 部分第三方网络库需要在 Unity 主线程中周期性调用 Update 进行驱动
-        /// </remarks>
-        void Update();
-
-        /// <summary>
         /// 创建 HEAD 请求
         /// </summary>
         /// <remarks>

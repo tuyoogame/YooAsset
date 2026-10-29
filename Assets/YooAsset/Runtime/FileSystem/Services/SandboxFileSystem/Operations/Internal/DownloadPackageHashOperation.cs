@@ -77,6 +77,7 @@ namespace YooAsset
                     _downloadFileRequest.SendRequest();
                 }
 
+                _downloadFileRequest.UpdateRequest();
                 if (_downloadFileRequest.IsDone == false)
                     return;
 

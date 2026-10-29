@@ -81,6 +81,7 @@ namespace YooAsset
                     _downloadBytesRequest.SendRequest();
                 }
 
+                _downloadBytesRequest.UpdateRequest();
                 if (_downloadBytesRequest.IsDone == false)
                     return;
 

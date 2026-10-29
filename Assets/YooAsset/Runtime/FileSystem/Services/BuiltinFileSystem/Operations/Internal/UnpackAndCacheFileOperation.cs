@@ -64,11 +64,9 @@ namespace YooAsset
 
                 _copyBuiltinFileOp.UpdateOperation();
                 Progress = CalculateMultiStageProgress(0, 2, _copyBuiltinFileOp.Progress);
+                LatestReport = DownloadReport.CreateProgress(_copyBuiltinFileOp.CopiedBytes, _copyBuiltinFileOp.Progress);
                 if (_copyBuiltinFileOp.IsDone == false)
                     return;
-
-                // 更新下载报告
-                LatestReport = DownloadReport.CreateProgress(Bundle.FileSize, 1f);
 
                 if (_copyBuiltinFileOp.Status == EOperationStatus.Succeeded)
                 {

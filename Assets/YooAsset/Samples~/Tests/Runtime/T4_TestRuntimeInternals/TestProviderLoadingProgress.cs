@@ -428,6 +428,7 @@ public class TestProviderLoadingProgress
         public string SavePath => "";
         byte[] IDownloadBytesRequest.Result => null;
         public void SendRequest() { }
+        public void UpdateRequest() { }
         public void AbortRequest() { }
         public void Dispose() { }
     }

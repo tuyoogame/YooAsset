@@ -25,11 +25,6 @@ namespace YooAsset
             public string SchedulerName { get; }
 
             /// <summary>
-            /// 下载后端实现
-            /// </summary>
-            public IDownloadBackend DownloadBackend { get; }
-
-            /// <summary>
             /// 最大并发下载数量
             /// </summary>
             public int MaxConcurrency { get; }
@@ -46,13 +41,11 @@ namespace YooAsset
             /// 构造调度器配置
             /// </summary>
             /// <param name="schedulerName">调度器名称</param>
-            /// <param name="downloadBackend">下载后端实现</param>
             /// <param name="maxConcurrency">最大并发下载数量</param>
             /// <param name="maxRequestsPerFrame">每帧最多启动的请求数量</param>
-            public Configuration(string schedulerName, IDownloadBackend downloadBackend, int maxConcurrency, int maxRequestsPerFrame)
+            public Configuration(string schedulerName, int maxConcurrency, int maxRequestsPerFrame)
             {
                 SchedulerName = schedulerName;
-                DownloadBackend = downloadBackend;
                 MaxConcurrency = maxConcurrency;
                 MaxRequestsPerFrame = maxRequestsPerFrame;
             }
@@ -100,9 +93,6 @@ namespace YooAsset
         }
         protected override void InternalUpdate()
         {
-            // 驱动下载后台
-            _config.DownloadBackend.Update();
-
             // 快照遍历（避免在遍历中修改原列表）
             _updateSnapshot.Clear();
             _updateSnapshot.AddRange(_operationList);

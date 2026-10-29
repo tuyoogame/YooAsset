@@ -49,6 +49,7 @@ namespace YooAsset
             // 检测下载结果
             if (_steps == ESteps.CheckRequest)
             {
+                _downloadRequest.UpdateRequest();
                 LatestReport = DownloadReport.CreateProgress(_downloadRequest.DownloadedBytes, _downloadRequest.DownloadProgress);
                 Progress = _downloadRequest.DownloadProgress;
                 if (_downloadRequest.IsDone == false)

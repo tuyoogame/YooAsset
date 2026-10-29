@@ -13,9 +13,8 @@ namespace YooAsset
         string Url { get; }
 
         /// <summary>
-        /// 是否完成（成功/失败/中止）
+        /// 是否已完成（成功或失败）
         /// </summary>
-        // TODO: 该属性具有轮询驱动语义，每次访问会推进内部状态机。后续优化为无副作用的纯查询属性。
         bool IsDone { get; }
 
         /// <summary>
@@ -61,6 +60,11 @@ namespace YooAsset
         /// 发起请求
         /// </summary>
         void SendRequest();
+
+        /// <summary>
+        /// 更新请求
+        /// </summary>
+        void UpdateRequest();
 
         /// <summary>
         /// 中止请求

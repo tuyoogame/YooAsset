@@ -11,6 +11,8 @@ namespace YooAsset
     /// </remarks>
     internal sealed class SimulatedFileRequest : IDownloadFileRequest
     {
+        private bool _isDisposed;
+
         /// <summary>
         /// 模拟下载参数
         /// </summary>
@@ -38,52 +40,38 @@ namespace YooAsset
         }
 
         #region 接口实现
-        /// <summary>
-        /// 请求地址
-        /// </summary>
+        /// <inheritdoc />
         public string Url { get; }
 
-        /// <summary>
-        /// 是否完成
-        /// </summary>
+        /// <inheritdoc />
         public bool IsDone
         {
             get
             {
-                PollRequest();
                 return Status == EDownloadRequestStatus.Succeeded
                     || Status == EDownloadRequestStatus.Failed;
             }
         }
 
-        /// <summary>
-        /// 请求状态
-        /// </summary>
+        /// <inheritdoc />
         public EDownloadRequestStatus Status { get; private set; }
 
-        /// <summary>
-        /// 当前下载进度（0f - 1f）
-        /// </summary>
+        /// <inheritdoc />
         public float DownloadProgress { get; private set; }
 
-        /// <summary>
-        /// 当前请求已接收的字节数
-        /// </summary>
+        /// <inheritdoc />
         public long DownloadedBytes { get; private set; }
 
-        /// <summary>
-        /// HTTP 返回码（模拟固定返回 200）
-        /// </summary>
+        /// <inheritdoc />
+        /// <remarks>
+        /// 模拟请求成功后返回 200，其他情况下返回 0。
+        /// </remarks>
         public long HttpCode { get; private set; }
 
-        /// <summary>
-        /// HTTP 错误信息
-        /// </summary>
+        /// <inheritdoc />
         public string HttpError { get; private set; }
 
-        /// <summary>
-        /// 错误信息
-        /// </summary>
+        /// <inheritdoc />
         public string Error { get; private set; }
         #endregion
 
@@ -98,41 +86,32 @@ namespace YooAsset
             Status = EDownloadRequestStatus.None;
         }
 
-        /// <summary>
-        /// 发起请求
-        /// </summary>
+        /// <inheritdoc />
         public void SendRequest()
         {
+            if (_isDisposed)
+                return;
+
             if (Status == EDownloadRequestStatus.None)
             {
+                if (_args.DownloadSpeed <= 0)
+                {
+                    Status = EDownloadRequestStatus.Failed;
+                    Error = $"[{GetType().Name}] Download speed must be greater than zero.";
+                    return;
+                }
+
                 Status = EDownloadRequestStatus.Running;
                 _lastUpdateTime = TimeUtility.RealtimeSinceStartup;
             }
         }
 
-        /// <summary>
-        /// 中止请求
-        /// </summary>
-        public void AbortRequest()
+        /// <inheritdoc />
+        public void UpdateRequest()
         {
-            if (Status == EDownloadRequestStatus.None || Status == EDownloadRequestStatus.Running)
-            {
-                Status = EDownloadRequestStatus.Failed;
-            }
-        }
+            if (_isDisposed)
+                return;
 
-        /// <summary>
-        /// 释放资源
-        /// </summary>
-        public void Dispose()
-        {
-        }
-
-        /// <summary>
-        /// 更新网络请求
-        /// </summary>
-        private void PollRequest()
-        {
             if (Status != EDownloadRequestStatus.Running)
                 return;
 
@@ -155,6 +134,25 @@ namespace YooAsset
                 DownloadedBytes = _args.FileSize;
                 Status = EDownloadRequestStatus.Succeeded;
             }
+        }
+
+        /// <inheritdoc />
+        public void AbortRequest()
+        {
+            if (_isDisposed)
+                return;
+
+            if (Status == EDownloadRequestStatus.None || Status == EDownloadRequestStatus.Running)
+            {
+                Status = EDownloadRequestStatus.Failed;
+                Error = $"[{GetType().Name}] Request canceled. URL: '{Url}'.";
+            }
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _isDisposed = true;
         }
     }
 }

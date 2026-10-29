@@ -24,6 +24,11 @@ namespace YooAsset
         private IDownloadFileRequest _downloadFileRequest;
         private ESteps _steps = ESteps.None;
 
+        /// <summary>
+        /// 实际已拷贝的字节数
+        /// </summary>
+        public long CopiedBytes;
+
         internal CopyBuiltinFileOperation(BuiltinFileSystem fileSystem, string sourceFilePath, string destFilePath)
         {
             _fileSystem = fileSystem;
@@ -64,6 +69,7 @@ namespace YooAsset
                     {
                         FileUtility.EnsureParentDirectoryExists(_destFilePath);
                         File.Copy(_sourceFilePath, _destFilePath, true);
+                        CopiedBytes = new FileInfo(_destFilePath).Length;
                         _steps = ESteps.Done;
                         SetResult();
                     }
@@ -90,6 +96,7 @@ namespace YooAsset
                     FileUtility.EnsureParentDirectoryExists(_destFilePath);
                     byte[] data = _fileSystem.BuiltinFileAccessor.ReadAllBytes(_sourceFilePath);
                     File.WriteAllBytes(_destFilePath, data);
+                    CopiedBytes = data.LongLength;
                     _steps = ESteps.Done;
                     SetResult();
                 }
@@ -116,6 +123,8 @@ namespace YooAsset
                     _downloadFileRequest.SendRequest();
                 }
 
+                _downloadFileRequest.UpdateRequest();
+                CopiedBytes = _downloadFileRequest.DownloadedBytes;
                 Progress = _downloadFileRequest.DownloadProgress;
                 if (_downloadFileRequest.IsDone == false)
                     return;

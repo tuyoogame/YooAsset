@@ -44,16 +44,6 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 驱动更新
-        /// </summary>
-        /// <remarks>
-        /// UnityWebRequest 由 Unity 引擎自动驱动，无需额外更新。
-        /// </remarks>
-        public void Update()
-        {
-        }
-
-        /// <summary>
         /// 释放资源
         /// </summary>
         public void Dispose()

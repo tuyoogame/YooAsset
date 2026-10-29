@@ -13,6 +13,8 @@ namespace YooAsset
     /// </remarks>
     internal abstract class UnityWebRequestBase : IDownloadRequest
     {
+        private bool _isDisposed;
+
         /// <summary>
         /// 自定义 UnityWebRequest 创建器
         /// </summary>
@@ -47,56 +49,35 @@ namespace YooAsset
         private double _lastDataReceivedTime;
 
         #region 接口实现
-        /// <summary>
-        /// 请求地址
-        /// </summary>
+        /// <inheritdoc />
         public string Url { get; }
 
-        /// <summary>
-        /// 是否已完成
-        /// </summary>
-        // TODO: 该属性具有轮询驱动语义，每次访问会推进内部状态机。后续优化为无副作用的纯查询属性。
+        /// <inheritdoc />
         public bool IsDone
         {
             get
             {
-                PollRequest();
                 return Status == EDownloadRequestStatus.Succeeded
                     || Status == EDownloadRequestStatus.Failed;
             }
         }
 
-        /// <summary>
-        /// 请求状态
-        /// </summary>
+        /// <inheritdoc />
         public EDownloadRequestStatus Status { get; protected set; }
 
-        /// <summary>
-        /// 当前下载进度（0f - 1f）
-        /// </summary>
+        /// <inheritdoc />
         public float DownloadProgress { get; private set; }
 
-        /// <summary>
-        /// 当前请求已接收的字节数
-        /// </summary>
+        /// <inheritdoc />
         public long DownloadedBytes { get; private set; }
 
-        /// <summary>
-        /// HTTP 返回码
-        /// </summary>
+        /// <inheritdoc />
         public long HttpCode { get; private set; }
 
-        /// <summary>
-        /// HTTP 错误信息
-        /// </summary>
+        /// <inheritdoc />
         public string HttpError { get; private set; }
 
-        /// <summary>
-        /// 请求失败时的错误信息
-        /// </summary>
-        /// <remarks>
-        /// 仅在请求失败时有意义；成功或尚未完成时通常为空。
-        /// </remarks>
+        /// <inheritdoc />
         public string Error { get; protected set; }
         #endregion
 
@@ -113,15 +94,12 @@ namespace YooAsset
             Status = EDownloadRequestStatus.None;
         }
 
-        /// <summary>
-        /// 发起请求
-        /// </summary>
-        /// <remarks>
-        /// <para>仅在 Status 为 None 时生效，重复调用无效。</para>
-        /// <para>调用后 Status 变为 Running</para>
-        /// </remarks>
+        /// <inheritdoc />
         public void SendRequest()
         {
+            if (_isDisposed)
+                return;
+
             if (Status == EDownloadRequestStatus.None)
             {
                 Status = EDownloadRequestStatus.Running;
@@ -150,15 +128,57 @@ namespace YooAsset
                 }
             }
         }
+        
+        /// <inheritdoc />
+        public void UpdateRequest()
+        {
+            if (_isDisposed)
+                return;
 
-        /// <summary>
-        /// 中止请求
-        /// </summary>
-        /// <remarks>
-        /// 可在任意状态调用，仅当 Status 为 None 或 Running 时生效。
-        /// </remarks>
+            if (Status != EDownloadRequestStatus.Running && Status != EDownloadRequestStatus.Aborting)
+                return;
+
+            DownloadProgress = _webRequest.downloadProgress;
+            DownloadedBytes = (long)_webRequest.downloadedBytes;
+
+            UpdateWatchdog();
+            if (_webRequest.isDone == false)
+                return;
+
+            HttpCode = _webRequest.responseCode;
+            HttpError = _webRequest.error;
+
+#if UNITY_2020_3_OR_NEWER
+            bool isSuccess = _webRequest.result == UnityWebRequest.Result.Success;
+#else
+            bool isSuccess = !_webRequest.isNetworkError && !_webRequest.isHttpError;
+#endif
+
+            // 注意：Aborting 状态下也可能进入此分支。
+            // 当看门狗触发 Abort 时，如果请求恰好已在引擎内部完成，isDone 和 isSuccess 均为 true。
+            // 此时数据已完整下载，标记为 Succeeded 在语义上是合理的（Unity 文档：已完成的请求 Abort 无效）。
+            if (isSuccess)
+            {
+                Status = EDownloadRequestStatus.Succeeded;
+                OnRequestSucceeded(_webRequest);
+            }
+            else
+            {
+                Status = EDownloadRequestStatus.Failed;
+                Error = $"[{GetType().Name}] Request failed. URL: '{Url}', HttpCode={HttpCode}, HttpError={HttpError}.";
+                OnRequestFailed(_webRequest);
+            }
+
+            // 完成后释放
+            CleanupWebRequest();
+        }
+
+        /// <inheritdoc />
         public void AbortRequest()
         {
+            if (_isDisposed)
+                return;
+
             if (Status == EDownloadRequestStatus.None)
             {
                 Status = EDownloadRequestStatus.Failed;
@@ -174,11 +194,13 @@ namespace YooAsset
             }
         }
 
-        /// <summary>
-        /// 释放资源
-        /// </summary>
+        /// <inheritdoc />
         public void Dispose()
         {
+            if (_isDisposed)
+                return;
+
+            _isDisposed = true;
             CleanupWebRequest();
         }
 
@@ -232,49 +254,6 @@ namespace YooAsset
             return new UnityWebRequest(requestUrl, UnityWebRequest.kHttpVerbHEAD);
         }
 
-
-        /// <summary>
-        /// 更新网络请求
-        /// </summary>
-        private void PollRequest()
-        {
-            if (Status != EDownloadRequestStatus.Running && Status != EDownloadRequestStatus.Aborting)
-                return;
-
-            DownloadProgress = _webRequest.downloadProgress;
-            DownloadedBytes = (long)_webRequest.downloadedBytes;
-
-            UpdateWatchdog();
-            if (_webRequest.isDone == false)
-                return;
-
-            HttpCode = _webRequest.responseCode;
-            HttpError = _webRequest.error;
-
-#if UNITY_2020_3_OR_NEWER
-            bool isSuccess = _webRequest.result == UnityWebRequest.Result.Success;
-#else
-            bool isSuccess = !_webRequest.isNetworkError && !_webRequest.isHttpError;
-#endif
-
-            // 注意：Aborting 状态下也可能进入此分支。
-            // 当看门狗触发 Abort 时，如果请求恰好已在引擎内部完成，isDone 和 isSuccess 均为 true。
-            // 此时数据已完整下载，标记为 Succeeded 在语义上是合理的（Unity 文档：已完成的请求 Abort 无效）。
-            if (isSuccess)
-            {
-                Status = EDownloadRequestStatus.Succeeded;
-                OnRequestSucceeded(_webRequest);
-            }
-            else
-            {
-                Status = EDownloadRequestStatus.Failed;
-                Error = $"[{GetType().Name}] Request failed. URL: '{Url}', HttpCode={HttpCode}, HttpError={HttpError}.";
-                OnRequestFailed(_webRequest);
-            }
-
-            // 完成后释放
-            CleanupWebRequest();
-        }
 
         /// <summary>
         /// 更新看门狗机制
