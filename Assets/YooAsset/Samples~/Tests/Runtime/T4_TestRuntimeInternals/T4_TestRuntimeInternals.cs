@@ -56,4 +56,16 @@ public class T4_TestRuntimeInternals
     {
         new TestDownloadRequestUpdates().LocalUnityRequestTester();
     }
+
+    [Test]
+    public void A08_TestVerifyCacheFilesTask()
+    {
+        new TestVerifyCacheFilesTask().RuntimeTester();
+    }
+
+    [Test]
+    public void A09_TestVerifyCacheFilesOperation()
+    {
+        new TestVerifyCacheFilesOperation().RuntimeTester();
+    }
 }

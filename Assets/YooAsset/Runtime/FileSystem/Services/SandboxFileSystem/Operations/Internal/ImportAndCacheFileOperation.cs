@@ -54,6 +54,7 @@ namespace YooAsset
                 try
                 {
                     File.Copy(_sourceFilePath, _tempFilePath, true);
+                    Progress = CalculateMultiStageProgress(0, 2, 1f);
 
                     // 更新下载报告
                     LatestReport = DownloadReport.CreateProgress(Bundle.FileSize, 1f);
@@ -89,6 +90,7 @@ namespace YooAsset
                     _bundleCacheOp.WaitForCompletion();
 
                 _bundleCacheOp.UpdateOperation();
+                Progress = CalculateMultiStageProgress(1, 2, _bundleCacheOp.Progress);
                 if (_bundleCacheOp.IsDone == false)
                     return;
 

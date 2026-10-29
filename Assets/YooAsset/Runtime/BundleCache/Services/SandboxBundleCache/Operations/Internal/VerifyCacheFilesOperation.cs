@@ -1,33 +1,34 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading;
 
 namespace YooAsset
 {
     /// <summary>
-    /// 缓存文件验证（线程版），验证缓存目录中的文件。
+    /// 缓存文件验证操作
     /// </summary>
+    /// <remarks>
+    /// 后台任务负责文件校验，成功后由主线程分帧登记缓存和清理无效文件。
+    /// </remarks>
     internal sealed class VerifyCacheFilesOperation : AsyncOperationBase
     {
         private enum ESteps
         {
             None,
-            InitVerify,
+            StartVerify,
             UpdateVerify,
+            ProcessResults,
             Done,
         }
 
         private readonly SandboxBundleCache _fileCache;
         private readonly EFileVerifyLevel _verifyLevel;
-        private readonly int _fileVerifyMaxConcurrency;
-        private readonly List<SearchFileInfo> _pendingVerifyList;
-        private List<SearchFileInfo> _activeVerifyList;
-        private int _maxConcurrentVerifyCount;
-        private int _verifyTotalCount;
+        private readonly int _verifyMaxConcurrency;
+        private readonly List<SearchFileInfo> _elements;
+
+        private VerifyCacheFilesTask _verifyTask;
+        private SearchFileInfo[] _verifyFiles;
         private double _verifyStartTime;
-        private int _successCount;
-        private int _failedCount;
+        private int _processIndex;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
@@ -35,146 +36,97 @@ namespace YooAsset
         /// </summary>
         /// <param name="fileCache">沙盒文件缓存系统</param>
         /// <param name="verifyLevel">文件校验等级</param>
-        /// <param name="fileVerifyMaxConcurrency">文件校验最大并发数</param>
+        /// <param name="verifyMaxConcurrency">文件校验最大并发数</param>
         /// <param name="elements">待验证的搜索文件信息列表</param>
-        internal VerifyCacheFilesOperation(SandboxBundleCache fileCache, EFileVerifyLevel verifyLevel, int fileVerifyMaxConcurrency, List<SearchFileInfo> elements)
+        internal VerifyCacheFilesOperation(SandboxBundleCache fileCache, EFileVerifyLevel verifyLevel, int verifyMaxConcurrency, List<SearchFileInfo> elements)
         {
             _fileCache = fileCache;
             _verifyLevel = verifyLevel;
-            _fileVerifyMaxConcurrency = fileVerifyMaxConcurrency;
-            _pendingVerifyList = elements;
+            _verifyMaxConcurrency = verifyMaxConcurrency;
+            _elements = elements;
         }
         protected override void InternalStart()
         {
-            _steps = ESteps.InitVerify;
+            _steps = ESteps.StartVerify;
         }
         protected override void InternalUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.InitVerify)
+            if (_steps == ESteps.StartVerify)
             {
-                // 设置同时验证的最大数
+                // 计算同时验证的最大数
                 int processorCount = Environment.ProcessorCount * 2 + 1;
-                _maxConcurrentVerifyCount = Math.Min(processorCount, _fileVerifyMaxConcurrency);
-                if (_maxConcurrentVerifyCount < 1)
-                    _maxConcurrentVerifyCount = 1;
+                int maxConcurrency = Math.Min(processorCount, _verifyMaxConcurrency);
+                maxConcurrency = Math.Max(maxConcurrency, 1);
+                YooLogger.Log($"Maximum verify concurrency is {maxConcurrency}.");
 
-                YooLogger.Log($"Maximum verify concurrency is {_maxConcurrentVerifyCount}.");
-                _activeVerifyList = new List<SearchFileInfo>(_maxConcurrentVerifyCount);
                 _verifyStartTime = TimeUtility.RealtimeSinceStartup;
-                _verifyTotalCount = _pendingVerifyList.Count;
+                _verifyFiles = _elements.ToArray();
+                _verifyTask = new VerifyCacheFilesTask(_verifyLevel, maxConcurrency, _verifyFiles);
+                _verifyTask.Start();
                 _steps = ESteps.UpdateVerify;
             }
 
             if (_steps == ESteps.UpdateVerify)
             {
-                // 检测校验结果
-                for (int i = _activeVerifyList.Count - 1; i >= 0; i--)
-                {
-                    var verifyElement = _activeVerifyList[i];
-                    int resultCode = verifyElement.VerifyResultCode; //注意: 一次命令取值
-                    if (resultCode != 0)
-                    {
-                        _activeVerifyList.RemoveAt(i);
-                        if (resultCode == (int)EFileVerifyResult.Succeed)
-                        {
-                            _successCount++;
-                            var cacheEntry = new SandboxBundleCacheEntry(verifyElement.BundleGuid, verifyElement.InfoFilePath, verifyElement.DataFilePath);
-                            _fileCache.AddEntry(verifyElement.BundleGuid, cacheEntry);
-                        }
-                        else
-                        {
-                            _failedCount++;
-                            YooLogger.LogWarning($"File verification failed (code: {resultCode}). Deleting files: '{verifyElement.FolderPath}'.");
-                            verifyElement.DeleteCacheFolder();
-                        }
-                    }
-                }
+                int progressTotal = _verifyTask.TotalCount;
+                int progressRemain = _verifyTask.TotalCount - _verifyTask.CompletedCount;
+                Progress = CalculateMultiStageProgress(0, 2, progressRemain, progressTotal);
 
-                Progress = GetProgress();
-                if (_pendingVerifyList.Count == 0 && _activeVerifyList.Count == 0)
+                var taskStatus = _verifyTask.Status;
+                if (taskStatus == EVerifyTaskStatus.Processing)
+                    return;
+
+                if (taskStatus == EVerifyTaskStatus.Failed)
                 {
                     _steps = ESteps.Done;
-                    SetResult();
-                    double costTime = TimeUtility.RealtimeSinceStartup - _verifyStartTime;
-                    YooLogger.Log($"Cache file verification completed in {costTime:f1} seconds.");
+                    SetError(_verifyTask.Error);
+                    return;
                 }
-
-                for (int i = _pendingVerifyList.Count - 1; i >= 0; i--)
+                else if (taskStatus == EVerifyTaskStatus.Succeeded)
                 {
-                    if (IsBusy)
-                        break;
-
-                    if (_activeVerifyList.Count >= _maxConcurrentVerifyCount)
-                        break;
-
-                    var element = _pendingVerifyList[i];
-                    bool succeed = ThreadPool.QueueUserWorkItem(new WaitCallback(VerifyFileInThread), element);
-                    if (succeed == false)
-                        VerifyFileInThread(element);
-
-                    _pendingVerifyList.RemoveAt(i);
-                    _activeVerifyList.Add(element);
+                    _steps = ESteps.ProcessResults;
                 }
             }
-        }
-        private float GetProgress()
-        {
-            if (_verifyTotalCount == 0)
-                return 1f;
-            return (float)(_successCount + _failedCount) / _verifyTotalCount;
-        }
 
-        // 验证缓存文件（子线程内操作）
-        private void VerifyFileInThread(object obj)
-        {
-            SearchFileInfo element = (SearchFileInfo)obj;
-            int verifyResultCode = (int)VerifyFile(element, _verifyLevel);
-            element.VerifyResultCode = verifyResultCode; //注意: 一次命令赋值
-        }
-        private EFileVerifyResult VerifyFile(SearchFileInfo element, EFileVerifyLevel verifyLevel)
-        {
-            try
+            if (_steps == ESteps.ProcessResults)
             {
-                if (File.Exists(element.InfoFilePath) == false)
-                    return EFileVerifyResult.InfoFileNotExisted;
-                if (File.Exists(element.DataFilePath) == false)
-                    return EFileVerifyResult.DataFileNotExisted;
+                // 校验任务成功后，在主线程分帧处理结果。
+                while (_processIndex < _verifyFiles.Length && IsBusy == false)
+                {
+                    var verifyElement = _verifyFiles[_processIndex];
+                    int resultCode = verifyElement.VerifyResultCode;
+                    if (resultCode == (int)EFileVerifyResult.Succeed)
+                    {
+                        var cacheEntry = new SandboxBundleCacheEntry(verifyElement.BundleGuid, verifyElement.InfoFilePath, verifyElement.DataFilePath);
+                        _fileCache.AddEntry(verifyElement.BundleGuid, cacheEntry);
+                    }
+                    else
+                    {
+                        YooLogger.LogWarning($"File verification failed (code: {resultCode}). Deleting files: '{verifyElement.FolderPath}'.");
+                        verifyElement.DeleteCacheFolder();
+                    }
+                    _processIndex++;
+                }
 
-                byte[] binaryData = FileUtility.ReadAllBytes(element.InfoFilePath);
-                if (binaryData.Length < SandboxBundleCacheConsts.InfoFileExpectedSize)
-                    return EFileVerifyResult.InfoFileInvalid;
+                int progressTotal = _verifyFiles.Length;
+                int progressRemain = _verifyFiles.Length - _processIndex;
+                Progress = CalculateMultiStageProgress(1, 2, progressRemain, progressTotal);
+                if (_processIndex < progressTotal)
+                    return;
 
-                var reader = new BufferReader(binaryData);
-                uint fileMagic = reader.ReadUInt32();
-                if (fileMagic != SandboxBundleCacheConsts.InfoFileMagic)
-                    return EFileVerifyResult.InfoFileMagicError;
-
-                int fileVersion = reader.ReadInt32();
-                if (fileVersion != SandboxBundleCacheConsts.InfoFileVersion)
-                    return EFileVerifyResult.InfoFileVersionError;
-
-                uint dataFileCRC = reader.ReadUInt32();
-                long dataFileSize = reader.ReadInt64();
-                long createdAtTicks = reader.ReadInt64();
-                long lastAccessAtTicks = reader.ReadInt64();
-
-                if (verifyLevel == EFileVerifyLevel.Low)
-                    return EFileVerifyResult.Succeed;
-                else if (verifyLevel == EFileVerifyLevel.Middle)
-                    return FileVerifyHelper.VerifyFile(element.DataFilePath, dataFileSize, 0);
-                else if (verifyLevel == EFileVerifyLevel.High)
-                    return FileVerifyHelper.VerifyFile(element.DataFilePath, dataFileSize, dataFileCRC);
-                else
-                    throw new YooInternalException($"Unexpected verify level: {verifyLevel}.");
+                _steps = ESteps.Done;
+                SetResult();
+                double costTime = TimeUtility.RealtimeSinceStartup - _verifyStartTime;
+                YooLogger.Log($"Cache file verification completed in {costTime:f1} seconds.");
             }
-            catch (Exception ex)
-            {
-                YooLogger.LogError($"File verification exception: {ex.Message}.");
-                return EFileVerifyResult.Exception;
-            }
+        }
+        protected override void InternalDispose()
+        {
+            if (_verifyTask != null)
+                _verifyTask.Dispose();
         }
     }
 }

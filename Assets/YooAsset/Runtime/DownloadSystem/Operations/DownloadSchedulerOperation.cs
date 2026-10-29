@@ -143,6 +143,7 @@ namespace YooAsset
                         if (operation.Status == EOperationStatus.None)
                         {
                             operation.StartOperation();
+                            ActiveDownloadCount++;
                             startCount--;
                             if (startCount <= 0)
                                 break;
