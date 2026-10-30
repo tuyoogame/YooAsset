@@ -1,5 +1,5 @@
-using UnityEngine;
-using UniFramework.Event;
+﻿using UnityEngine;
+using Framework.Event;
 
 /// <summary>
 /// Battle score changed event.
@@ -15,7 +15,7 @@ public sealed class BattleScoreChangedEvent : IEventMessage
 
     public static void SendEventMessage(int currentScores)
     {
-        UniEvent.SendMessage(new BattleScoreChangedEvent(currentScores));
+        EventManager.Instance.SendMessage(new BattleScoreChangedEvent(currentScores));
     }
 }
 
@@ -26,7 +26,7 @@ public sealed class BattleGameOverEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new BattleGameOverEvent());
+        EventManager.Instance.SendMessage(new BattleGameOverEvent());
     }
 }
 
@@ -46,7 +46,7 @@ public sealed class BattleEnemyDeadEvent : IEventMessage
 
     public static void SendEventMessage(Vector3 position, Quaternion rotation)
     {
-        UniEvent.SendMessage(new BattleEnemyDeadEvent(position, rotation));
+        EventManager.Instance.SendMessage(new BattleEnemyDeadEvent(position, rotation));
     }
 }
 
@@ -66,7 +66,7 @@ public sealed class BattlePlayerDeadEvent : IEventMessage
 
     public static void SendEventMessage(Vector3 position, Quaternion rotation)
     {
-        UniEvent.SendMessage(new BattlePlayerDeadEvent(position, rotation));
+        EventManager.Instance.SendMessage(new BattlePlayerDeadEvent(position, rotation));
     }
 }
 
@@ -86,7 +86,7 @@ public sealed class BattleAsteroidExplosionEvent : IEventMessage
 
     public static void SendEventMessage(Vector3 position, Quaternion rotation)
     {
-        UniEvent.SendMessage(new BattleAsteroidExplosionEvent(position, rotation));
+        EventManager.Instance.SendMessage(new BattleAsteroidExplosionEvent(position, rotation));
     }
 }
 
@@ -106,7 +106,7 @@ public sealed class BattleEnemyFireBulletEvent : IEventMessage
 
     public static void SendEventMessage(Vector3 position, Quaternion rotation)
     {
-        UniEvent.SendMessage(new BattleEnemyFireBulletEvent(position, rotation));
+        EventManager.Instance.SendMessage(new BattleEnemyFireBulletEvent(position, rotation));
     }
 }
 
@@ -126,6 +126,6 @@ public sealed class BattlePlayerFireBulletEvent : IEventMessage
 
     public static void SendEventMessage(Vector3 position, Quaternion rotation)
     {
-        UniEvent.SendMessage(new BattlePlayerFireBulletEvent(position, rotation));
+        EventManager.Instance.SendMessage(new BattlePlayerFireBulletEvent(position, rotation));
     }
 }

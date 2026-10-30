@@ -1,34 +1,24 @@
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UniFramework.Machine;
+using Framework.Machine;
 using YooAsset;
 
-internal class FsmInitializePackage : IStateNode
+internal class FsmInitializePackage : IState<PatchContext>
 {
-    private StateMachine _machine;
-
-    void IStateNode.OnCreate(StateMachine machine)
-    {
-        _machine = machine;
-    }
-    void IStateNode.OnEnter()
+    void IState<PatchContext>.OnEnter(PatchContext context)
     {
         PatchStepChangedEvent.SendEventMessage("Initializing package.");
-        GameManager.Instance.StartCoroutine(InitPackage());
+        GameManager.Instance.StartCoroutine(InitPackage(context));
     }
-    void IStateNode.OnUpdate()
-    {
-    }
-    void IStateNode.OnExit()
+    void IState<PatchContext>.OnExit(PatchContext context)
     {
     }
 
-    private IEnumerator InitPackage()
+    private IEnumerator InitPackage(PatchContext context)
     {
-        var playMode = (EPlayMode)_machine.GetBlackboardValue("PlayMode");
-        var packageName = (string)_machine.GetBlackboardValue("PackageName");
+        var playMode = context.PlayMode;
+        var packageName = context.PackageName;
 
         // Create package.
         if (!YooAssets.TryGetPackage(packageName, out var package))
@@ -101,7 +91,7 @@ internal class FsmInitializePackage : IStateNode
         }
         else
         {
-            _machine.ChangeState<FsmRequestPackageVersion>();
+            context.Machine.RequestChange(PatchState.RequestPackageVersion);
         }
     }
 

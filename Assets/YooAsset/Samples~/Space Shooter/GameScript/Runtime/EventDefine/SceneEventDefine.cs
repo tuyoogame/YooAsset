@@ -1,4 +1,4 @@
-using UniFramework.Event;
+﻿using Framework.Event;
 
 /// <summary>
 /// Change to home scene event.
@@ -7,7 +7,7 @@ public sealed class SceneChangeToHomeEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new SceneChangeToHomeEvent());
+        EventManager.Instance.SendMessage(new SceneChangeToHomeEvent());
     }
 }
 
@@ -18,6 +18,6 @@ public sealed class SceneChangeToBattleEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new SceneChangeToBattleEvent());
+        EventManager.Instance.SendMessage(new SceneChangeToBattleEvent());
     }
 }

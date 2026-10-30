@@ -1,32 +1,23 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UniFramework.Machine;
+using Framework.Machine;
 using YooAsset;
 
-internal class FsmUpdatePackageManifest : IStateNode
+internal class FsmUpdatePackageManifest : IState<PatchContext>
 {
-    private StateMachine _machine;
-
-    void IStateNode.OnCreate(StateMachine machine)
-    {
-        _machine = machine;
-    }
-    void IStateNode.OnEnter()
+    void IState<PatchContext>.OnEnter(PatchContext context)
     {
         PatchStepChangedEvent.SendEventMessage("Updating package manifest.");
-        GameManager.Instance.StartCoroutine(UpdateManifest());
+        GameManager.Instance.StartCoroutine(UpdateManifest(context));
     }
-    void IStateNode.OnUpdate()
-    {
-    }
-    void IStateNode.OnExit()
+    void IState<PatchContext>.OnExit(PatchContext context)
     {
     }
 
-    private IEnumerator UpdateManifest()
+    private IEnumerator UpdateManifest(PatchContext context)
     {
-        var packageName = (string)_machine.GetBlackboardValue("PackageName");
-        var packageVersion = (string)_machine.GetBlackboardValue("PackageVersion");
+        var packageName = context.PackageName;
+        var packageVersion = context.PackageVersion;
         var package = YooAssets.GetPackage(packageName);
         var options = new LoadPackageManifestOptions(packageVersion, 60);
         var operation = package.LoadPackageManifestAsync(options);
@@ -40,7 +31,7 @@ internal class FsmUpdatePackageManifest : IStateNode
         }
         else
         {
-            _machine.ChangeState<FsmCreateDownloader>();
+            context.Machine.RequestChange(PatchState.CreateDownloader);
         }
     }
 }

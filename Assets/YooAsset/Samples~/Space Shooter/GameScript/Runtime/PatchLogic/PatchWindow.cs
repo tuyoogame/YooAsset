@@ -1,8 +1,7 @@
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UniFramework.Event;
+using Framework.Event;
 
 public class PatchWindow : MonoBehaviour
 {
@@ -51,7 +50,7 @@ public class PatchWindow : MonoBehaviour
         }
     }
 
-    private readonly EventGroup _eventGroup = new EventGroup();
+    private EventSubscriptionScope _eventScope;
     private readonly List<MessageBox> _msgBoxList = new List<MessageBox>();
 
     // UGUI references.
@@ -67,17 +66,18 @@ public class PatchWindow : MonoBehaviour
         _messageBoxObj = transform.Find("UIWindow/MessgeBox").gameObject;
         _messageBoxObj.SetActive(false);
 
-        _eventGroup.AddListener<PatchInitializeFailedEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<PatchStepChangedEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<PatchFoundUpdateFilesEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<PatchDownloadUpdatedEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<PatchPackageVersionRequestFailedEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<PatchPackageManifestUpdateFailedEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<PatchWebFileDownloadFailedEvent>(OnHandleEventMessage);
+        _eventScope = EventManager.Instance.CreateScope();
+        _eventScope.AddListener<PatchInitializeFailedEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<PatchStepChangedEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<PatchFoundUpdateFilesEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<PatchDownloadUpdatedEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<PatchPackageVersionRequestFailedEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<PatchPackageManifestUpdateFailedEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<PatchWebFileDownloadFailedEvent>(OnHandleEventMessage);
     }
     void OnDestroy()
     {
-        _eventGroup.RemoveAllListener();
+        _eventScope?.Dispose();
     }
 
     /// <summary>
@@ -93,31 +93,28 @@ public class PatchWindow : MonoBehaviour
             };
             ShowMessageBox("Failed to initialize package.", callback);
         }
-        else if (message is PatchStepChangedEvent)
+        else if (message is PatchStepChangedEvent patchStepChanged)
         {
-            var msg = message as PatchStepChangedEvent;
-            _tips.text = msg.Tips;
-            UnityEngine.Debug.Log(msg.Tips);
+            _tips.text = patchStepChanged.Tips;
+            UnityEngine.Debug.Log(patchStepChanged.Tips);
         }
-        else if (message is PatchFoundUpdateFilesEvent)
+        else if (message is PatchFoundUpdateFilesEvent patchFoundUpdateFiles)
         {
-            var msg = message as PatchFoundUpdateFilesEvent;
             System.Action callback = () =>
             {
                 UserBeginDownloadWebFilesEvent.SendEventMessage();
             };
-            float sizeMB = msg.TotalSizeBytes / 1048576f;
+            float sizeMB = patchFoundUpdateFiles.TotalSizeBytes / 1048576f;
             sizeMB = Mathf.Clamp(sizeMB, 0.1f, float.MaxValue);
             string totalSizeMB = sizeMB.ToString("f1");
-            ShowMessageBox($"Update files were found. Total count: {msg.TotalCount}. Total size: {totalSizeMB} MB.", callback);
+            ShowMessageBox($"Update files were found. Total count: {patchFoundUpdateFiles.TotalCount}. Total size: {totalSizeMB} MB.", callback);
         }
-        else if (message is PatchDownloadUpdatedEvent)
+        else if (message is PatchDownloadUpdatedEvent patchDownloadUpdated)
         {
-            var msg = message as PatchDownloadUpdatedEvent;
-            _slider.value = (float)msg.CurrentDownloadCount / msg.TotalDownloadCount;
-            string currentSizeMB = (msg.CurrentDownloadSizeBytes / 1048576f).ToString("f1");
-            string totalSizeMB = (msg.TotalDownloadSizeBytes / 1048576f).ToString("f1");
-            _tips.text = $"{msg.CurrentDownloadCount}/{msg.TotalDownloadCount} {currentSizeMB}MB/{totalSizeMB}MB";
+            _slider.value = (float)patchDownloadUpdated.CurrentDownloadCount / patchDownloadUpdated.TotalDownloadCount;
+            string currentSizeMB = (patchDownloadUpdated.CurrentDownloadSizeBytes / 1048576f).ToString("f1");
+            string totalSizeMB = (patchDownloadUpdated.TotalDownloadSizeBytes / 1048576f).ToString("f1");
+            _tips.text = $"{patchDownloadUpdated.CurrentDownloadCount}/{patchDownloadUpdated.TotalDownloadCount} {currentSizeMB}MB/{totalSizeMB}MB";
         }
         else if (message is PatchPackageVersionRequestFailedEvent)
         {
@@ -135,18 +132,13 @@ public class PatchWindow : MonoBehaviour
             };
             ShowMessageBox("Failed to update package manifest. Check the network status.", callback);
         }
-        else if (message is PatchWebFileDownloadFailedEvent)
+        else if (message is PatchWebFileDownloadFailedEvent patchWebFileDownloadFailed)
         {
-            var msg = message as PatchWebFileDownloadFailedEvent;
             System.Action callback = () =>
             {
                 UserTryDownloadWebFilesEvent.SendEventMessage();
             };
-            ShowMessageBox($"Failed to download file: '{msg.FileName}'.", callback);
-        }
-        else
-        {
-            throw new InvalidOperationException($"Unsupported patch window event message type: {message.GetType().FullName}.");
+            ShowMessageBox($"Failed to download file: '{patchWebFileDownloadFailed.FileName}'.", callback);
         }
     }
 

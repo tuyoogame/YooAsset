@@ -1,30 +1,21 @@
 using System.Collections;
-using UniFramework.Machine;
+using Framework.Machine;
 using YooAsset;
 
-internal class FsmDownloadPackageFiles : IStateNode
+internal class FsmDownloadPackageFiles : IState<PatchContext>
 {
-    private StateMachine _machine;
-
-    void IStateNode.OnCreate(StateMachine machine)
-    {
-        _machine = machine;
-    }
-    void IStateNode.OnEnter()
+    void IState<PatchContext>.OnEnter(PatchContext context)
     {
         PatchStepChangedEvent.SendEventMessage("Downloading resource files.");
-        GameManager.Instance.StartCoroutine(StartDownload());
+        GameManager.Instance.StartCoroutine(StartDownload(context));
     }
-    void IStateNode.OnUpdate()
-    {
-    }
-    void IStateNode.OnExit()
+    void IState<PatchContext>.OnExit(PatchContext context)
     {
     }
 
-    private IEnumerator StartDownload()
+    private IEnumerator StartDownload(PatchContext context)
     {
-        var downloader = (ResourceDownloaderOperation)_machine.GetBlackboardValue("Downloader");
+        var downloader = context.Downloader;
         downloader.DownloadError += PatchWebFileDownloadFailedEvent.SendEventMessage;
         downloader.DownloadProgressChanged += PatchDownloadUpdatedEvent.SendEventMessage;
         downloader.StartDownload();
@@ -34,6 +25,6 @@ internal class FsmDownloadPackageFiles : IStateNode
         if (downloader.Status != EOperationStatus.Succeeded)
             yield break;
 
-        _machine.ChangeState<FsmDownloadPackageOver>();
+        context.Machine.RequestChange(PatchState.DownloadPackageOver);
     }
 }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UniFramework.Event;
-using UniFramework.Utility;
+using Framework.Event;
 using YooAsset;
 using Random = UnityEngine.Random;
 
@@ -27,7 +26,7 @@ public class BattleRoom
         GameOver,
     }
 
-    private readonly EventGroup _eventGroup = new EventGroup();
+    private EventSubscriptionScope _eventScope;
     private GameObject _roomRoot;
 
     // Level parameters.
@@ -44,9 +43,9 @@ public class BattleRoom
     private int _totalScore = 0;
     private int _waveSpawnCount = 0;
 
-    private readonly UniTimer _startWaitTimer = UniTimer.CreateOnceTimer(1f);
-    private readonly UniTimer _spawnWaitTimer = UniTimer.CreateOnceTimer(0.75f);
-    private readonly UniTimer _waveWaitTimer = UniTimer.CreateOnceTimer(4f);
+    private readonly Timer _startWaitTimer = Timer.Once(1);
+    private readonly Timer _spawnWaitTimer = Timer.Once(0.75);
+    private readonly Timer _waveWaitTimer = Timer.Once(4);
     private readonly List<AssetHandle> _handles = new List<AssetHandle>(1000);
 
 
@@ -59,11 +58,13 @@ public class BattleRoom
         _roomRoot = new GameObject("BattleRoom");
 
         // Listen for game events.
-        _eventGroup.AddListener<BattlePlayerDeadEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<BattleEnemyDeadEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<BattleAsteroidExplosionEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<BattlePlayerFireBulletEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<BattleEnemyFireBulletEvent>(OnHandleEventMessage);
+        _eventScope?.Dispose();
+        _eventScope = EventManager.Instance.CreateScope();
+        _eventScope.AddListener<BattlePlayerDeadEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<BattleEnemyDeadEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<BattleAsteroidExplosionEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<BattlePlayerFireBulletEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<BattleEnemyFireBulletEvent>(OnHandleEventMessage);
 
         _steps = ESteps.Ready;
     }
@@ -73,8 +74,8 @@ public class BattleRoom
     /// </summary>
     public void DestroyRoom()
     {
-        if (_eventGroup != null)
-            _eventGroup.RemoveAllListener();
+        _eventScope?.Dispose();
+        _eventScope = null;
 
         if (_roomRoot != null)
             GameObject.Destroy(_roomRoot);
@@ -160,72 +161,62 @@ public class BattleRoom
     /// <param name="message"></param>
     private void OnHandleEventMessage(IEventMessage message)
     {
-        if (message is BattlePlayerDeadEvent)
+        if (message is BattlePlayerDeadEvent battlePlayerDead)
         {
-            var msg = message as BattlePlayerDeadEvent;
-
             // Create explosion effect.
             var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("explosion_player");
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, msg.Position, msg.Rotation));
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, battlePlayerDead.Position, battlePlayerDead.Rotation));
             };
             _handles.Add(assetHandle);
 
             _steps = ESteps.GameOver;
             BattleGameOverEvent.SendEventMessage();
         }
-        else if (message is BattleEnemyDeadEvent)
+        else if (message is BattleEnemyDeadEvent battleEnemyDead)
         {
-            var msg = message as BattleEnemyDeadEvent;
-
             // Create explosion effect.
             var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("explosion_enemy");
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, msg.Position, msg.Rotation));
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, battleEnemyDead.Position, battleEnemyDead.Rotation));
             };
             _handles.Add(assetHandle);
 
             _totalScore += EnemyScore;
             BattleScoreChangedEvent.SendEventMessage(_totalScore);
         }
-        else if (message is BattleAsteroidExplosionEvent)
+        else if (message is BattleAsteroidExplosionEvent battleAsteroidExplosion)
         {
-            var msg = message as BattleAsteroidExplosionEvent;
-
             // Create explosion effect.
             var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("explosion_asteroid");
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, msg.Position, msg.Rotation));
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, battleAsteroidExplosion.Position, battleAsteroidExplosion.Rotation));
             };
             _handles.Add(assetHandle);
 
             _totalScore += AsteroidScore;
             BattleScoreChangedEvent.SendEventMessage(_totalScore);
         }
-        else if (message is BattlePlayerFireBulletEvent)
+        else if (message is BattlePlayerFireBulletEvent battlePlayerFireBullet)
         {
-            var msg = message as BattlePlayerFireBulletEvent;
-
             // Create bullet entity.
             var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("player_bullet");
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, msg.Position, msg.Rotation));
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, battlePlayerFireBullet.Position, battlePlayerFireBullet.Rotation));
             };
             _handles.Add(assetHandle);
         }
-        else if (message is BattleEnemyFireBulletEvent)
+        else if (message is BattleEnemyFireBulletEvent battleEnemyFireBullet)
         {
-            var msg = message as BattleEnemyFireBulletEvent;
-
             // Create bullet entity.
             var assetHandle = GameManager.Instance.GamePackage.LoadAssetAsync<GameObject>("enemy_bullet");
             assetHandle.Completed += (AssetHandle handle) =>
             {
-                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, msg.Position, msg.Rotation));
+                handle.InstantiateSync(new InstantiateOptions(true, _roomRoot.transform, battleEnemyFireBullet.Position, battleEnemyFireBullet.Rotation));
             };
             _handles.Add(assetHandle);
         }

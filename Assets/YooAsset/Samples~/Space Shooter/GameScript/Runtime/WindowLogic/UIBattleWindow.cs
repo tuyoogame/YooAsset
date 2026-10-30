@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using UniFramework.Event;
+using Framework.Event;
 
 public class UIBattleWindow : MonoBehaviour
 {
-    private readonly EventGroup _eventGroup = new EventGroup();
+    private EventSubscriptionScope _eventScope;
     private GameObject _overView;
     private Text _scoreLabel;
 
@@ -20,12 +20,13 @@ public class UIBattleWindow : MonoBehaviour
         var homeBtn = this.transform.Find("OverView/HomeButton").GetComponent<Button>();
         homeBtn.onClick.AddListener(OnClickHomeBtn);
 
-        _eventGroup.AddListener<BattleScoreChangedEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<BattleGameOverEvent>(OnHandleEventMessage);
+        _eventScope = EventManager.Instance.CreateScope();
+        _eventScope.AddListener<BattleScoreChangedEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<BattleGameOverEvent>(OnHandleEventMessage);
     }
     private void OnDestroy()
     {
-        _eventGroup.RemoveAllListener();
+        _eventScope?.Dispose();
     }
 
     private void OnClickReplayBtn()
@@ -38,12 +39,11 @@ public class UIBattleWindow : MonoBehaviour
     }
     private void OnHandleEventMessage(IEventMessage message)
     {
-        if(message is BattleScoreChangedEvent)
+        if (message is BattleScoreChangedEvent scoreChanged)
         {
-            var msg = message as BattleScoreChangedEvent;
-            _scoreLabel.text = $"Score: {msg.CurrentScores}";
+            _scoreLabel.text = $"Score: {scoreChanged.CurrentScores}";
         }
-        else if(message is BattleGameOverEvent)
+        else if (message is BattleGameOverEvent)
         {
             _overView.SetActive(true);
         }

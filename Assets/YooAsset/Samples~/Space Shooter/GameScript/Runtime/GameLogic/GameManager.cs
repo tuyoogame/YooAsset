@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using UniFramework.Event;
+using Framework.Event;
 using YooAsset;
 
-public class GameManager
+public sealed class GameManager
 {
     private static GameManager s_instance;
     public static GameManager Instance
@@ -17,7 +17,7 @@ public class GameManager
         }
     }
 
-    private readonly EventGroup _eventGroup = new EventGroup();
+    private EventSubscriptionScope _eventScope;
     private ResourcePackage _gamePackage;
     private MonoBehaviour _behaviour;
 
@@ -52,9 +52,25 @@ public class GameManager
 
     private GameManager()
     {
+    }
+
+    public void Create()
+    {
+        if (_eventScope != null)
+            throw new InvalidOperationException("Game manager has already been created.");
+
         // Register event listeners.
-        _eventGroup.AddListener<SceneChangeToHomeEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<SceneChangeToBattleEvent>(OnHandleEventMessage);
+        _eventScope = EventManager.Instance.CreateScope();
+        _eventScope.AddListener<SceneChangeToHomeEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<SceneChangeToBattleEvent>(OnHandleEventMessage);
+    }
+
+    public void Destroy()
+    {
+        _eventScope?.Dispose();
+        _eventScope = null;
+        _gamePackage = null;
+        _behaviour = null;
     }
 
     /// <summary>

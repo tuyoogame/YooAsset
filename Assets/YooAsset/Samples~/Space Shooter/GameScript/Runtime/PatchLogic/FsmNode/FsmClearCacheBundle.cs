@@ -1,32 +1,26 @@
-using UniFramework.Machine;
+using Framework.Machine;
 using YooAsset;
 
-internal class FsmClearCacheBundle : IStateNode
+internal class FsmClearCacheBundle : IState<PatchContext>
 {
-    private StateMachine _machine;
+    private PatchContext _context;
 
-    void IStateNode.OnCreate(StateMachine machine)
+    void IState<PatchContext>.OnEnter(PatchContext context)
     {
-        _machine = machine;
-    }
-    void IStateNode.OnEnter()
-    {
+        _context = context;
         PatchStepChangedEvent.SendEventMessage("Clearing unused cache files.");
-        var packageName = (string)_machine.GetBlackboardValue("PackageName");
+        var packageName = context.PackageName;
         var package = YooAssets.GetPackage(packageName);
         var options = new ClearCacheOptions(ClearCacheMethods.ClearUnusedBundleFiles);
         var operation = package.ClearCacheAsync(options);
         operation.Completed += Operation_Completed;
     }
-    void IStateNode.OnUpdate()
-    {
-    }
-    void IStateNode.OnExit()
+    void IState<PatchContext>.OnExit(PatchContext context)
     {
     }
 
     private void Operation_Completed(YooAsset.AsyncOperationBase obj)
     {
-        _machine.ChangeState<FsmStartGame>();
+        _context.Machine.RequestChange(PatchState.StartGame);
     }
 }

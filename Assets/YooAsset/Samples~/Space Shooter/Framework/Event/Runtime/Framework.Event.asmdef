@@ -1,0 +1,16 @@
+{
+    "name": "Framework.Event",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a04b92ed98b2cea49befb4b199ef6d98"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,10 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UniFramework.Utility;
 
 public class UILoadingWindow : MonoBehaviour
 {
-    private readonly UniTimer _timer = UniTimer.CreatePepeatTimer(0, 0.2f);
+    private readonly Timer _timer = Timer.Repeat(0.2);
     private Text _info;
     private int _countdown;
 

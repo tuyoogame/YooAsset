@@ -1,4 +1,4 @@
-using UniFramework.Event;
+﻿using Framework.Event;
 
 /// <summary>
 /// User retry package initialization event.
@@ -7,7 +7,7 @@ public sealed class UserTryInitializePackageEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new UserTryInitializePackageEvent());
+        EventManager.Instance.SendMessage(new UserTryInitializePackageEvent());
     }
 }
 
@@ -18,7 +18,7 @@ public sealed class UserBeginDownloadWebFilesEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new UserBeginDownloadWebFilesEvent());
+        EventManager.Instance.SendMessage(new UserBeginDownloadWebFilesEvent());
     }
 }
 
@@ -29,7 +29,7 @@ public sealed class UserTryRequestPackageVersionEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new UserTryRequestPackageVersionEvent());
+        EventManager.Instance.SendMessage(new UserTryRequestPackageVersionEvent());
     }
 }
 
@@ -40,7 +40,7 @@ public sealed class UserTryUpdatePackageManifestEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new UserTryUpdatePackageManifestEvent());
+        EventManager.Instance.SendMessage(new UserTryUpdatePackageManifestEvent());
     }
 }
 
@@ -51,6 +51,6 @@ public sealed class UserTryDownloadWebFilesEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new UserTryDownloadWebFilesEvent());
+        EventManager.Instance.SendMessage(new UserTryDownloadWebFilesEvent());
     }
 }

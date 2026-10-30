@@ -1,25 +1,19 @@
-using UniFramework.Machine;
+using Framework.Machine;
 using YooAsset;
 
-internal class FsmStartGame : IStateNode
+internal class FsmStartGame : IState<PatchContext>
 {
-    void IStateNode.OnCreate(StateMachine machine)
-    {
-    }
-    void IStateNode.OnEnter()
+    void IState<PatchContext>.OnEnter(PatchContext context)
     {
         PatchStepChangedEvent.SendEventMessage("Starting game.");
 
         // Set default package.
-        GameManager.Instance.SetGamePackage(YooAssets.GetPackage("DefaultPackage"));
+        GameManager.Instance.SetGamePackage(YooAssets.GetPackage(context.PackageName));
 
         // Change to home scene.
         SceneChangeToHomeEvent.SendEventMessage();
     }
-    void IStateNode.OnUpdate()
-    {
-    }
-    void IStateNode.OnExit()
+    void IState<PatchContext>.OnExit(PatchContext context)
     {
     }
 }

@@ -1,41 +1,32 @@
 ﻿using UnityEngine;
-using UniFramework.Machine;
+using Framework.Machine;
 using YooAsset;
 
-internal class FsmCreateDownloader : IStateNode
+internal class FsmCreateDownloader : IState<PatchContext>
 {
-    private StateMachine _machine;
-
-    void IStateNode.OnCreate(StateMachine machine)
-    {
-        _machine = machine;
-    }
-    void IStateNode.OnEnter()
+    void IState<PatchContext>.OnEnter(PatchContext context)
     {
         PatchStepChangedEvent.SendEventMessage("Creating resource downloader.");
-        CreateDownloader();
+        CreateDownloader(context);
     }
-    void IStateNode.OnUpdate()
-    {
-    }
-    void IStateNode.OnExit()
+    void IState<PatchContext>.OnExit(PatchContext context)
     {
     }
 
-    void CreateDownloader()
+    void CreateDownloader(PatchContext context)
     {
-        var packageName = (string)_machine.GetBlackboardValue("PackageName");
+        var packageName = context.PackageName;
         var package = YooAssets.GetPackage(packageName);
         int downloadingMaxNum = 10;
         int failedTryAgain = 3;
         var options = new ResourceDownloaderOptions(downloadingMaxNum, failedTryAgain);
         var downloader = package.CreateResourceDownloader(options);
-        _machine.SetBlackboardValue("Downloader", downloader);
+        context.Downloader = downloader;
 
         if (downloader.TotalDownloadCount == 0)
         {
             Debug.Log("No download files were found.");
-            _machine.ChangeState<FsmStartGame>();
+            context.Machine.RequestChange(PatchState.StartGame);
         }
         else
         {

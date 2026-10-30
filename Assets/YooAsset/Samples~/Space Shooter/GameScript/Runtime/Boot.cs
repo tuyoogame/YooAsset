@@ -1,5 +1,4 @@
-using UnityEngine;
-using UniFramework.Event;
+﻿using UnityEngine;
 using YooAsset;
 
 public class Boot : MonoBehaviour
@@ -18,11 +17,12 @@ public class Boot : MonoBehaviour
     }
     void Start()
     {
-        // Game manager.
-        GameManager.Instance.SetBehaviour(this);
+        // Create event manager before registering listeners.
+        EventManager.Instance.Create();
 
-        // Initialize event system.
-        UniEvent.Initalize();
+        // Game manager.
+        GameManager.Instance.Create();
+        GameManager.Instance.SetBehaviour(this);
 
         // Initialize asset system.
         YooAssets.Initialize();
@@ -32,11 +32,18 @@ public class Boot : MonoBehaviour
         GameObject.Instantiate(go);
 
         // Start patch workflow.
-        PatchManager.Create("DefaultPackage", PlayMode);
-        PatchManager.Start();
+        PatchManager.Instance.Create("DefaultPackage", PlayMode);
+        PatchManager.Instance.Start();
     }
     private void Update()
     {
-        PatchManager.Update();
+        PatchManager.Instance.Update();
+    }
+    private void OnDestroy()
+    {
+        StopAllCoroutines();
+        PatchManager.Instance.Destroy();
+        GameManager.Instance.Destroy();
+        EventManager.Instance.Destroy();
     }
 }

@@ -1,31 +1,22 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UniFramework.Machine;
+using Framework.Machine;
 using YooAsset;
 
-internal class FsmRequestPackageVersion : IStateNode
+internal class FsmRequestPackageVersion : IState<PatchContext>
 {
-    private StateMachine _machine;
-
-    void IStateNode.OnCreate(StateMachine machine)
-    {
-        _machine = machine;
-    }
-    void IStateNode.OnEnter()
+    void IState<PatchContext>.OnEnter(PatchContext context)
     {
         PatchStepChangedEvent.SendEventMessage("Requesting package version.");
-        GameManager.Instance.StartCoroutine(UpdatePackageVersion());
+        GameManager.Instance.StartCoroutine(UpdatePackageVersion(context));
     }
-    void IStateNode.OnUpdate()
-    {
-    }
-    void IStateNode.OnExit()
+    void IState<PatchContext>.OnExit(PatchContext context)
     {
     }
 
-    private IEnumerator UpdatePackageVersion()
+    private IEnumerator UpdatePackageVersion(PatchContext context)
     {
-        var packageName = (string)_machine.GetBlackboardValue("PackageName");
+        var packageName = context.PackageName;
         var package = YooAssets.GetPackage(packageName);
         var operation = package.RequestPackageVersionAsync();
         yield return operation;
@@ -38,8 +29,8 @@ internal class FsmRequestPackageVersion : IStateNode
         else
         {
             Debug.Log($"Package version requested: '{operation.PackageVersion}'.");
-            _machine.SetBlackboardValue("PackageVersion", operation.PackageVersion);
-            _machine.ChangeState<FsmUpdatePackageManifest>();
+            context.PackageVersion = operation.PackageVersion;
+            context.Machine.RequestChange(PatchState.UpdatePackageManifest);
         }
     }
 }

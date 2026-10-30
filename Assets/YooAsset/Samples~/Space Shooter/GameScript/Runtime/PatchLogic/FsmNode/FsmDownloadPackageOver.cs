@@ -1,22 +1,13 @@
-﻿using UniFramework.Machine;
+﻿using Framework.Machine;
 
-internal class FsmDownloadPackageOver : IStateNode
+internal class FsmDownloadPackageOver : IState<PatchContext>
 {
-    private StateMachine _machine;
-
-    void IStateNode.OnCreate(StateMachine machine)
-    {
-        _machine = machine;
-    }
-    void IStateNode.OnEnter()
+    void IState<PatchContext>.OnEnter(PatchContext context)
     {
         PatchStepChangedEvent.SendEventMessage("Resource files download completed.");
-        _machine.ChangeState<FsmClearCacheBundle>();
+        context.Machine.RequestChange(PatchState.ClearCacheBundle);
     }
-    void IStateNode.OnUpdate()
-    {
-    }
-    void IStateNode.OnExit()
+    void IState<PatchContext>.OnExit(PatchContext context)
     {
     }
 }

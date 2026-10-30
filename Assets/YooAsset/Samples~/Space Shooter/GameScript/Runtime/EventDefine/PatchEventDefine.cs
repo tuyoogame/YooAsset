@@ -1,4 +1,4 @@
-using UniFramework.Event;
+﻿using Framework.Event;
 using YooAsset;
 
 /// <summary>
@@ -8,7 +8,7 @@ public sealed class PatchInitializeFailedEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new PatchInitializeFailedEvent());
+        EventManager.Instance.SendMessage(new PatchInitializeFailedEvent());
     }
 }
 
@@ -26,7 +26,7 @@ public sealed class PatchStepChangedEvent : IEventMessage
 
     public static void SendEventMessage(string tips)
     {
-        UniEvent.SendMessage(new PatchStepChangedEvent(tips));
+        EventManager.Instance.SendMessage(new PatchStepChangedEvent(tips));
     }
 }
 
@@ -46,7 +46,7 @@ public sealed class PatchFoundUpdateFilesEvent : IEventMessage
 
     public static void SendEventMessage(int totalCount, long totalSizeBytes)
     {
-        UniEvent.SendMessage(new PatchFoundUpdateFilesEvent(totalCount, totalSizeBytes));
+        EventManager.Instance.SendMessage(new PatchFoundUpdateFilesEvent(totalCount, totalSizeBytes));
     }
 }
 
@@ -70,7 +70,7 @@ public sealed class PatchDownloadUpdatedEvent : IEventMessage
 
     public static void SendEventMessage(DownloadProgressChangedEventArgs updateData)
     {
-        UniEvent.SendMessage(new PatchDownloadUpdatedEvent(updateData));
+        EventManager.Instance.SendMessage(new PatchDownloadUpdatedEvent(updateData));
     }
 }
 
@@ -81,7 +81,7 @@ public sealed class PatchPackageVersionRequestFailedEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new PatchPackageVersionRequestFailedEvent());
+        EventManager.Instance.SendMessage(new PatchPackageVersionRequestFailedEvent());
     }
 }
 
@@ -92,7 +92,7 @@ public sealed class PatchPackageManifestUpdateFailedEvent : IEventMessage
 {
     public static void SendEventMessage()
     {
-        UniEvent.SendMessage(new PatchPackageManifestUpdateFailedEvent());
+        EventManager.Instance.SendMessage(new PatchPackageManifestUpdateFailedEvent());
     }
 }
 
@@ -112,6 +112,6 @@ public sealed class PatchWebFileDownloadFailedEvent : IEventMessage
 
     public static void SendEventMessage(DownloadErrorEventArgs errorData)
     {
-        UniEvent.SendMessage(new PatchWebFileDownloadFailedEvent(errorData));
+        EventManager.Instance.SendMessage(new PatchWebFileDownloadFailedEvent(errorData));
     }
 }

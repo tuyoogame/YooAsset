@@ -1,14 +1,29 @@
 using System;
-using UniFramework.Machine;
-using UniFramework.Event;
+using Framework.Machine;
+using Framework.Event;
 using YooAsset;
 
-public static class PatchManager
+public sealed class PatchManager
 {
-    private static readonly EventGroup _eventGroup = new EventGroup();
-    private static StateMachine _machine;
+    private static PatchManager s_instance;
+    public static PatchManager Instance
+    {
+        get
+        {
+            if (s_instance == null)
+                s_instance = new PatchManager();
+            return s_instance;
+        }
+    }
 
-    public static void Create(string packageName, EPlayMode playMode)
+    private EventSubscriptionScope _eventScope;
+    private FlowMachine<PatchState, PatchContext> _machine;
+
+    private PatchManager()
+    {
+    }
+
+    public void Create(string packageName, EPlayMode playMode)
     {
         if (string.IsNullOrWhiteSpace(packageName))
             throw new ArgumentException("Package name cannot be null or empty.", nameof(packageName));
@@ -16,34 +31,38 @@ public static class PatchManager
             throw new ArgumentException($"Invalid play mode: {playMode}.", nameof(playMode));
 
         // Register event listeners.
-        _eventGroup.AddListener<UserTryInitializePackageEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<UserBeginDownloadWebFilesEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<UserTryRequestPackageVersionEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<UserTryUpdatePackageManifestEvent>(OnHandleEventMessage);
-        _eventGroup.AddListener<UserTryDownloadWebFilesEvent>(OnHandleEventMessage);
+        _eventScope?.Dispose();
+        _eventScope = EventManager.Instance.CreateScope();
+        _eventScope.AddListener<UserTryInitializePackageEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<UserBeginDownloadWebFilesEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<UserTryRequestPackageVersionEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<UserTryUpdatePackageManifestEvent>(OnHandleEventMessage);
+        _eventScope.AddListener<UserTryDownloadWebFilesEvent>(OnHandleEventMessage);
 
         // Create state machine.
-        _machine = new StateMachine(null);
-        _machine.AddNode<FsmInitializePackage>();
-        _machine.AddNode<FsmRequestPackageVersion>();
-        _machine.AddNode<FsmUpdatePackageManifest>();
-        _machine.AddNode<FsmCreateDownloader>();
-        _machine.AddNode<FsmDownloadPackageFiles>();
-        _machine.AddNode<FsmDownloadPackageOver>();
-        _machine.AddNode<FsmClearCacheBundle>();
-        _machine.AddNode<FsmStartGame>();
-
-        _machine.SetBlackboardValue("PackageName", packageName);
-        _machine.SetBlackboardValue("PlayMode", playMode);
+        _machine?.Stop();
+        var context = new PatchContext(packageName, playMode);
+        _machine = new FlowMachineBuilder<PatchState, PatchContext>()
+            .AddState<FsmInitializePackage>(PatchState.InitializePackage)
+            .AddState<FsmRequestPackageVersion>(PatchState.RequestPackageVersion)
+            .AddState<FsmUpdatePackageManifest>(PatchState.UpdatePackageManifest)
+            .AddState<FsmCreateDownloader>(PatchState.CreateDownloader)
+            .AddState<FsmDownloadPackageFiles>(PatchState.DownloadPackageFiles)
+            .AddState<FsmDownloadPackageOver>(PatchState.DownloadPackageOver)
+            .AddState<FsmClearCacheBundle>(PatchState.ClearCacheBundle)
+            .AddState<FsmStartGame>(PatchState.StartGame)
+            .SetStartState(PatchState.InitializePackage)
+            .Build(context);
+        context.Machine = _machine;
     }
-    public static void Start()
+    public void Start()
     {
         if (_machine == null)
             throw new InvalidOperationException("Patch manager has not been created. Call Create before Start.");
 
-        _machine.Run<FsmInitializePackage>();
+        _machine.Start();
     }
-    public static void Update()
+    public void Update()
     {
         if (_machine == null)
             throw new InvalidOperationException("Patch manager has not been created. Call Create before Update.");
@@ -51,38 +70,42 @@ public static class PatchManager
         _machine.Update();
     }
 
+    public void Destroy()
+    {
+        _eventScope?.Dispose();
+        _eventScope = null;
+        _machine?.Stop();
+        _machine = null;
+    }
+
     /// <summary>
     /// Handles event messages.
     /// </summary>
-    private static void OnHandleEventMessage(IEventMessage message)
+    private void OnHandleEventMessage(IEventMessage message)
     {
         if (message is UserTryInitializePackageEvent)
         {
-            _machine.ChangeState<FsmInitializePackage>();
+            _machine.RequestChange(PatchState.InitializePackage);
         }
         else if (message is UserBeginDownloadWebFilesEvent)
         {
-            _machine.ChangeState<FsmDownloadPackageFiles>();
+            _machine.RequestChange(PatchState.DownloadPackageFiles);
         }
         else if (message is UserTryRequestPackageVersionEvent)
         {
-            _machine.ChangeState<FsmRequestPackageVersion>();
+            _machine.RequestChange(PatchState.RequestPackageVersion);
         }
         else if (message is UserTryUpdatePackageManifestEvent)
         {
-            _machine.ChangeState<FsmUpdatePackageManifest>();
+            _machine.RequestChange(PatchState.UpdatePackageManifest);
         }
         else if (message is UserTryDownloadWebFilesEvent)
         {
-            _machine.ChangeState<FsmCreateDownloader>();
-        }
-        else
-        {
-            throw new InvalidOperationException($"Unsupported patch event message type: {message.GetType().FullName}.");
+            _machine.RequestChange(PatchState.CreateDownloader);
         }
     }
 
-    private static bool IsValidPlayMode(EPlayMode playMode)
+    private bool IsValidPlayMode(EPlayMode playMode)
     {
         switch (playMode)
         {
